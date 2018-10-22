@@ -1,0 +1,14 @@
+<fieldset>
+<legend>{{ 'networkreport.details' | translate }} {{report.processorName}}</legend>
+     <fieldset>
+        <fieldset>
+            <p><b>{{ 'table.time' | translate }}: </b> {{report.startTime}}</p>
+        </fieldset>
+        <fieldset>
+            <legend>{{ 'networkreport.results' | translate }}:</legend>
+            <div *ngFor="let key of objectKeys(report.content)">
+                <p>{{report.content[key]}}</p>
+            </div>
+        </fieldset>
+    </fieldset>
+</fieldset>

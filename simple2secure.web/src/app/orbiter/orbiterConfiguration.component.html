@@ -1,0 +1,15 @@
+<div class="container-jumbotron">
+    <div class="jumbotron-bottom jumbotron text-center col-md-5 osconfigjumb" id="osconfigjumb1">
+        <h1>{{ 'menu.tools' | translate }}</h1>
+        <i class="fas fa-wrench fa-4x container-jumbotron-icon"></i>
+        <p>{{ 'orbiter.toolsconfig' | translate }}</p>
+        <button mat-raised-button id="osconfigbtn1" class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button" (click)="editConfiguration('tools')"> {{ 'button.more' | translate }} </button>
+    </div>
+
+    <div class="jumbotron-bottom jumbotron text-center col-md-5 osconfigjumb" id="osconfigjumb2">
+        <h1>{{ 'menu.tests' | translate }}</h1>
+        <i class="fas fa-clipboard-list fa-4x container-jumbotron-icon"></i>
+        <p>{{ 'orbiter.edittests' | translate }}</p>
+        <button mat-raised-button id="osconfigbtn2" class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button" (click)="editConfiguration('tools/test')"> {{ 'button.more' | translate }} </button>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+<fieldset>
+<legend>{{ 'query.details' | translate }} {{report.query}}</legend>
+    <fieldset>
+        <fieldset>
+            <p><b>{{ 'table.query' | translate }}: </b> {{report.query}}</p>
+            <p><b>{{ 'table.query' | translate }} ID: </b> {{report.queryID}}</p>
+            <p><b>{{ 'table.time' | translate }}: </b> {{report.queryTimestamp}}</p>
+            <ngx-json-viewer [json]="getQueryResult()"></ngx-json-viewer>
+        </fieldset>
+    </fieldset>
+</fieldset>

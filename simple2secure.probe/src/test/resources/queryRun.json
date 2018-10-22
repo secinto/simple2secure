@@ -1,0 +1,5 @@
+[
+    { "id":"001", "querystring":"\"SELECT * FROM system_info\"" },
+    { "id":"002", "querystring":"\"SELECT * FROM os_version\"" },
+    { "id":"003", "querystring":"\"SELECT * FROM platform_info\"" }
+]

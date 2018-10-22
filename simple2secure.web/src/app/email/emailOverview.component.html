@@ -1,0 +1,58 @@
+<button mat-raised-button color="primary" id="addButton" type="button" [routerLink]="['add']"
+	class="pull-right mat-green-button">
+	<i class="glyphicon glyphicon-plus"></i> {{ 'menu.addAccount' | translate }}
+</button>
+
+<div class="example-container mat-elevation-z8 table table-striped">
+  <div class="header-filter-table">
+    <mat-form-field class="header-filter-field">
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'login.email' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.version' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+    </ng-container>    
+    
+    <!-- Name Column -->
+    <ng-container matColumnDef="incomingPort">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'email.incomingport' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.incomingPort}} </mat-cell>
+    </ng-container>
+    
+    <ng-container matColumnDef="action">
+      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action </mat-header-cell>     
+      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
+      	<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu" (click)="onMenuTriggerClick(element)">
+          <i class="fas fa-bars"></i>
+        </button> 
+      </mat-cell>
+    </ng-container> 
+    
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>  
+  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="onViewClick()"><mat-icon>email</mat-icon> {{ 'table.inbox' | translate }}</button>
+  <button mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'table.edit' | translate }}</button>
+  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'table.delete' | translate }}</button>
+  <!-- <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> Delete</button> -->
+</mat-menu>

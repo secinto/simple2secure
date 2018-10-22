@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "JSON ReportGenerationMessage",
+  "description": "make database request and send report",
+  "type": "object",
+  "properties": {
+          "request": {
+            "description": "The string for a request",
+            "type": "string"
+        },
+        "reportoptions": {
+            "description": "How to send back report",
+            "type": "string"
+        }
+  },
+  "required": ["request", "reportoptions"]
+}

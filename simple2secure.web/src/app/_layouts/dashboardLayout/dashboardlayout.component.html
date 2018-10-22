@@ -1,0 +1,19 @@
+<navbar></navbar>
+<div class="container page-wrap">
+
+    <div *ngIf="pageTitle">
+        <div class="container">
+            <div class="row jumbotron-row">
+                <div class="jumbotron jumbotron-top">
+                    <h2>{{pageTitle}}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <alert></alert>
+
+    <router-outlet></router-outlet>
+   
+</div>
+ <app-footer></app-footer>
+

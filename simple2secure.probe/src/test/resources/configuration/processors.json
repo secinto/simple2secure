@@ -1,0 +1,22 @@
+[
+	{
+	  "name": "som",
+	  "processor_class": "com.simple2secure.probe.processor.impl.SelfOrganizingMapsProcessor"
+	},
+	{
+	  "name": "hmm",
+	  "processor_class": "com.simple2secure.probe.processor.impl.HiddenMarkovModelProcessor"
+	},
+	{
+	  "name": "common-stats",
+	  "processor_class": "com.simple2secure.probe.processor.impl.CommonStatisticProcessor"
+	},
+	{
+	  "name": "common-pattern",
+	  "processor_class": "com.simple2secure.probe.processor.impl.CommonPatternProcessor"
+	},
+	{
+	  "name": "tensor-flow",
+	  "processor_class": "com.simple2secure.probe.processor.impl.TensorFlowProcessor"
+	}
+]

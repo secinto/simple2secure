@@ -1,0 +1,408 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '~angular-tree-component/dist/angular-tree-component.css';
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
+/* You can add global styles to this file, and also import other style files */
+
+* {
+ font-family: Open Sans;
+}
+
+#pre-bootstrap {
+	background-color: #262626 ;
+	bottom: 0px ;
+	left: 0px ;
+	position: fixed ;
+	right: 0px ;
+	top: 0px ;
+	z-index: 999999 ;
+}
+#pre-bootstrap div.messaging {
+	color: #FFFFFF ;
+	font-family: monospace ;
+	left: 0px ;
+	margin-top: -37px ;
+	position: absolute ;
+	right: 0px ;
+	text-align: center ;
+	top: 50% ;
+}
+#pre-bootstrap h1 {
+	font-size: 26px ;
+	line-height: 35px ;
+	margin: 0px 0px 20px 0px ;
+}
+#pre-bootstrap p {
+	font-size: 18px ;
+	line-height: 14px ;
+	margin: 0px 0px 0px 0px ;
+}
+
+.tabset-content{
+	margin-top: 26px;
+}
+
+#cfgForm{
+	margin-bottom: 20px;
+}
+
+#addAPI{
+    padding: 0px 5px 0px 5px ;
+    margin-bottom: 20px;
+}
+
+.clickable{
+    cursor: pointer;
+}
+
+.osconfigjumb{
+    height: 400px;
+    background-color: lightcyan;
+    justify-content: space-between;
+    flex-direction: column;
+    display: flex;
+}
+
+#osconfigjumb1{
+	float: left;
+}
+
+#osconfigjumb2{
+	float: right;
+}
+
+.osconfigbtn{
+    display: block;
+}
+
+#editDeviceButton{
+	width: 100px;
+}
+
+body{
+    background:#222;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+.items, .items2{
+    margin: 0 auto;
+    max-width: 1140px;
+    padding-top:50px;
+}
+.items a, .items2 a{
+    display:inline-block;
+    text-decoration:none;
+    color:white;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight:400;
+    margin:0 20px;
+    height: 20px;
+    overflow: hidden;
+}
+.items a span{
+    display: inline-block;
+    position:relative;
+    transition: transform 500ms;
+    -webkit-transition: -webkit-transform 500ms;
+    -moz-transition: transform 500ms;
+
+}
+.items a span:after{
+    content: attr(data-hover);
+    position: absolute;
+    top: -30px;
+    left:0;
+    transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    -webkit-transform: translate3d(0,0,0);
+}
+.items a:hover span,
+.items a:focus span {
+    transform: translateY(30px);
+    -webkit-transform: translateY(30px);
+    -moz-transform: translateY(30px);
+}
+
+/* x3 */
+.items2 a span{
+    display: inline-block;
+    position:relative;
+    transition: transform 600ms;
+    -webkit-transition: -webkit-transform 600ms;
+}
+.items2 a span:before{
+    content: attr(data-hover);
+    position: absolute;
+    top: -60px;
+    left:0;
+    transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    -webkit-transform: translate3d(0,0,0);
+}
+.items2 a span:after{
+    content: attr(data-hover);
+    position: absolute;
+    top: -30px;
+    left:0;
+    transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    -webkit-transform: translate3d(0,0,0);
+}
+.items2 a:hover span,
+.items2 a:focus span {
+    transform: translateY(60px);
+    -webkit-transform: translateY(60px);
+    -moz-transform: translateY(60px);
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-container > * {
+  width: 100%;
+}
+
+.loginInput {
+	text-align: right;
+}
+
+.help-block{
+	text-align: center;
+	width: 50%;
+	margin: 0 auto;
+	border:2px solid red;
+}
+
+#holder img {
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+	margin-bottom: 60px;
+}
+
+:host {
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.controlButtons{
+    text-align: center;
+}
+
+.mat-tab-header {
+    margin-bottom: 20px !important;
+}
+
+.full_width_input {
+  width: 100%;
+}
+
+.header-filter-table{
+  min-height: 64px;
+  padding: 8px 24px 0;
+}
+
+.header-filter-field{
+  width: 100%;	
+}
+
+#addButton{
+	margin-bottom: 25px;
+}
+
+.mat-column-right{
+	display: flex;
+    justify-content: flex-end;
+}
+
+/* in-flight clone */
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+  pointer-events: none;
+}
+/* high-performance display:none; helper */
+.gu-hide {
+  left: -9999px !important;
+}
+/* added to mirrorContainer (default = body) while dragging */
+.gu-unselectable {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+/* added to the source element while its mirror is dragged */
+.gu-transit {
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+
+.mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar, .mat-form-field-ripple, .mat-button-toggle-checked{
+	background-color: #A7BD26 !important;
+}
+
+.mat-green-button{
+	background-color: #A7BD26 !important;
+	color: white !important;
+	font-weight: bold !important;
+}
+
+.mat-green-button:disabled{
+	background-color: #dddddd !important;
+	        cursor: not-allowed;
+        pointer-events: none;
+}
+
+.mat-grey-button{
+	background-color: grey !important;
+	color: white !important;
+	font-weight: bold !important;
+}
+
+.mat-green-button-with-hover{
+	background-color: #A7BD26 !important;
+	color: white !important;
+	font-weight: bold !important;
+}
+
+.mat-green-button-with-hover:hover{
+	background-color: #8fa02c !important;
+}
+
+.mat-red-button{
+	background-color: #AA3939 !important;
+	color: white !important;
+	font-weight: bold !important;	
+}
+
+.mat-icon-green{
+	color: #A7BD26 !important;
+}
+
+.mat-focused .mat-form-field-label{
+	color: #A7BD26 !important;
+}
+
+.mat-button-toggle{
+	color: black;
+}
+
+.mat-sort-header-button{
+	font-weight: bold !important;
+	font-size: 14px !important;
+}
+
+.mat-tab-label{
+	font-weight: bold !important;
+}
+
+.jumbotron-top{
+	background-color: #A7BD26 !important;
+	text-transform: uppercase;
+	font-weight: bold !important;
+	text-align: center;
+	/*text-decoration: underline;*/
+	-webkit-text-stroke-width: 2px;
+	-webkit-text-stroke-color: #fff;
+	 box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+
+.jumbotron-top-error{
+    background-color: #AA3939 !important;
+    text-transform: uppercase;
+    font-weight: bold !important;
+    text-align: center;
+    /*text-decoration: underline;*/
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: #fff;
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    margin-top: 60px;
+}
+
+.jumbotron-row-error{
+    margin-right: 10px !important;
+    margin-left:  10px !important;
+}
+
+.jumbotron-row{
+    margin-right: 15px !important;
+    margin-left: -15px !important;
+}
+
+.clickable-table-row{
+	cursor: pointer !important;
+}
+
+.container-jumbotron h1{
+	color: #A7BD26 !important;
+	-webkit-text-stroke-width: 2px;
+	-webkit-text-stroke-color: #fff;
+}
+
+.container-jumbotron p{
+	color: grey !important;
+}
+
+.jumbotron-bottom{
+	box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+
+.container-jumbotron-icon{
+	color: #A7BD26 !important;
+}
+
+.mat-form-field-underline{
+	background-color: #A7BD26 !important;
+}
+
+.mat-progress-spinner circle, .mat-spinner circle {
+	stroke: #A7BD26 !important;
+}
+
+.jumbotron-bottom .mat-green-button:hover{
+	color: #A7BD26 !important;
+	background-color: white !important;
+	font-weight: bold !important;
+}
+
+.mat-header-row, .mat-row{
+	    border-bottom-color: rgb(167, 189, 38, .3) !important;
+}
+
+.mat-cell{
+	text-align: center;
+}
+
+.mat-sort-header-container {
+  display:flex;
+  justify-content:center;
+}
+
+.page-wrap{
+	padding-bottom: 25px !important;
+}
+
+.rotate-icon{
+    color: #A7BD26 !important;
+    display:block;
+    -webkit-transform: rotate(70deg);
+    -moz-transform: rotate(-70deg);
+}
+
+legend{
+    font-size: 15px !important;
+}
