@@ -1,0 +1,52 @@
+buildscript {
+	repositories {
+		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url 'https://jitpack.io' }
+		mavenCentral()
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '3.4.1'
+}
+
+repositories {
+	flatDir {
+		dirs 'libs'
+	}
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+
+	compile 'com.google.guava:guava:21.0'
+
+	compile 'org.slf4j:slf4j-api:1.7.25'
+	compile 'ch.qos.logback:logback-classic:1.2.3'
+	
+	// Use JUnit test framework
+	testCompile 'junit:junit:4.12'
+	
+	// The production code uses Guava
+	compile group: 'org.json', name: 'json', version: '20170516'
+	
+	compile group: 'ch.qos.cal10n', name: 'cal10n-api', version: '0.8.1'
+	
+	
+	// https://mvnrepository.com/artifact/commons-io/commons-io
+	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+	
+	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.4'
+}

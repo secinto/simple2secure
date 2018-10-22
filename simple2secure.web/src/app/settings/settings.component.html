@@ -1,0 +1,66 @@
+<div class="container">
+    <mat-tab-group>
+         <mat-tab label="{{ 'menu.tokens' | translate }}">
+             <form #settingsForm="ngForm">
+                 <div>
+                    <fieldset>
+                         <legend>{{ 'accessToken.validity' | translate }}</legend>
+                         <table cellspacing="0"><tr>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.accessTokenValidityTime" name="accessTokenValidityTime">
+                                 </mat-form-field>
+                             </td>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <mat-select [(ngModel)]="settingsObj.accessTokenValidityUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenValidityUnit">
+                                         <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
+                                         </mat-option>
+                                     </mat-select>
+                                 </mat-form-field>
+                             </td>
+                         </tr></table>
+                    </fieldset>
+                     <fieldset>
+                         <legend>{{ 'accessToken.probe.validity' | translate }}</legend>
+                         <table cellspacing="0"><tr>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.accessTokenProbeValidityTime" name="accessTokenProbeValidityTime">
+                                 </mat-form-field>
+                             </td>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <mat-select [(ngModel)]="settingsObj.accessTokenProbeValidityUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenProbeValidityUnit">
+                                         <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
+                                         </mat-option>
+                                     </mat-select>
+                                 </mat-form-field>
+                             </td>
+                         </tr></table>
+                         <legend>{{ 'accessToken.probe.minimum.validity' | translate }}</legend>
+                         <table cellspacing="0"><tr>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.accessTokenProbeRestValidityTime" name="accessTokenProbeRestValidityTime">
+                                 </mat-form-field>
+                             </td>
+                             <td>
+                                 <mat-form-field class="full_width_input">
+                                     <mat-select [(ngModel)]="settingsObj.accessTokenProbeRestValidityTimeUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenProbeRestValidityTimeUnit">
+                                         <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
+                                         </mat-option>
+                                     </mat-select>
+                                 </mat-form-field>
+                             </td>
+                         </tr></table>
+                     </fieldset>
+                 </div>
+
+                 <button class="mat-green-button" type="button" (click)="updateSettings()" [disabled]="!settingsForm.dirty" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
+             </form>
+        </mat-tab>
+        <mat-tab label="{{ 'menu.group' | translate }}">
+        </mat-tab>
+    </mat-tab-group>
+</div>

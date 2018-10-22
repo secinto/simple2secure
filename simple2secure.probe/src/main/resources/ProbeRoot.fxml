@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?scenebuilder-stylesheet ../../../../../resources/gui/css/simple2secure.css?>
+
+<BorderPane fx:id="rootPane" prefHeight="400" prefWidth="500" stylesheets="@../../../../../gui/css/simple2secure.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.simple2secure.probe.gui.controller.ProbeController">
+   <left>
+      <VBox fx:id="vbButtons" maxWidth="Infinity" BorderPane.alignment="CENTER" />
+   </left>
+   <center>
+      <BorderPane fx:id="bpView" prefHeight="400.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+
+      </BorderPane>
+   </center>
+</BorderPane>

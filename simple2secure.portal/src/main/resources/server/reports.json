@@ -1,0 +1,7 @@
+[
+	{
+	"name": "common-stats",
+	"class": "com.simple2relax.probe.report.impl.CommonStatisticsReport",
+	"interval": "2"
+	}
+]

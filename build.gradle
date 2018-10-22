@@ -1,0 +1,19 @@
+project(':simple2secure.api') {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+}
+
+project(':simple2secure.commons') {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+}
+
+project(':simple2secure.probe') {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+}
+
+project(':simple2secure.portal') {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+}
