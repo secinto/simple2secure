@@ -1,0 +1,6 @@
+{
+	"accessTokenValidityTime": 2,
+	"accessTokenValidityUnit": "DAYS",
+	"accessTokenProbeValidityTime": 1,
+	"accessTokenProbeValidityUnit": "DAYS"
+}

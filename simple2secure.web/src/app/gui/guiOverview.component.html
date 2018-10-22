@@ -1,0 +1,30 @@
+<h3>GUI</h3>
+<table class="table table-striped" [mfData]="gui" #mf="mfDataTable" [mfRowsOnPage]="10">
+  <thead>
+  <tr>
+    <th style="width: 45%">
+      <mfDefaultSorter by="username">Username</mfDefaultSorter>
+    </th>
+    <th style="width: 45%">
+      <mfDefaultSorter by="version">Version</mfDefaultSorter>
+    </th>
+    <th style="width: 10%">
+      <mfDefaultSorter by="action">Action</mfDefaultSorter>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let item of mf.data">
+      <td>{{item.user.username}}</td>
+      <td>{{item.version}}</td>
+      <td><i class="fa fa-pencil-square-o" aria-hidden="true" (click)="editGUI(item)"></i></td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+    <td colspan="4">
+      <mfBootstrapPaginator></mfBootstrapPaginator>
+    </td>
+  </tr>
+  </tfoot>
+</table>

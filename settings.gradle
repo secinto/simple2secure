@@ -1,0 +1,3 @@
+include ":simple2secure.api", "simple2secure.commons", ":simple2secure.portal", ":simple2secure.probe"
+
+rootProject.name="simple2secure"
