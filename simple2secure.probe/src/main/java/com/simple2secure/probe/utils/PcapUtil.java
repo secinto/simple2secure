@@ -151,4 +151,14 @@ public class PcapUtil {
 		PacketInfo packetInfo = new PacketInfo(destIp, srcIp, destMac, srcMac, length, protocol);
 		return packetInfo;
 	}
+
+	/**
+	 * Does exclude the traffic to the local portal
+	 * @return
+	 */
+	public static String getBPFFilterLocal() {
+		StringBuilder bpfFilter = new StringBuilder();
+		bpfFilter.append("not host 127.0.0.1 and not port (8443 or 8080 or 9000)");
+		return bpfFilter.toString();
+	}
 }

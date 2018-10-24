@@ -35,6 +35,7 @@ public class NetworkMonitor {
 
 	private ProcessingQueue<PacketContainer> processingQueue;
 	private PcapHandle receiverHandle;
+	private PcapHandle senderHandle;
 
 	public static NetworkMonitor startMonitor() {
 		if (instance == null) {

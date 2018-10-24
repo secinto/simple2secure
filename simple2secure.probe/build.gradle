@@ -6,9 +6,7 @@ buildscript {
 	}
 }
 
-plugins {
-  id "org.sonarqube" version "2.6.2"
-}
+plugins { id "org.sonarqube" version "2.6.2" }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -17,23 +15,17 @@ apply plugin: 'application'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 repositories {
-	flatDir {
-		dirs 'libs'
-	}
+	flatDir { dirs 'libs' }
 	mavenCentral()
 	jcenter()
-}	
+}
 
 
 sonarqube {
-  properties {
-    property "sonar.projectBaseDir", "$projectDir/.."
-  }
+	properties { property "sonar.projectBaseDir", "$projectDir/.." }
 }
 
-task wrapper(type: Wrapper) {
-	gradleVersion = '3.4.1'
-}
+task wrapper(type: Wrapper) { gradleVersion = '3.4.1' }
 
 dependencies {
 
@@ -45,12 +37,12 @@ dependencies {
 
 	compile 'org.slf4j:slf4j-api:1.7.25'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
-	
+
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
 	compile group: 'commons-i18n', name: 'commons-i18n', version: '0.5'
 
 	compile 'org.apache.commons:commons-configuration2:2.1.1'
-	
+
 	compile group: 'org.pcap4j', name: 'pcap4j', version: '1.7.3'
 	compile group: 'org.pcap4j', name: 'pcap4j-packetfactory-static', version: '1.7.3'
 
@@ -61,15 +53,25 @@ dependencies {
 	compile 'org.hibernate:hibernate-core:5.0.7.Final'
 	compile 'org.hibernate:hibernate-entitymanager:5.0.7.Final'
 	compile group: 'com.h2database', name: 'h2', version: '1.4.195'
-	
+
 	compile 'org.apache.httpcomponents:httpcore:4.4.1'
 	compile 'org.apache.httpcomponents:httpclient:4.5'
-	
+
 	compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
 	compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
-	
-	
-	testCompile 'junit:junit:4.12'		
+
+
+	testCompileOnly(
+			'junit:junit:4.12',
+			'org.springframework.boot:spring-boot-starter-test'
+			)
+	testImplementation(
+			'org.junit.jupiter:junit-jupiter-api:5.1.0'
+			)
+	testRuntimeOnly(
+			'org.junit.jupiter:junit-jupiter-engine:5.1.0',
+			'org.junit.vintage:junit-vintage-engine:5.1.0'
+			)
 }
 
 jar {
@@ -78,13 +80,13 @@ jar {
 
 	manifest {
 		attributes 'Main-Class': 'com.simple2secure.probe.gui.ProbeGUI',
-				   'Implementation-Title': 'Network',
-				   'Implementation-Version': version,
-				   'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')
-			}
+		'Implementation-Title': 'Network',
+		'Implementation-Version': version,
+		'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')
+	}
 
 	from {
 		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-	}                
+	}
 }
 

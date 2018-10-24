@@ -1,16 +1,12 @@
 buildscript {
-	ext {
-		springBootVersion = '1.5.7.RELEASE'
-	}
+	ext { springBootVersion = '1.5.7.RELEASE' }
 	repositories {
 		maven { url "https://plugins.gradle.org/m2/" }
 		maven { url 'https://jitpack.io' }
 		maven { url 'https://repo.spring.io/libs-snapshot' }
 		mavenCentral()
 	}
-	dependencies {
-		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-	}
+	dependencies { classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}" }
 }
 
 apply plugin: 'java'
@@ -19,14 +15,12 @@ apply plugin: 'eclipse'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'war'	
+apply plugin: 'war'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 repositories {
-	flatDir {
-		dirs 'libs'
-	}
+	flatDir { dirs 'libs' }
 	mavenCentral()
 	jcenter()
 }
@@ -36,9 +30,7 @@ jar {
 	version =  '0.1.0-SNAPSHOT'
 }
 
-task wrapper(type: Wrapper) {
-	gradleVersion = '3.4.1'
-}
+task wrapper(type: Wrapper) { gradleVersion = '3.4.1' }
 
 compileJava {
 	options.warnings = false
@@ -47,44 +39,42 @@ compileJava {
 	options.compilerArgs += ["-Xdoclint:none", "-Xlint:none", "-nowarn"]
 }
 
-war {
-    baseName = 's2s'
-}
+war { baseName = 's2s' }
 
 dependencies {
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	compile 'com.google.guava:guava:21.0'
 	compile 'org.slf4j:slf4j-api:1.7.25'
-	compile 'ch.qos.logback:logback-classic:1.2.3'	
+	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
 	compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
-	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'	
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
 	compile 'org.springframework.boot:spring-boot-starter-web:1.5.7.RELEASE'
 	compile 'org.springframework.boot:spring-boot-starter-data-mongodb:1.5.7.RELEASE'
 	compile 'org.springframework.boot:spring-boot-starter-security:1.5.7.RELEASE'
 	compile 'org.springframework.boot:spring-boot-devtools:1.5.7.RELEASE'
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.5.7.RELEASE'	
-	// https://mvnrepository.com/artifact/com.verhas/license3j
-	//compile group: 'com.verhas', name: 'license3j', version: '1.0.4'
-	// https://mvnrepository.com/artifact/ro.fortsoft.licensius/licensius
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '1.5.7.RELEASE'
 	compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
-	// https://mvnrepository.com/artifact/ch.qos.cal10n/cal10n-api
 	compile group: 'ch.qos.cal10n', name: 'cal10n-api', version: '0.8.1'
-	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
-	// https://mvnrepository.com/artifact/io.fabric8/kubernetes-client
-	//compile group: 'io.fabric8', name: 'kubernetes-client', version: '3.1.10'
-	// https://mvnrepository.com/artifact/io.kubernetes/client-java
 	compile group: 'io.kubernetes', name: 'client-java', version: '2.0.0'
-	// https://mvnrepository.com/artifact/ch.maxant/rules
-	compile group: 'ch.maxant', name: 'rules', version: '2.2.1'	
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+	compile group: 'ch.maxant', name: 'rules', version: '2.2.1'
 	compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
-	// https://mvnrepository.com/artifact/de.flapdoodle.embed/de.flapdoodle.embed.mongo
-	//testCompile group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '2.0.3'
-	testCompile 'org.springframework.boot:spring-boot-starter-test'	
-	// Use JUnit test framework
-	testCompile 'junit:junit:4.12'	
+
+	testCompileOnly(
+			'junit:junit:4.12',
+			'org.springframework.boot:spring-boot-starter-test'
+			)
+	testImplementation(
+			'org.junit.jupiter:junit-jupiter-api:5.1.0'
+			)
+	testRuntimeOnly(
+			'org.junit.jupiter:junit-jupiter-engine:5.1.0',
+			'org.junit.vintage:junit-vintage-engine:5.1.0'
+			)
+
 	compile project(':simple2secure.api')
-	compile project(':simple2secure.commons')	
+	compile project(':simple2secure.commons')
 }
+
+//test { useJUnitPlatform() }

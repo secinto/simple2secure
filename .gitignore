@@ -16,3 +16,4 @@ simple2secure.api/.project
 simple2secure.probe/.project
 simple2secure.commons/.classpath
 simple2secure.portal/.classpath
+simple2secure.web/node_modules/

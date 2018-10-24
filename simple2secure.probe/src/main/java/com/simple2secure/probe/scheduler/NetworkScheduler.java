@@ -27,6 +27,7 @@ public class NetworkScheduler extends TimerTask {
 	public void run() {
 		isServerReachable();
 		getNetworkStatistics();
+		checkNetworkFilter();
 	}
 
 	/**
@@ -58,5 +59,10 @@ public class NetworkScheduler extends TimerTask {
 		} catch (Exception e) {
 			log.error("Couldn't obtain network statistics from PCAP. Reason {}", e.getCause());
 		}
+	}
+
+	private void checkNetworkFilter() {
+		String currentBPFFilter = monitor.getReceiverHandle().getFilteringExpression();
+		ProbeConfiguration.getInstance().get
 	}
 }
