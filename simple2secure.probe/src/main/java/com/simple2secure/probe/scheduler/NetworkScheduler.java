@@ -63,6 +63,6 @@ public class NetworkScheduler extends TimerTask {
 
 	private void checkNetworkFilter() {
 		String currentBPFFilter = monitor.getReceiverHandle().getFilteringExpression();
-		ProbeConfiguration.getInstance().get
+		//ProbeConfiguration.getInstance().get
 	}
 }

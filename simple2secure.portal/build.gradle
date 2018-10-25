@@ -61,9 +61,10 @@ dependencies {
 	compile group: 'ch.maxant', name: 'rules', version: '2.2.1'
 	compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
 
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	
 	testCompileOnly(
 			'junit:junit:4.12',
-			'org.springframework.boot:spring-boot-starter-test'
 			)
 	testImplementation(
 			'org.junit.jupiter:junit-jupiter-api:5.1.0'

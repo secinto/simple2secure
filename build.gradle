@@ -17,3 +17,4 @@ project(':simple2secure.portal') {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
 }
+

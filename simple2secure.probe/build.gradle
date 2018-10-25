@@ -14,11 +14,17 @@ apply plugin: 'application'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+
+mainClassName = "com.simple2secure.probe.gui.ProbeGUI"
+
 repositories {
 	flatDir { dirs 'libs' }
 	mavenCentral()
 	jcenter()
 }
+
+
 
 
 sonarqube {
@@ -33,7 +39,7 @@ dependencies {
 	compile project(':simple2secure.commons')
 
 	compile 'com.google.guava:guava:21.0'
-	compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.2'
+	compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.15'
 
 	compile 'org.slf4j:slf4j-api:1.7.25'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
