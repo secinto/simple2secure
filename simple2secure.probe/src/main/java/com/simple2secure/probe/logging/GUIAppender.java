@@ -1,4 +1,4 @@
-package com.simple2secure.probe.gui;
+package com.simple2secure.probe.logging;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 import ch.qos.logback.core.OutputStreamAppender;
 
-public class ProbeGUIAppender<E> extends OutputStreamAppender<E> {
+public class GUIAppender<E> extends OutputStreamAppender<E> {
 
 	private static final DelegatingOutputStream DELEGATING_OUTPUT_STREAM = new DelegatingOutputStream(null);
 

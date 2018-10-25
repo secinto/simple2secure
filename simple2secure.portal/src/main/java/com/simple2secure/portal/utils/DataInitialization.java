@@ -2,6 +2,7 @@ package com.simple2secure.portal.utils;
 import java.util.Arrays;
 import java.util.List;
 
+import org.assertj.core.util.Strings;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Config;

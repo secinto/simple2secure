@@ -37,7 +37,7 @@
         </connectionSource>
     </appender>-->
     
-   	<appender name="GUI" class="com.simple2secure.probe.logging.GuiAppender">
+   	<appender name="GUI" class="com.simple2secure.probe.logging.GUIAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>

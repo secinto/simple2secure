@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.gui.ProbeGUIAppender;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.gui.model.WindowButtons;
+import com.simple2secure.probe.logging.GUIAppender;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -153,7 +153,7 @@ public class ProbeController {
 		// TextArea textArea = new TextArea();
 		OutputStream os = new ListViewOutputStream(list, items);
 
-		ProbeGUIAppender.setStaticOutputStream(os);
+		GUIAppender.setStaticOutputStream(os);
 
 		Hyperlink hyperlink = new Hyperlink("More info...");
 		TextFlow flow = new TextFlow(new Text(""), hyperlink);

@@ -45,7 +45,7 @@ public class NetworkScheduler extends TimerTask {
 
 	private void getNetworkStatistics() {
 		try {
-			PcapStat statistics = monitor.getReceiverHandle().getStats();
+			PcapStat statistics = this.monitor.getReceiverHandle().getStats();
 			NetworkReport report = new NetworkReport();
 			report.setStartTime(new Date().toString());
 			report.setProcessorName("PCAP Network Statistics");
@@ -62,7 +62,7 @@ public class NetworkScheduler extends TimerTask {
 	}
 
 	private void checkNetworkFilter() {
-		String currentBPFFilter = monitor.getReceiverHandle().getFilteringExpression();
-		//ProbeConfiguration.getInstance().get
+		String currentBPFFilter = this.monitor.getReceiverHandle().getFilteringExpression();
+		ProbeConfiguration.getInstance().getConfig();
 	}
 }

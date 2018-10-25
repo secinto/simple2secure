@@ -42,7 +42,6 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/**
 	 * Returns all objects for the given class
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> getAll() {
 		// EntityManager em = getEntityManager();

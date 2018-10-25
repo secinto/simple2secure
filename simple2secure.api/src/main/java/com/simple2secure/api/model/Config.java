@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -34,6 +35,8 @@ public class Config extends GenericDBObject {
 	private String processing_factory;
 	private String communication_factory;
 	private int wt_intervall;
+	@Lob
+	private String bpfFilter;
 
 
 	@ManyToOne(cascade = {CascadeType.ALL})
@@ -47,7 +50,7 @@ public class Config extends GenericDBObject {
 
 	@OneToMany(cascade = {CascadeType.ALL})
 	private List<API> apis;
-	
+
 	private boolean isGroupConfiguration;
 
 	public Config() {
@@ -91,9 +94,9 @@ public class Config extends GenericDBObject {
 		this.baseUrl = baseUrl;
 		this.apis = apis;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param userUUID
 	 * @param id
 	 * @param version
@@ -113,7 +116,7 @@ public class Config extends GenericDBObject {
 	 * @param apis
 	 * @param baseUrl
 	 */
-	
+
 	public Config(String probeId, String id, int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
 			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
 			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, List<API> apis, String baseUrl) {
@@ -136,7 +139,7 @@ public class Config extends GenericDBObject {
 		this.queries = queries;
 		this.baseUrl = baseUrl;
 		this.apis = apis;
-	}	
+	}
 
 	/**
 	 *
@@ -409,4 +412,14 @@ public class Config extends GenericDBObject {
 	public void setGroupConfiguration(boolean isGroupConfiguration) {
 		this.isGroupConfiguration = isGroupConfiguration;
 	}
+
+	public String getBpfFilter() {
+		return bpfFilter;
+	}
+
+	public void setBpfFilter(String bpfFilter) {
+		this.bpfFilter = bpfFilter;
+	}
+
+
 }
