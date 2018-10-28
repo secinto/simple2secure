@@ -1,0 +1,44 @@
+server:
+  port: 8080
+  contextPath: /
+  ssl:
+    key-store: classpath:keys/keystore.p12
+    key-store-password: Latinica.1
+    key-store-type: PKCS12
+    key-alias: tomcat
+---
+spring:
+  profiles: prod
+  data:
+    mongodb:
+      database: s2s
+      host: localhost
+      port: 27017
+---
+spring:
+  profiles: test
+  data:
+    mongodb:
+      database: s2s_test
+      host: localhost
+      port: 27017
+---
+smtpserver:
+  enabled: true
+  hostname: smtp.1und1.de
+  port: 21
+  
+---
+username: activation@secinto.com
+password: S2S.secinto.18.AT
+mail:
+  imap:
+    host: imap.1und1.de
+    auth: true
+    socketFactory:
+      port: 465
+      class: javax.net.ssl.SSLSocketFactory
+  smtp:
+    auth: true
+    host: smtp.1und1.de
+    port: 587

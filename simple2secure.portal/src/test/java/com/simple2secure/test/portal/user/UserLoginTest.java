@@ -7,15 +7,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,19 +18,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.User;
-import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.UserRepository;
 
-@RunWith(SpringRunner.class)
-@ComponentScan(basePackages = ("com.simple2secure.test.portal"))
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class,
-		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class })
+//@RunWith(SpringRunner.class)
+//@ComponentScan(basePackages = ("com.simple2secure.test.portal"))
+//@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class,
+//		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class })
 
-// @DataMongoTest
+@ExtendWith(SpringExtension.class)
 public class UserLoginTest {
+	
 
 	@Autowired
 	UserRepository userRepository;

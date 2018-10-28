@@ -1,31 +1,4 @@
-buildscript {
-	repositories {
-		maven { url "https://plugins.gradle.org/m2/" }
-		maven { url 'https://jitpack.io' }
-		mavenCentral()
-	}
-}
-
-plugins { id "org.sonarqube" version "2.6.2" }
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'application'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-repositories {
-	flatDir { dirs 'libs' }
-	mavenCentral()
-	jcenter()
-}
-
-
-sonarqube {
-	properties { property "sonar.projectBaseDir", "$projectDir/.." }
-}
-
-task wrapper(type: Wrapper) { gradleVersion = '3.4.1' }
 
 dependencies {
 

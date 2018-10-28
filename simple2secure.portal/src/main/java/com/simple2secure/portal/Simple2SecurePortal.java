@@ -19,9 +19,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -33,13 +33,12 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.portal.utils.DataInitialization;
 
-
-
-@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = {EmbeddedMongoAutoConfiguration.class,
-		MongoAutoConfiguration.class })
+@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = {
+		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class })
 @EnableScheduling
 public class Simple2SecurePortal extends SpringBootServletInitializer {
 
+	@SuppressWarnings("deprecation")
 	@Bean
 	WebMvcConfigurer configurer() {
 		return new WebMvcConfigurerAdapter() {
@@ -49,66 +48,67 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 			}
 		};
 	}
-	
-    @Bean
-    public SessionLocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.ENGLISH);
-        return slr;
-    }
-    
-    @Bean
-    public ReloadableResourceBundleMessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:locale/messages");
-        messageSource.setCacheSeconds(3600); //refresh cache once per hour
-        return messageSource;
-    }    
-	
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Simple2SecurePortal.class);
-    }
-    
+
+	@Bean
+	public SessionLocaleResolver localeResolver() {
+		SessionLocaleResolver slr = new SessionLocaleResolver();
+		slr.setDefaultLocale(Locale.ENGLISH);
+		return slr;
+	}
+
+	@Bean
+	public ReloadableResourceBundleMessageSource messageSource() {
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:locale/messages");
+		messageSource.setCacheSeconds(3600); // refresh cache once per hour
+		return messageSource;
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(Simple2SecurePortal.class);
+	}
+
 	/**
 	 * This function initiates http on port 8080 but redirects all trafic to https
+	 * 
 	 * @return
 	 */
 	@Bean
-	public EmbeddedServletContainerFactory servletContainer() {
-		TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory() {
-		    @Override
-		    protected void postProcessContext(Context context) {
-		      SecurityConstraint securityConstraint = new SecurityConstraint();
-		      securityConstraint.setUserConstraint("CONFIDENTIAL");
-		  SecurityCollection collection = new SecurityCollection();
-		  collection.addPattern("/*");
-		      securityConstraint.addCollection(collection);
-		      context.addConstraint(securityConstraint);
-		    }
+	public ServletWebServerFactory servletContainer() {
+		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
+			@Override
+			protected void postProcessContext(Context context) {
+				SecurityConstraint securityConstraint = new SecurityConstraint();
+				securityConstraint.setUserConstraint("CONFIDENTIAL");
+				SecurityCollection collection = new SecurityCollection();
+				collection.addPattern("/*");
+				securityConstraint.addCollection(collection);
+				context.addConstraint(securityConstraint);
+			}
 		};
-	    
-	  	tomcat.addAdditionalTomcatConnectors(initiateHttpConnector());
+		tomcat.addAdditionalTomcatConnectors(redirectConnector());
 		return tomcat;
 	}
-	  
+
 	/**
 	 * Initiate new http connection on port 8080
+	 * 
 	 * @return
 	 */
-	private Connector initiateHttpConnector() {
+	private Connector redirectConnector() {
 		Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
 		connector.setScheme("http");
 		connector.setPort(8080);
 		connector.setSecure(false);
 		connector.setRedirectPort(8443);
-		
+
 		return connector;
-	}    
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Simple2SecurePortal.class, args);
 		DataInitialization.addDefaultSettings();
 	}
-	
+
 }

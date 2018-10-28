@@ -1,20 +1,38 @@
-project(':simple2secure.api') {
+allprojects {
+	buildscript {
+		repositories {
+			maven { url "https://plugins.gradle.org/m2/" }
+			maven { url 'https://jitpack.io' }
+			mavenCentral()
+		}
+	}
+
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
+
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+
+
+	task wrapper(type: Wrapper) { gradleVersion = '3.4.1' }
+
+	repositories {
+		flatDir { dirs 'libs' }
+		mavenCentral()
+		jcenter()
+	}
+	
+}
+
+project(':simple2secure.api') {
 }
 
 project(':simple2secure.commons') {
-	apply plugin: 'java'
-	apply plugin: 'eclipse'
 }
 
 project(':simple2secure.probe') {
-	apply plugin: 'java'
-	apply plugin: 'eclipse'
 }
 
 project(':simple2secure.portal') {
-	apply plugin: 'java'
-	apply plugin: 'eclipse'
 }
 
