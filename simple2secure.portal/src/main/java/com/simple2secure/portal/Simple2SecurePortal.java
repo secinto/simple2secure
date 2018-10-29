@@ -64,36 +64,6 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		return application.sources(Simple2SecurePortal.class);
 	}
 
-	/**
-	 * This function initiates http on port 8080 but redirects all trafic to https
-	 *
-	 * @return
-	 */
-	// @Bean
-	// public ServletWebServerFactory servletContainer(@Value("${server.http.port}")
-	// int httpPort) {
-	// Connector connector = new
-	// Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-	// connector.setPort(httpPort);
-	// connector.setRedirectPort(8443);
-	//
-	// TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
-	// @Override
-	// protected void postProcessContext(Context context) {
-	// SecurityConstraint securityConstraint = new SecurityConstraint();
-	// securityConstraint.setUserConstraint("CONFIDENTIAL");
-	// SecurityCollection collection = new SecurityCollection();
-	// collection.addPattern("/*");
-	// securityConstraint.addCollection(collection);
-	// context.addConstraint(securityConstraint);
-	// }
-	// };
-	//
-	// tomcat.addAdditionalTomcatConnectors(connector);
-	//
-	// return tomcat;
-	// }
-
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Simple2SecurePortal.class, args);
 		DataInitialization dataInitializer = context.getBean(DataInitialization.class);
