@@ -42,6 +42,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/**
 	 * Returns all objects for the given class
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> getAll() {
 		// EntityManager em = getEntityManager();
@@ -109,6 +110,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 * @param value
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> findByFieldName(String fieldName, Object value) {
 		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);

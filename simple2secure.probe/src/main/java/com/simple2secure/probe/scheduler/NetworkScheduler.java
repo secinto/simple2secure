@@ -10,7 +10,6 @@ import org.pcap4j.core.PcapStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.commons.general.TimingUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -37,7 +36,7 @@ public class NetworkScheduler extends TimerTask {
 	 * This function checks if the server is reachable
 	 */
 	private void isServerReachable() {
-		if (TimingUtils.netIsAvailable(ConfigItems.BASE_URL)) {
+		if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		} else {
@@ -68,13 +67,16 @@ public class NetworkScheduler extends TimerTask {
 		String configBPFFilter = ProbeConfiguration.getInstance().getConfig().getBpfFilter();
 		try {
 			/*
-			 * TODO: Verification of BPF expression must be made online during the creation. We assume that they are correct.
+			 * TODO: Verification of BPF expression must be made online during the creation.
+			 * We assume that they are correct.
 			 */
 			monitor.getReceiverHandle().setFilter(configBPFFilter, BpfCompileMode.OPTIMIZE);
 		} catch (PcapNativeException e) {
-			log.error("Couldn't apply BPF filter {} because some internal PCAP exception. Reason {}", configBPFFilter, e.getStackTrace());
+			log.error("Couldn't apply BPF filter {} because some internal PCAP exception. Reason {}", configBPFFilter,
+					e.getStackTrace());
 		} catch (NotOpenException e) {
-			log.error("Couldn't apply BPF filter {} because PCAP is not open. Reason {}", configBPFFilter, e.getStackTrace());
+			log.error("Couldn't apply BPF filter {} because PCAP is not open. Reason {}", configBPFFilter,
+					e.getStackTrace());
 		}
 	}
 }

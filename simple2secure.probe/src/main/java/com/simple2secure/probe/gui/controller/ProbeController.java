@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.config.ConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.gui.model.WindowButtons;
@@ -107,7 +107,7 @@ public class ProbeController {
 		} /**/
 
 		// label to display the application title
-		Label l = new Label(ConfigItems.PROBE_TITLE);
+		Label l = new Label(StaticConfigItems.PROBE_TITLE);
 
 		// the HBox is required to right-align the buttons.
 		HBox h = new HBox();
@@ -161,7 +161,8 @@ public class ProbeController {
 		hyperlink.setOnMouseClicked(ev -> {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().browse(new URI(ConfigItems.BASE_URL_WEB));
+					Desktop.getDesktop()
+							.browse(new URI(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURLWeb()));
 				} catch (IOException e) {
 					log.error(e.getMessage());
 				} catch (URISyntaxException e) {

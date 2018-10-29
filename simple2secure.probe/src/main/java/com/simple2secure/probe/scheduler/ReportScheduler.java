@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -46,7 +45,7 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.debug("Sending report {} with timestamp {} to the API.", report.getQuery(), report.getQueryTimestamp());
-			APIUtils.sendPost(ConfigItems.reports_api, report);
+			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI(), report);
 			DBUtil.getInstance().merge(report);
 		}
 	}
@@ -65,7 +64,8 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.info("Sending network report to the server with id: " + report.getId());
-			APIUtils.sendPost(ConfigItems.reports_api + "/network", report);
+			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI() + "/network",
+					report);
 			DBUtil.getInstance().merge(report);
 		}
 

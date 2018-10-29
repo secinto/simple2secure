@@ -22,18 +22,26 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import com.simple2secure.portal.utils.DataInitialization;
+import com.simple2secure.commons.config.LoadedConfigItems;
 
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
-		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
+@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = {
+		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
+
 
 	@Bean
 	public SessionLocaleResolver localeResolver() {
 		SessionLocaleResolver slr = new SessionLocaleResolver();
 		slr.setDefaultLocale(Locale.ENGLISH);
 		return slr;
+	}
+
+	@Bean
+	public LoadedConfigItems loadedConfigItems() {
+		LoadedConfigItems configItems = new LoadedConfigItems();
+		configItems.init();
+		return configItems;
 	}
 
 	@Bean
@@ -55,8 +63,10 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	 * @return
 	 */
 	// @Bean
-	// public ServletWebServerFactory servletContainer(@Value("${server.http.port}") int httpPort) {
-	// Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+	// public ServletWebServerFactory servletContainer(@Value("${server.http.port}")
+	// int httpPort) {
+	// Connector connector = new
+	// Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
 	// connector.setPort(httpPort);
 	// connector.setRedirectPort(8443);
 	//
@@ -79,7 +89,6 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Simple2SecurePortal.class, args);
-		DataInitialization.addDefaultSettings();
 	}
 
 }
