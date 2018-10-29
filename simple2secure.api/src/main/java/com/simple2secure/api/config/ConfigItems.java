@@ -7,6 +7,9 @@ public class ConfigItems {
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
 
 	public static String BASE_URL = "https://localhost:8443";
+	public static String BASE_PROTOCOL = "https";
+	public static String BASE_HOST = "localhost";
+	public static String BASE_PORT = "8443";
 	// public static final String BASE_URL = "http://s2s.secinto.com:8080/s2s";
 	public static String BASE_URL_WEB = "http://localhost:9000";
 	// public static final String BASE_URL_WEB = "http://s2s.secinto.com:8080/web";

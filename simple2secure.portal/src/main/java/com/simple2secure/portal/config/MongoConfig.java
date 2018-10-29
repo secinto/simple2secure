@@ -14,8 +14,6 @@ import com.simple2secure.portal.dao.ExtendedMongoTemplate;
 import com.simple2secure.portal.utils.YamlPropertySourceFactory;
 
 @Configuration
-//@ConfigurationProperties(prefix = "datasource")
-//@EnableConfigurationProperties
 @PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:application.yml")
 @EnableMongoRepositories
 public class MongoConfig extends AbstractMongoConfiguration {

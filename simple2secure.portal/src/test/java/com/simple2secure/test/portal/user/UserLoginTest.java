@@ -9,8 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,16 +25,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.User;
+import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.UserRepository;
 
 //@RunWith(SpringRunner.class)
-//@ComponentScan(basePackages = ("com.simple2secure.test.portal"))
-//@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class,
-//		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class })
 
+@ComponentScan(basePackages = "com.simple2secure.test.portal")
 @ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class, MongoAutoConfiguration.class })
 public class UserLoginTest {
-	
 
 	@Autowired
 	UserRepository userRepository;
@@ -56,22 +59,22 @@ public class UserLoginTest {
 		user.setLastName("test");
 		user.setUsername("test");
 		user.setEmail("testiing@test.com");
-		user.setPassword(this.passwordEncoder.encode("test"));
+		user.setPassword(passwordEncoder.encode("test"));
 		user.setUsername("test");
 		user.setActivated(true);
 		user.setActivationToken("12345");
 
-		this.userRepository.save(user);
+		userRepository.save(user);
 	}
 
 	@After
 	public void tearDown() {
-		this.userRepository.deleteAll();
+		userRepository.deleteAll();
 	}
 
 	/**
 	 * This test tries to login user with the correct credentials
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -88,8 +91,8 @@ public class UserLoginTest {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login",
-				HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login", HttpMethod.POST, entity,
+				String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -103,7 +106,7 @@ public class UserLoginTest {
 
 	/**
 	 * This is a negative test which sends a wrong credentials
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -118,8 +121,8 @@ public class UserLoginTest {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login",
-				HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login", HttpMethod.POST, entity,
+				String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -139,8 +142,8 @@ public class UserLoginTest {
 
 	@After
 	public void deleteUser() {
-		User retrievedUser = this.userRepository.findByEmailOnlyActivated(user.getEmail());
-		this.userRepository.delete(retrievedUser);
+		User retrievedUser = userRepository.findByEmailOnlyActivated(user.getEmail());
+		userRepository.delete(retrievedUser);
 	}
 
 }

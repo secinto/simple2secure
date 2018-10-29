@@ -8,35 +8,15 @@ server:
     key-alias: tomcat
     trust-store: classpath:keys/cacerts
     trust-store-password: testtest
-  http:
-    port: 8080
   certificate:
     serial: 1009697567
----
-spring:
-  profiles: prod,default
-  data:
-    mongodb:
-      database: s2s
-      host: localhost
-      port: 27017
----
-spring:
-  profiles: test
-  data:
-    mongodb:
-      database: s2s_test
-      host: localhost
-      port: 27017
----
 smtpserver:
   enabled: true
   hostname: smtp.1und1.de
   port: 21
-  
----
 username: activation@secinto.com
 password: S2S.secinto.18.AT
+
 mail:
   imap:
     host: imap.1und1.de
@@ -48,3 +28,27 @@ mail:
     auth: true
     host: smtp.1und1.de
     port: 587
+    
+spring:
+  profiles:
+    active: prod
+  main:
+    banner-mode: "off"
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+    
+  
+---
+spring:
+  profiles: prod,default
+  data:
+    mongodb:
+      database: s2s
+---
+spring:
+  profiles: test
+  data:
+    mongodb:
+      database: s2s_test
