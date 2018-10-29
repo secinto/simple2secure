@@ -16,8 +16,8 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.general.TimingUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
@@ -76,7 +76,7 @@ public class ProbeGUI extends Application {
 
 		ProbeGUI.primaryStage = primaryStage;
 
-		primaryStage.setTitle(ConfigItems.PROBE_TITLE);
+		primaryStage.setTitle(StaticConfigItems.PROBE_TITLE);
 		primaryStage.getIcons().add(new Image(ProbeGUI.class.getResourceAsStream("/gui/images/logo.png")));
 
 		// Remove window decoration
@@ -87,7 +87,7 @@ public class ProbeGUI extends Application {
 
 		createTrayIcon(primaryStage);
 
-		if (TimingUtils.netIsAvailable(ConfigItems.BASE_URL)) {
+		if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		}
@@ -192,8 +192,8 @@ public class ProbeGUI extends Application {
 			ViewNavigator.setMainController(loader.getController());
 
 			Scene scene = new Scene(rootPane);
-			rootPane.setBorder(
-					new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED,
+					CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -291,7 +291,8 @@ public class ProbeGUI extends Application {
 
 	public void showProgramIsMinimizedMsg() {
 		if (firstTime) {
-			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize", TrayIcon.MessageType.INFO);
+			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize",
+					TrayIcon.MessageType.INFO);
 			firstTime = false;
 		}
 	}

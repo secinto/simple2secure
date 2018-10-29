@@ -12,8 +12,10 @@ dependencies {
 	// The production code uses Guava
 	compile group: 'org.json', name: 'json', version: '20170516'
 	
-	compile group: 'ch.qos.cal10n', name: 'cal10n-api', version: '0.8.1'
 	
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
 	
 	// https://mvnrepository.com/artifact/commons-io/commons-io
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'

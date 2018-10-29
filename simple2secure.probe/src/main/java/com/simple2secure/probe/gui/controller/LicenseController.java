@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
@@ -120,7 +119,7 @@ public class LicenseController implements Initializable {
 								license.setExpirationDate(expirationDate);
 							}
 
-							String authToken = APIUtils.sendPostWithResponse(ConfigItems.license_api + "/activateProbe", license);
+							String authToken = APIUtils.sendPostWithResponse(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", license);
 
 							if (!Strings.isNullOrEmpty(authToken)) {
 								license.setAuthToken(authToken);

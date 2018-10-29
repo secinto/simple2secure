@@ -18,12 +18,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.APIUtils;
@@ -61,9 +62,12 @@ public class ProbeConfiguration {
 
 	private Map<String, QueryRun> currentQueries;
 
+	private LoadedConfigItems loadedConfigItems;
+
 	/***
-	 * Returns the configuration if already initialized. If not, it tries retrieving it from the standard path, the
-	 * database, and the WebAPI by calling updateConfig()
+	 * Returns the configuration if already initialized. If not, it tries retrieving
+	 * it from the standard path, the database, and the WebAPI by calling
+	 * updateConfig()
 	 *
 	 * @return Initialized ApplicationConfiguration object
 	 * @throws IllegalArgumentException
@@ -84,6 +88,7 @@ public class ProbeConfiguration {
 		this.currentProcessors = new HashMap<String, Processor>();
 		this.currentQueries = new HashMap<String, QueryRun>();
 		loadConfig();
+		loadedConfigItems = new LoadedConfigItems();
 	}
 
 	public Config getConfig() {
@@ -95,15 +100,18 @@ public class ProbeConfiguration {
 	}
 
 	/***
-	 * This method tries to acquire the newest Configuration file with all means necessary
+	 * This method tries to acquire the newest Configuration file with all means
+	 * necessary
 	 *
-	 * Detailed process: It checks the Database for Configuration files and reads in the newest. With the URL provided in
-	 * the Configuration file from the Database, this method contacts the WebAPI and checks whether a newer version is
-	 * available. If it is so, it will acquire it from there. If none are found, the offline Configuration provided will
-	 * be used
+	 * Detailed process: It checks the Database for Configuration files and reads in
+	 * the newest. With the URL provided in the Configuration file from the
+	 * Database, this method contacts the WebAPI and checks whether a newer version
+	 * is available. If it is so, it will acquire it from there. If none are found,
+	 * the offline Configuration provided will be used
 	 *
-	 * @param standardConfig
-	 *          the path to the offline Configuration file. <code>StaticConfigValues.XML_LOCATION</code> can be used.
+	 * @param standardConfig the path to the offline Configuration file.
+	 *                       <code>StaticConfigValues.XML_LOCATION</code> can be
+	 *                       used.
 	 */
 	public Config loadConfig() {
 
@@ -116,7 +124,8 @@ public class ProbeConfiguration {
 		List<QueryRun> dbQueries = getQueriesFromDatabase();
 
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is
+		 * available yet.
 		 */
 		if (dbConfig == null) {
 			log.debug("DB config not available, reading config from file. Should only happen once.");
@@ -133,7 +142,8 @@ public class ProbeConfiguration {
 			this.currentConfig = dbConfig;
 		}
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is
+		 * available yet.
 		 */
 		if (dbProcessors == null || dbProcessors.size() == 0) {
 			log.debug("DB processors not available, reading from file. Should only happen once.");
@@ -153,7 +163,8 @@ public class ProbeConfiguration {
 		}
 
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is
+		 * available yet.
 		 */
 		if (dbSteps == null || dbSteps.size() == 0) {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
@@ -200,8 +211,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Obtains the configuration from the server and updates the local configuration accordingly. The retrieved
-	 * information is stored in the database and the packet processors are instantiated.
+	 * Obtains the configuration from the server and updates the local configuration
+	 * accordingly. The retrieved information is stored in the database and the
+	 * packet processors are instantiated.
 	 */
 	public void checkConfig() {
 		/*
@@ -312,7 +324,7 @@ public class ProbeConfiguration {
 		isCheckingLicense = true;
 		CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
 		if (license != null) {
-			String response = APIUtils.sendPostWithResponse(ConfigItems.license_api + "/token", license);
+			String response = APIUtils.sendPostWithResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
 			if (!Strings.isNullOrEmpty(response)) {
 				return gson.fromJson(response, CompanyLicenseObj.class);
 			} else {
@@ -345,12 +357,14 @@ public class ProbeConfiguration {
 						Class<?> processorClass = Class.forName(processor.getProcessor_class());
 						Constructor<?> constructor = processorClass.getConstructor(String.class, Map.class);
 						Map<String, String> options = new HashMap<String, String>();
-						PacketProcessor packetProcessor = (PacketProcessor) constructor.newInstance(step.getName(), options);
+						PacketProcessor packetProcessor = (PacketProcessor) constructor.newInstance(step.getName(),
+								options);
 						updatedPacketProcessors.put(processor.getName(), packetProcessor);
 					}
 				}
 			} catch (Exception e) {
-				log.error("Couldn't create packet processor for configuration entry {} with. Reason {}", step.getName(), e);
+				log.error("Couldn't create packet processor for configuration entry {} with. Reason {}", step.getName(),
+						e);
 			}
 		}
 		this.currentPacketProcessors = updatedPacketProcessors;
@@ -362,7 +376,8 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(APIUtils.sendGet(ConfigItems.config_api + "/" + ProbeConfiguration.probeId), Config.class);
+		return gson.fromJson(APIUtils.sendGet(loadedConfigItems.getConfigAPI() + "/" + ProbeConfiguration.probeId),
+				Config.class);
 	}
 
 	/**
@@ -380,7 +395,8 @@ public class ProbeConfiguration {
 	public Config getConfigFromFile() {
 		Config fileConfig = null;
 		try {
-			InputStream ispotentialConfig = ProbeConfiguration.class.getResourceAsStream(ConfigItems.CONFIG_JSON_LOCATION);
+			InputStream ispotentialConfig = ProbeConfiguration.class
+					.getResourceAsStream(StaticConfigItems.CONFIG_JSON_LOCATION);
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(ispotentialConfig, writer, "UTF-8");
 			String potentialConfigString = writer.toString();
@@ -400,7 +416,7 @@ public class ProbeConfiguration {
 			}
 
 		} catch (IOException e) {
-			log.error("Could't open config file {} and load the configuration", ConfigItems.CONFIG_JSON_LOCATION);
+			log.error("Could't open config file {} and load the configuration", StaticConfigItems.CONFIG_JSON_LOCATION);
 			System.out.println(LocaleHolder.getMessage("load_config_failed").getMessage());
 			throw new IllegalArgumentException(LocaleHolder.getMessage("load_config_failed").getMessage());
 		}
@@ -413,8 +429,9 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(gson.fromJson(APIUtils.sendGet(ConfigItems.processor_api + "/" + ProbeConfiguration.probeId),
-				Processor[].class));
+		return Arrays.asList(
+				gson.fromJson(APIUtils.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
+						Processor[].class));
 	}
 
 	/**
@@ -436,17 +453,17 @@ public class ProbeConfiguration {
 		File potentialProcessors;
 		List<Processor> processors = new ArrayList<>();
 
-		potentialProcessors = new File(ConfigItems.PROCESSORS_JSON_LOCATION);
+		potentialProcessors = new File(StaticConfigItems.PROCESSORS_JSON_LOCATION);
 
 		if (!potentialProcessors.exists()) {
 			try {
 				potentialProcessors = new File(
-						ProbeConfiguration.class.getResource(ConfigItems.PROCESSORS_JSON_LOCATION).toURI());
+						ProbeConfiguration.class.getResource(StaticConfigItems.PROCESSORS_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialProcessors.getAbsolutePath());
 			}
 			if (!potentialProcessors.exists()) {
-				log.error("The specified file couldn't be found! {}", ConfigItems.QUERIES_JSON_LOCATION);
+				log.error("The specified file couldn't be found! {}", StaticConfigItems.QUERIES_JSON_LOCATION);
 				throw new IllegalArgumentException("The specified file couldn't be found!");
 			}
 		}
@@ -460,8 +477,9 @@ public class ProbeConfiguration {
 	 * This function returns steps from the API for the logged in user
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(gson
-				.fromJson(APIUtils.sendGet(ConfigItems.step_api + "/" + ProbeConfiguration.probeId + "/false"), Step[].class));
+		return Arrays.asList(gson.fromJson(
+				APIUtils.sendGet(loadedConfigItems.getStepAPI() + "/" + ProbeConfiguration.probeId + "/false"),
+				Step[].class));
 	}
 
 	/**
@@ -484,16 +502,17 @@ public class ProbeConfiguration {
 		File potentialSteps;
 		List<Step> fileSteps = new ArrayList<>();
 
-		potentialSteps = new File(ConfigItems.STEPS_JSON_LOCATION);
+		potentialSteps = new File(StaticConfigItems.STEPS_JSON_LOCATION);
 
 		if (!potentialSteps.exists()) {
 			try {
-				potentialSteps = new File(ProbeConfiguration.class.getResource(ConfigItems.STEPS_JSON_LOCATION).toURI());
+				potentialSteps = new File(
+						ProbeConfiguration.class.getResource(StaticConfigItems.STEPS_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialSteps.getAbsolutePath());
 			}
 			if (!potentialSteps.exists()) {
-				log.error("The specified file couldn't be found! {}" + ConfigItems.STEPS_JSON_LOCATION);
+				log.error("The specified file couldn't be found! {}" + StaticConfigItems.STEPS_JSON_LOCATION);
 				throw new IllegalArgumentException("The specified file couldn't be found!");
 			}
 		}
@@ -504,15 +523,16 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function retrieves the run Queries from API. Currently we are getting queries only for current user, but we
-	 * will also have to add additional parameter for client.
+	 * This function retrieves the run Queries from API. Currently we are getting
+	 * queries only for current user, but we will also have to add additional
+	 * parameter for client.
 	 *
 	 * @return
 	 */
-	private static List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(
-				gson.fromJson(APIUtils.sendGet(ConfigItems.system_query_api + "/" + ProbeConfiguration.probeId + "/" + false),
-						QueryRun[].class));
+	private List<QueryRun> getQueriesFromAPI() {
+		return Arrays.asList(gson.fromJson(
+				APIUtils.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
+				QueryRun[].class));
 	}
 
 	/**
@@ -533,16 +553,17 @@ public class ProbeConfiguration {
 		File potentialRunQueries;
 		List<QueryRun> runQueries = new ArrayList<>();
 
-		potentialRunQueries = new File(ConfigItems.QUERIES_JSON_LOCATION);
+		potentialRunQueries = new File(StaticConfigItems.QUERIES_JSON_LOCATION);
 
 		if (!potentialRunQueries.exists()) {
 			try {
-				potentialRunQueries = new File(ProbeConfiguration.class.getResource(ConfigItems.QUERIES_JSON_LOCATION).toURI());
+				potentialRunQueries = new File(
+						ProbeConfiguration.class.getResource(StaticConfigItems.QUERIES_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialRunQueries.getAbsolutePath());
 			}
 			if (!potentialRunQueries.exists()) {
-				log.error("The specified file couldn't be found! {}" + ConfigItems.QUERIES_JSON_LOCATION);
+				log.error("The specified file couldn't be found! {}" + StaticConfigItems.QUERIES_JSON_LOCATION);
 				throw new IllegalArgumentException("The specified file couldn't be found!");
 			}
 		}
@@ -579,4 +600,13 @@ public class ProbeConfiguration {
 	public Map<String, QueryRun> getCurrentQueries() {
 		return this.currentQueries;
 	}
+
+	public LoadedConfigItems getLoadedConfigItems() {
+		return loadedConfigItems;
+	}
+
+	public void setLoadedConfigItems(LoadedConfigItems loadedConfigItems) {
+		this.loadedConfigItems = loadedConfigItems;
+	}
+
 }

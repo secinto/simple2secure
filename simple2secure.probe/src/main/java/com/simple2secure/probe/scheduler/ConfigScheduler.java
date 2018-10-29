@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.gui.ProbeWorkerThread;
-import com.simple2secure.probe.network.NetworkMonitor;
 
 import javafx.application.Platform;
 

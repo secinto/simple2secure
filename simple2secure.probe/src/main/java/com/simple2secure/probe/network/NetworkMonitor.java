@@ -13,9 +13,9 @@ import org.pcap4j.core.Pcaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.commons.collections.ProcessingQueue;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.network.NetUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.exceptions.NetworkException;
@@ -107,7 +107,7 @@ public class NetworkMonitor {
 		}
 
 		try {
-			receiverHandle = singleInterface.openLive(ConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, ConfigItems.READ_TIMEOUT);
+			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, StaticConfigItems.READ_TIMEOUT);
 
 			/*
 			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must

@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.simple2secure.api.config.ConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 
 @Component
 public class MvcConfig implements WebMvcConfigurer {
@@ -33,7 +33,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/config/**").addResourceLocations(ConfigItems.resource_location);
+		registry.addResourceHandler("/config/**").addResourceLocations(StaticConfigItems.resource_location);
 	}
 
 }

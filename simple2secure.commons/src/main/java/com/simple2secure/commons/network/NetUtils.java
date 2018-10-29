@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.net.InetAddresses;
-import com.simple2secure.commons.messages.MessageCodeGeneral;
-import com.simple2secure.commons.messages.MessageCodeUtil;
 
 /**
  * Contains a collection of useful functions for manipulating different data types and network specific formats.

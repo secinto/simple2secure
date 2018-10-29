@@ -9,9 +9,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -66,13 +66,13 @@ public class UserRepositoryImpl extends UserRepository {
 
 			if (user == null) {
 				this.mongoTemplate.save(userToSave);
-				return ConfigItems.user_created;
+				return StaticConfigItems.user_created;
 			} else {
 
-				return ConfigItems.email_exists;
+				return StaticConfigItems.email_exists;
 			}
 		} else {
-			return ConfigItems.username_exists;
+			return StaticConfigItems.username_exists;
 		}
 	}
 
