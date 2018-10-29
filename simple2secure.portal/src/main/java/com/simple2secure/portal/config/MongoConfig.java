@@ -1,17 +1,22 @@
 package com.simple2secure.portal.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
+import com.simple2secure.portal.dao.ExtendedMongoTemplate;
+import com.simple2secure.portal.utils.YamlPropertySourceFactory;
 
 @Configuration
-@ConfigurationProperties(prefix="datasource")
-@EnableConfigurationProperties
+//@ConfigurationProperties(prefix = "datasource")
+//@EnableConfigurationProperties
+@PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:application.yml")
 @EnableMongoRepositories
 public class MongoConfig extends AbstractMongoConfiguration {
 
@@ -26,11 +31,25 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
 	@Override
 	protected String getDatabaseName() {
-		return this.database;
+		return database;
 	}
 
 	@Override
 	public MongoClient mongoClient() {
-		return new MongoClient(this.host, this.port);
+		return new MongoClient(host, port);
+	}
+
+	@Override
+	@Bean
+	public MongoDbFactory mongoDbFactory() {
+		MongoClient mongoClient = new MongoClient(host, port);
+		return new SimpleMongoDbFactory(mongoClient, database);
+	}
+
+	@Override
+	@Bean
+	public ExtendedMongoTemplate mongoTemplate() throws Exception {
+		ExtendedMongoTemplate mongoTemplate = new ExtendedMongoTemplate(mongoDbFactory());
+		return mongoTemplate;
 	}
 }

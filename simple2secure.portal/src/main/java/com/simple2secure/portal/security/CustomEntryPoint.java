@@ -11,16 +11,16 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomEntryPoint implements AuthenticationEntryPoint{
+public class CustomEntryPoint implements AuthenticationEntryPoint {
 
 	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response,
-			AuthenticationException authException) throws IOException, ServletException {
-		
-		//response.sendError(HttpServletResponse.SC_UNAUTHORIZED);	
+	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+			throws IOException, ServletException {
+
 		response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getOutputStream().println("{ \"error\": \"" + authException.getMessage() + "\" ,\"message\": \" User with provided credentials does not exists \" }");
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.getOutputStream().println(
+				"{ \"error\": \"" + authException.getMessage() + "\" ,\"message\": \" User with provided credentials does not exists \" }");
 	}
 
 }

@@ -3,6 +3,9 @@ package com.simple2secure.probe.scheduler;
 import java.util.Date;
 import java.util.TimerTask;
 
+import org.pcap4j.core.BpfProgram.BpfCompileMode;
+import org.pcap4j.core.NotOpenException;
+import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +48,7 @@ public class NetworkScheduler extends TimerTask {
 
 	private void getNetworkStatistics() {
 		try {
-			PcapStat statistics = this.monitor.getReceiverHandle().getStats();
+			PcapStat statistics = monitor.getReceiverHandle().getStats();
 			NetworkReport report = new NetworkReport();
 			report.setStartTime(new Date().toString());
 			report.setProcessorName("PCAP Network Statistics");
@@ -62,7 +65,16 @@ public class NetworkScheduler extends TimerTask {
 	}
 
 	private void checkNetworkFilter() {
-		String currentBPFFilter = this.monitor.getReceiverHandle().getFilteringExpression();
-		ProbeConfiguration.getInstance().getConfig();
+		String configBPFFilter = ProbeConfiguration.getInstance().getConfig().getBpfFilter();
+		try {
+			/*
+			 * TODO: Verification of BPF expression must be made online during the creation. We assume that they are correct.
+			 */
+			monitor.getReceiverHandle().setFilter(configBPFFilter, BpfCompileMode.OPTIMIZE);
+		} catch (PcapNativeException e) {
+			log.error("Couldn't apply BPF filter {} because some internal PCAP exception. Reason {}", configBPFFilter, e.getStackTrace());
+		} catch (NotOpenException e) {
+			log.error("Couldn't apply BPF filter {} because PCAP is not open. Reason {}", configBPFFilter, e.getStackTrace());
+		}
 	}
 }

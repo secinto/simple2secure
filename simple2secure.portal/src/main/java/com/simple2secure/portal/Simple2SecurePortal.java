@@ -14,8 +14,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -25,29 +27,34 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.portal.utils.DataInitialization;
 
-@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = {
-		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class })
 @EnableScheduling
+@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
+		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
 
-	@SuppressWarnings("deprecation")
-	@Bean
-	WebMvcConfigurer configurer() {
-		return new WebMvcConfigurerAdapter() {
-			@Override
-			public void addResourceHandlers(ResourceHandlerRegistry registry) {
-				registry.addResourceHandler("/config/**").addResourceLocations(ConfigItems.resource_location);
-			}
-		};
-	}
+	@Value("${server.ssl.key-store}")
+	private String keystore;
+	@Value("${server.ssl.key-store-password}")
+	private String keystorePassword;
+	@Value("${server.ssl.key-store-type}")
+	private String keystoreType;
+	@Value("${server.ssl.key-alias}")
+	private String keyAlias;
+
+	//	@SuppressWarnings("deprecation")
+	//	@Bean
+	//	WebMvcConfigurer configurer() {
+	//		return new WebMvcConfigurerAdapter() {
+	//			@Override
+	//			public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	//				registry.addResourceHandler("/config/**").addResourceLocations(ConfigItems.resource_location);
+	//			}
+	//		};
+	//	}
 
 	@Bean
 	public SessionLocaleResolver localeResolver() {
@@ -69,13 +76,72 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		return application.sources(Simple2SecurePortal.class);
 	}
 
+	// /**
+	// * This function initiates http on port 8080 but redirects all trafic to https
+	// *
+	// * @return
+	// */
+	// @Bean
+	// public ServletWebServerFactory servletContainer() {
+	// TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
+	// @Override
+	// protected void postProcessContext(Context context) {
+	// SecurityConstraint securityConstraint = new SecurityConstraint();
+	// securityConstraint.setUserConstraint("CONFIDENTIAL");
+	// SecurityCollection collection = new SecurityCollection();
+	// collection.addPattern("/*");
+	// securityConstraint.addCollection(collection);
+	// context.addConstraint(securityConstraint);
+	// }
+	// };
+	// tomcat.addAdditionalTomcatConnectors(redirectConnector());
+	// return tomcat;
+	// }
+	//
+	// /**
+	// * Initiate new http connection on port 8080
+	// *
+	// * @return
+	// */
+	// private Connector redirectConnector() {
+	// Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+	//
+	// Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
+	// try {
+	// File keystoreFile = new ClassPathResource(keystore.replace("classpath:", "")).getFile();
+	// //File truststoreFile = new ClassPathResource(truststore.replace("classpath:", "")).getFile();
+	// connector.setScheme("https");
+	// connector.setSecure(true);
+	// connector.setPort(8443);
+	//
+	// protocol.setKeystoreFile(keystoreFile.getAbsolutePath());
+	// protocol.setKeystorePass(keystorePassword);
+	// protocol.setKeyAlias(keyAlias);
+	// protocol.setSSLEnabled(true);
+	//
+	// protocol.setTruststoreFile(keystoreFile.getAbsolutePath());
+	// protocol.setTruststorePass(keystorePassword);
+	// protocol.setClientAuth(Boolean.TRUE.toString());
+	//
+	// protocol.setTrustManagerClassName("com.simple2secure.portal.security.Simple2SecureTrustManager");
+	//
+	// return connector;
+	// } catch (IOException ex) {
+	// throw new IllegalStateException("can't access keystore: [" + "keystore" + "] or truststore: [" + "keystore" + "]", ex);
+	// }
+	// }
+
 	/**
 	 * This function initiates http on port 8080 but redirects all trafic to https
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
-	public ServletWebServerFactory servletContainer() {
+	public ServletWebServerFactory servletContainer(@Value("${server.http.port}") int httpPort) {
+		Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+		connector.setPort(httpPort);
+		connector.setRedirectPort(8443);
+
 		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
 			@Override
 			protected void postProcessContext(Context context) {
@@ -87,23 +153,10 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 				context.addConstraint(securityConstraint);
 			}
 		};
-		tomcat.addAdditionalTomcatConnectors(redirectConnector());
+
+		tomcat.addAdditionalTomcatConnectors(connector);
+
 		return tomcat;
-	}
-
-	/**
-	 * Initiate new http connection on port 8080
-	 * 
-	 * @return
-	 */
-	private Connector redirectConnector() {
-		Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-		connector.setScheme("http");
-		connector.setPort(8080);
-		connector.setSecure(false);
-		connector.setRedirectPort(8443);
-
-		return connector;
 	}
 
 	public static void main(String[] args) {

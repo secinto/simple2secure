@@ -25,7 +25,8 @@
 	</appender>  -->
 
 	<logger name="com.simple2secure" level="debug" />
-
+	<logger name="org.mongodb.driver" level="info" />
+	
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>

@@ -20,8 +20,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 /**
- * Extension of the {@link org.springframework.data.mongodb.core.MongoTemplate}
- * implementing additional finder methods (e.g. by example, by native query).
+ * Extension of the {@link org.springframework.data.mongodb.core.MongoTemplate} implementing additional finder methods (e.g. by example, by
+ * native query).
  *
  * @author skraxberger
  *
@@ -58,10 +58,9 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 	}
 
 	/**
-	 * Convert a domain object to {@link DBObject} by the spring data mapping
-	 * subsystem.
+	 * Convert a domain object to {@link DBObject} by the spring data mapping subsystem.
 	 *
-	 * @param        <T>
+	 * @param <T>
 	 * @param object
 	 * @return
 	 */
@@ -83,10 +82,10 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 
 	private String determineCollection(Class<?> entityClass) {
 		Method m = ReflectionUtils.findMethod(super.getClass(), /*
-																 * MessageCodeUtil.getMessageCodeMessage(
-																 * MessageCodeGeneral.mongo_collection_name_determiner)
-																 */"mongo_collection_name_determiner", // $NON-NLS-1$
-				Class.class);
+		 * MessageCodeUtil.getMessageCodeMessage(
+		 * MessageCodeGeneral.mongo_collection_name_determiner)
+		 */"mongo_collection_name_determiner", // $NON-NLS-1$
+		 Class.class);
 		ReflectionUtils.makeAccessible(m);
 		return (String) ReflectionUtils.invokeMethod(m, this, entityClass);
 	}
@@ -95,7 +94,7 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 	 * Finder by "native" mongo db query. <br>
 	 * ATTENTION findOne finds the first, no matter if others are following!
 	 *
-	 * @param             <T>
+	 * @param <T>
 	 * @param entityClass
 	 * @param query
 	 * @return
@@ -108,7 +107,7 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 	/**
 	 * Finder by "native" mongo db query.
 	 *
-	 * @param             <T>
+	 * @param <T>
 	 * @param entityClass
 	 * @param query
 	 * @return

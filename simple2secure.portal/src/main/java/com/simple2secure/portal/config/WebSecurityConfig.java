@@ -16,12 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.simple2secure.portal.security.CustomAuthenticationFailureHandler;
-import com.simple2secure.portal.security.CustomAuthenticationProvider;
-import com.simple2secure.portal.security.CustomAuthenticationSuccessHandler;
 import com.simple2secure.portal.security.CustomEntryPoint;
-import com.simple2secure.portal.security.JWTAuthenticationFilter;
-import com.simple2secure.portal.security.JWTLoginFilter;
+import com.simple2secure.portal.security.auth.CustomAuthenticationFailureHandler;
+import com.simple2secure.portal.security.auth.CustomAuthenticationProvider;
+import com.simple2secure.portal.security.auth.CustomAuthenticationSuccessHandler;
+import com.simple2secure.portal.security.auth.JWTAuthenticationFilter;
+import com.simple2secure.portal.security.auth.JWTLoginFilter;
 
 @Configuration
 @EnableWebSecurity

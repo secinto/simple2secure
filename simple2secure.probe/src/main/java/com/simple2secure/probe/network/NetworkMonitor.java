@@ -2,6 +2,7 @@ package com.simple2secure.probe.network;
 
 import java.util.List;
 
+import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.PcapAddress;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapIpV4Address;
@@ -82,8 +83,8 @@ public class NetworkMonitor {
 					log.info(i + ":" + currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
 				}
 				/*
-				 * Iterate through the addresses of the interfaces and check if someone fits.
-				 * TODO: We should store the interfaces which have relevant addresses.
+				 * Iterate through the addresses of the interfaces and check if someone fits. TODO: We should store the interfaces which have
+				 * relevant addresses.
 				 */
 				List<PcapAddress> addresses = interfaces.get(i).getAddresses();
 				for (PcapAddress address : addresses) {
@@ -107,6 +108,12 @@ public class NetworkMonitor {
 
 		try {
 			receiverHandle = singleInterface.openLive(ConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, ConfigItems.READ_TIMEOUT);
+
+			/*
+			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
+			 * be developed
+			 */
+			receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
 
 			processingQueue = new ProcessingQueue<PacketContainer>();
 
@@ -135,7 +142,7 @@ public class NetworkMonitor {
 		if (packetProcessor != null) {
 			packetProcessor.stop();
 		}
-		if(instance != null) {
+		if (instance != null) {
 			instance = null;
 		}
 	}

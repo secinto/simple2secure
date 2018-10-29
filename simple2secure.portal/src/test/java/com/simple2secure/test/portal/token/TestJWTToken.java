@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.portal.security.CustomAuthenticationProvider;
+import com.simple2secure.portal.security.auth.CustomAuthenticationProvider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

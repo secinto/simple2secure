@@ -1,14 +1,20 @@
 server:
-  port: 8080
-  contextPath: /
+  port: 8443
   ssl:
+    enabled: true
     key-store: classpath:keys/keystore.p12
     key-store-password: Latinica.1
     key-store-type: PKCS12
     key-alias: tomcat
+    trust-store: classpath:keys/cacerts
+    trust-store-password: testtest
+  http:
+    port: 8080
+  certificate:
+    serial: 1009697567
 ---
 spring:
-  profiles: prod
+  profiles: prod,default
   data:
     mongodb:
       database: s2s

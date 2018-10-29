@@ -24,11 +24,5 @@
 	  "querystrings": "src/test/resources/osqueries.json",
 	  "queryconfig": "src/test/resources/osqueryconfig.json",
 	  "osquerypath": ".\\\\bin\\\\osquery\\\\os_win7"
-	},
-	"apis":[
-	{	
-		"name":"test",
-		"url":"test"
 	}
-	]
 }
