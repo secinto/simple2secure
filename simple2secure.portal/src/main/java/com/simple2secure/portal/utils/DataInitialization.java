@@ -3,8 +3,6 @@ package com.simple2secure.portal.utils;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,8 @@ public class DataInitialization {
 
 	private static Logger log = LoggerFactory.getLogger(DataInitialization.class);
 
-	static RestTemplate restTemplate = new RestTemplate();
+	@Autowired
+	RestTemplate restTemplate;
 
 	@Autowired
 	protected LoadedConfigItems loadedConfigItems;
@@ -55,11 +54,6 @@ public class DataInitialization {
 
 	@Autowired
 	protected StepRepository stepRepository;
-
-	@PostConstruct
-	public void init() {
-		addDefaultSettings();
-	}
 
 	/**
 	 * 
@@ -160,10 +154,14 @@ public class DataInitialization {
 		List<Settings> settingsDB = settingsRepository.findAll();
 
 		if (settingsDB == null || settingsDB.isEmpty()) {
-			ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(),
-					Settings.class);
-			Settings settings = response.getBody();
-			settingsRepository.save(settings);
+			try {
+				ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(),
+						Settings.class);
+				Settings settings = response.getBody();
+				settingsRepository.save(settings);
+			} catch (Exception e) {
+
+			}
 		}
 
 	}

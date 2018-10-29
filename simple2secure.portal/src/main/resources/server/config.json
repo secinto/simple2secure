@@ -1,5 +1,5 @@
 {
-	"version": 1, 
+	"version": 2, 
 	"config_supplier": "http://localhost:8080/api/config",
 	"task_supplier": "http://localhost:8080/api/getTasks",
 	"stylesheet": "/gui/css/simple2secure.css",

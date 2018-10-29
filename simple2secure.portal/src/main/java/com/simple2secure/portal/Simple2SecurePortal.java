@@ -17,18 +17,25 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.utils.DataInitialization;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = {
 		EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
 
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
 
 	@Bean
 	public SessionLocaleResolver localeResolver() {
@@ -88,7 +95,11 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	// }
 
 	public static void main(String[] args) {
-		SpringApplication.run(Simple2SecurePortal.class, args);
+		ConfigurableApplicationContext context = SpringApplication.run(Simple2SecurePortal.class, args);
+		DataInitialization dataInitializer = context.getBean(DataInitialization.class);
+		if (dataInitializer != null) {
+			dataInitializer.addDefaultSettings();
+		}
 	}
 
 }
