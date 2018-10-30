@@ -3,7 +3,6 @@ package com.simple2secure.portal.controller;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +59,13 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
+import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
 public class UserController {
+
+	static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	UserRepository userRepository;
@@ -128,19 +130,21 @@ public class UserController {
 	@Autowired
 	DataInitialization dataInitialization;
 
+	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
+	MailUtils mailUtils;
+
+	@Autowired
+	RestTemplate restTemplate;
+
 	protected static SecureRandom random = new SecureRandom();
 
-	RestTemplate restTemplate = new RestTemplate();
-
-	public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
-	public static final Charset UTF_8 = Charset.forName("UTF-8");
-	static final Logger log = LoggerFactory.getLogger(UserController.class);
-
 	/**
-	 * This function is used to add new user. For each user added it sets the
-	 * configuration, queries, processors and steps from the default configuration
-	 * .json files which are placed on the server
-	 * 
+	 * This function is used to add new user. For each user added it sets the configuration, queries, processors and steps from the default
+	 * configuration .json files which are placed on the server
+	 *
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 * @throws URISyntaxException
@@ -148,8 +152,7 @@ public class UserController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	@RequestMapping(value = "/api/users/{type}", method = RequestMethod.POST)
 	public ResponseEntity<User> insertUser(@RequestBody User user, @PathVariable("type") String type,
-			@RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		return addNewUser(user, type, locale);
 	}
@@ -164,8 +167,7 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/api/register/{type}", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<User> registerUser(@RequestBody User user, @PathVariable("type") String type,
-			@RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		return addNewUser(user, type, locale);
 	}
@@ -180,9 +182,8 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/activate/updatePassword/{authenticationToken}", method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserPasswordFirstLogin(
-			@PathVariable("authenticationToken") String authenticationToken, @RequestBody String password,
-			@RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable("authenticationToken") String authenticationToken,
+			@RequestBody String password, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(authenticationToken)) {
@@ -193,15 +194,12 @@ public class UserController {
 				user.setPassword(password);
 				return addNewUser(user, StaticConfigItems.type_password_update, locale);
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(
-								messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -210,8 +208,7 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/activate/{activationToken}", method = RequestMethod.GET)
 	public ResponseEntity<InputStreamResource> activateUser(@PathVariable("activationToken") String activationToken,
-			@RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(activationToken);
 
 		if (user != null) {
@@ -239,8 +236,7 @@ public class UserController {
 			}
 
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -254,15 +250,14 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/sendResetPasswordEmail", method = RequestMethod.POST)
-	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, IOException {
+	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException, IOException {
 
 		if (!Strings.isNullOrEmpty(email)) {
 			User user = userRepository.findByEmailOnlyActivated(email);
 			if (user != null) {
-				user.setPasswordResetToken(PortalUtils.generateToken());
-				user.setPasswordResetExpirationTime(
-						System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset);
+				user.setPasswordResetToken(portalUtils.generateToken());
+				user.setPasswordResetExpirationTime(System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset);
 
 				userRepository.update(user);
 
@@ -270,22 +265,18 @@ public class UserController {
 				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
 						+ loadedConfigItems.getBaseURL() + "/api/users/resetPassword/" + user.getPasswordResetToken();
 
-				if (PortalUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
+				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
 					return new ResponseEntity<User>(user, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
 							HttpStatus.NOT_FOUND);
 				}
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(
-								messageByLocaleService.getMessage("user_with_provided_email_not_exists", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_not_exists", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -297,8 +288,8 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@RequestMapping(value = "/api/users/resetPassword/{token}", method = RequestMethod.GET)
-	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token,
-			@RequestHeader("Accept-Language") String locale) throws URISyntaxException {
+	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token, @RequestHeader("Accept-Language") String locale)
+			throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);
@@ -316,8 +307,7 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/updatePassword/{token}", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserPassword(@PathVariable("token") String token, @RequestBody String password,
-			@RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token)) {
 			User user = userRepository.findByPasswordResetToken(token);
@@ -326,9 +316,7 @@ public class UserController {
 				if (user.getPasswordResetExpirationTime() >= System.currentTimeMillis()) {
 
 					if (user.getPassword().equals(passwordEncoder.encode(password))) {
-						return new ResponseEntity(
-								new CustomErrorType(
-										messageByLocaleService.getMessage("password_must_be_different", locale)),
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("password_must_be_different", locale)),
 								HttpStatus.NOT_FOUND);
 					}
 
@@ -337,27 +325,23 @@ public class UserController {
 					userRepository.update(user);
 
 					String emailContent = messageByLocaleService.getMessage("password_changed_email_content", locale);
-					PortalUtils.sendEmail(user, emailContent, StaticConfigItems.email_subjct_pcs);
+					mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subjct_pcs);
 
 					URI url = new URI(loadedConfigItems.getBaseURLWeb());
 					HttpHeaders httpHeaders = new HttpHeaders();
 					httpHeaders.setLocation(url);
 					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(
-									messageByLocaleService.getMessage("password_reset_token_expired", locale)),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("password_reset_token_expired", locale)),
 							HttpStatus.NOT_FOUND);
 				}
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -379,8 +363,7 @@ public class UserController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/api/users/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
 		User user = userRepository.findByUserID(id);
 		List<User> myUsers = new ArrayList<>();
@@ -437,8 +420,7 @@ public class UserController {
 		}
 
 		else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -454,8 +436,8 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
 		boolean hasPrivilegedUser = false;
 		if (!Strings.isNullOrEmpty(userId)) {
 
@@ -492,24 +474,19 @@ public class UserController {
 
 				return new ResponseEntity<User>(user, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(
-								messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 	}
 
 	/**
-	 * This function updates the myUsers List for the user which added the user
-	 * which is currently being deleted and new privileged user will be added to
-	 * this list
-	 * 
+	 * This function updates the myUsers List for the user which added the user which is currently being deleted and new privileged user will
+	 * be added to this list
+	 *
 	 * @param addedByUser
 	 * @param oldUserId
 	 * @param newUserId
@@ -531,9 +508,8 @@ public class UserController {
 	}
 
 	/**
-	 * This function copies the groups from the user which is being deleted to the
-	 * privileged one
-	 * 
+	 * This function copies the groups from the user which is being deleted to the privileged one
+	 *
 	 * @param privilegedUser
 	 * @param user
 	 */
@@ -554,9 +530,8 @@ public class UserController {
 	}
 
 	/**
-	 * This function copies the added users from the user which is being deleted to
-	 * the privileged one
-	 * 
+	 * This function copies the added users from the user which is being deleted to the privileged one
+	 *
 	 * @param privilegedUser
 	 * @param myUsers
 	 * @return
@@ -572,7 +547,7 @@ public class UserController {
 
 	/**
 	 * This function returns the privileged user from the list of myUsers
-	 * 
+	 *
 	 * @param myUsers
 	 * @return
 	 */
@@ -603,9 +578,8 @@ public class UserController {
 	}
 
 	/**
-	 * This function checks if the user which is being deleted contains a privileged
-	 * user (ADMIN or SUPERUSER)
-	 * 
+	 * This function checks if the user which is being deleted contains a privileged user (ADMIN or SUPERUSER)
+	 *
 	 * @param myUsers
 	 * @return
 	 */
@@ -614,8 +588,7 @@ public class UserController {
 			for (String myUserId : myUsers) {
 				User myUser = userRepository.find(myUserId);
 				if (myUser != null) {
-					if (myUser.getUserRole().equals(UserRole.ADMIN)
-							|| myUser.getUserRole().equals(UserRole.SUPERUSER)) {
+					if (myUser.getUserRole().equals(UserRole.ADMIN) || myUser.getUserRole().equals(UserRole.SUPERUSER)) {
 						return true;
 					}
 				}
@@ -626,9 +599,9 @@ public class UserController {
 	}
 
 	/**
-	 * This function deletes all user dependencies. Flag deleteMyUsers is used to
-	 * distinguish if the users from the myUsers list should be deleted or not
-	 * 
+	 * This function deletes all user dependencies. Flag deleteMyUsers is used to distinguish if the users from the myUsers list should be
+	 * deleted or not
+	 *
 	 * @param user
 	 * @param deleteMyUsers
 	 */
@@ -733,9 +706,7 @@ public class UserController {
 
 			return new ResponseEntity<List<CompanyGroupDTO>>(groupDTO, HttpStatus.OK);
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -743,7 +714,7 @@ public class UserController {
 
 	/**
 	 * This function add new group to the group repository
-	 * 
+	 *
 	 * @param group
 	 * @param locale
 	 * @return
@@ -752,8 +723,8 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/group", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
 		if (group != null) {
 			User user = userRepository.findByUserID(group.getAddedByUserId());
 			if (Strings.isNullOrEmpty(group.getId())) {
@@ -762,9 +733,7 @@ public class UserController {
 					ObjectId groupId = groupRepository.saveAndReturnId(group);
 
 					if (Strings.isNullOrEmpty(groupId.toString())) {
-						return new ResponseEntity(
-								new CustomErrorType(messageByLocaleService
-										.getMessage("problem_occured_while_saving_group", locale)),
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
 								HttpStatus.NOT_FOUND);
 					} else {
 						dataInitialization.addDefaultGroupConfiguration(groupId.toString());
@@ -774,9 +743,7 @@ public class UserController {
 					}
 
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(
-									messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
 							HttpStatus.NOT_FOUND);
 				}
 
@@ -791,9 +758,7 @@ public class UserController {
 
 			return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -804,13 +769,10 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/group/{groupID}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 		CompanyGroup group = groupRepository.find(groupId);
 		if (group == null) {
-			return new ResponseEntity(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
 					HttpStatus.NOT_FOUND);
 		} else {
 			return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
@@ -823,14 +785,14 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/api/users/group/{groupID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 		// When the group is deleted we have also to delete the processors,
 		// configuration, etc.
 		CompanyGroup group = groupRepository.find(groupId);
 		if (group == null) {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService
-					.getMessage("problem_occured_while_retrieving_group", ObjectUtils.toObjectArray(groupId), locale)),
+			return new ResponseEntity<>(
+					new CustomErrorType(
+							messageByLocaleService.getMessage("problem_occured_while_retrieving_group", ObjectUtils.toObjectArray(groupId), locale)),
 					HttpStatus.NOT_FOUND);
 		} else {
 
@@ -879,9 +841,7 @@ public class UserController {
 			@RequestHeader("Accept-Language") String locale) {
 		List<CompanyGroup> groups = groupRepository.findByOwnerId(userId);
 		if (groups.isEmpty() || groups == null) {
-			return new ResponseEntity(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
 					HttpStatus.NOT_FOUND);
 		} else {
 			return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
@@ -893,8 +853,7 @@ public class UserController {
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		/*
-		 * TO-DO - if the email changes - check if the email already exists - send new
-		 * activation email to the user
+		 * TO-DO - if the email changes - check if the email already exists - send new activation email to the user
 		 */
 		if (user != null) {
 
@@ -904,7 +863,7 @@ public class UserController {
 			}
 
 			if (type.equals(StaticConfigItems.type_email)) {
-				String randomPass = PortalUtils.alphaNumericString(15);
+				String randomPass = portalUtils.alphaNumericString(15);
 				user.setPassword(randomPass);
 				user.setUsername(user.getEmail());
 			} else {
@@ -957,8 +916,7 @@ public class UserController {
 				userRepository.update(user);
 
 				if (type.equals(StaticConfigItems.type_password_update)) {
-					URI url = new URI(
-							loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + user.getActivationToken());
+					URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + user.getActivationToken());
 					HttpHeaders httpHeaders = new HttpHeaders();
 					httpHeaders.setLocation(url);
 					return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
@@ -970,7 +928,7 @@ public class UserController {
 				User queryUser = userRepository.findByEmail(user.getEmail());
 				if (queryUser == null) {
 
-					String activationToken = PortalUtils.generateToken();
+					String activationToken = portalUtils.generateToken();
 					user.setEnabled(true);
 					if (!type.contains(StaticConfigItems.type_add_by_user)) {
 						user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -992,17 +950,13 @@ public class UserController {
 						if (type.contains(StaticConfigItems.type_add_by_user)) {
 							if (Strings.isNullOrEmpty(addedByUserId)) {
 								userRepository.delete(user);
-								return new ResponseEntity(
-										new CustomErrorType(
-												messageByLocaleService.getMessage("error_no_added_by_userId", locale)),
+								return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_no_added_by_userId", locale)),
 										HttpStatus.NOT_FOUND);
 							} else {
 								User addedByUser = userRepository.findByUserID(addedByUserId);
 								if (addedByUser == null) {
 									userRepository.delete(user);
-									return new ResponseEntity(
-											new CustomErrorType(messageByLocaleService
-													.getMessage("error_no_added_by_userId", locale)),
+									return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_no_added_by_userId", locale)),
 											HttpStatus.NOT_FOUND);
 								} else {
 									List<String> addedByUserIds = addedByUser.getMyUsers();
@@ -1018,40 +972,31 @@ public class UserController {
 
 						if (userID != null) {
 
-							String emailContent = messageByLocaleService.getMessage("registration_email_content",
-									locale) + loadedConfigItems.getBaseURL() + "/api/users/activate/"
-									+ user.getActivationToken();
+							String emailContent = messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL()
+									+ "/api/users/activate/" + user.getActivationToken();
 
-							if (!PortalUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_al)) {
-								return new ResponseEntity(
-										new CustomErrorType(
-												messageByLocaleService.getMessage("error_while_sending_email", locale)),
+							if (!mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_al)) {
+								return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
 										HttpStatus.NOT_FOUND);
 
 							}
 						} else {
-							return new ResponseEntity(
-									new CustomErrorType(
-											messageByLocaleService.getMessage("error_while_saving_user", locale)),
+							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_user", locale)),
 									HttpStatus.NOT_FOUND);
 						}
 					} else {
-						return new ResponseEntity(
-								new CustomErrorType(
-										messageByLocaleService.getMessage("error_user_cannot_be_empty", locale)),
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_user_cannot_be_empty", locale)),
 								HttpStatus.NOT_FOUND);
 					}
 				} else {
 					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService
-									.getMessage("user_with_provided_email_already_exists", locale)),
+							new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_already_exists", locale)),
 							HttpStatus.NOT_FOUND);
 				}
 			}
 
 		} else {
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);

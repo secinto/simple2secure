@@ -19,7 +19,7 @@ public class TLSConfig {
 	private static Logger log = LoggerFactory.getLogger(TLSConfig.class);
 
 	@Value("${server.certificate.serial}")
-	private String acceptedSerialNumber;
+	private String[] acceptedSerialNumbers;
 
 	@Value("${server.ssl.trust-store}")
 	private String truststore;
@@ -48,7 +48,7 @@ public class TLSConfig {
 		try {
 
 			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, new TrustManager[] { new Simple2SecureTrustManager(acceptedSerialNumber, sunJsseX509TrustManager) }, null);
+			sslContext.init(null, new TrustManager[] { new Simple2SecureTrustManager(acceptedSerialNumbers, sunJsseX509TrustManager) }, null);
 			SSLContext.setDefault(sslContext);
 		} catch (Exception e) {
 			log.error("Couldn't initialize SSLContext for TLS. Reason {}", e.getLocalizedMessage());

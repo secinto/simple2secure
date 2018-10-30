@@ -55,27 +55,26 @@ public class DataInitialization {
 	@Autowired
 	protected StepRepository stepRepository;
 
+	@Autowired
+	protected PortalUtils portalUtils;
+
 	/**
-	 * 
+	 *
 	 * @param userId
 	 * @param username
-	 * 
-	 *                 This function adds a default group for the users which are
-	 *                 registered using the standard registration. This function
-	 *                 does not apply when another user(superadmin, admin,
-	 *                 superuser) adds new user, because he has to choose the group
-	 *                 while adding.
+	 *
+	 *          This function adds a default group for the users which are registered using the standard registration. This function does not
+	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group while adding.
 	 */
 	public void addDefaultGroup(String userId, String username) {
 
 		List<CompanyGroup> groupList = groupRepository.findByOwnerId(userId);
 
 		if (groupList == null || groupList.isEmpty()) {
-			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(),
-					CompanyGroup.class);
+			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(), CompanyGroup.class);
 			CompanyGroup group = response.getBody();
 			group.setAddedByUserId(userId);
-			String expirationDate = PortalUtils.getDefaultLicenseExpirationDate();
+			String expirationDate = portalUtils.getDefaultLicenseExpirationDate();
 			group.setOwner(username);
 			group.setLicenseExpirationDate(expirationDate);
 			ObjectId groupId = groupRepository.saveAndReturnId(group);
@@ -90,7 +89,7 @@ public class DataInitialization {
 
 	/**
 	 * This function adds default configuration for each group which is created
-	 * 
+	 *
 	 * @param probeId
 	 */
 	public void addDefaultGroupConfiguration(String groupId) {
@@ -106,15 +105,14 @@ public class DataInitialization {
 
 	/**
 	 * This function adds default queries for each group which is created
-	 * 
+	 *
 	 * @param probeId
 	 */
 	public void addDefaultGroupQueries(String groupId) {
 		List<QueryRun> queriesDB = queryRepository.findByGroupId(groupId, true, true);
 
 		if (queriesDB == null || queriesDB.isEmpty()) {
-			ResponseEntity<QueryRun[]> response = restTemplate.getForEntity(loadedConfigItems.getQueryURL(),
-					QueryRun[].class);
+			ResponseEntity<QueryRun[]> response = restTemplate.getForEntity(loadedConfigItems.getQueryURL(), QueryRun[].class);
 			List<QueryRun> queries = Arrays.asList(response.getBody());
 
 			for (QueryRun query : queries) {
@@ -134,8 +132,7 @@ public class DataInitialization {
 		List<Processor> processorsDB = processorRepository.getProcessorsByGroupId(groupId, true);
 
 		if (processorsDB == null || processorsDB.isEmpty()) {
-			ResponseEntity<Processor[]> response = restTemplate.getForEntity(loadedConfigItems.getProcessorsURL(),
-					Processor[].class);
+			ResponseEntity<Processor[]> response = restTemplate.getForEntity(loadedConfigItems.getProcessorsURL(), Processor[].class);
 			List<Processor> processors = Arrays.asList(response.getBody());
 			for (Processor processor : processors) {
 				processor.setGroupId(groupId);
@@ -146,8 +143,7 @@ public class DataInitialization {
 	}
 
 	/**
-	 * This function adds default settings at the system startup if settings does
-	 * not exist in the Portal DB
+	 * This function adds default settings at the system startup if settings does not exist in the Portal DB
 	 *
 	 */
 	public void addDefaultSettings() {
@@ -155,8 +151,7 @@ public class DataInitialization {
 
 		if (settingsDB == null || settingsDB.isEmpty()) {
 			try {
-				ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(),
-						Settings.class);
+				ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(), Settings.class);
 				Settings settings = response.getBody();
 				settingsRepository.save(settings);
 			} catch (Exception e) {

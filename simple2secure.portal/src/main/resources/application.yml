@@ -9,24 +9,20 @@ server:
     trust-store: classpath:keys/cacerts
     trust-store-password: testtest
   certificate:
-    serial: 1009697567
-smtpserver:
-  enabled: true
-  hostname: smtp.1und1.de
-  port: 21
-username: activation@secinto.com
-password: S2S.secinto.18.AT
+    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195
 
 mail:
+  username: activation@secinto.com
+  password: S2S.secinto.18.AT
   imap:
-    host: imap.1und1.de
+    host: imap.ionos.de
     auth: true
     socketFactory:
-      port: 465
+      port: 993
       class: javax.net.ssl.SSLSocketFactory
   smtp:
     auth: true
-    host: smtp.1und1.de
+    host: smtp.ionos.de
     port: 587
     
 spring:

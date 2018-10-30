@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.junit.Test;
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PacketListener;
@@ -40,7 +39,6 @@ public class TestSendArpRequest {
 
 	private static MacAddress resolvedAddr;
 
-	@Test
 	public void testSendArpRequest() throws PcapNativeException, NotOpenException {
 		String strSrcIpAddress = "192.0.2.100"; // for InetAddress.getByName()
 		String strDstIpAddress = "192.168.123.1"; // for InetAddress.getByName()
@@ -69,8 +67,9 @@ public class TestSendArpRequest {
 		ExecutorService pool = Executors.newSingleThreadExecutor();
 
 		try {
-			handle.setFilter("arp and src host " + strDstIpAddress + " and dst host " + strSrcIpAddress + " and ether dst "
-					+ Pcaps.toBpfString(SRC_MAC_ADDR), BpfCompileMode.OPTIMIZE);
+			handle.setFilter(
+					"arp and src host " + strDstIpAddress + " and dst host " + strSrcIpAddress + " and ether dst " + Pcaps.toBpfString(SRC_MAC_ADDR),
+					BpfCompileMode.OPTIMIZE);
 
 			PacketListener listener = new PacketListener() {
 				@Override
@@ -90,11 +89,10 @@ public class TestSendArpRequest {
 
 			ArpPacket.Builder arpBuilder = new ArpPacket.Builder();
 			try {
-				arpBuilder.hardwareType(ArpHardwareType.ETHERNET).protocolType(EtherType.IPV4)
-						.hardwareAddrLength((byte) MacAddress.SIZE_IN_BYTES)
-						.protocolAddrLength((byte) ByteArrays.INET4_ADDRESS_SIZE_IN_BYTES).operation(ArpOperation.REQUEST)
-						.srcHardwareAddr(SRC_MAC_ADDR).srcProtocolAddr(InetAddress.getByName(strSrcIpAddress))
-						.dstHardwareAddr(MacAddress.ETHER_BROADCAST_ADDRESS).dstProtocolAddr(InetAddress.getByName(strDstIpAddress));
+				arpBuilder.hardwareType(ArpHardwareType.ETHERNET).protocolType(EtherType.IPV4).hardwareAddrLength((byte) MacAddress.SIZE_IN_BYTES)
+						.protocolAddrLength((byte) ByteArrays.INET4_ADDRESS_SIZE_IN_BYTES).operation(ArpOperation.REQUEST).srcHardwareAddr(SRC_MAC_ADDR)
+						.srcProtocolAddr(InetAddress.getByName(strSrcIpAddress)).dstHardwareAddr(MacAddress.ETHER_BROADCAST_ADDRESS)
+						.dstProtocolAddr(InetAddress.getByName(strDstIpAddress));
 			} catch (UnknownHostException e) {
 				throw new IllegalArgumentException(e);
 			}

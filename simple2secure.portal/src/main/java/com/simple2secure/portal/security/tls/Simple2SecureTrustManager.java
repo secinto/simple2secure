@@ -15,13 +15,13 @@ public class Simple2SecureTrustManager implements X509TrustManager {
 
 	private static Logger log = LoggerFactory.getLogger(Simple2SecureTrustManager.class);
 
-	private String acceptedSerialNumber;
+	private String[] acceptedSerialNumbers;
 	private X509TrustManager sunJsseX509TrustManager;
 	private List<X509Certificate> trustedIssuers;
 
-	public Simple2SecureTrustManager(String acceptedSerialNumber, X509TrustManager sunJsseX509TrustManager) {
+	public Simple2SecureTrustManager(String[] acceptedSerialNumbers, X509TrustManager sunJsseX509TrustManager) {
 		trustedIssuers = new ArrayList<X509Certificate>();
-		this.acceptedSerialNumber = acceptedSerialNumber;
+		this.acceptedSerialNumbers = acceptedSerialNumbers;
 		this.sunJsseX509TrustManager = sunJsseX509TrustManager;
 	}
 
@@ -30,25 +30,27 @@ public class Simple2SecureTrustManager implements X509TrustManager {
 		for (X509Certificate cert : chain) {
 			log.debug("Client Certificate Chain {}", cert.getSubjectX500Principal().toString());
 		}
-		if (sunJsseX509TrustManager != null)
+		if (sunJsseX509TrustManager != null) {
 			sunJsseX509TrustManager.checkClientTrusted(chain, authType);
+		}
 	}
 
 	@Override
 	public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		try {
-			if (sunJsseX509TrustManager != null)
+			if (sunJsseX509TrustManager != null) {
 				sunJsseX509TrustManager.checkServerTrusted(chain, authType);
+			}
 		} catch (CertificateException excep) {
 			for (X509Certificate cert : chain) {
 				log.debug("Client Certificate Chain {}", cert.getSubjectX500Principal().toString());
-				if (cert.getSerialNumber().toString().equals(acceptedSerialNumber)) {
+				if (stringContainsItemFromList(cert.getSerialNumber().toString(), acceptedSerialNumbers)) {
 					if (!trustedIssuers.contains(cert)) {
 						trustedIssuers.add(cert);
 					}
 				} else {
 					throw new CertificateException(
-							"Not trusted certificate found. Currently only trusting certificate with serial " + acceptedSerialNumber);
+							"Not trusted certificate found. Currently only trusting certificate with serial " + acceptedSerialNumbers);
 				}
 			}
 		}
@@ -60,6 +62,10 @@ public class Simple2SecureTrustManager implements X509TrustManager {
 		ArrayList<X509Certificate> trustedCerts = new ArrayList<X509Certificate>(Arrays.asList(sunJsseX509TrustManager.getAcceptedIssuers()));
 		trustedCerts.addAll(trustedIssuers);
 		return trustedCerts.toArray(new X509Certificate[0]);
+	}
+
+	public static boolean stringContainsItemFromList(String inputStr, String[] items) {
+		return Arrays.stream(items).parallel().anyMatch(inputStr::contains);
 	}
 
 }

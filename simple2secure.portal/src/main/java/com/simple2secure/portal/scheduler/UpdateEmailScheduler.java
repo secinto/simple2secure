@@ -27,7 +27,7 @@ import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
-import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.MailUtils;
 
 import ch.maxant.rules.AbstractAction;
 import ch.maxant.rules.CompileException;
@@ -39,155 +39,160 @@ import ch.maxant.rules.ParseException;
 import ch.maxant.rules.Rule;
 
 @Component
-public class UpdateEmailScheduler{
-	
+public class UpdateEmailScheduler {
+
 	private String STORE = "imaps";
 	private String FOLDER = "inbox";
 	private String SOCKET_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
 	private String SOCKET_FACTORY_PORT = "465";
 	private String IMAP_AUTH = "true";
-	
+
 	@Autowired
 	EmailConfigurationRepository emailConfigRepository;
-	
+
 	@Autowired
 	NotificationRepository notificationRepository;
-	
+
 	@Autowired
 	RuleRepository ruleRepository;
-	
-	@Autowired 
+
+	@Autowired
 	EmailRepository emailRepository;
-	
-    private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);	 
-    
-    @Scheduled(fixedRate = 50000)
-    public void checkEmails() throws Exception {
-        List<EmailConfiguration> configs = this.emailConfigRepository.findAll();
-        if(configs != null) {
-            for(EmailConfiguration cfg : configs) {
-            	Message[] msg = connect(cfg);
-            	if(msg != null) {
-            		extractEmailsFromMessages(msg, cfg.getUserUUID(), cfg.getId());
-            	}
-            }        	
-        }
-    }
-    
+
+	@Autowired
+	MailUtils mailUtils;
+
+	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
+
+	@Scheduled(fixedRate = 50000)
+	public void checkEmails() throws Exception {
+		List<EmailConfiguration> configs = emailConfigRepository.findAll();
+		if (configs != null) {
+			for (EmailConfiguration cfg : configs) {
+				Message[] msg = connect(cfg);
+				if (msg != null) {
+					extractEmailsFromMessages(msg, cfg.getUserUUID(), cfg.getId());
+				}
+			}
+		}
+	}
+
 	/**
 	 * This function extracts the emails from the message array, and converts the email content from MimeMultipart type to the String
+	 *
 	 * @param messages
 	 * @param user_id
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String user_id, String config_id) throws Exception{
-		for(Message msg : messages) {
-			UIDFolder uf = (UIDFolder)msg.getFolder();
+	public void extractEmailsFromMessages(Message[] messages, String user_id, String config_id) throws Exception {
+		for (Message msg : messages) {
+			UIDFolder uf = (UIDFolder) msg.getFolder();
 			Long messageId = uf.getUID(msg);
-			
-			if(emailRepository.findByUserUUIDConfigIDAndMsgID(user_id, config_id, messageId.toString()) == null) {
-				//TO-DO - check if there is a rule for this inbox and check it accordingly
-				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(), 
-						PortalUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());	
-				
+
+			if (emailRepository.findByUserUUIDConfigIDAndMsgID(user_id, config_id, messageId.toString()) == null) {
+				// TO-DO - check if there is a rule for this inbox and check it accordingly
+				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(),
+						msg.getFrom()[0].toString(), mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()),
+						msg.getReceivedDate().toString());
+
 				emailsRuleChecker(email);
-				
+
 				emailRepository.save(email);
 			}
 		}
 	}
-	
+
 	/**
-	 * This function checks the rules for the email and in case that some rules applies it will be automatically added to the notification repository
+	 * This function checks the rules for the email and in case that some rules applies it will be automatically added to the notification
+	 * repository
 	 */
-	
+
 	private void emailsRuleChecker(Email email) {
-        
+
 		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigID());
-		//Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
-        
+		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
+
 		List<Rule> rules = new ArrayList<>();
-		if(portalRules != null) {
-			for(PortalRule pRule : portalRules) {
+		if (portalRules != null) {
+			for (PortalRule pRule : portalRules) {
 				ExtendedRule extRule = pRule.getRule();
 				Rule r1 = new Rule(extRule.getName(), extRule.getExpression(), extRule.getOutcome(), extRule.getPriority(), extRule.getNamespace());
 				rules.add(r1);
 			}
-			
-			if(rules == null || rules.isEmpty()) {
+
+			if (rules == null || rules.isEmpty()) {
 				log.error("No rules provided!");
-			}
-			else {
+			} else {
 				AbstractAction<Email, Void> a1 = new AbstractAction<Email, Void>("notificationAction") {
 					@Override
 					public Void execute(Email input) {
-						
-						//adding to the notification repository!
-						Notification notification = new Notification(email.getUserUUID(), email.getConfigID(), "Subject", "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
+
+						// adding to the notification repository!
+						Notification notification = new Notification(email.getUserUUID(), email.getConfigID(), "Subject",
+								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
 						notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
 						return null;
 					}
 				};
-				
+
 				List<AbstractAction<Email, Void>> actions = new ArrayList<>();
 				actions.add(a1);
-				
+
 				try {
-					
+
 					Engine engine = new Engine(rules, true);
 					engine.executeAllActions(email, actions);
 				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}			
-			}			
-		}
-		else {
+				}
+			}
+		} else {
 			log.error("No rules provided!");
 		}
 
 	}
-	
-	
+
 	/**
 	 * This function connects to the server and returns the messages in case that the connection was successful
+	 *
 	 * @param config
 	 * @return
 	 * @throws NumberFormatException
 	 * @throws MessagingException
 	 */
-	
+
 	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
-		
-		//create a new session with the provided properties
+
+		// create a new session with the provided properties
 		Session session = Session.getDefaultInstance(setEmailConfiguration(config), null);
-		
-		//connect to the store using the provided credentials
-		Store store = session.getStore(this.STORE);
-		
+
+		// connect to the store using the provided credentials
+		Store store = session.getStore(STORE);
+
 		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
-		
+
 		log.info("Connected to the store: " + store);
-		
-		//get inbox folder
-		Folder inbox = store.getFolder(this.FOLDER);
-		
-		//open inbox folder to read the messages
+
+		// get inbox folder
+		Folder inbox = store.getFolder(FOLDER);
+
+		// open inbox folder to read the messages
 		inbox.open(Folder.READ_ONLY);
-		
-		//retrieve the messages
+
+		// retrieve the messages
 		Message[] messages = inbox.getMessages();
-		
+
 		log.info("Messages length: " + messages.length);
-		
+
 		return messages;
 	}
-	
-	
+
 	/**
 	 * This function creates a new properties object from the EmailConfiguration object and returns it.
+	 *
 	 * @param config
 	 * @return
 	 */
@@ -195,12 +200,12 @@ public class UpdateEmailScheduler{
 		Properties props = new Properties();
 		props.setProperty("mail.imap.host", config.getIncomingServer());
 		props.setProperty("mail.imap.port", config.getIncomingPort());
-		props.setProperty("mail.imap.socketFactory.class", this.SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", this.SOCKET_FACTORY_PORT);
-		props.setProperty("mail.imap.auth", this.IMAP_AUTH);
-	
+		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
+		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
+		props.setProperty("mail.imap.auth", IMAP_AUTH);
+
 		return props;
-		
-	}	
+
+	}
 
 }

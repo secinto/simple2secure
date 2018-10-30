@@ -51,6 +51,9 @@ public class TokenAuthenticationService {
 	@Autowired
 	LicenseRepository licenseRepository;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	static final String TOKEN_PREFIX = "Bearer";
 	static final String HEADER_STRING = "Authorization";
 	static final String CLAIMS_SUBJECT = "data";
@@ -67,7 +70,7 @@ public class TokenAuthenticationService {
 
 			if (settings != null) {
 				if (settings.size() == 1) {
-					expirationTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
+					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
 							settings.get(0).getAccessTokenProbeValidityUnit());
 				} else {
 					return null;
@@ -110,7 +113,7 @@ public class TokenAuthenticationService {
 
 			if (settings != null) {
 				if (settings.size() == 1) {
-					expirationTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
+					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
 							settings.get(0).getAccessTokenValidityUnit());
 				}
 			}
@@ -194,7 +197,7 @@ public class TokenAuthenticationService {
 
 	}
 
-	private static String resolveToken(HttpServletRequest req) {
+	private String resolveToken(HttpServletRequest req) {
 		String bearerToken = req.getHeader(HEADER_STRING);
 		if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
 			return bearerToken.replace(TOKEN_PREFIX, "").trim();
@@ -202,11 +205,11 @@ public class TokenAuthenticationService {
 		return null;
 	}
 
-	public static boolean validateToken(String token, String secretKey) {
+	public boolean validateToken(String token, String secretKey) {
 		try {
 			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
 
-			if (PortalUtils.isAccessTokenExpired(expirationDate)) {
+			if (portalUtils.isAccessTokenExpired(expirationDate)) {
 				return false;
 			}
 			log.info("Token still valid!" + " Expiration date: " + expirationDate.toString());
@@ -217,7 +220,7 @@ public class TokenAuthenticationService {
 		}
 	}
 
-	public static Date getTokenExpirationDate(String token, String secretKey) {
+	public Date getTokenExpirationDate(String token, String secretKey) {
 		try {
 			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
 			return expirationDate;

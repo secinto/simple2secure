@@ -1,5 +1,7 @@
 apply plugin: 'application'
 
+mainClassName = "com.simple2secure.probe.gui.ProbeGUI"
+
 dependencies {
 
 	compile project(':simple2secure.api')
@@ -38,7 +40,6 @@ dependencies {
 
 	testCompileOnly(
 			'junit:junit:4.12',
-			'org.springframework.boot:spring-boot-starter-test'
 			)
 	testImplementation(
 			'org.junit.jupiter:junit-jupiter-api:5.1.0'
@@ -64,4 +65,3 @@ jar {
 		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 }
-

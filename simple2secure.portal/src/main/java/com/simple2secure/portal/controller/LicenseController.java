@@ -100,6 +100,9 @@ public class LicenseController {
 	@Autowired
 	TokenAuthenticationService tokenAuthenticationService;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	RestTemplate restTemplate = new RestTemplate();
@@ -132,7 +135,7 @@ public class LicenseController {
 							HttpStatus.NOT_FOUND);
 				} else {
 					if (!Strings.isNullOrEmpty(license.getUserId())) {
-						license.setTokenSecret(PortalUtils.alphaNumericString(20));
+						license.setTokenSecret(portalUtils.alphaNumericString(20));
 						String accessToken = tokenAuthenticationService.addLicenseAuthentication(probeId, group, license);
 
 						if (!Strings.isNullOrEmpty(accessToken)) {
@@ -303,7 +306,7 @@ public class LicenseController {
 
 			if (license != null) {
 				boolean isTokenValid = false;
-				isTokenValid = TokenAuthenticationService.validateToken(accessToken, license.getTokenSecret());
+				isTokenValid = tokenAuthenticationService.validateToken(accessToken, license.getTokenSecret());
 
 				if (isTokenValid) {
 					// Generate new access token if validity is smaller than the value defined in
@@ -311,12 +314,12 @@ public class LicenseController {
 					List<Settings> settings = settingsRepository.findAll();
 					if (settings != null) {
 						if (settings.size() == 1) {
-							long tokenMinValidityTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
+							long tokenMinValidityTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
 									settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
-							long tokenExpirationTime = TokenAuthenticationService.getTokenExpirationDate(accessToken, license.getTokenSecret()).getTime();
+							long tokenExpirationTime = tokenAuthenticationService.getTokenExpirationDate(accessToken, license.getTokenSecret()).getTime();
 
 							if (tokenExpirationTime - System.currentTimeMillis() <= tokenMinValidityTime) {
-								if (!PortalUtils.isLicenseExpired(license.getExpirationDate())) {
+								if (!portalUtils.isLicenseExpired(license.getExpirationDate())) {
 									CompanyGroup group = groupRepository.find(license.getGroupId());
 									if (group != null) {
 										accessToken = tokenAuthenticationService.addLicenseAuthentication(license.getProbeId(), group, license);
@@ -331,7 +334,7 @@ public class LicenseController {
 					log.debug("Probe access token is still valid.");
 					return new ResponseEntity<CompanyLicenseObj>(licenseObj, HttpStatus.OK);
 				} else {
-					if (!PortalUtils.isLicenseExpired(license.getExpirationDate())) {
+					if (!portalUtils.isLicenseExpired(license.getExpirationDate())) {
 						CompanyGroup group = groupRepository.find(license.getGroupId());
 						if (group != null) {
 							accessToken = tokenAuthenticationService.addLicenseAuthentication(license.getProbeId(), group, license);
