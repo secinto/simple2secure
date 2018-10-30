@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,21 +19,22 @@ import com.simple2secure.portal.repository.UserRepository;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+	@Autowired
 	private UserRepository userRepository;
 
-	public UserDetailsServiceImpl(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-
+	// public UserDetailsServiceImpl(UserRepository userRepository) {
+	// this.userRepository = userRepository;
+	// }
+	//
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = this.userRepository.findUserByUserName(username);
+		User user = userRepository.findUserByUserName(username);
 
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		}
 
-		//List<GrantedAuthority> authorities = buildUserAuthority(user.getUserRole());
+		// List<GrantedAuthority> authorities = buildUserAuthority(user.getUserRole());
 
 		return buildUserForAuthentication(user, null);
 	}

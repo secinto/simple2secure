@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
@@ -25,7 +27,6 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.utils.BeanUtil;
 import com.simple2secure.portal.utils.PortalUtils;
 
 import io.jsonwebtoken.Claims;
@@ -33,9 +34,22 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+@Service
 public class TokenAuthenticationService {
 
 	public static final Logger log = LoggerFactory.getLogger(TokenAuthenticationService.class);
+
+	@Autowired
+	SettingsRepository settingsRepository;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	TokenRepository tokenRepository;
+
+	@Autowired
+	LicenseRepository licenseRepository;
 
 	static final String TOKEN_PREFIX = "Bearer";
 	static final String HEADER_STRING = "Authorization";
@@ -44,8 +58,7 @@ public class TokenAuthenticationService {
 	static final String CLAIM_USERROLE = "userRole";
 	static final String CLAIM_PROBEID = "probeID";
 
-	public static String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicense license) {
-		SettingsRepository settingsRepository = BeanUtil.getBean(SettingsRepository.class);
+	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicense license) {
 		if (!Strings.isNullOrEmpty(probeId) && group != null && license != null) {
 
 			List<Settings> settings = settingsRepository.findAll();
@@ -77,10 +90,7 @@ public class TokenAuthenticationService {
 
 	}
 
-	public static void addAuthentication(HttpServletResponse res, String username, Collection<? extends GrantedAuthority> collection) {
-		UserRepository userRepository = BeanUtil.getBean(UserRepository.class);
-		TokenRepository tokenRepository = BeanUtil.getBean(TokenRepository.class);
-		SettingsRepository settingsRepository = BeanUtil.getBean(SettingsRepository.class);
+	public void addAuthentication(HttpServletResponse res, String username, Collection<? extends GrantedAuthority> collection) {
 		User user = userRepository.findByEmailOnlyActivated(username);
 		if (user != null) {
 
@@ -129,11 +139,9 @@ public class TokenAuthenticationService {
 
 	}
 
-	public static Authentication getAuthentication(HttpServletRequest request) {
+	public Authentication getAuthentication(HttpServletRequest request) {
 		String accessToken = resolveToken(request);
 		if (accessToken != null) {
-			TokenRepository tokenRepository = BeanUtil.getBean(TokenRepository.class);
-			UserRepository userRepository = BeanUtil.getBean(UserRepository.class);
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 			if (token != null) {
@@ -161,9 +169,6 @@ public class TokenAuthenticationService {
 			else {
 				// Handle token for probeId
 				// Check if there is a token with this id in the licenseRepo - for probe
-
-				LicenseRepository licenseRepository = BeanUtil.getBean(LicenseRepository.class);
-
 				CompanyLicense license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 				if (license != null) {

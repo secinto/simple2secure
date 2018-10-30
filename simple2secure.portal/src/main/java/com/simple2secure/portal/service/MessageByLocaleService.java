@@ -1,8 +1,5 @@
 package com.simple2secure.portal.service;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public interface MessageByLocaleService {
 	public String getMessage(String id);
 

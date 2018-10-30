@@ -42,16 +42,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
+	@Autowired
 	private UserDetailsService userDetailsService;
-
-	public WebSecurityConfig(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
-	}
 
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(this.userDetailsService);
+		authProvider.setUserDetailsService(userDetailsService);
 		authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
 		return authProvider;
 	}
@@ -59,27 +56,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/users/activate/**", "/api/download/**",
-				"/api/users/sendResetPasswordEmail", "/api/device/**", "/api/users/resetPassword/**",
-				"/api/users/updatePassword/**", "/api/license/activateProbe", "/api/license/token", "/assets/**",
-				"/favicon.ico", "/index.html", "/*.js", "/*.map", "/fontawesome*", "/glyphicons*");
+				"/api/users/sendResetPasswordEmail", "/api/device/**", "/api/users/resetPassword/**", "/api/users/updatePassword/**",
+				"/api/license/activateProbe", "/api/license/token", "/assets/**", "/favicon.ico", "/index.html", "/*.js", "/*.map", "/fontawesome*",
+				"/glyphicons*");
 	}
 
 	// TODO - find better solution for antMatchers!
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login")
-				.permitAll().anyRequest().authenticated().and().authorizeRequests().antMatchers("/api/register/**")
-				.anonymous().and().authorizeRequests().antMatchers("/api/login").anonymous().and().authorizeRequests()
-				.antMatchers("/api/users/activate/").anonymous().and().authorizeRequests()
-				.antMatchers("/api/users/sendResetPasswordEmail").anonymous().and().authorizeRequests()
-				.antMatchers("/api/users/resetPassword/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/users/updatePassword/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/download/**").anonymous().and().authorizeRequests().antMatchers("/api/device/**")
-				.anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe").anonymous().and()
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll().anyRequest()
+				.authenticated().and().authorizeRequests().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/login").anonymous().and().authorizeRequests().antMatchers("/api/users/activate/").anonymous().and()
+				.authorizeRequests().antMatchers("/api/users/sendResetPasswordEmail").anonymous().and().authorizeRequests()
+				.antMatchers("/api/users/resetPassword/**").anonymous().and().authorizeRequests().antMatchers("/api/users/updatePassword/**")
+				.anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/device/**").anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe").anonymous().and()
 				// We filter the api/login requests
-				.addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()),
-						UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 				// And filter other requests to check the presence of JWT in header
 				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 
@@ -93,6 +87,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		// auth.authenticationProvider(authProvider());
 		// auth.userDetailsService(userDetailsService);
-		auth.authenticationProvider(this.authProvider);
+		auth.authenticationProvider(authProvider);
 	}
 }

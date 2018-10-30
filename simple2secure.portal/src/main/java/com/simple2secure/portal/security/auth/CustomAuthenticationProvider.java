@@ -30,7 +30,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	String password;
 
 	@Autowired
-	private UserService userService;
+	UserService userService;
+
 	public static String userID;
 
 	@Autowired

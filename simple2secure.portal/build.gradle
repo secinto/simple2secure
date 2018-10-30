@@ -15,6 +15,10 @@ apply plugin: 'eclipse-wtp'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
+
+mainClassName = "com.secinto.portal.Simple2SecurePortal"
+
+
 sonarqube {
 	properties { property "sonar.projectBaseDir", "$projectDir/.." }
 }

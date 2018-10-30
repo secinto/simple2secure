@@ -19,33 +19,30 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String baseURL = baseProtocol + "://" + baseHost + ":" + basePort;
-	private String baseURLWeb = baseProtocol + "://" + baseHost + ":" + basePortWeb;
-
 	private String baseKubernetesURL = "https://35.232.109.156";
 
-	private String reportURL = baseURL + "/config/reports.json";
-	private String stepsURL = baseURL + "/config/steps.json";
-	private String configURL = baseURL + "/config/config.json";
-	private String endpointsURL = baseURL + "/config/endpoints.json";
-	private String processorsURL = baseURL + "/config/processors.json";
-	private String queryURL = baseURL + "/config/queries.json";
-	private String toolsURL = baseURL + "/config/tools.json";
-	private String testsURL = baseURL + "/config/tests.json";
-	private String groupURL = baseURL + "/config/group.json";
-	private String settingsURL = baseURL + "/config/settings.json";
+	private String reportURL = "/config/reports.json";
+	private String stepsURL = "/config/steps.json";
+	private String configURL = "/config/config.json";
+	private String endpointsURL = "/config/endpoints.json";
+	private String processorsURL = "/config/processors.json";
+	private String queryURL = "/config/queries.json";
+	private String toolsURL = "/config/tools.json";
+	private String testsURL = "/config/tests.json";
+	private String groupURL = "/config/group.json";
+	private String settingsURL = "/config/settings.json";
 
-	private String usersAPI = baseURL + "/api/users";
-	private String endpointsAPI = baseURL + "/api/endpoints";
-	private String loginAPI = baseURL + "/api/login";
-	private String reportsAPI = baseURL + "/api/reports";
-	private String queryAPI = baseURL + "/api/config/query";
-	private String configAPI = baseURL + "/api/config";
-	private String deviceAPI = baseURL + "/api/device";
-	private String packetAPI = baseURL + "/api/packet";
-	private String stepAPI = baseURL + "/api/steps";
-	private String processorAPI = baseURL + "/api/processors";
-	private String licenseAPI = baseURL + "/api/license";
+	private String usersAPI = "/api/users";
+	private String endpointsAPI = "/api/endpoints";
+	private String loginAPI = "/api/login";
+	private String reportsAPI = "/api/reports";
+	private String queryAPI = "/api/config/query";
+	private String configAPI = "/api/config";
+	private String deviceAPI = "/api/device";
+	private String packetAPI = "/api/packet";
+	private String stepAPI = "/api/steps";
+	private String processorAPI = "/api/processors";
+	private String licenseAPI = "/api/license";
 
 	public LoadedConfigItems() {
 	}
@@ -57,15 +54,13 @@ public class LoadedConfigItems {
 			/*
 			 * Read configuration from resources application configuration
 			 */
-			LoadedConfigItems user = mapper.readValue(
-					Resources.toString(Resources.getResource("config.items.yml"), Charset.forName("UTF-8")),
+			LoadedConfigItems user = mapper.readValue(Resources.toString(Resources.getResource("config.items.yml"), Charset.forName("UTF-8")),
 					LoadedConfigItems.class);
 
 			log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
 
 		} catch (Exception e) {
-			log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(),
-					e.getStackTrace());
+			log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(), e.getStackTrace());
 		}
 	}
 
@@ -118,171 +113,87 @@ public class LoadedConfigItems {
 	}
 
 	public String getReportURL() {
-		return reportURL;
-	}
-
-	public void setReportURL(String reportURL) {
-		this.reportURL = reportURL;
+		return getBaseURL() + reportURL;
 	}
 
 	public String getStepsURL() {
-		return stepsURL;
-	}
-
-	public void setStepsURL(String stepsURL) {
-		this.stepsURL = stepsURL;
+		return getBaseURL() + stepsURL;
 	}
 
 	public String getConfigURL() {
-		return configURL;
-	}
-
-	public void setConfigURL(String configURL) {
-		this.configURL = configURL;
+		return getBaseURL() + configURL;
 	}
 
 	public String getEndpointsURL() {
-		return endpointsURL;
-	}
-
-	public void setEndpointsURL(String endpointsURL) {
-		this.endpointsURL = endpointsURL;
+		return getBaseURL() + endpointsURL;
 	}
 
 	public String getProcessorsURL() {
-		return processorsURL;
-	}
-
-	public void setProcessorsURL(String processorsURL) {
-		this.processorsURL = processorsURL;
+		return getBaseURL() + processorsURL;
 	}
 
 	public String getQueryURL() {
-		return queryURL;
-	}
-
-	public void setQueryURL(String queryURL) {
-		this.queryURL = queryURL;
+		return getBaseURL() + queryURL;
 	}
 
 	public String getToolsURL() {
-		return toolsURL;
-	}
-
-	public void setToolsURL(String toolsURL) {
-		this.toolsURL = toolsURL;
+		return getBaseURL() + toolsURL;
 	}
 
 	public String getTestsURL() {
-		return testsURL;
-	}
-
-	public void setTestsURL(String testsURL) {
-		this.testsURL = testsURL;
+		return getBaseURL() + testsURL;
 	}
 
 	public String getGroupURL() {
-		return groupURL;
-	}
-
-	public void setGroupURL(String groupURL) {
-		this.groupURL = groupURL;
+		return getBaseURL() + groupURL;
 	}
 
 	public String getSettingsURL() {
-		return settingsURL;
-	}
-
-	public void setSettingsURL(String settingsURL) {
-		this.settingsURL = settingsURL;
+		return getBaseURL() + settingsURL;
 	}
 
 	public String getUsersAPI() {
-		return usersAPI;
-	}
-
-	public void setUsersAPI(String usersAPI) {
-		this.usersAPI = usersAPI;
+		return getBaseURL() + usersAPI;
 	}
 
 	public String getEndpointsAPI() {
-		return endpointsAPI;
-	}
-
-	public void setEndpointsAPI(String endpointsAPI) {
-		this.endpointsAPI = endpointsAPI;
+		return getBaseURL() + endpointsAPI;
 	}
 
 	public String getLoginAPI() {
-		return loginAPI;
-	}
-
-	public void setLoginAPI(String loginAPI) {
-		this.loginAPI = loginAPI;
+		return getBaseURL() + loginAPI;
 	}
 
 	public String getReportsAPI() {
-		return reportsAPI;
-	}
-
-	public void setReportsAPI(String reportsAPI) {
-		this.reportsAPI = reportsAPI;
+		return getBaseURL() + reportsAPI;
 	}
 
 	public String getQueryAPI() {
-		return queryAPI;
-	}
-
-	public void setQueryAPI(String queryAPI) {
-		this.queryAPI = queryAPI;
+		return getBaseURL() + queryAPI;
 	}
 
 	public String getConfigAPI() {
-		return configAPI;
-	}
-
-	public void setConfigAPI(String configAPI) {
-		this.configAPI = configAPI;
+		return getBaseURL() + configAPI;
 	}
 
 	public String getDeviceAPI() {
-		return deviceAPI;
-	}
-
-	public void setDeviceAPI(String deviceAPI) {
-		this.deviceAPI = deviceAPI;
+		return getBaseURL() + deviceAPI;
 	}
 
 	public String getPacketAPI() {
-		return packetAPI;
-	}
-
-	public void setPacketAPI(String packetAPI) {
-		this.packetAPI = packetAPI;
+		return getBaseURL() + packetAPI;
 	}
 
 	public String getStepAPI() {
-		return stepAPI;
-	}
-
-	public void setStepAPI(String stepAPI) {
-		this.stepAPI = stepAPI;
+		return getBaseURL() + stepAPI;
 	}
 
 	public String getProcessorAPI() {
-		return processorAPI;
-	}
-
-	public void setProcessorAPI(String processorAPI) {
-		this.processorAPI = processorAPI;
+		return getBaseURL() + processorAPI;
 	}
 
 	public String getLicenseAPI() {
-		return licenseAPI;
-	}
-
-	public void setLicenseAPI(String licenseAPI) {
-		this.licenseAPI = licenseAPI;
+		return getBaseURL() + licenseAPI;
 	}
 
 }

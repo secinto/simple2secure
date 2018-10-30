@@ -1,20 +1,21 @@
 package com.simple2secure.test.portal.user;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.List;
 
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,18 +23,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserRole;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.UserRepository;
 
-//@RunWith(SpringRunner.class)
-
-@ComponentScan(basePackages = "com.simple2secure.test.portal")
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class, MongoAutoConfiguration.class })
-public class UserLoginTest {
+@ExtendWith({ SpringExtension.class })
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class TestUserLogin {
 
 	@Autowired
 	UserRepository userRepository;
@@ -41,18 +44,21 @@ public class UserLoginTest {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	protected LoadedConfigItems loadedConfigItems;
+
 	@LocalServerPort
-	private int port;
+	protected int randomServerPort;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	private User user;
+	private static User user;
 
 	String token;
 
-	@Before
-	public void init() throws Exception {
+	@BeforeAll
+	public void init() {
 		user = new User();
 
 		user.setFirstName("test");
@@ -63,13 +69,11 @@ public class UserLoginTest {
 		user.setUsername("test");
 		user.setActivated(true);
 		user.setActivationToken("12345");
-
+		user.setUserRole(UserRole.ADMIN);
 		userRepository.save(user);
-	}
 
-	@After
-	public void tearDown() {
-		userRepository.deleteAll();
+		loadedConfigItems.setBasePort(String.valueOf(randomServerPort));
+
 	}
 
 	/**
@@ -91,8 +95,7 @@ public class UserLoginTest {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login", HttpMethod.POST, entity,
-				String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -100,8 +103,7 @@ public class UserLoginTest {
 		} else if (loginResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 			token = null;
 		}
-
-		Assert.assertNotNull(token);
+		assertNotNull(token);
 	}
 
 	/**
@@ -121,8 +123,7 @@ public class UserLoginTest {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange("http://localhost:" + port + "/api/login", HttpMethod.POST, entity,
-				String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -130,7 +131,7 @@ public class UserLoginTest {
 		} else if (loginResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 			token = null;
 		}
-		Assert.assertNull(token);
+		assertNull(token);
 	}
 
 	@Test
@@ -140,10 +141,9 @@ public class UserLoginTest {
 		request.put("password", "testss");
 	}
 
-	@After
+	@AfterAll
 	public void deleteUser() {
-		User retrievedUser = userRepository.findByEmailOnlyActivated(user.getEmail());
-		userRepository.delete(retrievedUser);
+		userRepository.deleteAll();
 	}
 
 }
