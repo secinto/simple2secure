@@ -1,28 +1,26 @@
-import {Component} from '@angular/core';
-import {CompanyGroup} from '../_models/index';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {CompanyGroup, Processor, QueryRun, Step} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
-import {DatePipe} from '@angular/common';
+import {MatDialog} from '@angular/material';
 
 @Component({
   moduleId: module.id,
   templateUrl: 'userGroup.component.html',
   selector: 'UserGroupComponent',
-  providers: [DatePipe]
 })
 
 export class UserGroupComponent {
+
   public group: CompanyGroup;
   loading = false;
   id: string;
   private sub: any;
   url: string;
   currentUser: any;
-  selectedDate: string;
-  tempDate: Date;
 
   constructor(
     private router: Router,
@@ -30,9 +28,9 @@ export class UserGroupComponent {
     private httpService: HttpService,
     private dataService: DataService,
     private location: Location,
+    private dialog: MatDialog,
     private alertService: AlertService,
-    private translate: TranslateService,
-    private datePipe: DatePipe) {
+    private translate: TranslateService) {
         this.group = new CompanyGroup();
   }
 
@@ -43,30 +41,43 @@ export class UserGroupComponent {
 
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-    if (this.id === 'newGroup') {
-
-    }
-    else {
-      this.loadGroup();
-      this.tempDate = new Date(this.group.licenseExpirationDate + ' ');
-      this.selectedDate = this.datePipe.transform(this.tempDate, 'yyyy-MM-dd', 'Europe/Vienna');
-    }
+    this.loadGroup();
   }
 
   private loadGroup() {
-      this.group = this.dataService.get();
+
+      this.loading = true;
+      this.httpService.get(environment.apiEndpoint + 'users/group/' + this.id)
+          .subscribe(
+              data => {
+                  this.group = data;
+                  if (this.group){
+                      this.alertService.success(this.translate.instant('message.data'));
+                  }
+                  else{
+                      this.alertService.error(this.translate.instant('message.data.notProvided'));
+                  }
+                  this.loading = false;
+
+              },
+              error => {
+                  if (error.status == 0){
+                      this.alertService.error(this.translate.instant('server.notresponding'));
+                  }
+                  else{
+                      this.alertService.error(error.error.errorMessage);
+                  }
+                  this.loading = false;
+              });
   }
 
   saveGroup() {
     this.loading = true;
-    this.url = environment.apiEndpoint + 'users/group';
-    if (this.id === 'newGroup') {
-        this.group.addedByUserId = this.currentUser['userID'];
-    }
-    this.group.licenseExpirationDate = this.datePipe.transform(this.selectedDate, 'MM/dd/yyyy', 'Europe/Vienna');
+
+    this.url = environment.apiEndpoint + 'users/group/' + this.currentUser.userID + '/' + 'null';
     this.httpService.post(this.group, this.url).subscribe(
       data => {
-        this.group = data;
+          this.group = data;
 
         if (this.id === 'new') {
           this.alertService.success(this.translate.instant('message.user.create'));

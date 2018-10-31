@@ -1,11 +1,12 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {Location} from '@angular/common';
-import {QueryRun, Timeunit} from '../_models/index';
+import {QueryRun, Step, Timeunit, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
   moduleId: module.id,
@@ -32,29 +33,20 @@ export class OsqueryConfigurationEditComponent {
     private router: Router,
     private translate: TranslateService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private dialogRef: MatDialogRef<OsqueryConfigurationEditComponent>,
+    @Inject(MAT_DIALOG_DATA) data
   ) {
-    this.queryRun = new QueryRun();
-  }
-
-  ngOnInit() {
-
-    this.route.queryParams.subscribe(params => {
-      this.type = params['type'];
-      this.action = params['action'];
-
-      if (this.type == 1){
-          this.groupId = params['groupId'];
+      if (data.queryRun == null){
+          this.action = UrlParameter.NEW;
+          this.queryRun = new QueryRun();
+          this.groupId = data.groupId;
       }
       else{
-          this.probeId = params['probeId'];
+          this.action = UrlParameter.EDIT;
+          this.queryRun = data.queryRun;
+          this.groupId = data.groupId;
       }
-
-    });
-
-    if (this.action === 'edit') {
-      this.queryRun = this.dataService.get();
-    }
   }
 
   extractTimeUnits(): Array<string> {
@@ -64,33 +56,16 @@ export class OsqueryConfigurationEditComponent {
 
   saveQueryRun() {
 
-    if (this.action == 'new') {
-      if (this.type == 1) {
-        if (!this.queryRun.groupId) {
-          this.queryRun.groupId = this.groupId;
-        }
-      }
-      else{
-          this.queryRun.probeId = this.probeId;
-        }
-      }
+    if (this.action == UrlParameter.NEW) {
+      this.queryRun.groupId = this.groupId;
+    }
 
     this.httpService.post(this.queryRun, environment.apiEndpoint + 'config/query').subscribe(
       data => {
-        this.queryRun = data;
-        this.location.back();
+          this.dialogRef.close(true);
       },
       error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
+          this.dialogRef.close(error);
       });
-  }
-
-  cancel(){
-      this.location.back();
   }
 }

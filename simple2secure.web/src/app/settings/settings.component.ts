@@ -1,10 +1,11 @@
 import {Component} from '@angular/core';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatCard} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {Settings, Timeunit} from '../_models';
+import {Settings, SettingsDTO, Timeunit} from '../_models';
 import {environment} from '../../environments/environment';
+import {LicensePlan} from '../_models/LicensePlan';
 
 @Component({
   moduleId: module.id,
@@ -16,7 +17,7 @@ export class SettingsComponent {
 
     loading = false;
     currentUser: any;
-    settingsObj = Settings;
+    settingsObj: SettingsDTO;
     timeUnits = Timeunit;
     updated = false;
 
@@ -27,7 +28,11 @@ export class SettingsComponent {
             private alertService: AlertService,
             private dataService: DataService,
             private dialog: MatDialog,
-            private translate: TranslateService) {}
+            private translate: TranslateService) {
+                this.settingsObj = new SettingsDTO();
+                this.settingsObj.licensePlan = [];
+                this.settingsObj.settings = new Settings();
+    }
 
     ngOnInit() {
         this.loadSettings();
@@ -67,9 +72,9 @@ export class SettingsComponent {
 
     updateSettings(){
         this.loading = true;
-        this.httpService.post(this.settingsObj, environment.apiEndpoint + 'settings').subscribe(
+        this.httpService.post(this.settingsObj['settings'], environment.apiEndpoint + 'settings').subscribe(
             data => {
-                this.settingsObj = data;
+                this.settingsObj['settings'] = data;
                 this.updated = true;
                 this.loadSettings();
             },
@@ -82,5 +87,53 @@ export class SettingsComponent {
                 }
             });
         this.loading = false;
+    }
+
+    addNewLicensePlan(){
+        if (this.settingsObj.licensePlan){
+            this.settingsObj.licensePlan.push(new LicensePlan());
+        }
+        else{
+            this.settingsObj.licensePlan = [];
+            this.settingsObj.licensePlan.push(new LicensePlan());
+        }
+    }
+
+    saveLicensePlan(licensePlan: LicensePlan){
+        this.loading = true;
+        this.httpService.post(licensePlan, environment.apiEndpoint + 'settings/licensePlan').subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('message.settings.update'));
+                this.loading = false;
+                this.loadSettings();
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
+    }
+
+    deleteLicensePlan(licensePlan: LicensePlan){
+        this.loading = true;
+        this.httpService.delete(environment.apiEndpoint + 'settings/licensePlan/' + licensePlan.id).subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('message.user.delete'));
+                this.loading = false;
+                this.loadSettings();
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
     }
 }

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 
-import {User} from '../_models/index';
+import {UserRegistration, UserRegistrationType} from '../_models/index';
 
 import {Router} from '@angular/router';
 import {AlertService, HttpService} from '../_services/index';
@@ -13,7 +13,7 @@ import {TranslateService} from '@ngx-translate/core';
 })
 
 export class RegisterComponent {
-  user: User;
+  user: UserRegistration;
   loading: boolean;
 
   constructor(
@@ -21,13 +21,14 @@ export class RegisterComponent {
     private httpService: HttpService,
     private alertService: AlertService,
     private translate: TranslateService) {
-    this.user = new User();
+    this.user = new UserRegistration();
     this.loading = false;
   }
 
   register() {
     this.loading = true;
-    this.httpService.postRegister(this.user, 'standard')
+    this.user.registrationType = UserRegistrationType.STANDARD;
+    this.httpService.postRegister(this.user)
       .subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.registration'), true);

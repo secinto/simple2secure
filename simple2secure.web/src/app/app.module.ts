@@ -26,13 +26,13 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
     MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-    MatNativeDateModule, MatDatepickerModule} from '@angular/material';
+    MatNativeDateModule, MatDatepickerModule, MatCardModule} from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {NavbarComponent} from './navbar/index';
 import {ConfigurationComponent, ConfigurationDetailsComponent, ConfigurationOverviewComponent, ConfigurationTypeComponent} from './configuration/index';
-import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent} from './user/index';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent} from './user/index';
 import {GuiComponent, GuiOverviewComponent, GuiImportComponent, GuiUserOverviewComponent} from './gui/index';
 import {
   ReportComponent, ReportDetailsComponent, ReportOverviewComponent, OsqueryConfigurationComponent,
@@ -56,8 +56,10 @@ import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, 
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import { ChartModule } from 'angular-highcharts';
 import { TreeModule } from 'angular-tree-component';
+import {TreeTableModule} from 'ng-treetable';
 import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
+import { TreeviewModule } from 'ngx-treeview';
 
 export const httpInterceptorProviders = [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -97,9 +99,12 @@ export const httpInterceptorProviders = [
     MatDialogModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatCardModule,
     HttpClientModule,
     //NgxDnDModule,
     ChartModule,
+    TreeTableModule,
+    TreeviewModule.forRoot(),
     TreeModule.forRoot(),
     TranslateModule.forRoot({
         loader: {
@@ -141,6 +146,7 @@ export const httpInterceptorProviders = [
     UserDetailsComponent,
     UserOverviewComponent,
     UserGroupComponent,
+    UserGroupDialogComponent,
     ReportComponent,
     ReportOverviewComponent,
     ReportDetailsComponent,
@@ -179,6 +185,10 @@ export const httpInterceptorProviders = [
   ],
   entryComponents: [
     ConfirmationDialog,
+    UserGroupDialogComponent,
+    NetworkProcessorConfigurationEditComponent,
+    NetworkStepConfigurationEditComponent,
+    OsqueryConfigurationEditComponent
   ],
   providers: [
     AuthGuard,

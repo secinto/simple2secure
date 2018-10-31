@@ -64,8 +64,6 @@ const appRoutes: Routes = [
           {path: 'config/details', component: OsqueryConfigurationDetailsComponent, data: {title: 'menu.currentQueries'}},
           {path: 'config/devices', component: OsqueryConfigurationDevicesComponent, data: {title: 'table.myprobes'}},
           {path: 'config/group', component: OsqueryConfigurationGroupsComponent, data: {title: 'table.mygroups'}},
-          {path: 'config/details/edit', component: OsqueryConfigurationEditComponent, data: {title: 'menu.currentQueries'}},
-          {path: 'config/details/new', component: OsqueryConfigurationEditComponent, data: {title: 'menu.currentQueries'}},
           {path: 'report', component: ReportOverviewComponent, data: {title: 'menu.queryReport'}},
           {path: 'report/:id', component: ReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
         ]
@@ -82,9 +80,6 @@ const appRoutes: Routes = [
           {path: 'config/groups', component: OsqueryConfigurationGroupsComponent, data: {title: 'table.mygroups'}},
           {path: 'config/details/step', component: NetworkConfigurationStepDetailsComponent, data: {title: 'menu.networkanalysisStepConfig'}},
           {path: 'config/details/processor', component: NetworkConfigurationProcessorDetailsComponent, data: {title: 'menu.networkanalysisProcessorConfig'}},
-          {path: 'config/details/step/edit', component: NetworkStepConfigurationEditComponent, data: {title: 'menu.currentStep'}},
-          {path: 'config/details/step/new', component: NetworkStepConfigurationEditComponent, data: {title: 'menu.currentStep'}},
-          {path: 'config/details/processor/edit', component: NetworkProcessorConfigurationEditComponent, data: {title: 'menu.currentProcessor'}},
           {path: 'config/details/processor/new', component: NetworkProcessorConfigurationEditComponent, data: {title: 'menu.currentProcessor'}},
           {path: 'report', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports'}},
           {path: 'report/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
@@ -130,8 +125,6 @@ const appRoutes: Routes = [
           data: {title: 'menu.email'},
           children: [
             {path: '', component: EmailOverviewComponent},
-            {path: 'add', component: EmailAccountAddComponent, data: {title: 'menu.addAccount'}},
-            {path: 'edit', component: EmailAccountAddComponent, data: {title: 'menu.editAccount'}},
             {path: ':id/inbox', component: EmailInboxComponent, data: {title: 'table.inbox'}},
             {path: ':id/inbox/rule/overview', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
             {path: ':id/inbox/rule/add', component: RuleAddComponent, data: {title: 'button.addRule'}},

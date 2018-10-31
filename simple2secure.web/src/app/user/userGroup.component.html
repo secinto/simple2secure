@@ -1,22 +1,31 @@
-<h3>{{ 'group.details' | translate }} {{group.name}}</h3>
-<form #groupForm="ngForm">
-	  <div class="container">  	  
-		  <mat-form-field class="full_width_input">
-		    <input matInput type="text" placeholder="{{ 'group.name.placeholder' | translate }}" [(ngModel)]="group.name" name="name" autocomplete="name" required>
-		  </mat-form-field> 	  
-	  
-			<mat-form-field class="full_width_input">
-			  <input matInput readonly format="yyyy-MM-dd" [matDatepicker]="picker" placeholder="{{ 'table.groupExpirationDate' | translate }}" [(ngModel)]="selectedDate" name="selectedDate" required>
-			  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-			  <mat-datepicker #picker></mat-datepicker>
-			</mat-form-field>	
-			
-		  <mat-form-field class="full_width_input">
-		    <input matInput type="number" placeholder="{{ 'group.maxNumberOfLicenses.placeholder' | translate }}" [(ngModel)]="group.maxNumberOfLicenseDownloads" name="maxNumberOfLicenseDownloads" required>
-		  </mat-form-field>  
-	  </div>
-	    
-	<button type="button" (click)="saveGroup()" [disabled]="!groupForm.dirty" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}</button>
-	<button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
-</form>
+<mat-tab-group #tabGroup>
+
+	<mat-tab label="{{ 'menu.general' | translate }}">
+        <h3>{{ 'group.details' | translate }} {{group.name}}</h3>
+        <form #groupForm="ngForm">
+                <mat-form-field class="full_width_input">
+                    <input matInput type="text" placeholder="{{ 'group.name.placeholder' | translate }}" [(ngModel)]="group.name" name="name" autocomplete="name" required>
+                </mat-form-field>
+
+            <button type="button" (click)="saveGroup()" [disabled]="!groupForm.dirty" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}</button>
+            <button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
+        </form>
+	</mat-tab>
+
+    <mat-tab label="{{ 'table.query' | translate }}">
+        <osQueryConfigDetails></osQueryConfigDetails>
+    </mat-tab>
+
+    <mat-tab label="{{ 'network.processors' | translate }}">
+        <networkConfigurationProcessor></networkConfigurationProcessor>
+    </mat-tab>
+
+    <mat-tab label="{{ 'network.steps' | translate }}">
+        <networkConfigurationStep></networkConfigurationStep>
+    </mat-tab>
+
+</mat-tab-group>
+
+
+
 

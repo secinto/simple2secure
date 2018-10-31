@@ -1,27 +1,40 @@
-<h3>{{ 'user.details' | translate }} {{user.username}}</h3>
-<form #userForm="ngForm">
-	  
-	  <mat-form-field class="full_width_input">
-	    <input matInput type="email" placeholder="{{ 'login.email.placeholder' | translate }}" [(ngModel)]="user.email" name="email" autocomplete="email" required>
-	  </mat-form-field>
-	  
-  	  <mat-form-field class="full_width_input">  	      
-	    <mat-select placeholder="{{ 'userRole.placeholder' | translate }}" [(ngModel)]="user.userRole" name="userRole" required>
-	      <mat-option *ngFor="let role of userRoleKeys()" [value]="role">
-	        {{role}}
-	      </mat-option>
-	    </mat-select>
-	  </mat-form-field>
+<h3 mat-dialog-title>{{ 'user.details' | translate }} {{user.username}}</h3>
+
+<div mat-dialog-content>
+	<form #userForm="ngForm">
 
 		<mat-form-field class="full_width_input">
-			<mat-select placeholder="{{ 'table.group' | translate }}" [(ngModel)]="user.groupId" name="groupId" required>
+			<input matInput type="email" placeholder="{{ 'login.email.placeholder' | translate }}"
+				   [(ngModel)]="user.email" name="email" autocomplete="email" required>
+		</mat-form-field>
+
+		<mat-form-field class="full_width_input">
+			<mat-select placeholder="{{ 'userRole.placeholder' | translate }}" [(ngModel)]="user.userRole"
+						name="userRole" (change)="onRoleChange($event.value)" required>
+				<mat-option *ngFor="let role of userRoleKeys()" [value]="role">
+					{{role}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field *ngIf="showGroupSelectBox" class="full_width_input">
+			<mat-select placeholder="{{ 'table.group' | translate }}" [(ngModel)]="user.groupIds" name="groupId" multiple required>
 				<mat-option *ngFor="let group of groups" [value]="group.id">
 					{{group.name}}
 				</mat-option>
 			</mat-select>
 		</mat-form-field>
-	  
-	<button type="button" (click)="saveUser()" [disabled]="!userForm.dirty" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }} <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" /> </button>
-	<button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
-</form>
+	</form>
+</div>
+<div mat-dialog-actions>
+	<button type="button" (click)="saveUser()" [disabled]="!userForm.dirty || !userForm.valid" mat-raised-button
+			class="mat-green-button" color="primary">{{ 'button.save' | translate }}
+		<img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+	</button>
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="processor"
+			cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
+</div>
+
+
+
 

@@ -1,52 +1,51 @@
-<h3>queryRun details {{queryRun.name}}</h3>
-<form #osqueryConfigForm="ngForm" (ngSubmit)="saveQueryRun()">
-	<div>
-		
-		<div class="form-group">
-			<mat-form-field class="full_width_input">
-		    	<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="queryRun.name" name="name">
-		  	</mat-form-field>
-		</div>
-		
-		<div class="form-group">
-			<mat-form-field class="full_width_input">
-		    	<input type="text" matInput placeholder="{{ 'table.sql' | translate }}" [(ngModel)]="queryRun.sqlQuery" name="sqlQuery">
-		  	</mat-form-field>
-		</div>
-
-        <div class="form-group">
-            <label for="active">{{ 'table.active' | translate }}</label><br>
-            <mat-button-toggle-group id="active" name="active" [(ngModel)]="queryRun.active">
-                <mat-button-toggle [value]="1">{{ 'button.true' | translate }}</mat-button-toggle>
-                <mat-button-toggle [value]="0">{{ 'button.false' | translate }}</mat-button-toggle>
-            </mat-button-toggle-group>
-        </div>
-
-        <div class="form-group">
-            <label for="always">{{ 'osquery.runalways' | translate }}</label><br>
-            <mat-button-toggle-group id="always" name="always" [(ngModel)]="queryRun.always">
-                <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
-                <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
-            </mat-button-toggle-group>
-        </div>
-
-		<table *ngIf="queryRun.always" class="full_width_input" cellspacing="0"><tr>
-			<td>
+<h1 mat-dialog-title>{{'query.details' | translate}} {{queryRun.name}}</h1>
+<div mat-dialog-content>
+	<form #osqueryConfigForm="ngForm">
+		<div>
+			<div class="form-group">
 				<mat-form-field class="full_width_input">
-					<input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="queryRun.analysisInterval" name="analysisInterval">
+					<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="queryRun.name" name="name" required>
 				</mat-form-field>
-			</td>
-			<td>
+			</div>
+			<div class="form-group">
 				<mat-form-field class="full_width_input">
-					<mat-select [(ngModel)]="queryRun.analysisIntervalUnit" placeholder="{{ 'table.unit' | translate }}" name="analysisIntervalUnit">
-						<mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-						</mat-option>
-					</mat-select>
+					<input type="text" matInput placeholder="{{ 'table.sql' | translate }}" [(ngModel)]="queryRun.sqlQuery" name="sqlQuery" required>
 				</mat-form-field>
-			</td>
-		</tr></table>
+			</div>
+			<div class="form-group">
+				<label for="active">{{ 'table.active' | translate }}</label><br>
+				<mat-button-toggle-group id="active" name="active" [(ngModel)]="queryRun.active" required="">
+					<mat-button-toggle [value]="1">{{ 'button.true' | translate }}</mat-button-toggle>
+					<mat-button-toggle [value]="0">{{ 'button.false' | translate }}</mat-button-toggle>
+				</mat-button-toggle-group>
+			</div>
+			<div class="form-group">
+				<label for="always">{{ 'osquery.runalways' | translate }}</label><br>
+				<mat-button-toggle-group id="always" name="always" [(ngModel)]="queryRun.always" required="">
+					<mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
+					<mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
+				</mat-button-toggle-group>
+			</div>
+			<table *ngIf="queryRun.always" class="full_width_input" cellspacing="0"><tr>
+				<td>
+					<mat-form-field class="full_width_input">
+						<input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="queryRun.analysisInterval" name="analysisInterval" required>
+					</mat-form-field>
+				</td>
+				<td>
+					<mat-form-field class="full_width_input">
+						<mat-select [(ngModel)]="queryRun.analysisIntervalUnit" placeholder="{{ 'table.unit' | translate }}" name="analysisIntervalUnit" required>
+							<mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</td>
+			</tr></table>
 
-	</div>
-	<button class="mat-green-button" type="button" (click)="saveQueryRun()" [disabled]="!osqueryConfigForm.dirty" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
-	<button class="mat-red-button" type="button" (click)="cancel()" mat-raised-button color="warn">{{ 'button.cancel' | translate }}</button>
-</form>
+		</div>
+	</form>
+</div>
+<div mat-dialog-actions>
+	<button class="mat-green-button" type="button" (click)="saveQueryRun()" [disabled]="!osqueryConfigForm.dirty || !osqueryConfigForm.valid" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="queryRun" cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
+</div>

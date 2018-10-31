@@ -406,3 +406,15 @@ body{
 legend{
     font-size: 15px !important;
 }
+
+.mat-card-header-text{
+    width: 100% !important;
+}
+
+.node-s2s-item{
+    margin-right: 500px;
+}
+
+.node-s2s-button{
+    text-align:right
+}

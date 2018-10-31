@@ -24,3 +24,7 @@ export * from './userRole';
 export * from './timeunit';
 export * from './settings';
 export * from './companygroupDTO';
+export * from './settingsDTO';
+export * from './UrlParameter';
+export * from './userRegistration';
+export * from './userRegistrationType';
