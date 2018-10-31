@@ -130,24 +130,6 @@ public class UserRepositoryImpl extends UserRepository {
 	}
 
 	@Override
-	public void removeAsssignedGroup(String groupId) {
-		List<User> users = findByGroupId(groupId);
-		
-		if(users != null) {
-			for(User user : users) {
-				user.setGroupId("");
-				user.setGroupName("");
-				try {
-					this.update(user);
-				} catch (ItemNotFoundRepositoryException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}		
-	}
-
-	@Override
 	public User findAddedByUser(String userId) {
 		List<User> users = this.mongoTemplate.findAll(User.class);
 		if(users != null) {

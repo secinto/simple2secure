@@ -31,6 +31,7 @@ public class LoadedConfigItems {
 	private String testsURL = "/config/tests.json";
 	private String groupURL = "/config/group.json";
 	private String settingsURL = "/config/settings.json";
+	private String licensePlanURL = "/config/licensePlan.json";
 
 	private String usersAPI = "/api/users";
 	private String endpointsAPI = "/api/endpoints";
@@ -195,5 +196,9 @@ public class LoadedConfigItems {
 	public String getLicenseAPI() {
 		return getBaseURL() + licenseAPI;
 	}
+
+	public String getLicensePlanURL() {
+		return licensePlanURL;
+	}	
 
 }

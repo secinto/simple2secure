@@ -32,7 +32,7 @@ public class TestMailUtils {
 	 */
 	@Test
 	public void testSendEmailPositive() throws IOException {
-		User user = new User("", "emir", "sahinovic", "emir", "emir.sahinovic@secinto.com", "test", true, null, null, null, true, true);
+		User user = new User("emir", "sahinovic", "emir", "emir.sahinovic@secinto.com", "test", true, null, null, null, true, true);
 		boolean result = mailUtils.sendEmail(user, "Sending Test Email from the test class", "Sending Test Email from the test class");
 		assertTrue(result);
 	}
@@ -55,7 +55,7 @@ public class TestMailUtils {
 	 */
 	@Test
 	public void testSendEmailUserEmailEmpty() throws IOException {
-		User user = new User("", "emir", "sahinovic", "emir", "", "test", true, null, null, null, true, true);
+		User user = new User("emir", "sahinovic", "emir", "", "test", true, null, null, null, true, true);
 		boolean result = mailUtils.sendEmail(user, "Sending Test Email from the test class", "Sending Test Email from the test class");
 		assertFalse(result);
 	}
@@ -67,7 +67,7 @@ public class TestMailUtils {
 	 */
 	@Test
 	public void testSendEmailUserEmailNull() throws IOException {
-		User user = new User("", "emir", "sahinovic", "emir", null, "test", true, null, null, null, true, true);
+		User user = new User("emir", "sahinovic", "emir", null, "test", true, null, null, null, true, true);
 		boolean result = mailUtils.sendEmail(user, "Sending Test Email from the test class", "Sending Test Email from the test class");
 		assertFalse(result);
 	}

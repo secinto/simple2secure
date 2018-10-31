@@ -6,5 +6,9 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class GroupRepository extends MongoRepository<CompanyGroup> {
 	public abstract List<CompanyGroup> findByOwnerId(String userId);
+	public abstract List<CompanyGroup> findByParentId(String parentId);
 	public abstract void deleteByOwnerId(String userId);
+	public abstract List<CompanyGroup> findByAdminGroupId(String adminGroupId);
+	public abstract List<CompanyGroup> findRootGroupsByAdminGroupId(String adminGroupId);
+	public abstract List<CompanyGroup> findBySuperUserId(String superUserId);
 }
