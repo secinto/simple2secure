@@ -130,7 +130,6 @@ public class ProbeConfiguration {
 		if (dbConfig == null) {
 			log.debug("DB config not available, reading config from file. Should only happen once.");
 			Config fileConfig = getConfigFromFile();
-			fileConfig.setProbeId(ProbeConfiguration.probeId);
 			DBUtil.getInstance().save(fileConfig);
 			/*
 			 * Obtain the config stored in the DB to also obtain the ID.
@@ -240,7 +239,6 @@ public class ProbeConfiguration {
 				log.debug("Queries obtained from API {}", apiQueries.size());
 				if (apiConfig != null && apiConfig.getVersion() >= this.currentConfig.getVersion()) {
 					apiConfig.setId(this.currentConfig.getId());
-					apiConfig.setProbeId(ProbeConfiguration.probeId);
 					DBUtil.getInstance().merge(apiConfig);
 					/*
 					 * Obtain it from the database to have all merged fields correctly updated.
@@ -370,7 +368,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(APIUtils.sendGet(loadedConfigItems.getConfigAPI() + "/" + ProbeConfiguration.probeId),
+		return gson.fromJson(APIUtils.sendGet(loadedConfigItems.getConfigAPI()),
 				Config.class);
 	}
 
@@ -379,7 +377,11 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromDatabase() {
-		return DBUtil.getInstance().findByFieldNameObject("probeId", probeId, new Config());
+		List<Config> configs = DBUtil.getInstance().findAll(new Config());
+		if(configs != null && configs.size() == 1) {
+			return configs.get(0);
+		}
+		return null;
 	}
 
 	/**

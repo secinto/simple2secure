@@ -11,6 +11,7 @@ import {v4} from 'uuid';
 import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
+import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 
 @Component({
   moduleId: module.id,
@@ -276,6 +277,33 @@ export class UserOverviewComponent {
   public onDeleteClick(){
       this.openDialog('user');
       // this.deleteUser(this.selectedUser);
+  }
+
+  public onApplyConfigClick(){
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = '450px';
+      dialogConfig.data = {
+          destGroup: this.selectedItem,
+      };
+
+      const dialogRef = this.dialog.open(UserGroupApplyConfigComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe(result => {
+          if (result == true){
+              this.alertService.success(this.translate.instant('message.config.group.update'));
+              this.userAdded = true;
+          }
+          else{
+              if (result instanceof HttpErrorResponse){
+                  if (result.status == 0){
+                      this.alertService.error(this.translate.instant('server.notresponding'));
+                  }
+                  else{
+                      this.alertService.error(result.error.errorMessage);
+                  }
+              }
+          }
+      });
   }
 
     openDialogAddUser(): void {

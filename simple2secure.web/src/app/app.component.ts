@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import { ActivatedRoute, Router, NavigationEnd} from '@angular/router';
-import { Observable } from "rxjs/Observable";
-import {Title} from "@angular/platform-browser";
+import {Title} from '@angular/platform-browser';
 
 @Component({
     moduleId: module.id,
@@ -14,15 +13,15 @@ export class AppComponent implements OnInit{
 
   title = 'Simple2Secure Web';
   translatedTitle = 'Simple2Secure Web';
-  
+
   constructor(
-          private router:Router, 
-          private activatedRoute:ActivatedRoute, 
-          private translate: TranslateService, 
+          private router: Router,
+          private activatedRoute: ActivatedRoute,
+          private translate: TranslateService,
           private titleService: Title) {
               translate.setDefaultLang('en');
     }
-  
+
   ngOnInit() {
       this.router
      .events
@@ -40,14 +39,14 @@ export class AppComponent implements OnInit{
        }
        return null;
      }).subscribe( (title: any) => {
-        if(title){
-            this.translatedTitle = this.translate.instant(title);  
+        if (title){
+            this.translatedTitle = this.translate.instant(title);
             this.titleService.setTitle(this.translatedTitle);
         }
         else{
             this.titleService.setTitle(title);
         }
-        
+
     });
  }
 }

@@ -83,7 +83,7 @@
   "menu.networkanalysisProcessorConfig": "Communication Processor Configuration",
   "menu.currentStep": "Current Step",
   "menu.currentProcessor": "Current Processor",
-  "menu.networkanalysisReports": "Communication Reports",
+  "menu.networkanalysisReports": "Network Reports",
   "menu.orbiterConfig": "Orbiter Configuration",
   "menu.orbiterTools": "Orbiter Tools",
   "menu.addAccount": "Add account",
@@ -278,5 +278,7 @@
   "message.settings.update": "Settings updated successfully",
   "table.licensePlans": "License Plans",
   "licensePlan.name.placeholder": "Please enter the license plan name",
-  "licensePlan.add.button": "Add new license plan"
+  "licensePlan.add.button": "Add new license plan",
+  "message.config.group.update": "Configuration updated successfully",
+  "message.apply.config": "Apply group configuration for OSQuery, Steps and Processors"
 }

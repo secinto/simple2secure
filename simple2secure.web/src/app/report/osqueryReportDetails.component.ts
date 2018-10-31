@@ -7,7 +7,7 @@ import {DataService} from '../_services/index';
   templateUrl: 'osqueryReportDetails.component.html'
 })
 
-export class ReportDetailsComponent {
+export class OsQueryReportDetailsComponent {
   report: any;
   queryResult: string;
   loading = false;

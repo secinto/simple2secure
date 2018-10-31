@@ -12,7 +12,7 @@ import {TranslateService} from '@ngx-translate/core';
   templateUrl: 'osqueryReportOverview.component.html'
 })
 
-export class ReportOverviewComponent {
+export class OsQueryReportOverviewComponent {
   reports: any[];
   selectedReport: any;
   currentUser: any;

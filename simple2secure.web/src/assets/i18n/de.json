@@ -278,5 +278,7 @@
   "message.settings.update": "Einstellungen wurden erfolgreich aktualisiert",
   "table.licensePlans": "Lizenzpläne",
   "licensePlan.name.placeholder": "Bitte geben Sie den Namen des Lizenzplans ein",
-  "licensePlan.add.button": "Neuen Lizenzplan erstellen"
+  "licensePlan.add.button": "Neuen Lizenzplan erstellen",
+  "message.config.group.update": "Konfiguration wurde erfolgreich aktualisiert",
+  "message.apply.config": "Wenden Sie die Gruppenkonfiguration für OSQuery, Steps und Processors an"
 }

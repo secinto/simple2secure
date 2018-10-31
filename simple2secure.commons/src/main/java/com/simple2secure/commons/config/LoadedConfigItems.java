@@ -198,7 +198,7 @@ public class LoadedConfigItems {
 	}
 
 	public String getLicensePlanURL() {
-		return licensePlanURL;
+		return getBaseURL() + licensePlanURL;
 	}	
 
 }

@@ -101,6 +101,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		ConfigurableApplicationContext context = SpringApplication.run(Simple2SecurePortal.class, args);
 		DataInitialization dataInitializer = context.getBean(DataInitialization.class);
 		if (dataInitializer != null) {
+			dataInitializer.addDefaultConfiguration();
 			dataInitializer.addDefaultSettings();
 			dataInitializer.addDefaultLicensePlan();
 		}

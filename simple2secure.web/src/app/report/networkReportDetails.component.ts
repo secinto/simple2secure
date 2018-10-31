@@ -13,8 +13,7 @@ export class NetworkReportDetailsComponent {
   objectKeys = Object.keys;
 
   constructor(
-    private dataService: DataService,
-    private alertService: AlertService) {}
+    private dataService: DataService) {}
 
   ngOnInit() {
     this.report = this.dataService.get();

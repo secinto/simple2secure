@@ -84,7 +84,6 @@ public class DataInitialization {
 			ObjectId groupId = groupRepository.saveAndReturnId(group);
 			log.debug("Default group added for user with id {}", userId);
 			if(!Strings.isNullOrEmpty(groupId.toString())) {
-				addDefaultGroupConfiguration(groupId.toString());
 				addDefaultGroupQueries(groupId.toString());
 				addDefaultGroupProcessors(groupId.toString());
 				addDefaultGroupSteps(groupId.toString());
@@ -97,13 +96,11 @@ public class DataInitialization {
 	 *
 	 * @param probeId
 	 */
-	public void addDefaultGroupConfiguration(String groupId) {
-		Config config = configRepository.findByGroupId(groupId);
-		if (config == null) {
+	public void addDefaultConfiguration() {
+		List<Config> configDB = configRepository.findAll();
+		if (configDB == null || configDB.isEmpty()) {
 			ResponseEntity<Config> response = restTemplate.getForEntity(loadedConfigItems.getConfigURL(), Config.class);
 			Config configuration = response.getBody();
-			configuration.setGroupConfiguration(true);
-			configuration.setGroupId(groupId);
 			configRepository.save(configuration);
 		}
 	}

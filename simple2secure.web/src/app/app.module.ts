@@ -31,19 +31,17 @@ import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {NavbarComponent} from './navbar/index';
-import {ConfigurationComponent, ConfigurationDetailsComponent, ConfigurationOverviewComponent, ConfigurationTypeComponent} from './configuration/index';
-import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent} from './user/index';
-import {GuiComponent, GuiOverviewComponent, GuiImportComponent, GuiUserOverviewComponent} from './gui/index';
-import {
-  ReportComponent, ReportDetailsComponent, ReportOverviewComponent, OsqueryConfigurationComponent,
-  OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent, OsqueryConfigurationDevicesComponent, OsqueryConfigurationGroupsComponent, OsqueryOverviewComponent
+import {ConfigurationDetailsComponent} from './configuration/index';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent, UserGroupApplyConfigComponent} from './user/index';
+import {OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
 } from './osquery/index';
-import {
-  NetworkComponent, NetworkConfigurationComponent, NetworkReportOverviewComponent, NetworkConfigurationTypeComponent, NetworkConfigurationDetailsComponent,
-  NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent, NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent,
-  NetworkReportDetailsComponent, NetworkOverviewComponent
+import {NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
+    NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
 }
   from './network/index';
+
+import {ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
+    OsQueryReportDetailsComponent, ReportOverviewComponent} from './report/index';
 
 import {EmailComponent, EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
@@ -101,7 +99,6 @@ export const httpInterceptorProviders = [
     MatNativeDateModule,
     MatCardModule,
     HttpClientModule,
-    //NgxDnDModule,
     ChartModule,
     TreeTableModule,
     TreeviewModule.forRoot(),
@@ -127,16 +124,8 @@ export const httpInterceptorProviders = [
     DashboardLayoutComponent,
     LoginLayoutComponent,
     NavbarComponent,
-    ConfigurationComponent,
     ConfigurationDetailsComponent,
-    ConfigurationOverviewComponent,
-    ConfigurationTypeComponent,
-    NetworkComponent,
-    NetworkOverviewComponent,
-    NetworkConfigurationComponent,
-    NetworkConfigurationDetailsComponent,
     NetworkReportOverviewComponent,
-    NetworkConfigurationTypeComponent,
     NetworkConfigurationStepDetailsComponent,
     NetworkConfigurationProcessorDetailsComponent,
     NetworkStepConfigurationEditComponent,
@@ -147,19 +136,11 @@ export const httpInterceptorProviders = [
     UserOverviewComponent,
     UserGroupComponent,
     UserGroupDialogComponent,
-    ReportComponent,
-    ReportOverviewComponent,
-    ReportDetailsComponent,
-    OsqueryConfigurationComponent,
-    OsqueryOverviewComponent,
+    UserGroupApplyConfigComponent,
+    OsQueryReportOverviewComponent,
+    OsQueryReportDetailsComponent,
     OsqueryConfigurationDetailsComponent,
     OsqueryConfigurationEditComponent,
-    OsqueryConfigurationDevicesComponent,
-    OsqueryConfigurationGroupsComponent,
-    GuiComponent,
-    GuiOverviewComponent,
-    GuiImportComponent,
-    GuiUserOverviewComponent,
     FooterComponent,
     EqualValidator,
     OrbiterComponent,
@@ -181,14 +162,17 @@ export const httpInterceptorProviders = [
 	RuleComponent,
 	RuleOverviewComponent,
 	RuleAddComponent,
-	AnalysisComponent
+	AnalysisComponent,
+    ReportComponent,
+    ReportOverviewComponent
   ],
   entryComponents: [
     ConfirmationDialog,
     UserGroupDialogComponent,
     NetworkProcessorConfigurationEditComponent,
     NetworkStepConfigurationEditComponent,
-    OsqueryConfigurationEditComponent
+    OsqueryConfigurationEditComponent,
+    UserGroupApplyConfigComponent
   ],
   providers: [
     AuthGuard,
@@ -207,7 +191,7 @@ export class AppModule {
 
 }
 
-//required for AOT compilation
+// required for AOT compilation
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }

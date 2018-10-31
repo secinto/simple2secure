@@ -1,6 +1,9 @@
 <div class="container">
     <form #settingsForm="ngForm">
         <mat-tab-group>
+            <mat-tab label="{{ 'menu.general' | translate }}">
+                <configurationDetails></configurationDetails>
+            </mat-tab>
              <mat-tab label="{{ 'menu.tokens' | translate }}">
                      <div>
                          <mat-card class="mat-card-custom">

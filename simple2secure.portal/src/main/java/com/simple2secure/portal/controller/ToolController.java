@@ -26,7 +26,6 @@ import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.Tool;
 import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ToolRepository;

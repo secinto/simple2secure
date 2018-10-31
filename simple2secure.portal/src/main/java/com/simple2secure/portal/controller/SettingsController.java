@@ -9,7 +9,6 @@
 package com.simple2secure.portal.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,7 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -39,6 +39,9 @@ public class SettingsController {
 	
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
+	
+	@Autowired
+	ConfigRepository configRepository;
 		
     @Autowired
     MessageByLocaleService messageByLocaleService;
@@ -49,7 +52,6 @@ public class SettingsController {
 	public ResponseEntity<SettingsDTO> getSettings(@RequestHeader("Accept-Language") String locale) {
 		List<Settings> settings = settingsRepository.findAll();
 		List<LicensePlan> licensePlans = licensePlanRepository.findAll();
-		
 		if(settings != null) {
 			if(settings.size() == 1) {
 				return new ResponseEntity<SettingsDTO>(new SettingsDTO(settings.get(0), licensePlans), HttpStatus.OK);

@@ -47,7 +47,7 @@
 
 			<div class="form-group">
 				<label for="show_interfaces">{{ 'config.showInterfaces' | translate }}</label><br>
-				<mat-button-toggle-group name="show_interfaces" [(ngModel)]="config.show_interfaces">
+				<mat-button-toggle-group id="show_interfaces" name="show_interfaces" [(ngModel)]="config.show_interfaces">
 				  <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
 				  <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
 				</mat-button-toggle-group>
@@ -197,5 +197,4 @@
     </mat-tab-group>
 </div>
 <button type="button" (click)="saveConfig()" [disabled]="!configForm.dirty" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}</button>
-<button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
 </form>

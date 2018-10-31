@@ -4,15 +4,8 @@
 	      <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
 	    </div>
 	    <ul class="nav navbar-nav centered-nav">
-		        <li *ngIf="loggedIn" id="configuration-menu" (click)="onNavItemClick('/config', 'configuration-menu')">
-					<img src="assets/icons/configuration.png">
-		        </li>
-		        
-		        <li *ngIf="loggedIn" id="system-menu" (click)="onNavItemClick('/osquery', 'system-menu')">
-		        	<img src="assets/icons/system.png">     	
-		        </li>      
-		        
-		        <li *ngIf="loggedIn" id="communication-menu" (click)="onNavItemClick('/network', 'communication-menu')">
+
+		        <li *ngIf="loggedIn" id="report-menu" (click)="onNavItemClick('/report', 'report-menu')">
 		        	<img src="assets/icons/communication.png">			     	
 		        </li>   
 		        

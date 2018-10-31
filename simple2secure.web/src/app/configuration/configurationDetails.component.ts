@@ -11,7 +11,7 @@ import {TranslateService} from '@ngx-translate/core';
 @Component({
   moduleId: module.id,
   templateUrl: 'configurationDetails.component.html',
-  styleUrls: ['configurationDetails.component.css'],
+  styleUrls: ['configuration.component.css'],
   selector: 'configurationDetails'
 })
 
@@ -41,7 +41,7 @@ export class ConfigurationDetailsComponent {
 
   private loadConfiguration() {
     this.loading = true;
-    this.httpService.get(environment.apiEndpoint + 'configs/' + this.id)
+    this.httpService.get(environment.apiEndpoint + 'config/')
       .subscribe(
       data => {
         this.config = data;
@@ -75,7 +75,6 @@ export class ConfigurationDetailsComponent {
           }
           this.loading = false;
       });
-      this.cancel();
   }
 
   public addNewAPI() {
@@ -85,9 +84,5 @@ export class ConfigurationDetailsComponent {
     else {
       this.config['apis'].push({id: '', name: '', url: ''});
     }
-  }
-
-  cancel(){
-      this.location.back();
   }
 }

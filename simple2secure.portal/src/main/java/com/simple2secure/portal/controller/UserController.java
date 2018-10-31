@@ -793,6 +793,7 @@ public class UserController {
 		
 		if (user != null) {
 			
+			//TODO - one user can be assigned to more admin groups
 			AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
 			
 			//Retrieving my groups		
@@ -803,8 +804,7 @@ public class UserController {
 				if(myGroups == null) {
 					myGroups = new ArrayList<>();
 				}
-				else {
-					
+				else {					
 					for(CompanyGroup group : myGroups) {
 						if(!PortalUtils.groupHasChildren(group)) {
 							myGroupsWithChildren.add(group);
@@ -838,16 +838,13 @@ public class UserController {
 						
 						User adminUser = userRepository.find(userId);
 						
-						if(adminUser != null) {
-							
+						if(adminUser != null) {							
 							if(!myUsers.contains(adminUser)) {
 								if(!adminUser.getUserRole().equals(UserRole.SUPERADMIN)) {
 									myUsers.add(adminUser);
-								}
-								
+								}								
 							}
-
-							
+						
 							if(!adminUser.getMyUsers().isEmpty()) {
 								for(String adminChildId : adminUser.getMyUsers()) {
 									User adminChildUser = userRepository.find(adminChildId);
@@ -855,7 +852,6 @@ public class UserController {
 										if(!adminChildUser.getId().equals(user.getId())) {
 											myUsers.add(adminChildUser);
 										}
-										
 									}
 								}							
 							}
@@ -1133,7 +1129,6 @@ public class UserController {
 						probes.add(probe);					
 					}					
 				}
-
 			}
 		}
 		return new ResponseEntity<List<Probe>>(probes, HttpStatus.OK);

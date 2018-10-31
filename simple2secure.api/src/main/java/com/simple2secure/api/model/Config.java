@@ -21,8 +21,6 @@ public class Config extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -3153781553493971957L;
 
-	private String probeId;
-	private String groupId;
 	private int version;
 	private String config_supplier;
 	private String task_supplier;
@@ -51,8 +49,6 @@ public class Config extends GenericDBObject {
 	@OneToMany(cascade = {CascadeType.ALL})
 	private List<API> apis;
 
-	private boolean isGroupConfiguration;
-
 	public Config() {
 
 	}
@@ -72,11 +68,10 @@ public class Config extends GenericDBObject {
 	 * @param communication_factory
 	 * @param db_config
 	 */
-	public Config(String probeId, int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
+	public Config(int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
 			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
 			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, List<API> apis, String baseUrl) {
 		super();
-		this.probeId = probeId;
 		this.version = version;
 		this.config_supplier = config_supplier;
 		this.task_supplier = task_supplier;
@@ -121,7 +116,6 @@ public class Config extends GenericDBObject {
 			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
 			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, List<API> apis, String baseUrl) {
 		super();
-		this.probeId = probeId;
 		this.id = id;
 		this.version = version;
 		this.config_supplier = config_supplier;
@@ -365,22 +359,6 @@ public class Config extends GenericDBObject {
 		this.queries = queries;
 	}
 
-	public String getProbeId() {
-		return probeId;
-	}
-
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
 	public String getBaseUrl() {
 		return baseUrl;
 	}
@@ -403,14 +381,6 @@ public class Config extends GenericDBObject {
 
 	public void setWt_intervall(int wt_intervall) {
 		this.wt_intervall = wt_intervall;
-	}
-
-	public boolean isGroupConfiguration() {
-		return isGroupConfiguration;
-	}
-
-	public void setGroupConfiguration(boolean isGroupConfiguration) {
-		this.isGroupConfiguration = isGroupConfiguration;
 	}
 
 	public String getBpfFilter() {

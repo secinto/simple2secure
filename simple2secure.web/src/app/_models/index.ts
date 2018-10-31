@@ -17,7 +17,6 @@ export * from './test';
 export * from './notification';
 export * from './portalRule';
 export * from './companygroup';
-export * from './configDTO';
 export * from './probe';
 export * from './networkReport';
 export * from './userRole';
