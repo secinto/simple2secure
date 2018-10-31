@@ -16,7 +16,6 @@ public class User extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -4145217947046921778L;
 
-	private String uuid;
 	private String firstName;
 	private String lastName;
 	private String username;
@@ -34,14 +33,10 @@ public class User extends GenericDBObject {
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 	
-	
-	/*@ManyToOne(cascade = {CascadeType.ALL})
-	@JoinColumn(name = "Group")*/
-	private String groupId;
-	private String groupName;
+	private String adminGroupId;
 	
 	@ElementCollection
-	private List<String> myUsers;
+	private List<String> myUsers = new ArrayList<>();
 
 	@OneToMany
 	private List<Probe> myProbes;
@@ -55,9 +50,8 @@ public class User extends GenericDBObject {
 
 	}
 
-	public User(String uuid, String firstName, String lastName, String username, String email, String password, boolean enabled,
+	public User(String firstName, String lastName, String username, String email, String password, boolean enabled,
 			List<Probe> myProbes, UserRole userRole, String activationToken, boolean activated, boolean passwordUpdated) {
-		this.uuid = uuid;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
@@ -71,6 +65,11 @@ public class User extends GenericDBObject {
 		this.myUsers = new ArrayList<String>();
 		this.userRole = userRole;
 	}
+	
+	public User(String email, UserRole userRole) {
+		this.email = email;
+		this.userRole = userRole;
+	}
 
 	/*public User(String uuid, String firstName, String lastName, String username, String email, String password, boolean enabled,
 			String userRole, List<Probe> myProbes, String activationToken, boolean activated, boolean passwordUpdated) {
@@ -78,14 +77,6 @@ public class User extends GenericDBObject {
 		this.userRole = userRole;
 		this.myUsers = new ArrayList<String>();
 	}*/
-
-	public String getUUID() {
-		return uuid;
-	}
-
-	public void setUUID(String uuid) {
-		this.uuid = uuid;
-	}
 
 	public String getFirstName() {
 		return this.firstName;
@@ -245,14 +236,6 @@ public class User extends GenericDBObject {
 		this.phone = phone;
 	}
 
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
 	public UserRole getUserRole() {
 		return userRole;
 	}
@@ -261,11 +244,13 @@ public class User extends GenericDBObject {
 		this.userRole = userRole;
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public String getAdminGroupId() {
+		return adminGroupId;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void setAdminGroupId(String adminGroupId) {
+		this.adminGroupId = adminGroupId;
 	}
+	
+	
 }

@@ -1,5 +1,4 @@
 package com.simple2secure.api.model;
-
 import java.util.concurrent.TimeUnit;
 
 import com.simple2secure.api.dbo.GenericDBObject;
