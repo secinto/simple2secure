@@ -149,7 +149,6 @@ public class ProbeConfiguration {
 			log.debug("DB processors not available, reading from file. Should only happen once.");
 			List<Processor> fileProcessors = getProcessorsFromFile();
 			for (Processor processor : fileProcessors) {
-				processor.setProbeId(ProbeConfiguration.probeId);
 				DBUtil.getInstance().merge(processor);
 			}
 			/*
@@ -170,7 +169,6 @@ public class ProbeConfiguration {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
 			List<Step> fileSteps = getStepsFromFile();
 			for (Step step : fileSteps) {
-				step.setProbeId(ProbeConfiguration.probeId);
 				step.setActive(1);
 				DBUtil.getInstance().merge(step);
 			}
@@ -188,7 +186,6 @@ public class ProbeConfiguration {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
 			List<QueryRun> fileQueries = getQueriesFromFile();
 			for (QueryRun query : fileQueries) {
-				query.setProbeId(ProbeConfiguration.probeId);
 				query.setActive(1);
 				DBUtil.getInstance().merge(query);
 			}
@@ -259,7 +256,6 @@ public class ProbeConfiguration {
 					DBUtil.getInstance().clearDB(Processor.class);
 
 					for (Processor processor : apiProcessors) {
-						processor.setProbeId(ProbeConfiguration.probeId);
 						DBUtil.getInstance().merge(processor);
 					}
 					/*
@@ -277,7 +273,6 @@ public class ProbeConfiguration {
 					DBUtil.getInstance().clearDB(Step.class);
 
 					for (Step step : apiSteps) {
-						step.setProbeId(ProbeConfiguration.probeId);
 						DBUtil.getInstance().merge(step);
 					}
 					/*
@@ -301,7 +296,6 @@ public class ProbeConfiguration {
 
 					for (QueryRun query : apiQueries) {
 						if (query != null) {
-							query.setProbeId(ProbeConfiguration.probeId);
 							DBUtil.getInstance().merge(query);
 						}
 					}
