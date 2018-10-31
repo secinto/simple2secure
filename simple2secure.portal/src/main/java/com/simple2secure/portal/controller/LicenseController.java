@@ -43,6 +43,7 @@ import com.simple2secure.api.model.CompanyLicense;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.AdminGroupRepository;
@@ -201,7 +202,7 @@ public class LicenseController {
 					createLicense(groupId, userId, licensePlan);
 					ArrayList<File> files = new ArrayList<>();
 
-					File publicKey = new File(LicenseManager.PUBLIC_KEY_FILE);
+					File publicKey = new File(StaticConfigItems.KEYS_LOCATION + LicenseManager.PUBLIC_KEY_FILE);
 					File certificate = new File(LicenseManager.LICENSE_FILE);
 
 					files.add(publicKey);
@@ -281,7 +282,7 @@ public class LicenseController {
 		properties.setProperty("expirationDate", expirationDate);
 		properties.setProperty("groupId", groupId);
 		properties.setProperty("licenseId", licenseId.toString());
-		LicenseGenerator.generateLicense(properties, "private.key");
+		LicenseGenerator.generateLicense(properties, StaticConfigItems.KEYS_LOCATION + "private.key");
 	}
 	
 	@RequestMapping(value = "/api/license/token", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
