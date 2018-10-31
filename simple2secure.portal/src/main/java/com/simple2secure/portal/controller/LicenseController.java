@@ -12,6 +12,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -23,6 +24,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -208,7 +211,7 @@ public class LicenseController {
 
 			ArrayList<File> files = new ArrayList<>();
 
-			File publicKey = new File(LicenseManager.PUBLIC_KEY_FILE);
+			File publicKey = new File("src/main/resources/keys/public.key");
 			File certificate = new File(LicenseManager.LICENSE_FILE);
 
 			files.add(publicKey);
@@ -269,7 +272,9 @@ public class LicenseController {
 		properties.setProperty("expirationDate", group.getLicenseExpirationDate());
 		properties.setProperty("groupId", groupId);
 		properties.setProperty("licenseId", licenseId.toString());
-		LicenseGenerator.generateLicense(properties, "private.key");
+		Resource resource = new ClassPathResource("keys/private.key");
+		InputStream resourceInputStream = resource.getInputStream();
+		LicenseGenerator.generateLicense(properties, "src/main/resources/keys/private.key");
 	}
 
 	/**

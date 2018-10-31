@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.util.Strings;
 
 import com.simple2secure.api.model.QueryRun;
@@ -29,7 +30,7 @@ public class QueryRunnable implements Runnable {
 		String queryString = query.getSqlQuery();
 		String queryResult = executeQuery(queryString);
 		if (Strings.isNotNullAndNotEmpty(queryResult)) {
-			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, (new Date()).toString(), false);
+			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date().toString(), false);
 			DBUtil.getInstance().save(result);
 		}
 	}
@@ -46,7 +47,7 @@ public class QueryRunnable implements Runnable {
 	 * Run a osQuery query.
 	 *
 	 * @param directory
-	 *            filepath to directory holding osqueryi executable
+	 *          filepath to directory holding osqueryi executable
 	 * @param query
 	 * @return
 	 */
@@ -58,7 +59,8 @@ public class QueryRunnable implements Runnable {
 				ProbeConfiguration.getInstance().getCurrentConfigObj().getQueries().getOsquerypath() + File.separator + "osqueryi.exe");
 		String myCommand = queryExec.getAbsolutePath();
 		String myArgs0 = "--json";
-		String myArgs1 = "--config-path=osquery.conf";
+		String myArgs1 = "--config-path=" + ProbeConfiguration.getInstance().getCurrentConfigObj().getQueries().getOsquerypath()
+				+ File.separator + "osquery.conf";
 		String myArgs2 = query;
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
@@ -69,6 +71,7 @@ public class QueryRunnable implements Runnable {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			result = IOUtils.toString(reader);
+			result = StringUtils.substringBetween(result, "[", "]").trim();
 			p.destroy();
 		} catch (Exception e) {
 			e.printStackTrace();

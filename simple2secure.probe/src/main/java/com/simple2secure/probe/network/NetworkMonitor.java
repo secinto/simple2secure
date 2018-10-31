@@ -12,6 +12,7 @@ import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.core.Pcaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.util.Strings;
 
 import com.simple2secure.api.model.Config;
 import com.simple2secure.commons.collections.ProcessingQueue;
@@ -113,8 +114,13 @@ public class NetworkMonitor {
 			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
 			 * be developed
 			 */
-			receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
-
+			if (Strings.isNotNullAndNotEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
+				try {
+					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
+				} catch (Exception e) {
+					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
+				}
+			}
 			processingQueue = new ProcessingQueue<PacketContainer>();
 
 			receiver = new PacketReceiver(receiverHandle, processingQueue);
