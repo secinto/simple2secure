@@ -1,5 +1,6 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -58,9 +59,19 @@ public class GroupRepositoryImpl extends GroupRepository {
 	}
 
 	@Override
-	public List<CompanyGroup> findBySuperUserId(String superUserId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<CompanyGroup> findBySuperUserId(String superUserId, String adminGroupId) {
+		List<CompanyGroup> groups = findByAdminGroupId(adminGroupId);
+		List<CompanyGroup> userGroups = new ArrayList<>();
+		if(groups != null) {
+			for(CompanyGroup group : groups) {
+				if(group.getSuperUserIds().contains(superUserId)) {
+					userGroups.add(group);
+				}
+			}
+			return userGroups;
+		}
+		
+		return userGroups;
 	}
 	
 	

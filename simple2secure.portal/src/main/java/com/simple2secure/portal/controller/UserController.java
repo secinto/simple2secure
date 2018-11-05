@@ -1150,14 +1150,19 @@ public class UserController {
 	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @PathVariable("userId") String userId, 
 			@PathVariable("parentGroupId") String parentGroupId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
+		
 		if (group != null && !Strings.isNullOrEmpty(userId)) {
-			
-			if(Strings.isNullOrEmpty(group.getId())) {
+			User user = userRepository.find(userId);
+			if(Strings.isNullOrEmpty(group.getId()) && user != null) {
 				
 				if(!parentGroupId.equals("null")) {
 					//THERE IS A PARENT GROUP!!
 					CompanyGroup parentGroup = groupRepository.find(parentGroupId);
 					if(parentGroup != null) {
+						if(user.getUserRole().equals(UserRole.SUPERUSER)) {
+							group.addSuperUserId(user.getId());
+						}
+						
 						group.setAdminGroupId(parentGroup.getAdminGroupId());
 						group.setRootGroup(false);
 						group.setParentId(parentGroupId);						
@@ -1175,6 +1180,11 @@ public class UserController {
 					//NEW PARENT GROUP!
 					AdminGroup adminGroup = adminGroupRepository.getAdminGroupByUserId(userId);
 					if(adminGroup != null) {
+						
+						if(user.getUserRole().equals(UserRole.SUPERUSER)) {
+							group.addSuperUserId(user.getId());
+						}
+						
 						group.setAdminGroupId(adminGroup.getId());
 						group.setRootGroup(true);
 						groupRepository.save(group);
@@ -1258,6 +1268,40 @@ public class UserController {
 	 * This function returns all users from the user repository
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/api/users/group/superuser/{userId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<String>> getGroupsBySuperUserId(@PathVariable("userId") String userId,
+			@RequestHeader("Accept-Language") String locale) {
+		User user = userRepository.find(userId);
+		List<String> superUserGroups = new ArrayList<>();
+		if(user != null) {
+			List<CompanyGroup> groups = groupRepository.findBySuperUserId(userId, user.getAdminGroupId());
+
+			if(groups != null) {
+				for(CompanyGroup group : groups) {
+					if(group != null) {
+						superUserGroups.add(group.getId());
+					}
+				}
+				return new ResponseEntity<List<String>>(superUserGroups, HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity(
+						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+						HttpStatus.NOT_FOUND);					
+			}
+		}
+		else {
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+					HttpStatus.NOT_FOUND);			
+		}
+	}
+	
+	/**
+	 * This function returns all users from the user repository
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/users/group/{groupID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
@@ -1281,39 +1325,49 @@ public class UserController {
 	}
 	
 	/**
-	 * This function returns all groups according to the user id
+	 * This function moves the group to the one which has been selected using drag&drop
 	 * @throws ItemNotFoundRepositoryException 
 	 */
-	@RequestMapping(value = "/api/users/groups/move/{sourceGroupId}/{destGroupId}", method = RequestMethod.POST)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/api/users/groups/move/{sourceGroupId}/{destGroupId}/{userId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")	
 	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable("sourceGroupId") String sourceGroupId, 
-			@PathVariable("destGroupId") String destGroupId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException{
+			@PathVariable("destGroupId") String destGroupId, @PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) 
+					throws ItemNotFoundRepositoryException{
 		CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
 		CompanyGroup toGroup = groupRepository.find(destGroupId);
 		//TODO - additional checks and error handling
-		if(sourceGroup != null && toGroup != null) {
-			CompanyGroup parentGroup = groupRepository.find(sourceGroup.getParentId());
-			if(parentGroup != null) {
-				parentGroup.removeChildrenId(sourceGroupId);
-				groupRepository.update(parentGroup);
-				
-				sourceGroup.setParentId(destGroupId);
-				toGroup.addChildrenId(sourceGroupId);
-				
-				groupRepository.update(sourceGroup);
-				groupRepository.update(toGroup);
-			}
-			//This is the root group!
-			else {
-				if(sourceGroup.isRootGroup()) {
+		if(sourceGroup != null && toGroup != null && !Strings.isNullOrEmpty(userId)) {
+			if(sourceGroup.getSuperUserIds().contains(userId) && toGroup.getSuperUserIds().contains(userId)) {
+				CompanyGroup parentGroup = groupRepository.find(sourceGroup.getParentId());
+				if(parentGroup != null) {
+					parentGroup.removeChildrenId(sourceGroupId);
+					groupRepository.update(parentGroup);
+					
 					sourceGroup.setParentId(destGroupId);
-					sourceGroup.setRootGroup(false);
 					toGroup.addChildrenId(sourceGroupId);
 					
 					groupRepository.update(sourceGroup);
 					groupRepository.update(toGroup);
 				}
+				//This is the root group!
+				else {
+					if(sourceGroup.isRootGroup()) {
+						sourceGroup.setParentId(destGroupId);
+						sourceGroup.setRootGroup(false);
+						toGroup.addChildrenId(sourceGroupId);
+						
+						groupRepository.update(sourceGroup);
+						groupRepository.update(toGroup);
+					}
+				}
 			}
+			else {
+				return new ResponseEntity(
+						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+						HttpStatus.NOT_FOUND);	
+			}
+
 		}
 		//Group will be moved to root!
 		else if(sourceGroup != null && toGroup == null) {

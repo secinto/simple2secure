@@ -65,10 +65,10 @@
 			  </div>
 			  <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
 
-				  <ng-container matColumnDef="group">
+				  <!--<ng-container matColumnDef="group">
 					  <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }} </mat-header-cell>
 					  <mat-cell *matCellDef="let element"> {{element.groupName}} </mat-cell>
-				  </ng-container>
+				  </ng-container>-->
 
 				  <ng-container matColumnDef="userRole">
 					  <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'userRole.placeholder' | translate }} </mat-header-cell>
@@ -123,7 +123,7 @@
 			</button>
 
             <div *ngIf="showGroupTable" class="example-container mat-elevation-z8 table table-striped">
-                <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)">
+                <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)" >
                     <ng-template #treeNodeTemplate let-node let-index="index">
                         <span class="node-s2s-item">{{ node.data.name }}</span>
                         <button class="mat-green-button node-s2s-button float-right" mat-button [matMenuTriggerFor]="menuGrp" (click)="onMenuTriggerClick(node.data)">

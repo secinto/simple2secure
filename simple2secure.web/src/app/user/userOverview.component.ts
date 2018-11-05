@@ -28,6 +28,7 @@ export class UserOverviewComponent {
   userAdded = false;
   selectedItem: any;
   myProfile: any;
+  moveNotPossible = false;
   url: string;
   id: string;
   public user: User;
@@ -41,7 +42,7 @@ export class UserOverviewComponent {
   showEditAndDelete: boolean;
   isGroupDeletable = false;
 
-  displayedColumnsUsers = ['email', 'userRole', 'group', 'action'];
+  displayedColumnsUsers = ['email', 'userRole', 'action'];
   displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
 
   dataSource = new MatTableDataSource();
@@ -115,10 +116,11 @@ export class UserOverviewComponent {
         this.checkMyUsersSize(this.myProfile.myUsersList);
         this.checkMyProbesSize(this.myProfile.myProfile.myProbes);
         this.dataService.setGroups(this.myProfile.myGroups);
-        if (!this.userDeleted && !this.groupDeleted && !this.groupAdded && !this.userAdded){
+        if (!this.userDeleted && !this.groupDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible){
             this.alertService.success(this.translate.instant('message.user'));
         }
 
+        this.moveNotPossible = false;
         this.groupDeleted = false;
         this.groupAdded = false;
         this.userAdded = false;
@@ -253,9 +255,18 @@ export class UserOverviewComponent {
 
       if (this.currentUser.userRole === UserRole.SUPERADMIN || this.currentUser.userRole === UserRole.ADMIN){
           this.showEditAndDelete = true;
+          this.dataService.setGroupEditable(this.showEditAndDelete);
       }
       else{
-          this.showEditAndDelete = false;
+          if (this.currentUser.userRole === UserRole.SUPERUSER){
+              this.showEditAndDelete = this.checkIfUserCanEditGroup(item);
+              this.dataService.setGroupEditable(this.showEditAndDelete);
+          }
+          else{
+              this.showEditAndDelete = false;
+              this.dataService.setGroupEditable(false);
+          }
+
       }
 
       if (item.standardGroup){
@@ -263,6 +274,34 @@ export class UserOverviewComponent {
       }
       else{
           this.isGroupDeletable = true;
+      }
+  }
+
+  checkIfUserCanEditGroup(group: CompanyGroup){
+      if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+          return true;
+      }
+      else if (this.currentUser.userRole == UserRole.SUPERUSER){
+          if (group){
+              if (group.superUserIds){
+                  if (group.superUserIds.indexOf(this.currentUser.userID) > -1){
+                      return true;
+                  }
+                  else{
+                      return false;
+                  }
+              }
+              else{
+                  return false;
+              }
+
+          }
+          else{
+              return false;
+          }
+      }
+      else{
+          return false;
       }
   }
 
@@ -418,29 +457,28 @@ export class UserOverviewComponent {
     }
 
     onMoveGroupNode($event) {
-        console.log(
-            'Moved', $event.node.name, ' with id:',  $event.node.id, ' to', $event.to.parent.name, ' with id:', $event.to.parent.id);
-        this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id;
-        this.httpService.post(null, this.url).subscribe(
-            data => {
-                if (this.id === 'new') {
-                    this.alertService.success(this.translate.instant('message.user.create'));
-                }
-                else {
-                    this.alertService.success(this.translate.instant('message.user.update'));
-                }
-                this.loading = false;
-            },
-            error => {
-                if (error.status == 0){
-                    this.alertService.error(this.translate.instant('server.notresponding'));
-                }
-                else{
-                    this.alertService.error(error.error.errorMessage);
-                }
-                this.loading = false;
-            });
-
+        if (this.checkIfUserCanEditGroup($event.node) && this.checkIfUserCanEditGroup($event.to.parent)){
+            this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
+            this.httpService.post(null, this.url).subscribe(
+                data => {
+                    this.alertService.success(this.translate.instant('node.move.success'));
+                    this.loading = false;
+                },
+                error => {
+                    if (error.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
+        }
+        else {
+            this.moveNotPossible = true;
+            this.alertService.error(this.translate.instant('node.move.error'));
+            this.loadMyProfile();
+        }
     }
 
 

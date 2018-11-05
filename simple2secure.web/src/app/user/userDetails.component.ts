@@ -41,7 +41,12 @@ export class UserDetailsComponent {
       }
       else{
           this.action = UrlParameter.EDIT;
-          this.user = data.user;
+          this.user = new UserRegistration();
+          this.user.addedByUserId = data.user.addedByUserId;
+          this.user.id = data.user.id;
+          this.user.userRole = data.user.userRole;
+          this.user.email = data.user.email;
+          this.user.groupIds = [];
           if (this.user.userRole === UserRole.SUPERUSER){
               this.showGroupSelectBox = true;
       }
@@ -84,6 +89,7 @@ export class UserDetailsComponent {
             .subscribe(
                 data => {
                     this.groups = data;
+                    this.addMyGroups(this.groups);
                 },
                 error => {
 
@@ -96,6 +102,19 @@ export class UserDetailsComponent {
                 });
     }
 
+    addMyGroups(groups: CompanyGroup[]){
+      if (this.user.userRole === UserRole.SUPERUSER){
+          if (groups){
+              groups.forEach(group => {
+                  if (group.superUserIds.indexOf(this.user.id) > -1){
+                      this.user.groupIds.push(group.id);
+                  }
+              });
+          }
+      }
+
+    }
+
 	saveUser() {
         this.url = environment.apiEndpoint + 'users';
         if (this.action === UrlParameter.NEW) {
@@ -105,8 +124,6 @@ export class UserDetailsComponent {
         else{
             this.user.registrationType = UserRegistrationType.UPDATE_USER_INFO;
         }
-
-        console.log("USERRRR: " + JSON.stringify(this.user));
 
         this.httpService.post(this.user, this.url).subscribe(
           data => {

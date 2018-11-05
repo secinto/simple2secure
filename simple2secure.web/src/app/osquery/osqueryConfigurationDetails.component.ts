@@ -1,5 +1,5 @@
-import {Component, ViewChild} from '@angular/core';
-import {AlertService, HttpService} from '../_services';
+import {Component, Input, ViewChild} from '@angular/core';
+import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -8,6 +8,7 @@ import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {HttpErrorResponse} from '@angular/common/http';
 import {QueryRun} from '../_models';
 import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.component';
+import {UserGroupComponent} from '../user';
 
 @Component({
     moduleId: module.id,
@@ -16,7 +17,6 @@ import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.comp
 })
 
 export class OsqueryConfigurationDetailsComponent {
-
     displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active', 'action'];
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
@@ -32,6 +32,7 @@ export class OsqueryConfigurationDetailsComponent {
     private sub: any;
     groupId: string;
     probeId: string;
+    groupEditable: boolean;
 
 
     constructor(
@@ -39,6 +40,7 @@ export class OsqueryConfigurationDetailsComponent {
         private httpService: HttpService,
         private router: Router,
         private dialog: MatDialog,
+        private dataService: DataService,
         private route: ActivatedRoute,
         private translate: TranslateService
     ) {}
@@ -49,6 +51,12 @@ export class OsqueryConfigurationDetailsComponent {
         this.sub = this.route.params.subscribe(params => {
             this.groupId = params['id'];
         });
+
+        this.groupEditable = this.dataService.isGroupEditable();
+
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
+        }
 
         this.loadQueries();
     }

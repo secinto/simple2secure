@@ -280,5 +280,7 @@
   "licensePlan.name.placeholder": "Please enter the license plan name",
   "licensePlan.add.button": "Add new license plan",
   "message.config.group.update": "Configuration updated successfully",
-  "message.apply.config": "Apply group configuration for OSQuery, Steps and Processors"
+  "message.apply.config": "Apply group configuration for OSQuery, Steps and Processors",
+  "node.move.error": "You do not have privileges to move the selected group!",
+  "node.move.success": "Group moved successfully!"
 }

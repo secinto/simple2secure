@@ -280,5 +280,7 @@
   "licensePlan.name.placeholder": "Bitte geben Sie den Namen des Lizenzplans ein",
   "licensePlan.add.button": "Neuen Lizenzplan erstellen",
   "message.config.group.update": "Konfiguration wurde erfolgreich aktualisiert",
-  "message.apply.config": "Wenden Sie die Gruppenkonfiguration für OSQuery, Steps und Processors an"
+  "message.apply.config": "Wenden Sie die Gruppenkonfiguration für OSQuery, Steps und Processors an",
+  "node.move.error": "Sie haben keine Berechtigungen zum Verschieben der ausgewählten Gruppe!",
+  "node.move.success": "Gruppe erfolgreich verschiebt!"
 }

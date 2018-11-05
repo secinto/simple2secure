@@ -1,7 +1,7 @@
-import {Component, Inject, ViewChild} from '@angular/core';
-import {CompanyGroup, Processor, QueryRun, Step} from '../_models/index';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {CompanyGroup, UserRole} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
-import {Router, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
@@ -13,14 +13,15 @@ import {MatDialog} from '@angular/material';
   selector: 'UserGroupComponent',
 })
 
-export class UserGroupComponent {
+export class UserGroupComponent implements OnInit{
 
-  public group: CompanyGroup;
+  group = new CompanyGroup();
   loading = false;
   id: string;
   private sub: any;
   url: string;
   currentUser: any;
+  groupEditable: boolean;
 
   constructor(
     private router: Router,
@@ -31,21 +32,20 @@ export class UserGroupComponent {
     private dialog: MatDialog,
     private alertService: AlertService,
     private translate: TranslateService) {
-        this.group = new CompanyGroup();
   }
 
   ngOnInit() {
-    this.sub = this.route.params.subscribe(params => {
-      this.id = params['id'];
-    });
+      this.sub = this.route.params.subscribe(params => {
+          this.id = params['id'];
+      });
 
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-    this.loadGroup();
+      this.groupEditable = this.dataService.isGroupEditable();
+      this.loadGroup();
   }
 
-  private loadGroup() {
-
+  public loadGroup() {
       this.loading = true;
       this.httpService.get(environment.apiEndpoint + 'users/group/' + this.id)
           .subscribe(

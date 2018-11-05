@@ -6,4 +6,5 @@ export class CompanyGroup extends Generic {
     children: string[];
     rootGroup: boolean;
     standardGroup: boolean;
+    superUserIds: string[];
 }

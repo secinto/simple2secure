@@ -1,5 +1,5 @@
 import { Component, ViewChild} from '@angular/core';
-import { AlertService, HttpService} from '../_services';
+import {AlertService, DataService, HttpService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
@@ -30,6 +30,7 @@ export class NetworkConfigurationProcessorDetailsComponent {
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    groupEditable: boolean;
 
     constructor(
         private alertService: AlertService,
@@ -37,6 +38,7 @@ export class NetworkConfigurationProcessorDetailsComponent {
         private router: Router,
         private dialog: MatDialog,
         private route: ActivatedRoute,
+        private dataService: DataService,
         private translate: TranslateService
     ) {}
 
@@ -46,6 +48,12 @@ export class NetworkConfigurationProcessorDetailsComponent {
         this.sub = this.route.params.subscribe(params => {
             this.groupId = params['id'];
         });
+
+        this.groupEditable = this.dataService.isGroupEditable();
+
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'class', 'interval', 'packet'];
+        }
 
         this.loadProcessors();
     }

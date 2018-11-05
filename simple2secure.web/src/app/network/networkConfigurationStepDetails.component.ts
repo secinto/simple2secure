@@ -30,6 +30,7 @@ export class NetworkConfigurationStepDetailsComponent {
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    groupEditable: boolean;
 
     constructor(
         private alertService: AlertService,
@@ -47,6 +48,12 @@ export class NetworkConfigurationStepDetailsComponent {
         this.sub = this.route.params.subscribe(params => {
             this.groupId = params['id'];
         });
+
+        this.groupEditable = this.dataService.isGroupEditable();
+
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'number', 'state'];
+        }
 
         this.loadSteps();
     }
