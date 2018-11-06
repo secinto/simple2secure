@@ -11,7 +11,7 @@
 	"processing_factory": "com.simple2secure.probe.processor.DefaultPacketProcessingFactory",
 	"communication_factory": "com.simple2secure.probe.comm.LocalCommConfiguration",
 	"wt_intervall": 20,
-	"bpfString" : "not (host 127.0.0.1 and port (8080 or 9000))",
+	"bpfFilter" : "not (host 127.0.0.1 and port (8080 or 9000))",
     "db_config": {
 	  "location": "plocal",
 	  "dbURI": "/temp/mydb",
