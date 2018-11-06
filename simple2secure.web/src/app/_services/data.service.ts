@@ -49,4 +49,12 @@ export class DataService {
     getGroups(){
         return JSON.parse(localStorage.getItem('groups'));
     }
+
+    setGroupEditable(value: boolean){
+        localStorage.setItem('isGroupEditable', JSON.stringify(value));
+    }
+
+    isGroupEditable(){
+        return JSON.parse(localStorage.getItem('isGroupEditable'));
+    }
 }

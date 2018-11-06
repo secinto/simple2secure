@@ -1,5 +1,5 @@
 {
-	"version": 2, 
+	"version": 1, 
 	"config_supplier": "http://localhost:8080/api/config",
 	"task_supplier": "http://localhost:8080/api/getTasks",
 	"stylesheet": "/gui/css/simple2secure.css",
@@ -11,7 +11,8 @@
 	"processing_factory": "com.simple2secure.probe.processor.DefaultPacketProcessingFactory",
 	"communication_factory": "com.simple2secure.probe.comm.LocalCommConfiguration",
 	"wt_intervall": 20,
-	"db_config": {
+	"bpfFilter" : "not (host 127.0.0.1 and port (8080 or 9000))",
+    "db_config": {
 	  "location": "plocal",
 	  "dbURI": "/temp/mydb",
 	  "write_user": "admin",

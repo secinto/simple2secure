@@ -1,16 +1,17 @@
 import {Component, ViewChild} from '@angular/core';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {HttpService, AlertService, DataService} from '../_services/index';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {AlertService, DataService, HttpService} from '../_services/index';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {CompanyGroup, User, UserRole} from '../_models/index';
-import {UserDTO} from '../_models/index';
-import {Router, ActivatedRoute} from '@angular/router';
+import {CompanyGroup, User, UserDTO, UserRole} from '../_models/index';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ITreeState, ITreeOptions} from 'angular-tree-component';
-import { v4 } from 'uuid';
-import { HttpErrorResponse } from '@angular/common/http';
+import {v4} from 'uuid';
+import {UserGroupDialogComponent} from './userGroupDialog.component';
+import {HttpErrorResponse} from '@angular/common/http';
+import {UserDetailsComponent} from './userDetails.component';
+import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 
 @Component({
   moduleId: module.id,
@@ -23,8 +24,11 @@ export class UserOverviewComponent {
   loading = false;
   userDeleted = false;
   groupDeleted = false;
+  groupAdded = false;
+  userAdded = false;
   selectedItem: any;
   myProfile: any;
+  moveNotPossible = false;
   url: string;
   id: string;
   public user: User;
@@ -36,18 +40,18 @@ export class UserOverviewComponent {
   showUserTable: boolean;
   showProbeTable: boolean;
   showEditAndDelete: boolean;
+  isGroupDeletable = false;
 
-  displayedColumnsUsers = ['email', 'userRole', 'group', 'action'];
+  displayedColumnsUsers = ['email', 'userRole', 'action'];
   displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
-  displayedColumnsGroups = ['name', 'owner', 'licenseExpirationDate', 'numOfUsedLicenses', 'action'];
 
   dataSource = new MatTableDataSource();
   dataSource2 = new MatTableDataSource();
   dataSource3 = new MatTableDataSource();
+  options = { focused: true, allowDrag: true};
 
   @ViewChild('paginator') paginator: MatPaginator;
   @ViewChild('paginator2') paginator2: MatPaginator;
-  @ViewChild('paginator3') paginator3: MatPaginator;
   @ViewChild('sort') sort: MatSort;
   @ViewChild('sortDev') sortDev: MatSort;
   @ViewChild('sortGrp') sortGrp: MatSort;
@@ -59,12 +63,14 @@ export class UserOverviewComponent {
     private dataService: DataService,
     private alertService: AlertService,
     private dialog: MatDialog,
+    private dialog2: MatDialog,
     private translate: TranslateService) {
       this.myProfile = new UserDTO();
       this.myProfile.myProfile = new User();
   }
 
   ngOnInit() {
+      this.selectedItem = new CompanyGroup();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
       this.loadMyProfile();
       if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN ||
@@ -81,10 +87,8 @@ export class UserOverviewComponent {
   ngAfterViewInit() {
       this.dataSource.paginator = this.paginator;
       this.dataSource2.paginator = this.paginator2;
-      this.dataSource3.paginator = this.paginator3;
       this.dataSource.sort = this.sort;
       this.dataSource2.sort = this.sortDev;
-      this.dataSource3.sort = this.sortGrp;
   }
 
   applyFilter(filterValue: string) {
@@ -97,12 +101,6 @@ export class UserOverviewComponent {
       filterValue = filterValue.trim(); // Remove whitespace
       filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
       this.dataSource2.filter = filterValue;
-  }
-
-  applyFilterGrp(filterValue: string) {
-      filterValue = filterValue.trim(); // Remove whitespace
-      filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-      this.dataSource3.filter = filterValue;
   }
 
   private loadMyProfile() {
@@ -118,12 +116,14 @@ export class UserOverviewComponent {
         this.checkMyUsersSize(this.myProfile.myUsersList);
         this.checkMyProbesSize(this.myProfile.myProfile.myProbes);
         this.dataService.setGroups(this.myProfile.myGroups);
-
-        if (!this.userDeleted && !this.groupDeleted){
+        if (!this.userDeleted && !this.groupDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible){
             this.alertService.success(this.translate.instant('message.user'));
         }
 
+        this.moveNotPossible = false;
         this.groupDeleted = false;
+        this.groupAdded = false;
+        this.userAdded = false;
         this.userDeleted = false;
         this.loading = false;
       },
@@ -182,64 +182,28 @@ export class UserOverviewComponent {
     }
 
 
-  saveUser() {
+  updateUserInfo() {
       this.loading = true;
-
-      if (this.id === 'new') {
-          this.url = environment.apiEndpoint + 'users/add_by_user-' + this.currentUser.userID;
-          this.httpService.post(this.user, this.url).subscribe(
-                  data => {
-                    this.user = data;
-                    if (this.id === 'new') {
-                      this.alertService.success(this.translate.instant('message.user.create'));
-                    }
-                    else {
-                      this.alertService.success(this.translate.instant('message.user.update'));
-                    }
-                    this.loading = false;
-                    this.router.navigate(['user']);
-                  },
-                  error => {
-                      if (error.status == 0){
-                          this.alertService.error(this.translate.instant('server.notresponding'));
-                      }
-                      else{
-                          this.alertService.error(error.error.errorMessage);
-                      }
-                      this.loading = false;
-                  });
-      }
-      else{
-          this.url = environment.apiEndpoint + 'users/update_user_info';
-          this.httpService.post(this.myProfile.myProfile, this.url).subscribe(
-                  data => {
-                    this.user = data;
-                    if (this.id === 'new') {
-                      this.alertService.success(this.translate.instant('message.user.create'));
-                    }
-                    else {
-                      this.alertService.success(this.translate.instant('message.user.update'));
-                    }
-                    this.router.navigate(['user']);
-                  },
-                  error => {
-                      if (error.status == 0){
-                          this.alertService.error(this.translate.instant('server.notresponding'));
-                      }
-                      else{
-                          this.alertService.error(error.error.errorMessage);
-                      }
-                      this.loading = false;
-                  });
-      }
+      this.url = environment.apiEndpoint + 'users/update';
+      this.httpService.post(this.myProfile.myProfile, this.url).subscribe(
+              data => {
+                  this.user = data;
+                  this.alertService.success(this.translate.instant('message.user.update'));
+                  this.router.navigate(['user']);
+              },
+              error => {
+                  if (error.status == 0){
+                      this.alertService.error(this.translate.instant('server.notresponding'));
+                  }
+                  else{
+                      this.alertService.error(error.error.errorMessage);
+                  }
+                  this.loading = false;
+              });
 
 
     }
 
-  public editUser(userItem: any) {
-    this.dataService.set(userItem);
-    this.router.navigate(['../user', userItem.id], {relativeTo: this.route});
-  }
 
   public editGroup(groupItem: any) {
       this.dataService.set(groupItem);
@@ -289,11 +253,55 @@ export class UserOverviewComponent {
   public onMenuTriggerClick(item: any) {
       this.selectedItem = item;
 
-      if (item.addedByUserId == this.currentUser.userID){
+      if (this.currentUser.userRole === UserRole.SUPERADMIN || this.currentUser.userRole === UserRole.ADMIN){
           this.showEditAndDelete = true;
+          this.dataService.setGroupEditable(this.showEditAndDelete);
       }
       else{
-          this.showEditAndDelete = false;
+          if (this.currentUser.userRole === UserRole.SUPERUSER){
+              this.showEditAndDelete = this.checkIfUserCanEditGroup(item);
+              this.dataService.setGroupEditable(this.showEditAndDelete);
+          }
+          else{
+              this.showEditAndDelete = false;
+              this.dataService.setGroupEditable(false);
+          }
+
+      }
+
+      if (item.standardGroup){
+          this.isGroupDeletable = false;
+      }
+      else{
+          this.isGroupDeletable = true;
+      }
+  }
+
+  checkIfUserCanEditGroup(group: CompanyGroup){
+      if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+          return true;
+      }
+      else if (this.currentUser.userRole == UserRole.SUPERUSER){
+          if (group){
+              if (group.superUserIds){
+                  if (group.superUserIds.indexOf(this.currentUser.userID) > -1){
+                      return true;
+                  }
+                  else{
+                      return false;
+                  }
+              }
+              else{
+                  return false;
+              }
+
+          }
+          else{
+              return false;
+          }
+      }
+      else{
+          return false;
       }
   }
 
@@ -305,14 +313,173 @@ export class UserOverviewComponent {
       this.openDialog('group');
   }
 
-  public onEditClick(){
-      this.editUser(this.selectedItem);
-  }
-
   public onDeleteClick(){
       this.openDialog('user');
       // this.deleteUser(this.selectedUser);
   }
+
+  public onApplyConfigClick(){
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = '450px';
+      dialogConfig.data = {
+          destGroup: this.selectedItem,
+      };
+
+      const dialogRef = this.dialog.open(UserGroupApplyConfigComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe(result => {
+          if (result == true){
+              this.alertService.success(this.translate.instant('message.config.group.update'));
+              this.userAdded = true;
+          }
+          else{
+              if (result instanceof HttpErrorResponse){
+                  if (result.status == 0){
+                      this.alertService.error(this.translate.instant('server.notresponding'));
+                  }
+                  else{
+                      this.alertService.error(result.error.errorMessage);
+                  }
+              }
+          }
+      });
+  }
+
+    openDialogAddUser(): void {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            user: null,
+            addedByUserId: this.currentUser.userID,
+            groups: this.myProfile.myGroups
+        };
+
+
+        const dialogRef = this.dialog.open(UserDetailsComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.user.create'));
+                this.userAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    openDialogEditUser(): void {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            user: this.selectedItem,
+            addedByUserId: null,
+            groups: this.myProfile.myGroups
+        };
+
+        const dialogRef = this.dialog.open(UserDetailsComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.user.update'));
+                this.userAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+
+    openDialogSubGroup(): void {
+        const dialogRef = this.dialog2.open(UserGroupDialogComponent, {
+            width: '350px',
+            data: this.selectedItem
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.group.add'));
+                this.groupAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    openDialogRootGroup(): void {
+        const dialogRef = this.dialog.open(UserGroupDialogComponent, {
+            width: '250px',
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.group.add'));
+                this.groupAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    onMoveGroupNode($event) {
+        if (this.checkIfUserCanEditGroup($event.node) && this.checkIfUserCanEditGroup($event.to.parent)){
+            this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
+            this.httpService.post(null, this.url).subscribe(
+                data => {
+                    this.alertService.success(this.translate.instant('node.move.success'));
+                    this.loading = false;
+                },
+                error => {
+                    if (error.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
+        }
+        else {
+            this.moveNotPossible = true;
+            this.alertService.error(this.translate.instant('node.move.error'));
+            this.loadMyProfile();
+        }
+    }
 
 
   public onDownloadClick(){
@@ -372,10 +539,6 @@ export class UserOverviewComponent {
             !this.dataSource.paginator ? this.dataSource.paginator = this.paginator : null;
             !this.dataSource.sort ? this.dataSource.sort = this.sort : null;
             break;
-          case 2:
-              !this.dataSource3.paginator ? this.dataSource3.paginator = this.paginator3 : null;
-              !this.dataSource3.sort ? this.dataSource3.sort = this.sortGrp : null;
-              break;
           case 3:
             !this.dataSource2.paginator ? this.dataSource2.paginator = this.paginator2 : null;
             !this.dataSource2.sort ? this.dataSource2.sort = this.sortDev : null;

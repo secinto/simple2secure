@@ -1,4 +1,4 @@
-<button mat-raised-button color="primary" id="addButton" type="button" (click)="addStep()"
+<button *ngIf="groupEditable" mat-raised-button color="primary" id="addButton" type="button" (click)="onAddClick()"
 	class="pull-right mat-green-button">
 	<i class="glyphicon glyphicon-plus"></i> {{ 'button.addStep' | translate }}
 </button>
@@ -31,7 +31,7 @@
       </mat-cell>
     </ng-container>
     
-    <ng-container matColumnDef="action">
+    <ng-container matColumnDef="action" *ngIf="groupEditable">
       <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>     
       <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
         <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuSteps" (click)="onMenuTriggerClick(element)">
@@ -52,6 +52,6 @@
 </div>
 
 <mat-menu #menuSteps="matMenu">
-  <button mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
-  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+  <button *ngIf="groupEditable" mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
+  <button *ngIf="groupEditable" mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
 </mat-menu>

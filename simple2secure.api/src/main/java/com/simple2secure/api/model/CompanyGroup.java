@@ -1,16 +1,10 @@
 package com.simple2secure.api.model;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-@Entity
-@Table(name = "CompanyGroup")
 public class CompanyGroup extends GenericDBObject{
 
 	/**
@@ -18,27 +12,25 @@ public class CompanyGroup extends GenericDBObject{
 	 */
 	private static final long serialVersionUID = 8637103644388176110L;
 	
+	private String parentId;
 	private String name;
-	private String addedByUserId;
-	private String owner;
+	private String adminGroupId;
+		
+	List<String> childrenIds = new ArrayList<>();
 	
-	private String licenseExpirationDate;
+	List<CompanyGroup> children = new ArrayList<>();
 	
-	@OneToMany(cascade = {CascadeType.ALL})
-	List<CompanyGroup> children;
+	private boolean rootGroup;
 	
-	private int maxNumberOfLicenseDownloads;
+	private boolean standardGroup = false;
 	
-	private int currentNumberOfLicenseDownloads;
+	private List<String> superUserIds = new ArrayList<>();
 	
 	public CompanyGroup() {}
 	
-	public CompanyGroup(String name, String owner, String addedByUserId, String licenseExpirationDate, List<CompanyGroup> children) {
+	public CompanyGroup(String name, List<String> childrenIds) {
 		this.name = name;
-		this.owner = owner;
-		this.addedByUserId = addedByUserId;
-		this.children = children;
-		this.licenseExpirationDate = licenseExpirationDate;
+		this.childrenIds = childrenIds;
 	}
 	
 	public String getName() {
@@ -48,52 +40,84 @@ public class CompanyGroup extends GenericDBObject{
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public String getAddedByUserId() {
-		return addedByUserId;
+	
+	public List<String> getChildrenIds() {
+		return childrenIds;
 	}
 
-	public void setAddedByUserId(String addedByUserId) {
-		this.addedByUserId = addedByUserId;
+	public void addChildrenId(String companyGroupId) {
+		this.childrenIds.add(companyGroupId);
+	}
+	
+	public void addChildren(CompanyGroup child) {
+		this.children.add(child);
+	}
+	
+	public void removeChildrenId(String companyGroupId) {
+		this.childrenIds.remove(companyGroupId);
+	}
+	
+	public void removeChild(CompanyGroup child) {
+		this.children.remove(child);
+	}
+
+	public String getAdminGroupId() {
+		return adminGroupId;
+	}
+
+	public void setAdminGroupId(String adminGroupId) {
+		this.adminGroupId = adminGroupId;
+	}
+
+	public boolean isRootGroup() {
+		return rootGroup;
+	}
+
+	public void setRootGroup(boolean rootGroup) {
+		this.rootGroup = rootGroup;
+	}
+
+	public void setChildrenIds(List<String> children) {
+		this.childrenIds = children;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 	public List<CompanyGroup> getChildren() {
 		return children;
 	}
 
-	public void setGroupId(List<CompanyGroup> children) {
+	public void setChildren(List<CompanyGroup> children) {
 		this.children = children;
 	}
 
-	public String getLicenseExpirationDate() {
-		return licenseExpirationDate;
+	public boolean isStandardGroup() {
+		return standardGroup;
 	}
 
-	public void setLicenseExpirationDate(String licenseExpirationDate) {
-		this.licenseExpirationDate = licenseExpirationDate;
+	public void setStandardGroup(boolean standardGroup) {
+		this.standardGroup = standardGroup;
 	}
 
-	public int getMaxNumberOfLicenseDownloads() {
-		return maxNumberOfLicenseDownloads;
+	public List<String> getSuperUserIds() {
+		return superUserIds;
 	}
 
-	public void setMaxNumberOfLicenseDownloads(int maxNumberOfLicenseDownloads) {
-		this.maxNumberOfLicenseDownloads = maxNumberOfLicenseDownloads;
+	public void setSuperUserIds(List<String> superUserIds) {
+		this.superUserIds = superUserIds;
 	}
-
-	public int getCurrentNumberOfLicenseDownloads() {
-		return currentNumberOfLicenseDownloads;
+	
+	public void addSuperUserId(String superUserId) {
+		this.superUserIds.add(superUserId);
 	}
-
-	public void setCurrentNumberOfLicenseDownloads(int currentNumberOfLicenseDownloads) {
-		this.currentNumberOfLicenseDownloads = currentNumberOfLicenseDownloads;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
+	
+	public void removeSuperUserId(String superUserId) {
+		this.superUserIds.remove(superUserId);
 	}
 }

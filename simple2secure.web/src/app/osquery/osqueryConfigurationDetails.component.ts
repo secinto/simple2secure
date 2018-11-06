@@ -1,18 +1,22 @@
-import {Component, ViewChild} from '@angular/core';
-import {AlertService, HttpService, DataService} from '../_services';
+import {Component, Input, ViewChild} from '@angular/core';
+import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
+import {HttpErrorResponse} from '@angular/common/http';
+import {QueryRun} from '../_models';
+import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.component';
+import {UserGroupComponent} from '../user';
 
 @Component({
     moduleId: module.id,
+    selector: 'osQueryConfigDetails',
     templateUrl: 'osqueryConfigurationDetails.component.html'
 })
 
 export class OsqueryConfigurationDetailsComponent {
-
     displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active', 'action'];
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
@@ -20,36 +24,39 @@ export class OsqueryConfigurationDetailsComponent {
 
     currentUser: any;
     queries: any[];
+    selectedItem: QueryRun;
     loading = false;
     type: number;
-    deleted: boolean;
+    deleted = false;
+    added = false;
     private sub: any;
-    currentProbe: any;
     groupId: string;
     probeId: string;
+    groupEditable: boolean;
 
 
     constructor(
         private alertService: AlertService,
         private httpService: HttpService,
-        private dataService: DataService,
         private router: Router,
         private dialog: MatDialog,
+        private dataService: DataService,
         private route: ActivatedRoute,
         private translate: TranslateService
     ) {}
 
     ngOnInit() {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        this.route.queryParams.subscribe(params => {
-            this.type = params['type'];
-            if (this.type == 1){
-                this.groupId = params['groupId'];
-            }
-            else{
-                this.probeId = params['probeId'];
-            }
+
+        this.sub = this.route.params.subscribe(params => {
+            this.groupId = params['id'];
         });
+
+        this.groupEditable = this.dataService.isGroupEditable();
+
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
+        }
 
         this.loadQueries();
     }
@@ -66,46 +73,6 @@ export class OsqueryConfigurationDetailsComponent {
     }
 
     loadQueries(){
-        if (this.type == 1){
-            this.loadGroupQueries();
-        }
-        else{
-            this.loadDeviceQueries();
-        }
-    }
-
-    loadDeviceQueries(){
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'config/query/' + this.probeId + '/true')
-            .subscribe(
-                data => {
-                    this.queries = data;
-                    this.dataSource.data = this.queries;
-                    if (data.length > 0){
-                        if (this.deleted == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = true;
-                        }
-                    }
-                    else{
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
-
-    loadGroupQueries(){
         this.loading = true;
         this.httpService.get(environment.apiEndpoint + 'config/query/group/' + this.groupId + '/true')
             .subscribe(
@@ -113,18 +80,15 @@ export class OsqueryConfigurationDetailsComponent {
                     this.queries = data;
                     this.dataSource.data = this.queries;
                     if (data.length > 0){
-                        if (this.deleted == false){
+                        if (this.deleted == false && this.added == false){
                             this.alertService.success(this.translate.instant('message.data'));
                         }
                         else{
                             this.deleted = false;
+                            this.added = false;
                         }
                     }
-                    else{
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
                     this.loading = false;
-
                 },
                 error => {
                     if (error.status == 0){
@@ -138,15 +102,67 @@ export class OsqueryConfigurationDetailsComponent {
     }
 
     onMenuTriggerClick(item: any){
-        this.dataService.set(item);
+        this.selectedItem = item;
     }
 
     onEditClick(){
-        this.router.navigate(['edit'], { relativeTo: this.route, queryParams: { action: 'edit' } });
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            queryRun: this.selectedItem,
+            groupId: this.groupId
+        };
+
+        const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.osquery.update'));
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    onAddClick(){
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            queryRun: null,
+            groupId: this.groupId
+        };
+
+        const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.osquery.add'));
+                this.added = true;
+                this.loadQueries();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
     }
 
     onDeleteClick(){
-        this.openDialog(this.dataService.get());
+        this.openDialog(this.selectedItem);
     }
 
     public openDialog(item: any){
@@ -175,7 +191,7 @@ export class OsqueryConfigurationDetailsComponent {
         this.loading = true;
         this.httpService.delete(environment.apiEndpoint + 'config/query/' + queryConfig.id).subscribe(
             data => {
-                this.alertService.success(this.translate.instant('message.config.delete'));
+                this.alertService.success(this.translate.instant('message.osquery.delete'));
                 this.deleted = true;
                 this.loadQueries();
                 this.loading = false;
@@ -189,16 +205,5 @@ export class OsqueryConfigurationDetailsComponent {
                 }
                 this.loading = false;
             });
-    }
-
-
-
-    addQuery(){
-        if (this.type == 1){
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, groupId: this.groupId , action: 'new' } });
-        }
-        else{
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, probeId: this.probeId, action: 'new' } });
-        }
     }
 }

@@ -1,12 +1,13 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 
-import {Processor, Timeunit} from '../_models/index';
+import {Processor, Timeunit, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {Location, Time} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
   moduleId: module.id,
@@ -16,14 +17,8 @@ import {TranslateService} from '@ngx-translate/core';
 export class NetworkProcessorConfigurationEditComponent {
 
   processor: Processor;
-  id: string;
-  private sub: any;
-  splittedurl: any[];
-  type: number;
   action: string;
   groupId: string;
-  probeId: string;
-
   timeUnits = Timeunit;
 
   constructor(
@@ -33,61 +28,39 @@ export class NetworkProcessorConfigurationEditComponent {
     private translate: TranslateService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private dialogRef: MatDialogRef<NetworkProcessorConfigurationEditComponent>,
+    @Inject(MAT_DIALOG_DATA) data
   ) {
-    this.processor = new Processor();
-  }
-
-    extractTimeUnits(): Array<string> {
-        const keys = Object.keys(this.timeUnits);
-        return keys.slice();
-    }
-
-  ngOnInit() {
-
-    this.route.queryParams.subscribe(params => {
-      this.type = params['type'];
-      this.action = params['action'];
-
-
-      if (this.type == 3){
-          this.groupId = params['groupId'];
+      if (data.processor == null){
+          this.action = UrlParameter.NEW;
+          this.processor = new Processor();
+          this.groupId = data.groupId;
       }
       else{
-          this.probeId = params['probeId'];
+          this.action = UrlParameter.EDIT;
+          this.processor = data.processor;
+          this.groupId = data.groupId;
       }
+  }
 
-    });
-
-    if (this.action === 'edit') {
-      this.processor = this.dataService.get();
-    }
+  extractTimeUnits(): Array<string> {
+      const keys = Object.keys(this.timeUnits);
+      return keys.slice();
   }
 
   saveProcessor() {
 
-      if (this.action == 'new') {
-
-          if (this.type == 3){
-              this.processor.groupId = this.groupId;
-          }
-          else{
-              this.processor.probeId = this.probeId;
-          }
-      }
+    if (this.action == UrlParameter.NEW) {
+      this.processor.groupId = this.groupId;
+    }
 
     this.httpService.post(this.processor, environment.apiEndpoint + 'processors').subscribe(
       data => {
-        this.processor = data;
-        this.location.back();
+        this.dialogRef.close(true);
       },
       error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
+          this.dialogRef.close(error);
       });
   }
 

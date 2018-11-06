@@ -6,18 +6,8 @@ import {LoginComponent} from './login/index';
 import {ResetComponent} from './resetPassword/index';
 import {AnalysisComponent} from './analysis/index';
 import {RegisterComponent, RegisterByEmailComponent} from './register/index';
-import {ConfigurationComponent, ConfigurationDetailsComponent, ConfigurationOverviewComponent, ConfigurationTypeComponent} from './configuration/index';
-import {
-  ReportComponent, ReportDetailsComponent, ReportOverviewComponent, OsqueryConfigurationComponent,
-  OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent, OsqueryConfigurationDevicesComponent, OsqueryConfigurationGroupsComponent, OsqueryOverviewComponent
-} from './osquery/index';
-import {GuiComponent, GuiOverviewComponent, GuiImportComponent, GuiUserOverviewComponent} from './gui/index';
 import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user/index';
-import {
-  NetworkComponent, NetworkConfigurationComponent, NetworkReportOverviewComponent, NetworkConfigurationTypeComponent,
-  NetworkConfigurationStepDetailsComponent, NetworkConfigurationProcessorDetailsComponent, NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent,
-  NetworkReportDetailsComponent, NetworkOverviewComponent
-} from './network/index';
+import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './network/index';
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
 import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent, OrbiterToolTestResultComponent} from './orbiter/index';
@@ -29,6 +19,8 @@ import {RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {UserGroupComponent} from './user/userGroup.component';
 import {RoleGuard} from './_guards/role.guard';
 import {UserRole} from './_models';
+import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
+import {ReportComponent, ReportOverviewComponent} from './report';
 const appRoutes: Routes = [
   {
     path: '', component: DashboardLayoutComponent, canActivate: [AuthGuard],
@@ -37,57 +29,22 @@ const appRoutes: Routes = [
         path: '',
         component: HomeComponent,
       },
-      {
-        path: 'config',
-        component: ConfigurationComponent,
-        data: {title: 'menu.configuration'},
-        children: [
-          {path: '', component: ConfigurationTypeComponent, data: {title: 'dashboard.configuration'}},
-          {path: ':type', component: ConfigurationOverviewComponent, data: {title: 'menu.generalConfig'}},
-          {path: ':type/:id', component: ConfigurationDetailsComponent, data: {title: 'menu.updateConfig'}}
-        ]
-      },
 
       {
           path: 'analysis',
           component: AnalysisComponent,
           data: {title: 'menu.analysis'}
       },
-
       {
-        path: 'osquery',
+        path: 'report',
         component: ReportComponent,
-        data: {title: 'menu.osquery'},
+        data: {title: 'menu.reports'},
         children: [
-          {path: '', component: OsqueryOverviewComponent, data: {title: 'menu.osquery'}},
-          {path: 'config', component: OsqueryConfigurationComponent, data: {title: 'menu.osqueryConfig'}},
-          {path: 'config/details', component: OsqueryConfigurationDetailsComponent, data: {title: 'menu.currentQueries'}},
-          {path: 'config/devices', component: OsqueryConfigurationDevicesComponent, data: {title: 'table.myprobes'}},
-          {path: 'config/group', component: OsqueryConfigurationGroupsComponent, data: {title: 'table.mygroups'}},
-          {path: 'config/details/edit', component: OsqueryConfigurationEditComponent, data: {title: 'menu.currentQueries'}},
-          {path: 'config/details/new', component: OsqueryConfigurationEditComponent, data: {title: 'menu.currentQueries'}},
-          {path: 'report', component: ReportOverviewComponent, data: {title: 'menu.queryReport'}},
-          {path: 'report/:id', component: ReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
-        ]
-      },
-      {
-        path: 'network',
-        component: NetworkComponent,
-        data: {title: 'menu.networkanalysis'},
-        children: [
-          {path: '', component: NetworkOverviewComponent, data: {title: 'menu.networkanalysis'}},
-          {path: 'config', component: NetworkConfigurationComponent, data: {title: 'menu.networkanalysisConfig'}},
-          {path: 'config/type', component: NetworkConfigurationTypeComponent, data: {title: 'menu.networkanalysisConfigTypes'}},
-          {path: 'config/devices', component: OsqueryConfigurationDevicesComponent, data: {title: 'table.myprobes'}},
-          {path: 'config/groups', component: OsqueryConfigurationGroupsComponent, data: {title: 'table.mygroups'}},
-          {path: 'config/details/step', component: NetworkConfigurationStepDetailsComponent, data: {title: 'menu.networkanalysisStepConfig'}},
-          {path: 'config/details/processor', component: NetworkConfigurationProcessorDetailsComponent, data: {title: 'menu.networkanalysisProcessorConfig'}},
-          {path: 'config/details/step/edit', component: NetworkStepConfigurationEditComponent, data: {title: 'menu.currentStep'}},
-          {path: 'config/details/step/new', component: NetworkStepConfigurationEditComponent, data: {title: 'menu.currentStep'}},
-          {path: 'config/details/processor/edit', component: NetworkProcessorConfigurationEditComponent, data: {title: 'menu.currentProcessor'}},
-          {path: 'config/details/processor/new', component: NetworkProcessorConfigurationEditComponent, data: {title: 'menu.currentProcessor'}},
-          {path: 'report', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports'}},
-          {path: 'report/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
+          {path: '', component: ReportOverviewComponent, data: {title: 'menu.reports'}},
+          {path: 'network', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports'}},
+          {path: 'network/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
+          {path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
+          {path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
         ]
       },
         {
@@ -102,18 +59,6 @@ const appRoutes: Routes = [
                 {path: 'tools/test/result', component: OrbiterToolTestResultComponent, data: {title: 'button.testresults'}},
             ]
         },
-
-
-      {
-        path: 'gui',
-        component: GuiComponent,
-        data: {title: 'GUI'},
-        children: [
-          {path: '', component: GuiOverviewComponent},
-          {path: 'edit', component: GuiUserOverviewComponent},
-          {path: 'upload', component: GuiImportComponent}
-        ]
-      },
       {
         path: 'user',
         component: UserComponent,
@@ -130,8 +75,7 @@ const appRoutes: Routes = [
           data: {title: 'menu.email'},
           children: [
             {path: '', component: EmailOverviewComponent},
-            {path: 'add', component: EmailAccountAddComponent, data: {title: 'menu.addAccount'}},
-            {path: 'edit', component: EmailAccountAddComponent, data: {title: 'menu.editAccount'}},
+            {path: 'add', component: EmailAccountAddComponent},
             {path: ':id/inbox', component: EmailInboxComponent, data: {title: 'table.inbox'}},
             {path: ':id/inbox/rule/overview', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
             {path: ':id/inbox/rule/add', component: RuleAddComponent, data: {title: 'button.addRule'}},

@@ -31,7 +31,5 @@ public abstract class UserRepository extends MongoRepository<User> {
 	
 	public abstract List<User> findByGroupId(String groupId);
 	
-	public abstract void removeAsssignedGroup(String groupId);
-	
 	public abstract User findAddedByUser(String userId);
 }

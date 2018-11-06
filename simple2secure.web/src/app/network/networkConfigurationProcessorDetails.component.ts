@@ -1,14 +1,17 @@
 import { Component, ViewChild} from '@angular/core';
-import { AlertService, HttpService, DataService} from '../_services';
+import {AlertService, DataService, HttpService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Processor} from '../_models';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
+import {NetworkProcessorConfigurationEditComponent} from './networkProcessorConfigurationEdit.component';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
     moduleId: module.id,
+    selector: 'networkConfigurationProcessor',
     templateUrl: 'networkConfigurationProcessorDetails.component.html'
 })
 
@@ -16,48 +19,73 @@ export class NetworkConfigurationProcessorDetailsComponent {
 
     currentUser: any;
     processors: Processor[];
+    private sub: any;
     loading = false;
     type: number;
     groupId: string;
-    probeId: string;
-    deleted: boolean;
+    deleted = false;
+    added = false;
+    selectedItem: Processor;
     displayedColumns = ['name', 'class', 'interval', 'packet', 'action'];
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    groupEditable: boolean;
 
     constructor(
         private alertService: AlertService,
         private httpService: HttpService,
-        private dataService: DataService,
         private router: Router,
         private dialog: MatDialog,
         private route: ActivatedRoute,
+        private dataService: DataService,
         private translate: TranslateService
     ) {}
 
     ngOnInit() {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        this.route.queryParams.subscribe(params => {
-            this.type = params['type'];
-            if (this.type == 3){
-                this.groupId = params['groupId'];
-            }
-            else{
-                this.probeId = params['probeId'];
-            }
+
+        this.sub = this.route.params.subscribe(params => {
+            this.groupId = params['id'];
         });
+
+        this.groupEditable = this.dataService.isGroupEditable();
+
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'class', 'interval', 'packet'];
+        }
 
         this.loadProcessors();
     }
 
     loadProcessors(){
-        if (this.type == 3) {
-            this.loadGroupProcessors();
-        }
-        else {
-            this.loadDeviceProcessors();
-        }
+        this.loading = true;
+        this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+            .subscribe(
+                data => {
+                    this.processors = data;
+                    this.dataSource.data = this.processors;
+                    if (data.length > 0) {
+                        if (this.deleted == false && this.added == false){
+                            this.alertService.success(this.translate.instant('message.data'));
+                        }
+                        else{
+                            this.deleted = false;
+                            this.added = false;
+                        }
+                    }
+                    this.loading = false;
+
+                },
+                error => {
+                    if (error.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
     }
 
     ngAfterViewInit() {
@@ -71,85 +99,68 @@ export class NetworkConfigurationProcessorDetailsComponent {
         this.dataSource.filter = filterValue;
     }
 
-    loadDeviceProcessors() {
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'processors/' + this.probeId)
-            .subscribe(
-                data => {
-                    this.processors = data;
-                    this.dataSource.data = this.processors;
-                    if (data.length > 0) {
-                        if (this.deleted == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = false;
-                        }
-                    }
-                    else {
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
-
-    loadGroupProcessors() {
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
-            .subscribe(
-                data => {
-                    this.processors = data;
-                    this.dataSource.data = this.processors;
-                    if (data.length > 0) {
-                        if (this.deleted == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = false;
-                        }
-                    }
-                    else {
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
-                    this.loading = false;
-
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
-
     onMenuTriggerClick(item: any){
-        this.dataService.set(item);
+        this.selectedItem = item;
     }
 
     onEditClick() {
-        if (this.type == 3){
-            this.router.navigate(['edit'], { relativeTo: this.route, queryParams: { type: this.type, groupId: this.groupId, action: 'edit' } });
-        }
-        else{
-            this.router.navigate(['edit'], { relativeTo: this.route, queryParams: { type: this.type, probeId: this.probeId, action: 'edit' } });
-        }
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            processor: this.selectedItem,
+            groupId: this.groupId
+        };
 
+        const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.processor.update'));
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    onAddClick() {
+
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            processor: null,
+            groupId: this.groupId
+        };
+        const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.processor.add'));
+                this.added = true;
+                this.loadProcessors();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
     }
 
     onDeleteClick(){
-        this.openDialog(this.dataService.get());
+        this.openDialog(this.selectedItem);
     }
 
     public openDialog(item: any){
@@ -192,15 +203,5 @@ export class NetworkConfigurationProcessorDetailsComponent {
                 }
                 this.loading = false;
             });
-    }
-
-    addProcessor() {
-        if (this.type == 3){
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, groupId: this.groupId, action: 'new' } });
-        }
-        else{
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, probeId: this.probeId, action: 'new' } });
-        }
-
     }
 }

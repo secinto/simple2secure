@@ -19,7 +19,6 @@
 		<class>com.simple2secure.api.model.Service</class>
 		<class>com.simple2secure.api.model.Step</class>
 		<class>com.simple2secure.api.model.Task</class>
-		<class>com.simple2secure.api.model.CompanyGroup</class>
 		<class>com.simple2secure.api.model.CompanyLicenseObj</class>
 		<class>com.simple2secure.api.model.NetworkReport</class>
 		<properties>

@@ -2,5 +2,7 @@
 	"accessTokenValidityTime": 2,
 	"accessTokenValidityUnit": "DAYS",
 	"accessTokenProbeValidityTime": 1,
-	"accessTokenProbeValidityUnit": "DAYS"
+	"accessTokenProbeValidityUnit": "DAYS",
+	"accessTokenProbeRestValidityTime": 1,
+	"accessTokenProbeRestValidityTimeUnit": "DAYS"
 }

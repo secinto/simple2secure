@@ -33,5 +33,6 @@ public class StaticConfigItems {
 	public static final String QUERIES_JSON_LOCATION = "/configuration/queries.json";
 	public static final String PROCESSORS_JSON_LOCATION = "/configuration/processors.json";
 	public static final String STEPS_JSON_LOCATION = "/configuration/steps.json";
+	public static final String KEYS_LOCATION = "./src/main/resources/keys/";
 
 }

@@ -27,21 +27,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.ConfigDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicense;
 import com.simple2secure.api.model.Config;
-import com.simple2secure.api.model.Probe;
+import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.Step;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.QueryRepository;
+import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
 public class ConfigController {
@@ -61,8 +63,17 @@ public class ConfigController {
 	@Autowired
 	GroupRepository groupRepository;	
 	
+	@Autowired
+	ProcessorRepository processorRepository;
+	
+	@Autowired
+	StepRepository stepRepository;
+	
     @Autowired
     MessageByLocaleService messageByLocaleService;
+    
+	@Autowired
+	PortalUtils portalUtils;
 
 	RestTemplate restTemplate = new RestTemplate();
 	
@@ -74,7 +85,7 @@ public class ConfigController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@RequestMapping(value = "/api/config", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN')")
 	public ResponseEntity<Config> saveConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		config.setVersion(config.getVersion() + 1);
 		this.configRepository.update(config);
@@ -88,164 +99,16 @@ public class ConfigController {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/configs/{id}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Config> getConfigByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
-		Config config = this.configRepository.find(id);
-		if(config == null) {
+	@RequestMapping(value = "/api/config", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
+	public ResponseEntity<Config> getConfig(@RequestHeader("Accept-Language") String locale) {
+		List<Config> configs = this.configRepository.findAll();
+		if(configs == null || configs.size() != 1) {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
 		}
 		
-		return new ResponseEntity<Config>(config, HttpStatus.OK);
+		return new ResponseEntity<Config>(configs.get(0), HttpStatus.OK);
 	}	
-	
-	/**
-	 * This function returns configuration for the specified probe
-	 *
-	 * @param user_id
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/api/config/{probeId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAuthority('PROBE')")
-	public ResponseEntity<Config> getConfigByProbeId(@PathVariable("probeId") String probeId, @RequestHeader("Accept-Language") String locale) {
-		if(Strings.isNullOrEmpty(probeId)) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
-		}
-		else {
-			Config config = this.configRepository.findByProbeId(probeId);
-			if(config != null) {
-				return new ResponseEntity<Config>(config, HttpStatus.OK);
-			}
-			else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
-			}
-		}
-	}	
-	
-	/**
-	 * This function returns configuration for the specified user
-	 *
-	 * @param user_id
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/dto/{type}/{userId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<ConfigDTO>> getConfigDtoByUserUUID(@PathVariable("type") String type, @PathVariable("userId") String userId, 
-			@RequestHeader("Accept-Language") String locale) {
-		if(!Strings.isNullOrEmpty(type)) {
-			List<ConfigDTO> configurations = new ArrayList<>();
-			
-			//Return the configuration for the probes
-			if(type.equals("probe")) {
-				List<CompanyLicense> licenses = this.licenseRepository.findByUserId(userId);
-				if(licenses != null) {
-					for(CompanyLicense license: licenses) {
-						if(license != null) {
-							//only activated probes will be shown
-							if(license.isActivated()) {
-								if(!Strings.isNullOrEmpty(license.getGroupId())) {
-									Config config = this.configRepository.findByProbeId(license.getProbeId());
-									
-									if(config != null) {
-										String groupName = "";
-										if(!Strings.isNullOrEmpty(config.getGroupId())) {
-											CompanyGroup group = groupRepository.find(config.getGroupId());
-											
-											if(group != null) {
-												groupName = group.getName();
-												configurations.add(new ConfigDTO(groupName, config, true));
-											}
-										}
-									}
-								}								
-							}
-
-						}
-					}
-				}
-				else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
-				}
-			}
-			
-			//Return the configuration for the groups
-			else {
-				User user = userRepository.find(userId);
-				
-				if(user != null) {
-					if(!Strings.isNullOrEmpty(user.getGroupId())) {
-						CompanyGroup group = groupRepository.find(user.getGroupId());
-						if(group != null) {
-							Config config = configRepository.findByGroupId(user.getGroupId());
-							if(config != null) {
-								configurations.add(new ConfigDTO(group.getName(), config, false));
-							}
-						}
-					}
-				}
-				
-				List<CompanyGroup> groups = groupRepository.findByOwnerId(userId);
-				if(groups != null) {
-					for(CompanyGroup group: groups) {
-						if(group != null) {
-							Config config = this.configRepository.findByGroupId(group.getId());
-							
-							if(config != null) {
-								configurations.add(new ConfigDTO(group.getName(), config, true));
-							}
-						}
-					}
-				}
-				
-				if(configurations.isEmpty()) {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
-				}
-			}
-			
-			return new ResponseEntity<List<ConfigDTO>>(configurations, HttpStatus.OK);
-			
-		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
-		}		
-	}
-	
-	/**
-	 * This function updates the current probe configuration from the current group configuration
-	 * 
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/update/group", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Config> applyGroupConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-
-		if(config != null) {
-			if(!Strings.isNullOrEmpty(config.getGroupId())) {
-				Config groupConfig = configRepository.findByGroupId(config.getGroupId());
-				if(groupConfig != null) {
-					Config tempConfig = groupConfig;
-					tempConfig.setId(config.getId());
-					tempConfig.setVersion(config.getVersion() + 1);
-					tempConfig.setProbeId(config.getProbeId());
-					tempConfig.setGroupConfiguration(config.isGroupConfiguration());
-					configRepository.update(tempConfig);	
-					return new ResponseEntity<Config>(tempConfig, HttpStatus.OK);
-				}
-				else {
-					log.error("Group Configuration not found");
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_configuration", locale)), HttpStatus.NOT_FOUND);					
-				}
-			}
-			else {
-				log.error("Group Id cannot be null");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_configuration", locale)), HttpStatus.NOT_FOUND);
-			}
-		}
-		return new ResponseEntity<Config>(config, HttpStatus.OK);
-	}
 
 	/**
 	 * This function updates or saves new Query config into the database
@@ -262,86 +125,11 @@ public class ConfigController {
 		}
 
 		else {
-			if(!Strings.isNullOrEmpty(query.getGroupId())) {
-				query.setGroupQueryRun(true);
-			}
-			else {
-				query.setGroupQueryRun(false);
-			}
-			
 			this.queryRepository.save(query);
 			return new ResponseEntity<QueryRun>(query, HttpStatus.OK);
 		}
 
 	}
-	
-	/**
-	 * This function updates the current probe configuration from the current group configuration
-	 * 
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/query/update/group", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Probe> applyGroupOSQueryConfig(@RequestBody Probe probe, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-
-		if(probe != null) {
-			if(!Strings.isNullOrEmpty(probe.getProbeId())) {
-				CompanyLicense license = licenseRepository.findByProbeId(probe.getProbeId());
-				
-				if(license != null) {
-					if(!Strings.isNullOrEmpty(license.getGroupId())) {
-						
-						//Delete current probe queries
-						List<QueryRun> probeQueries = queryRepository.findByProbeId(probe.getProbeId(), true);
-						if(probeQueries != null) {
-							for(QueryRun query : probeQueries) {
-								queryRepository.delete(query);
-							}
-						}
-						else {
-							log.debug("Nothing to delete for this probe!");
-						}
-						
-						//Copy group queries
-						List<QueryRun> groupQueries = queryRepository.findByGroupId(license.getGroupId(), true, true);
-						
-						if(groupQueries != null) {
-							for(QueryRun query : groupQueries) {
-								query.setId(null);
-								query.setProbeId(probe.getProbeId());
-								query.setGroupQueryRun(false);
-								
-								queryRepository.save(query);
-								
-							}
-						}
-						else {
-							log.debug("No queries found for this group!");
-						}
-						
-						return new ResponseEntity<Probe>(probe, HttpStatus.OK);
-					}
-					else {
-						log.error("Group id not found in the license object");
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale)), HttpStatus.NOT_FOUND);
-					}
-				}
-				else {
-					log.error("License for the provided probeId does not exist!");
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale)), HttpStatus.NOT_FOUND);
-				}
-			}
-			else {
-				log.error("ProbeId cannot be null or empty");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale)), HttpStatus.NOT_FOUND);
-			}
-		}
-		else {
-			log.error("Probe object cannot be null");
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale)), HttpStatus.NOT_FOUND);
-		}
-	}	
 	
 	/**
 	 * This function returns all users from the user repository
@@ -368,12 +156,48 @@ public class ConfigController {
 	public ResponseEntity<List<QueryRun>> getQueriesByUserID(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 		
-		List<QueryRun> queryConfig = this.queryRepository.findByProbeId(probeId, select_all);
-		if(queryConfig == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);			
-		}
+		CompanyLicense license = licenseRepository.findByProbeId(probeId);
 		
-		return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+		if(license != null) {
+			
+			CompanyGroup group = groupRepository.find(license.getGroupId());
+			
+			if(group != null) {
+				//Check if this is root group 
+				List<QueryRun> queryConfig = new ArrayList<>();
+				if(group.isRootGroup()) {
+					//Take only the query runs of this group, because this is root group!
+					queryConfig = this.queryRepository.findByGroupId(license.getGroupId(), select_all);
+					if(queryConfig == null) {
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);			
+					}
+					
+					return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+				}
+				else {
+					//go until the root group is not found and get all configurations from all groups which are parents of this group
+					List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
+					
+					//Iterate through all found groups and add their queries to the queryConfig
+					if(foundGroups != null) {
+						for(CompanyGroup cg : foundGroups) {
+							List<QueryRun> currentQueries = queryRepository.findByGroupId(cg.getId(), select_all);
+							if(currentQueries != null) {
+								queryConfig.addAll(currentQueries);
+							}
+						}
+					}
+										
+					return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+				}
+			}
+			else {
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);
+			}
+		}
+		else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	/**
@@ -383,7 +207,7 @@ public class ConfigController {
 	@RequestMapping(value = "/api/config/query/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId, @PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-		List<QueryRun> queryConfig = this.queryRepository.findByGroupId(groupId, select_all, true);
+		List<QueryRun> queryConfig = this.queryRepository.findByGroupId(groupId, select_all);
 		
 		if(queryConfig == null) {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
@@ -404,5 +228,77 @@ public class ConfigController {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<QueryRun>(queryConfig, HttpStatus.OK);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/api/config/copy/{sourceGroupId}", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")	
+	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup, 
+			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException{
+		
+		CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
+		
+		if(sourceGroup != null && destGroup != null) {
+			if(!Strings.isNullOrEmpty(destGroup.getId())) {
+				//Delete all configuration from destGroup
+				List<QueryRun> queries = queryRepository.findByGroupId(destGroup.getId(), true);
+				List<Processor> processors = processorRepository.getProcessorsByGroupId(destGroup.getId());
+				List<Step> steps = stepRepository.getStepsByGroupId(destGroup.getId(), true);
+				
+				if(queries != null) {
+					for(QueryRun query : queries) {
+						queryRepository.delete(query);
+					}
+				}			
+				
+				if(processors != null) {
+					for(Processor processor : processors) {
+						processorRepository.delete(processor);
+					}
+				}			
+				
+				if(steps != null) {
+					for(Step step : steps) {
+						stepRepository.delete(step);
+					}
+				}
+				
+				//Copy all configurations from the source group to dest group
+				
+				queries = queryRepository.findByGroupId(sourceGroup.getId(), true);
+				processors = processorRepository.getProcessorsByGroupId(sourceGroup.getId());
+				steps = stepRepository.getStepsByGroupId(sourceGroup.getId(), true);
+				
+				if(queries != null) {
+					for(QueryRun query : queries) {
+						query.setGroupId(destGroup.getId());
+						query.setId(null);
+						queryRepository.save(query);
+					}
+				}
+				
+				if(processors != null) {
+					for(Processor processor : processors) {
+						processor.setGroupId(destGroup.getId());
+						processor.setId(null);
+						processorRepository.save(processor);
+					}
+				}
+				
+				if(steps != null) {
+					for(Step step : steps) {
+						step.setGroupId(destGroup.getId());
+						step.setId(null);
+						stepRepository.save(step);
+					}
+				}
+				
+				return new ResponseEntity<CompanyGroup>(sourceGroup, HttpStatus.OK);
+			}
+		}
+		
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_copying_config", locale)),
+				HttpStatus.NOT_FOUND);				
 	}
 }

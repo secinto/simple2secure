@@ -130,7 +130,6 @@ public class ProbeConfiguration {
 		if (dbConfig == null) {
 			log.debug("DB config not available, reading config from file. Should only happen once.");
 			Config fileConfig = getConfigFromFile();
-			fileConfig.setProbeId(ProbeConfiguration.probeId);
 			DBUtil.getInstance().save(fileConfig);
 			/*
 			 * Obtain the config stored in the DB to also obtain the ID.
@@ -149,7 +148,6 @@ public class ProbeConfiguration {
 			log.debug("DB processors not available, reading from file. Should only happen once.");
 			List<Processor> fileProcessors = getProcessorsFromFile();
 			for (Processor processor : fileProcessors) {
-				processor.setProbeId(ProbeConfiguration.probeId);
 				DBUtil.getInstance().merge(processor);
 			}
 			/*
@@ -170,7 +168,6 @@ public class ProbeConfiguration {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
 			List<Step> fileSteps = getStepsFromFile();
 			for (Step step : fileSteps) {
-				step.setProbeId(ProbeConfiguration.probeId);
 				step.setActive(1);
 				DBUtil.getInstance().merge(step);
 			}
@@ -188,7 +185,6 @@ public class ProbeConfiguration {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
 			List<QueryRun> fileQueries = getQueriesFromFile();
 			for (QueryRun query : fileQueries) {
-				query.setProbeId(ProbeConfiguration.probeId);
 				query.setActive(1);
 				DBUtil.getInstance().merge(query);
 			}
@@ -243,7 +239,6 @@ public class ProbeConfiguration {
 				log.debug("Queries obtained from API {}", apiQueries.size());
 				if (apiConfig != null && apiConfig.getVersion() >= this.currentConfig.getVersion()) {
 					apiConfig.setId(this.currentConfig.getId());
-					apiConfig.setProbeId(ProbeConfiguration.probeId);
 					DBUtil.getInstance().merge(apiConfig);
 					/*
 					 * Obtain it from the database to have all merged fields correctly updated.
@@ -259,7 +254,6 @@ public class ProbeConfiguration {
 					DBUtil.getInstance().clearDB(Processor.class);
 
 					for (Processor processor : apiProcessors) {
-						processor.setProbeId(ProbeConfiguration.probeId);
 						DBUtil.getInstance().merge(processor);
 					}
 					/*
@@ -277,7 +271,6 @@ public class ProbeConfiguration {
 					DBUtil.getInstance().clearDB(Step.class);
 
 					for (Step step : apiSteps) {
-						step.setProbeId(ProbeConfiguration.probeId);
 						DBUtil.getInstance().merge(step);
 					}
 					/*
@@ -301,7 +294,6 @@ public class ProbeConfiguration {
 
 					for (QueryRun query : apiQueries) {
 						if (query != null) {
-							query.setProbeId(ProbeConfiguration.probeId);
 							DBUtil.getInstance().merge(query);
 						}
 					}
@@ -376,7 +368,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(APIUtils.sendGet(loadedConfigItems.getConfigAPI() + "/" + ProbeConfiguration.probeId),
+		return gson.fromJson(APIUtils.sendGet(loadedConfigItems.getConfigAPI()),
 				Config.class);
 	}
 
@@ -385,7 +377,11 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromDatabase() {
-		return DBUtil.getInstance().findByFieldNameObject("probeId", probeId, new Config());
+		List<Config> configs = DBUtil.getInstance().findAll(new Config());
+		if(configs != null && configs.size() == 1) {
+			return configs.get(0);
+		}
+		return null;
 	}
 
 	/**

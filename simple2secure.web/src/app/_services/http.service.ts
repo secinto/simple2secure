@@ -3,7 +3,7 @@ import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
-import {User} from '../_models';
+import {User, UserRegistration} from '../_models';
 import {Response} from '@angular/http';
 import {catchError} from 'rxjs/operators';
 
@@ -67,9 +67,8 @@ export class HttpService {
             JSON.stringify({ username: username, password: password }), { observe: 'response' });
     }
 
-    public postRegister(user: User, type: String): Observable<HttpResponse<any>> {
-        return this.httpClient.post<any>(environment.apiEndpoint + 'register/' +
-            type, user, { observe: 'response' });
+    public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
+        return this.httpClient.post<any>(environment.apiEndpoint + 'register', user, { observe: 'response' });
     }
 
     public postReset(email: String): Observable<HttpResponse<any>> {

@@ -1,0 +1,7 @@
+export enum UserRegistrationType {
+    PASSWORD_UPDATE = 'PASSWORD_UPDATE',
+    EMAIL = 'EMAIL',
+    UPDATE_USER_INFO = 'UPDATE_USER_INFO',
+    ADDED_BY_USER = 'ADDED_BY_USER',
+    STANDARD = 'STANDARD'
+}

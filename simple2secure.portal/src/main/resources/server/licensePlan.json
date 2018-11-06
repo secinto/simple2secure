@@ -1,0 +1,6 @@
+{
+	"name": "Default Plan",
+	"validity": 30,
+	"validityUnit": "DAYS",
+	"maxNumberOfDownloads": 30
+}

@@ -1,0 +1,12 @@
+import {UserRole} from './userRole';
+import {UserRegistrationType} from './userRegistrationType';
+import {Generic} from './generic';
+
+export class UserRegistration extends Generic{
+    email: string;
+    password: string;
+    userRole: UserRole;
+    groupIds: string[];
+    addedByUserId: string;
+    registrationType: UserRegistrationType;
+}

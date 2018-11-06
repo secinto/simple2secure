@@ -1,43 +1,44 @@
-<h3>{{ 'network.processorDetails' | translate }} {{processor.name}}</h3>
-<form #processorForm="ngForm" (ngSubmit)="saveProcessor()">
-    <div>
-    
- 	  <div class="form-group">
-			  <mat-form-field class="full_width_input">
-		    	<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="processor.name" name="name" required>
-		  	</mat-form-field>
-	  </div>
-	  
-	  
-	  <table class="full_width_input" cellspacing="0"><tr>
-	    <td>
-	    	<mat-form-field class="full_width_input">
-	      		<input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="processor.analysisInterval" name="analysisInterval">
-	    	</mat-form-field>
-	    </td>
-	    <td>
-	    	<mat-form-field class="full_width_input">
-    			<mat-select [(ngModel)]="processor.analysisIntervalUnit" placeholder="{{ 'table.unit' | translate }}" name="analysisIntervalUnit">
-				    <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-				    </mat-option>
-			   </mat-select>
-	    	</mat-form-field>
-	    </td>
-	  </tr></table>	  
+<h3 mat-dialog-title>{{ 'network.processorDetails' | translate }} {{processor.name}}</h3>
+<div mat-dialog-content>
+	<form #processorForm="ngForm">
+		<div>
+			<div class="form-group">
+				<mat-form-field class="full_width_input">
+					<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="processor.name" name="name" required>
+				</mat-form-field>
+			</div>
 
-      <div class="form-group">
-			  <mat-form-field class="full_width_input">
-		    	<input type="text" matInput placeholder="{{ 'table.class' | translate }}" [(ngModel)]="processor.processor_class" name="processor_class" required>
-		  	</mat-form-field>
-	  </div>
+			<table class="full_width_input" cellspacing="0"><tr>
+				<td>
+					<mat-form-field class="full_width_input">
+						<input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="processor.analysisInterval" name="analysisInterval" required>
+					</mat-form-field>
+				</td>
+				<td>
+					<mat-form-field class="full_width_input">
+						<mat-select [(ngModel)]="processor.analysisIntervalUnit" placeholder="{{ 'table.unit' | translate }}" name="analysisIntervalUnit" required>
+							<mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</td>
+			</tr></table>
 
-      <div class="form-group">
-        <mat-form-field class="full_width_input">
-          <textarea type="text" matInput placeholder="{{ 'table.packet' | translate }}" [(ngModel)]="processor.groovyProcessor" name="groovyProcessor"></textarea>
-        </mat-form-field>
-      </div>
+			<div class="form-group">
+				<mat-form-field class="full_width_input">
+					<input type="text" matInput placeholder="{{ 'table.class' | translate }}" [(ngModel)]="processor.processor_class" name="processor_class" required>
+				</mat-form-field>
+			</div>
 
-    </div>
-    <button class="mat-green-button" type="button" (click)="saveProcessor()" [disabled]="!processorForm.dirty" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
-	<button class="mat-red-button" type="button" (click)="cancel()" mat-raised-button color="warn">{{ 'button.cancel' | translate }}</button>
-</form>
+			<div class="form-group">
+				<mat-form-field class="full_width_input">
+					<textarea type="text" matInput placeholder="{{ 'table.packet' | translate }}" [(ngModel)]="processor.groovyProcessor" name="groovyProcessor"></textarea>
+				</mat-form-field>
+			</div>
+		</div>
+	</form>
+</div>
+<div mat-dialog-actions>
+	<button class="mat-green-button" type="button" (click)="saveProcessor()" [disabled]="!processorForm.dirty || !processorForm.valid" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="processor" cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
+</div>

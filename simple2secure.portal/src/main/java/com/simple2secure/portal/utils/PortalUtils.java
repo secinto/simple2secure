@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
+import com.simple2secure.portal.repository.GroupRepository;
 
 @Component
 public class PortalUtils {
@@ -33,6 +37,9 @@ public class PortalUtils {
 
 	@Autowired
 	JavaMailSender javaMailSender;
+	
+	@Autowired
+	GroupRepository groupRepository;
 
 	/**
 	 * Helper function to read string from the file
@@ -168,5 +175,76 @@ public class PortalUtils {
 		} else {
 			return 0;
 		}
+	}
+	
+	/**
+	 * This function converts milis to date
+	 * @param milis
+	 * @return
+	 */
+	public static Calendar milisToDate(long milis) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(milis);
+		return calendar;
+	}
+	
+	/**
+	 * This function checks if this group has children groups
+	 * @param group
+	 * @return
+	 */
+	public static boolean groupHasChildren(CompanyGroup group) {
+		if(group != null) {
+			if(group.getChildrenIds() != null) {
+				if(group.getChildrenIds().size() > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * This function finds the parent group of the current child
+	 * @param group
+	 * @return
+	 */
+	public CompanyGroup findTheParentGroup(CompanyGroup group) {
+		
+		if(!Strings.isNullOrEmpty(group.getParentId())) {
+			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
+			if(parentGroup != null) {
+				return parentGroup;
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * This function searches recursively for all dependent groups until the root group is found
+	 * @param group
+	 * @return
+	 */
+	public List<CompanyGroup> findAllParentGroups(CompanyGroup group){
+		List<CompanyGroup> foundGroups = new ArrayList<>();
+		foundGroups.add(group);
+		boolean rootGroupFound = false;
+		while(!rootGroupFound) {
+			CompanyGroup parentGroup = findTheParentGroup(group);
+			if(parentGroup != null) {
+				foundGroups.add(parentGroup);
+				if(parentGroup.isRootGroup()) {
+					rootGroupFound = true;
+				}
+				else {
+					group = parentGroup;
+				}
+			}
+			else {
+				rootGroupFound = true;
+			}
+		}
+		return foundGroups;
 	}
 }

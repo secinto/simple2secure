@@ -26,24 +26,22 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
     MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-    MatNativeDateModule, MatDatepickerModule} from '@angular/material';
+    MatNativeDateModule, MatDatepickerModule, MatCardModule} from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {NavbarComponent} from './navbar/index';
-import {ConfigurationComponent, ConfigurationDetailsComponent, ConfigurationOverviewComponent, ConfigurationTypeComponent} from './configuration/index';
-import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent} from './user/index';
-import {GuiComponent, GuiOverviewComponent, GuiImportComponent, GuiUserOverviewComponent} from './gui/index';
-import {
-  ReportComponent, ReportDetailsComponent, ReportOverviewComponent, OsqueryConfigurationComponent,
-  OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent, OsqueryConfigurationDevicesComponent, OsqueryConfigurationGroupsComponent, OsqueryOverviewComponent
+import {ConfigurationDetailsComponent} from './configuration/index';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent, UserGroupApplyConfigComponent} from './user/index';
+import {OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
 } from './osquery/index';
-import {
-  NetworkComponent, NetworkConfigurationComponent, NetworkReportOverviewComponent, NetworkConfigurationTypeComponent, NetworkConfigurationDetailsComponent,
-  NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent, NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent,
-  NetworkReportDetailsComponent, NetworkOverviewComponent
+import {NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
+    NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
 }
   from './network/index';
+
+import {ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
+    OsQueryReportDetailsComponent, ReportOverviewComponent} from './report/index';
 
 import {EmailComponent, EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
@@ -56,8 +54,10 @@ import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, 
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import { ChartModule } from 'angular-highcharts';
 import { TreeModule } from 'angular-tree-component';
+import {TreeTableModule} from 'ng-treetable';
 import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
+import { TreeviewModule } from 'ngx-treeview';
 
 export const httpInterceptorProviders = [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -97,9 +97,11 @@ export const httpInterceptorProviders = [
     MatDialogModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatCardModule,
     HttpClientModule,
-    //NgxDnDModule,
     ChartModule,
+    TreeTableModule,
+    TreeviewModule.forRoot(),
     TreeModule.forRoot(),
     TranslateModule.forRoot({
         loader: {
@@ -122,16 +124,8 @@ export const httpInterceptorProviders = [
     DashboardLayoutComponent,
     LoginLayoutComponent,
     NavbarComponent,
-    ConfigurationComponent,
     ConfigurationDetailsComponent,
-    ConfigurationOverviewComponent,
-    ConfigurationTypeComponent,
-    NetworkComponent,
-    NetworkOverviewComponent,
-    NetworkConfigurationComponent,
-    NetworkConfigurationDetailsComponent,
     NetworkReportOverviewComponent,
-    NetworkConfigurationTypeComponent,
     NetworkConfigurationStepDetailsComponent,
     NetworkConfigurationProcessorDetailsComponent,
     NetworkStepConfigurationEditComponent,
@@ -141,19 +135,12 @@ export const httpInterceptorProviders = [
     UserDetailsComponent,
     UserOverviewComponent,
     UserGroupComponent,
-    ReportComponent,
-    ReportOverviewComponent,
-    ReportDetailsComponent,
-    OsqueryConfigurationComponent,
-    OsqueryOverviewComponent,
+    UserGroupDialogComponent,
+    UserGroupApplyConfigComponent,
+    OsQueryReportOverviewComponent,
+    OsQueryReportDetailsComponent,
     OsqueryConfigurationDetailsComponent,
     OsqueryConfigurationEditComponent,
-    OsqueryConfigurationDevicesComponent,
-    OsqueryConfigurationGroupsComponent,
-    GuiComponent,
-    GuiOverviewComponent,
-    GuiImportComponent,
-    GuiUserOverviewComponent,
     FooterComponent,
     EqualValidator,
     OrbiterComponent,
@@ -175,10 +162,17 @@ export const httpInterceptorProviders = [
 	RuleComponent,
 	RuleOverviewComponent,
 	RuleAddComponent,
-	AnalysisComponent
+	AnalysisComponent,
+    ReportComponent,
+    ReportOverviewComponent
   ],
   entryComponents: [
     ConfirmationDialog,
+    UserGroupDialogComponent,
+    NetworkProcessorConfigurationEditComponent,
+    NetworkStepConfigurationEditComponent,
+    OsqueryConfigurationEditComponent,
+    UserGroupApplyConfigComponent
   ],
   providers: [
     AuthGuard,
@@ -197,7 +191,7 @@ export class AppModule {
 
 }
 
-//required for AOT compilation
+// required for AOT compilation
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }

@@ -1,7 +1,6 @@
 import {Generic} from './generic';
 import {Probe} from './probe';
 import {UserRole} from './userRole'
-import {CompanyGroup} from './companygroup';
 
 export class User extends Generic {
     username: string;
