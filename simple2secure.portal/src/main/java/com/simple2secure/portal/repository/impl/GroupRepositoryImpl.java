@@ -72,9 +72,5 @@ public class GroupRepositoryImpl extends GroupRepository {
 		}
 		
 		return userGroups;
-	}
-	
-	
-	
-	
+	}	
 }
