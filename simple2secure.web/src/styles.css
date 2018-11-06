@@ -418,3 +418,7 @@ legend{
 .node-s2s-button{
     text-align:right
 }
+
+.toggle-children{
+    height: 35px !important;
+}
