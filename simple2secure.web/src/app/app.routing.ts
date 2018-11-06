@@ -75,7 +75,7 @@ const appRoutes: Routes = [
           data: {title: 'menu.email'},
           children: [
             {path: '', component: EmailOverviewComponent},
-            {path: 'add', component: EmailAccountAddComponent},
+            {path: 'add', component: EmailAccountAddComponent, data: {title: 'login.email'}},
             {path: ':id/inbox', component: EmailInboxComponent, data: {title: 'table.inbox'}},
             {path: ':id/inbox/rule/overview', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
             {path: ':id/inbox/rule/add', component: RuleAddComponent, data: {title: 'button.addRule'}},
