@@ -11,7 +11,7 @@ import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
 import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent, OrbiterToolTestResultComponent} from './orbiter/index';
-import {EmailComponent, EmailOverviewComponent, EmailInboxComponent} from './email/index';
+import {EmailComponent, EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
@@ -75,6 +75,7 @@ const appRoutes: Routes = [
           data: {title: 'menu.email'},
           children: [
             {path: '', component: EmailOverviewComponent},
+            {path: 'add', component: EmailAccountAddComponent},
             {path: ':id/inbox', component: EmailInboxComponent, data: {title: 'table.inbox'}},
             {path: ':id/inbox/rule/overview', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
             {path: ':id/inbox/rule/add', component: RuleAddComponent, data: {title: 'button.addRule'}},
