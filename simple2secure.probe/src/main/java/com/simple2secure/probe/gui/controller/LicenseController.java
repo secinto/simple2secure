@@ -57,8 +57,8 @@ public class LicenseController implements Initializable {
 	}
 
 	/**
-	 * TODO: Write tests to check the different scenarios. This is the function
-	 * which sets error/success messages according to the response from the server!
+	 * TODO: Write tests to check the different scenarios. This is the function which sets error/success messages according to the response
+	 * from the server!
 	 *
 	 * @param event
 	 * @throws IOException
@@ -68,8 +68,7 @@ public class LicenseController implements Initializable {
 	 */
 
 	@FXML
-	private void handleLicenseImport(ActionEvent event)
-			throws IOException, LicenseNotFoundException, LicenseException, InterruptedException {
+	private void handleLicenseImport(ActionEvent event) throws IOException, LicenseNotFoundException, LicenseException, InterruptedException {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Import your simple2secure license");
 		ExtensionFilter extFilter = new ExtensionFilter("ZIP Files", "*.zip");
@@ -94,8 +93,12 @@ public class LicenseController implements Initializable {
 						errorLabel.setText("Provided license is not valid. Please try it again with the new one!");
 						importButton.setDisable(false);
 					} else {
-						// LicenseDaoImpl licenseDao = new LicenseDaoImpl();
 						CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
+						/*
+						 * Here we create the unique ID for the probe.
+						 *
+						 * TODO: This must be checked if it is the correct place. Should also work without license view.
+						 */
 						String probeId = UUID.randomUUID().toString();
 
 						if (license != null) {
@@ -103,13 +106,16 @@ public class LicenseController implements Initializable {
 								probeId = license.getProbeId();
 							}
 						}
-
+						/*
+						 * Obtain parameters from the license itself.
+						 */
 						String groupId = map.get("groupId");
 						String licenseId = map.get("licenseId");
 						String expirationDate = map.get("expirationDate");
-
-						if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId)
-								&& !Strings.isNullOrEmpty(expirationDate)) {
+						/*
+						 * This verification should never be invalid
+						 */
+						if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(expirationDate)) {
 							if (license == null) {
 								license = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
 							} else {
@@ -119,12 +125,14 @@ public class LicenseController implements Initializable {
 								license.setExpirationDate(expirationDate);
 							}
 
-							String authToken = APIUtils.sendPostWithResponse(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", license);
+							String authToken = APIUtils.sendPostWithResponse(
+									ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", license);
 
 							if (!Strings.isNullOrEmpty(authToken)) {
 								license.setAuthToken(authToken);
 								license.setActivated(true);
 								DBUtil.getInstance().merge(license);
+
 								ProbeConfiguration.authKey = authToken;
 								ProbeConfiguration.probeId = probeId;
 
@@ -135,8 +143,7 @@ public class LicenseController implements Initializable {
 								ProbeGUI.initRootPane();
 
 							} else {
-								errorLabel.setText(
-										"Problem occured during the license validation. The server is not responding. Try again later!");
+								errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
 								importButton.setDisable(false);
 							}
 
@@ -157,11 +164,10 @@ public class LicenseController implements Initializable {
 
 	/**
 	 * TODO: Write tests to check the different scenarios.
-	 * 
-	 * This function unzips the imported license file and cheks if the extracted
-	 * content is correct. If not the null will be returned, else the list of the
-	 * files will be returned (public.key and certificate.dat)
-	 * 
+	 *
+	 * This function unzips the imported license file and cheks if the extracted content is correct. If not the null will be returned, else
+	 * the list of the files will be returned (public.key and certificate.dat)
+	 *
 	 * @param licenseZip
 	 * @return
 	 * @throws IOException
@@ -206,10 +212,9 @@ public class LicenseController implements Initializable {
 	}
 
 	/**
-	 * This function checks if the imported license is still valid. If it is valid
-	 * some data should be sent to the portal in order to map this probe with the
-	 * groupId which is provided in the license.dat file.
-	 * 
+	 * This function checks if the imported license is still valid. If it is valid some data should be sent to the portal in order to map this
+	 * probe with the groupId which is provided in the license.dat file.
+	 *
 	 * @param license
 	 * @return
 	 * @throws LicenseException

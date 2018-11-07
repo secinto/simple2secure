@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.general.TimingUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
 import com.simple2secure.probe.utils.DBUtil;
@@ -87,10 +86,17 @@ public class ProbeGUI extends Application {
 
 		createTrayIcon(primaryStage);
 
-		if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
-			ProbeConfiguration.setAPIAvailablitity(true);
-			log.info("SERVER REACHABLE!");
-		}
+		/*
+		 * Initialize the configuration. It must be checked if this is the best place to do it. But it will be done anyhow further down if the
+		 * license is not loaded. Thus we should provide it here immediately. The only thing is that it also would verify if the API is
+		 * available.
+		 */
+		ProbeConfiguration.getInstance();
+
+		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
+		// ProbeConfiguration.setAPIAvailablitity(true);
+		// log.info("SERVER REACHABLE!");
+		// }
 		CompanyLicenseObj license = checkIfLicenseExists();
 
 		if (license != null) {
@@ -100,12 +106,11 @@ public class ProbeGUI extends Application {
 				ProbeConfiguration.authKey = license.getAuthToken();
 				ProbeConfiguration.probeId = license.getProbeId();
 				ProbeConfiguration.licenseId = license.getLicenseId();
-
-				if (!ProbeConfiguration.isAPIAvailable()) {
+				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
-				}
+				} else {
 
-				ProbeConfiguration.getInstance();
+				}
 
 				if (ProbeConfiguration.isLicenseValid) {
 					initRootPane();
@@ -125,19 +130,14 @@ public class ProbeGUI extends Application {
 	}
 
 	/**
-	 * This function checks if the license exists and according to that sets the
-	 * different view on the start
-	 * 
+	 * This function checks if the license exists and according to that sets the different view on the start
+	 *
 	 * @return
 	 */
 	public CompanyLicenseObj checkIfLicenseExists() {
-		// LicenseDaoImpl licenseDao = new LicenseDaoImpl();
 		CompanyLicenseObj license = getLicenseFromDb();
 		if (license != null) {
 			if (license.isActivated()) {
-				// String licenseExists = APIUtils.sendPostWithResponse(ConfigItems.license_api,
-				// license.id);
-
 				return license;
 			} else {
 				return null;
@@ -161,8 +161,6 @@ public class ProbeGUI extends Application {
 	public static void initLicenseImportPane(String errorText) throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(ProbeGUI.class.getResource(ViewNavigator.LICENSE_VIEW));
-		// final FXMLLoader fxmlLoader = new
-		// FXMLLoader(getClass().getResource(ViewNavigator.LICENSE_VIEW));
 		loader.getNamespace().put("labelText", errorText);
 		Parent root = loader.load();
 		Scene scene = new Scene(root);
@@ -172,8 +170,7 @@ public class ProbeGUI extends Application {
 	}
 
 	/**
-	 * This function initializes the Root Pane, it is called after the user is
-	 * successfully logged in
+	 * This function initializes the Root Pane, it is called after the user is successfully logged in
 	 */
 
 	public static void initRootPane() {
@@ -192,8 +189,7 @@ public class ProbeGUI extends Application {
 			ViewNavigator.setMainController(loader.getController());
 
 			Scene scene = new Scene(rootPane);
-			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED,
-					CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -291,8 +287,7 @@ public class ProbeGUI extends Application {
 
 	public void showProgramIsMinimizedMsg() {
 		if (firstTime) {
-			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize",
-					TrayIcon.MessageType.INFO);
+			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize", TrayIcon.MessageType.INFO);
 			firstTime = false;
 		}
 	}
