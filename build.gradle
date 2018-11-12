@@ -13,9 +13,6 @@ allprojects {
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
 
-
-	task wrapper(type: Wrapper) { gradleVersion = '3.4.1' }
-
 	repositories {
 		flatDir { dirs 'libs' }
 		mavenCentral()
