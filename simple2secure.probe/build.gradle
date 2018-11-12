@@ -7,13 +7,10 @@ dependencies {
 	compile project(':simple2secure.api')
 	compile project(':simple2secure.commons')
 
-	compile 'com.google.guava:guava:21.0'
 	compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.2'
 
-	compile 'org.slf4j:slf4j-api:1.7.25'
-	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile group: 'org.logback-extensions', name: 'logback-ext-spring', version: '0.1.5'
-	
+
 	compile 'javax.activation:activation:1.1.1'
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
 	compile group: 'commons-i18n', name: 'commons-i18n', version: '0.5'
@@ -36,18 +33,6 @@ dependencies {
 
 	compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
 	compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
-
-
-	testCompileOnly(
-			'junit:junit:4.12',
-			)
-	testImplementation(
-			'org.junit.jupiter:junit-jupiter-api:5.1.0'
-			)
-	testRuntimeOnly(
-			'org.junit.jupiter:junit-jupiter-engine:5.1.0',
-			'org.junit.vintage:junit-vintage-engine:5.1.0'
-			)
 }
 
 jar {
@@ -65,3 +50,6 @@ jar {
 		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 }
+
+test { useJUnitPlatform() }
+

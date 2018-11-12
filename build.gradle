@@ -3,7 +3,7 @@ allprojects {
 		repositories {
 			maven { url "https://plugins.gradle.org/m2/" }
 			maven { url 'https://jitpack.io' }
-			mavenCentral()
+			maven { url 'https://repo.spring.io/libs-snapshot' }
 		}
 	}
 
@@ -18,18 +18,34 @@ allprojects {
 		mavenCentral()
 		jcenter()
 	}
-	
+
+	dependencies {
+		compile 'com.google.guava:guava:21.0'
+		compile 'org.slf4j:slf4j-api:1.7.25'
+		compile 'ch.qos.logback:logback-classic:1.2.3'
+
+
+		testCompile(
+				'org.junit.jupiter:junit-jupiter-api:5.3.1'
+				)
+		testRuntime(
+				'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+				)
+	}
+
+	test { useJUnitPlatform() }
 }
 
-project(':simple2secure.api') {
-}
-
-project(':simple2secure.commons') {
-}
-
-project(':simple2secure.probe') {
-}
-
-project(':simple2secure.portal') {
-}
-
+/*
+ project(':simple2secure.api') {
+ }
+ project(':simple2secure.commons') {
+ apply plugin: 'java'
+ }
+ project(':simple2secure.probe') {
+ apply plugin: 'java'
+ }
+ project(':simple2secure.portal') {
+ apply plugin: 'java'
+ }
+ */
