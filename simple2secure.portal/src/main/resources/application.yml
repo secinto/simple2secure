@@ -27,24 +27,19 @@ mail:
     
 spring:
   profiles:
-    active: prod
+    active: prod,default
   main:
     banner-mode: "off"
   data:
     mongodb:
       host: localhost
       port: 27017
-    
-  
----
-spring:
-  profiles: prod,default
-  data:
-    mongodb:
       database: s2s
 ---
 spring:
   profiles: test
   data:
     mongodb:
+      host: 192.168.123.63
+      port: 27017
       database: s2s_test
