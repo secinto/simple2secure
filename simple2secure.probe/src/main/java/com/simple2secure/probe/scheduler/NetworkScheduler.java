@@ -9,8 +9,8 @@ import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.util.Strings;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.commons.general.TimingUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -70,7 +70,7 @@ public class NetworkScheduler extends TimerTask {
 			/*
 			 * TODO: Verification of BPF expression must be made online during the creation. We assume that they are correct.
 			 */
-			if (Strings.isNotNullAndNotEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
+			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
 				monitor.getReceiverHandle().setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
 			}
 		} catch (PcapNativeException e) {

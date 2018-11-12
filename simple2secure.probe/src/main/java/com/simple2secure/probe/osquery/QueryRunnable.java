@@ -8,8 +8,8 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.testng.util.Strings;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -29,7 +29,7 @@ public class QueryRunnable implements Runnable {
 	public void run() {
 		String queryString = query.getSqlQuery();
 		String queryResult = executeQuery(queryString);
-		if (Strings.isNotNullAndNotEmpty(queryResult)) {
+		if (!Strings.isNullOrEmpty(queryResult)) {
 			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date().toString(), false);
 			DBUtil.getInstance().save(result);
 		}
