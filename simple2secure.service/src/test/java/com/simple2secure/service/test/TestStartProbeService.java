@@ -8,7 +8,7 @@ public class TestStartProbeService {
 
 	@Test
 	public void testCreateProbeService() throws Exception {
-		ProbeServiceRunner.startService("Test", "Test Service", "simple2secure.service-0.1.0-SNAPSHOT.jar",
+		ProbeServiceRunner.installService("Test", "Test Service", "simple2secure.service-0.1.0.jar",
 				"com.simple2secure.service.ProbeControllerService");
 	}
 }

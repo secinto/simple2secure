@@ -19,7 +19,7 @@ public class ProbeServiceRunner {
 	private static String workingDirectory = System.getProperty("user.dir");
 
 	public static void main(String[] args) {
-		ProcessContainer startedService = startService("ProbeService", "Probe Service", "simple2secure.service-0.1.0.jar",
+		ProcessContainer startedService = installService("ProbeService", "Probe Service", "simple2secure.service-0.1.0.jar",
 				"com.simple2secure.service.ProbeControllerService");
 
 		/*
@@ -59,7 +59,7 @@ public class ProbeServiceRunner {
 		return licenseFile;
 	}
 
-	public static ProcessContainer startService(String serviceName, String displayName, String jarFile, String startClass) {
+	public static ProcessContainer installService(String serviceName, String displayName, String jarFile, String startClass) {
 		StringBuilder serviceString = new StringBuilder();
 		serviceString.append(workingDirectory + "\\daemon\\");
 		serviceString.append("prunsrv.exe //IS//");
@@ -75,4 +75,31 @@ public class ProbeServiceRunner {
 		return ProcessUtils.startProcess(serviceString.toString());
 	}
 
+	public static ProcessContainer startService(String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		serviceString.append(workingDirectory + "\\daemon\\");
+		serviceString.append("prunsrv.exe //ES//");
+		serviceString.append(serviceName);
+
+		return ProcessUtils.startProcess(serviceString.toString());
+	}
+
+	public static ProcessContainer stopService(String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		serviceString.append(workingDirectory + "\\daemon\\");
+		serviceString.append("prunsrv.exe //SS//");
+		serviceString.append(serviceName);
+
+		return ProcessUtils.startProcess(serviceString.toString());
+	}
+	
+	public static ProcessContainer deleteService(String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		serviceString.append(workingDirectory + "\\daemon\\");
+		serviceString.append("prunsrv.exe //DS//");
+		serviceString.append(serviceName);
+
+		return ProcessUtils.startProcess(serviceString.toString());
+	}
+	
 }

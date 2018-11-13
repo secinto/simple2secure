@@ -23,6 +23,7 @@ import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.utils.APIUtils;
 import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.LicenseUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 
 import javafx.event.ActionEvent;
@@ -93,7 +94,7 @@ public class LicenseController implements Initializable {
 						errorLabel.setText("Provided license is not valid. Please try it again with the new one!");
 						importButton.setDisable(false);
 					} else {
-						CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
+						CompanyLicenseObj license = LicenseUtil.getLicenseFromDb();
 						/*
 						 * Here we create the unique ID for the probe.
 						 *
@@ -136,7 +137,7 @@ public class LicenseController implements Initializable {
 								ProbeConfiguration.authKey = authToken;
 								ProbeConfiguration.probeId = probeId;
 
-								license = ProbeGUI.getLicenseFromDb();
+								license = LicenseUtil.getLicenseFromDb();
 
 								ProbeConfiguration.setAPIAvailablitity(true);
 

@@ -25,11 +25,11 @@ import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.APIUtils;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
+import com.simple2secure.probe.utils.LicenseUtil;
 import com.simple2secure.probe.utils.LocaleHolder;
 
 public class ProbeConfiguration {
@@ -216,7 +216,7 @@ public class ProbeConfiguration {
 		 * Check if the API is available and if a newer version is available update it.
 		 */
 		if (isAPIAvailable()) {
-			CompanyLicenseObj licenseObj = checkTokenValidity();
+			CompanyLicenseObj licenseObj = LicenseUtil.checkTokenValidity();
 
 			if (licenseObj != null) {
 				DBUtil.getInstance().merge(licenseObj);
@@ -225,7 +225,7 @@ public class ProbeConfiguration {
 				isCheckingLicense = false;
 			} else {
 				/// Delete license object from the db and change to the license import view!
-				CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
+				CompanyLicenseObj license = LicenseUtil.getLicenseFromDb();
 				DBUtil.getInstance().delete(license);
 				isLicenseValid = false;
 			}
@@ -309,25 +309,6 @@ public class ProbeConfiguration {
 				}
 			}
 
-		}
-	}
-
-	private CompanyLicenseObj checkTokenValidity() {
-		isCheckingLicense = true;
-		CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
-		if (license != null) {
-			String response = APIUtils.sendPostWithResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
-			if (!Strings.isNullOrEmpty(response)) {
-				return gson.fromJson(response, CompanyLicenseObj.class);
-			} else {
-				return null;
-			}
-		} else {
-			/*
-			 * TODO: Create handling if license is not stored in DB.
-			 */
-			log.error("Couldn't find license in DB. Need to do something here");
-			return null;
 		}
 	}
 

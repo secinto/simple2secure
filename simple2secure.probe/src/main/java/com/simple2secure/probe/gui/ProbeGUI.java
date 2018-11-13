@@ -8,7 +8,6 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -20,7 +19,7 @@ import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
-import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.LicenseUtil;
 import com.simple2secure.probe.utils.LocaleHolder;
 import com.simple2secure.probe.utils.ProbeUtils;
 
@@ -93,11 +92,7 @@ public class ProbeGUI extends Application {
 		 */
 		ProbeConfiguration.getInstance();
 
-		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
-		// ProbeConfiguration.setAPIAvailablitity(true);
-		// log.info("SERVER REACHABLE!");
-		// }
-		CompanyLicenseObj license = checkIfLicenseExists();
+		CompanyLicenseObj license = LicenseUtil.checkIfLicenseExists();
 
 		if (license != null) {
 
@@ -128,36 +123,6 @@ public class ProbeGUI extends Application {
 			initLicenseImportPane("");
 		}
 	}
-
-	/**
-	 * This function checks if the license exists and according to that sets the different view on the start
-	 *
-	 * @return
-	 */
-	public CompanyLicenseObj checkIfLicenseExists() {
-		CompanyLicenseObj license = getLicenseFromDb();
-		if (license != null) {
-			if (license.isActivated()) {
-				return license;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static CompanyLicenseObj getLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
-
-	}
-
 	public static void initLicenseImportPane(String errorText) throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(ProbeGUI.class.getResource(ViewNavigator.LICENSE_VIEW));
