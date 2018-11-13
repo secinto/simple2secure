@@ -51,7 +51,20 @@ project(':simple2secure.api') {
 		compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
 	}
 }
-project(':simple2secure.commons') { dependencies { } }
+project(':simple2secure.commons') {
+	dependencies {
+		compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+	}
+}
+
+project(':simple2secure.service') {
+	dependencies {
+		compile project(':simple2secure.commons')
+
+		compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
+	}
+}
+
 project(':simple2secure.probe') {
 	dependencies {
 		dependencies {

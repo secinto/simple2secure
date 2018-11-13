@@ -39,6 +39,9 @@ public class FileUtil {
 			absoluteWorkingPath = dir.getAbsolutePath();
 			absoluteWorkingPath = absoluteWorkingPath.replace("\\.", "\\");
 			FileUtil.workingDirectory = dir;
+		} else {
+			workingDirectory = System.getProperty("user.dir");
+			absoluteWorkingPath = workingDirectory;
 		}
 	}
 
