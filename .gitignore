@@ -32,3 +32,6 @@ simple2secure.web/.idea/inspectionProfiles/profiles_settings.xml
 simple2secure.web/.idea/dictionaries/emirs.xml
 simple2secure.portal/logfile-test.2018-10-31.log
 *.log
+*.classpath
+*.project
+simple2secure.service/bin/
