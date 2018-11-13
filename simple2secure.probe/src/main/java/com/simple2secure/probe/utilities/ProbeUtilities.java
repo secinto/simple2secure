@@ -13,7 +13,7 @@ import org.testng.util.Strings;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
-import com.simple2secure.probe.utils.APIUtils;
+import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 
@@ -69,7 +69,7 @@ public final class ProbeUtilities {
 					license.setExpirationDate(expirationDate);
 				}
 				
-				String authToken = APIUtils.sendPostWithResponse(
+				String authToken = RequestHandler.sendPostReceiveResponse(
 						ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", license);
 
 				if (!Strings.isNullOrEmpty(authToken)) {

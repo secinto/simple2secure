@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.utils.APIUtils;
+import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
 
 public class ReportScheduler extends TimerTask {
@@ -45,7 +45,7 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.debug("Sending report {} with timestamp {} to the API.", report.getQuery(), report.getQueryTimestamp());
-			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI(), report);
+			RequestHandler.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI(), report);
 			DBUtil.getInstance().merge(report);
 		}
 	}
@@ -64,7 +64,7 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.info("Sending network report to the server with id: " + report.getId());
-			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI() + "/network",
+			RequestHandler.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI() + "/network",
 					report);
 			DBUtil.getInstance().merge(report);
 		}
