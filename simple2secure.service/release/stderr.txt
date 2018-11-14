@@ -1,0 +1,11 @@
+
+2018-11-14 11:32:46 Commons Daemon procrun stderr initialized
+[2018-11-14 11:36:20] [error] [12556] apxServiceControl(): returning FALSE
+[2018-11-14 11:36:20] [error] [12556] Der Dienst kann zurzeit keine Steuerungsmeldungen annehmen.
+[2018-11-14 14:01:26] [error] [ 9864] apxServiceControl(): returning FALSE
+[2018-11-14 14:01:26] [error] [ 9864] Der Dienst kann zurzeit keine Steuerungsmeldungen annehmen.
+Der angegebene Dienst wurde zum Löschen markiert.
+Unable to delete 'simple2secure' service[2018-11-14 14:01:26] [error] [ 9864] Commons Daemon procrun failed with exit value: 9 (Failed to delete service)
+[2018-11-14 14:01:26] [error] [ 9864] Der angegebene Dienst wurde zum Löschen markiert.
+Der angegebene Dienst wurde zum Löschen markiert.
+Failed to delete service

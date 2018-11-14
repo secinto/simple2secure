@@ -1,7 +1,5 @@
 package com.simple2secure.service;
 
-import java.util.Scanner;
-
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.slf4j.Logger;
@@ -12,29 +10,7 @@ public class ProbeControllerService implements Daemon {
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerService.class);
 
 	private static ProbeControllerService engineLauncherInstance = new ProbeControllerService();
-	private static ProbeControllerEngine engine = null;
-
-	/**
-	 * The Java entry point.
-	 *
-	 * @param args
-	 *          Command line arguments, all ignored.
-	 */
-	public static void main(String[] args) {
-		engineLauncherInstance.initialize();
-
-		Scanner sc = new Scanner(System.in);
-		// wait until receive stop command from keyboard
-		System.out.printf("Enter 'stop' to halt: ");
-		while (!sc.nextLine().toLowerCase().equals("stop")) {
-			;
-		}
-
-		if (!engine.isStopped()) {
-			engineLauncherInstance.terminate();
-		}
-
-	}
+	private static ProbeControllerEngine engine = new ProbeControllerEngine();
 
 	/**
 	 * Static methods called by prunsrv to start/stop the Windows service. Pass the argument "start" to start the service, and pass "stop" to
@@ -48,7 +24,7 @@ public class ProbeControllerService implements Daemon {
 		if (args.length > 0) {
 			cmd = args[0];
 		}
-
+		System.out.println("Starting service");
 		if ("start".equals(cmd)) {
 			engineLauncherInstance.windowsStart();
 		} else {
@@ -107,6 +83,8 @@ public class ProbeControllerService implements Daemon {
 	 */
 	private void initialize() {
 		if (engine == null) {
+			engine = new ProbeControllerEngine();
+		} else {
 			log.info("Starting {}", engine.getName());
 			if (engine.start()) {
 				log.info("{} started successfully!", engine.getName());

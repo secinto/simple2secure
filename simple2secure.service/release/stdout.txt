@@ -1,0 +1,14 @@
+
+2018-11-14 11:32:46 Commons Daemon procrun stdout initialized
+Starting service
+11:32:46.889 [main] DEBUG c.s.service.ProbeControllerService - windowsStart called
+11:32:46.890 [main] INFO  c.s.service.ProbeControllerService - Starting ProbeController Service:0.1.0
+Starting service
+11:32:56.161 [Thread-0] DEBUG c.s.service.ProbeControllerService - windowsStart called
+11:32:56.161 [Thread-0] INFO  c.s.service.ProbeControllerService - Starting ProbeController Service:0.1.0
+Exception caught when trying to listen on port 8000 or listening for a connection
+Address already in use: JVM_Bind
+11:32:56.161 [Thread-0] INFO  c.s.service.ProbeControllerService - ProbeController Service:0.1.0 started successfully!
+Exception caught when trying to listen on port 8000 or listening for a connection
+socket closed
+11:32:56.162 [main] INFO  c.s.service.ProbeControllerService - ProbeController Service:0.1.0 started successfully!

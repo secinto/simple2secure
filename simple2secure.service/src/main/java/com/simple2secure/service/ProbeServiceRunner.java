@@ -7,10 +7,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.process.ProcessContainer;
-import com.simple2secure.commons.process.ProcessUtils;
+import com.simple2secure.commons.service.ServiceUtils;
 
 public class ProbeServiceRunner {
 
@@ -19,20 +18,29 @@ public class ProbeServiceRunner {
 	private static String workingDirectory = System.getProperty("user.dir");
 
 	public static void main(String[] args) {
-		ProcessContainer startedService = installService("ProbeService", "Probe Service", "simple2secure.service-0.1.0.jar",
-				"com.simple2secure.service.ProbeControllerService");
+		// String[] newArgs = new String[1];
+		// newArgs[0] = "start";
+		// ProbeControllerService.windowsService(newArgs);
+		log.info("Starting ProbeSericeRunner");
 
+		ProcessContainer startedService = ServiceUtils.installService(workingDirectory, "ProbeService", "Probe Service",
+				"simple2secure.service-0.1.0.jar", "com.simple2secure.service.ProbeControllerService", "windowsService",
+				"com.simple2secure.service.ProbeControllerService", "windowsService");
+
+		System.out.println(startedService.getProcess().exitValue());
+
+		ServiceUtils.deleteService("ProbeService");
 		/*
 		 * Check if we can find the license file in the directory, if not start the probe service without the license file.
 		 */
-		String licenseFile = findLicenseFile();
-
-		if (!Strings.isNullOrEmpty(licenseFile)) {
-			ProcessUtils.startProcess("java -jar simple2secure.probe.jar -l " + licenseFile);
-		} else {
-			log.info("License file is not available, starting service without.");
-			ProcessUtils.startProcess("java -jar simple2secure.probe.jar");
-		}
+		// String licenseFile = findLicenseFile();
+		//
+		// if (!Strings.isNullOrEmpty(licenseFile)) {
+		// ProcessUtils.startProcess("java -jar simple2secure.probe.jar -l " + licenseFile);
+		// } else {
+		// log.info("License file is not available, starting service without.");
+		// ProcessUtils.startProcess("java -jar simple2secure.probe.jar");
+		// }
 	}
 
 	public static String findLicenseFile() {
@@ -59,47 +67,4 @@ public class ProbeServiceRunner {
 		return licenseFile;
 	}
 
-	public static ProcessContainer installService(String serviceName, String displayName, String jarFile, String startClass) {
-		StringBuilder serviceString = new StringBuilder();
-		serviceString.append(workingDirectory + "\\daemon\\");
-		serviceString.append("prunsrv.exe //IS//");
-		serviceString.append(serviceName);
-		serviceString.append(" --DisplayName=\"");
-		serviceString.append(displayName);
-		serviceString.append("\" --Jvm=auto --Classpath=");
-		serviceString.append(jarFile);
-		serviceString.append(" --StartMode=jvm --StartClass=");
-		serviceString.append(startClass);
-		serviceString.append(" --Startup=Auto");
-
-		return ProcessUtils.startProcess(serviceString.toString());
-	}
-
-	public static ProcessContainer startService(String serviceName) {
-		StringBuilder serviceString = new StringBuilder();
-		serviceString.append(workingDirectory + "\\daemon\\");
-		serviceString.append("prunsrv.exe //ES//");
-		serviceString.append(serviceName);
-
-		return ProcessUtils.startProcess(serviceString.toString());
-	}
-
-	public static ProcessContainer stopService(String serviceName) {
-		StringBuilder serviceString = new StringBuilder();
-		serviceString.append(workingDirectory + "\\daemon\\");
-		serviceString.append("prunsrv.exe //SS//");
-		serviceString.append(serviceName);
-
-		return ProcessUtils.startProcess(serviceString.toString());
-	}
-	
-	public static ProcessContainer deleteService(String serviceName) {
-		StringBuilder serviceString = new StringBuilder();
-		serviceString.append(workingDirectory + "\\daemon\\");
-		serviceString.append("prunsrv.exe //DS//");
-		serviceString.append(serviceName);
-
-		return ProcessUtils.startProcess(serviceString.toString());
-	}
-	
 }

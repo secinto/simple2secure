@@ -1,20 +1,20 @@
 @echo off
  
-set SERVICE_NAME=Test
+set SERVICE_NAME="simple2secure"
  
 set PR_INSTALL=%~dp0%prunsrv.exe
-set PR_DESCRIPTION="Test Service"
+set PR_DESCRIPTION="simple2secure Probe Controller Service"
  
 REM Service log configuration
 set PR_LOGPREFIX=%SERVICE_NAME%
 set PR_LOGPATH=%~dp0%\
 set PR_STDOUTPUT=%~dp0%\stdout.txt
-set PR_STDERROR=%~dp0%\stderr.txt
+set PR_STDERROR=%~dp0%stderr.txt
 set PR_LOGLEVEL=Debug
  
 REM Path to java installation
 set PR_JVM=%JAVA_HOME%\jre\bin\server\jvm.dll
-set PR_CLASSPATH=simple2secure-0.1.0.jar
+set PR_CLASSPATH=simple2secure.service-0.1.0.jar
  
 REM Startup configuration
 set PR_STARTUP=auto
@@ -28,6 +28,10 @@ set PR_STOPCLASS=com.simple2secure.service.ProbeControllerService
 set PR_STOPMETHOD=windowsService
 set PR_STOPTIMEOUT=120
  
+ 
+set PR_STARTIMAGE=%~dp0%\simple2secure.ico
+set PR_STOPIMAGE=%~dp0%\simple2secure.ico
+
 REM JVM configuration
 set PR_JVMMS=256
 set PR_JVMMX=1024
@@ -37,10 +41,10 @@ REM JVM options
 set prunsrv_port=8080
 set prunsrv_server=localhost
  
-set PR_JVMOPTIONS=-Dprunsrv.port=%prunsrv_port%;-Dprunsrv.server=%prunsrv_server%
+REM set PR_JVMOPTIONS=-Dprunsrv.port=%prunsrv_port%;-Dprunsrv.server=%prunsrv_server%
  
 REM current file
-set "SELF=%~dp0%installService.bat"
+set "SELF=%~dp0%service.bat"
 REM current directory
 set "CURRENT_DIR=%cd%"
  
