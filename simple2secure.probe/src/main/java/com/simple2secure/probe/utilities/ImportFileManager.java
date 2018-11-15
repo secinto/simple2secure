@@ -39,7 +39,7 @@ public class ImportFileManager {
 	 * @return
 	 * @throws IOException
 	 */
-	List<File> unzipImportedFile(File importFile) throws IOException {
+	public List<File> unzipImportedFile(File importFile) throws IOException {
 		if(importFile == null) {
 			log.error("Importfile parameter should not be null.");
 		}
