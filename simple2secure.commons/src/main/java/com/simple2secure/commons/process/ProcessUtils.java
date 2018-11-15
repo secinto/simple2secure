@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +42,8 @@ public class ProcessUtils {
 					String mode = execParts[1];
 					String serviceName = environment.get(execParts[2].replaceAll("%", "").trim());
 
-					builder.command("powershell.exe", "-command", "\"Start-Process -FilePath " + installProcess + " -ArgumentList \\\"//" + mode
-							+ "//" + serviceName + "\\\", " + createCmdLineArgumentList(environment) + " -verb RunAs\"");
+					builder.command("powershell.exe", "\"Start-Process -FilePath " + installProcess + " -ArgumentList \\\"`\\\"//" + mode + "//"
+							+ serviceName + "`\\\"\\\", " + createCmdLineArgumentList(environment) + " -verb RunAs\"");
 				} else {
 					builder.command("cmd.exe", "/c", executable);
 				}
@@ -89,13 +88,13 @@ public class ProcessUtils {
 				paramToConvert = paramToConvert.substring(0, paramToConvert.length() - 1);
 			}
 
-			if (StringUtils.containsWhitespace(paramToConvert)) {
-				cmdLine.append("\\\"" + key + "=`\\\"" + paramToConvert + "`\\\"\\\", ");
-				// cmdLine.append("\"`\"" + key + "=" + paramToConvert + "`\"\", ");
-			} else {
-				cmdLine.append("\\\"" + key + "=" + paramToConvert + "\\\", ");
-				// cmdLine.append("\"" + key + "=" + paramToConvert + "\", ");
-			}
+			// if (StringUtils.containsWhitespace(paramToConvert)) {
+			cmdLine.append("\\\"`\\\"" + key + "=" + paramToConvert + "`\\\"\\\", ");
+			// cmdLine.append("\"`\"" + key + "=" + paramToConvert + "`\"\", ");
+			// } else {
+			// cmdLine.append("\\\"" + key + "=" + paramToConvert + "\\\", ");
+			// // cmdLine.append("\"" + key + "=" + paramToConvert + "\", ");
+			// }
 
 		}
 

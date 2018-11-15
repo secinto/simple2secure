@@ -396,9 +396,6 @@ public class ServiceUtils {
 			case "SERVICE_NAME":
 				convertedParams.put("--DisplayName", value);
 				break;
-			case "PR_INSTALL":
-				convertedParams.put("--Install", value);
-				break;
 			case "PR_STARTUP":
 				convertedParams.put("--Startup", value);
 				break;
@@ -445,7 +442,7 @@ public class ServiceUtils {
 				convertedParams.put("--StartClass", value);
 				break;
 			case "PR_STARTMETHOD":
-				convertedParams.put("--StartMetod", value);
+				convertedParams.put("--StartMethod", value);
 				break;
 			case "PR_STARTPARAMS":
 				convertedParams.put("--StartParams", value);
