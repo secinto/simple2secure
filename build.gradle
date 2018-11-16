@@ -62,6 +62,7 @@ project(':simple2secure.service') {
 		compile project(':simple2secure.commons')
 
 		compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
+		compile group: 'net.openhft', name: 'chronicle-queue', version: '5.17.1'
 	}
 }
 
@@ -87,6 +88,7 @@ project(':simple2secure.probe') {
 
 			compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
 			compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
+			compile group: 'net.openhft', name: 'chronicle-queue', version: '5.17.1'
 		}
 	}
 }
