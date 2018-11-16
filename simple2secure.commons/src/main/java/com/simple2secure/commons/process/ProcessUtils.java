@@ -107,13 +107,13 @@ public class ProcessUtils {
 		String[] execParts = executable.split("//");
 		if (execParts.length == 3) {
 			String installProcess = execParts[0];
-			if (execParts[0].contains("%PR_")) {
+			if (execParts[0].contains("%PR_INSTALL%")) {
 				installProcess = environment.get(execParts[0].replaceAll("%", "").trim());
 			}
 			String mode = execParts[1];
 
 			String serviceName = execParts[2];
-			if (execParts[0].contains("%PR_")) {
+			if (execParts[2].contains("%SERVICE_NAME%")) {
 				serviceName = environment.get(execParts[2].replaceAll("%", "").trim());
 			}
 			if (runAsAdmin) {
