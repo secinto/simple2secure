@@ -8,9 +8,20 @@ import org.slf4j.LoggerFactory;
 public class LoggingStringConsumer implements Consumer<String> {
 	private static Logger log = LoggerFactory.getLogger(LoggingStringConsumer.class);
 
+	private String prefix = "";
+
+	public LoggingStringConsumer() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public LoggingStringConsumer(String prefix) {
+		this.prefix = prefix;
+	}
+
 	@Override
 	public void accept(String data) {
-		log.debug(data);
+		log.debug("Accepting");
+		log.debug(prefix + " : " + data);
 	}
 
 }

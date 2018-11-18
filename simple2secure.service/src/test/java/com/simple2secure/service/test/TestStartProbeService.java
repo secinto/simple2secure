@@ -9,13 +9,13 @@ public class TestStartProbeService {
 
 	@AfterAll
 	public static void cleanup() {
-		ServiceUtils.deleteService("Probe Test Service");
+		ServiceUtils.deleteService("Probe Service");
 	}
 
 	@Test
 	public void testInstallService() {
-		ServiceUtils.installService(System.getProperty("user.dir"), "Probe Test Service", "Probe Test Service",
-				"release/simple2secure.service-0.1.0.jar", "com.simple2secure.service.ProbeControllerService",
+		ServiceUtils.installService(System.getProperty("user.dir"), "Probe Service", "Probe Service",
+				"release\\simple2secure.service-0.1.0.jar", "com.simple2secure.service.ProbeControllerService",
 				"windowsService", "com.simple2secure.service.ProbeControllerService", "windowsService");
 	}
 }

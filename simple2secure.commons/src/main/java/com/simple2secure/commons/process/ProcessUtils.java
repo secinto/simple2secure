@@ -3,10 +3,7 @@ package com.simple2secure.commons.process;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,10 @@ public class ProcessUtils {
 		isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 	}
 
+	public static ProcessContainer createProcess(String... executable) {
+		return createProcess(null, false, executable);
+	}
+
 	/**
 	 * Tries to create a process from the provided executable string using
 	 * ProcessBuilder. The input, output and error streams a wrapped in a
@@ -32,11 +33,11 @@ public class ProcessUtils {
 	 * @return The {@link ProcessContainer} which wraps the relevant streams,
 	 *         processes and consumers.
 	 */
-	public static ProcessContainer createProcess(String executable, Map<String, String> environment,
-			boolean cleanEnvironment) {
+	public static ProcessContainer createProcess(Map<String, String> environment, boolean cleanEnvironment,
+			String... executable) {
 		try {
 			ProcessBuilder builder = new ProcessBuilder();
-
+			builder.redirectErrorStream(true);
 			builder.command(executable);
 
 			builder.directory(new File(System.getProperty("user.dir")));
@@ -51,10 +52,20 @@ public class ProcessUtils {
 
 			Process process;
 			process = builder.start();
-			ProcessStream streamConsumer = new ProcessStream(process.getInputStream(), new LoggingStringConsumer());
-			Executors.newSingleThreadExecutor().submit(streamConsumer);
+			
+//	        BufferedReader lineReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//	        lineReader.lines().forEach(log::debug);
 
-			ProcessContainer procContainer = new ProcessContainer(process, streamConsumer);
+//			new BufferedReader(new InputStreamReader(process.getErrorStream())).lines().forEach(log::debug);
+
+
+			StreamGobbler inputGobbler = new StreamGobbler(process.getInputStream());
+			//StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
+
+			ProcessGobbler processGobbler = new ProcessGobbler(inputGobbler); 
+			processGobbler.startGobbling();
+
+			ProcessContainer procContainer = new ProcessContainer(process, processGobbler);
 			return procContainer;
 		} catch (IOException e) {
 			log.error("Couldn't create process for executable {} for reason {}", executable, e);
@@ -117,12 +128,13 @@ public class ProcessUtils {
 				serviceName = environment.get(execParts[2].replaceAll("%", "").trim());
 			}
 			if (runAsAdmin) {
-				return createProcess("powershell.exe \"Start-Process -FilePath " + installProcess
-						+ " -ArgumentList \\\"`\\\"//" + mode + "//" + serviceName + "`\\\"\\\", "
-						+ createCmdLineArgumentList(environment) + " -verb RunAs\"", null, false);
+				return createProcess("powershell.exe",
+						"\"Start-Process -FilePath " + installProcess + " -ArgumentList \\\"`\\\"//" + mode + "//"
+								+ serviceName + "`\\\"\\\", " + createCmdLineArgumentList(environment)
+								+ " -verb RunAs\"");
 			} else {
-				return createProcess("powershell.exe \"Start-Process -FilePath " + installProcess
-						+ " -ArgumentList \\\"`\\\"//" + mode + "//" + serviceName + "`\\\"\\\"", null, false);
+				return createProcess("powershell.exe", "\"Start-Process -FilePath " + installProcess
+						+ " -ArgumentList \\\"`\\\"//" + mode + "//" + serviceName + "`\\\"\\\"");
 			}
 		}
 		return null;
@@ -175,6 +187,23 @@ public class ProcessUtils {
 	 * required as input, such as the following list of string arguments.
 	 * <code>-cp, classpath.lib.jar, -Dsomeparam, startclass.start, input-param1</code>
 	 * The Java executable is obtained automatically if available in the system and
+	 * supplied to invoke the java process.
+	 * 
+	 * @param arguments The list of parameters which should be applied as input to
+	 *                  the Java process.
+	 * @return The {@link ProcessContainer} which wraps the relevant streams,
+	 *         processes and consumers.
+	 * @throws FileNotFoundException
+	 */
+	public static ProcessContainer invokeJavaProcess(String... arguments) throws FileNotFoundException {
+		return invokeJavaProcess(null, false, arguments);
+	}
+
+	/**
+	 * Invokes a Java process using the provided parameters. Only the parameters are
+	 * required as input, such as the following list of string arguments.
+	 * <code>-cp, classpath.lib.jar, -Dsomeparam, startclass.start, input-param1</code>
+	 * The Java executable is obtained automatically if available in the system and
 	 * supplied to invoke the java process. The provided environment and the
 	 * cleanEnv parameters are used to build the execution environment. See
 	 * {@link #createProcess(String, Map, boolean)} for further details.
@@ -188,13 +217,16 @@ public class ProcessUtils {
 	 *         processes and consumers.
 	 * @throws FileNotFoundException
 	 */
-	public static ProcessContainer invokeJavaProcess(List<String> cmdArray, Map<String, String> environment,
-			boolean cleanEnv) throws FileNotFoundException {
+	public static ProcessContainer invokeJavaProcess(Map<String, String> environment, boolean cleanEnv,
+			String... arguments) throws FileNotFoundException {
 		/*
 		 * Add the java executable path to the command parameters.
 		 */
-		cmdArray.add(0, getJavaExecutable().toString());
-		return createProcess(String.join(",", cmdArray), environment, cleanEnv);
+		String[] extraArguments = new String[arguments.length + 1];
+		extraArguments[0] = getJavaExecutable();
+		System.arraycopy(arguments, 0, extraArguments, 1, arguments.length);
+
+		return createProcess(environment, cleanEnv, extraArguments);
 	}
 
 	/**
@@ -214,9 +246,9 @@ public class ProcessUtils {
 	public static ProcessContainer createConsoleProcess(String executable, Map<String, String> environment,
 			boolean cleanEnv) {
 		if (isWindows) {
-			return createProcess("cmd.exe /c " + executable, environment, cleanEnv);
+			return createProcess(environment, cleanEnv, "cmd.exe", "/c", executable);
 		} else {
-			return createProcess("sh -c " + executable, environment, cleanEnv);
+			return createProcess(environment, cleanEnv, "sh", "-c", executable);
 		}
 	}
 

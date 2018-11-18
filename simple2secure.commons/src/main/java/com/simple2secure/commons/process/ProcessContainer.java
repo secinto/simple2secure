@@ -3,9 +3,9 @@ package com.simple2secure.commons.process;
 public class ProcessContainer {
 
 	private Process process;
-	private ProcessStream consumer;
+	private ProcessGobbler consumer;
 
-	public ProcessContainer(Process process, ProcessStream consumer) {
+	public ProcessContainer(Process process, ProcessGobbler consumer) {
 		this.process = process;
 		this.consumer = consumer;
 	}
@@ -14,7 +14,7 @@ public class ProcessContainer {
 		return process;
 	}
 
-	public ProcessStream getConsumer() {
+	public ProcessGobbler getConsumer() {
 		return consumer;
 	}
 
