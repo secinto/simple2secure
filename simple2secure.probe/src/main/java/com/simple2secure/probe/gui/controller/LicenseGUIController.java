@@ -9,9 +9,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.utilities.ImportFileManager;
 import com.simple2secure.probe.utils.ProbeUtils;
+import com.simple2secure.probe.utils.RequestHandler;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -47,12 +51,11 @@ public class LicenseGUIController {
 		ExtensionFilter extFilter = new ExtensionFilter("ZIP Files", "*.zip");
 		fileChooser.getExtensionFilters().add(extFilter);
 		File licenseZip = fileChooser.showOpenDialog(ProbeGUI.primaryStage);
-		License license = null;
-		Map<String, String> mappedLicense;
+		License downloadedLicense = null;
+		CompanyLicenseObj licenseForAuth;
+		String authToken;
 		
-		Boolean isValidLicenseDir;
 		List<File> filesFromDir = null;
-		
 		
 		//Unzips the zipped directory to a List
 		try {
@@ -62,32 +65,40 @@ public class LicenseGUIController {
 			log.error("Problem occured while unzipping the zip file");
 		}
 		
-		//Checks if the unzipped license directory contains the expected files.
-		isValidLicenseDir = licenseController.checkLicenseDirValidity(filesFromDir);
-		
 		//Load the license file from the imported directory
-		if(isValidLicenseDir) {
+		if(licenseController.checkLicenseDirValidity(filesFromDir)) {
 			try {
-				license = licenseController.loadLocalLicense();
+				downloadedLicense = licenseController.loadLocalLicense();
 			} catch (LicenseNotFoundException | LicenseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				errorLabel.setText("A problem occured while loading the downloaded license.");
+				log.error("A problem occured while loading the downloaded license.");
 			}
 		}else {
 			errorLabel.setText("The directory you tried to import, does not contain the expected files.");
 			log.error("The directory you tried to import, does not contain the expected files.");
 		}
 		
-		try {
-			mappedLicense = licenseController.mapLicenseToMap(license);
-		} catch (InvalidObjectException e) {
-			errorLabel.setText("The directory you tried to import, does not contain the expected files.");
-			log.error("The directory you tried to import, does not contain the expected files.");
+		if(!licenseController.checkLicenseProps(downloadedLicense)) {
+			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
+			log.error("Problem occured during the license validation. The server is not responding. Try again later!");
+			importButton.setDisable(false);
 		}
 		
+		licenseForAuth = licenseController.getLicenseForAuth(downloadedLicense);
+		authToken = RequestHandler.sendPostReceiveResponse(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", licenseForAuth);
+		if (Strings.isNullOrEmpty(authToken)) {
+			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
+			log.error("Problem occured during the license validation. The server is not responding. Try again later!");
+			importButton.setDisable(false);
+		}
+			
+		licenseController.activateLicenseInDB(authToken, licenseForAuth);
 		
+		ProbeConfiguration.authKey = authToken;
+		ProbeConfiguration.probeId = licenseForAuth.getProbeId();
+		ProbeConfiguration.setAPIAvailablitity(true);
 		
-		
+		ProbeGUI.initRootPane();
 	}
 
 }

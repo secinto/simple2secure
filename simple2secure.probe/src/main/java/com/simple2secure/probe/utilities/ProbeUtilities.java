@@ -13,6 +13,7 @@ import org.testng.util.Strings;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
+import com.simple2secure.probe.gui.controller.LicenseController;
 import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
@@ -27,9 +28,10 @@ public final class ProbeUtilities {
 	private static CompanyLicenseObj license;
 	private static ImportFileManager iFM =  new ImportFileManager();
 	private static Logger log = LoggerFactory.getLogger(ProbeUtilities.class);
+	private LicenseController licenseCon;
 
 	
-	public static CompanyLicenseObj loadLicenseFromPath(String importFilePath) {
+	public  CompanyLicenseObj loadLicenseFromPath(String importFilePath) {
 		
 		//License parameters
 		String probeId = UUID.randomUUID().toString();
@@ -48,8 +50,7 @@ public final class ProbeUtilities {
 				File licenseFile = ProbeUtils.getFileFromListByName(unzippedFiles, "license.dat");
 				map = iFM.checkLicense(licenseFile);
 				
-				
-				license = ProbeGUI.getLicenseFromDb();
+				license = licenseCon.loadLicenseFromDB(); 
 				
 				if(license != null)
 					if(Strings.isNotNullAndNotEmpty(license.getProbeId()))

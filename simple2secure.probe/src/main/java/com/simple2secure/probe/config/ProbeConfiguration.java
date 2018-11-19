@@ -25,7 +25,7 @@ import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.probe.gui.ProbeGUI;
+import com.simple2secure.probe.gui.controller.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
@@ -63,6 +63,8 @@ public class ProbeConfiguration {
 	private Map<String, QueryRun> currentQueries;
 
 	private LoadedConfigItems loadedConfigItems;
+	
+	private LicenseController licenseCon;
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -225,7 +227,7 @@ public class ProbeConfiguration {
 				isCheckingLicense = false;
 			} else {
 				/// Delete license object from the db and change to the license import view!
-				CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
+				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
 				isLicenseValid = false;
 			}
@@ -314,7 +316,7 @@ public class ProbeConfiguration {
 
 	private CompanyLicenseObj checkTokenValidity() {
 		isCheckingLicense = true;
-		CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
+		CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
 		if (license != null) {
 			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
 			if (!Strings.isNullOrEmpty(response)) {

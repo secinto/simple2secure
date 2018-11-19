@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
+import com.simple2secure.probe.gui.controller.LicenseController;
 import com.simple2secure.probe.gui.view.ViewNavigator;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.LocaleHolder;
@@ -56,6 +57,8 @@ public class ProbeGUI extends Application {
 	private TrayIcon trayIcon;
 
 	public static ResourceBundle rb;
+	
+	private LicenseController licenseCon;
 
 	public static void main(String[] args) {
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
@@ -97,65 +100,27 @@ public class ProbeGUI extends Application {
 		// ProbeConfiguration.setAPIAvailablitity(true);
 		// log.info("SERVER REACHABLE!");
 		// }
-		CompanyLicenseObj license = checkIfLicenseExists();
-
-		if (license != null) {
-
-			Date expirationDate = ProbeUtils.convertStringtoDate(license.getExpirationDate());
-			if (!isLicenseExpired(expirationDate)) {
-				ProbeConfiguration.authKey = license.getAuthToken();
-				ProbeConfiguration.probeId = license.getProbeId();
-				ProbeConfiguration.licenseId = license.getLicenseId();
-				if (license.isActivated()) {
+		
+		CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
+		
+		if(license != null) {
+			if(!licenseCon.isLicenseExpired(license)) {
+				if(license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
-				} else {
-
 				}
-
-				if (ProbeConfiguration.isLicenseValid) {
+				
+				if(ProbeConfiguration.isLicenseValid) {
 					initRootPane();
-				} else {
-					initLicenseImportPane("Your license has expired! Please import the new one!");
+				}else {
+					initLicenseImportPane("Your license has expired! Please import a new one!");
 				}
-
-			} else {
-				initLicenseImportPane("Your license has expired! Please import the new one!");
+			}else {
+				initLicenseImportPane("Your license has expired! Please import a new one!");
 			}
-
+		}else {
+			initLicenseImportPane("There is no license stored, please import a license.");
 		}
-
-		else {
-			initLicenseImportPane("");
-		}
-	}
-
-	/**
-	 * This function checks if the license exists and according to that sets the different view on the start
-	 *
-	 * @return
-	 */
-	public CompanyLicenseObj checkIfLicenseExists() {
-		CompanyLicenseObj license = getLicenseFromDb();
-		if (license != null) {
-			if (license.isActivated()) {
-				return license;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static CompanyLicenseObj getLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
-
+		
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {
@@ -304,9 +269,5 @@ public class ProbeGUI extends Application {
 				}
 			}
 		});
-	}
-
-	private boolean isLicenseExpired(Date expirationDate) {
-		return System.currentTimeMillis() > expirationDate.getTime();
 	}
 }

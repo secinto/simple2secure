@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,103 +69,11 @@ public class LicenseController implements Initializable {
 	 * @throws InterruptedException
 	 */
 	//TODO: Move all GUI-elements from this class to the LicenseGUIController
+	
 	@FXML
-	private void handleLicenseImport() throws IOException, LicenseNotFoundException, LicenseException, InterruptedException {
-		final FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Import your simple2secure license");
-		ExtensionFilter extFilter = new ExtensionFilter("ZIP Files", "*.zip");
-		fileChooser.getExtensionFilters().add(extFilter);
-		File licenseZip = fileChooser.showOpenDialog(ProbeGUI.primaryStage);
-		if (licenseZip != null) {
-			String fileName = licenseZip.getName();
-			importButton.setDisable(true);
-			errorLabel.setText("File imported successfully: " + fileName + " - Validating the license...");
-			//TODO: unzipLicense will be outsourced to ImportFileManager
-			List<File> unzippedFiles = unzipLicense(licenseZip);
-
-			if (unzippedFiles == null) {
-				importButton.setDisable(false);
-			} else {
-				File licenseFile = ProbeUtils.getFileFromListByName(unzippedFiles, "license.dat");
-				if (licenseFile == null) {
-					errorLabel.setText("Error occured during validation process. Please try again!");
-					importButton.setDisable(false);
-				} else {
-					License localLicense = loadLocalLicense();
-					boolean isValid = checkLicenseValidity(localLicense);
-					if (!isValid) {
-						errorLabel.setText("Provided license is not valid. Please try it again with the new one!");
-						importButton.setDisable(false);
-					} else {
-						CompanyLicenseObj license = ProbeGUI.getLicenseFromDb();
-						/*
-						 * Here we create the unique ID for the probe.
-						 *
-						 * TODO: This must be checked if it is the correct place. Should also work without license view.
-						 */
-						String probeId = UUID.randomUUID().toString();
-
-						if (license != null) {
-							if (!Strings.isNullOrEmpty(license.getProbeId())) {
-								probeId = license.getProbeId();
-							}
-						}
-						/*
-						 * Obtain parameters from the license itself.
-						 */
-						String groupId = map.get("groupId");
-						String licenseId = map.get("licenseId");
-						String expirationDate = map.get("expirationDate");
-						/*
-						 * This verification should never be invalid
-						 */
-						if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(expirationDate)) {
-							if (license == null) {
-								license = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
-							} else {
-								license.setGroupId(groupId);
-								license.setProbeId(probeId);
-								license.setLicenseId(licenseId);
-								license.setExpirationDate(expirationDate);
-							}
-
-							String authToken = RequestHandler.sendPostReceiveResponse(
-									ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", license);
-
-							if (!Strings.isNullOrEmpty(authToken)) {
-								license.setAuthToken(authToken);
-								license.setActivated(true);
-								DBUtil.getInstance().merge(license);
-
-								ProbeConfiguration.authKey = authToken;
-								ProbeConfiguration.probeId = probeId;
-
-								license = ProbeGUI.getLicenseFromDb();
-
-								ProbeConfiguration.setAPIAvailablitity(true);
-
-								ProbeGUI.initRootPane();
-
-							} else {
-								errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
-								importButton.setDisable(false);
-							}
-
-						} else {
-							errorLabel.setText("Problem occured during the license validation. Please try it again with the new one!");
-							importButton.setDisable(false);
-						}
-
-					}
-				}
-
-			}
-		} else {
-			errorLabel.setText("Problem occured while importing license file");
-			log.error("Problem occured while importing license file");
-		}
+	private void handleLicenseImport(String filePath) throws IOException, LicenseNotFoundException, LicenseException, InterruptedException {
+	
 	}
-
 
 	/**
 	 * Checks the validity of the license. 
@@ -189,50 +98,7 @@ public class LicenseController implements Initializable {
 	public License loadLocalLicense() throws LicenseNotFoundException, LicenseException {
 		return LicenseManager.getInstance().getLicense();
 	}
-
-	/**
-	 * Creates a new entry for the license in the DB. 
-	 *
-	 * @param 	...groupId
-	 * @param 	...licenseId
-	 * @param 	...expirationDate
-	 */
-	public void createNewCompanyLicenseObjectInDB(String groupId, String licenseId, String expirationDate) {
-		String probeId = UUID.randomUUID().toString();
-		CompanyLicenseObj cLO = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
-		DBUtil.getInstance().merge(cLO);
-	}
-	
-	/**
-	 * Loads the license from the data base. 
-	 * 
-	 * @return 	...a CompanyLicenseObject
-	 */
-	public static CompanyLicenseObj loadLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
-
-	}
-
-	/**
-	 * Checks if a license already exists in the DB. 
-	 * 
-	 * @return 	...true if already a license exists in DB, false if there is no license in the DB
-	 */
-	public boolean licenseExistsInDB() {
-		boolean licenseExistsInDB = false;
 		
-		if(loadLicenseFromDb() != null)
-			licenseExistsInDB = true;
-		
-		return licenseExistsInDB;
-	}
-	
 	/**
 	 * Checks if the license directory contains the right files. 
 	 *
@@ -269,38 +135,97 @@ public class LicenseController implements Initializable {
 	 *
 	 * @param   ...License object
 	 */
-	public void updateDBFromLocalLicense(License license) {
-		CompanyLicenseObj dbLicense = loadLicenseFromDb();
-		dbLicense.setGroupId(license.getFeature("groupId"));
-		//dbLicense.setProbeId(license.getFeature("probeId"));
-		dbLicense.setLicenseId(license.getFeature("licenseId"));
-		dbLicense.setExpirationDate(license.getFeature("expirationDate"));
+	public void updateLicenseInDB(CompanyLicenseObj license) {
+		DBUtil.getInstance().merge(license);
+	}
+
+	//TODO: Possibly null check required
+	/**
+	 * Loads the license from the data base. 
+	 * 
+	 * @return 	...a CompanyLicenseObject
+	 */
+	public CompanyLicenseObj loadLicenseFromDB() {
+		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
+
+		if (licenses.size() != 1) {
+			return null;
+		} else {
+			return licenses.get(0);
+		}
+	}
+
+	/**
+	 * Checks if a license already exists in the DB. 
+	 * 
+	 * @return 	...true if already a license exists in DB, false if there is no license in the DB
+	 */
+	public boolean licenseExistsInDB() {
+		boolean licenseExistsInDB = false;
 		
-		DBUtil.getInstance().merge(dbLicense);
+		if(loadLicenseFromDB() != null)
+			licenseExistsInDB = true;
+		
+		return licenseExistsInDB;
+	}
+
+	/**
+	 * Sets the needed Flags in the DB to mark the license activated.
+	 *
+	 * @param license  	...CompanyLicenseObj
+	 * @param authToken	...the token which the server returns if the activation succeeded.
+	 *
+	 */
+	public void activateLicenseInDB(String authToken, CompanyLicenseObj license) {
+		license.setAuthToken(authToken);
+		license.setActivated(true);
+		updateLicenseInDB(license);
 	}
 	
-	//TODO: This method seems to be unnecessary so it should be removed
+	//TODO: Possibly null check required
 	/**
-	 * Maps the license object to a hashmap. 
+	 * Creates a CompanyLicenseObj to send it to the server for authentication.
+	 * Also checks if there is already a license stored in the DB, if there is
+	 * a license stored it just updates the license. If there is no license
+	 * stored in the DB, it creates a new entry in the DB. 
 	 *
-	 * @param 	...License object
-	 * @return 	...hashMap with the mapped license properties in it.
-	 * @throws 	...InvalidObjectException
+	 * @param   ...License object
+	 * @return 	...CompanyLicenseObj for authentication.
+	 *
 	 */
-	public Map<String, String> mapLicenseToMap(License license) throws InvalidObjectException {
+	public CompanyLicenseObj getLicenseForAuth(License license) {
+		String probeId = ""; 
+		String groupId, licenseId, expirationDate;
+		CompanyLicenseObj result;
 		
-		Map<String, String> mappedLicense = new HashMap<String, String>();
-		String groupId = license.getFeature("groupId");
-		String licenseId = license.getFeature("licenseId");
-		String expirationDate = license.getExpirationDateAsString();
-
-		if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(expirationDate)) {
-			mappedLicense.put("groupId", groupId);
-			mappedLicense.put("licenseId", licenseId);
-			mappedLicense.put("expirationDate", expirationDate);
-		} else {
-			throw new InvalidObjectException("The license object does not provide enough Information to map.");
-		}	
-		return mappedLicense;
+		groupId = license.getFeature("groupId");
+		licenseId = license.getFeature("licenseId");
+		expirationDate = license.getExpirationDateAsString();
+		
+		if(licenseExistsInDB()) {
+			result = loadLicenseFromDB();
+			if(Strings.isNullOrEmpty(result.getProbeId())) {
+				probeId =  UUID.randomUUID().toString();
+				result.setProbeId(probeId);
+			}
+			result.setGroupId(groupId);
+			result.setLicenseId(licenseId);
+			result.setExpirationDate(expirationDate);
+		}else {
+			probeId =  UUID.randomUUID().toString();
+			result = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
+		}
+		
+		updateLicenseInDB(result);
+		return result;
+	}
+	
+	/**
+	 * Checks if a license is expired. 
+	 * 
+	 * @return 	...true if the license is expired, false if the license is not expired
+	 */
+	public boolean isLicenseExpired(CompanyLicenseObj license) {
+		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
 	}
 }
