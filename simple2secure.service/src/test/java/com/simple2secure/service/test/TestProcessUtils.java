@@ -1,13 +1,19 @@
 package com.simple2secure.service.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
+import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
+import com.simple2secure.service.test.utils.TestLoggingObserver;
 
 public class TestProcessUtils {
+
+	private CountDownLatch lock = new CountDownLatch(1);
 
 	@Test
 	public void testDemoApplicationStart() throws Exception {
@@ -17,6 +23,13 @@ public class TestProcessUtils {
 
 	@Test
 	public void testCreateProcess() throws Exception {
-		ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
+		ProcessContainer container = ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
+		TestLoggingObserver observer = new TestLoggingObserver();
+		container.getGobbler().addObserver(observer);
+		container.startGobbling();
+		lock.await(2000, TimeUnit.MILLISECONDS);
+		assertTrue(observer.getFirstObservable().contains("java version"));
+		assertTrue(observer.getLastObservable().contains("Java HotSpot"));
+
 	}
 }

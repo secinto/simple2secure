@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.commons.service.ServiceCommand;
+
 public class EchoService {
 	private static Logger log = LoggerFactory.getLogger(EchoService.class);
 
@@ -26,13 +28,24 @@ public class EchoService {
 			br = new BufferedReader(new InputStreamReader(is));
 
 			String line = null;
-
+			boolean shouldTerminate = false;
 			while ((line = br.readLine()) != null) {
-				if (line.equalsIgnoreCase("exit")) {
+				log.debug("Line entered {} ", line);
+				ServiceCommand command = ServiceCommand.fromString(line);
+				switch (command.getCommand()) {
+				case START:
+				case STOP:
+				case TERMINATE:
 					log.debug("Exiting service, received exit");
+					shouldTerminate = true;
+					break;
+				default:
+					log.error("Not recognized command {}", command);
 					break;
 				}
-				log.debug("Line entered {} ", line);
+				if (shouldTerminate) {
+					break;
+				}
 			}
 
 		} catch (IOException ioe) {
@@ -66,8 +79,7 @@ public class EchoService {
 				out.println(inputLine);
 			}
 		} catch (IOException e) {
-			log.debug("Exception caught when trying to listen on port {} or listening for a connection. Error {}",
-					portNumber, e);
+			log.debug("Exception caught when trying to listen on port {} or listening for a connection. Error {}", portNumber, e);
 		}
 	}
 

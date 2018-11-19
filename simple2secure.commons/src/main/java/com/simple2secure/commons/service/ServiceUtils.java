@@ -52,8 +52,8 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Returns the absolute file name of the PRUNSRV.EXE file which needs to be used
-	 * for this architecture. The files are bundled with the jar itself.
+	 * Returns the absolute file name of the PRUNSRV.EXE file which needs to be used for this architecture. The files are bundled with the jar
+	 * itself.
 	 *
 	 * @return The absolute filename of the service.
 	 */
@@ -68,11 +68,11 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Creates the environment solely for service execution. Only the serviceName
-	 * must be specified which should be managed. The prunsrv.exe is used from the
-	 * package.
+	 * Creates the environment solely for service execution. Only the serviceName must be specified which should be managed. The prunsrv.exe
+	 * is used from the package.
 	 *
-	 * @param serviceName The service to be managed.
+	 * @param serviceName
+	 *          The service to be managed.
 	 * @return
 	 */
 	public static Map<String, String> createServiceEnvironment(String serviceName) {
@@ -80,20 +80,19 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Creates the environment solely for service execution. Therefore only the
-	 * service name and the prunsrv.exe path are provided as environment variables.
-	 * If useOwnPrunSrv is true the installPath is used and the prunsrv.exe is
-	 * expected to be available from there. If not the own prunsrv.exe is used,
-	 * depending on the architecture.
+	 * Creates the environment solely for service execution. Therefore only the service name and the prunsrv.exe path are provided as
+	 * environment variables. If useOwnPrunSrv is true the installPath is used and the prunsrv.exe is expected to be available from there. If
+	 * not the own prunsrv.exe is used, depending on the architecture.
 	 *
-	 * @param useOwnPrunSrv If yes the prunsrv.exe needs to exist in the installPath
-	 * @param installPath   The installPath from which the prunsrv.exe should be
-	 *                      executed.
-	 * @param serviceName   The service name which needs to be managed.
+	 * @param useOwnPrunSrv
+	 *          If yes the prunsrv.exe needs to exist in the installPath
+	 * @param installPath
+	 *          The installPath from which the prunsrv.exe should be executed.
+	 * @param serviceName
+	 *          The service name which needs to be managed.
 	 * @return
 	 */
-	public static Map<String, String> createServiceEnvironment(boolean useOwnPrunSrv, String installPath,
-			String serviceName) {
+	public static Map<String, String> createServiceEnvironment(boolean useOwnPrunSrv, String installPath, String serviceName) {
 		Map<String, String> env = new TreeMap<String, String>();
 
 		env.put("SERVICE_NAME", serviceName);
@@ -110,153 +109,135 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Creates the environment settings for Windows service creation using procrun,
-	 * based on the provided input parameters. </br>
+	 * Creates the environment settings for Windows service creation using procrun, based on the provided input parameters. </br>
 	 * The prunsrv.exe is used from the ServiceUtils itself. </br>
-	 * The logging output will be created in the installPath and the file names are
-	 * used from the default settings. All other parameters are also set using the
-	 * default settings.
+	 * The logging output will be created in the installPath and the file names are used from the default settings. All other parameters are
+	 * also set using the default settings.
 	 *
-	 * @param installPath        The path into which all the relevant files
-	 *                           (procsrv, jar file, images) are installed and
-	 *                           available from.
-	 * @param serviceName        The name of the service as it will be shown in the
-	 *                           windows services panel.
-	 * @param serviceDescription The description which should be used for the
-	 *                           service which is shown in the panel.
-	 * @param library            The jar file which contains the executable code.
-	 *                           The jar should be a fat jar containing all
-	 *                           dependencies.
-	 * @param startClass         The fully qualified class name which contains the
-	 *                           start method.
-	 * @param startMethod        The name of the start method. The method must be
-	 *                           static.
-	 * @param stopClass          The fully qualified class name which contains the
-	 *                           stop method.
-	 * @param stopMethod         The name of the stop method. The method must be
-	 *                           static.
+	 * @param installPath
+	 *          The path into which all the relevant files (procsrv, jar file, images) are installed and available from.
+	 * @param serviceName
+	 *          The name of the service as it will be shown in the windows services panel.
+	 * @param serviceDescription
+	 *          The description which should be used for the service which is shown in the panel.
+	 * @param library
+	 *          The jar file which contains the executable code. The jar should be a fat jar containing all dependencies.
+	 * @param startClass
+	 *          The fully qualified class name which contains the start method.
+	 * @param startMethod
+	 *          The name of the start method. The method must be static.
+	 * @param stopClass
+	 *          The fully qualified class name which contains the stop method.
+	 * @param stopMethod
+	 *          The name of the stop method. The method must be static.
 	 * @return A map containing all service relevant environment variables.
 	 */
-	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName,
-			String serviceDescription, String library, String startClass, String startMethod, String stopClass,
-			String stopMethod) {
-		return createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass, startMethod,
-				stopClass, stopMethod, installPath);
+	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName, String serviceDescription,
+			String library, String startClass, String startMethod, String stopClass, String stopMethod) {
+		return createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass, startMethod, stopClass, stopMethod,
+				installPath);
 	}
 
 	/**
-	 * Creates the environment settings for Windows service creation using procrun,
-	 * based on the provided input parameters. </br>
-	 * The procsrv.exe is to be expected to exist in the installPath., otherwise the
-	 * service creation fails. </br>
-	 * The logging output will be created in the provided logPath and the file names
-	 * are used from the default settings. All other parameters are also set using
-	 * the default settings.
+	 * Creates the environment settings for Windows service creation using procrun, based on the provided input parameters. </br>
+	 * The procsrv.exe is to be expected to exist in the installPath., otherwise the service creation fails. </br>
+	 * The logging output will be created in the provided logPath and the file names are used from the default settings. All other parameters
+	 * are also set using the default settings.
 	 *
-	 * @param installPath        The path into which all the relevant files
-	 *                           (procsrv, jar file, images) are installed and
-	 *                           available from.
-	 * @param serviceName        The name of the service as it will be shown in the
-	 *                           windows services panel.
-	 * @param serviceDescription The description which should be used for the
-	 *                           service which is shown in the panel.
-	 * @param library            The jar file which contains the executable code.
-	 *                           The jar should be a fat jar containing all
-	 *                           dependencies.
-	 * @param startClass         The fully qualified class name which contains the
-	 *                           start method.
-	 * @param startMethod        The name of the start method. The method must be
-	 *                           static.
-	 * @param stopClass          The fully qualified class name which contains the
-	 *                           stop method.
-	 * @param stopMethod         The name of the stop method. The method must be
-	 *                           static.
-	 * @param logPath            The path where the log files should be written to.
+	 * @param installPath
+	 *          The path into which all the relevant files (procsrv, jar file, images) are installed and available from.
+	 * @param serviceName
+	 *          The name of the service as it will be shown in the windows services panel.
+	 * @param serviceDescription
+	 *          The description which should be used for the service which is shown in the panel.
+	 * @param library
+	 *          The jar file which contains the executable code. The jar should be a fat jar containing all dependencies.
+	 * @param startClass
+	 *          The fully qualified class name which contains the start method.
+	 * @param startMethod
+	 *          The name of the start method. The method must be static.
+	 * @param stopClass
+	 *          The fully qualified class name which contains the stop method.
+	 * @param stopMethod
+	 *          The name of the stop method. The method must be static.
+	 * @param logPath
+	 *          The path where the log files should be written to.
 	 * @return A map containing all service relevant environment variables.
 	 */
-	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName,
-			String serviceDescription, String library, String startClass, String startMethod, String stopClass,
-			String stopMethod, String logPath) {
+	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName, String serviceDescription,
+			String library, String startClass, String startMethod, String stopClass, String stopMethod, String logPath) {
 		/*
-		 * Creates an environment with default settings except the service specific
-		 * ones.
+		 * Creates an environment with default settings except the service specific ones.
 		 */
-		return createInstallEnvironment(false, installPath, serviceName, serviceDescription, library, DEFAULT_STARTUP,
-				startClass, startMethod, DEFAULT_START_STOP_MODE, DEFAULT_START_IMAGE, stopClass, stopMethod,
-				DEFAULT_START_STOP_MODE, DEFAULT_STOP_TIMEOUT, DEFAULT_STOP_IMAGE, logPath, DEFAULT_LOG_LEVEL,
-				DEFAULT_STDOUT, DEFAULT_STDOUT, DEFAULT_JVM, DEFAULT_JVMMS, DEFAULT_JVMMX, DEFAULT_JVMSS,
-				DEFAULT_JVM_OPTIONS);
+		return createInstallEnvironment(false, installPath, serviceName, serviceDescription, library, DEFAULT_STARTUP, startClass, startMethod,
+				DEFAULT_START_STOP_MODE, DEFAULT_START_IMAGE, stopClass, stopMethod, DEFAULT_START_STOP_MODE, DEFAULT_STOP_TIMEOUT,
+				DEFAULT_STOP_IMAGE, logPath, DEFAULT_LOG_LEVEL, DEFAULT_STDOUT, DEFAULT_STDOUT, DEFAULT_JVM, DEFAULT_JVMMS, DEFAULT_JVMMX,
+				DEFAULT_JVMSS, DEFAULT_JVM_OPTIONS);
 	}
 
 	/**
-	 * Creates the environment settings for Windows service creation using procrun,
-	 * based on the provided input parameters. For the stdout and stderr only the
-	 * file name must be provided since they will be created in the specified
-	 * logPath directory. For the start and stop image also only the file name must
-	 * be provided since they are expected to be available from the installPath. If
-	 * an empty string is provided for them they are omitted. </br>
-	 * If useOwnPrunSrv is set to true the prunsrv.exe, for the used architecture,
-	 * is to be expected to exist in the installPath, otherwise the service creation
-	 * fails. </br>
-	 * If jvmPath is null or empty it is tried to obtain the path automatically from
-	 * the already available system environment variables. </br>
+	 * Creates the environment settings for Windows service creation using procrun, based on the provided input parameters. For the stdout and
+	 * stderr only the file name must be provided since they will be created in the specified logPath directory. For the start and stop image
+	 * also only the file name must be provided since they are expected to be available from the installPath. If an empty string is provided
+	 * for them they are omitted. </br>
+	 * If useOwnPrunSrv is set to true the prunsrv.exe, for the used architecture, is to be expected to exist in the installPath, otherwise
+	 * the service creation fails. </br>
+	 * If jvmPath is null or empty it is tried to obtain the path automatically from the already available system environment variables. </br>
 	 *
-	 * @param useOwnPrunSrv      If set to true the prunsrv.exe is expected to exist
-	 *                           in the installPath in the given architecture.
-	 * @param installPath        The path into which all the relevant files
-	 *                           (procsrv, jar file, images) are installed and
-	 *                           available from.
-	 * @param serviceName        The name of the service as it will be shown in the
-	 *                           windows services panel.
-	 * @param serviceDescription The description which should be used for the
-	 *                           service which is shown in the panel.
-	 * @param library            The jar file which contains the executable code.
-	 *                           The jar should be a fat jar containing all
-	 *                           dependencies.
-	 * @param startup            The type of startup mechanisms which should be used
-	 *                           (auto, manual, ...).
-	 * @param startClass         The fully qualified class name which contains the
-	 *                           start method.
-	 * @param startMethod        The name of the start method. The method must be
-	 *                           static.
-	 * @param startMode          The name of the start mode. Usually this will only
-	 *                           be jvm.
-	 * @param startImage         The image (icon - *.ico) which should be used.
-	 *                           Needs to be available relatively from the install
-	 *                           path.
-	 * @param stopClass          The fully qualified class name which contains the
-	 *                           stop method.
-	 * @param stopMethod         The name of the stop method. The method must be
-	 *                           static.
-	 * @param stopMode           The name of the stop mode. Usually this will only
-	 *                           be jvm.
-	 * @param stopTimeout        The amount of seconds which should be waited before
-	 *                           the service is terminated if not finished with
-	 *                           stopping.
-	 * @param stopImage          The image (icon - *.ico) which should be used.
-	 *                           Needs to be available relatively from the install
-	 *                           path.
-	 * @param logPath            The path where the log files should be written to.
-	 * @param logLevel           The log level which should be used (Error, Warning,
-	 *                           Info, Debug)
-	 * @param stdout             The name of the file to which the stdout should be
-	 *                           written
-	 * @param stderr             The name of the file to which the stderr should be
-	 *                           written
-	 * @param jvmPath            The path to the jvm.dll which should be used. If it
-	 *                           is empty or null it is tried to obtain the path
-	 *                           automatically.
-	 * @param jvmms              Initial memory pool
-	 * @param jvmmx              Maximum memory pool
-	 * @param jvmss              Thread stack size
-	 * @param jvmOptions         JVM options which should be passed to the methods.
+	 * @param useOwnPrunSrv
+	 *          If set to true the prunsrv.exe is expected to exist in the installPath in the given architecture.
+	 * @param installPath
+	 *          The path into which all the relevant files (procsrv, jar file, images) are installed and available from.
+	 * @param serviceName
+	 *          The name of the service as it will be shown in the windows services panel.
+	 * @param serviceDescription
+	 *          The description which should be used for the service which is shown in the panel.
+	 * @param library
+	 *          The jar file which contains the executable code. The jar should be a fat jar containing all dependencies.
+	 * @param startup
+	 *          The type of startup mechanisms which should be used (auto, manual, ...).
+	 * @param startClass
+	 *          The fully qualified class name which contains the start method.
+	 * @param startMethod
+	 *          The name of the start method. The method must be static.
+	 * @param startMode
+	 *          The name of the start mode. Usually this will only be jvm.
+	 * @param startImage
+	 *          The image (icon - *.ico) which should be used. Needs to be available relatively from the install path.
+	 * @param stopClass
+	 *          The fully qualified class name which contains the stop method.
+	 * @param stopMethod
+	 *          The name of the stop method. The method must be static.
+	 * @param stopMode
+	 *          The name of the stop mode. Usually this will only be jvm.
+	 * @param stopTimeout
+	 *          The amount of seconds which should be waited before the service is terminated if not finished with stopping.
+	 * @param stopImage
+	 *          The image (icon - *.ico) which should be used. Needs to be available relatively from the install path.
+	 * @param logPath
+	 *          The path where the log files should be written to.
+	 * @param logLevel
+	 *          The log level which should be used (Error, Warning, Info, Debug)
+	 * @param stdout
+	 *          The name of the file to which the stdout should be written
+	 * @param stderr
+	 *          The name of the file to which the stderr should be written
+	 * @param jvmPath
+	 *          The path to the jvm.dll which should be used. If it is empty or null it is tried to obtain the path automatically.
+	 * @param jvmms
+	 *          Initial memory pool
+	 * @param jvmmx
+	 *          Maximum memory pool
+	 * @param jvmss
+	 *          Thread stack size
+	 * @param jvmOptions
+	 *          JVM options which should be passed to the methods.
 	 * @return A map containing all service relevant environment variables.
 	 */
-	public static Map<String, String> createInstallEnvironment(boolean useOwnPrunSrv, String installPath,
-			String serviceName, String serviceDescription, String library, String startup, String startClass,
-			String startMethod, String startMode, String startImage, String stopClass, String stopMethod,
-			String stopMode, String stopTimeout, String stopImage, String logPath, String logLevel, String stdout,
-			String stderr, String jvmPath, String jvmms, String jvmmx, String jvmss, String jvmOptions) {
+	public static Map<String, String> createInstallEnvironment(boolean useOwnPrunSrv, String installPath, String serviceName,
+			String serviceDescription, String library, String startup, String startClass, String startMethod, String startMode, String startImage,
+			String stopClass, String stopMethod, String stopMode, String stopTimeout, String stopImage, String logPath, String logLevel,
+			String stdout, String stderr, String jvmPath, String jvmms, String jvmmx, String jvmss, String jvmOptions) {
 		Map<String, String> env = new TreeMap<String, String>();
 
 		if (!installPath.endsWith("\\")) {
@@ -339,45 +320,42 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Installs the provided service as Windows service using the provided
-	 * parameters. The library is expected to exist in the installPath directory.
-	 * The logging output will be created also in the installPath directory. The
-	 * provided class name and methods are used for starting and stopping the
-	 * service.
+	 * Installs the provided service as Windows service using the provided parameters. The library is expected to exist in the installPath
+	 * directory. The logging output will be created also in the installPath directory. The provided class name and methods are used for
+	 * starting and stopping the service.
 	 *
-	 * @param installPath        The path into which all the relevant files
-	 *                           (procsrv, jar file, images) are installed and
-	 *                           available from.
-	 * @param serviceName        The name of the service as it will be shown in the
-	 *                           windows services panel.
-	 * @param serviceDescription The description which should be used for the
-	 *                           service which is shown in the panel.
-	 * @param library            The jar file which contains the executable code.
-	 *                           The jar should be a fat jar containing all
-	 *                           dependencies.
-	 * @param startClass         The fully qualified class name which contains the
-	 *                           start method.
-	 * @param startMethod        The name of the start method. The method must be
-	 *                           static.
-	 * @param stopClass          The fully qualified class name which contains the
-	 *                           stop method.
-	 * @param stopMethod         The name of the stop method. The method must be
-	 *                           static.
+	 * @param installPath
+	 *          The path into which all the relevant files (procsrv, jar file, images) are installed and available from.
+	 * @param serviceName
+	 *          The name of the service as it will be shown in the windows services panel.
+	 * @param serviceDescription
+	 *          The description which should be used for the service which is shown in the panel.
+	 * @param library
+	 *          The jar file which contains the executable code. The jar should be a fat jar containing all dependencies.
+	 * @param startClass
+	 *          The fully qualified class name which contains the start method.
+	 * @param startMethod
+	 *          The name of the start method. The method must be static.
+	 * @param stopClass
+	 *          The fully qualified class name which contains the stop method.
+	 * @param stopMethod
+	 *          The name of the stop method. The method must be static.
 	 * @return
 	 */
-	public static ProcessContainer installService(String installPath, String serviceName, String serviceDescription,
-			String library, String startClass, String startMethod, String stopClass, String stopMethod) {
+	public static ProcessContainer installService(String installPath, String serviceName, String serviceDescription, String library,
+			String startClass, String startMethod, String stopClass, String stopMethod) {
 		StringBuilder serviceString = new StringBuilder();
 		serviceString.append("%PR_INSTALL% //IS//%SERVICE_NAME%");
-		Map<String, String> environment = createInstallEnvironment(installPath, serviceName, serviceDescription,
-				library, startClass, startMethod, stopClass, stopMethod);
+		Map<String, String> environment = createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass,
+				startMethod, stopClass, stopMethod);
 		return ProcessUtils.manageServiceWindows(serviceString.toString(), true, environment);
 	}
 
 	/**
 	 * Starts the provided service from the Windows services.
 	 *
-	 * @param serviceName The service name to started.
+	 * @param serviceName
+	 *          The service name to started.
 	 * @return
 	 */
 	public static ProcessContainer startService(String serviceName) {
@@ -391,7 +369,8 @@ public class ServiceUtils {
 	/**
 	 * Stops the provided service from the Windows services.
 	 *
-	 * @param serviceName The service name to be stopped
+	 * @param serviceName
+	 *          The service name to be stopped
 	 * @return
 	 */
 	public static ProcessContainer stopService(String serviceName) {
@@ -405,7 +384,8 @@ public class ServiceUtils {
 	/**
 	 * Deletes the provided service from the Windows services.
 	 *
-	 * @param serviceName The service to be deleted.
+	 * @param serviceName
+	 *          The service to be deleted.
 	 * @return
 	 */
 	public static ProcessContainer deleteService(String serviceName) {
@@ -417,11 +397,10 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Converts the created install parameters to be used in command line direct
-	 * instead as being set as environment variables.
+	 * Converts the created install parameters to be used in command line direct instead as being set as environment variables.
 	 *
-	 * @param params The environment variables which should be converted. Only the
-	 *               names created in createInstallEnvironment can be converted.
+	 * @param params
+	 *          The environment variables which should be converted. Only the names created in createInstallEnvironment can be converted.
 	 * @return The converted variables as Map.
 	 */
 	public static Map<String, String> convertParameters(Map<String, String> params) {

@@ -1,21 +1,27 @@
 package com.simple2secure.commons.process;
 
+import java.util.concurrent.Executors;
+
 public class ProcessContainer {
 
 	private Process process;
-	private ProcessGobbler consumer;
+	private ProcessStreamObservable gobbler;
 
-	public ProcessContainer(Process process, ProcessGobbler consumer) {
+	public ProcessContainer(Process process, ProcessStreamObservable gobbler) {
 		this.process = process;
-		this.consumer = consumer;
+		this.gobbler = gobbler;
 	}
 
 	public Process getProcess() {
 		return process;
 	}
 
-	public ProcessGobbler getConsumer() {
-		return consumer;
+	public ProcessStreamObservable getGobbler() {
+		return gobbler;
+	}
+
+	public void startGobbling() {
+		Executors.newSingleThreadExecutor().submit(gobbler);
 	}
 
 }
