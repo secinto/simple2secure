@@ -13,22 +13,33 @@ public class ProcessStreamObservable extends Observable implements Runnable {
 
 	private InputStream inputStream;
 
+	private boolean running = false;
+
 	public ProcessStreamObservable(InputStream inputStream) {
 		this.inputStream = inputStream;
 	}
 
 	@Override
 	public void run() {
-		String line = "";
+		running = true;
+		String line = "INIT";
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-			while ((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null && running) {
 				setChanged();
 				notifyObservers(line);
 			}
+			if (!running) {
+				reader.close();
+			}
+			log.debug("Observable is exiting");
 		} catch (Exception e) {
 			log.error("Reading output from process failed. Reason {}", e);
 		}
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 }

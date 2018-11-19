@@ -25,8 +25,8 @@ public class TestProcessUtils {
 	public void testCreateProcess() throws Exception {
 		ProcessContainer container = ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
 		TestLoggingObserver observer = new TestLoggingObserver();
-		container.getGobbler().addObserver(observer);
-		container.startGobbling();
+		container.getObservable().addObserver(observer);
+		container.startObserving();
 		lock.await(2000, TimeUnit.MILLISECONDS);
 		assertTrue(observer.getFirstObservable().contains("java version"));
 		assertTrue(observer.getLastObservable().contains("Java HotSpot"));
