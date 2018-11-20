@@ -8,9 +8,15 @@
 
 package com.simple2secure.portal;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,13 +34,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.simple2secure.api.model.ServiceLibrary;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.utils.DataInitialization;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
 		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
+
+	private static Logger log = LoggerFactory.getLogger(Simple2SecurePortal.class);
 
 	@Value("${mail.username}")
 	private String mailUser;
@@ -46,6 +56,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	private String mailSMTPHost;
 	@Value("${mail.smtp.port}")
 	private String mailSMTPPort;
+
+	@Autowired
+	private ServiceLibraryRepository serviceLibraryRepository;
 
 	@Bean
 	public JavaMailSender getJavaMailSender() {
@@ -90,6 +103,20 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		messageSource.setBasename("classpath:locale/messages");
 		messageSource.setCacheSeconds(3600); // refresh cache once per hour
 		return messageSource;
+	}
+
+	@PostConstruct
+	public void initialize() {
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.0.jar").getFile());
+		ServiceLibrary library = new ServiceLibrary("Probe", "0.1.0", file.getAbsolutePath());
+		serviceLibraryRepository.save(library);
+		file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.1.jar").getFile());
+		library = new ServiceLibrary("Probe", "0.1.1", file.getAbsolutePath());
+		serviceLibraryRepository.save(library);
+		file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.2.jar").getFile());
+		library = new ServiceLibrary("Probe", "0.1.2", file.getAbsolutePath());
+		serviceLibraryRepository.save(library);
 	}
 
 	@Override

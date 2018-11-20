@@ -9,10 +9,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.util.ReflectionUtils;
 
 import com.mongodb.BasicDBObject;
@@ -36,6 +38,11 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 	 */
 	public ExtendedMongoTemplate(MongoClient mongoClient, String databaseName) {
 		super(mongoClient, databaseName);
+	}
+
+	@Bean
+	public GridFsTemplate gridFsTemplate() throws Exception {
+		return new GridFsTemplate(getMongoDbFactory(), getMongoConverter());
 	}
 
 	/**
@@ -82,10 +89,10 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 
 	private String determineCollection(Class<?> entityClass) {
 		Method m = ReflectionUtils.findMethod(super.getClass(), /*
-		 * MessageCodeUtil.getMessageCodeMessage(
-		 * MessageCodeGeneral.mongo_collection_name_determiner)
-		 */"mongo_collection_name_determiner", // $NON-NLS-1$
-		 Class.class);
+																														 * MessageCodeUtil.getMessageCodeMessage(
+																														 * MessageCodeGeneral.mongo_collection_name_determiner)
+																														 */"mongo_collection_name_determiner", // $NON-NLS-1$
+				Class.class);
 		ReflectionUtils.makeAccessible(m);
 		return (String) ReflectionUtils.invokeMethod(m, this, entityClass);
 	}

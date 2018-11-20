@@ -3,80 +3,55 @@ package com.simple2secure.api.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
 @Table(name = "Service")
 public class Service extends GenericDBObject {
-	/**
-	 * 
-	 */
+	private static Logger log = LoggerFactory.getLogger(Service.class);
+
 	private static final long serialVersionUID = 2929933295739730023L;
 	private String name;
-	private String api_url;
-	private String backup_location;
+	private String version;
 
-	/**
-	 *
-	 * @param name
-	 * @param api_url
-	 * @param backup_location
-	 */
-	
-	public Service() {}
-	
-	public Service(String name, String api_url, String backup_location) {
+	protected Service() {
+	}
+
+	public Service(String name, String version) {
 		super();
 		this.name = name;
-		this.api_url = api_url;
-		this.backup_location = backup_location;
+		this.version = version;
 	}
 
 	/**
+	 * Returns the name of the service object.
 	 *
-	 * @return
+	 * @return The name as string of this service object.
 	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	/**
+	 * Sets the name of this service object.
 	 *
 	 * @param name
+	 *          The name of the service object.
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
+	 * Returns the version number of this service object.
 	 *
-	 * @return
+	 * @return The version of the service object as string.
 	 */
-	public String getApi_url() {
-		return this.api_url;
+	public String getVersion() {
+		return version;
 	}
 
-	/**
-	 *
-	 * @param api_url
-	 */
-	public void setApi_url(String api_url) {
-		this.api_url = api_url;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public String getBackup_location() {
-		return this.backup_location;
-	}
-
-	/**
-	 *
-	 * @param backup_location
-	 */
-	public void setBackup_location(String backup_location) {
-		this.backup_location = backup_location;
-	}
 }

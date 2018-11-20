@@ -35,3 +35,6 @@ simple2secure.portal/logfile-test.2018-10-31.log
 *.classpath
 *.project
 simple2secure.service/bin/
+simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.2.jar
+simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.1.jar
+simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.0.jar
