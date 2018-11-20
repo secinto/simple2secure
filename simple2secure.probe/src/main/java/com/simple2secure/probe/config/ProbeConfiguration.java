@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
@@ -25,6 +24,7 @@ import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.DBUtil;
@@ -37,8 +37,6 @@ public class ProbeConfiguration {
 	private static Logger log = LoggerFactory.getLogger(ProbeConfiguration.class);
 
 	private static ProbeConfiguration instance;
-
-	private static Gson gson = new Gson();
 
 	private static boolean apiAvailable = false;
 
@@ -351,7 +349,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
+		return JSONUtils.fromString(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
 	}
 
 	/**
@@ -407,7 +405,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
 				Processor[].class));
 	}
@@ -455,7 +453,7 @@ public class ProbeConfiguration {
 	 * This function returns steps from the API for the logged in user
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler.sendGet(loadedConfigItems.getStepAPI() + "/" + ProbeConfiguration.probeId + "/false"),
 				Step[].class));
 	}
@@ -508,7 +506,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler
 						.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
 				QueryRun[].class));

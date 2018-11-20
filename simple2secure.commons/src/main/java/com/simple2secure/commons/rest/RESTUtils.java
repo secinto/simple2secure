@@ -9,9 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.simple2secure.commons.json.JSONUtils;
 
 public class RESTUtils {
 
@@ -25,7 +26,7 @@ public class RESTUtils {
 			HttpURLConnection connection = getConnection(url, "GET");
 
 			OutputStream os = connection.getOutputStream();
-			os.write(new JSONObject(obj).toString().getBytes());
+			os.write(JSONUtils.toString(obj).getBytes());
 			os.flush();
 
 			return getResponse(connection);
@@ -54,7 +55,8 @@ public class RESTUtils {
 	private static String getResponse(HttpURLConnection connection) throws IOException {
 		String output = null;
 		StringBuilder outputBuilder = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
+		BufferedReader br = new BufferedReader(
+				new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
 
 		while ((output = br.readLine()) != null) {
 			outputBuilder.append(output);
@@ -76,7 +78,8 @@ public class RESTUtils {
 		conn.setRequestMethod(method);
 		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestProperty("Accept-Language", "en");
-		// conn.setRequestProperty("Authorization", BEARER + ProbeConfiguration.authKey);
+		// conn.setRequestProperty("Authorization", BEARER +
+		// ProbeConfiguration.authKey);
 
 		return conn;
 	}

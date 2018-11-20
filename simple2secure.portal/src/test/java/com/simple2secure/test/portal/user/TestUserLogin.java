@@ -95,7 +95,8 @@ public class TestUserLogin {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST,
+				entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -123,7 +124,8 @@ public class TestUserLogin {
 
 		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST,
+				entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -132,13 +134,6 @@ public class TestUserLogin {
 			token = null;
 		}
 		assertNull(token);
-	}
-
-	@Test
-	public void testRegisterUserSuccessfull() {
-		JSONObject request = new JSONObject();
-		request.put("username", "testiing@test.com");
-		request.put("password", "testss");
 	}
 
 	@AfterAll

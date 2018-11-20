@@ -3,16 +3,15 @@ package com.simple2secure.probe.license;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
@@ -27,7 +26,6 @@ public class LicenseController {
 
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
-	private static Gson gson = new Gson();
 	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
 
 	/**
@@ -214,9 +212,9 @@ public class LicenseController {
 		groupId = license.getFeature("groupId");
 		licenseId = license.getFeature("licenseId");
 		expirationDate = license.getExpirationDateAsString();
-		
+
 		result = loadLicenseFromDB();
-		
+
 		if (result != null) {
 			if (Strings.isNullOrEmpty(result.getProbeId())) {
 				probeId = UUID.randomUUID().toString();
@@ -250,7 +248,7 @@ public class LicenseController {
 			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token",
 					license);
 			if (!Strings.isNullOrEmpty(response)) {
-				return gson.fromJson(response, CompanyLicenseObj.class);
+				return JSONUtils.fromString(response, CompanyLicenseObj.class);
 			} else {
 				return null;
 			}
