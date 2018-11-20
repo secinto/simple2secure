@@ -43,7 +43,7 @@
 	</appender>
 
 	<logger name="com.simple2secure.probe" level="info" />
-	<logger name="org.pcap4j" level="info" />
+	<logger name="org.pcap4j" level="debug" />
 	<logger name="org.hibernate" level="info" />
 
 	<root level="error">

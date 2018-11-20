@@ -3,7 +3,6 @@ package com.simple2secure.service.test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +25,8 @@ public class TestProcessUtils {
 		ProcessContainer container = ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
 		TestLoggingObserver observer = new TestLoggingObserver();
 		container.getObservable().addObserver(observer);
-		container.startGobbling();
-		lock.await(2000, TimeUnit.MILLISECONDS);
+		container.startObserving();
+		// lock.await(2000, TimeUnit.MILLISECONDS);
 		assertTrue(observer.getFirstObservable().contains("java version"));
 		assertTrue(observer.getLastObservable().contains("Java HotSpot"));
 

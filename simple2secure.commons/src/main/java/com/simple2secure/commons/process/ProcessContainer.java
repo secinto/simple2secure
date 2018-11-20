@@ -21,7 +21,7 @@ public class ProcessContainer {
 		return observable;
 	}
 
-	public void startGobbling() {
+	public void startObserving() {
 		ExecutorService pool = Executors.newSingleThreadExecutor();
 		pool.submit(observable);
 		pool.shutdown();

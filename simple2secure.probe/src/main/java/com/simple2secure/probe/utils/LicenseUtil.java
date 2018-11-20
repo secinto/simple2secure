@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public class LicenseUtil {
@@ -19,8 +20,7 @@ public class LicenseUtil {
 
 	public static boolean validateLicense() {
 		/*
-		 * Checking if license exists should have already been performed by
-		 * configuration loading.
+		 * Checking if license exists should have already been performed by configuration loading.
 		 */
 		CompanyLicenseObj license = checkIfLicenseExists();
 
@@ -91,8 +91,7 @@ public class LicenseUtil {
 		ProbeConfiguration.isCheckingLicense = true;
 		CompanyLicenseObj license = LicenseUtil.getLicenseFromDb();
 		if (license != null) {
-			String response = APIUtils.sendPostWithResponse(
-					ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/token", license);
+			String response = RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/token", license);
 			if (!Strings.isNullOrEmpty(response)) {
 				return gson.fromJson(response, CompanyLicenseObj.class);
 			} else {

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.utils.APIUtils;
 import com.simple2secure.probe.utils.DBUtil;
 
 public class ReportScheduler extends TimerTask {
@@ -32,8 +32,7 @@ public class ReportScheduler extends TimerTask {
 	}
 
 	/**
-	 * This function sends the {@link Report} to the server updates the sent value
-	 * and stores it in the database
+	 * This function sends the {@link Report} to the server updates the sent value and stores it in the database
 	 *
 	 * @param report
 	 */
@@ -45,14 +44,13 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.debug("Sending report {} with timestamp {} to the API.", report.getQuery(), report.getQueryTimestamp());
-			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI(), report);
+			RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI(), report);
 			DBUtil.getInstance().merge(report);
 		}
 	}
 
 	/**
-	 * This function sends the {@link NetworkReport} to the server updates the sent
-	 * value and stores it in the database
+	 * This function sends the {@link NetworkReport} to the server updates the sent value and stores it in the database
 	 *
 	 * @param report
 	 */
@@ -64,16 +62,14 @@ public class ReportScheduler extends TimerTask {
 			}
 			report.setSent(true);
 			log.info("Sending network report to the server with id: " + report.getId());
-			APIUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI() + "/network",
-					report);
+			RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getReportsAPI() + "/network", report);
 			DBUtil.getInstance().merge(report);
 		}
 
 	}
 
 	/**
-	 * This function retrieves all {@link Report} objects from the database where
-	 * sent tag is false.
+	 * This function retrieves all {@link Report} objects from the database where sent tag is false.
 	 */
 	private void sendReportsToServer() {
 		List<Report> reports = DBUtil.getInstance().findByFieldName("isSent", false, new Report());
@@ -85,8 +81,7 @@ public class ReportScheduler extends TimerTask {
 	}
 
 	/**
-	 * This function retrieves all {@link NetworkReport} objects from the database
-	 * where sent tag is false.
+	 * This function retrieves all {@link NetworkReport} objects from the database where sent tag is false.
 	 */
 	private void sendNetworkReportsToServer() {
 		List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldName("sent", false, new NetworkReport());
