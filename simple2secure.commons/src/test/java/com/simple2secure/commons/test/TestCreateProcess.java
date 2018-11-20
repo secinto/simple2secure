@@ -11,18 +11,24 @@ public class TestCreateProcess {
 
 	public static void main(String[] args) throws Exception {
 		// ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
-		ProcessContainer container = ProcessUtils.createProcess("java", "-cp", "build\\libs\\simple2secure.commons-0.1.0.jar",
-				"com.simple2secure.commons.process.EchoService");
+		ProcessContainer container = ProcessUtils.createProcess("java", "-cp",
+				"build\\libs\\simple2secure.commons-0.1.0.jar", "com.simple2secure.commons.process.EchoService");
 		container.getObservable().addObserver(new LoggingObserver());
-		container.startGobbling();
+		container.startObserving();
 
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(container.getProcess().getOutputStream()));
 		writer.write("Test\n");
 		writer.flush();
 		writer.write("TestMore\n");
 		writer.flush();
-		writer.write("stop\n");
+		//writer.write("stop\n");
 		writer.flush();
 		writer.close();
+		/*
+		 * Give the service some time to get the input and process it. Otherwise this
+		 * thread exits immediately
+		 */
+		Thread.sleep(2000);
+		//container.getObservable().setRunning(false);
 	}
 }

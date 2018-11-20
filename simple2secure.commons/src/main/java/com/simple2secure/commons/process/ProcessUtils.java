@@ -23,7 +23,7 @@ public class ProcessUtils {
 	/**
 	 * Tries to create a process from the provided executable string using {@link ProcessBuilder}. The input, output and error streams a
 	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the {@link ProcessContainer}.
-	 * Call {@link ProcessContainer#startGobbling()} to allow consumption of the output from the process which is provided to the input and
+	 * Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is provided to the input and
 	 * error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}.
 	 *
 	 * @param executable
@@ -37,7 +37,7 @@ public class ProcessUtils {
 	/**
 	 * Tries to create a process from the provided executable string using {@link ProcessBuilder}. The input, output and error streams a
 	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the {@link ProcessContainer}.
-	 * Call {@link ProcessContainer#startGobbling()} to allow consumption of the output from the process which is provided to the input and
+	 * Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is provided to the input and
 	 * error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}. The a map with environment
 	 * variables is provided, it is applied to the created {@link ProcessBuilder} as environment settings. If the cleanEnv is set to true all
 	 * existing environment variables from the system are cleared upfront.
