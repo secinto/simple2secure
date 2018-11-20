@@ -2,9 +2,7 @@ package com.simple2secure.probe.gui.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
-import com.simple2secure.probe.utilities.ImportFileManager;
+import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.utils.ProbeUtils;
 import com.simple2secure.probe.utils.RequestHandler;
 
@@ -30,7 +28,6 @@ import ro.fortsoft.licensius.LicenseNotFoundException;
 public class LicenseGUIController {
 	
 	private static Logger log = LoggerFactory.getLogger(LicenseGUIController.class);
-	ImportFileManager iFM = new ImportFileManager();
 	LicenseController licenseController = new LicenseController();
 
 	@FXML
@@ -59,7 +56,7 @@ public class LicenseGUIController {
 		
 		//Unzips the zipped directory to a List
 		try {
-			filesFromDir = iFM.unzipImportedFile(licenseZip);
+			filesFromDir = ProbeUtils.unzipImportedFile(licenseZip);
 		} catch (IOException e) {
 			errorLabel.setText("Problem occured while unzipping the zip file");
 			log.error("Problem occured while unzipping the zip file");
@@ -84,7 +81,7 @@ public class LicenseGUIController {
 			importButton.setDisable(false);
 		}
 		
-		licenseForAuth = licenseController.getLicenseForAuth(downloadedLicense);
+		licenseForAuth = licenseController.createLicenseForAuth(downloadedLicense);
 		authToken = RequestHandler.sendPostReceiveResponse(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", licenseForAuth);
 		if (Strings.isNullOrEmpty(authToken)) {
 			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");

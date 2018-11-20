@@ -32,11 +32,12 @@ public class RequestHandler {
 			HttpResponse<String> jsonResponse = createPostRequest(url_, requestBody);
 			response = jsonResponse.getBody();
 			log.debug("Response from POST request: " + response);
+			ProbeConfiguration.setAPIAvailablitity(true);
 		}catch(UnirestException | JsonProcessingException ex) {
 			ProbeConfiguration.setAPIAvailablitity(false);
 			log.error("Couldn 't send POST to URL {} because of execption {}", url_, ex);
+			return null;
 		}
-		ProbeConfiguration.setAPIAvailablitity(true);
 		return response;
 	}
 
@@ -46,12 +47,12 @@ public class RequestHandler {
 			HttpResponse<String> jsonResponse = createGetRequest(url_);
 			response = jsonResponse.getBody();
 			log.debug("Response from POST request: " + response);
-			
+			ProbeConfiguration.setAPIAvailablitity(true);
 		} catch (UnirestException ex) {
 			ProbeConfiguration.setAPIAvailablitity(false);
 			log.error("Couldn 't send GET to URL {} with response because of execption {}", url_, ex.getStackTrace());
+			return null;
 		}
-		ProbeConfiguration.setAPIAvailablitity(true);
 		return response;
 	}
 

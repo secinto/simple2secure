@@ -7,8 +7,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -19,11 +17,10 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.gui.controller.LicenseController;
 import com.simple2secure.probe.gui.view.ViewNavigator;
-import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.license.LicenseController;
+import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.LocaleHolder;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 import ch.qos.logback.classic.Level;
 import javafx.application.Application;
@@ -58,7 +55,7 @@ public class ProbeGUI extends Application {
 
 	public static ResourceBundle rb;
 	
-	private LicenseController licenseCon;
+	private LicenseController licenseCon = new LicenseController();
 
 	public static void main(String[] args) {
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
@@ -101,26 +98,12 @@ public class ProbeGUI extends Application {
 		// log.info("SERVER REACHABLE!");
 		// }
 		
-		CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
-		
-		if(license != null) {
-			if(!licenseCon.isLicenseExpired(license)) {
-				if(license.isActivated()) {
-					ProbeConfiguration.isLicenseValid = true;
-				}
-				
-				if(ProbeConfiguration.isLicenseValid) {
-					initRootPane();
-				}else {
-					initLicenseImportPane("Your license has expired! Please import a new one!");
-				}
-			}else {
-				initLicenseImportPane("Your license has expired! Please import a new one!");
-			}
+
+		if(licenseCon.checkProbeStartConditions()) {
+			initRootPane();
 		}else {
 			initLicenseImportPane("There is no license stored, please import a license.");
 		}
-		
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {

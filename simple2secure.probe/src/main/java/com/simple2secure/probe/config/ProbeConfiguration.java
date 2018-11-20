@@ -25,12 +25,12 @@ import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.probe.gui.controller.LicenseController;
+import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
-import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
 import com.simple2secure.probe.utils.LocaleHolder;
+import com.simple2secure.probe.utils.RequestHandler;
 
 public class ProbeConfiguration {
 
@@ -63,8 +63,8 @@ public class ProbeConfiguration {
 	private Map<String, QueryRun> currentQueries;
 
 	private LoadedConfigItems loadedConfigItems;
-	
-	private LicenseController licenseCon;
+
+	private LicenseController licenseCon = new LicenseController();
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -218,7 +218,7 @@ public class ProbeConfiguration {
 		 * Check if the API is available and if a newer version is available update it.
 		 */
 		if (isAPIAvailable()) {
-			CompanyLicenseObj licenseObj = checkTokenValidity();
+			CompanyLicenseObj licenseObj = licenseCon.checkTokenValidity();
 
 			if (licenseObj != null) {
 				DBUtil.getInstance().merge(licenseObj);
@@ -314,25 +314,6 @@ public class ProbeConfiguration {
 		}
 	}
 
-	private CompanyLicenseObj checkTokenValidity() {
-		isCheckingLicense = true;
-		CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
-		if (license != null) {
-			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
-			if (!Strings.isNullOrEmpty(response)) {
-				return gson.fromJson(response, CompanyLicenseObj.class);
-			} else {
-				return null;
-			}
-		} else {
-			/*
-			 * TODO: Create handling if license is not stored in DB.
-			 */
-			log.error("Couldn't find license in DB. Need to do something here");
-			return null;
-		}
-	}
-
 	/**
 	 *
 	 */
@@ -370,8 +351,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()),
-				Config.class);
+		return gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
 	}
 
 	/**
@@ -380,7 +360,7 @@ public class ProbeConfiguration {
 	 */
 	public Config getConfigFromDatabase() {
 		List<Config> configs = DBUtil.getInstance().findAll(new Config());
-		if(configs != null && configs.size() == 1) {
+		if (configs != null && configs.size() == 1) {
 			return configs.get(0);
 		}
 		return null;
@@ -427,9 +407,9 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(
-				gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
-						Processor[].class));
+		return Arrays.asList(gson.fromJson(
+				RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
+				Processor[].class));
 	}
 
 	/**
@@ -529,7 +509,8 @@ public class ProbeConfiguration {
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
 		return Arrays.asList(gson.fromJson(
-				RequestHandler.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
+				RequestHandler
+						.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
 				QueryRun[].class));
 	}
 
