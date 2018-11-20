@@ -1,4 +1,4 @@
-package com.simple2secure.probe.gui;
+package com.simple2secure.probe.scheduler;
 
 import java.util.Timer;
 import java.util.concurrent.Executors;
@@ -9,10 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.probe.network.NetworkMonitor;
-import com.simple2secure.probe.scheduler.ConfigScheduler;
-import com.simple2secure.probe.scheduler.NetworkScheduler;
-import com.simple2secure.probe.scheduler.QueryScheduler;
-import com.simple2secure.probe.scheduler.ReportScheduler;
 
 public class ProbeWorkerThread extends Thread {
 

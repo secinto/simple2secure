@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
-import com.simple2secure.probe.gui.ProbeWorkerThread;
 
 import javafx.application.Platform;
 
@@ -35,13 +34,13 @@ public class ConfigScheduler extends TimerTask {
 			//Stop all timer tasks including Network Monitor and OSQuery
 			//Change to the license view
 			ProbeWorkerThread.stopTimerTasks();		
-			Platform.runLater(() -> {
-				try {
-					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
-				} catch (IOException e) {
-					log.error("Error {}", e.getMessage());
-				}
-			});				
+//			Platform.runLater(() -> {
+//				try {
+//					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
+//				} catch (IOException e) {
+//					log.error("Error {}", e.getMessage());
+//				}
+//			});				
 		}
 	}
 

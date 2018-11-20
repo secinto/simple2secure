@@ -1,29 +1,25 @@
 <configuration>
 
-	<property name="LOG_HOME" value="./logs" />
-
-	<appender name="STDOUT"
-		class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
 			by default -->
-		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>INFO</level> 
-			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
+		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter> -->
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 		</encoder>
 	</appender>
 
-	<appender name="FILE"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/logfile.log</file>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>logfile.log</file>
 		<rollingPolicy
-			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/archived/logfile.%d{yyyy-MM-dd}.%i.log
-			</fileNamePattern>
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logfile.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>30</maxHistory>
-			<maxFileSize>30MB</maxFileSize>
-			<totalSizeCap>3GB</totalSizeCap>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
@@ -31,8 +27,7 @@
 		</encoder>
 	</appender>
 
-	<appender name="GUI"
-		class="com.simple2secure.probe.logging.GUIAppender">
+	<appender name="GUI" class="com.simple2secure.probe.logging.GUIAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>INFO</level>
 		</filter>
@@ -42,14 +37,16 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.simple2secure.probe" level="info" />
-	<logger name="org.pcap4j" level="debug" />
+	<logger name="com.simple2secure.probe" level="debug" />
+	<logger name="org.pcap4j" level="info" />
 	<logger name="org.hibernate" level="info" />
+	<!-- <logger name="org.hibernate" level="info" /> -->
+
 
 	<root level="error">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
-		<appender-ref ref="GUI" />
+		<!-- <appender-ref ref="GUI"/> -->
 	</root>
 
 </configuration>

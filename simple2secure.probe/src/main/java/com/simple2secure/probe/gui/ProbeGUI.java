@@ -7,7 +7,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -19,9 +18,9 @@ import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
-import com.simple2secure.probe.utils.LicenseUtil;
+import com.simple2secure.probe.license.LicenseController;
+import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.LocaleHolder;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 import ch.qos.logback.classic.Level;
 import javafx.application.Application;
@@ -55,6 +54,8 @@ public class ProbeGUI extends Application {
 	private TrayIcon trayIcon;
 
 	public static ResourceBundle rb;
+	
+	private LicenseController licenseCon = new LicenseController();
 
 	public static void main(String[] args) {
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
@@ -92,37 +93,19 @@ public class ProbeGUI extends Application {
 		 */
 		ProbeConfiguration.getInstance();
 
-		CompanyLicenseObj license = LicenseUtil.checkIfLicenseExists();
+		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
+		// ProbeConfiguration.setAPIAvailablitity(true);
+		// log.info("SERVER REACHABLE!");
+		// }
+		
 
-		if (license != null) {
-
-			Date expirationDate = ProbeUtils.convertStringtoDate(license.getExpirationDate());
-			if (!isLicenseExpired(expirationDate)) {
-				ProbeConfiguration.authKey = license.getAuthToken();
-				ProbeConfiguration.probeId = license.getProbeId();
-				ProbeConfiguration.licenseId = license.getLicenseId();
-				if (license.isActivated()) {
-					ProbeConfiguration.isLicenseValid = true;
-				} else {
-
-				}
-
-				if (ProbeConfiguration.isLicenseValid) {
-					initRootPane();
-				} else {
-					initLicenseImportPane("Your license has expired! Please import the new one!");
-				}
-
-			} else {
-				initLicenseImportPane("Your license has expired! Please import the new one!");
-			}
-
-		}
-
-		else {
-			initLicenseImportPane("");
+		if(licenseCon.checkProbeStartConditions()) {
+			initRootPane();
+		}else {
+			initLicenseImportPane("There is no license stored, please import a license.");
 		}
 	}
+
 	public static void initLicenseImportPane(String errorText) throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(ProbeGUI.class.getResource(ViewNavigator.LICENSE_VIEW));
@@ -269,9 +252,5 @@ public class ProbeGUI extends Application {
 				}
 			}
 		});
-	}
-
-	private boolean isLicenseExpired(Date expirationDate) {
-		return System.currentTimeMillis() > expirationDate.getTime();
 	}
 }
