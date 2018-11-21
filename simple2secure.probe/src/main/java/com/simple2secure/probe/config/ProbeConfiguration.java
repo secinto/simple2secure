@@ -1,5 +1,7 @@
 package com.simple2secure.probe.config;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +53,8 @@ public class ProbeConfiguration {
 	public static boolean isCheckingLicense = false;
 
 	public static boolean isLicenseValid = false;
+	
+	public static boolean isGuiRunning = false;
 
 	private Config currentConfig;
 
@@ -65,6 +69,8 @@ public class ProbeConfiguration {
 	private LoadedConfigItems loadedConfigItems;
 
 	private LicenseController licenseCon = new LicenseController();
+		
+    private static PropertyChangeSupport support;
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -91,6 +97,15 @@ public class ProbeConfiguration {
 		this.currentQueries = new HashMap<String, QueryRun>();
 		loadConfig();
 		loadedConfigItems = new LoadedConfigItems();
+		support = new PropertyChangeSupport(this);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+		support.addPropertyChangeListener(pcl);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+		support.removePropertyChangeListener(pcl);
 	}
 
 	public Config getConfig() {
@@ -225,11 +240,15 @@ public class ProbeConfiguration {
 				authKey = licenseObj.getAuthToken();
 				isLicenseValid = true;
 				isCheckingLicense = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			} else {
 				/// Delete license object from the db and change to the license import view!
 				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
 				isLicenseValid = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			}
 
 			if (isLicenseValid) {
@@ -465,7 +484,6 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-
 	private List<Step> getStepsFromDatabase() {
 		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, new Step());
 		return dbSteps;
@@ -562,6 +580,7 @@ public class ProbeConfiguration {
 
 	public static void setAPIAvailablitity(boolean apiAvailability) {
 		apiAvailable = apiAvailability;
+		support.firePropertyChange("isApiAvailable", apiAvailable, apiAvailability);
 	}
 
 	public Map<String, Step> getCurrentSteps() {

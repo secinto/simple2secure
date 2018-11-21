@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
@@ -98,13 +97,27 @@ public class ProbeGUI extends Application {
 		// log.info("SERVER REACHABLE!");
 		// }
 		
-
-		if(licenseCon.checkProbeStartConditions()) {
-			ProbeConfiguration.getInstance();
-			initRootPane();
-		}else {
-			initLicenseImportPane("There is no license stored, please import a license.");
+		ProbeConfiguration.isGuiRunning = true;
+		
+		String startConditions = licenseCon.checkProbeStartConditions();
+		
+		switch(startConditions) {
+			case ("FIRST_TIME"): initLicenseImportPane("There is no license stored, please import a license.");
+				
+			case ("LICENSE_EXPIRED"): initRootPane();
+				
+			case ("NOT_ACTIVATED"): initRootPane();
+			
+			case ("VALID_CONDITIONS"): initRootPane();
 		}
+
+//		if(licenseCon.checkProbeStartConditions()) {
+//			ProbeConfiguration.getInstance();
+//			initRootPane();
+//		}else {
+//			initLicenseImportPane("There is no license stored, please import a license.");
+//		}
+		
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {

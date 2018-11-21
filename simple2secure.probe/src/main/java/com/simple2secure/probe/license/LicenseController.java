@@ -29,6 +29,7 @@ public class LicenseController {
 
 	private static Gson gson = new Gson();
 	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
+	private enum startConditions {FIRST_TIME, LICENSE_EXPIRED, NOT_ACTIVATED, VALID_CONDITIONS }
 
 	/**
 	 * Unzips the directory containing the license.dat in the /simple2secure/probe/
@@ -66,24 +67,24 @@ public class LicenseController {
 	 * Checks if there is a license stored in the DB... Checks if the license found
 	 * in DB is expired... Checks if the license is activated
 	 * 
-	 * @return... "False" if there is no license stored in the DB @return... "True"
-	 * if the license is in DB but expired @return... "True" if the license is not
-	 * expired but the isActivated()-flag is not set @return... "True" if the
-	 * license is not expired & the isActivated()-flag is set/ sets the
-	 * isLicenseValid-flag in ProbeConfiguration to true
+	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in the DB 
+	 * @return... String of enum Type "LICENSE_EXPIRED" if the license is in DB but expired 
+	 * @return... String of enum Type "NOT_ACTIVATED" if the license is not expired but the isActivated()-flag is not set 
+	 * @return... String of enum Type "VALID_CONDITIONS" if the license is not expired & the isActivated()-flag is set/ sets the isLicenseValid-flag in ProbeConfiguration to true
 	 */
-	public boolean checkProbeStartConditions() {
+	public String checkProbeStartConditions() {
 		CompanyLicenseObj license = loadLicenseFromDB();
-		boolean isProbeStartConditionsValid = false;
+		String isProbeStartConditionsValid = startConditions.FIRST_TIME.toString();
 		if (license != null) {
 			if (!isLicenseExpired(license)) {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
-					isProbeStartConditionsValid = true;
+					ProbeConfiguration.probeId = license.getProbeId();
+					isProbeStartConditionsValid = startConditions.VALID_CONDITIONS.toString();
 				}
-				isProbeStartConditionsValid = true;
+				isProbeStartConditionsValid = startConditions.NOT_ACTIVATED.toString();
 			}
-			isProbeStartConditionsValid = true;
+			isProbeStartConditionsValid = startConditions.LICENSE_EXPIRED.toString();
 		}
 		return isProbeStartConditionsValid;
 	}
