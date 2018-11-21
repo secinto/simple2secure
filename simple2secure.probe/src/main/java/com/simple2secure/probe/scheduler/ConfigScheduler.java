@@ -13,27 +13,33 @@ import com.simple2secure.probe.gui.ProbeGUI;
 public class ConfigScheduler extends TimerTask implements PropertyChangeListener {
 
 	private static Logger log = LoggerFactory.getLogger(ConfigScheduler.class);
-	
+
 	private boolean probeIsLicenseValid = false;
+
 	public boolean isProbeIsLicenseValid() {
 		return probeIsLicenseValid;
 	}
+
 	public void setProbeIsLicenseValid(boolean probeIsLicenseValid) {
 		this.probeIsLicenseValid = probeIsLicenseValid;
 	}
 
 	private boolean probeIsApiAvailable = false;
+
 	public boolean isProbeIsApiAvailable() {
 		return probeIsApiAvailable;
 	}
+
 	public void setProbeIsApiAvailable(boolean probeIsApiAvailable) {
 		this.probeIsApiAvailable = probeIsApiAvailable;
 	}
 
 	private boolean probeIsGuiRunning = false;
+
 	public boolean isProbeIsGuiRunning() {
 		return probeIsGuiRunning;
 	}
+
 	private void setProbeIsGuiRunning(boolean probeIsGuiRunning) {
 		this.probeIsGuiRunning = probeIsGuiRunning;
 	}
@@ -50,10 +56,9 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 
 	private void checkConfiguration() {
 		log.info("Checking for the new configuration...");
-		//ProbeConfiguration.getInstance().checkConfig();
-		if(!probeIsLicenseValid) {
-			if(probeIsGuiRunning) {
-				ProbeWorkerThread.stopTimerTasks();
+		// ProbeConfiguration.getInstance().checkConfig();
+		if (!probeIsLicenseValid) {
+			if (probeIsGuiRunning) {
 				try {
 					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
 				} catch (IOException e) {
@@ -61,10 +66,10 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 					e.printStackTrace();
 				}
 			}
-			//TODO - find a better solution
-			//Stop all timer tasks including Network Monitor and OSQuery
-			//Change to the license view
-			//ProbeWorkerThread.stopTimerTasks();		
+			// TODO - find a better solution
+			// Stop all timer tasks including Network Monitor and OSQuery
+			// Change to the license view
+			// ProbeWorkerThread.stopTimerTasks();
 //			Platform.runLater(() -> {
 //				try {
 //					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
@@ -77,11 +82,11 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
-		if(arg0.getPropertyName().equals("isApiAvailable"))
+		if (arg0.getPropertyName().equals("isApiAvailable"))
 			setProbeIsApiAvailable((boolean) arg0.getNewValue());
-		if(arg0.getPropertyName().equals("isLicenseValid"))
+		if (arg0.getPropertyName().equals("isLicenseValid"))
 			setProbeIsLicenseValid((boolean) arg0.getNewValue());
-		if(arg0.getPropertyName().equals("isGuiRunning"))
+		if (arg0.getPropertyName().equals("isGuiRunning"))
 			setProbeIsGuiRunning((boolean) arg0.getNewValue());
 	}
 }

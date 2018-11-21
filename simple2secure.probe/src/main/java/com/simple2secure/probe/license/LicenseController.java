@@ -3,16 +3,15 @@ package com.simple2secure.probe.license;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
@@ -27,9 +26,7 @@ public class LicenseController {
 
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
-	private static Gson gson = new Gson();
 	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
-	private enum startConditions {FIRST_TIME, LICENSE_EXPIRED, NOT_ACTIVATED, VALID_CONDITIONS }
 
 	/**
 	 * Unzips the directory containing the license.dat in the /simple2secure/probe/
@@ -43,16 +40,16 @@ public class LicenseController {
 	 * @throws LicenseNotFoundException
 	 * @throws InterruptedException
 	 */
-	public CompanyLicenseObj loadLicenseFromPath(String importFilePath)
+	public CompanyLicensePublic loadLicenseFromPath(String importFilePath)
 			throws IOException, LicenseNotFoundException, LicenseException {
-		CompanyLicenseObj license = null;
+		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
 		if (inputFile != null) {
 			List<File> unzippedFiles = ProbeUtils.unzipImportedFile(inputFile);
 			if (unzippedFiles != null && unzippedFiles.size() == 2) {
 				License downloadedLicense = LicenseManager.getInstance().getLicense();
-
+				
 				if (downloadedLicense != null && checkLicenseProps(downloadedLicense)) {
 					license = createLicenseForAuth(downloadedLicense);
 				}
@@ -67,26 +64,28 @@ public class LicenseController {
 	 * Checks if there is a license stored in the DB... Checks if the license found
 	 * in DB is expired... Checks if the license is activated
 	 * 
-	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in the DB 
-	 * @return... String of enum Type "LICENSE_EXPIRED" if the license is in DB but expired 
-	 * @return... String of enum Type "NOT_ACTIVATED" if the license is not expired but the isActivated()-flag is not set 
-	 * @return... String of enum Type "VALID_CONDITIONS" if the license is not expired & the isActivated()-flag is set/ sets the isLicenseValid-flag in ProbeConfiguration to true
+	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in
+	 * the DB @return... String of enum Type "LICENSE_EXPIRED" if the license is in
+	 * DB but expired @return... String of enum Type "NOT_ACTIVATED" if the license
+	 * is not expired but the isActivated()-flag is not set @return... String of
+	 * enum Type "VALID_CONDITIONS" if the license is not expired & the
+	 * isActivated()-flag is set/ sets the isLicenseValid-flag in ProbeConfiguration
+	 * to true
 	 */
-	public String checkProbeStartConditions() {
-		CompanyLicenseObj license = loadLicenseFromDB();
-		String isProbeStartConditionsValid = startConditions.FIRST_TIME.toString();
+	public StartConditions checkProbeStartConditions() {
+		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
 			if (!isLicenseExpired(license)) {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
 					ProbeConfiguration.probeId = license.getProbeId();
-					isProbeStartConditionsValid = startConditions.VALID_CONDITIONS.toString();
+					return StartConditions.LICENSE_VALID;
 				}
-				isProbeStartConditionsValid = startConditions.NOT_ACTIVATED.toString();
+				return StartConditions.LICENSE_NOT_ACTIVATED;
 			}
-			isProbeStartConditionsValid = startConditions.LICENSE_EXPIRED.toString();
+			return StartConditions.LICENSE_EXPIRED;
 		}
-		return isProbeStartConditionsValid;
+		return StartConditions.LICENSE_NOT_AVAILABLE;
 	}
 
 	/**
@@ -162,7 +161,7 @@ public class LicenseController {
 	 *
 	 * @param ...License object
 	 */
-	public void updateLicenseInDB(CompanyLicenseObj license) {
+	public void updateLicenseInDB(CompanyLicensePublic license) {
 		DBUtil.getInstance().merge(license);
 	}
 
@@ -172,8 +171,8 @@ public class LicenseController {
 	 * 
 	 * @return ...a CompanyLicenseObject
 	 */
-	public CompanyLicenseObj loadLicenseFromDB() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
+	public CompanyLicensePublic loadLicenseFromDB() {
+		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(CompanyLicensePublic.class);
 
 		if (licenses.size() != 1) {
 			return null;
@@ -190,8 +189,8 @@ public class LicenseController {
 	 *                  succeeded.
 	 *
 	 */
-	public void activateLicenseInDB(String authToken, CompanyLicenseObj license) {
-		license.setAuthToken(authToken);
+	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
+		license.setAccessToken(authToken);
 		license.setActivated(true);
 		updateLicenseInDB(license);
 	}
@@ -207,17 +206,17 @@ public class LicenseController {
 	 * @return ...CompanyLicenseObj for authentication.
 	 *
 	 */
-	public CompanyLicenseObj createLicenseForAuth(License license) {
+	public CompanyLicensePublic createLicenseForAuth(License license) {
 		String probeId = "";
 		String groupId, licenseId, expirationDate;
-		CompanyLicenseObj result;
+		CompanyLicensePublic result;
 
 		groupId = license.getFeature("groupId");
 		licenseId = license.getFeature("licenseId");
 		expirationDate = license.getExpirationDateAsString();
-		
+
 		result = loadLicenseFromDB();
-		
+
 		if (result != null) {
 			if (Strings.isNullOrEmpty(result.getProbeId())) {
 				probeId = UUID.randomUUID().toString();
@@ -228,7 +227,7 @@ public class LicenseController {
 			result.setExpirationDate(expirationDate);
 		} else {
 			probeId = UUID.randomUUID().toString();
-			result = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
+			result = new CompanyLicensePublic(groupId, probeId, licenseId, expirationDate);
 		}
 
 		updateLicenseInDB(result);
@@ -241,17 +240,17 @@ public class LicenseController {
 	 * @return ...true if the license is expired, false if the license is not
 	 *         expired
 	 */
-	public boolean isLicenseExpired(CompanyLicenseObj license) {
+	public boolean isLicenseExpired(CompanyLicensePublic license) {
 		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
 	}
 
-	public CompanyLicenseObj checkTokenValidity() {
-		CompanyLicenseObj license = loadLicenseFromDB();
+	public CompanyLicensePublic checkTokenValidity() {
+		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
 			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token",
 					license);
 			if (!Strings.isNullOrEmpty(response)) {
-				return gson.fromJson(response, CompanyLicenseObj.class);
+				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			} else {
 				return null;
 			}

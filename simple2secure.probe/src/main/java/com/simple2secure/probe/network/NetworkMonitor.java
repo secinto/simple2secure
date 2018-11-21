@@ -84,8 +84,8 @@ public class NetworkMonitor {
 					log.info(i + ":" + currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
 				}
 				/*
-				 * Iterate through the addresses of the interfaces and check if someone fits. TODO: We should store the interfaces which have
-				 * relevant addresses.
+				 * Iterate through the addresses of the interfaces and check if someone fits.
+				 * TODO: We should store the interfaces which have relevant addresses.
 				 */
 				List<PcapAddress> addresses = interfaces.get(i).getAddresses();
 				for (PcapAddress address : addresses) {
@@ -93,7 +93,8 @@ public class NetworkMonitor {
 						String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
 						if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
 							if (singleInterface != null) {
-								log.info("Found another usable address {}, discarding old one {}", ipAddress, previousAddress);
+								log.info("Found another usable address {}, discarding old one {}", ipAddress,
+										previousAddress);
 							}
 							singleInterface = currentInterface;
 							previousAddress = ipAddress;
@@ -108,17 +109,20 @@ public class NetworkMonitor {
 		}
 
 		try {
-			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, StaticConfigItems.READ_TIMEOUT);
+			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS,
+					StaticConfigItems.READ_TIMEOUT);
 
 			/*
-			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
-			 * be developed
+			 * TODO: Verify if this setting works and is correctly applied. A verification
+			 * for inconsistent or incorrect BPF filter strings must be developed
 			 */
 			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
 				try {
-					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
+					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(),
+							BpfCompileMode.OPTIMIZE);
 				} catch (Exception e) {
-					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
+					log.error("Couldn't apply filter {} for reason {}",
+							ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
 				}
 			}
 			processingQueue = new ProcessingQueue<PacketContainer>();
@@ -130,27 +134,15 @@ public class NetworkMonitor {
 			new Thread(receiver).start();
 
 		} catch (Exception e) {
-			if (receiver != null) {
-				receiver.stop();
-			}
 			if (packetProcessor != null) {
 				packetProcessor.stop();
+			}
+			if (receiver != null) {
+				receiver.stop();
 			}
 			throw new NetworkException(LocaleHolder.getMessage("pcap_interface_open_error"));
 		}
 
-	}
-
-	public void stop() {
-		if (receiver != null) {
-			receiver.stop();
-		}
-		if (packetProcessor != null) {
-			packetProcessor.stop();
-		}
-		if (instance != null) {
-			instance = null;
-		}
 	}
 
 	public PacketReceiver getReceiver() {

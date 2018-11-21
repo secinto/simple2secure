@@ -46,7 +46,6 @@ public class DBUtil {
 	}
 
 	public DBUtil() {
-
 		if (configDao == null) {
 			configDao = new ConfigDaoImpl();
 		}
