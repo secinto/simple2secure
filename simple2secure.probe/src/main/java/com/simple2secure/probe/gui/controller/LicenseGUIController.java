@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.license.LicenseController;
@@ -49,7 +49,7 @@ public class LicenseGUIController {
 		fileChooser.getExtensionFilters().add(extFilter);
 		File licenseZip = fileChooser.showOpenDialog(ProbeGUI.primaryStage);
 		License downloadedLicense = null;
-		CompanyLicenseObj licenseForAuth;
+		CompanyLicensePublic licenseForAuth;
 		String authToken;
 		
 		List<File> filesFromDir = null;

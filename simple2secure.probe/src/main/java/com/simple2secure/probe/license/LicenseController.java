@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -40,9 +40,9 @@ public class LicenseController {
 	 * @throws LicenseNotFoundException
 	 * @throws InterruptedException
 	 */
-	public CompanyLicenseObj loadLicenseFromPath(String importFilePath)
+	public CompanyLicensePublic loadLicenseFromPath(String importFilePath)
 			throws IOException, LicenseNotFoundException, LicenseException {
-		CompanyLicenseObj license = null;
+		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
 		if (inputFile != null) {
@@ -71,7 +71,7 @@ public class LicenseController {
 	 * isLicenseValid-flag in ProbeConfiguration to true
 	 */
 	public boolean checkProbeStartConditions() {
-		CompanyLicenseObj license = loadLicenseFromDB();
+		CompanyLicensePublic license = loadLicenseFromDB();
 		boolean isProbeStartConditionsValid = false;
 		if (license != null) {
 			if (!isLicenseExpired(license)) {
@@ -159,7 +159,7 @@ public class LicenseController {
 	 *
 	 * @param ...License object
 	 */
-	public void updateLicenseInDB(CompanyLicenseObj license) {
+	public void updateLicenseInDB(CompanyLicensePublic license) {
 		DBUtil.getInstance().merge(license);
 	}
 
@@ -169,8 +169,8 @@ public class LicenseController {
 	 * 
 	 * @return ...a CompanyLicenseObject
 	 */
-	public CompanyLicenseObj loadLicenseFromDB() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
+	public CompanyLicensePublic loadLicenseFromDB() {
+		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(new CompanyLicensePublic());
 
 		if (licenses.size() != 1) {
 			return null;
@@ -187,8 +187,8 @@ public class LicenseController {
 	 *                  succeeded.
 	 *
 	 */
-	public void activateLicenseInDB(String authToken, CompanyLicenseObj license) {
-		license.setAuthToken(authToken);
+	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
+		license.setAccessToken(authToken);
 		license.setActivated(true);
 		updateLicenseInDB(license);
 	}
@@ -204,10 +204,10 @@ public class LicenseController {
 	 * @return ...CompanyLicenseObj for authentication.
 	 *
 	 */
-	public CompanyLicenseObj createLicenseForAuth(License license) {
+	public CompanyLicensePublic createLicenseForAuth(License license) {
 		String probeId = "";
 		String groupId, licenseId, expirationDate;
-		CompanyLicenseObj result;
+		CompanyLicensePublic result;
 
 		groupId = license.getFeature("groupId");
 		licenseId = license.getFeature("licenseId");
@@ -225,7 +225,7 @@ public class LicenseController {
 			result.setExpirationDate(expirationDate);
 		} else {
 			probeId = UUID.randomUUID().toString();
-			result = new CompanyLicenseObj(groupId, probeId, licenseId, expirationDate);
+			result = new CompanyLicensePublic(groupId, probeId, licenseId, expirationDate);
 		}
 
 		updateLicenseInDB(result);
@@ -238,17 +238,17 @@ public class LicenseController {
 	 * @return ...true if the license is expired, false if the license is not
 	 *         expired
 	 */
-	public boolean isLicenseExpired(CompanyLicenseObj license) {
+	public boolean isLicenseExpired(CompanyLicensePublic license) {
 		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
 	}
 
-	public CompanyLicenseObj checkTokenValidity() {
-		CompanyLicenseObj license = loadLicenseFromDB();
+	public CompanyLicensePublic checkTokenValidity() {
+		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
 			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token",
 					license);
 			if (!Strings.isNullOrEmpty(response)) {
-				return JSONUtils.fromString(response, CompanyLicenseObj.class);
+				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			} else {
 				return null;
 			}

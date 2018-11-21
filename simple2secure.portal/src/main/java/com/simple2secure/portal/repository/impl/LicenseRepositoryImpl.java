@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.repository.LicenseRepository;
 
 @Repository
@@ -18,25 +18,25 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	@PostConstruct
 	public void init() {
 		super.collectionName = "license";
-		super.className = CompanyLicense.class;
+		super.className = CompanyLicensePrivate.class;
 	}
 
 	@Override
-	public List<CompanyLicense> findByGroupId(String groupId) {
+	public List<CompanyLicensePrivate> findByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
-		return this.mongoTemplate.find(query, CompanyLicense.class, this.collectionName);
+		return this.mongoTemplate.find(query, CompanyLicensePrivate.class, this.collectionName);
 	}
 
 	@Override
-	public List<CompanyLicense> findByUserId(String userId) {
+	public List<CompanyLicensePrivate> findByUserId(String userId) {
 		Query query = new Query(Criteria.where("userId").is(userId));
-		return this.mongoTemplate.find(query, CompanyLicense.class, this.collectionName);
+		return this.mongoTemplate.find(query, CompanyLicensePrivate.class, this.collectionName);
 	}
 
 	@Override
-	public CompanyLicense findByGroupAndUserId(String groupId, String userId) {
+	public CompanyLicensePrivate findByGroupAndUserId(String groupId, String userId) {
 		Query query = new Query(Criteria.where("userId").is(userId).and("groupId").is(groupId));
-		List<CompanyLicense> license = this.mongoTemplate.find(query, CompanyLicense.class, this.collectionName);
+		List<CompanyLicensePrivate> license = this.mongoTemplate.find(query, CompanyLicensePrivate.class, this.collectionName);
 		
 		if(license != null && license.size() == 1) {
 			return license.get(0);
@@ -47,17 +47,17 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicense findByProbeId(String probeId) {
+	public CompanyLicensePrivate findByProbeId(String probeId) {
 		Query query = new Query(Criteria.where("probeId").is(probeId));
-		return this.mongoTemplate.findOne(query, CompanyLicense.class, this.collectionName);
+		return this.mongoTemplate.findOne(query, CompanyLicensePrivate.class, this.collectionName);
 	}
 	
 	@Override
 	public void deleteByGroupId(String groupId) {
-		List<CompanyLicense> licenses = findByGroupId(groupId);
+		List<CompanyLicensePrivate> licenses = findByGroupId(groupId);
 		
 		if(licenses != null) {
-			for(CompanyLicense license : licenses) {
+			for(CompanyLicensePrivate license : licenses) {
 				this.delete(license);
 			}
 		}
@@ -65,8 +65,8 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicense findByAccessToken(String accessToken) {
+	public CompanyLicensePrivate findByAccessToken(String accessToken) {
 		Query query = new Query(Criteria.where("accessToken").is(accessToken));
-		return this.mongoTemplate.findOne(query, CompanyLicense.class, this.collectionName);
+		return this.mongoTemplate.findOne(query, CompanyLicensePrivate.class, this.collectionName);
 	}	
 }

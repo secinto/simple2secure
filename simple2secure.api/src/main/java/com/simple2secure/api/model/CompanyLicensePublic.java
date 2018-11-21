@@ -8,30 +8,30 @@ import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
 @Table(name = "CompanyLicenseObj")
-public class CompanyLicenseObj extends GenericDBObject {
+public class CompanyLicensePublic extends GenericDBObject {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7011645066859754490L;
 
-	private String groupId;
+	protected String groupId;
 
-	private String probeId;
+	protected String probeId;
 
-	private String licenseId;
+	protected String licenseId;
 
 	@Lob
-	private String authToken;
+	protected String accessToken;
 
-	private String expirationDate;
+	protected String expirationDate;
 
-	private boolean activated;
+	protected boolean activated;
 
-	public CompanyLicenseObj() {
+	public CompanyLicensePublic() {
 	}
 
-	public CompanyLicenseObj(String groupId, String probeId, String licenseId, String expirationDate) {
+	public CompanyLicensePublic(String groupId, String probeId, String licenseId, String expirationDate) {
 		this.groupId = groupId;
 		this.probeId = probeId;
 		this.licenseId = licenseId;
@@ -62,12 +62,12 @@ public class CompanyLicenseObj extends GenericDBObject {
 		this.licenseId = licenseId;
 	}
 
-	public String getAuthToken() {
-		return authToken;
+	public String getAccessToken() {
+		return accessToken;
 	}
 
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
 	}
 
 	public boolean isActivated() {

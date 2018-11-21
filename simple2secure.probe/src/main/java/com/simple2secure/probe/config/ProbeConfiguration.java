@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
@@ -62,7 +62,7 @@ public class ProbeConfiguration {
 
 	private LoadedConfigItems loadedConfigItems;
 
-	private LicenseController licenseCon = new LicenseController();
+	private LicenseController licenseController = new LicenseController();
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -216,16 +216,16 @@ public class ProbeConfiguration {
 		 * Check if the API is available and if a newer version is available update it.
 		 */
 		if (isAPIAvailable()) {
-			CompanyLicenseObj licenseObj = licenseCon.checkTokenValidity();
+			CompanyLicensePublic license = licenseController.checkTokenValidity();
 
-			if (licenseObj != null) {
-				DBUtil.getInstance().merge(licenseObj);
-				authKey = licenseObj.getAuthToken();
+			if (license != null) {
+				DBUtil.getInstance().merge(license);
+				authKey = license.getAccessToken();
 				isLicenseValid = true;
 				isCheckingLicense = false;
 			} else {
 				/// Delete license object from the db and change to the license import view!
-				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
+				license = licenseController.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
 				isLicenseValid = false;
 			}

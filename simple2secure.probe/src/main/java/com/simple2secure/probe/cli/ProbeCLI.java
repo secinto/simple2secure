@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
@@ -37,7 +37,7 @@ public class ProbeCLI {
 
 		case 2:
 			importFilePath = args[1].toString();
-			CompanyLicenseObj licenseFile = null;
+			CompanyLicensePublic licenseFile = null;
 			try {
 				licenseFile = licenseCon.loadLicenseFromPath(importFilePath);
 				if (licenseFile != null) {

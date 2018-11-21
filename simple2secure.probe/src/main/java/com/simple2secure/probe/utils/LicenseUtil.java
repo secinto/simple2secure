@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -21,13 +21,13 @@ public class LicenseUtil {
 		 * Checking if license exists should have already been performed by
 		 * configuration loading.
 		 */
-		CompanyLicenseObj license = checkIfLicenseExists();
+		CompanyLicensePublic license = checkIfLicenseExists();
 
 		if (license != null) {
 
 			Date expirationDate = ProbeUtils.convertStringtoDate(license.getExpirationDate());
 			if (!isLicenseExpired(expirationDate)) {
-				ProbeConfiguration.authKey = license.getAuthToken();
+				ProbeConfiguration.authKey = license.getAccessToken();
 				ProbeConfiguration.probeId = license.getProbeId();
 				ProbeConfiguration.licenseId = license.getLicenseId();
 
@@ -43,15 +43,15 @@ public class LicenseUtil {
 
 	}
 
-	public static CompanyLicenseObj checkIfLicenseExists() {
+	public static CompanyLicensePublic checkIfLicenseExists() {
 		// LicenseDaoImpl licenseDao = new LicenseDaoImpl();
-		CompanyLicenseObj license = getLicenseFromDb();
+		CompanyLicensePublic license = getLicenseFromDb();
 
-		CompanyLicenseObj licenseObj = checkTokenValidity();
+		CompanyLicensePublic licenseObj = checkTokenValidity();
 
 		if (licenseObj != null) {
 			DBUtil.getInstance().merge(licenseObj);
-			ProbeConfiguration.authKey = licenseObj.getAuthToken();
+			ProbeConfiguration.authKey = licenseObj.getAccessToken();
 			ProbeConfiguration.isLicenseValid = true;
 			ProbeConfiguration.isCheckingLicense = false;
 		} else {
@@ -75,8 +75,8 @@ public class LicenseUtil {
 		}
 	}
 
-	public static CompanyLicenseObj getLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
+	public static CompanyLicensePublic getLicenseFromDb() {
+		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(new CompanyLicensePublic());
 
 		if (licenses.size() != 1) {
 			return null;
@@ -86,14 +86,14 @@ public class LicenseUtil {
 
 	}
 
-	public static CompanyLicenseObj checkTokenValidity() {
+	public static CompanyLicensePublic checkTokenValidity() {
 		ProbeConfiguration.isCheckingLicense = true;
-		CompanyLicenseObj license = LicenseUtil.getLicenseFromDb();
+		CompanyLicensePublic license = LicenseUtil.getLicenseFromDb();
 		if (license != null) {
 			String response = RESTUtils.sendPost(
 					ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/token", license);
 			if (!Strings.isNullOrEmpty(response)) {
-				return JSONUtils.fromString(response, CompanyLicenseObj.class);
+				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			} else {
 				return null;
 			}

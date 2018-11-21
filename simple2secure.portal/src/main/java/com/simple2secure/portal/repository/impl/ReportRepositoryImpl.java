@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ReportRepository;
@@ -32,14 +32,14 @@ public class ReportRepositoryImpl extends ReportRepository {
 	@Override
 	public List<Report> getAllReportsByUserID(String userId) {
 		List<Report> reports = new ArrayList<>();
-		List<CompanyLicense> licenses = this.licenseRepository.findByUserId(userId);
+		List<CompanyLicensePrivate> licenses = this.licenseRepository.findByUserId(userId);
 		
 		if(licenses == null) {
 			return null;
 		}
 		else {
 			
-			for(CompanyLicense license : licenses) {
+			for(CompanyLicensePrivate license : licenses) {
 				reports.addAll(getReportsByProbeId(license.getProbeId()));
 			}
 		}

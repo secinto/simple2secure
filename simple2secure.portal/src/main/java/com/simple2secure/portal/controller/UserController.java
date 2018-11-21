@@ -32,7 +32,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.UserDTO;
 import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
@@ -861,10 +861,10 @@ public class UserController {
 			}
 
 			/* Set user probes from the licenses */
-			List<CompanyLicense> licenses = licenseRepository.findByUserId(id);
+			List<CompanyLicensePrivate> licenses = licenseRepository.findByUserId(id);
 			List<Probe> myProbes = new ArrayList<Probe>();
 			if (licenses != null) {
-				for (CompanyLicense license : licenses) {
+				for (CompanyLicensePrivate license : licenses) {
 					// Retrieve only activated probes
 					if (license.isActivated()) {
 						CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -1117,10 +1117,10 @@ public class UserController {
 
 		List<Probe> probes = new ArrayList<Probe>();
 
-		List<CompanyLicense> licenses = licenseRepository.findByUserId(userId);
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByUserId(userId);
 
 		if (licenses != null) {
-			for (CompanyLicense license : licenses) {
+			for (CompanyLicensePrivate license : licenses) {
 				//Retrieve only activated probes
 				if(license.isActivated()) {
 					CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -1397,10 +1397,10 @@ public class UserController {
 		processorRepository.deleteByGroupId(groupId);
 		
 		//Delete all licenses and all probe reports which were created
-		List<CompanyLicense> licenses = licenseRepository.findByGroupId(groupId);
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(groupId);
 		
 		if(licenses != null) {
-			for(CompanyLicense license : licenses) {
+			for(CompanyLicensePrivate license : licenses) {
 				if(!Strings.isNullOrEmpty(license.getProbeId())) {
 					reportRepository.deleteByProbeId(license.getProbeId());
 					networkReportRepository.deleteByProbeId(license.getProbeId());						
