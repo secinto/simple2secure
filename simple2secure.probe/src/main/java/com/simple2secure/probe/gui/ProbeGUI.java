@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
@@ -91,19 +90,34 @@ public class ProbeGUI extends Application {
 		 * license is not loaded. Thus we should provide it here immediately. The only thing is that it also would verify if the API is
 		 * available.
 		 */
-		ProbeConfiguration.getInstance();
+		//ProbeConfiguration.getInstance();
 
 		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
 		// ProbeConfiguration.setAPIAvailablitity(true);
 		// log.info("SERVER REACHABLE!");
 		// }
 		
-
-		if(licenseCon.checkProbeStartConditions()) {
-			initRootPane();
-		}else {
-			initLicenseImportPane("There is no license stored, please import a license.");
+		ProbeConfiguration.isGuiRunning = true;
+		
+		String startConditions = licenseCon.checkProbeStartConditions();
+		
+		switch(startConditions) {
+			case ("FIRST_TIME"): initLicenseImportPane("There is no license stored, please import a license.");
+				
+			case ("LICENSE_EXPIRED"): initRootPane();
+				
+			case ("NOT_ACTIVATED"): initRootPane();
+			
+			case ("VALID_CONDITIONS"): initRootPane();
 		}
+
+//		if(licenseCon.checkProbeStartConditions()) {
+//			ProbeConfiguration.getInstance();
+//			initRootPane();
+//		}else {
+//			initLicenseImportPane("There is no license stored, please import a license.");
+//		}
+		
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {

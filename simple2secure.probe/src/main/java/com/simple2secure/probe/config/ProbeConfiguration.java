@@ -1,5 +1,7 @@
 package com.simple2secure.probe.config;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,14 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicensePublic;
+import com.google.gson.Gson;
+import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.DBUtil;
@@ -38,6 +40,8 @@ public class ProbeConfiguration {
 
 	private static ProbeConfiguration instance;
 
+	private static Gson gson = new Gson();
+
 	private static boolean apiAvailable = false;
 
 	public static String authKey = "";
@@ -49,6 +53,8 @@ public class ProbeConfiguration {
 	public static boolean isCheckingLicense = false;
 
 	public static boolean isLicenseValid = false;
+	
+	public static boolean isGuiRunning = false;
 
 	private Config currentConfig;
 
@@ -62,7 +68,9 @@ public class ProbeConfiguration {
 
 	private LoadedConfigItems loadedConfigItems;
 
-	private LicenseController licenseController = new LicenseController();
+	private LicenseController licenseCon = new LicenseController();
+		
+    private static PropertyChangeSupport support;
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -89,6 +97,15 @@ public class ProbeConfiguration {
 		this.currentQueries = new HashMap<String, QueryRun>();
 		loadConfig();
 		loadedConfigItems = new LoadedConfigItems();
+		support = new PropertyChangeSupport(this);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+		support.addPropertyChangeListener(pcl);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+		support.removePropertyChangeListener(pcl);
 	}
 
 	public Config getConfig() {
@@ -216,18 +233,22 @@ public class ProbeConfiguration {
 		 * Check if the API is available and if a newer version is available update it.
 		 */
 		if (isAPIAvailable()) {
-			CompanyLicensePublic license = licenseController.checkTokenValidity();
+			CompanyLicenseObj licenseObj = licenseCon.checkTokenValidity();
 
-			if (license != null) {
-				DBUtil.getInstance().merge(license);
-				authKey = license.getAccessToken();
+			if (licenseObj != null) {
+				DBUtil.getInstance().merge(licenseObj);
+				authKey = licenseObj.getAuthToken();
 				isLicenseValid = true;
 				isCheckingLicense = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			} else {
 				/// Delete license object from the db and change to the license import view!
-				license = licenseController.loadLicenseFromDB();
+				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
 				isLicenseValid = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			}
 
 			if (isLicenseValid) {
@@ -349,7 +370,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return JSONUtils.fromString(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
+		return gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
 	}
 
 	/**
@@ -405,7 +426,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
+		return Arrays.asList(gson.fromJson(
 				RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
 				Processor[].class));
 	}
@@ -453,7 +474,7 @@ public class ProbeConfiguration {
 	 * This function returns steps from the API for the logged in user
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
+		return Arrays.asList(gson.fromJson(
 				RequestHandler.sendGet(loadedConfigItems.getStepAPI() + "/" + ProbeConfiguration.probeId + "/false"),
 				Step[].class));
 	}
@@ -463,7 +484,6 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-
 	private List<Step> getStepsFromDatabase() {
 		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, new Step());
 		return dbSteps;
@@ -506,7 +526,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
+		return Arrays.asList(gson.fromJson(
 				RequestHandler
 						.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
 				QueryRun[].class));
@@ -560,6 +580,7 @@ public class ProbeConfiguration {
 
 	public static void setAPIAvailablitity(boolean apiAvailability) {
 		apiAvailable = apiAvailability;
+		support.firePropertyChange("isApiAvailable", apiAvailable, apiAvailability);
 	}
 
 	public Map<String, Step> getCurrentSteps() {

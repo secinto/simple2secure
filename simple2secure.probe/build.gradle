@@ -18,3 +18,18 @@ jar {
 	}
 }
 
+task probeCli(type: Jar){
+	baseName = 'simple2secure-probeCLI'
+	version =  '0.1.0-SNAPSHOT'
+
+	manifest {
+		attributes 'Main-Class': 'com.simple2secure.probe.utilities.ProbeCLI',
+		'Implementation-Title': 'ProbeCLI',
+		'Implementation-Version': version,
+		'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')
+	}
+
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}

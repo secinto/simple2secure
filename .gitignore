@@ -32,10 +32,11 @@ simple2secure.web/.idea/inspectionProfiles/profiles_settings.xml
 simple2secure.web/.idea/dictionaries/emirs.xml
 simple2secure.portal/logfile-test.2018-10-31.log
 *.log
+simple2secure.service/bin/
 *.classpath
 *.project
-simple2secure.service/bin/
 simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.2.jar
-simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.1.jar
 simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.0.jar
+simple2secure.portal/src/main/resources/probe/simple2secure.probe-0.1.1.jar
+license-5bed73521dbe9535e0caf2b3.zip
 simple2secure.probe/src/main/resources/license-5bf45bb78b3ecc3aa4bb4a69.zip
