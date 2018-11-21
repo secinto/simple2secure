@@ -91,7 +91,7 @@ public class ProbeGUI extends Application {
 		 * license is not loaded. Thus we should provide it here immediately. The only thing is that it also would verify if the API is
 		 * available.
 		 */
-		ProbeConfiguration.getInstance();
+		//ProbeConfiguration.getInstance();
 
 		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
 		// ProbeConfiguration.setAPIAvailablitity(true);
@@ -100,6 +100,7 @@ public class ProbeGUI extends Application {
 		
 
 		if(licenseCon.checkProbeStartConditions()) {
+			ProbeConfiguration.getInstance();
 			initRootPane();
 		}else {
 			initLicenseImportPane("There is no license stored, please import a license.");
