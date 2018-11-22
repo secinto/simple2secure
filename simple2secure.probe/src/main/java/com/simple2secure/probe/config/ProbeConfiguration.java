@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.experimental.theories.Theories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +51,15 @@ public class ProbeConfiguration {
 
 	public static String licenseId = "";
 
-	public static boolean isCheckingLicense = false;
+	private static boolean isCheckingLicense = false;
 
-	public static boolean isLicenseValid = false;
-	
-	public static boolean isGuiRunning = false;
+	private static boolean isLicenseValid = false;
+
+	private static boolean isGuiRunning = false;
+
+	public static String LICENSE_VALID_EVENT = "isLicenseValid";
+	public static String CHECKING_LICENSE_EVENT = "isCheckingLicense";
+	public static String GUI_RUNNING = "isGuiRunning";
 
 	private Config currentConfig;
 
@@ -69,8 +74,8 @@ public class ProbeConfiguration {
 	private LoadedConfigItems loadedConfigItems;
 
 	private LicenseController licenseCon = new LicenseController();
-		
-    private static PropertyChangeSupport support;
+
+	private static PropertyChangeSupport support;
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving
@@ -99,11 +104,11 @@ public class ProbeConfiguration {
 		loadedConfigItems = new LoadedConfigItems();
 		support = new PropertyChangeSupport(this);
 	}
-	
+
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
 		support.addPropertyChangeListener(pcl);
 	}
-	
+
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
 		support.removePropertyChangeListener(pcl);
 	}
@@ -238,17 +243,13 @@ public class ProbeConfiguration {
 			if (licenseObj != null) {
 				DBUtil.getInstance().merge(licenseObj);
 				authKey = licenseObj.getAuthToken();
-				isLicenseValid = true;
-				isCheckingLicense = false;
-				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
-				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
+				setLicenseValid(true);
+				setCheckingLicense(false);
 			} else {
 				/// Delete license object from the db and change to the license import view!
 				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
-				isLicenseValid = false;
-				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
-				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
+				setLicenseValid(false);
 			}
 
 			if (isLicenseValid) {
@@ -331,6 +332,33 @@ public class ProbeConfiguration {
 			}
 
 		}
+	}
+
+	public static boolean isCheckingLicense() {
+		return isCheckingLicense;
+	}
+
+	public static void setCheckingLicense(boolean isCheckingLicense) {
+		support.firePropertyChange(CHECKING_LICENSE_EVENT, ProbeConfiguration.isCheckingLicense, isCheckingLicense);
+		ProbeConfiguration.isCheckingLicense = isCheckingLicense;
+	}
+
+	public static boolean isLicenseValid() {
+		return isLicenseValid;
+	}
+
+	public static void setLicenseValid(boolean isLicenseValid) {
+		support.firePropertyChange(LICENSE_VALID_EVENT, ProbeConfiguration.isLicenseValid, isLicenseValid);
+		ProbeConfiguration.isLicenseValid = isLicenseValid;
+	}
+
+	public static boolean isGuiRunning() {
+		return isGuiRunning;
+	}
+
+	public static void setGuiRunning(boolean isGuiRunning) {
+		support.firePropertyChange(GUI_RUNNING, ProbeConfiguration.isGuiRunning, isGuiRunning);
+		ProbeConfiguration.isGuiRunning = isGuiRunning;
 	}
 
 	/**
