@@ -29,10 +29,11 @@ public class ProbeCLI {
 	private static String OPTION_FILEPATH = "licensePath";
 
 	/**
-	 * Initializes the ProbeCLI with importFilePath which specifies the location of
-	 * the license which should be used to activate this Probe instance.
-	 * 
-	 * @param importFilePath The absolute file path to the License ZIP File.
+	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
+	 * instance.
+	 *
+	 * @param importFilePath
+	 *          The absolute file path to the License ZIP File.
 	 */
 	public void init(String importFilePath) {
 		LicenseController licenseController = new LicenseController();
@@ -47,8 +48,7 @@ public class ProbeCLI {
 				licenseFile = licenseController.loadLicenseFromPath(importFilePath);
 				if (licenseFile != null) {
 					authToken = RequestHandler.sendPostReceiveResponse(
-							ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe",
-							licenseFile);
+							ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", licenseFile);
 					if (authToken != null) {
 						licenseController.activateLicenseInDB(authToken, licenseFile);
 
@@ -62,8 +62,6 @@ public class ProbeCLI {
 			} catch (IOException | LicenseNotFoundException | LicenseException e) {
 				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
 			}
-
-			log.error("You have to enter the \"filepath\" in the filepath option.");
 			break;
 		case LICENSE_NOT_ACTIVATED:
 		case LICENSE_VALID:
@@ -83,8 +81,8 @@ public class ProbeCLI {
 	public static void main(String[] args) {
 		Options options = new Options();
 
-		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).argName("ZIP-FILE")
-				.longOpt(OPTION_FILEPATH).desc("The path to the license ZIP file which should be used.").build();
+		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).argName("ZIP-FILE").longOpt(OPTION_FILEPATH)
+				.desc("The path to the license ZIP file which should be used.").build();
 
 		options.addOption(filePath);
 		try {
@@ -92,8 +90,8 @@ public class ProbeCLI {
 			CommandLine line = parser.parse(options, args);
 			ProbeCLI client = new ProbeCLI();
 
-			if (line.hasOption(filePath.getArgName())) {
-				client.init(line.getOptionValue(OPTION_FILEPATH));
+			if (line.hasOption(filePath.getOpt())) {
+				client.init(line.getOptionValue(filePath.getOpt()));
 			}
 
 			client.start();

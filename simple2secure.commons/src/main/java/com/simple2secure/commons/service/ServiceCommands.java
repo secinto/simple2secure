@@ -1,5 +1,5 @@
 package com.simple2secure.commons.service;
 
-public enum Commands {
+public enum ServiceCommands {
 	START, STOP, RESET, GET_VERSION, TERMINATE, OTHER;
 }
