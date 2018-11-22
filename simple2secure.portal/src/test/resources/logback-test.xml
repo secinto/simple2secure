@@ -1,6 +1,9 @@
 <configuration>
 
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	<property name="LOG_HOME" value="./logs" />
+
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
 			by default -->
 		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>INFO</level> 
@@ -12,24 +15,25 @@
 
 	<appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>./logs/logfile-test.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>logfile-test.%d{yyyy-MM-dd}.log</fileNamePattern>
+		<file>${LOG_HOME}/logfile.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/archived/logfile.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
 			<maxHistory>30</maxHistory>
+			<maxFileSize>30MB</maxFileSize>
+			<totalSizeCap>3GB</totalSizeCap>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
-	<logger name="com.simple2secure" level="debug" />
+	<logger name="com.simple2secure.portal" level="debug" />
 	<logger name="org.mongodb.driver" level="debug" />
 
-	<root level="debug">
+	<root level="error">
 		<appender-ref ref="STDOUT" />
-	</root>
-
-	<root level="debug">
 		<appender-ref ref="FILE" />
 	</root>
 

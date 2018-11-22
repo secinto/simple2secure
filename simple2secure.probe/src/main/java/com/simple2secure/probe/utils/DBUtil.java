@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Processor;
@@ -46,7 +46,6 @@ public class DBUtil {
 	}
 
 	public DBUtil() {
-
 		if (configDao == null) {
 			configDao = new ConfigDaoImpl();
 		}
@@ -156,7 +155,7 @@ public class DBUtil {
 			return configDao;
 		}
 
-		else if (t instanceof CompanyLicenseObj || t == CompanyLicenseObj.class) {
+		else if (t instanceof CompanyLicensePublic || t == CompanyLicensePublic.class) {
 			return licenseDao;
 		}
 

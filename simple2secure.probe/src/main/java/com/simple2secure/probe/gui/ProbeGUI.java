@@ -92,37 +92,23 @@ public class ProbeGUI extends Application {
 		 * Thus we should provide it here immediately. The only thing is that it also
 		 * would verify if the API is available.
 		 */
-		// ProbeConfiguration.getInstance();
-
-		// if
-		// (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL()))
-		// {
-		// ProbeConfiguration.setAPIAvailablitity(true);
-		// log.info("SERVER REACHABLE!");
-		// }
 
 		ProbeConfiguration.isGuiRunning = true;
 
 		StartConditions startConditions = licenseCon.checkProbeStartConditions();
 
 		switch (startConditions) {
-		case FIRST_TIME:
+		case LICENSE_NOT_AVAILABLE:
 			initLicenseImportPane("There is no license stored, please import a license.");
 			break;
 		case LICENSE_EXPIRED:
-		case NOT_ACTIVATED:
-		case VALID_CONDITIONS:
+		case LICENSE_NOT_ACTIVATED:
+		case LICENSE_VALID:
 			initRootPane();
 			break;
+		default:
+			initRootPane();
 		}
-
-//		if(licenseCon.checkProbeStartConditions()) {
-//			ProbeConfiguration.getInstance();
-//			initRootPane();
-//		}else {
-//			initLicenseImportPane("There is no license stored, please import a license.");
-//		}
-
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {
@@ -140,6 +126,7 @@ public class ProbeGUI extends Application {
 	 * This function initializes the Root Pane, it is called after the user is
 	 * successfully logged in
 	 */
+
 	public static void initRootPane() {
 		try {
 			primaryStage.close();
@@ -179,7 +166,7 @@ public class ProbeGUI extends Application {
 		return primaryStage;
 	}
 
-	private void createTrayIcon(final Stage stage) {
+	public void createTrayIcon(final Stage stage) {
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
 			SystemTray tray = SystemTray.getSystemTray();
@@ -253,7 +240,7 @@ public class ProbeGUI extends Application {
 		}
 	}
 
-	private void showProgramIsMinimizedMsg() {
+	public void showProgramIsMinimizedMsg() {
 		if (firstTime) {
 			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize",
 					TrayIcon.MessageType.INFO);

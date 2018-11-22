@@ -8,7 +8,6 @@
 
 package com.simple2secure.portal.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,11 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.ReportDTO;
-import com.simple2secure.api.model.CompanyLicense;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
-import com.simple2secure.api.model.User;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
@@ -68,49 +64,47 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/reports", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<ReportDTO>> getAvailableReports(@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<Report>> getAvailableReports(@RequestHeader("Accept-Language") String locale) {
 
 		List<Report> reportList = reportsRepository.findAll();
-		List<ReportDTO> reportListDTO = new ArrayList<>();
+//		List<ReportDTO>  = new ArrayList<>();
 
 		if (reportList == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
 					HttpStatus.NOT_FOUND);
 		} else {
-			for (Report report : reportList) {
-
-				if (!Strings.isNullOrEmpty(report.getProbeId())) {
-					CompanyLicense license = licenseRepository.findByProbeId(report.getProbeId());
-					if (license != null) {
-						User user = userRepository.findByUserID(license.getUserId());
-						if (user != null) {
-							ReportDTO reportDTO = new ReportDTO(user.getUsername(), report);
-							reportListDTO.add(reportDTO);
-						} else {
-							log.error("There is no license with the provided userId");
-						}
-
-					} else {
-						log.error("There is no license with the provided probeId");
-					}
-				} else {
-					log.error("Report does not contain probe ID");
-				}
-
-			}
-
-			if (reportListDTO == null || reportListDTO.isEmpty()) {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-						HttpStatus.NOT_FOUND);
-			} else {
-				return new ResponseEntity<List<ReportDTO>>(reportListDTO, HttpStatus.OK);
-			}
+//			for (Report report : reportList) {
+//
+//				if (!Strings.isNullOrEmpty(report.getProbeId())) {
+//					CompanyLicensePrivate license = licenseRepository.findByProbeId(report.getProbeId());
+//					if (license != null) {
+//						ReportDTO reportDTO = new ReportDTO(report);
+//						reportListDTO.add(reportDTO);
+//
+//					} else {
+//						log.error("There is no license with the provided probeId");
+//					}
+//				} else {
+//					log.error("Report does not contain probe ID");
+//				}
+//
+//			}
+//
+//			if (reportListDTO == null || reportListDTO.isEmpty()) {
+//				return new ResponseEntity(
+//						new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
+//						HttpStatus.NOT_FOUND);
+//			} else {
+				return new ResponseEntity<List<Report>>(reportList, HttpStatus.OK);
+//			}
 		}
 	}
 
 	@RequestMapping(value = "/api/reports", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('PROBE')")
-	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<Report> saveReport(@RequestBody Report report,
+			@RequestHeader("Accept-Language") String locale) {
 		reportsRepository.save(report);
 		return new ResponseEntity<Report>(report, HttpStatus.OK);
 	}
@@ -123,7 +117,8 @@ public class ReportController {
 		// TODO Auto-generated method stub
 		List<Report> reportsList = reportsRepository.getAllReportsByUserID(userId);
 		if (reportsList == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<List<Report>>(reportsList, HttpStatus.OK);
@@ -132,10 +127,12 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/reports/report/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id,
+			@RequestHeader("Accept-Language") String locale) {
 		Report report = reportsRepository.find(id);
 		if (report == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)),
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<Report>(report, HttpStatus.OK);
@@ -144,10 +141,12 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/reports/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id,
+			@RequestHeader("Accept-Language") String locale) {
 
 		if (Strings.isNullOrEmpty(id)) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
 					HttpStatus.NOT_FOUND);
 		} else {
 			Report report = reportsRepository.find(id);
@@ -155,7 +154,8 @@ public class ReportController {
 				reportsRepository.delete(report);
 				return new ResponseEntity<Report>(report, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
+				return new ResponseEntity(
+						new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 		}
@@ -177,7 +177,8 @@ public class ReportController {
 		// TODO Auto-generated method stub
 		List<NetworkReport> reportsList = networkReportRepository.getReportsByUserID(userId);
 		if (reportsList == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
+			return new ResponseEntity(
+					new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
 					HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<List<NetworkReport>>(reportsList, HttpStatus.OK);

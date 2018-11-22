@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.DeviceRepository;
@@ -23,22 +24,22 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
 public class DeviceController {
-	
+
 	@Autowired
 	DeviceRepository deviceRepository;
-	
-    @Autowired
-    MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/api/device/{deviceId}/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<Probe> getDevice(@PathVariable("deviceId") String deviceId, @PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
-		Probe device = this.deviceRepository.findByProbeAndUserId(deviceId, userId);
-		
-		if(device != null) {
+	public ResponseEntity<Probe> getDevice(@PathVariable("deviceId") String deviceId, @PathVariable("userId") String userId,
+			@RequestHeader("Accept-Language") String locale) {
+		Probe device = deviceRepository.findByProbeAndUserId(deviceId, userId);
+
+		if (device != null) {
 			return new ResponseEntity<Probe>(device, HttpStatus.OK);
-		}
-		else {
+		} else {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("device_not_found", locale)), HttpStatus.NOT_FOUND);
 		}
 	}

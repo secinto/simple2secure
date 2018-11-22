@@ -7,6 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
@@ -40,8 +41,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	@Override
 	@Bean
 	public MongoDbFactory mongoDbFactory() {
-		MongoClient mongoClient = new MongoClient(host, port);
-		return new SimpleMongoDbFactory(mongoClient, database);
+		return new SimpleMongoDbFactory(mongoClient(), database);
 	}
 
 	@Override
@@ -50,4 +50,10 @@ public class MongoConfig extends AbstractMongoConfiguration {
 		ExtendedMongoTemplate mongoTemplate = new ExtendedMongoTemplate(mongoDbFactory());
 		return mongoTemplate;
 	}
+
+	@Bean
+	public GridFsTemplate gridFsTemplate() throws Exception {
+		return new GridFsTemplate(mongoDbFactory(), mongoTemplate().getConverter());
+	}
+
 }

@@ -15,19 +15,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.experimental.theories.Theories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.DBUtil;
@@ -41,8 +40,6 @@ public class ProbeConfiguration {
 
 	private static ProbeConfiguration instance;
 
-	private static Gson gson = new Gson();
-
 	private static boolean apiAvailable = false;
 
 	public static String authKey = "";
@@ -51,15 +48,11 @@ public class ProbeConfiguration {
 
 	public static String licenseId = "";
 
-	private static boolean isCheckingLicense = false;
+	public static boolean isCheckingLicense = false;
 
-	private static boolean isLicenseValid = false;
+	public static boolean isLicenseValid = false;
 
-	private static boolean isGuiRunning = false;
-
-	public static String LICENSE_VALID_EVENT = "isLicenseValid";
-	public static String CHECKING_LICENSE_EVENT = "isCheckingLicense";
-	public static String GUI_RUNNING = "isGuiRunning";
+	public static boolean isGuiRunning = false;
 
 	private Config currentConfig;
 
@@ -238,18 +231,22 @@ public class ProbeConfiguration {
 		 * Check if the API is available and if a newer version is available update it.
 		 */
 		if (isAPIAvailable()) {
-			CompanyLicenseObj licenseObj = licenseCon.checkTokenValidity();
+			CompanyLicensePublic licenseObj = licenseCon.checkTokenValidity();
 
 			if (licenseObj != null) {
 				DBUtil.getInstance().merge(licenseObj);
-				authKey = licenseObj.getAuthToken();
-				setLicenseValid(true);
-				setCheckingLicense(false);
+				authKey = licenseObj.getAccessToken();
+				isLicenseValid = true;
+				isCheckingLicense = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			} else {
 				/// Delete license object from the db and change to the license import view!
-				CompanyLicenseObj license = licenseCon.loadLicenseFromDB();
+				CompanyLicensePublic license = licenseCon.loadLicenseFromDB();
 				DBUtil.getInstance().delete(license);
-				setLicenseValid(false);
+				isLicenseValid = false;
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
 			}
 
 			if (isLicenseValid) {
@@ -334,33 +331,6 @@ public class ProbeConfiguration {
 		}
 	}
 
-	public static boolean isCheckingLicense() {
-		return isCheckingLicense;
-	}
-
-	public static void setCheckingLicense(boolean isCheckingLicense) {
-		support.firePropertyChange(CHECKING_LICENSE_EVENT, ProbeConfiguration.isCheckingLicense, isCheckingLicense);
-		ProbeConfiguration.isCheckingLicense = isCheckingLicense;
-	}
-
-	public static boolean isLicenseValid() {
-		return isLicenseValid;
-	}
-
-	public static void setLicenseValid(boolean isLicenseValid) {
-		support.firePropertyChange(LICENSE_VALID_EVENT, ProbeConfiguration.isLicenseValid, isLicenseValid);
-		ProbeConfiguration.isLicenseValid = isLicenseValid;
-	}
-
-	public static boolean isGuiRunning() {
-		return isGuiRunning;
-	}
-
-	public static void setGuiRunning(boolean isGuiRunning) {
-		support.firePropertyChange(GUI_RUNNING, ProbeConfiguration.isGuiRunning, isGuiRunning);
-		ProbeConfiguration.isGuiRunning = isGuiRunning;
-	}
-
 	/**
 	 *
 	 */
@@ -398,7 +368,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public Config getConfigFromAPI() {
-		return gson.fromJson(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
+		return JSONUtils.fromString(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
 	}
 
 	/**
@@ -454,7 +424,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
 				Processor[].class));
 	}
@@ -502,7 +472,7 @@ public class ProbeConfiguration {
 	 * This function returns steps from the API for the logged in user
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler.sendGet(loadedConfigItems.getStepAPI() + "/" + ProbeConfiguration.probeId + "/false"),
 				Step[].class));
 	}
@@ -554,7 +524,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(gson.fromJson(
+		return Arrays.asList(JSONUtils.fromString(
 				RequestHandler
 						.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
 				QueryRun[].class));

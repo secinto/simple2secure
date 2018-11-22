@@ -39,8 +39,8 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -98,10 +98,10 @@ public class LicenseController {
 
 	@Autowired
 	SettingsRepository settingsRepository;
-	
+
 	@Autowired
 	AdminGroupRepository adminGroupRepository;
-	
+
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
 
@@ -119,7 +119,8 @@ public class LicenseController {
 	RestTemplate restTemplate = new RestTemplate();
 
 	/**
-	 * This function is used to update the license in the mongodb and activate the probe when the license is imported for the first time
+	 * This function is used to update the license in the mongodb and activate the
+	 * probe when the license is imported for the first time
 	 *
 	 * @param groupId
 	 * @param licenseId
@@ -129,61 +130,48 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/license/activateProbe", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> activateLicense(@RequestBody CompanyLicenseObj licenseObj,
+	public ResponseEntity<String> activateLicense(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		if (licenseObj != null) {
+		if (licensePublic != null) {
 
-			String groupId = licenseObj.getGroupId();
-			String licenseId = licenseObj.getLicenseId();
-			String probeId = licenseObj.getProbeId();
+			String groupId = licensePublic.getGroupId();
+			String licenseId = licensePublic.getLicenseId();
+			String probeId = licensePublic.getProbeId();
 
-			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(probeId)) {
+			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId)
+					&& !Strings.isNullOrEmpty(probeId)) {
 				CompanyGroup group = groupRepository.find(groupId);
-				CompanyLicense license = licenseRepository.find(licenseId);
+				CompanyLicensePrivate license = licenseRepository.find(licenseId);
 
-				if (group == null || license == null) {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-							HttpStatus.NOT_FOUND);
-				} else {
-					if (!Strings.isNullOrEmpty(license.getUserId())) {
-						license.setTokenSecret(portalUtils.alphaNumericString(20));
-						String accessToken = tokenAuthenticationService.addLicenseAuthentication(probeId, group, license);
-						
-						if (!Strings.isNullOrEmpty(accessToken)) {
-														
-							license.setProbeId(probeId);
-							license.setAccessToken(accessToken);
-							license.setActivated(true);
+				if (group != null && license != null) {
+//					if (!Strings.isNullOrEmpty(license.getUserId())) {
+					license.setTokenSecret(portalUtils.alphaNumericString(20));
+					String accessToken = tokenAuthenticationService.addLicenseAuthentication(probeId, group, license);
 
-							licenseRepository.update(license);
+					if (!Strings.isNullOrEmpty(accessToken)) {
 
-							return new ResponseEntity(accessToken, HttpStatus.OK);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-									HttpStatus.NOT_FOUND);
-						}
-					} else {
-						return new ResponseEntity(
-								new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-								HttpStatus.NOT_FOUND);
+						license.setProbeId(probeId);
+						license.setAccessToken(accessToken);
+						license.setActivated(true);
+
+						licenseRepository.update(license);
+
+						return new ResponseEntity(accessToken, HttpStatus.OK);
 					}
+//					}
 				}
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-						HttpStatus.NOT_FOUND);
 			}
-
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/api/license/{groupId}/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
-			@RequestHeader("Accept-Language") String locale) throws Exception {
+	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId,
+			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -194,12 +182,12 @@ public class LicenseController {
 
 		CompanyGroup group = groupRepository.find(groupId);
 		AdminGroup adminGroup = adminGroupRepository.find(group.getAdminGroupId());
-		
-		if(adminGroup != null) {
+
+		if (adminGroup != null) {
 			LicensePlan licensePlan = licensePlanRepository.find(adminGroup.getLicensePlanId());
-			if(licensePlan != null) {
+			if (licensePlan != null) {
 				if (adminGroup.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
-					createLicense(groupId, userId, licensePlan);
+					createLicense(groupId, licensePlan);
 					ArrayList<File> files = new ArrayList<>();
 
 					File publicKey = new File(StaticConfigItems.KEYS_LOCATION + LicenseManager.PUBLIC_KEY_FILE);
@@ -231,26 +219,18 @@ public class LicenseController {
 
 					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 				}
-				else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
-							HttpStatus.NOT_FOUND);
-				}
-			}
-			else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
-						HttpStatus.NOT_FOUND);
 			}
 		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
-					HttpStatus.NOT_FOUND);
-		}
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "/api/license/{licenseId}/{groupId}/{probeId}", method = RequestMethod.GET)
-	public ResponseEntity<Boolean> checkLicense(@PathVariable("licenseId") String licenseId, @PathVariable("groupId") String groupId,
-			@PathVariable("probeId") String probeId, @RequestHeader("Accept-Language") String locale) throws Exception {
-		CompanyLicense license = licenseRepository.find(licenseId);
+	public ResponseEntity<Boolean> checkLicense(@PathVariable("licenseId") String licenseId,
+			@PathVariable("groupId") String groupId, @PathVariable("probeId") String probeId,
+			@RequestHeader("Accept-Language") String locale) throws Exception {
+		CompanyLicensePrivate license = licenseRepository.find(licenseId);
 		if (license != null && license.isActivated()) {
 			if (license.getGroupId().equalsIgnoreCase(groupId) && license.getProbeId().equalsIgnoreCase(probeId)) {
 				return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
@@ -266,17 +246,17 @@ public class LicenseController {
 	 * @param groupId
 	 * @throws Exception
 	 */
-	public void createLicense(String groupId, String userId, LicensePlan licensePlan) throws Exception {
+	public void createLicense(String groupId, LicensePlan licensePlan) throws Exception {
 		Properties properties = new OrderedProperties();
-		CompanyLicense companyLicense = new CompanyLicense(groupId, userId, false);
+		CompanyLicensePrivate companyLicense = new CompanyLicensePrivate(groupId, false);
 		long milis = portalUtils.convertTimeUnitsToMilis(licensePlan.getValidity(), licensePlan.getValidityUnit());
 		Calendar expiration = PortalUtils.milisToDate(System.currentTimeMillis() + milis);
 		int mYear = expiration.get(Calendar.YEAR);
 		int mMonth = expiration.get(Calendar.MONTH) + 1;
 		int mDay = expiration.get(Calendar.DAY_OF_MONTH);
-		
+
 		String expirationDate = mMonth + "/" + mDay + "/" + mYear;
-		
+
 		companyLicense.setExpirationDate(expirationDate);
 		ObjectId licenseId = licenseRepository.saveAndReturnId(companyLicense);
 		properties.setProperty("expirationDate", expirationDate);
@@ -284,59 +264,61 @@ public class LicenseController {
 		properties.setProperty("licenseId", licenseId.toString());
 		LicenseGenerator.generateLicense(properties, StaticConfigItems.KEYS_LOCATION + "private.key");
 	}
-	
+
 	@RequestMapping(value = "/api/license/token", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CompanyLicenseObj> checkAccessToken(@RequestBody CompanyLicenseObj licenseObj, 
+	public ResponseEntity<CompanyLicensePublic> checkAccessToken(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
-		if(!Strings.isNullOrEmpty(licenseObj.getAuthToken())) {
-			String accessToken = licenseObj.getAuthToken();
-			CompanyLicense license = licenseRepository.findByProbeId(licenseObj.getProbeId());
-			
-			if(license != null) {
+		if (!Strings.isNullOrEmpty(licensePublic.getAccessToken())) {
+			String accessToken = licensePublic.getAccessToken();
+			CompanyLicensePrivate licensePrivate = licenseRepository.findByProbeId(licensePublic.getProbeId());
+
+			if (licensePrivate != null) {
 				boolean isTokenValid = false;
-				isTokenValid = tokenAuthenticationService.validateToken(accessToken, license.getTokenSecret());
-				
-				if(isTokenValid) {
-					//Generate new access token if validity is smaller than the value defined in settings
+				isTokenValid = tokenAuthenticationService.validateToken(accessToken, licensePrivate.getTokenSecret());
+
+				if (isTokenValid) {
+					// Generate new access token if validity is smaller than the value defined in
+					// settings
 					List<Settings> settings = settingsRepository.findAll();
-					if(settings != null) {
-						if(settings.size() == 1) {
-							long tokenMinValidityTime = portalUtils.convertTimeUnitsToMilis
-									(settings.get(0).getAccessTokenProbeRestValidityTime(), 
-											settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
-							long tokenExpirationTime = tokenAuthenticationService.getTokenExpirationDate(accessToken, 
-									license.getTokenSecret()).getTime();
-							
-							if(tokenExpirationTime - System.currentTimeMillis() <= tokenMinValidityTime) {
-								if(!portalUtils.isLicenseExpired(license.getExpirationDate())) {
-									CompanyGroup group = groupRepository.find(license.getGroupId());
-									if(group != null) {
-										accessToken = tokenAuthenticationService.addLicenseAuthentication(license.getProbeId(), group, license);
-										license.setAccessToken(accessToken);
-										licenseObj.setAuthToken(accessToken);
-										licenseRepository.update(license);								
-									}
+					if (settings != null && settings.size() == 1) {
+						long tokenMinValidityTime = portalUtils.convertTimeUnitsToMilis(
+								settings.get(0).getAccessTokenProbeRestValidityTime(),
+								settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
+						long tokenExpirationTime = tokenAuthenticationService
+								.getTokenExpirationDate(accessToken, licensePrivate.getTokenSecret()).getTime();
+
+						if (tokenExpirationTime - System.currentTimeMillis() <= tokenMinValidityTime) {
+							if (!portalUtils.isLicenseExpired(licensePrivate.getExpirationDate())) {
+								CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
+								if (group != null) {
+									accessToken = tokenAuthenticationService.addLicenseAuthentication(
+											licensePrivate.getProbeId(), group, licensePrivate);
+									licensePrivate.setAccessToken(accessToken);
+									// licensePublic.setAccessToken(accessToken);
+									licenseRepository.update(licensePrivate);
 								}
 							}
 						}
 					}
 					log.debug("Probe access token is still valid.");
-					return new ResponseEntity<CompanyLicenseObj>(licenseObj, HttpStatus.OK);
-				}
-				else {
-					if(!portalUtils.isLicenseExpired(license.getExpirationDate())) {
-						CompanyGroup group = groupRepository.find(license.getGroupId());
-						if(group != null) {
-							accessToken = tokenAuthenticationService.addLicenseAuthentication(license.getProbeId(), group, license);
-							license.setAccessToken(accessToken);
-							licenseObj.setAuthToken(accessToken);
-							licenseRepository.update(license);
-							return new ResponseEntity<CompanyLicenseObj>(licenseObj, HttpStatus.OK);								
+					return new ResponseEntity<CompanyLicensePublic>((CompanyLicensePublic) licensePrivate,
+							HttpStatus.OK);
+				} else {
+					if (!portalUtils.isLicenseExpired(licensePrivate.getExpirationDate())) {
+						CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
+						if (group != null) {
+							accessToken = tokenAuthenticationService
+									.addLicenseAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
+							licensePrivate.setAccessToken(accessToken);
+							// licensePublic.setAccessToken(accessToken);
+							licenseRepository.update(licensePrivate);
+							return new ResponseEntity<CompanyLicensePublic>((CompanyLicensePublic) licensePrivate,
+									HttpStatus.OK);
 						}
-					}						
+					}
 				}
 			}
 		}
-		return new ResponseEntity<CompanyLicenseObj>(licenseObj, HttpStatus.OK);
+		return new ResponseEntity<CompanyLicensePublic>(licensePublic, HttpStatus.OK);
 	}
 }

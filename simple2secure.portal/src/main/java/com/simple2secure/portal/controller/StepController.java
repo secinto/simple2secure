@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -63,7 +63,7 @@ public class StepController {
 	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 
-		CompanyLicense license = licenseRepository.findByProbeId(probeId);
+		CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
 
 		if (license != null) {
 			CompanyGroup group = groupRepository.find(license.getGroupId());

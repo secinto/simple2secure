@@ -1,8 +1,8 @@
 package com.simple2secure.probe.dao;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 
-public interface LicenseDao extends BaseDao<CompanyLicenseObj> {
+public interface LicenseDao extends BaseDao<CompanyLicensePublic> {
 
-	public CompanyLicenseObj getLicense();
+	public CompanyLicensePublic getLicense();
 }

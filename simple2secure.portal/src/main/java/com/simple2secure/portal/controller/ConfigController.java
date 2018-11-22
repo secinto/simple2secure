@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
@@ -156,7 +156,7 @@ public class ConfigController {
 	public ResponseEntity<List<QueryRun>> getQueriesByUserID(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 		
-		CompanyLicense license = licenseRepository.findByProbeId(probeId);
+		CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
 		
 		if(license != null) {
 			
