@@ -4,7 +4,7 @@ mainClassName = "com.simple2secure.probe.gui.ProbeGUI"
 
 jar {
 	baseName = 'simple2secure.probe'
-	version =  '0.1.2'
+	version =  '0.1.0'
 
 	manifest {
 		attributes 'Main-Class': 'com.simple2secure.probe.gui.ProbeGUI',

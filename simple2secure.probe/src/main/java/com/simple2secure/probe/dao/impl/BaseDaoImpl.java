@@ -23,11 +23,20 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/** The entity class. */
 	protected Class<T> entityClass;
 
-	private static final String PERSISTENCE_UNIT_NAME = "s2s";
+	private static String PERSISTENCE_UNIT_NAME = "s2s";
 	private static EntityManagerFactory factory;
 
-	static {
+	public static void createEntityManager() {
 		factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+	}
+
+	public static void init(String persistenceUnitName) {
+		PERSISTENCE_UNIT_NAME = persistenceUnitName;
+		init();
+	}
+
+	public static void init() {
+		createEntityManager();
 	}
 
 	/**
@@ -120,10 +129,8 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/**
 	 * Find object by filed name.
 	 *
-	 * @param fieldName
-	 *            the field name
-	 * @param value
-	 *            the value
+	 * @param fieldName the field name
+	 * @param value     the value
 	 * @return the t
 	 */
 	public T findBy(String fieldName, Object value) {
@@ -134,11 +141,10 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/**
 	 * Gets the query.
 	 *
-	 * @param fieldName
-	 *            the field name
+	 * @param fieldName the field name
 	 * @return the query
 	 */
-	String getQuery(String fieldName) {
+	private String getQuery(String fieldName) {
 		String query = "from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
 	}
@@ -146,8 +152,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/**
 	 * Gets the single result.
 	 *
-	 * @param query
-	 *            the query
+	 * @param query the query
 	 * @return the single result
 	 */
 	@SuppressWarnings("unchecked")
