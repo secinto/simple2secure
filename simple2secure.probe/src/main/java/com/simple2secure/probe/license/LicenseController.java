@@ -190,6 +190,7 @@ public class LicenseController {
 	 *
 	 */
 	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
+		CompanyLicensePublic dbLicense = DBUtil.getInstance().findByFieldNameObject("licenseId", license.getLicenseId(), CompanyLicensePublic.class);
 		license.setAccessToken(authToken);
 		license.setActivated(true);
 		updateLicenseInDB(license);
@@ -210,6 +211,10 @@ public class LicenseController {
 		String probeId = "";
 		String groupId, licenseId, expirationDate;
 		CompanyLicensePublic result;
+		
+		if(license == null) {
+			return null;
+		}
 
 		groupId = license.getFeature("groupId");
 		licenseId = license.getFeature("licenseId");
