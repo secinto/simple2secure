@@ -44,29 +44,20 @@ project(':simple2secure.api') {
 }
 project(':simple2secure.commons') {
 	dependencies {
-		//compile group: 'org.json', name: 'json', version: '20180813'
 		compile group: 'commons-io', name: 'commons-io', version: '2.6'
 		compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 		compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
+		compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.2.0-S2S'
 	}
 }
-/*
- * 		compile group: 'commons-io', name: 'commons-io', version: '.6'
- compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
- compile group: 'commons-i18n', name: 'commons-i18n', version: '0.5'
- compile group: 'org.json', name: 'json', version: '20170516'
- compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
- compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
- compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
- */
+
 project(':simple2secure.service') {
 	dependencies {
 		compile project(':simple2secure.api')
 		compile project(':simple2secure.commons')
 
 		compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
-		//compile group: 'net.openhft', name: 'chronicle-queue', version: '5.17.1'
 	}
 }
 
@@ -80,7 +71,6 @@ project(':simple2secure.probe') {
 			compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.2'
 			compile group: 'org.logback-extensions', name: 'logback-ext-spring', version: '0.1.5'
 			compile 'javax.activation:activation:1.1.1'
-			//compile 'org.apache.commons:commons-configuration2:2.1.1'
 			compile group: 'org.pcap4j', name: 'pcap4j', version: '1.7.3'
 			compile group: 'org.pcap4j', name: 'pcap4j-packetfactory-static', version: '1.7.3'
 
@@ -88,11 +78,7 @@ project(':simple2secure.probe') {
 			compile 'org.hibernate:hibernate-entitymanager:5.0.7.Final'
 			compile group: 'com.h2database', name: 'h2', version: '1.4.195'
 
-			//compile 'org.apache.httpcomponents:httpclient:4.5.5'
-
 			compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
-			compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
-			//compile group: 'net.openhft', name: 'chronicle-queue', version: '5.17.1'
 		}
 	}
 }
@@ -110,7 +96,6 @@ project(':simple2secure.portal') {
 		compile 'org.springframework.boot:spring-boot-starter-security'
 		compile 'org.springframework.boot:spring-boot-devtools'
 		compile 'org.springframework.boot:spring-boot-starter-mail'
-		compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
 		compile group: 'ch.qos.cal10n', name: 'cal10n-api', version: '0.8.1'
 		compile group: 'io.kubernetes', name: 'client-java', version: '2.0.0'
 		compile group: 'ch.maxant', name: 'rules', version: '2.2.1'

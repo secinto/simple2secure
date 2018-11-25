@@ -39,39 +39,43 @@ public class DBUtil {
 	private StepDaoImpl stepDao;
 
 	public static DBUtil getInstance() throws IllegalArgumentException {
+		return getInstance(null);
+	}
+
+	public static DBUtil getInstance(String persistenceUnitName) {
 		if (instance == null) {
-			instance = new DBUtil();
+			instance = new DBUtil(persistenceUnitName);
 		}
 		return instance;
 	}
 
-	public DBUtil() {
+	private DBUtil(String persistenceUnitName) {
 		if (configDao == null) {
-			configDao = new ConfigDaoImpl();
+			configDao = new ConfigDaoImpl(persistenceUnitName);
 		}
 
 		if (licenseDao == null) {
-			licenseDao = new LicenseDaoImpl();
+			licenseDao = new LicenseDaoImpl(persistenceUnitName);
 		}
 
 		if (networkReportDao == null) {
-			networkReportDao = new NetworkReportDaoImpl();
+			networkReportDao = new NetworkReportDaoImpl(persistenceUnitName);
 		}
 
 		if (processorDao == null) {
-			processorDao = new ProcessorDaoImpl();
+			processorDao = new ProcessorDaoImpl(persistenceUnitName);
 		}
 
 		if (reportDao == null) {
-			reportDao = new ReportDaoImpl();
+			reportDao = new ReportDaoImpl(persistenceUnitName);
 		}
 
 		if (queryDao == null) {
-			queryDao = new QueryDaoImpl();
+			queryDao = new QueryDaoImpl(persistenceUnitName);
 		}
 
 		if (stepDao == null) {
-			stepDao = new StepDaoImpl();
+			stepDao = new StepDaoImpl(persistenceUnitName);
 		}
 
 		if (log.isDebugEnabled()) {

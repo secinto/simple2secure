@@ -1,4 +1,4 @@
-package com.simple2secure.test;
+package com.simple2secure.probe.test;
 
 import java.io.IOException;
 import java.net.InetAddress;

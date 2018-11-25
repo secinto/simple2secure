@@ -11,7 +11,7 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class CompanyLicensePublic extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7011645066859754490L;
 
@@ -31,11 +31,19 @@ public class CompanyLicensePublic extends GenericDBObject {
 	public CompanyLicensePublic() {
 	}
 
-	public CompanyLicensePublic(String groupId, String probeId, String licenseId, String expirationDate) {
+	public CompanyLicensePublic(String groupId, String licenseId) {
 		this.groupId = groupId;
-		this.probeId = probeId;
 		this.licenseId = licenseId;
+	}
+
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate) {
+		this(groupId, licenseId);
 		this.expirationDate = expirationDate;
+	}
+
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String probeId) {
+		this(groupId, licenseId, expirationDate);
+		this.probeId = probeId;
 	}
 
 	public String getGroupId() {

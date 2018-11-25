@@ -10,8 +10,8 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.utils.RequestHandler;
 import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.RequestHandler;
 
 public class ReportScheduler extends TimerTask {
 

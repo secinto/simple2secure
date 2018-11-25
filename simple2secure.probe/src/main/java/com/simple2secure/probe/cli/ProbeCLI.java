@@ -59,7 +59,7 @@ public class ProbeCLI {
 					}
 				}
 				log.error("A problem occured while loading the license from path.");
-			} catch (IOException | LicenseNotFoundException | LicenseException e) {
+			} catch (Exception e) {
 				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
 			}
 			break;

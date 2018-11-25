@@ -1,7 +1,6 @@
 package com.simple2secure.probe.license;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,14 +11,13 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
+import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 import com.simple2secure.probe.utils.RequestHandler;
 
 import ro.fortsoft.licensius.License;
-import ro.fortsoft.licensius.LicenseException;
-import ro.fortsoft.licensius.LicenseManager;
 import ro.fortsoft.licensius.LicenseNotFoundException;
 
 public class LicenseController {
@@ -29,27 +27,24 @@ public class LicenseController {
 	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
 
 	/**
-	 * Unzips the directory containing the license.dat in the /simple2secure/probe/
-	 * project directory. Further this method maps the License object to a
-	 * CompanyLicenseObj(has additionally probeId).
+	 * Unzips the directory containing the license.dat in the /simple2secure/probe/ project directory. Further this method maps the License
+	 * object to a CompanyLicenseObj(has additionally probeId).
 	 *
-	 * @param... The path to the license.zip-directory @throws... IOException if a
-	 * problem occure during the unzipping @throws... LicenseException if something
-	 * went wrong while unzipping or the
-	 * 
+	 * @param... The path to the license.zip-directory @throws... IOException if a problem occure during the unzipping @throws...
+	 * LicenseException if something went wrong while unzipping or the
+	 *
 	 * @throws LicenseNotFoundException
 	 * @throws InterruptedException
 	 */
-	public CompanyLicensePublic loadLicenseFromPath(String importFilePath)
-			throws IOException, LicenseNotFoundException, LicenseException {
+	public CompanyLicensePublic loadLicenseFromPath(String importFilePath) throws Exception {
 		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
 		if (inputFile != null) {
 			List<File> unzippedFiles = ProbeUtils.unzipImportedFile(inputFile);
 			if (unzippedFiles != null && unzippedFiles.size() == 2) {
-				License downloadedLicense = LicenseManager.getInstance().getLicense();
-				
+				License downloadedLicense = LicenseUtil.getLicense();
+
 				if (downloadedLicense != null && checkLicenseProps(downloadedLicense)) {
 					license = createLicenseForAuth(downloadedLicense);
 				}
@@ -61,16 +56,12 @@ public class LicenseController {
 	}
 
 	/**
-	 * Checks if there is a license stored in the DB... Checks if the license found
-	 * in DB is expired... Checks if the license is activated
-	 * 
-	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in
-	 * the DB @return... String of enum Type "LICENSE_EXPIRED" if the license is in
-	 * DB but expired @return... String of enum Type "NOT_ACTIVATED" if the license
-	 * is not expired but the isActivated()-flag is not set @return... String of
-	 * enum Type "VALID_CONDITIONS" if the license is not expired & the
-	 * isActivated()-flag is set/ sets the isLicenseValid-flag in ProbeConfiguration
-	 * to true
+	 * Checks if there is a license stored in the DB... Checks if the license found in DB is expired... Checks if the license is activated
+	 *
+	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in the DB @return... String of enum Type "LICENSE_EXPIRED" if
+	 * the license is in DB but expired @return... String of enum Type "NOT_ACTIVATED" if the license is not expired but the
+	 * isActivated()-flag is not set @return... String of enum Type "VALID_CONDITIONS" if the license is not expired & the isActivated()-flag
+	 * is set/ sets the isLicenseValid-flag in ProbeConfiguration to true
 	 */
 	public StartConditions checkProbeStartConditions() {
 		CompanyLicensePublic license = loadLicenseFromDB();
@@ -89,67 +80,15 @@ public class LicenseController {
 	}
 
 	/**
-	 * Checks the validity of the license.
-	 *
-	 * @param ...License object
-	 * @return ...Boolean isLicenseValid
-	 * @throws ...LicenseException
-	 * @throws ...LicenseNotFoundException
-	 */
-	public boolean checkLicenseValidity(License license) throws LicenseNotFoundException, LicenseException {
-		return LicenseManager.getInstance().isValidLicense(license);
-	}
-
-	/**
-	 * Loads the license from the root directory of the project.
-	 *
-	 * @param
-	 * @return ...true if the license is valid, false if it is not valid
-	 * @throws ...LicenseException
-	 * @throws ...LicenseNotFoundException
-	 */
-	public License loadLocalLicense() throws LicenseNotFoundException, LicenseException {
-		return LicenseManager.getInstance().getLicense();
-	}
-
-	/**
-	 * Checks if the license directory contains the right files.
-	 *
-	 * @param ...List<File> licenseDir
-	 * @return ...true if the directory contains the right files, false if it does
-	 *         not contain the right files
-	 */
-	public boolean checkLicenseDirValidity(List<File> licenseDir) {
-		boolean isValidLicenseDir = false;
-		boolean licenseFile = false;
-		boolean publicKeyFile = false;
-
-		for (File file : licenseDir) {
-			if (file.getName().equals("license.dat")) {
-				licenseFile = true;
-			} else if (file.getName().equals("public.key")) {
-				publicKeyFile = true;
-			}
-		}
-
-		if (licenseFile && publicKeyFile) {
-			isValidLicenseDir = true;
-		}
-
-		return isValidLicenseDir;
-	}
-
-	/**
 	 * Checks if the properties in the license object are set (not null or empty).
 	 *
-	 * @param ...License object
-	 * @return ...true if the properties in the license object are set, false if
-	 *         only one property is null or empty
+	 * @param ...License
+	 *          object
+	 * @return ...true if the properties in the license object are set, false if only one property is null or empty
 	 */
 	public boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
-		if (!Strings.isNullOrEmpty(license.getFeature("groupId"))
-				&& !Strings.isNullOrEmpty(license.getFeature("licenseId"))
+		if (!Strings.isNullOrEmpty(license.getFeature("groupId")) && !Strings.isNullOrEmpty(license.getFeature("licenseId"))
 				&& !Strings.isNullOrEmpty(license.getExpirationDateAsString())) {
 			isLicensePropsValid = true;
 		}
@@ -159,7 +98,8 @@ public class LicenseController {
 	/**
 	 * Updates the license in the DB with the local license.
 	 *
-	 * @param ...License object
+	 * @param ...License
+	 *          object
 	 */
 	public void updateLicenseInDB(CompanyLicensePublic license) {
 		DBUtil.getInstance().merge(license);
@@ -168,7 +108,7 @@ public class LicenseController {
 	// TODO: Possibly null check required
 	/**
 	 * Loads the license from the data base.
-	 * 
+	 *
 	 * @return ...a CompanyLicenseObject
 	 */
 	public CompanyLicensePublic loadLicenseFromDB() {
@@ -184,13 +124,13 @@ public class LicenseController {
 	/**
 	 * Sets the needed Flags in the DB to mark the license activated.
 	 *
-	 * @param license   ...CompanyLicenseObj
-	 * @param authToken ...the token which the server returns if the activation
-	 *                  succeeded.
+	 * @param license
+	 *          ...CompanyLicenseObj
+	 * @param authToken
+	 *          ...the token which the server returns if the activation succeeded.
 	 *
 	 */
 	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
-		CompanyLicensePublic dbLicense = DBUtil.getInstance().findByFieldNameObject("licenseId", license.getLicenseId(), CompanyLicensePublic.class);
 		license.setAccessToken(authToken);
 		license.setActivated(true);
 		updateLicenseInDB(license);
@@ -198,12 +138,11 @@ public class LicenseController {
 
 	// TODO: Possibly null check required
 	/**
-	 * Creates a CompanyLicenseObj to send it to the server for authentication. Also
-	 * checks if there is already a license stored in the DB, if there is a license
-	 * stored it just updates the license. If there is no license stored in the DB,
-	 * it creates a new entry in the DB.
+	 * Creates a CompanyLicenseObj to send it to the server for authentication. Also checks if there is already a license stored in the DB, if
+	 * there is a license stored it just updates the license. If there is no license stored in the DB, it creates a new entry in the DB.
 	 *
-	 * @param ...License object
+	 * @param ...License
+	 *          object
 	 * @return ...CompanyLicenseObj for authentication.
 	 *
 	 */
@@ -211,8 +150,8 @@ public class LicenseController {
 		String probeId = "";
 		String groupId, licenseId, expirationDate;
 		CompanyLicensePublic result;
-		
-		if(license == null) {
+
+		if (license == null) {
 			return null;
 		}
 
@@ -232,7 +171,7 @@ public class LicenseController {
 			result.setExpirationDate(expirationDate);
 		} else {
 			probeId = UUID.randomUUID().toString();
-			result = new CompanyLicensePublic(groupId, probeId, licenseId, expirationDate);
+			result = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
 		}
 
 		updateLicenseInDB(result);
@@ -241,9 +180,8 @@ public class LicenseController {
 
 	/**
 	 * Checks if a license is expired.
-	 * 
-	 * @return ...true if the license is expired, false if the license is not
-	 *         expired
+	 *
+	 * @return ...true if the license is expired, false if the license is not expired
 	 */
 	public boolean isLicenseExpired(CompanyLicensePublic license) {
 		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
@@ -252,8 +190,7 @@ public class LicenseController {
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token",
-					license);
+			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			} else {

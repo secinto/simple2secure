@@ -11,47 +11,60 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.util.Strings;
 
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.gui.ProbeGUI;
-import com.simple2secure.probe.license.LicenseController;
-
-import ro.fortsoft.licensius.LicenseException;
-import ro.fortsoft.licensius.LicenseNotFoundException;
 
 public final class ProbeUtils {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
 
-	// private ProbeUtilities() {};
-
-	
 	private static Logger log = LoggerFactory.getLogger(ProbeUtils.class);
-	
+
+	private static String workingDirectory = System.getProperty("user.dir");
+
 	/**
 	 * TODO: Write tests to check the different scenarios.
 	 *
-	 * This function unzips the imported license file and cheks if the extracted content is correct. If not the null will be returned, else
-	 * the list of the files will be returned (public.key and certificate.dat)
+	 * This function unzips the imported ZIP file and checks if the extracted content is correct. If not then <code>null</code> will be
+	 * returned, else the list of the files will be returned.
 	 *
-	 * @param licenseZip
-	 * @return
+	 * @param importFile
+	 *          The file which should be imported and unzipped in the current working directory.
+	 * @return A list of files which have been created from the ZIP container.
 	 * @throws IOException
 	 */
 	public static List<File> unzipImportedFile(File importFile) throws IOException {
-		if(importFile == null) {
+		return unzipImportedFile(workingDirectory, importFile);
+	}
+
+	/**
+	 * TODO: Write tests to check the different scenarios.
+	 *
+	 * This function extracts the imported ZIP file and checks if the extracted content is correct. If not then <code>null</code> will be
+	 * returned, else the list of the files will be returned.
+	 *
+	 * @param baseDir
+	 *          Specifies the base directory into which the ZIP container should be extracted to.
+	 * @param importFile
+	 *          The file which should be imported and unzipped in the current working directory.
+	 * @return A list of files which have been created from the ZIP container.
+	 * @throws IOException
+	 */
+	public static List<File> unzipImportedFile(String baseDir, File importFile) throws IOException {
+
+		if (!baseDir.endsWith("\\")) {
+			baseDir = baseDir + "\\";
+		}
+
+		if (importFile == null) {
 			log.error("Importfile parameter should not be null.");
 		}
-		
+
 		List<File> fileListUnzipped = new ArrayList<>();
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(importFile));
 
@@ -98,9 +111,8 @@ public final class ProbeUtils {
 	}
 
 	/**
-	 * This function returns the file file from the file list according to the
-	 * filename
-	 * 
+	 * This function returns the file file from the file list according to the filename
+	 *
 	 * @param files
 	 * @param fileName
 	 * @return

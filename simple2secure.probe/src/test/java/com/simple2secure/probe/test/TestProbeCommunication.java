@@ -1,4 +1,4 @@
-package com.simple2secure.test;
+package com.simple2secure.probe.test;
 
 public class TestProbeCommunication {
 	

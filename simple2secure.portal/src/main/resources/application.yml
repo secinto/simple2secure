@@ -35,6 +35,11 @@ spring:
       host: localhost
       port: 27017
       database: s2s
+      
+license:
+  filepath: temp/license/
+  privateKey: keys/private.key
+  publicKey: keys/public.key
 ---
 spring:
   profiles: test

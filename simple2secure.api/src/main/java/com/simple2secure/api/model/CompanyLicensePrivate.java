@@ -8,15 +8,14 @@ import javax.persistence.Table;
 public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8652284780091080199L;
 
 	private String tokenSecret;
 
-	public CompanyLicensePrivate(String groupId, boolean activated) {
-		super();
-		this.groupId = groupId;
+	public CompanyLicensePrivate(String groupId, String licenseId, String expirationDate, boolean activated) {
+		super(groupId, licenseId, expirationDate);
 		this.activated = activated;
 	}
 
@@ -26,5 +25,18 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	public void setTokenSecret(String tokenSecret) {
 		this.tokenSecret = tokenSecret;
+	}
+
+	/**
+	 * Function returns the {@link CompanyLicensePublic} object for this {@link CompanyLicensePrivate} object. It cleans all sensitive
+	 * information such that serializing this object doesn't leak any information.
+	 *
+	 * @return
+	 */
+	public CompanyLicensePublic getPublicLicense() {
+		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
+		publicLicense.setActivated(activated);
+		publicLicense.setAccessToken(accessToken);
+		return publicLicense;
 	}
 }
