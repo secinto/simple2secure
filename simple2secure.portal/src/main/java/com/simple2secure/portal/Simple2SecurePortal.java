@@ -8,7 +8,6 @@
 
 package com.simple2secure.portal;
 
-import java.io.File;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -34,7 +33,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import com.simple2secure.api.model.ServiceLibrary;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.utils.DataInitialization;
@@ -107,16 +105,16 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	@PostConstruct
 	public void initialize() {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.0.jar").getFile());
-		ServiceLibrary library = new ServiceLibrary("Probe", "0.1.0", file.getAbsolutePath());
-		serviceLibraryRepository.save(library);
-		file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.1.jar").getFile());
-		library = new ServiceLibrary("Probe", "0.1.1", file.getAbsolutePath());
-		serviceLibraryRepository.save(library);
-		file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.2.jar").getFile());
-		library = new ServiceLibrary("Probe", "0.1.2", file.getAbsolutePath());
-		serviceLibraryRepository.save(library);
+		// ClassLoader classLoader = getClass().getClassLoader();
+		// File file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.0.jar").getFile());
+		// ServiceLibrary library = new ServiceLibrary("Probe", "0.1.0", file.getAbsolutePath());
+		// serviceLibraryRepository.save(library);
+		// file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.1.jar").getFile());
+		// library = new ServiceLibrary("Probe", "0.1.1", file.getAbsolutePath());
+		// serviceLibraryRepository.save(library);
+		// file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.2.jar").getFile());
+		// library = new ServiceLibrary("Probe", "0.1.2", file.getAbsolutePath());
+		// serviceLibraryRepository.save(library);
 	}
 
 	@Override

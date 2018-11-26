@@ -43,16 +43,12 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.AdminGroupRepository;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
@@ -75,19 +71,7 @@ public class LicenseController {
 	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
 	LicenseRepository licenseRepository;
-
-	@Autowired
-	QueryRepository queryRepository;
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	GroupRepository groupRepository;
@@ -200,7 +184,7 @@ public class LicenseController {
 					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil
 							.generateLicenseZIPStream(StaticConfigItems.KEYS_LOCATION + "public.key");
 
-					adminGroup.setCurrentNumberOfLicenseDownloads(adminGroup.getCurrentNumberOfLicenseDownloads() + 1);
+					//adminGroup.setCurrentNumberOfLicenseDownloads(adminGroup.getCurrentNumberOfLicenseDownloads() + 1);
 					adminGroupRepository.update(adminGroup);
 
 					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
