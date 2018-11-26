@@ -171,7 +171,7 @@
 			    
    			    <ng-container matColumnDef="group">
 			      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }} </mat-header-cell>
-			      <mat-cell *matCellDef="let element"> {{element.groupName}} </mat-cell>
+			      <mat-cell *matCellDef="let element"> {{element.group.name}} </mat-cell>
 			    </ng-container>
 			    
 			    <ng-container matColumnDef="activated">
@@ -184,7 +184,7 @@
 			    <ng-container matColumnDef="action">
 			      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>     
 			      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
-			      	<button class="mat-green-button" mat-button >
+			      	<button class="mat-green-button" mat-button [matMenuTriggerFor]="menuProbe" (click)="onMenuTriggerClick(element)">
 			          <i class="fas fa-bars"></i>
 			        </button> 
 			      </mat-cell>
@@ -209,9 +209,9 @@
 				</div>
 			</div>
 			
-			 <mat-menu #menu="matMenu">
-			  <button mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
-			  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+			 <mat-menu #menuProbe="matMenu">
+			  <button mat-menu-item (click)="openDialogChangeProbeGroup()"><mat-icon>edit</mat-icon> {{ 'probe.change.group' | translate }}</button>
+			  <button mat-menu-item (click)="onProbeDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
 			</mat-menu>         
         </mat-tab>
     </mat-tab-group>

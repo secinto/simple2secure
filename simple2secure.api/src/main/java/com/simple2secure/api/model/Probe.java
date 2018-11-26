@@ -10,22 +10,22 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Probe extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1408094765003045124L;
 	private String probeId;
-	private String groupName;
+	private CompanyGroup group;
 	private boolean activated;
-	
+
 	public Probe() {
-		
+
 	}
 
-	public Probe(String probeId, String groupName, boolean activated) {
+	public Probe(String probeId, CompanyGroup group, boolean activated) {
 		super();
-		
+
 		this.probeId = probeId;
-		this.groupName = groupName;
+		this.group = group;
 		this.activated = activated;
 	}
 
@@ -45,11 +45,11 @@ public class Probe extends GenericDBObject {
 		this.activated = activated;
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public CompanyGroup getGroup() {
+		return group;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void setGroup(CompanyGroup group) {
+		this.group = group;
 	}
 }

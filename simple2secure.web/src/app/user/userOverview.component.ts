@@ -12,6 +12,7 @@ import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
+import {UserProbeChangeGroupComponent} from './userProbeChangeGroup.component';
 
 @Component({
   moduleId: module.id,
@@ -24,6 +25,7 @@ export class UserOverviewComponent {
   loading = false;
   userDeleted = false;
   groupDeleted = false;
+  probeDeleted = false;
   groupAdded = false;
   userAdded = false;
   selectedItem: any;
@@ -116,12 +118,13 @@ export class UserOverviewComponent {
         this.checkMyUsersSize(this.myProfile.myUsersList);
         this.checkMyProbesSize(this.myProfile.myProfile.myProbes);
         this.dataService.setGroups(this.myProfile.myGroups);
-        if (!this.userDeleted && !this.groupDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible){
+        if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible){
             this.alertService.success(this.translate.instant('message.user'));
         }
 
         this.moveNotPossible = false;
         this.groupDeleted = false;
+        this.probeDeleted = false;
         this.groupAdded = false;
         this.userAdded = false;
         this.userDeleted = false;
@@ -250,6 +253,26 @@ export class UserOverviewComponent {
       });
   }
 
+    public deleteProbe(probe: any) {
+        this.loading = true;
+        this.httpService.delete(environment.apiEndpoint + 'users/deleteProbe/' + probe.probeId).subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('message.probe.delete"'));
+                this.loadMyProfile();
+                this.probeDeleted = true;
+                this.loading = false;
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
+    }
+
   public onMenuTriggerClick(item: any) {
       this.selectedItem = item;
 
@@ -316,6 +339,10 @@ export class UserOverviewComponent {
   public onDeleteClick(){
       this.openDialog('user');
       // this.deleteUser(this.selectedUser);
+  }
+
+  onProbeDeleteClick(){
+      this.openDialog('probe');
   }
 
   public onApplyConfigClick(){
@@ -432,6 +459,31 @@ export class UserOverviewComponent {
         });
     }
 
+    openDialogChangeProbeGroup(): void {
+        const dialogRef = this.dialog2.open(UserProbeChangeGroupComponent, {
+            width: '350px',
+            data: this.selectedItem
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.group.add'));
+                this.groupAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
     openDialogRootGroup(): void {
         const dialogRef = this.dialog.open(UserGroupDialogComponent, {
             width: '250px',
@@ -458,6 +510,7 @@ export class UserOverviewComponent {
 
     onMoveGroupNode($event) {
         if (this.checkIfUserCanEditGroup($event.node) && this.checkIfUserCanEditGroup($event.to.parent)){
+            console.log("Moving from " + $event.node.superUserIds + " to " + $event.to.parent.name);
             this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
             this.httpService.post(null, this.url).subscribe(
                 data => {
@@ -509,6 +562,13 @@ export class UserOverviewComponent {
               content: this.translate.instant('message.user.dialog')
           };
       }
+      else if(type == 'probe'){
+          dialogConfig.data = {
+              id: 1,
+              title: this.translate.instant('message.arayousure'),
+              content: this.translate.instant('message.probe.dialog')
+          };
+      }
       else{
           dialogConfig.data = {
               id: 1,
@@ -527,6 +587,9 @@ export class UserOverviewComponent {
               }
               else if (type == 'group'){
                   this.deleteGroup(this.selectedItem);
+              }
+              else if(type == 'probe') {
+                  this.deleteProbe(this.selectedItem);
               }
           }
         });

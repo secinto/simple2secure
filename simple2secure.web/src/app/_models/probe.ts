@@ -1,7 +1,7 @@
-import {Generic} from './generic';
+import {CompanyGroup} from './companygroup';
 
 export class Probe{
   probeId: string;
-  groupName: string;
+  group: CompanyGroup;
   activated: boolean;
 }

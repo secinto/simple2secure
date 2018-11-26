@@ -32,7 +32,8 @@ import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {NavbarComponent} from './navbar/index';
 import {ConfigurationDetailsComponent} from './configuration/index';
-import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent, UserGroupApplyConfigComponent} from './user/index';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
+    UserGroupApplyConfigComponent, UserProbeChangeGroupComponent} from './user/index';
 import {OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
 } from './osquery/index';
 import {NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
@@ -137,6 +138,7 @@ export const httpInterceptorProviders = [
     UserGroupComponent,
     UserGroupDialogComponent,
     UserGroupApplyConfigComponent,
+    UserProbeChangeGroupComponent,
     OsQueryReportOverviewComponent,
     OsQueryReportDetailsComponent,
     OsqueryConfigurationDetailsComponent,
@@ -172,7 +174,8 @@ export const httpInterceptorProviders = [
     NetworkProcessorConfigurationEditComponent,
     NetworkStepConfigurationEditComponent,
     OsqueryConfigurationEditComponent,
-    UserGroupApplyConfigComponent
+    UserGroupApplyConfigComponent,
+    UserProbeChangeGroupComponent
   ],
   providers: [
     AuthGuard,

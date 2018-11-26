@@ -197,9 +197,11 @@
   "message.user.delete": "User deleted successfully!",
   "message.user.dialog": "With clicking on yes, selected user will be deleted!",
   "message.group.dialog": "With clicking on yes, selected group will be deleted!",
+  "message.probe.dialog": "With clicking on yes, selected probe will be deleted!",
   "message.config.dialog": "With clicking on yes, selected config will be deleted!",
   "message.config.delete": "Config deleted successfully!",
   "message.group.delete": "Group deleted successfully!",
+  "message.probe.delete": "Probe deleted successfully!",
   "message.group.add": "Group added successfully!",
   "message.processor.dialog": "With clicking on yes, selected processor will be deleted!",
   "message.processor.delete": "Processor deleted successfully!",
@@ -282,5 +284,6 @@
   "message.config.group.update": "Configuration updated successfully",
   "message.apply.config": "Apply group configuration for OSQuery, Steps and Processors",
   "node.move.error": "You do not have privileges to move the selected group!",
-  "node.move.success": "Group moved successfully!"
+  "node.move.success": "Group moved successfully!",
+  "probe.change.group": "Change group"
 }

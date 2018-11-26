@@ -14,6 +14,9 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	private String tokenSecret;
 
+	public CompanyLicensePrivate() {
+	};
+
 	public CompanyLicensePrivate(String groupId, String licenseId, String expirationDate, boolean activated) {
 		super(groupId, licenseId, expirationDate);
 		this.activated = activated;

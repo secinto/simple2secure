@@ -239,7 +239,7 @@ public class LicenseController {
 					// settings
 					List<Settings> settings = settingsRepository.findAll();
 					if (settings != null && settings.size() == 1) {
-						long tokenMinValidityTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
+						long tokenMinValidityTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
 								settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
 						long tokenExpirationTime = tokenAuthenticationService.getTokenExpirationDate(accessToken, licensePrivate.getTokenSecret())
 								.getTime();

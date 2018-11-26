@@ -92,7 +92,7 @@ public class PortalUtils {
 	 *          The unit in which the time is measured.
 	 * @return The specified amount of time in milliseconds.
 	 */
-	public static long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
+	public long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
 		if (timeUnit != null) {
 			return timeUnit.toMillis(time);
 		} else {
