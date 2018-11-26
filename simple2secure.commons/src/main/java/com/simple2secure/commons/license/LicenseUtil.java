@@ -307,28 +307,51 @@ public class LicenseUtil {
 		LicenseManager.setLicenseFile(licenseFile);
 	}
 
+	/**
+	 * Creates a license from the provided parameters and uses the default private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @throws Exception
+	 */
 	public static void createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
-		createLicense(groupId, licenseId, expirationDate, LicenseManager.PUBLIC_KEY_FILE, licenseFilePath);
+		createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
-	public static void createLicense(String groupId, String licenseId, String expirationDate, String publicKeyFile) throws Exception {
-		createLicense(groupId, licenseId, expirationDate, publicKeyFile, licenseFilePath);
-	}
-
-	public static void createLicense(String groupId, String licenseId, String expirationDate, String publicKeyFile, String licenseFilePath)
-			throws Exception {
+	/**
+	 * Creates a license from the provided parameters and uses the provided private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @param privateKeyFile
+	 *          The private key which should be used for the signature.
+	 * @throws Exception
+	 *           Thrown if something goes wrong.
+	 */
+	public static void createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
 
 		Properties properties = new OrderedProperties();
 		properties.setProperty("expirationDate", expirationDate);
 		properties.setProperty("groupId", groupId);
 		properties.setProperty("licenseId", licenseId.toString());
 
-		FileOutputStream fos = new FileOutputStream(licenseFilePath + licenseId + "/license.dat");
-		FileUtil.copyToFolder(new File(publicKeyFile), licenseFilePath + licenseId + "/");
-		File publicKey = new File(licenseFilePath + licenseId + "/" + publicKeyFile);
+		FileUtil.createFolder(licenseFilePath + "\\" + licenseId + "\\");
 
-		if (publicKey.exists()) {
-			LicenseGenerator.generateLicense(properties, fos, publicKeyFile);
+		FileOutputStream fos = new FileOutputStream(licenseFilePath + "\\" + licenseId + "\\license.dat");
+		File privateKeyOriginal = new File(privateKeyFilePath);
+		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + "\\" + licenseId + "\\");
+		File privateKey = new File(licenseFilePath + "\\" + licenseId + "\\" + privateKeyOriginal.getName());
+
+		if (privateKey.exists()) {
+			LicenseGenerator.generateLicense(properties, fos, privateKey.getAbsolutePath());
 		} else {
 			log.error("Couldn't create License in folder {} because public key couldn't ne copied. ", licenseFilePath + licenseId + "/");
 		}
