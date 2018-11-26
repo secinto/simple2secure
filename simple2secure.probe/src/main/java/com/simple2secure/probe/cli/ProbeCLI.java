@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
@@ -43,8 +44,7 @@ public class ProbeCLI {
 			try {
 				licenseFile = licenseController.loadLicenseFromPath(importFilePath);
 				if (licenseFile != null) {
-					authToken = RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe",
-							licenseFile);
+					authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", licenseFile);
 					if (authToken != null) {
 						licenseController.activateLicenseInDB(authToken, licenseFile);
 
@@ -63,8 +63,7 @@ public class ProbeCLI {
 			try {
 				licenseFile = licenseController.loadLicenseFromDB();
 				if (licenseFile != null) {
-					authToken = RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe",
-							licenseFile);
+					authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", licenseFile);
 					if (authToken != null) {
 						licenseController.activateLicenseInDB(authToken, licenseFile);
 
@@ -80,7 +79,13 @@ public class ProbeCLI {
 			}
 			break;
 		case LICENSE_VALID:
+			log.info("Found valid license. Starting probe!");
+			break;
 		case LICENSE_EXPIRED:
+			/*
+			 * TODO: Insert handling for licenses which are expired for more than a predefined period.
+			 */
+			log.info("License expired!");
 			break;
 		}
 	}

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -81,8 +82,8 @@ public class LicenseGUIController {
 		}
 
 		licenseForAuth = licenseController.createLicenseForAuth(downloadedLicense);
-		authToken = RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe",
-				licenseForAuth, ProbeConfiguration.authKey);
+		authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", licenseForAuth,
+				ProbeConfiguration.authKey);
 		if (Strings.isNullOrEmpty(authToken)) {
 			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
 			log.error("Problem occured during the license validation. The server is not responding. Try again later!");

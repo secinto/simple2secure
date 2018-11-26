@@ -86,13 +86,6 @@ public class ProbeGUI extends Application {
 
 		createTrayIcon(primaryStage);
 
-		/*
-		 * Initialize the configuration. It must be checked if this is the best place to
-		 * do it. But it will be done anyhow further down if the license is not loaded.
-		 * Thus we should provide it here immediately. The only thing is that it also
-		 * would verify if the API is available.
-		 */
-
 		ProbeConfiguration.isGuiRunning = true;
 
 		StartConditions startConditions = licenseCon.checkProbeStartConditions();
@@ -123,8 +116,7 @@ public class ProbeGUI extends Application {
 	}
 
 	/**
-	 * This function initializes the Root Pane, it is called after the user is
-	 * successfully logged in
+	 * This function initializes the Root Pane, it is called after the user is successfully logged in
 	 */
 
 	public static void initRootPane() {
@@ -143,8 +135,7 @@ public class ProbeGUI extends Application {
 			ViewNavigator.setMainController(loader.getController());
 
 			Scene scene = new Scene(rootPane);
-			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED,
-					CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -242,8 +233,7 @@ public class ProbeGUI extends Application {
 
 	public void showProgramIsMinimizedMsg() {
 		if (firstTime) {
-			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize",
-					TrayIcon.MessageType.INFO);
+			trayIcon.displayMessage("Simple2secure is minimized", "Double click to maximize", TrayIcon.MessageType.INFO);
 			firstTime = false;
 		}
 	}

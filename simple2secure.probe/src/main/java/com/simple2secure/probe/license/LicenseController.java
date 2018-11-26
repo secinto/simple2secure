@@ -24,8 +24,6 @@ public class LicenseController {
 
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
-	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
-
 	public LicenseController() {
 		init();
 	}
@@ -64,12 +62,13 @@ public class LicenseController {
 	}
 
 	/**
-	 * Checks if there is a license stored in the DB... Checks if the license found in DB is expired... Checks if the license is activated
+	 * Checks if there is a license stored in the DB. Checks if the license found in DB is expired. Checks if the license is activated.
+	 * Depending on the outcome either {@link StartConditions#LICENSE_NOT_AVAILABLE} if there is no license stored in the DB is returned.
+	 * {@link StartConditions#LICENSE_EXPIRED} if the license is in DB but expired is returned. {@link StartConditions#LICENSE_NOT_ACTIVATED}
+	 * is returned if the license is not expired but it is not activated set. {@link StartConditions#LICENSE_VALID} if the license is not
+	 * expired and it is activated.
 	 *
-	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in the DB @return... String of enum Type "LICENSE_EXPIRED" if
-	 * the license is in DB but expired @return... String of enum Type "NOT_ACTIVATED" if the license is not expired but the
-	 * isActivated()-flag is not set @return... String of enum Type "VALID_CONDITIONS" if the license is not expired & the isActivated()-flag
-	 * is set/ sets the isLicenseValid-flag in ProbeConfiguration to true
+	 * @return The {@link StartConditions} which corresponds to the current state.
 	 */
 	public StartConditions checkProbeStartConditions() {
 		CompanyLicensePublic license = loadLicenseFromDB();
@@ -90,9 +89,9 @@ public class LicenseController {
 	/**
 	 * Checks if the properties in the license object are set (not null or empty).
 	 *
-	 * @param ...License
-	 *          object
-	 * @return ...true if the properties in the license object are set, false if only one property is null or empty
+	 * @param license
+	 *          The {@link License} for which the properties are checked.
+	 * @return True if the properties in the license object are set, false if only one property is null or empty
 	 */
 	public boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
@@ -106,18 +105,19 @@ public class LicenseController {
 	/**
 	 * Updates the license in the DB with the local license.
 	 *
-	 * @param ...License
-	 *          object
+	 * @param license
+	 *          The license which should be updated in the database.
 	 */
 	public void updateLicenseInDB(CompanyLicensePublic license) {
-		DBUtil.getInstance().merge(license);
+		if (license != null) {
+			DBUtil.getInstance().merge(license);
+		}
 	}
 
-	// TODO: Possibly null check required
 	/**
 	 * Loads the license from the data base.
 	 *
-	 * @return ...a CompanyLicenseObject
+	 * @return The {@link CompanyLicensePublic} from stored in the database.
 	 */
 	public CompanyLicensePublic loadLicenseFromDB() {
 		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(CompanyLicensePublic.class);
@@ -195,21 +195,23 @@ public class LicenseController {
 		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RESTUtils.sendPost(loadedConfigItems.getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
-			} else {
-				return null;
 			}
-		} else {
-			/*
-			 * TODO: Create handling if license is not stored in DB.
-			 */
-			log.error("Couldn't find license in DB. Need to do something here");
-			return null;
 		}
+		/*
+		 * TODO: Create handling if license is not stored in DB.
+		 */
+		log.error("Couldn't find license in DB. Need to do something here");
+		return null;
+
 	}
 }
