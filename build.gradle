@@ -54,8 +54,8 @@ project(':simple2secure.commons') {
 
 project(':simple2secure.service') {
 	dependencies {
-		compile project(':simple2secure.api')
-		compile project(':simple2secure.commons')
+		implementation project(':simple2secure.api')
+		implementation project(':simple2secure.commons')
 
 		compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
 	}
@@ -64,11 +64,11 @@ project(':simple2secure.service') {
 project(':simple2secure.probe') {
 	dependencies {
 		dependencies {
+			implementation project(':simple2secure.api')
+			implementation project(':simple2secure.commons')
 
-			compile project(':simple2secure.api')
-			compile project(':simple2secure.commons')
-
-			compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.2'
+			compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+			compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.2'
 			compile group: 'org.logback-extensions', name: 'logback-ext-spring', version: '0.1.5'
 			compile 'javax.activation:activation:1.1.1'
 			compile group: 'org.pcap4j', name: 'pcap4j', version: '1.7.3'
@@ -77,8 +77,6 @@ project(':simple2secure.probe') {
 			compile 'org.hibernate:hibernate-core:5.0.7.Final'
 			compile 'org.hibernate:hibernate-entitymanager:5.0.7.Final'
 			compile group: 'com.h2database', name: 'h2', version: '1.4.195'
-
-			compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
 		}
 	}
 }
@@ -86,8 +84,8 @@ project(':simple2secure.probe') {
 project(':simple2secure.portal') {
 
 	dependencies {
-		compile project(':simple2secure.api')
-		compile project(':simple2secure.commons')
+		implementation project(':simple2secure.api')
+		implementation project(':simple2secure.commons')
 
 		compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
 		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'

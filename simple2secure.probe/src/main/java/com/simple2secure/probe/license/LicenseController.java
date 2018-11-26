@@ -12,10 +12,10 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.LicenseUtil;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
-import com.simple2secure.probe.utils.RequestHandler;
 
 import ro.fortsoft.licensius.License;
 import ro.fortsoft.licensius.LicenseNotFoundException;
@@ -25,6 +25,14 @@ public class LicenseController {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
+
+	public LicenseController() {
+		init();
+	}
+
+	public void init() {
+		LicenseUtil.initialize(System.getProperty("user.dir"), "public.key");
+	}
 
 	/**
 	 * Unzips the directory containing the license.dat in the /simple2secure/probe/ project directory. Further this method maps the License
@@ -190,7 +198,7 @@ public class LicenseController {
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
+			String response = RESTUtils.sendPost(loadedConfigItems.getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			} else {

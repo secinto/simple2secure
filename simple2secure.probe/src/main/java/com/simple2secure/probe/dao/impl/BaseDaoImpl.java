@@ -33,7 +33,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 		if (factory == null) {
 			factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 		} else {
-			if (factory.getProperties().get("hibernate.ejb.persistenceUnitName").toString() != PERSISTENCE_UNIT_NAME) {
+			if (!factory.getProperties().get("hibernate.ejb.persistenceUnitName").toString().equals(PERSISTENCE_UNIT_NAME)) {
 				factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 			}
 		}

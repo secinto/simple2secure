@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.license.LicenseUtil;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.utils.ProbeUtils;
-import com.simple2secure.probe.utils.RequestHandler;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -81,8 +81,8 @@ public class LicenseGUIController {
 		}
 
 		licenseForAuth = licenseController.createLicenseForAuth(downloadedLicense);
-		authToken = RequestHandler.sendPostReceiveResponse(
-				ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", licenseForAuth);
+		authToken = RESTUtils.sendPost(ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe",
+				licenseForAuth, ProbeConfiguration.authKey);
 		if (Strings.isNullOrEmpty(authToken)) {
 			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
 			log.error("Problem occured during the license validation. The server is not responding. Try again later!");
