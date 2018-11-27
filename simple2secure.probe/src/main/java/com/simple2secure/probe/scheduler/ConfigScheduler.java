@@ -53,7 +53,7 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 
 	private void checkConfiguration() {
 		log.info("Checking for the new configuration...");
-		ProbeConfiguration.getInstance().checkConfig();
+		ProbeConfiguration.getInstance().checkAndUpdateConfigFromAPI();
 		if (!probeIsLicenseValid) {
 			if (probeIsGuiRunning) {
 				try {

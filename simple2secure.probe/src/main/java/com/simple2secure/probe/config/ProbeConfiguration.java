@@ -93,14 +93,31 @@ public class ProbeConfiguration {
 		support = new PropertyChangeSupport(this);
 	}
 
+	/**
+	 * Adds a listener for changing properties. It gets informed if internal state variables are changing.
+	 *
+	 * @param pcl
+	 *          The listener to add.
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
 		support.addPropertyChangeListener(pcl);
 	}
 
+	/**
+	 * Removes the specified listener from being informed about changing properties.
+	 *
+	 * @param pcl
+	 *          The listener to remove
+	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
 		support.removePropertyChangeListener(pcl);
 	}
 
+	/**
+	 * Returns the current configuration of the Probe which is kept update using the API from the Portal.
+	 *
+	 * @return The current configuration of the probe.
+	 */
 	public Config getConfig() {
 		if (currentConfig != null) {
 			return currentConfig;
@@ -125,16 +142,16 @@ public class ProbeConfiguration {
 		updateStepsLocal();
 		updateQueriesLocal();
 
-		checkConfig();
+		checkAndUpdateConfigFromAPI();
 
 		return currentConfig;
 	}
 
 	/**
-	 * Obtains the configuration from the server and updates the local configuration accordingly. The retrieved information is stored in the
+	 * Obtains the configuration from the Portal and updates the local configuration accordingly. The retrieved information is stored in the
 	 * database and the packet processors are instantiated.
 	 */
-	public void checkConfig() {
+	public void checkAndUpdateConfigFromAPI() {
 		/*
 		 * Check if the API is available and if a newer version is available update it.
 		 */
@@ -156,6 +173,10 @@ public class ProbeConfiguration {
 		}
 	}
 
+	/**
+	 * Verifies if the currently used license and token is still valid. The license is updated if something has changed in the Portal. If the
+	 * license is not valid anymore the properties are set accordingly.
+	 */
 	private void verifyLicense() {
 		CompanyLicensePublic licenseObj = licenseController.checkTokenValidity();
 
@@ -165,13 +186,16 @@ public class ProbeConfiguration {
 			isLicenseValid = true;
 			support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
 		} else {
-			CompanyLicensePublic license = licenseController.loadLicenseFromDB();
-			DBUtil.getInstance().delete(license);
+			// CompanyLicensePublic license = licenseController.loadLicenseFromDB();
+			// DBUtil.getInstance().delete(license);
 			isLicenseValid = false;
 			support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
 		}
 	}
 
+	/**
+	 * Obtains the {@link Config} from the Portal and updates the locally stored and used accordingly.
+	 */
 	private void updateConfigFromAPI() {
 		Config apiConfig = getConfigFromAPI();
 
@@ -189,7 +213,7 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Updates the current configuration from local information, either the database if available or from the default file configuration
+	 * Updates the current {@link Config} from local information, either the database if available or from the default file configuration
 	 * otherwise.
 	 */
 	private void updateConfigLocal() {
@@ -212,6 +236,10 @@ public class ProbeConfiguration {
 		}
 	}
 
+	/**
+	 * Updates the {@link Processor} objects, which are used to perform actions for network monitoring, from the Portal. Updates the local
+	 * configuration accordingly.
+	 */
 	private void updateProcessorsFromAPI() {
 		List<Processor> apiProcessors = getProcessorsFromAPI();
 
@@ -262,6 +290,10 @@ public class ProbeConfiguration {
 
 	}
 
+	/**
+	 * Updates the {@link Step} objects, which are used to define which steps (processors) are actually used to monitor the network traffic,
+	 * from the API. Updates the local configuration accordingly.
+	 */
 	private void updateStepsFromAPI() {
 		List<Step> apiSteps = getStepsFromAPI();
 		if (apiSteps != null) {
@@ -316,6 +348,10 @@ public class ProbeConfiguration {
 
 	}
 
+	/**
+	 * Updates the {@link QueryRun} objects, which are used to obtain system information using OSQuery, from the API. Updates the local
+	 * configuration accordingly.
+	 */
 	private void updateQueriesFromAPI() {
 		List<QueryRun> apiQueries = getQueriesFromAPI();
 		if (apiQueries != null) {
@@ -393,8 +429,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
+	 * Returns the {@link Config} object from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromAPI() {
 		return JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getConfigAPI(), ProbeConfiguration.authKey),
@@ -402,8 +439,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
+	 * Return the {@link Config} object from the database.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromDatabase() {
 		List<Config> configs = DBUtil.getInstance().findAll(new Config());
@@ -414,8 +452,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
+	 * Returns the {@link Config} from the local default file configuration.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromFile() {
 		Config fileConfig = null;
@@ -448,9 +487,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function returns processors from the API
+	 * Returns a List of {@link Processor} objects from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
 		return Arrays.asList(JSONUtils.fromString(
@@ -497,7 +536,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function returns steps from the API for the logged in user
+	 * Returns a List of {@link Step} objects from the associated Portal API.
+	 *
+	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
 		return Arrays.asList(
@@ -544,10 +585,9 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function retrieves the run Queries from API. Currently we are getting queries only for current user, but we will also have to add
-	 * additional parameter for client.
+	 * Returns a List of {@link QueryRun} objects from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained List of {@link QueryRun} objects.
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
 		return Arrays.asList(JSONUtils
@@ -592,14 +632,21 @@ public class ProbeConfiguration {
 		return runQueries;
 	}
 
-	public Config getCurrentConfigObj() {
-		return currentConfig;
-	}
-
+	/**
+	 * Returns whether the Portal API is available or not currently.
+	 *
+	 * @return True if the API is available
+	 */
 	public static boolean isAPIAvailable() {
 		return apiAvailable;
 	}
 
+	/**
+	 * Sets the API availability to the specified value.
+	 *
+	 * @param apiAvailability
+	 *          The availability of the API (true or false)
+	 */
 	public static void setAPIAvailablitity(boolean apiAvailability) {
 		apiAvailable = apiAvailability;
 		if (support != null) {
@@ -607,18 +654,39 @@ public class ProbeConfiguration {
 		}
 	}
 
+	/**
+	 * Returns a map containing the current steps which are defined for the Probe. These Steps are used in the {@link PacketProcessorFSM} to
+	 * obtain from what Processor the currently received packet needs to be processed.
+	 *
+	 * @return
+	 */
 	public Map<String, Step> getCurrentSteps() {
 		return currentSteps;
 	}
 
+	/**
+	 * Returns the map of currently specified {@link PacketProcessor} objects.
+	 *
+	 * @return The map of {@link PacketProcessor} objects.
+	 */
 	public Map<String, PacketProcessor> getCurrentPacketProcessors() {
 		return currentPacketProcessors;
 	}
 
+	/**
+	 * Returns a map of currently specified {@link Processor} objects.
+	 *
+	 * @return The map of {@link Processor} objects
+	 */
 	public Map<String, Processor> getCurrentProcessors() {
 		return currentProcessors;
 	}
 
+	/**
+	 * Returns a map of currently specified {@link QueryRun} objects.
+	 *
+	 * @return
+	 */
 	public Map<String, QueryRun> getCurrentQueries() {
 		return currentQueries;
 	}

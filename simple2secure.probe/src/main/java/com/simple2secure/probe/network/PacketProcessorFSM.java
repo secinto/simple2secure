@@ -60,13 +60,7 @@ public class PacketProcessorFSM implements Runnable {
 		/*
 		 * TODO: Refactor this in order to not run this for every packet but only if the configuration changes.
 		 */
-		processors = new ArrayList<>();
-		for (Step stp : ProbeConfiguration.getInstance().getCurrentSteps().values()) {
-			PacketProcessor processor = ProbeConfiguration.getInstance().getCurrentPacketProcessors().get(stp.getName());
-			if (processor != null) {
-				processors.add(processor);
-			}
-		}
+		updateProcessorsForPacket();
 
 		int next = packet.getNext();
 		packet.setNext(next + 1);
@@ -83,6 +77,17 @@ public class PacketProcessorFSM implements Runnable {
 			processor.initialize(packet);
 			return processor;
 		}
+	}
+
+	private void updateProcessorsForPacket() {
+		processors = new ArrayList<>();
+		for (Step stp : ProbeConfiguration.getInstance().getCurrentSteps().values()) {
+			PacketProcessor processor = ProbeConfiguration.getInstance().getCurrentPacketProcessors().get(stp.getName());
+			if (processor != null) {
+				processors.add(processor);
+			}
+		}
+
 	}
 
 	public void stop() {
