@@ -37,7 +37,7 @@ public class NetworkMonitor {
 
 	private ProcessingQueue<PacketContainer> processingQueue;
 	private PcapHandle receiverHandle;
-	private PcapHandle senderHandle;
+	// private PcapHandle senderHandle;
 
 	public static NetworkMonitor startMonitor() {
 		if (instance == null) {
@@ -61,7 +61,7 @@ public class NetworkMonitor {
 			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
 		}
 
-		Config configuration = ProbeConfiguration.getInstance().getCurrentConfigObj();
+		Config configuration = ProbeConfiguration.getInstance().getConfig();
 
 		boolean show = configuration.isShow_interfaces();
 
@@ -69,7 +69,7 @@ public class NetworkMonitor {
 
 		boolean use_iface = configuration.isUse_configured_iface();
 		if (use_iface) {
-			int config = ProbeConfiguration.getInstance().getCurrentConfigObj().getInterface_number();
+			int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
 			int iface = config;
 			if (iface < interfaces.size()) {
 				singleInterface = interfaces.get(iface);
@@ -130,27 +130,15 @@ public class NetworkMonitor {
 			new Thread(receiver).start();
 
 		} catch (Exception e) {
-			if (receiver != null) {
-				receiver.stop();
-			}
 			if (packetProcessor != null) {
 				packetProcessor.stop();
+			}
+			if (receiver != null) {
+				receiver.stop();
 			}
 			throw new NetworkException(LocaleHolder.getMessage("pcap_interface_open_error"));
 		}
 
-	}
-
-	public void stop() {
-		if (receiver != null) {
-			receiver.stop();
-		}
-		if (packetProcessor != null) {
-			packetProcessor.stop();
-		}
-		if (instance != null) {
-			instance = null;
-		}
 	}
 
 	public PacketReceiver getReceiver() {

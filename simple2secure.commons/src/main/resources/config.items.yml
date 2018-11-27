@@ -19,3 +19,4 @@ packetAPI: /api/packet
 stepAPI: /api/steps
 processorAPI: /api/processors
 licenseAPI: /api/license
+serviceAPI: /api/service

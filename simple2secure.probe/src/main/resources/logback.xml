@@ -1,5 +1,4 @@
 <configuration>
-
 	<property name="LOG_HOME" value="./logs" />
 
 	<appender name="STDOUT"
@@ -42,14 +41,16 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.simple2secure.probe" level="info" />
+	<logger name="com.simple2secure.probe" level="debug" />
 	<logger name="org.pcap4j" level="info" />
 	<logger name="org.hibernate" level="info" />
+	<!-- <logger name="org.hibernate" level="info" /> -->
+
 
 	<root level="error">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
-		<appender-ref ref="GUI" />
+		<!-- <appender-ref ref="GUI"/> -->
 	</root>
 
 </configuration>

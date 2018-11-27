@@ -42,9 +42,9 @@ public class PacketProcessorFSM implements Runnable {
 				}
 				if (lastPacket.isPacketInProcess()) {
 					processingQueue.push(lastPacket);
-					log.debug("Processing of packet with ID {} not finished. Pushing it onto the queue.", lastPacket.getId());
+					log.trace("Processing of packet with ID {} not finished. Pushing it onto the queue.", lastPacket.getId());
 				} else {
-					log.trace("Processing for this packet has finished all steps.");
+					log.trace("Processing for this packet with ID {} has finished all steps.", lastPacket.getId());
 				}
 			} catch (Exception e) {
 				if (lastPacket != null) {
@@ -58,16 +58,9 @@ public class PacketProcessorFSM implements Runnable {
 
 	public PacketProcessor getProcessorForPacket(PacketContainer packet) {
 		/*
-		 * TODO: Refactor this in order to not run this for every packet but only if the
-		 * configuration changes.
+		 * TODO: Refactor this in order to not run this for every packet but only if the configuration changes.
 		 */
-		processors = new ArrayList<>();
-		for (Step stp : ProbeConfiguration.getInstance().getCurrentSteps().values()) {
-			PacketProcessor processor = ProbeConfiguration.getInstance().getCurrentPacketProcessors().get(stp.getName());
-			if (processor != null) {
-				processors.add(processor);
-			}
-		}
+		updateProcessorsForPacket();
 
 		int next = packet.getNext();
 		packet.setNext(next + 1);
@@ -84,6 +77,17 @@ public class PacketProcessorFSM implements Runnable {
 			processor.initialize(packet);
 			return processor;
 		}
+	}
+
+	private void updateProcessorsForPacket() {
+		processors = new ArrayList<>();
+		for (Step stp : ProbeConfiguration.getInstance().getCurrentSteps().values()) {
+			PacketProcessor processor = ProbeConfiguration.getInstance().getCurrentPacketProcessors().get(stp.getName());
+			if (processor != null) {
+				processors.add(processor);
+			}
+		}
+
 	}
 
 	public void stop() {

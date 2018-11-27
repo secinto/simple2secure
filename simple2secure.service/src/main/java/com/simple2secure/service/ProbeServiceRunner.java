@@ -18,29 +18,14 @@ public class ProbeServiceRunner {
 	private static String workingDirectory = System.getProperty("user.dir");
 
 	public static void main(String[] args) {
-		// String[] newArgs = new String[1];
-		// newArgs[0] = "start";
-		// ProbeControllerService.windowsService(newArgs);
 		log.info("Starting ProbeSericeRunner");
-
+		/*
+		 * Installing Probe Service. Command line arguments should also be processed.
+		 */
 		ProcessContainer startedService = ServiceUtils.installService(workingDirectory, "ProbeService", "Probe Service",
 				"simple2secure.service-0.1.0.jar", "com.simple2secure.service.ProbeControllerService", "windowsService",
 				"com.simple2secure.service.ProbeControllerService", "windowsService");
 
-		System.out.println(startedService.getProcess().exitValue());
-
-		ServiceUtils.deleteService("ProbeService");
-		/*
-		 * Check if we can find the license file in the directory, if not start the probe service without the license file.
-		 */
-		// String licenseFile = findLicenseFile();
-		//
-		// if (!Strings.isNullOrEmpty(licenseFile)) {
-		// ProcessUtils.startProcess("java -jar simple2secure.probe.jar -l " + licenseFile);
-		// } else {
-		// log.info("License file is not available, starting service without.");
-		// ProcessUtils.startProcess("java -jar simple2secure.probe.jar");
-		// }
 	}
 
 	public static String findLicenseFile() {

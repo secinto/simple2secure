@@ -1,21 +1,30 @@
 package com.simple2secure.commons.process;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ProcessContainer {
 
 	private Process process;
-	private ProcessStream consumer;
+	private ProcessStreamObservable observable;
 
-	public ProcessContainer(Process process, ProcessStream consumer) {
+	public ProcessContainer(Process process, ProcessStreamObservable observable) {
 		this.process = process;
-		this.consumer = consumer;
+		this.observable = observable;
 	}
 
 	public Process getProcess() {
 		return process;
 	}
 
-	public ProcessStream getConsumer() {
-		return consumer;
+	public ProcessStreamObservable getObservable() {
+		return observable;
+	}
+
+	public void startObserving() {
+		ExecutorService pool = Executors.newSingleThreadExecutor();
+		pool.submit(observable);
+		pool.shutdown();
 	}
 
 }

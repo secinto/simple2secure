@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
 
@@ -242,9 +243,6 @@ public class ServiceUtils {
 		if (!installPath.endsWith("\\")) {
 			installPath = installPath + "\\";
 		}
-		if (!logPath.endsWith("\\")) {
-			logPath = logPath + "\\";
-		}
 
 		env.put("SERVICE_NAME", serviceName);
 
@@ -257,6 +255,11 @@ public class ServiceUtils {
 
 		env.put("PR_LOGPREFIX", serviceName.replaceAll(" ", "").trim());
 		env.put("PR_LOGPATH", logPath);
+
+		if (!logPath.endsWith("\\")) {
+			logPath = logPath + "\\";
+		}
+
 		env.put("PR_STDOUTPUT", logPath + stdout);
 		env.put("PR_STDERROR", logPath + stderr);
 		env.put("PR_LOGLEVEL", logLevel);
@@ -273,7 +276,19 @@ public class ServiceUtils {
 			String javaHome = getJVMPath();
 			env.put("PR_JVM", javaHome + JVM_LIBRARY_REL);
 		}
+
+		if (!FileUtil.fileOrFolderExists(env.get("PR_JVM"))) {
+			log.error("The specified JVM path is not correct! Ignoring it?");
+		}
+
+		/*
+		 * TODO: Should we add file checks for the JVM, library and the image files?
+		 */
 		env.put("PR_CLASSPATH", installPath + library);
+
+		if (!FileUtil.fileOrFolderExists(env.get("PR_CLASSPATH"))) {
+			log.error("The specified library path is not correct! Ignoring it?");
+		}
 
 		env.put("PR_STARTUP", startup);
 		env.put("PR_STARTMODE", startMode);
@@ -333,7 +348,7 @@ public class ServiceUtils {
 		serviceString.append("%PR_INSTALL% //IS//%SERVICE_NAME%");
 		Map<String, String> environment = createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass,
 				startMethod, stopClass, stopMethod);
-		return ProcessUtils.startProcess(serviceString.toString(), false, true, environment);
+		return ProcessUtils.manageServiceWindows(serviceString.toString(), true, environment);
 	}
 
 	/**
@@ -348,7 +363,7 @@ public class ServiceUtils {
 		serviceString.append("%PR_INSTALL% //ES//%SERVICE_NAME%");
 		Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.startProcess(serviceString.toString(), false, false, environment);
+		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
 	}
 
 	/**
@@ -363,7 +378,7 @@ public class ServiceUtils {
 		serviceString.append("%PR_INSTALL% //SS//%SERVICE_NAME%");
 		Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.startProcess(serviceString.toString(), false, false, environment);
+		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
 	}
 
 	/**
@@ -378,7 +393,7 @@ public class ServiceUtils {
 		serviceString.append("%PR_INSTALL% //DS//%SERVICE_NAME%");
 		Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.startProcess(serviceString.toString(), false, false, environment);
+		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
 	}
 
 	/**

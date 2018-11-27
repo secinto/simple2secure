@@ -3,11 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
-	<persistence-unit name="s2s">
-		<description>Simple2Secure Probe</description>
+	<persistence-unit name="s2s-test">
+		<description>Simple2Secure Probe Test</description>
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>com.simple2secure.api.model.AccountCredential</class>
-		<class>com.simple2secure.api.model.API</class>
 		<class>com.simple2secure.api.model.Config</class>
 		<class>com.simple2secure.api.model.DBConfig</class>
 		<class>com.simple2secure.api.model.Device</class>
@@ -20,19 +19,24 @@
 		<class>com.simple2secure.api.model.Step</class>
 		<class>com.simple2secure.api.model.Task</class>
 		<class>com.simple2secure.api.model.CompanyGroup</class>
-		<class>com.simple2secure.api.model.CompanyLicenseObj</class>
+		<class>com.simple2secure.api.model.CompanyLicensePublic</class>
 		<class>com.simple2secure.api.model.NetworkReport</class>
 		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
-			<property name="hibernate.archive.autodetection" value="class" />
-			<property name="hibernate.connection.driver_class" value="org.h2.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:h2:file:~/s2sDb/s2sProbeDB" />
+			<property name="hibernate.archive.autodetection"
+				value="class" />
+			<property name="hibernate.connection.driver_class"
+				value="org.h2.Driver" />
+			<property name="hibernate.connection.url"
+				value="jdbc:h2:file:~/s2sDb/s2sProbeDB-test" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
-			<property name="javax.persistence.jdbc.password" value="admin" />
+			<property name="javax.persistence.jdbc.password"
+				value="admin" />
 		</properties>
 	</persistence-unit>
 </persistence> 

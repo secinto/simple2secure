@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.commons.general.TimingUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.NetworkMonitor;
 import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class NetworkScheduler extends TimerTask {
 
@@ -28,22 +28,9 @@ public class NetworkScheduler extends TimerTask {
 
 	@Override
 	public void run() {
-		isServerReachable();
+		ProbeUtils.isServerReachable();
 		getNetworkStatistics();
 		checkNetworkFilter();
-	}
-
-	/**
-	 * This function checks if the server is reachable
-	 */
-	private void isServerReachable() {
-		if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
-			ProbeConfiguration.setAPIAvailablitity(true);
-			log.info("SERVER REACHABLE!");
-		} else {
-			ProbeConfiguration.setAPIAvailablitity(false);
-			log.error("SERVER NOT REACHABLE!");
-		}
 	}
 
 	private void getNetworkStatistics() {
@@ -53,6 +40,7 @@ public class NetworkScheduler extends TimerTask {
 			report.setStartTime(new Date().toString());
 			report.setProcessorName("PCAP Network Statistics");
 			report.setProbeId(ProbeConfiguration.probeId);
+			report.setGroupId(ProbeConfiguration.groupId);
 			report.addContent("PacketsCaptured", String.valueOf(statistics.getNumPacketsCaptured()));
 			report.addContent("PacketsDropped", String.valueOf(statistics.getNumPacketsDropped()));
 			report.addContent("PacketsDroppedByIf", String.valueOf(statistics.getNumPacketsDroppedByIf()));

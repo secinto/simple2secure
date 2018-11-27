@@ -1,10 +1,5 @@
 package com.simple2secure.commons.general;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,24 +69,5 @@ public class TimingUtils {
 		double seconds = stopTimingSimple();
 		log.info("Time for \"{}\" took {} seconds", message, seconds);
 		return seconds;
-	}
-
-	/**
-	 *
-	 * @param string_url
-	 * @return
-	 */
-	public static boolean netIsAvailable(String string_url) {
-		try {
-			final URL url = new URL(string_url);
-			final URLConnection conn = url.openConnection();
-			conn.connect();
-			return true;
-		} catch (MalformedURLException e) {
-			log.error(e.getMessage());
-			return false;
-		} catch (IOException e) {
-			return false;
-		}
 	}
 }

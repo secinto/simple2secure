@@ -36,18 +36,14 @@ public class Config extends GenericDBObject {
 	@Lob
 	private String bpfFilter;
 
-
-	@ManyToOne(cascade = {CascadeType.ALL})
+	@ManyToOne(cascade = { CascadeType.ALL })
 	@JoinColumn(name = "db_config")
 	private DBConfig db_config;
-	@ManyToOne(cascade = {CascadeType.ALL})
+	@ManyToOne(cascade = { CascadeType.ALL })
 	@JoinColumn(name = "query_config")
 	private QueryConfig queries;
 
 	private String baseUrl;
-
-	@OneToMany(cascade = {CascadeType.ALL})
-	private List<API> apis;
 
 	public Config() {
 
@@ -68,9 +64,10 @@ public class Config extends GenericDBObject {
 	 * @param communication_factory
 	 * @param db_config
 	 */
-	public Config(int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
-			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
-			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, List<API> apis, String baseUrl) {
+	public Config(int version, String config_supplier, String task_supplier, String stylesheet,
+			boolean use_configured_iface, int interface_number, boolean show_interfaces, String external_address,
+			int connection_timeout, String processing_factory, String communication_factory, int wt_intervall,
+			DBConfig db_config, QueryConfig queries, String baseUrl) {
 		super();
 		this.version = version;
 		this.config_supplier = config_supplier;
@@ -87,7 +84,6 @@ public class Config extends GenericDBObject {
 		this.db_config = db_config;
 		this.queries = queries;
 		this.baseUrl = baseUrl;
-		this.apis = apis;
 	}
 
 	/**
@@ -112,9 +108,10 @@ public class Config extends GenericDBObject {
 	 * @param baseUrl
 	 */
 
-	public Config(String probeId, String id, int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
-			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
-			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, List<API> apis, String baseUrl) {
+	public Config(String probeId, String id, int version, String config_supplier, String task_supplier,
+			String stylesheet, boolean use_configured_iface, int interface_number, boolean show_interfaces,
+			String external_address, int connection_timeout, String processing_factory, String communication_factory,
+			int wt_intervall, DBConfig db_config, QueryConfig queries, String baseUrl) {
 		super();
 		this.id = id;
 		this.version = version;
@@ -132,7 +129,6 @@ public class Config extends GenericDBObject {
 		this.db_config = db_config;
 		this.queries = queries;
 		this.baseUrl = baseUrl;
-		this.apis = apis;
 	}
 
 	/**
@@ -367,14 +363,6 @@ public class Config extends GenericDBObject {
 		this.baseUrl = baseUrl;
 	}
 
-	public List<API> getApis() {
-		return apis;
-	}
-
-	public void setApis(List<API> apis) {
-		this.apis = apis;
-	}
-
 	public int getWt_intervall() {
 		return wt_intervall;
 	}
@@ -390,6 +378,5 @@ public class Config extends GenericDBObject {
 	public void setBpfFilter(String bpfFilter) {
 		this.bpfFilter = bpfFilter;
 	}
-
 
 }

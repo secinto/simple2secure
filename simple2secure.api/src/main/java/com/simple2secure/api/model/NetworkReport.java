@@ -16,10 +16,10 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class NetworkReport extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5984944130903360444L;
-
+	private String groupId;
 	private String probeId;
 	@ElementCollection
 	@MapKeyColumn(name = "key")
@@ -38,6 +38,14 @@ public class NetworkReport extends GenericDBObject {
 		this.content = content;
 		this.startTime = startTime;
 		this.sent = sent;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 	public String getProbeId() {

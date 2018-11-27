@@ -30,10 +30,9 @@ import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.DBUtil;
 
 /***
- * The CommonStatisticsProcessor reads all the basic data from the packet and
- * writes it to the Database. This data includes: Timestamp, Source- and
- * Destination Mac Address, Source- and Destination IP Address, Type (IPv4,
- * Ipv6...) and Protocol (TCP, UDP...) both in the same slot, and length
+ * The CommonStatisticsProcessor reads all the basic data from the packet and writes it to the Database. This data includes: Timestamp,
+ * Source- and Destination Mac Address, Source- and Destination IP Address, Type (IPv4, Ipv6...) and Protocol (TCP, UDP...) both in the same
+ * slot, and length
  *
  * @author jhoffmann
  *
@@ -73,6 +72,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		analysisStartTime = new Date();
 		report = new NetworkReport();
 		report.setProbeId(ProbeConfiguration.probeId);
+		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
 
 		reportContent = new HashMap<>();
@@ -88,9 +88,8 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	@Override
 	public PacketContainer processPacket() {
 		/*
-		 * Obtain the features for this packet. Depending on the feature type and the
-		 * actual packet (TCP, UDP, or higher layer packet instances) different features
-		 * will be returned.
+		 * Obtain the features for this packet. Depending on the feature type and the actual packet (TCP, UDP, or higher layer packet instances)
+		 * different features will be returned.
 		 */
 
 		Packet packet = this.packet.getPacket();
@@ -163,8 +162,8 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		long intervalTime = packet.getProcessor().getAnalysisInterval();
 		TimeUnit intervalUnit = packet.getProcessor().getAnalysisIntervalUnit();
 		/*
-		 * TODO: Verify that this never happens or create a better handler for the case
-		 * that null is returned. Also use shared constants for that.
+		 * TODO: Verify that this never happens or create a better handler for the case that null is returned. Also use shared constants for
+		 * that.
 		 */
 		if (intervalUnit == null) {
 			intervalUnit = TimeUnit.HOURS;
@@ -184,6 +183,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				analysisStartTime = new Date();
 				report = new NetworkReport();
 				report.setProbeId(ProbeConfiguration.probeId);
+				report.setGroupId(ProbeConfiguration.groupId);
 				report.setStartTime(analysisStartTime.toString());
 				report.setProcessorName(packet.getProcessor().getName());
 
@@ -258,8 +258,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	}
 
 	/*
-	 * This function analyzes the collected values and writes the maximum values to
-	 * the content map
+	 * This function analyzes the collected values and writes the maximum values to the content map
 	 */
 	private void writeNetworkTrafficResults() {
 		Map.Entry<String, Integer> mostUsedSourceIP = getMostUsedEntry(sourceIp);
@@ -271,10 +270,9 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		String contentSrcIp = "Most used source IP: " + mostUsedSourceIP.getKey() + " - used: " + mostUsedSourceIP.getValue() + " times";
 		String contentDstIp = "Most used destination IP: " + mostUsedDestinationIP.getKey() + " - used: " + mostUsedDestinationIP.getValue()
 				+ " times";
-		String contentSrcMac = "Most used source MAC: " + mostUsedSourceMac.getKey() + " - used: " + mostUsedSourceMac.getValue()
+		String contentSrcMac = "Most used source MAC: " + mostUsedSourceMac.getKey() + " - used: " + mostUsedSourceMac.getValue() + " times";
+		String contentDstMac = "Most used destination MAC: " + mostUsedDestinationMac.getKey() + " - used: " + mostUsedDestinationMac.getValue()
 				+ " times";
-		String contentDstMac = "Most used destination MAC: " + mostUsedDestinationMac.getKey() + " - used: "
-				+ mostUsedDestinationMac.getValue() + " times";
 		String contentProtocol = "Most used protocol; " + mostUsedProtocol.getKey() + " - used: " + mostUsedProtocol.getValue() + " times";
 		String contentMaxPacketLength = "Maximum packet length was: " + maxLength;
 
@@ -288,7 +286,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	/**
 	 * This function returns the entry with the maximum value
-	 * 
+	 *
 	 * @param map
 	 * @return
 	 */

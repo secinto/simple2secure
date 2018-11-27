@@ -23,11 +23,39 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	/** The entity class. */
 	protected Class<T> entityClass;
 
-	private static final String PERSISTENCE_UNIT_NAME = "s2s";
+	protected static String PERSISTENCE_UNIT_NAME = "s2s";
 	private static EntityManagerFactory factory;
 
-	static {
-		factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+	/**
+	 * Creates the EntityManager using the built-in persistence unit name.
+	 */
+	protected static void createEntityManager() {
+		if (factory == null) {
+			factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+		} else {
+			if (!factory.getProperties().get("hibernate.ejb.persistenceUnitName").toString().equals(PERSISTENCE_UNIT_NAME)) {
+				factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+			}
+		}
+	}
+
+	/**
+	 * Initializes the EntityManager using the provided persistence unit name.
+	 *
+	 * @param persistenceUnitName
+	 *          The persistence unit which should be used to initialize the EntityManager.
+	 */
+	public static void init(String persistenceUnitName) {
+		PERSISTENCE_UNIT_NAME = persistenceUnitName;
+		init();
+	}
+
+	/**
+	 * Initializes the EntityManager using the default persistence unit name. If another unit name should be used function
+	 * {@link #init(String)} must be used.
+	 */
+	public static void init() {
+		createEntityManager();
 	}
 
 	/**
@@ -70,8 +98,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	}
 
 	/**
-	 * Checks if object already exists, if yes updates in the the database, if not
-	 * inserts new one to the database
+	 * Checks if object already exists, if yes updates in the the database, if not inserts new one to the database
 	 */
 	@Override
 	public void merge(T t) {
@@ -118,27 +145,13 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	}
 
 	/**
-	 * Find object by filed name.
-	 *
-	 * @param fieldName
-	 *            the field name
-	 * @param value
-	 *            the value
-	 * @return the t
-	 */
-	public T findBy(String fieldName, Object value) {
-		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
-		return getSingleResult(query);
-	}
-
-	/**
 	 * Gets the query.
 	 *
 	 * @param fieldName
-	 *            the field name
+	 *          the field name
 	 * @return the query
 	 */
-	String getQuery(String fieldName) {
+	private String getQuery(String fieldName) {
 		String query = "from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
 	}
@@ -147,7 +160,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 * Gets the single result.
 	 *
 	 * @param query
-	 *            the query
+	 *          the query
 	 * @return the single result
 	 */
 	@SuppressWarnings("unchecked")

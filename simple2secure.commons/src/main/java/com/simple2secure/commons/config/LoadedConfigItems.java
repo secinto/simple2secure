@@ -44,11 +44,23 @@ public class LoadedConfigItems {
 	private String stepAPI = "/api/steps";
 	private String processorAPI = "/api/processors";
 	private String licenseAPI = "/api/license";
+	private String serviceAPI = "/api/service";
 
-	public LoadedConfigItems() {
+	private static LoadedConfigItems instance;
+
+	public static LoadedConfigItems getInstance() {
+		if (instance == null) {
+			instance = new LoadedConfigItems();
+			instance.init();
+		}
+		return instance;
 	}
 
-	public void init() {
+	public LoadedConfigItems() {
+
+	}
+
+	protected void init() {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
 		try {
@@ -197,8 +209,12 @@ public class LoadedConfigItems {
 		return getBaseURL() + licenseAPI;
 	}
 
+	public String getServiceAPI() {
+		return getBaseURL() + serviceAPI;
+	}
+
 	public String getLicensePlanURL() {
 		return getBaseURL() + licensePlanURL;
-	}	
+	}
 
 }

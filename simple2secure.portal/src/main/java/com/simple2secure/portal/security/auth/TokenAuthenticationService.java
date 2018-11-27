@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Token;
 import com.simple2secure.api.model.User;
@@ -61,7 +61,7 @@ public class TokenAuthenticationService {
 	static final String CLAIM_USERROLE = "userRole";
 	static final String CLAIM_PROBEID = "probeID";
 
-	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicense license) {
+	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicensePrivate license) {
 		if (!Strings.isNullOrEmpty(probeId) && group != null && license != null) {
 
 			List<Settings> settings = settingsRepository.findAll();
@@ -172,7 +172,7 @@ public class TokenAuthenticationService {
 			else {
 				// Handle token for probeId
 				// Check if there is a token with this id in the licenseRepo - for probe
-				CompanyLicense license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
+				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 				if (license != null) {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
