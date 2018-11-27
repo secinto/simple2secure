@@ -823,17 +823,18 @@ public class UserController {
 				}
 			}
 
-			/* Set user probes from the licenses */
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByUserId(id);
+			/* Set user probes from the licenses - not from the users anymore */
 			List<Probe> myProbes = new ArrayList<Probe>();
-			if (licenses != null) {
-				for (CompanyLicensePrivate license : licenses) {
-					// Retrieve only activated probes
-					if (license.isActivated()) {
-						CompanyGroup group = groupRepository.find(license.getGroupId());
-						if (group != null) {
-							Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
-							myProbes.add(probe);
+			List<CompanyGroup> assignedGroups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
+			if (myGroups != null) {
+				for (CompanyGroup group : assignedGroups) {
+					List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(group.getId());
+					if (licenses != null) {
+						for (CompanyLicensePrivate license : licenses) {
+							if (license.isActivated()) {
+								Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
+								myProbes.add(probe);
+							}
 						}
 					}
 				}
@@ -1064,6 +1065,56 @@ public class UserController {
 		emailRepository.deleteByUserId(user.getId());
 		notificationRepository.deleteByUserId(user.getId());
 		tokenRepository.deleteByUserId(user.getId());
+	}
+
+	/**
+	 * This function returns all devices according to the user id
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/api/users/deleteProbe/{probeId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<CompanyLicensePrivate> deleteProbe(@PathVariable("probeId") String probeId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(probeId)) {
+			// retrieve license from database
+			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			if (license != null) {
+				// TODO - check before deleting if we need to decrement the number of downloaded licenses in adminGroup
+				licenseRepository.delete(license);
+				return new ResponseEntity<>(license, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_probe", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function returns all devices according to the user id
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/api/users/changeGroup/{probeId}", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("probeId") String probeId, @RequestBody CompanyGroup group,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(probeId) && group != null) {
+			// retrieve license from database
+			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyGroup dbGroup = groupRepository.find(group.getId());
+			if (license != null && dbGroup != null) {
+
+				license.setGroupId(dbGroup.getId());
+				// TODO - check what needs to be updated in order that probe gets a correct
+				// during the next license check
+				licenseRepository.update(license);
+				return new ResponseEntity<>(license, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_probe_group", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**

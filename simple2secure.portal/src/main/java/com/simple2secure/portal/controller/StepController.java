@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -140,18 +139,25 @@ public class StepController {
 
 	/**
 	 * This function returns all users from the user repository
+	 *
+	 * @throws ItemNotFoundRepositoryException
 	 */
 	@RequestMapping(value = "/api/steps/{stepId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
 		Step step = repository.find(stepId);
-		if (step == null) {
-			return new ResponseEntity<>(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_deleting_step", ObjectUtils.toObjectArray(stepId), locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
+		List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber(), step.getGroupId());
+		{
 			repository.delete(step);
+
+			if (steps != null) {
+				for (Step stepObj : steps) {
+					stepObj.setNumber(stepObj.getNumber() - 1);
+					repository.update(stepObj);
+				}
+			}
+
 			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 	}

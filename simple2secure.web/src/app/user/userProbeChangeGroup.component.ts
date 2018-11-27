@@ -33,6 +33,7 @@ export class UserProbeChangeGroupComponent {
         private dialogRef: MatDialogRef<UserProbeChangeGroupComponent>,
         @Inject(MAT_DIALOG_DATA) data) {
             this.probe = data;
+            this.selectedGroup = this.probe.group;
         }
 
     ngOnInit() {
@@ -45,10 +46,7 @@ export class UserProbeChangeGroupComponent {
         this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID)
             .subscribe(
                 data => {
-                    this.groups = data;
-                    this.selectedGroup = this.probe.group;
-                    console.log("Selected group " + JSON.stringify(this.selectedGroup));
-                    console.log("Loaded groups " + JSON.stringify(this.groups));
+                    this.extractGroups(data);
                 },
                 error => {
 
@@ -74,5 +72,16 @@ export class UserProbeChangeGroupComponent {
                 this.dialogRef.close(error);
                 this.loading = false;
             });
+    }
+
+    extractGroups(groups: CompanyGroup[]){
+        this.groups = [];
+        for (let i = 0; i < groups.length; i++) {
+            if (groups[i].id == this.selectedGroup.id){
+            }
+            else{
+                this.groups.push(groups[i]);
+            }
+        }
     }
 }
