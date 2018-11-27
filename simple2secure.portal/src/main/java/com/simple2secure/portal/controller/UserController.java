@@ -823,17 +823,18 @@ public class UserController {
 				}
 			}
 
-			/* Set user probes from the licenses */
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByUserId(id);
+			/* Set user probes from the licenses - not from the users anymore */
 			List<Probe> myProbes = new ArrayList<Probe>();
-			if (licenses != null) {
-				for (CompanyLicensePrivate license : licenses) {
-					// Retrieve only activated probes
-					if (license.isActivated()) {
-						CompanyGroup group = groupRepository.find(license.getGroupId());
-						if (group != null) {
-							Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
-							myProbes.add(probe);
+			List<CompanyGroup> assignedGroups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
+			if (myGroups != null) {
+				for (CompanyGroup group : assignedGroups) {
+					List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(group.getId());
+					if (licenses != null) {
+						for (CompanyLicensePrivate license : licenses) {
+							if (license.isActivated()) {
+								Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
+								myProbes.add(probe);
+							}
 						}
 					}
 				}

@@ -56,42 +56,43 @@ public class ConfigController {
 
 	@Autowired
 	QueryRepository queryRepository;
-	
+
 	@Autowired
 	LicenseRepository licenseRepository;
-	
+
 	@Autowired
-	GroupRepository groupRepository;	
-	
+	GroupRepository groupRepository;
+
 	@Autowired
 	ProcessorRepository processorRepository;
-	
+
 	@Autowired
 	StepRepository stepRepository;
-	
-    @Autowired
-    MessageByLocaleService messageByLocaleService;
-    
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
+
 	@Autowired
 	PortalUtils portalUtils;
 
 	RestTemplate restTemplate = new RestTemplate();
-	
+
 	static final Logger log = LoggerFactory.getLogger(ConfigController.class);
 
 	/**
 	 * This function updates configuration and automatically after each update the version will be incremented
-	 * 
+	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@RequestMapping(value = "/api/config", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN')")
-	public ResponseEntity<Config> saveConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Config> saveConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
 		config.setVersion(config.getVersion() + 1);
-		this.configRepository.update(config);
+		configRepository.update(config);
 		return new ResponseEntity<Config>(config, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * this function returns config by config id
 	 *
@@ -102,35 +103,38 @@ public class ConfigController {
 	@RequestMapping(value = "/api/config", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	public ResponseEntity<Config> getConfig(@RequestHeader("Accept-Language") String locale) {
-		List<Config> configs = this.configRepository.findAll();
-		if(configs == null || configs.size() != 1) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);
+		List<Config> configs = configRepository.findAll();
+		if (configs == null || configs.size() != 1) {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
+					HttpStatus.NOT_FOUND);
 		}
-		
+
 		return new ResponseEntity<Config>(configs.get(0), HttpStatus.OK);
-	}	
+	}
 
 	/**
 	 * This function updates or saves new Query config into the database
-	 * @throws ItemNotFoundRepositoryException 
+	 *
+	 * @throws ItemNotFoundRepositoryException
 	 */
 	@RequestMapping(value = "/api/config/query", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(query.getId())) {
-			
-			this.queryRepository.update(query);
+
+			queryRepository.update(query);
 			return new ResponseEntity<QueryRun>(query, HttpStatus.OK);
 		}
 
 		else {
-			this.queryRepository.save(query);
+			queryRepository.save(query);
 			return new ResponseEntity<QueryRun>(query, HttpStatus.OK);
 		}
 
 	}
-	
+
 	/**
 	 * This function returns all users from the user repository
 	 */
@@ -139,13 +143,15 @@ public class ConfigController {
 	public ResponseEntity<?> deleteConfig(@PathVariable("queryId") String queryId, @RequestHeader("Accept-Language") String locale) {
 		QueryRun queryRun = queryRepository.find(queryId);
 		if (queryRun == null) {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun",
-					ObjectUtils.toObjectArray(queryId), locale)), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(
+					new CustomErrorType(
+							messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun", ObjectUtils.toObjectArray(queryId), locale)),
+					HttpStatus.NOT_FOUND);
 		} else {
 			queryRepository.delete(queryRun);
 			return new ResponseEntity<>(queryRun, HttpStatus.OK);
 		}
-	}	
+	}
 
 	/**
 	 * This function returns the query config for the specified user
@@ -155,65 +161,66 @@ public class ConfigController {
 	@RequestMapping(value = "/api/config/query/{probeId}/{select_all}", method = RequestMethod.GET)
 	public ResponseEntity<List<QueryRun>> getQueriesByUserID(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-		
+
 		CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
-		
-		if(license != null) {
-			
+
+		if (license != null) {
+
 			CompanyGroup group = groupRepository.find(license.getGroupId());
-			
-			if(group != null) {
-				//Check if this is root group 
+
+			if (group != null) {
+				// Check if this is root group
 				List<QueryRun> queryConfig = new ArrayList<>();
-				if(group.isRootGroup()) {
-					//Take only the query runs of this group, because this is root group!
-					queryConfig = this.queryRepository.findByGroupId(license.getGroupId(), select_all);
-					if(queryConfig == null) {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);			
+				if (group.isRootGroup()) {
+					// Take only the query runs of this group, because this is root group!
+					queryConfig = queryRepository.findByGroupId(license.getGroupId(), select_all);
+					if (queryConfig == null) {
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)),
+								HttpStatus.NOT_FOUND);
 					}
-					
+
 					return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
-				}
-				else {
-					//go until the root group is not found and get all configurations from all groups which are parents of this group
+				} else {
+					// go until the root group is not found and get all configurations from all groups which are parents of this group
 					List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
-					
-					//Iterate through all found groups and add their queries to the queryConfig
-					if(foundGroups != null) {
-						for(CompanyGroup cg : foundGroups) {
+
+					// Iterate through all found groups and add their queries to the queryConfig
+					if (foundGroups != null) {
+						for (CompanyGroup cg : foundGroups) {
 							List<QueryRun> currentQueries = queryRepository.findByGroupId(cg.getId(), select_all);
-							if(currentQueries != null) {
+							if (currentQueries != null) {
 								queryConfig.addAll(currentQueries);
 							}
 						}
 					}
-										
+
 					return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
 				}
+			} else {
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)),
+						HttpStatus.NOT_FOUND);
 			}
-			else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);
-			}
-		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)), HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)),
+					HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	/**
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/config/query/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId, @PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-		List<QueryRun> queryConfig = this.queryRepository.findByGroupId(groupId, select_all);
-		
-		if(queryConfig == null) {
+	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
+			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
+		List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId, select_all);
+
+		if (queryConfig == null) {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
-	}	
+	}
 
 	/**
 	 * This function returns query config by the id
@@ -222,83 +229,86 @@ public class ConfigController {
 	@RequestMapping(value = "/api/config/query/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
-		QueryRun queryConfig = this.queryRepository.find(id);
-		
-		if(queryConfig == null) {
+		QueryRun queryConfig = queryRepository.find(id);
+
+		if (queryConfig == null) {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<QueryRun>(queryConfig, HttpStatus.OK);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/config/copy/{sourceGroupId}", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")	
-	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup, 
-			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException{
-		
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup,
+			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
 		CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
-		
-		if(sourceGroup != null && destGroup != null) {
-			if(!Strings.isNullOrEmpty(destGroup.getId())) {
-				//Delete all configuration from destGroup
-				List<QueryRun> queries = queryRepository.findByGroupId(destGroup.getId(), true);
-				List<Processor> processors = processorRepository.getProcessorsByGroupId(destGroup.getId());
-				List<Step> steps = stepRepository.getStepsByGroupId(destGroup.getId(), true);
-				
-				if(queries != null) {
-					for(QueryRun query : queries) {
-						queryRepository.delete(query);
+
+		if (sourceGroup != null && destGroup != null) {
+			if (!Strings.isNullOrEmpty(destGroup.getId())) {
+				// Cannot copy if both group IDs are same
+				if (!sourceGroupId.equals(destGroup.getId())) {
+					// Delete all configuration from destGroup
+					List<QueryRun> queries = queryRepository.findByGroupId(destGroup.getId(), true);
+					List<Processor> processors = processorRepository.getProcessorsByGroupId(destGroup.getId());
+					List<Step> steps = stepRepository.getStepsByGroupId(destGroup.getId(), true);
+
+					if (queries != null) {
+						for (QueryRun query : queries) {
+							queryRepository.delete(query);
+						}
 					}
-				}			
-				
-				if(processors != null) {
-					for(Processor processor : processors) {
-						processorRepository.delete(processor);
+
+					if (processors != null) {
+						for (Processor processor : processors) {
+							processorRepository.delete(processor);
+						}
 					}
-				}			
-				
-				if(steps != null) {
-					for(Step step : steps) {
-						stepRepository.delete(step);
+
+					if (steps != null) {
+						for (Step step : steps) {
+							stepRepository.delete(step);
+						}
 					}
+
+					// Copy all configurations from the source group to dest group
+
+					queries = queryRepository.findByGroupId(sourceGroup.getId(), true);
+					processors = processorRepository.getProcessorsByGroupId(sourceGroup.getId());
+					steps = stepRepository.getStepsByGroupId(sourceGroup.getId(), true);
+
+					if (queries != null) {
+						for (QueryRun query : queries) {
+							query.setGroupId(destGroup.getId());
+							query.setId(null);
+							queryRepository.save(query);
+						}
+					}
+
+					if (processors != null) {
+						for (Processor processor : processors) {
+							processor.setGroupId(destGroup.getId());
+							processor.setId(null);
+							processorRepository.save(processor);
+						}
+					}
+
+					if (steps != null) {
+						for (Step step : steps) {
+							step.setGroupId(destGroup.getId());
+							step.setId(null);
+							stepRepository.save(step);
+						}
+					}
+
+					return new ResponseEntity<CompanyGroup>(sourceGroup, HttpStatus.OK);
 				}
-				
-				//Copy all configurations from the source group to dest group
-				
-				queries = queryRepository.findByGroupId(sourceGroup.getId(), true);
-				processors = processorRepository.getProcessorsByGroupId(sourceGroup.getId());
-				steps = stepRepository.getStepsByGroupId(sourceGroup.getId(), true);
-				
-				if(queries != null) {
-					for(QueryRun query : queries) {
-						query.setGroupId(destGroup.getId());
-						query.setId(null);
-						queryRepository.save(query);
-					}
-				}
-				
-				if(processors != null) {
-					for(Processor processor : processors) {
-						processor.setGroupId(destGroup.getId());
-						processor.setId(null);
-						processorRepository.save(processor);
-					}
-				}
-				
-				if(steps != null) {
-					for(Step step : steps) {
-						step.setGroupId(destGroup.getId());
-						step.setId(null);
-						stepRepository.save(step);
-					}
-				}
-				
-				return new ResponseEntity<CompanyGroup>(sourceGroup, HttpStatus.OK);
 			}
 		}
-		
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_copying_config", locale)),
-				HttpStatus.NOT_FOUND);				
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_copying_config", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 }

@@ -40,7 +40,7 @@ public class PortalUtils {
 	 *
 	 * @return
 	 */
-	public static synchronized String generateToken() {
+	public synchronized String generateToken() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
 	}
@@ -72,7 +72,7 @@ public class PortalUtils {
 	 * @param expirationDate
 	 * @return
 	 */
-	public static boolean isAccessTokenExpired(Date expirationDate) {
+	public boolean isAccessTokenExpired(Date expirationDate) {
 		Date currentDate = new Date(System.currentTimeMillis());
 
 		if (expirationDate.before(currentDate)) {

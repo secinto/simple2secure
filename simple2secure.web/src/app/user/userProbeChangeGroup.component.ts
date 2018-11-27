@@ -33,12 +33,12 @@ export class UserProbeChangeGroupComponent {
         private dialogRef: MatDialogRef<UserProbeChangeGroupComponent>,
         @Inject(MAT_DIALOG_DATA) data) {
             this.probe = data;
-            this.selectedGroup = this.probe.group;
         }
 
     ngOnInit() {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
         this.loadGroups();
+
     }
 
     private loadGroups() {
@@ -46,6 +46,9 @@ export class UserProbeChangeGroupComponent {
             .subscribe(
                 data => {
                     this.groups = data;
+                    this.selectedGroup = this.probe.group;
+                    console.log("Selected group " + JSON.stringify(this.selectedGroup));
+                    console.log("Loaded groups " + JSON.stringify(this.groups));
                 },
                 error => {
 

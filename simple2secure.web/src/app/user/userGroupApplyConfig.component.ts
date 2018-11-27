@@ -46,7 +46,7 @@ export class UserGroupApplyConfigComponent {
         this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID)
             .subscribe(
                 data => {
-                    this.groups = data;
+                    this.extractGroups(data);
                 },
                 error => {
 
@@ -69,5 +69,16 @@ export class UserGroupApplyConfigComponent {
                 this.dialogRef.close(error);
                 this.loading = false;
             });
+    }
+
+    extractGroups(groups: CompanyGroup[]){
+        this.groups = [];
+        for (let i = 0; i < groups.length; i++) {
+            if (groups[i].id == this.destGroup.id){
+            }
+            else{
+                this.groups.push(groups[i]);
+            }
+        }
     }
 }

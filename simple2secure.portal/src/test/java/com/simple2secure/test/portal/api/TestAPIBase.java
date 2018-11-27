@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -55,52 +56,92 @@ public class TestAPIBase {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	MongoTemplate mongoTemplate;
+
 	@LocalServerPort
 	protected int randomServerPort;
 
-	private User user;
+	private User adminUser;
 
-	private String accessToken;
+	private User probeUser;
+
+	private String accessTokenAdmin;
+
+	private String accessTokenProbe;
 
 	HttpHeaders headers = new HttpHeaders();
 
+	// TO-DO: We have to find a solution to delete database automatically after all tests are executed. Currently, the database is dropped
+	// before test execution.
+
 	@PostConstruct
 	public void init() {
+
+		// Drop the database before the tests
+		mongoTemplate.getDb().drop();
 
 		/*
 		 * Update the port to the one randomly selected by the framework. Otherwise the URLs would be incorrect.
 		 */
 		loadedConfigItems.setBasePort(String.valueOf(randomServerPort));
 
-		user = createUser();
+		adminUser = createUser(UserRole.ADMIN);
+		probeUser = createUser(UserRole.PROBE);
 		createSettings();
-		setAccessToken(obtainAccessToken(user));
+		setAccessTokenAdmin(obtainAccessToken(adminUser));
+		setAccessTokenProbe(obtainAccessToken(probeUser));
 	}
 
+	/**
+	 * Creates setting object in the database, so that accessToken can be obtained.
+	 */
 	private void createSettings() {
 		Settings settings = new Settings();
 		settings.setAccessTokenValidityTime(10);
 		settings.setAccessTokenValidityUnit(TimeUnit.MINUTES);
+		settings.setAccessTokenProbeRestValidityTime(10);
+		settings.setAccessTokenProbeRestValidityTimeUnit(TimeUnit.MINUTES);
+		settings.setAccessTokenProbeValidityTime(10);
+		settings.setAccessTokenProbeValidityUnit(TimeUnit.MINUTES);
 		settingsRepository.save(settings);
 	}
 
-	private User createUser() {
+	/**
+	 * Creates user object in the database with the user role parameter which has been transferred, this object will be used in login
+	 * procedure
+	 *
+	 * @return
+	 */
+	private User createUser(UserRole userRole) {
 		User user = new User();
 
 		user.setFirstName("test");
 		user.setLastName("test");
-		user.setUsername("test");
 		user.setEmail("testiing@test.com");
 		user.setPassword(passwordEncoder.encode("test"));
 		user.setUsername("testiing@test.com");
 		user.setActivated(true);
 		user.setActivationToken("12345");
-		user.setUserRole(UserRole.ADMIN);
+		user.setUserRole(userRole);
+
+		if (userRole.equals(UserRole.PROBE)) {
+			user.setEmail("probe@test.com");
+			user.setUsername("probe");
+			user.setActivationToken("54321");
+		}
+
 		userRepository.save(user);
 
 		return user;
 	}
 
+	/**
+	 * Obtains an access token using the login api. Sends the credentials of the user which has been previously created.
+	 *
+	 * @param user
+	 * @return
+	 */
 	private String obtainAccessToken(User user) {
 
 		JSONObject request = new JSONObject();
@@ -123,26 +164,57 @@ public class TestAPIBase {
 		return null;
 	}
 
-	public HttpHeaders createHttpHeaders() {
+	/**
+	 * Creates http headers which are used in each API call. Access Token and Langugage must be provided in order to retrive the information
+	 * from the API.
+	 *
+	 * @return
+	 */
+	public HttpHeaders createHttpHeaders(UserRole userRole) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set("Authorization", accessToken);
+		headers.set("Accept-Language", "en");
+		if (userRole.equals(UserRole.ADMIN)) {
+			headers.set("Authorization", getAccessTokenAdmin());
+		} else {
+			headers.set("Authorization", getAccessTokenProbe());
+		}
 		return headers;
 	}
 
-	public String getAccessToken() {
-		return accessToken;
+	/**
+	 * Creates http headers without access token. This function is used mostly for unauthorized tests.
+	 *
+	 * @return
+	 */
+	public HttpHeaders createHttpHeadersWithoutAccessToken() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("Accept-Language", "en");
+		return headers;
 	}
 
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
+	public String getAccessTokenAdmin() {
+		return accessTokenAdmin;
 	}
 
-	public User getUser() {
-		return user;
+	public void setAccessTokenAdmin(String accessToken) {
+		accessTokenAdmin = accessToken;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public String getAccessTokenProbe() {
+		return accessTokenProbe;
+	}
+
+	public void setAccessTokenProbe(String accessTokenProbe) {
+		this.accessTokenProbe = accessTokenProbe;
+	}
+
+	public User getAdminUser() {
+		return adminUser;
+	}
+
+	public User getProbeUser() {
+		return probeUser;
 	}
 }

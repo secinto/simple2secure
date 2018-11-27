@@ -2,6 +2,7 @@ package com.simple2secure.api.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -29,12 +30,12 @@ public class User extends GenericDBObject {
 	private String phone;
 	private boolean enabled;
 	private boolean passwordUpdated;
-	
+
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
-	
+
 	private String adminGroupId;
-	
+
 	@ElementCollection
 	private List<String> myUsers = new ArrayList<>();
 
@@ -50,8 +51,8 @@ public class User extends GenericDBObject {
 
 	}
 
-	public User(String firstName, String lastName, String username, String email, String password, boolean enabled,
-			List<Probe> myProbes, UserRole userRole, String activationToken, boolean activated, boolean passwordUpdated) {
+	public User(String firstName, String lastName, String username, String email, String password, boolean enabled, List<Probe> myProbes,
+			UserRole userRole, String activationToken, boolean activated, boolean passwordUpdated) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
@@ -62,24 +63,17 @@ public class User extends GenericDBObject {
 		this.activationToken = activationToken;
 		this.activated = activated;
 		this.passwordUpdated = passwordUpdated;
-		this.myUsers = new ArrayList<String>();
+		myUsers = new ArrayList<String>();
 		this.userRole = userRole;
 	}
-	
+
 	public User(String email, UserRole userRole) {
 		this.email = email;
 		this.userRole = userRole;
 	}
 
-	/*public User(String uuid, String firstName, String lastName, String username, String email, String password, boolean enabled,
-			String userRole, List<Probe> myProbes, String activationToken, boolean activated, boolean passwordUpdated) {
-		this(uuid, firstName, lastName, username, email, password, enabled, myProbes, activationToken, activated, passwordUpdated);
-		this.userRole = userRole;
-		this.myUsers = new ArrayList<String>();
-	}*/
-
 	public String getFirstName() {
-		return this.firstName;
+		return firstName;
 	}
 
 	public void setFirstName(String firstName) {
@@ -87,7 +81,7 @@ public class User extends GenericDBObject {
 	}
 
 	public String getLastName() {
-		return this.lastName;
+		return lastName;
 	}
 
 	public void setLastName(String lastName) {
@@ -95,7 +89,7 @@ public class User extends GenericDBObject {
 	}
 
 	public String getUsername() {
-		return this.username;
+		return username;
 	}
 
 	public void setUsername(String username) {
@@ -103,7 +97,7 @@ public class User extends GenericDBObject {
 	}
 
 	public String getPassword() {
-		return this.password;
+		return password;
 	}
 
 	public void setPassword(String password) {
@@ -111,7 +105,7 @@ public class User extends GenericDBObject {
 	}
 
 	public String getEmail() {
-		return this.email;
+		return email;
 	}
 
 	public void setEmail(String email) {
@@ -119,7 +113,7 @@ public class User extends GenericDBObject {
 	}
 
 	public boolean isEnabled() {
-		return this.enabled;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -127,7 +121,7 @@ public class User extends GenericDBObject {
 	}
 
 	public List<Probe> getMyProbes() {
-		return this.myProbes;
+		return myProbes;
 	}
 
 	public void setMyProbes(List<Probe> myProbes) {
@@ -135,37 +129,37 @@ public class User extends GenericDBObject {
 	}
 
 	public void setActivated(boolean activate) {
-		this.activated = activate;
+		activated = activate;
 
 	}
 
 	public boolean isActivated() {
-		return this.activated;
+		return activated;
 	}
 
 	public void setActivationToken(String activationLink) {
-		this.activationToken = activationLink;
+		activationToken = activationLink;
 	}
 
 	public String getActivationToken() {
-		return this.activationToken;
+		return activationToken;
 	}
 
 	public void setPasswordResetExpirationTime(long timestamp) {
-		this.passwordResetExpirationTime = timestamp;
+		passwordResetExpirationTime = timestamp;
 
 	}
 
 	public long getPasswordResetExpirationTime() {
-		return this.passwordResetExpirationTime;
+		return passwordResetExpirationTime;
 	}
 
 	public void setPasswordResetToken(String token) {
-		this.passwordResetToken = token;
+		passwordResetToken = token;
 	}
 
 	public String getPasswordResetToken() {
-		return this.passwordResetToken;
+		return passwordResetToken;
 	}
 
 	public boolean isPasswordUpdated() {
@@ -183,9 +177,9 @@ public class User extends GenericDBObject {
 	public void setMyUsers(List<String> myUsers) {
 		this.myUsers = myUsers;
 	}
-	
+
 	public void addMyUser(String userId) {
-		this.myUsers.add(userId);
+		myUsers.add(userId);
 	}
 
 	public String getAddress() {
@@ -251,6 +245,5 @@ public class User extends GenericDBObject {
 	public void setAdminGroupId(String adminGroupId) {
 		this.adminGroupId = adminGroupId;
 	}
-	
-	
+
 }
