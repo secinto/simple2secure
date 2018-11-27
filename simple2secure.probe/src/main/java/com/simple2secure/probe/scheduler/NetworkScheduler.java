@@ -1,7 +1,9 @@
 package com.simple2secure.probe.scheduler;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.TimerTask;
+import java.util.TreeMap;
 
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.NotOpenException;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.NetworkMonitor;
 import com.simple2secure.probe.utils.DBUtil;
@@ -41,10 +44,12 @@ public class NetworkScheduler extends TimerTask {
 			report.setProcessorName("PCAP Network Statistics");
 			report.setProbeId(ProbeConfiguration.probeId);
 			report.setGroupId(ProbeConfiguration.groupId);
-			report.addContent("PacketsCaptured", String.valueOf(statistics.getNumPacketsCaptured()));
-			report.addContent("PacketsDropped", String.valueOf(statistics.getNumPacketsDropped()));
-			report.addContent("PacketsDroppedByIf", String.valueOf(statistics.getNumPacketsDroppedByIf()));
-			report.addContent("PacketsReceived", String.valueOf(statistics.getNumPacketsReceived()));
+			Map<String, String> content = new TreeMap<String, String>();
+			content.put("PacketsCaptured", String.valueOf(statistics.getNumPacketsCaptured()));
+			content.put("PacketsDropped", String.valueOf(statistics.getNumPacketsDropped()));
+			content.put("PacketsDroppedByIf", String.valueOf(statistics.getNumPacketsDroppedByIf()));
+			content.put("PacketsReceived", String.valueOf(statistics.getNumPacketsReceived()));
+			report.setStringContent(JSONUtils.toString(content));
 			DBUtil.getInstance().save(report);
 
 		} catch (Exception e) {

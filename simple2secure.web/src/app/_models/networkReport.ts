@@ -5,5 +5,6 @@ export class NetworkReport extends Generic{
   startTime: string;
   processorName: string;
   content: Map<String, String>;
+  stringContent: string;
   sent: boolean;
 }

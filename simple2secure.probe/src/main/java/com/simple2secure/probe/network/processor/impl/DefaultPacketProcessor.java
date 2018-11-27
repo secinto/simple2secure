@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.PacketContainer;
 import com.simple2secure.probe.network.PacketProcessor;
@@ -64,7 +65,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				// set reportContent stringBuilder
 				// initialize new report
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
-					report.setContent(reportContent);
+					report.setStringContent(JSONUtils.toString(reportContent));
 					report.setProcessorName(packet.getProcessor().getName());
 					report.setSent(false);
 					/*
