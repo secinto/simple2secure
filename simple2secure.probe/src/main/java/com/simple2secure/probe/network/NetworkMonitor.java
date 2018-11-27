@@ -37,7 +37,7 @@ public class NetworkMonitor {
 
 	private ProcessingQueue<PacketContainer> processingQueue;
 	private PcapHandle receiverHandle;
-	private PcapHandle senderHandle;
+	// private PcapHandle senderHandle;
 
 	public static NetworkMonitor startMonitor() {
 		if (instance == null) {
@@ -61,7 +61,7 @@ public class NetworkMonitor {
 			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
 		}
 
-		Config configuration = ProbeConfiguration.getInstance().getCurrentConfigObj();
+		Config configuration = ProbeConfiguration.getInstance().getConfig();
 
 		boolean show = configuration.isShow_interfaces();
 
@@ -69,7 +69,7 @@ public class NetworkMonitor {
 
 		boolean use_iface = configuration.isUse_configured_iface();
 		if (use_iface) {
-			int config = ProbeConfiguration.getInstance().getCurrentConfigObj().getInterface_number();
+			int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
 			int iface = config;
 			if (iface < interfaces.size()) {
 				singleInterface = interfaces.get(iface);
@@ -84,8 +84,8 @@ public class NetworkMonitor {
 					log.info(i + ":" + currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
 				}
 				/*
-				 * Iterate through the addresses of the interfaces and check if someone fits.
-				 * TODO: We should store the interfaces which have relevant addresses.
+				 * Iterate through the addresses of the interfaces and check if someone fits. TODO: We should store the interfaces which have
+				 * relevant addresses.
 				 */
 				List<PcapAddress> addresses = interfaces.get(i).getAddresses();
 				for (PcapAddress address : addresses) {
@@ -93,8 +93,7 @@ public class NetworkMonitor {
 						String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
 						if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
 							if (singleInterface != null) {
-								log.info("Found another usable address {}, discarding old one {}", ipAddress,
-										previousAddress);
+								log.info("Found another usable address {}, discarding old one {}", ipAddress, previousAddress);
 							}
 							singleInterface = currentInterface;
 							previousAddress = ipAddress;
@@ -109,20 +108,17 @@ public class NetworkMonitor {
 		}
 
 		try {
-			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS,
-					StaticConfigItems.READ_TIMEOUT);
+			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, StaticConfigItems.READ_TIMEOUT);
 
 			/*
-			 * TODO: Verify if this setting works and is correctly applied. A verification
-			 * for inconsistent or incorrect BPF filter strings must be developed
+			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
+			 * be developed
 			 */
 			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
 				try {
-					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(),
-							BpfCompileMode.OPTIMIZE);
+					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
 				} catch (Exception e) {
-					log.error("Couldn't apply filter {} for reason {}",
-							ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
+					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
 				}
 			}
 			processingQueue = new ProcessingQueue<PacketContainer>();

@@ -42,4 +42,9 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 		publicLicense.setAccessToken(accessToken);
 		return publicLicense;
 	}
+
+	public CompanyLicensePrivate copyLicense() {
+		CompanyLicensePrivate license = new CompanyLicensePrivate(groupId, licenseId, expirationDate, false);
+		return license;
+	}
 }

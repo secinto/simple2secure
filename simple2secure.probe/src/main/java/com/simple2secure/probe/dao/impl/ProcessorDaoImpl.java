@@ -1,7 +1,6 @@
 package com.simple2secure.probe.dao.impl;
 
-import org.testng.util.Strings;
-
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.probe.dao.ProcessorDao;
 

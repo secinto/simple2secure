@@ -10,12 +10,17 @@ import {DataService, AlertService} from '../_services/index';
 export class NetworkReportDetailsComponent {
   report: NetworkReport;
   loading = false;
-  objectKeys = Object.keys;
-
+  //objectKeys = Object.keys;
+  result: string;
   constructor(
     private dataService: DataService) {}
 
   ngOnInit() {
     this.report = this.dataService.get();
   }
+
+    getStringResult () {
+        this.result = JSON.parse(this.report.stringContent);
+        return this.result;
+    }
 }

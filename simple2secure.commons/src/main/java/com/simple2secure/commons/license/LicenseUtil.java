@@ -14,6 +14,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
 
@@ -27,8 +28,17 @@ public class LicenseUtil {
 
 	private static String workingDirectory = System.getProperty("user.dir");
 
-	public static String licenseFilePath = "./license/";
+	/**
+	 * Specifies the storage location of the generated license files.
+	 */
+	public static String licenseFilePath = "license/";
+	/**
+	 * Specifies the private key which is used to generate the signature
+	 */
 	public static String privateKeyFilePath = "private.key";
+	/**
+	 * Specifies the public key which is used to verify the signature
+	 */
 	public static String publicKeyFilePath = "public.key";
 
 	static {
@@ -37,6 +47,10 @@ public class LicenseUtil {
 
 	private static void init() {
 		initLicenseManager(licenseFilePath + "license.dat", licenseFilePath + "public.key");
+	}
+
+	public static void initialize(String filePath, String publicKey) {
+		initialize(filePath, null, publicKey);
 	}
 
 	/**
@@ -54,7 +68,11 @@ public class LicenseUtil {
 	public static void initialize(String filePath, String privateKey, String publicKey) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
 		publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
-		privateKeyFilePath = LicenseUtil.getLicenseKeyPath(privateKey, licenseFilePath);
+		if (!Strings.isNullOrEmpty(privateKey)) {
+			privateKeyFilePath = LicenseUtil.getLicenseKeyPath(privateKey, licenseFilePath);
+		} else {
+			privateKeyFilePath = "private.key";
+		}
 		init();
 	}
 
@@ -130,7 +148,7 @@ public class LicenseUtil {
 	 * @throws IOException
 	 */
 	public static void generateLicenseZIPFile(String zipFile) throws IOException {
-		generateLicenseZIPFile(LicenseManager.PUBLIC_KEY_FILE, zipFile);
+		generateLicenseZIPFile(publicKeyFilePath, zipFile);
 	}
 
 	/**
@@ -144,7 +162,7 @@ public class LicenseUtil {
 	 * @throws IOException
 	 */
 	public static void generateLicenseZIPFile(String publicKeyFile, String zipFile) throws IOException {
-		generateLicenseZIPFile(LicenseManager.LICENSE_FILE, publicKeyFile, zipFile);
+		generateLicenseZIPFile(licenseFilePath, publicKeyFile, zipFile);
 	}
 
 	/**
@@ -162,6 +180,7 @@ public class LicenseUtil {
 	public static void generateLicenseZIPFile(String licenseFile, String publicKeyFile, String zipFile) throws IOException {
 
 		initLicenseManager(licenseFile, publicKeyFile);
+
 		List<File> files = getLicenseFileList();
 		ByteArrayOutputStream byteOutStream = ZIPUtils.createZIPStreamFromFiles(files);
 
@@ -170,17 +189,26 @@ public class LicenseUtil {
 		byteOutStream.writeTo(outputStream);
 	}
 
+	public static List<File> getLicenseFileList() {
+		return getLicenseFileList(licenseFilePath);
+	}
+
 	/**
 	 * Returns a List of files containing the default license (working directory license.dat file) and public key (working directory
 	 * public.key file).
 	 *
 	 * @return The List<File> containing license.dat and public.key.
 	 */
-	public static List<File> getLicenseFileList() {
+	public static List<File> getLicenseFileList(String licenseFile) {
 		ArrayList<File> files = new ArrayList<>();
 
-		File publicKey = new File(LicenseManager.PUBLIC_KEY_FILE);
-		File certificate = new File(LicenseManager.LICENSE_FILE);
+		File publicKey = new File(publicKeyFilePath);
+		File certificate = null;
+		if (!Strings.isNullOrEmpty(licenseFile)) {
+			certificate = new File(licenseFile);
+		} else {
+			certificate = new File(licenseFilePath + "/license.dat");
+		}
 
 		files.add(publicKey);
 		files.add(certificate);
@@ -196,7 +224,7 @@ public class LicenseUtil {
 	 * @throws IOException
 	 */
 	public static ByteArrayOutputStream generateLicenseZIPStream() throws IOException {
-		return generateLicenseZIPStream(LicenseManager.PUBLIC_KEY_FILE);
+		return generateLicenseZIPStream(publicKeyFilePath);
 	}
 
 	/**
@@ -209,7 +237,7 @@ public class LicenseUtil {
 	 * @throws IOException
 	 */
 	public static ByteArrayOutputStream generateLicenseZIPStream(String publicKeyFile) throws IOException {
-		return generateLicenseZIPStream(LicenseManager.LICENSE_FILE, publicKeyFile);
+		return generateLicenseZIPStream(licenseFilePath, publicKeyFile);
 	}
 
 	/**
@@ -226,7 +254,7 @@ public class LicenseUtil {
 	public static ByteArrayOutputStream generateLicenseZIPStream(String licenseFile, String publicKeyFile) throws IOException {
 		initLicenseManager(licenseFile, publicKeyFile);
 
-		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList());
+		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList(licenseFile));
 	}
 
 	/**
@@ -265,7 +293,7 @@ public class LicenseUtil {
 	 * @throws Exception
 	 */
 	public static License getLicense() throws Exception {
-		return getLicense(LicenseManager.PUBLIC_KEY_FILE);
+		return getLicense(publicKeyFilePath);
 	}
 
 	/**
@@ -275,7 +303,7 @@ public class LicenseUtil {
 	 * @throws Exception
 	 */
 	public static License getLicense(String publicKeyFile) throws Exception {
-		return getLicense(LicenseManager.LICENSE_FILE, publicKeyFile);
+		return getLicense(licenseFilePath, publicKeyFile);
 	}
 
 	/**
@@ -289,7 +317,7 @@ public class LicenseUtil {
 	 * @throws Exception
 	 */
 	public static License getLicense(String licenseFile, String publicKeyFile) throws Exception {
-		initLicenseManager(licenseFile, publicKeyFile);
+		initLicenseManager(licenseFile + "license.dat", licenseFile + publicKeyFile);
 		return LicenseManager.getInstance().getLicense();
 	}
 
@@ -303,36 +331,65 @@ public class LicenseUtil {
 	 *          The public key of the license file.
 	 */
 	private static void initLicenseManager(String licenseFile, String publicKeyFile) {
+		// licenseFilePath = licenseFile;
+		// publicKeyFilePath = publicKeyFile;
 		LicenseManager.setPublicKeyFile(publicKeyFile);
 		LicenseManager.setLicenseFile(licenseFile);
 	}
 
-	public static void createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
-		createLicense(groupId, licenseId, expirationDate, LicenseManager.PUBLIC_KEY_FILE, licenseFilePath);
+	/**
+	 * Creates a license from the provided parameters and uses the default private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @throws Exception
+	 */
+	public static String createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
+		return createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
-	public static void createLicense(String groupId, String licenseId, String expirationDate, String publicKeyFile) throws Exception {
-		createLicense(groupId, licenseId, expirationDate, publicKeyFile, licenseFilePath);
-	}
-
-	public static void createLicense(String groupId, String licenseId, String expirationDate, String publicKeyFile, String licenseFilePath)
-			throws Exception {
+	/**
+	 * Creates a license from the provided parameters and uses the provided private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @param privateKeyFile
+	 *          The private key which should be used for the signature.
+	 * @throws Exception
+	 *           Thrown if something goes wrong.
+	 */
+	public static String createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
 
 		Properties properties = new OrderedProperties();
 		properties.setProperty("expirationDate", expirationDate);
 		properties.setProperty("groupId", groupId);
 		properties.setProperty("licenseId", licenseId.toString());
 
-		FileOutputStream fos = new FileOutputStream(licenseFilePath + licenseId + "/license.dat");
-		FileUtil.copyToFolder(new File(publicKeyFile), licenseFilePath + licenseId + "/");
-		File publicKey = new File(licenseFilePath + licenseId + "/" + publicKeyFile);
+		FileUtil.createFolder(licenseFilePath + "\\" + licenseId + "\\");
 
-		if (publicKey.exists()) {
-			LicenseGenerator.generateLicense(properties, fos, publicKeyFile);
+		File privateKeyOriginal = new File(privateKeyFilePath);
+		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + "\\" + licenseId + "\\");
+		File privateKey = new File(licenseFilePath + "\\" + licenseId + "\\" + privateKeyOriginal.getName());
+
+		if (privateKey.exists()) {
+			File licenseFile = new File(licenseFilePath + "\\" + licenseId + "\\license.dat");
+			FileOutputStream fos = new FileOutputStream(licenseFile);
+			LicenseGenerator.generateLicense(properties, fos, privateKey.getAbsolutePath());
+			fos.flush();
+			fos.close();
+			return licenseFile.getAbsolutePath();
 		} else {
 			log.error("Couldn't create License in folder {} because public key couldn't ne copied. ", licenseFilePath + licenseId + "/");
 		}
-
+		return null;
 	}
 
 	/**

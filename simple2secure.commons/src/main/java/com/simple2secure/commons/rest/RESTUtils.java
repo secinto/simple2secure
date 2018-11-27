@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.commons.json.JSONUtils;
 
 public class RESTUtils {
@@ -21,9 +22,13 @@ public class RESTUtils {
 	final static String BEARER = "Bearer ";
 
 	public static String sendPost(String url, Object obj) {
+		return sendPost(url, obj, null);
+	}
+
+	public static String sendPost(String url, Object obj, String authKey) {
 		try {
 
-			HttpURLConnection connection = getConnection(url, "GET");
+			HttpURLConnection connection = getConnection(url, "POST", authKey);
 
 			OutputStream os = connection.getOutputStream();
 			os.write(JSONUtils.toString(obj).getBytes());
@@ -32,7 +37,7 @@ public class RESTUtils {
 			return getResponse(connection);
 
 		} catch (MalformedURLException e) {
-			log.error("Couldn 't send POST to URL {} with response because of execption {}", url, e.getStackTrace());
+			log.error("Couldn 't send POST to URL {} with response because of malformed URL {}", url, e.getStackTrace());
 			return null;
 		} catch (IOException e) {
 			log.error("Couldn 't send POST to URL {} with response because of execption {}", url, e.getStackTrace());
@@ -41,11 +46,15 @@ public class RESTUtils {
 	}
 
 	public static String sendGet(String url) {
+		return sendGet(url, null);
+	}
+
+	public static String sendGet(String url, String authKey) {
 		try {
-			HttpURLConnection connection = getConnection(url, "GET");
+			HttpURLConnection connection = getConnection(url, "GET", authKey);
 			return getResponse(connection);
 		} catch (MalformedURLException e) {
-			log.error("Couldn 't send GET to URL {} because URL is malformed. {}", url, e.getStackTrace());
+			log.error("Couldn 't send GET to URL {} with response because of malformed URL {}", url, e.getStackTrace());
 		} catch (IOException e) {
 			log.error("Couldn 't send GET to URL {} with response because of execption {}", url, e.getStackTrace());
 		}
@@ -55,8 +64,7 @@ public class RESTUtils {
 	private static String getResponse(HttpURLConnection connection) throws IOException {
 		String output = null;
 		StringBuilder outputBuilder = new StringBuilder();
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
+		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
 
 		while ((output = br.readLine()) != null) {
 			outputBuilder.append(output);
@@ -71,15 +79,16 @@ public class RESTUtils {
 		return outputBuilder.toString();
 	}
 
-	private static HttpURLConnection getConnection(String url, String method) throws IOException {
+	private static HttpURLConnection getConnection(String url, String method, String authKey) throws IOException {
 		URL remote = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) remote.openConnection();
 		conn.setDoOutput(true);
 		conn.setRequestMethod(method);
 		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestProperty("Accept-Language", "en");
-		// conn.setRequestProperty("Authorization", BEARER +
-		// ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(authKey)) {
+			conn.setRequestProperty("Authorization", BEARER + authKey);
+		}
 
 		return conn;
 	}

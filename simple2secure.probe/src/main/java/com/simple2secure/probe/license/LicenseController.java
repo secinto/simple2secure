@@ -12,10 +12,10 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.LicenseUtil;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
-import com.simple2secure.probe.utils.RequestHandler;
 
 import ro.fortsoft.licensius.License;
 import ro.fortsoft.licensius.LicenseNotFoundException;
@@ -24,7 +24,13 @@ public class LicenseController {
 
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
-	private LoadedConfigItems loadedConfigItems = new LoadedConfigItems();
+	public LicenseController() {
+		init();
+	}
+
+	public void init() {
+		LicenseUtil.initialize(System.getProperty("user.dir"), "public.key");
+	}
 
 	/**
 	 * Unzips the directory containing the license.dat in the /simple2secure/probe/ project directory. Further this method maps the License
@@ -40,7 +46,7 @@ public class LicenseController {
 		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
-		if (inputFile != null) {
+		if (inputFile != null && inputFile.exists()) {
 			List<File> unzippedFiles = ProbeUtils.unzipImportedFile(inputFile);
 			if (unzippedFiles != null && unzippedFiles.size() == 2) {
 				License downloadedLicense = LicenseUtil.getLicense();
@@ -56,12 +62,13 @@ public class LicenseController {
 	}
 
 	/**
-	 * Checks if there is a license stored in the DB... Checks if the license found in DB is expired... Checks if the license is activated
+	 * Checks if there is a license stored in the DB. Checks if the license found in DB is expired. Checks if the license is activated.
+	 * Depending on the outcome either {@link StartConditions#LICENSE_NOT_AVAILABLE} if there is no license stored in the DB is returned.
+	 * {@link StartConditions#LICENSE_EXPIRED} if the license is in DB but expired is returned. {@link StartConditions#LICENSE_NOT_ACTIVATED}
+	 * is returned if the license is not expired but it is not activated set. {@link StartConditions#LICENSE_VALID} if the license is not
+	 * expired and it is activated.
 	 *
-	 * @return... String of enum Type "FIRST_TIME" if there is no license stored in the DB @return... String of enum Type "LICENSE_EXPIRED" if
-	 * the license is in DB but expired @return... String of enum Type "NOT_ACTIVATED" if the license is not expired but the
-	 * isActivated()-flag is not set @return... String of enum Type "VALID_CONDITIONS" if the license is not expired & the isActivated()-flag
-	 * is set/ sets the isLicenseValid-flag in ProbeConfiguration to true
+	 * @return The {@link StartConditions} which corresponds to the current state.
 	 */
 	public StartConditions checkProbeStartConditions() {
 		CompanyLicensePublic license = loadLicenseFromDB();
@@ -70,6 +77,8 @@ public class LicenseController {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
 					ProbeConfiguration.probeId = license.getProbeId();
+					ProbeConfiguration.groupId = license.getGroupId();
+					ProbeConfiguration.authKey = license.getAccessToken();
 					return StartConditions.LICENSE_VALID;
 				}
 				return StartConditions.LICENSE_NOT_ACTIVATED;
@@ -82,9 +91,9 @@ public class LicenseController {
 	/**
 	 * Checks if the properties in the license object are set (not null or empty).
 	 *
-	 * @param ...License
-	 *          object
-	 * @return ...true if the properties in the license object are set, false if only one property is null or empty
+	 * @param license
+	 *          The {@link License} for which the properties are checked.
+	 * @return True if the properties in the license object are set, false if only one property is null or empty
 	 */
 	public boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
@@ -98,18 +107,24 @@ public class LicenseController {
 	/**
 	 * Updates the license in the DB with the local license.
 	 *
-	 * @param ...License
-	 *          object
+	 * @param license
+	 *          The license which should be updated in the database.
 	 */
 	public void updateLicenseInDB(CompanyLicensePublic license) {
-		DBUtil.getInstance().merge(license);
+		if (license != null) {
+			CompanyLicensePublic loadedLicense = loadLicenseFromDB();
+			if (loadedLicense != null) {
+				license.setId(loadedLicense.getId());
+			}
+
+			DBUtil.getInstance().merge(license);
+		}
 	}
 
-	// TODO: Possibly null check required
 	/**
 	 * Loads the license from the data base.
 	 *
-	 * @return ...a CompanyLicenseObject
+	 * @return The {@link CompanyLicensePublic} from stored in the database.
 	 */
 	public CompanyLicensePublic loadLicenseFromDB() {
 		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(CompanyLicensePublic.class);
@@ -119,6 +134,32 @@ public class LicenseController {
 		} else {
 			return licenses.get(0);
 		}
+	}
+
+	/**
+	 * Tries to activate the provided {@link CompanyLicensePublic} via the Portal API. If successful the current access token is obtained and
+	 * stored in the {@link ProbeConfiguration}.
+	 *
+	 * @param license
+	 *          The license which should be used for activation.
+	 * @return
+	 */
+	public boolean activateLicense(CompanyLicensePublic license) {
+		if (license != null) {
+			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", license);
+			if (authToken != null) {
+				activateLicenseInDB(authToken, license);
+
+				ProbeConfiguration.authKey = authToken;
+				ProbeConfiguration.probeId = license.getProbeId();
+				ProbeConfiguration.groupId = license.getGroupId();
+				ProbeConfiguration.setAPIAvailablitity(true);
+				return true;
+			} else {
+				log.error("A problem occured while loading the license from path.");
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -187,21 +228,23 @@ public class LicenseController {
 		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RequestHandler.sendPostReceiveResponse(loadedConfigItems.getLicenseAPI() + "/token", license);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
-			} else {
-				return null;
 			}
-		} else {
-			/*
-			 * TODO: Create handling if license is not stored in DB.
-			 */
-			log.error("Couldn't find license in DB. Need to do something here");
-			return null;
 		}
+		/*
+		 * TODO: Create handling if license is not stored in DB.
+		 */
+		log.error("Couldn't find license in DB. Need to do something here");
+		return null;
+
 	}
 }

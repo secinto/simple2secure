@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 
 public class ConfigScheduler extends TimerTask implements PropertyChangeListener {
@@ -15,6 +16,8 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 	private static Logger log = LoggerFactory.getLogger(ConfigScheduler.class);
 
 	private boolean probeIsLicenseValid = false;
+	private boolean probeIsGuiRunning = false;
+	private boolean probeIsApiAvailable = false;
 
 	public boolean isProbeIsLicenseValid() {
 		return probeIsLicenseValid;
@@ -24,8 +27,6 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 		this.probeIsLicenseValid = probeIsLicenseValid;
 	}
 
-	private boolean probeIsApiAvailable = false;
-
 	public boolean isProbeIsApiAvailable() {
 		return probeIsApiAvailable;
 	}
@@ -33,8 +34,6 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 	public void setProbeIsApiAvailable(boolean probeIsApiAvailable) {
 		this.probeIsApiAvailable = probeIsApiAvailable;
 	}
-
-	private boolean probeIsGuiRunning = false;
 
 	public boolean isProbeIsGuiRunning() {
 		return probeIsGuiRunning;
@@ -49,44 +48,33 @@ public class ConfigScheduler extends TimerTask implements PropertyChangeListener
 
 	@Override
 	public void run() {
-		if (probeIsLicenseValid) {
-			checkConfiguration();
-		}
+		checkConfiguration();
 	}
 
 	private void checkConfiguration() {
 		log.info("Checking for the new configuration...");
-		// ProbeConfiguration.getInstance().checkConfig();
+		ProbeConfiguration.getInstance().checkAndUpdateConfigFromAPI();
 		if (!probeIsLicenseValid) {
 			if (probeIsGuiRunning) {
 				try {
 					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error("Checking configuration was not successful. Reason {}", e);
 				}
 			}
-			// TODO - find a better solution
-			// Stop all timer tasks including Network Monitor and OSQuery
-			// Change to the license view
-			// ProbeWorkerThread.stopTimerTasks();
-//			Platform.runLater(() -> {
-//				try {
-//					ProbeGUI.initLicenseImportPane("Your license has expired! Please import the new one!");
-//				} catch (IOException e) {
-//					log.error("Error {}", e.getMessage());
-//				}
-//			});				
 		}
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent arg0) {
-		if (arg0.getPropertyName().equals("isApiAvailable"))
-			setProbeIsApiAvailable((boolean) arg0.getNewValue());
-		if (arg0.getPropertyName().equals("isLicenseValid"))
-			setProbeIsLicenseValid((boolean) arg0.getNewValue());
-		if (arg0.getPropertyName().equals("isGuiRunning"))
-			setProbeIsGuiRunning((boolean) arg0.getNewValue());
+	public void propertyChange(PropertyChangeEvent event) {
+		if (event.getPropertyName().equals("isApiAvailable")) {
+			setProbeIsApiAvailable((boolean) event.getNewValue());
+		}
+		if (event.getPropertyName().equals("isLicenseValid")) {
+			setProbeIsLicenseValid((boolean) event.getNewValue());
+		}
+		if (event.getPropertyName().equals("isGuiRunning")) {
+			setProbeIsGuiRunning((boolean) event.getNewValue());
+		}
 	}
 }

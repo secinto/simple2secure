@@ -90,9 +90,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	@Bean
 	public LoadedConfigItems loadedConfigItems() {
-		LoadedConfigItems configItems = new LoadedConfigItems();
-		configItems.init();
-		return configItems;
+		return LoadedConfigItems.getInstance();
 	}
 
 	@Bean

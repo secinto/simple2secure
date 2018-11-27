@@ -27,12 +27,13 @@ import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.network.PacketProcessor;
+import com.simple2secure.probe.network.PacketProcessorFSM;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
 import com.simple2secure.probe.utils.LocaleHolder;
-import com.simple2secure.probe.utils.RequestHandler;
 
 public class ProbeConfiguration {
 
@@ -43,15 +44,13 @@ public class ProbeConfiguration {
 	private static boolean apiAvailable = false;
 
 	public static String authKey = "";
-
+	public static String groupId = "";
 	public static String probeId = "";
 
 	public static String licenseId = "";
 
-	public static boolean isCheckingLicense = false;
-
 	public static boolean isLicenseValid = false;
-
+	public static boolean isCheckingLicense = false;
 	public static boolean isGuiRunning = false;
 
 	private Config currentConfig;
@@ -64,16 +63,13 @@ public class ProbeConfiguration {
 
 	private Map<String, QueryRun> currentQueries;
 
-	private LoadedConfigItems loadedConfigItems;
-
-	private LicenseController licenseCon = new LicenseController();
+	private LicenseController licenseController = new LicenseController();
 
 	private static PropertyChangeSupport support;
 
 	/***
-	 * Returns the configuration if already initialized. If not, it tries retrieving
-	 * it from the standard path, the database, and the WebAPI by calling
-	 * updateConfig()
+	 * Returns the configuration if already initialized. If not, it tries retrieving it from the standard path, the database, and the WebAPI
+	 * by calling updateConfig()
 	 *
 	 * @return Initialized ApplicationConfiguration object
 	 * @throws IllegalArgumentException
@@ -89,75 +85,197 @@ public class ProbeConfiguration {
 	 * General constructor which creates the config DAO.
 	 */
 	private ProbeConfiguration() {
-		this.currentPacketProcessors = new HashMap<String, PacketProcessor>();
-		this.currentSteps = new HashMap<String, Step>();
-		this.currentProcessors = new HashMap<String, Processor>();
-		this.currentQueries = new HashMap<String, QueryRun>();
-		loadConfig();
-		loadedConfigItems = new LoadedConfigItems();
 		support = new PropertyChangeSupport(this);
+		currentPacketProcessors = new HashMap<>();
+		currentSteps = new HashMap<>();
+		currentProcessors = new HashMap<>();
+		currentQueries = new HashMap<>();
+		loadConfig();
 	}
 
+	/**
+	 * Adds a listener for changing properties. It gets informed if internal state variables are changing.
+	 *
+	 * @param pcl
+	 *          The listener to add.
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
 		support.addPropertyChangeListener(pcl);
 	}
 
+	/**
+	 * Removes the specified listener from being informed about changing properties.
+	 *
+	 * @param pcl
+	 *          The listener to remove
+	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
 		support.removePropertyChangeListener(pcl);
 	}
 
+	/**
+	 * Returns the current configuration of the Probe which is kept update using the API from the Portal.
+	 *
+	 * @return The current configuration of the probe.
+	 */
 	public Config getConfig() {
-		if (this.currentConfig != null) {
-			return this.currentConfig;
+		if (currentConfig != null) {
+			return currentConfig;
 		} else {
 			return loadConfig();
 		}
 	}
 
 	/***
-	 * This method tries to acquire the newest Configuration file with all means
-	 * necessary
+	 * This method tries to acquire the newest Configuration file with all means necessary
 	 *
-	 * Detailed process: It checks the Database for Configuration files and reads in
-	 * the newest. With the URL provided in the Configuration file from the
-	 * Database, this method contacts the WebAPI and checks whether a newer version
-	 * is available. If it is so, it will acquire it from there. If none are found,
-	 * the offline Configuration provided will be used
+	 * Detailed process: It checks the Database for Configuration files and reads in the newest. With the URL provided in the Configuration
+	 * file from the Database, this method contacts the WebAPI and checks whether a newer version is available. If it is so, it will acquire
+	 * it from there. If none are found, the offline Configuration provided will be used
 	 *
-	 * @param standardConfig the path to the offline Configuration file.
-	 *                       <code>StaticConfigValues.XML_LOCATION</code> can be
-	 *                       used.
+	 * @param standardConfig
+	 *          the path to the offline Configuration file. <code>StaticConfigValues.XML_LOCATION</code> can be used.
 	 */
 	public Config loadConfig() {
+		updateConfigLocal();
+		updateProcessorsLocal();
+		updateStepsLocal();
+		updateQueriesLocal();
 
+		checkAndUpdateConfigFromAPI();
+
+		return currentConfig;
+	}
+
+	/**
+	 * Obtains the configuration from the Portal and updates the local configuration accordingly. The retrieved information is stored in the
+	 * database and the packet processors are instantiated.
+	 */
+	public void checkAndUpdateConfigFromAPI() {
 		/*
-		 * Obtain currently stored configurations from database.
+		 * Check if the API is available and if a newer version is available update it.
 		 */
-		Config dbConfig = getConfigFromDatabase();
-		List<Processor> dbProcessors = getProcessorsFromDatabase();
-		List<Step> dbSteps = getStepsFromDatabase();
-		List<QueryRun> dbQueries = getQueriesFromDatabase();
+		if (isAPIAvailable()) {
+			/*
+			 * Verifies if the token is still valid or updates it if necessary.
+			 */
+			verifyLicense();
 
+			if (isLicenseValid) {
+
+				updateConfigFromAPI();
+				updateProcessorsFromAPI();
+				updateStepsFromAPI();
+				updateQueriesFromAPI();
+
+			}
+
+		}
+	}
+
+	/**
+	 * Verifies if the currently used license and token is still valid. The license is updated if something has changed in the Portal. If the
+	 * license is not valid anymore the properties are set accordingly.
+	 */
+	private void verifyLicense() {
+		CompanyLicensePublic licenseObj = licenseController.checkTokenValidity();
+
+		if (licenseObj != null) {
+			licenseController.updateLicenseInDB(licenseObj);
+			authKey = licenseObj.getAccessToken();
+			isLicenseValid = true;
+			if (support != null) {
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			}
+		} else {
+			// CompanyLicensePublic license = licenseController.loadLicenseFromDB();
+			// DBUtil.getInstance().delete(license);
+			isLicenseValid = false;
+			if (support != null) {
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			}
+		}
+	}
+
+	/**
+	 * Obtains the {@link Config} from the Portal and updates the locally stored and used accordingly.
+	 */
+	private void updateConfigFromAPI() {
+		Config apiConfig = getConfigFromAPI();
+
+		if (apiConfig != null && apiConfig.getVersion() >= currentConfig.getVersion()) {
+			apiConfig.setId(currentConfig.getId());
+			DBUtil.getInstance().merge(apiConfig);
+			/*
+			 * Obtain it from the database to have all merged fields correctly updated.
+			 *
+			 * TODO: Although there will probably be no changes. Verify if this is necessary
+			 */
+			currentConfig = getConfigFromDatabase();
+			log.info("Using configuration from the server!");
+		}
+	}
+
+	/**
+	 * Updates the current {@link Config} from local information, either the database if available or from the default file configuration
+	 * otherwise.
+	 */
+	private void updateConfigLocal() {
+		Config dbConfig = getConfigFromDatabase();
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is
-		 * available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is available yet.
 		 */
 		if (dbConfig == null) {
 			log.debug("DB config not available, reading config from file. Should only happen once.");
 			Config fileConfig = getConfigFromFile();
-			DBUtil.getInstance().save(fileConfig);
+			DBUtil.getInstance().merge(fileConfig);
 			/*
 			 * Obtain the config stored in the DB to also obtain the ID.
 			 *
 			 * TODO: Currently the case that it is still not stored is not handled.
 			 */
-			this.currentConfig = getConfigFromDatabase();
+			currentConfig = getConfigFromDatabase();
 		} else {
-			this.currentConfig = dbConfig;
+			currentConfig = dbConfig;
 		}
+	}
+
+	/**
+	 * Updates the {@link Processor} objects, which are used to perform actions for network monitoring, from the Portal. Updates the local
+	 * configuration accordingly.
+	 */
+	private void updateProcessorsFromAPI() {
+		List<Processor> apiProcessors = getProcessorsFromAPI();
+
+		if (apiProcessors != null) {
+			/*
+			 * Use the configuration from the API and clear existing entries.
+			 */
+			DBUtil.getInstance().clearDB(Processor.class);
+
+			for (Processor processor : apiProcessors) {
+				DBUtil.getInstance().merge(processor);
+			}
+			/*
+			 * Obtain the processors stored in the DB to update the currentProcessors.
+			 */
+			List<Processor> dbProcessors = getProcessorsFromDatabase();
+			currentProcessors.clear();
+			for (Processor processor : dbProcessors) {
+				currentProcessors.put(processor.getName(), processor);
+			}
+			log.info("Using processors configuration from server!");
+		}
+	}
+
+	/**
+	 * Updates the current processors from local information, either the database if available or from the default file configuration
+	 * otherwise.
+	 */
+	private void updateProcessorsLocal() {
+		List<Processor> dbProcessors = getProcessorsFromDatabase();
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is
-		 * available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is available yet.
 		 */
 		if (dbProcessors == null || dbProcessors.size() == 0) {
 			log.debug("DB processors not available, reading from file. Should only happen once.");
@@ -172,12 +290,50 @@ public class ProbeConfiguration {
 		}
 
 		for (Processor processor : dbProcessors) {
-			this.currentProcessors.put(processor.getName(), processor);
+			currentProcessors.put(processor.getName(), processor);
 		}
 
+	}
+
+	/**
+	 * Updates the {@link Step} objects, which are used to define which steps (processors) are actually used to monitor the network traffic,
+	 * from the API. Updates the local configuration accordingly.
+	 */
+	private void updateStepsFromAPI() {
+		List<Step> apiSteps = getStepsFromAPI();
+		if (apiSteps != null) {
+
+			DBUtil.getInstance().clearDB(Step.class);
+
+			for (Step step : apiSteps) {
+				DBUtil.getInstance().merge(step);
+			}
+			/*
+			 * Obtain the steps stored in the DB to update the currentSteps.
+			 */
+			List<Step> dbSteps = getStepsFromDatabase();
+			currentSteps.clear();
+			for (Step step : dbSteps) {
+				currentSteps.put(step.getName(), step);
+			}
+
+			/*
+			 * Perform an update of the packet processors since they may have changed.
+			 */
+			updatePacketProcessors();
+			log.info("Using steps configuration from server!");
+
+		}
+	}
+
+	/**
+	 * Updates the current steps from local information, either the database if available or from the default file configuration otherwise.
+	 */
+	private void updateStepsLocal() {
+		List<Step> dbSteps = getStepsFromDatabase();
+
 		/*
-		 * Obtain initial configuration from file and store it to the DB if none is
-		 * available yet.
+		 * Obtain initial configuration from file and store it to the DB if none is available yet.
 		 */
 		if (dbSteps == null || dbSteps.size() == 0) {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
@@ -193,8 +349,46 @@ public class ProbeConfiguration {
 		}
 
 		for (Step step : dbSteps) {
-			this.currentSteps.put(step.getName(), step);
+			currentSteps.put(step.getName(), step);
 		}
+
+	}
+
+	/**
+	 * Updates the {@link QueryRun} objects, which are used to obtain system information using OSQuery, from the API. Updates the local
+	 * configuration accordingly.
+	 */
+	private void updateQueriesFromAPI() {
+		List<QueryRun> apiQueries = getQueriesFromAPI();
+		if (apiQueries != null) {
+			DBUtil.getInstance().clearDB(QueryRun.class);
+
+			for (QueryRun query : apiQueries) {
+				if (query != null) {
+					DBUtil.getInstance().merge(query);
+				}
+			}
+			/*
+			 * Obtain the processors stored in the DB to also obtain the ID.
+			 */
+			List<QueryRun> dbQueries = getQueriesFromDatabase();
+			currentQueries.clear();
+			for (QueryRun query : dbQueries) {
+				currentQueries.put(query.getName(), query);
+			}
+			log.info("Using queries configuration from server!");
+
+		}
+	}
+
+	/**
+	 * Updates the current queries from local information, either the database if available or from the default file configuration otherwise.
+	 */
+	private void updateQueriesLocal() {
+		/*
+		 * Obtain currently stored configurations from database.
+		 */
+		List<QueryRun> dbQueries = getQueriesFromDatabase();
 
 		if (dbQueries == null || dbQueries.size() == 0) {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
@@ -207,176 +401,58 @@ public class ProbeConfiguration {
 		}
 
 		for (QueryRun query : dbQueries) {
-			this.currentQueries.put(query.getName(), query);
+			currentQueries.put(query.getName(), query);
 		}
 
-		/*
-		 * Check if something new is available from the API
-		 */
-		checkConfig();
-		if (isLicenseValid) {
-			updatePacketProcessors();
-		}
-
-		return this.currentConfig;
 	}
 
 	/**
-	 * Obtains the configuration from the server and updates the local configuration
-	 * accordingly. The retrieved information is stored in the database and the
-	 * packet processors are instantiated.
-	 */
-	public void checkConfig() {
-		/*
-		 * Check if the API is available and if a newer version is available update it.
-		 */
-		if (isAPIAvailable()) {
-			CompanyLicensePublic licenseObj = licenseCon.checkTokenValidity();
-
-			if (licenseObj != null) {
-				DBUtil.getInstance().merge(licenseObj);
-				authKey = licenseObj.getAccessToken();
-				isLicenseValid = true;
-				isCheckingLicense = false;
-				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
-				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
-			} else {
-				/// Delete license object from the db and change to the license import view!
-				CompanyLicensePublic license = licenseCon.loadLicenseFromDB();
-				DBUtil.getInstance().delete(license);
-				isLicenseValid = false;
-				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
-				support.firePropertyChange("isGuiRunning", ProbeConfiguration.isGuiRunning, isGuiRunning);
-			}
-
-			if (isLicenseValid) {
-				Config apiConfig = getConfigFromAPI();
-				List<Processor> apiProcessors = getProcessorsFromAPI();
-				List<Step> apiSteps = getStepsFromAPI();
-				List<QueryRun> apiQueries = getQueriesFromAPI();
-
-				log.debug("Queries obtained from API {}", apiQueries.size());
-				if (apiConfig != null && apiConfig.getVersion() >= this.currentConfig.getVersion()) {
-					apiConfig.setId(this.currentConfig.getId());
-					DBUtil.getInstance().merge(apiConfig);
-					/*
-					 * Obtain it from the database to have all merged fields correctly updated.
-					 *
-					 * TODO: Although there will probably be no changes. Verify if this is necessary
-					 */
-					this.currentConfig = getConfigFromAPI();
-					log.info("Using configuration from the server!");
-				}
-
-				if (apiProcessors != null) {
-
-					DBUtil.getInstance().clearDB(Processor.class);
-
-					for (Processor processor : apiProcessors) {
-						DBUtil.getInstance().merge(processor);
-					}
-					/*
-					 * Obtain the processors stored in the DB to update the currentProcessors.
-					 */
-					List<Processor> dbProcessors = getProcessorsFromDatabase();
-					this.currentProcessors.clear();
-					for (Processor processor : dbProcessors) {
-						this.currentProcessors.put(processor.getName(), processor);
-					}
-				}
-
-				if (apiSteps != null) {
-
-					DBUtil.getInstance().clearDB(Step.class);
-
-					for (Step step : apiSteps) {
-						DBUtil.getInstance().merge(step);
-					}
-					/*
-					 * Obtain the steps stored in the DB to update the currentSteps.
-					 */
-					List<Step> dbSteps = getStepsFromDatabase();
-					this.currentSteps.clear();
-					for (Step step : dbSteps) {
-						this.currentSteps.put(step.getName(), step);
-					}
-
-					/*
-					 * Perform an update of the packet processors since they may have changed.
-					 */
-					updatePacketProcessors();
-
-				}
-
-				if (apiQueries != null) {
-					DBUtil.getInstance().clearDB(QueryRun.class);
-
-					for (QueryRun query : apiQueries) {
-						if (query != null) {
-							DBUtil.getInstance().merge(query);
-						}
-					}
-					/*
-					 * Obtain the processors stored in the DB to also obtain the ID.
-					 */
-					List<QueryRun> dbQueries = getQueriesFromDatabase();
-					this.currentQueries.clear();
-					for (QueryRun query : dbQueries) {
-						this.currentQueries.put(query.getName(), query);
-					}
-
-				}
-			}
-
-		}
-	}
-
-	/**
-	 *
+	 * Updates the packet processors locally, which are used from the {@link PacketProcessorFSM}.
 	 */
 	private void updatePacketProcessors() {
 		/*
 		 * Instantiate the actual packet processors currently defined in the database.
 		 */
-		Map<String, PacketProcessor> updatedPacketProcessors = new HashMap<String, PacketProcessor>();
-		for (Step step : this.currentSteps.values()) {
+		Map<String, PacketProcessor> updatedPacketProcessors = new HashMap<>();
+		for (Step step : currentSteps.values()) {
 			try {
-				if (this.currentPacketProcessors.containsKey(step.getName())) {
-					updatedPacketProcessors.put(step.getName(), this.currentPacketProcessors.get(step.getName()));
+				if (currentPacketProcessors.containsKey(step.getName())) {
+					updatedPacketProcessors.put(step.getName(), currentPacketProcessors.get(step.getName()));
 				} else {
-					Processor processor = this.currentProcessors.get(step.getName());
+					Processor processor = currentProcessors.get(step.getName());
 					if (processor != null) {
 						Class<?> processorClass = Class.forName(processor.getProcessor_class());
 						Constructor<?> constructor = processorClass.getConstructor(String.class, Map.class);
-						Map<String, String> options = new HashMap<String, String>();
-						PacketProcessor packetProcessor = (PacketProcessor) constructor.newInstance(step.getName(),
-								options);
+						Map<String, String> options = new HashMap<>();
+						PacketProcessor packetProcessor = (PacketProcessor) constructor.newInstance(step.getName(), options);
 						updatedPacketProcessors.put(processor.getName(), packetProcessor);
 					}
 				}
 			} catch (Exception e) {
-				log.error("Couldn't create packet processor for configuration entry {} with. Reason {}", step.getName(),
-						e);
+				log.error("Couldn't create packet processor for configuration entry {} with. Reason {}", step.getName(), e);
 			}
 		}
-		this.currentPacketProcessors = updatedPacketProcessors;
+		currentPacketProcessors = updatedPacketProcessors;
 
 	}
 
 	/**
+	 * Returns the {@link Config} object from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromAPI() {
-		return JSONUtils.fromString(RequestHandler.sendGet(loadedConfigItems.getConfigAPI()), Config.class);
+		return JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getConfigAPI(), ProbeConfiguration.authKey),
+				Config.class);
 	}
 
 	/**
+	 * Return the {@link Config} object from the database.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromDatabase() {
-		List<Config> configs = DBUtil.getInstance().findAll(new Config());
+		List<Config> configs = DBUtil.getInstance().findAll(Config.class);
 		if (configs != null && configs.size() == 1) {
 			return configs.get(0);
 		}
@@ -384,14 +460,14 @@ public class ProbeConfiguration {
 	}
 
 	/**
+	 * Returns the {@link Config} from the local default file configuration.
 	 *
-	 * @return
+	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromFile() {
 		Config fileConfig = null;
 		try {
-			InputStream ispotentialConfig = ProbeConfiguration.class
-					.getResourceAsStream(StaticConfigItems.CONFIG_JSON_LOCATION);
+			InputStream ispotentialConfig = ProbeConfiguration.class.getResourceAsStream(StaticConfigItems.CONFIG_JSON_LOCATION);
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(ispotentialConfig, writer, "UTF-8");
 			String potentialConfigString = writer.toString();
@@ -419,13 +495,13 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function returns processors from the API
+	 * Returns a List of {@link Processor} objects from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
 		return Arrays.asList(JSONUtils.fromString(
-				RequestHandler.sendGet(loadedConfigItems.getProcessorAPI() + "/" + ProbeConfiguration.probeId),
+				RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI() + "/" + ProbeConfiguration.probeId, ProbeConfiguration.authKey),
 				Processor[].class));
 	}
 
@@ -435,7 +511,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<Processor> getProcessorsFromDatabase() {
-		List<Processor> processors = DBUtil.getInstance().findByFieldName("active", 1, new Processor());
+		List<Processor> processors = DBUtil.getInstance().findAll(Processor.class);
 		return processors;
 	}
 
@@ -452,8 +528,7 @@ public class ProbeConfiguration {
 
 		if (!potentialProcessors.exists()) {
 			try {
-				potentialProcessors = new File(
-						ProbeConfiguration.class.getResource(StaticConfigItems.PROCESSORS_JSON_LOCATION).toURI());
+				potentialProcessors = new File(ProbeConfiguration.class.getResource(StaticConfigItems.PROCESSORS_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialProcessors.getAbsolutePath());
 			}
@@ -469,12 +544,14 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function returns steps from the API for the logged in user
+	 * Returns a List of {@link Step} objects from the associated Portal API.
+	 *
+	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
-				RequestHandler.sendGet(loadedConfigItems.getStepAPI() + "/" + ProbeConfiguration.probeId + "/false"),
-				Step[].class));
+		return Arrays.asList(
+				JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
+						ProbeConfiguration.authKey), Step[].class));
 	}
 
 	/**
@@ -483,7 +560,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<Step> getStepsFromDatabase() {
-		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, new Step());
+		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, Step.class);
 		return dbSteps;
 	}
 
@@ -500,8 +577,7 @@ public class ProbeConfiguration {
 
 		if (!potentialSteps.exists()) {
 			try {
-				potentialSteps = new File(
-						ProbeConfiguration.class.getResource(StaticConfigItems.STEPS_JSON_LOCATION).toURI());
+				potentialSteps = new File(ProbeConfiguration.class.getResource(StaticConfigItems.STEPS_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialSteps.getAbsolutePath());
 			}
@@ -517,17 +593,14 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * This function retrieves the run Queries from API. Currently we are getting
-	 * queries only for current user, but we will also have to add additional
-	 * parameter for client.
+	 * Returns a List of {@link QueryRun} objects from the associated Portal API.
 	 *
-	 * @return
+	 * @return The obtained List of {@link QueryRun} objects.
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
-				RequestHandler
-						.sendGet(loadedConfigItems.getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false),
-				QueryRun[].class));
+		return Arrays.asList(JSONUtils
+				.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false,
+						ProbeConfiguration.authKey), QueryRun[].class));
 	}
 
 	/**
@@ -552,8 +625,7 @@ public class ProbeConfiguration {
 
 		if (!potentialRunQueries.exists()) {
 			try {
-				potentialRunQueries = new File(
-						ProbeConfiguration.class.getResource(StaticConfigItems.QUERIES_JSON_LOCATION).toURI());
+				potentialRunQueries = new File(ProbeConfiguration.class.getResource(StaticConfigItems.QUERIES_JSON_LOCATION).toURI());
 			} catch (URISyntaxException e) {
 				log.error("Provided file URI is not correct!" + potentialRunQueries.getAbsolutePath());
 			}
@@ -568,41 +640,62 @@ public class ProbeConfiguration {
 		return runQueries;
 	}
 
-	public Config getCurrentConfigObj() {
-		return this.currentConfig;
-	}
-
+	/**
+	 * Returns whether the Portal API is available or not currently.
+	 *
+	 * @return True if the API is available
+	 */
 	public static boolean isAPIAvailable() {
 		return apiAvailable;
 	}
 
+	/**
+	 * Sets the API availability to the specified value.
+	 *
+	 * @param apiAvailability
+	 *          The availability of the API (true or false)
+	 */
 	public static void setAPIAvailablitity(boolean apiAvailability) {
 		apiAvailable = apiAvailability;
-		support.firePropertyChange("isApiAvailable", apiAvailable, apiAvailability);
+		if (support != null) {
+			support.firePropertyChange("isApiAvailable", apiAvailable, apiAvailability);
+		}
 	}
 
+	/**
+	 * Returns a map containing the current steps which are defined for the Probe. These Steps are used in the {@link PacketProcessorFSM} to
+	 * obtain from what Processor the currently received packet needs to be processed.
+	 *
+	 * @return
+	 */
 	public Map<String, Step> getCurrentSteps() {
-		return this.currentSteps;
+		return currentSteps;
 	}
 
+	/**
+	 * Returns the map of currently specified {@link PacketProcessor} objects.
+	 *
+	 * @return The map of {@link PacketProcessor} objects.
+	 */
 	public Map<String, PacketProcessor> getCurrentPacketProcessors() {
-		return this.currentPacketProcessors;
+		return currentPacketProcessors;
 	}
 
+	/**
+	 * Returns a map of currently specified {@link Processor} objects.
+	 *
+	 * @return The map of {@link Processor} objects
+	 */
 	public Map<String, Processor> getCurrentProcessors() {
-		return this.currentProcessors;
+		return currentProcessors;
 	}
 
+	/**
+	 * Returns a map of currently specified {@link QueryRun} objects.
+	 *
+	 * @return
+	 */
 	public Map<String, QueryRun> getCurrentQueries() {
-		return this.currentQueries;
+		return currentQueries;
 	}
-
-	public LoadedConfigItems getLoadedConfigItems() {
-		return loadedConfigItems;
-	}
-
-	public void setLoadedConfigItems(LoadedConfigItems loadedConfigItems) {
-		this.loadedConfigItems = loadedConfigItems;
-	}
-
 }

@@ -33,7 +33,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 		if (factory == null) {
 			factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 		} else {
-			if (factory.getProperties().get("hibernate.ejb.persistenceUnitName").toString() != PERSISTENCE_UNIT_NAME) {
+			if (!factory.getProperties().get("hibernate.ejb.persistenceUnitName").toString().equals(PERSISTENCE_UNIT_NAME)) {
 				factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 			}
 		}
@@ -142,20 +142,6 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	public List<T> findByFieldName(String fieldName, Object value) {
 		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
 		return query.getResultList();
-	}
-
-	/**
-	 * Find object by filed name.
-	 *
-	 * @param fieldName
-	 *          the field name
-	 * @param value
-	 *          the value
-	 * @return the t
-	 */
-	public T findBy(String fieldName, Object value) {
-		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
-		return getSingleResult(query);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package com.simple2secure.probe.test;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ public class TestLicenseController {
 
 	@BeforeAll
 	public static void setup() {
-
 		DBUtil.getInstance("s2s-test");
 	}
 
@@ -61,7 +60,6 @@ public class TestLicenseController {
 		License license = getLicenseFromZip(filePathLicenseValid);
 
 		assertNotNull(license);
-
 		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getFeature("groupId"), "1", license.getFeature("licenseId"),
 				license.getExpirationDateAsString());
 

@@ -1,7 +1,5 @@
 package com.simple2secure.probe.cli;
 
-import java.io.IOException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -12,21 +10,19 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
-import com.simple2secure.probe.utils.RequestHandler;
-
-import ro.fortsoft.licensius.LicenseException;
-import ro.fortsoft.licensius.LicenseNotFoundException;
 
 public class ProbeCLI {
 	private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
 
 	private static String OPTION_FILEPATH_SHORT = "l";
 	private static String OPTION_FILEPATH = "licensePath";
+
+	private LicenseController licenseController = new LicenseController();
 
 	/**
 	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
@@ -36,36 +32,43 @@ public class ProbeCLI {
 	 *          The absolute file path to the License ZIP File.
 	 */
 	public void init(String importFilePath) {
-		LicenseController licenseController = new LicenseController();
-		String authToken = null;
-
 		StartConditions startConditions = licenseController.checkProbeStartConditions();
+
+		CompanyLicensePublic licenseFile = null;
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:
-			CompanyLicensePublic licenseFile = null;
 			try {
 				licenseFile = licenseController.loadLicenseFromPath(importFilePath);
-				if (licenseFile != null) {
-					authToken = RequestHandler.sendPostReceiveResponse(
-							ProbeConfiguration.getInstance().getLoadedConfigItems().getLicenseAPI() + "/activateProbe", licenseFile);
-					if (authToken != null) {
-						licenseController.activateLicenseInDB(authToken, licenseFile);
-
-						ProbeConfiguration.authKey = authToken;
-						ProbeConfiguration.probeId = licenseFile.getProbeId();
-						ProbeConfiguration.setAPIAvailablitity(true);
-						break;
-					}
+				if (!licenseController.activateLicense(licenseFile)) {
+					log.error("A problem occured while activating the license.");
 				}
-				log.error("A problem occured while loading the license from path.");
 			} catch (Exception e) {
 				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
 			}
 			break;
 		case LICENSE_NOT_ACTIVATED:
+			try {
+				if (!Strings.isNullOrEmpty(importFilePath)) {
+					licenseFile = licenseController.loadLicenseFromPath(importFilePath);
+				} else {
+					licenseFile = licenseController.loadLicenseFromDB();
+				}
+				if (!licenseController.activateLicense(licenseFile)) {
+					log.error("A problem occured while activating the license.");
+				}
+			} catch (Exception e) {
+				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
+			}
+			break;
 		case LICENSE_VALID:
+			log.info("Found valid license. Starting probe!");
+			break;
 		case LICENSE_EXPIRED:
+			/*
+			 * TODO: Insert handling for licenses which are expired for more than a predefined period.
+			 */
+			log.info("License expired!");
 			break;
 		}
 	}
@@ -81,7 +84,7 @@ public class ProbeCLI {
 	public static void main(String[] args) {
 		Options options = new Options();
 
-		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).argName("ZIP-FILE").longOpt(OPTION_FILEPATH)
+		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
 
 		options.addOption(filePath);
