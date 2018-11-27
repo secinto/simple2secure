@@ -145,20 +145,6 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	}
 
 	/**
-	 * Find object by filed name.
-	 *
-	 * @param fieldName
-	 *          the field name
-	 * @param value
-	 *          the value
-	 * @return the t
-	 */
-	public T findBy(String fieldName, Object value) {
-		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
-		return getSingleResult(query);
-	}
-
-	/**
 	 * Gets the query.
 	 *
 	 * @param fieldName

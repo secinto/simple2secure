@@ -78,7 +78,7 @@ export class NetworkReportOverviewComponent {
   }
 
   public deleteReport(report: any) {
-    this.httpService.delete(environment.apiEndpoint + 'packet/' + report.id).subscribe(
+    this.httpService.delete(environment.apiEndpoint + 'reports/network/' + report.id).subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.report.delete'));
         this.loadAllReports();

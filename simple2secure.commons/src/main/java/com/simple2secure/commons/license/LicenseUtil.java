@@ -189,17 +189,26 @@ public class LicenseUtil {
 		byteOutStream.writeTo(outputStream);
 	}
 
+	public static List<File> getLicenseFileList() {
+		return getLicenseFileList(licenseFilePath);
+	}
+
 	/**
 	 * Returns a List of files containing the default license (working directory license.dat file) and public key (working directory
 	 * public.key file).
 	 *
 	 * @return The List<File> containing license.dat and public.key.
 	 */
-	public static List<File> getLicenseFileList() {
+	public static List<File> getLicenseFileList(String licenseFile) {
 		ArrayList<File> files = new ArrayList<>();
 
 		File publicKey = new File(publicKeyFilePath);
-		File certificate = new File(licenseFilePath + "//license.dat");
+		File certificate = null;
+		if (!Strings.isNullOrEmpty(licenseFile)) {
+			certificate = new File(licenseFile);
+		} else {
+			certificate = new File(licenseFilePath + "/license.dat");
+		}
 
 		files.add(publicKey);
 		files.add(certificate);
@@ -245,7 +254,7 @@ public class LicenseUtil {
 	public static ByteArrayOutputStream generateLicenseZIPStream(String licenseFile, String publicKeyFile) throws IOException {
 		initLicenseManager(licenseFile, publicKeyFile);
 
-		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList());
+		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList(licenseFile));
 	}
 
 	/**
@@ -322,6 +331,8 @@ public class LicenseUtil {
 	 *          The public key of the license file.
 	 */
 	private static void initLicenseManager(String licenseFile, String publicKeyFile) {
+		// licenseFilePath = licenseFile;
+		// publicKeyFilePath = publicKeyFile;
 		LicenseManager.setPublicKeyFile(publicKeyFile);
 		LicenseManager.setLicenseFile(licenseFile);
 	}
@@ -337,8 +348,8 @@ public class LicenseUtil {
 	 *          The expiration date which should be used for the license.
 	 * @throws Exception
 	 */
-	public static void createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
-		createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
+	public static String createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
+		return createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
 	/**

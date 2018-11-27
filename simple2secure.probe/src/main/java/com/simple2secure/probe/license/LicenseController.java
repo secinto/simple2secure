@@ -46,7 +46,7 @@ public class LicenseController {
 		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
-		if (inputFile != null) {
+		if (inputFile != null && inputFile.exists()) {
 			List<File> unzippedFiles = ProbeUtils.unzipImportedFile(inputFile);
 			if (unzippedFiles != null && unzippedFiles.size() == 2) {
 				License downloadedLicense = LicenseUtil.getLicense();
@@ -77,6 +77,8 @@ public class LicenseController {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
 					ProbeConfiguration.probeId = license.getProbeId();
+					ProbeConfiguration.groupId = license.getGroupId();
+					ProbeConfiguration.authKey = license.getAccessToken();
 					return StartConditions.LICENSE_VALID;
 				}
 				return StartConditions.LICENSE_NOT_ACTIVATED;
@@ -110,6 +112,11 @@ public class LicenseController {
 	 */
 	public void updateLicenseInDB(CompanyLicensePublic license) {
 		if (license != null) {
+			CompanyLicensePublic loadedLicense = loadLicenseFromDB();
+			if (loadedLicense != null) {
+				license.setId(loadedLicense.getId());
+			}
+
 			DBUtil.getInstance().merge(license);
 		}
 	}
@@ -127,6 +134,32 @@ public class LicenseController {
 		} else {
 			return licenses.get(0);
 		}
+	}
+
+	/**
+	 * Tries to activate the provided {@link CompanyLicensePublic} via the Portal API. If successful the current access token is obtained and
+	 * stored in the {@link ProbeConfiguration}.
+	 *
+	 * @param license
+	 *          The license which should be used for activation.
+	 * @return
+	 */
+	public boolean activateLicense(CompanyLicensePublic license) {
+		if (license != null) {
+			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", license);
+			if (authToken != null) {
+				activateLicenseInDB(authToken, license);
+
+				ProbeConfiguration.authKey = authToken;
+				ProbeConfiguration.probeId = license.getProbeId();
+				ProbeConfiguration.groupId = license.getGroupId();
+				ProbeConfiguration.setAPIAvailablitity(true);
+				return true;
+			} else {
+				log.error("A problem occured while loading the license from path.");
+			}
+		}
+		return false;
 	}
 
 	/**

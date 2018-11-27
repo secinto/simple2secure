@@ -116,22 +116,10 @@ public class DBUtil {
 
 		BaseDao dao = getDao(t);
 		if (dao != null) {
-			queryObjects = dao.getAll();
+			queryObjects = dao.findByFieldName(fieldName, value);
 		}
 
 		return queryObjects;
-	}
-
-	@SuppressWarnings("unchecked")
-	public synchronized <T> T findByFieldNameObject(String fieldName, Object value, Object t) {
-
-		Object queryObject = new Object();
-
-		if (t instanceof Config || t == Report.class) {
-			queryObject = configDao.findBy(fieldName, value);
-		}
-
-		return (T) queryObject;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

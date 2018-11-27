@@ -44,7 +44,7 @@ public class ProbeConfiguration {
 	private static boolean apiAvailable = false;
 
 	public static String authKey = "";
-
+	public static String groupId = "";
 	public static String probeId = "";
 
 	public static String licenseId = "";
@@ -85,12 +85,12 @@ public class ProbeConfiguration {
 	 * General constructor which creates the config DAO.
 	 */
 	private ProbeConfiguration() {
+		support = new PropertyChangeSupport(this);
 		currentPacketProcessors = new HashMap<>();
 		currentSteps = new HashMap<>();
 		currentProcessors = new HashMap<>();
 		currentQueries = new HashMap<>();
 		loadConfig();
-		support = new PropertyChangeSupport(this);
 	}
 
 	/**
@@ -181,15 +181,19 @@ public class ProbeConfiguration {
 		CompanyLicensePublic licenseObj = licenseController.checkTokenValidity();
 
 		if (licenseObj != null) {
-			DBUtil.getInstance().merge(licenseObj);
+			licenseController.updateLicenseInDB(licenseObj);
 			authKey = licenseObj.getAccessToken();
 			isLicenseValid = true;
-			support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			if (support != null) {
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			}
 		} else {
 			// CompanyLicensePublic license = licenseController.loadLicenseFromDB();
 			// DBUtil.getInstance().delete(license);
 			isLicenseValid = false;
-			support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			if (support != null) {
+				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
+			}
 		}
 	}
 
@@ -207,7 +211,7 @@ public class ProbeConfiguration {
 			 *
 			 * TODO: Although there will probably be no changes. Verify if this is necessary
 			 */
-			currentConfig = getConfigFromAPI();
+			currentConfig = getConfigFromDatabase();
 			log.info("Using configuration from the server!");
 		}
 	}
@@ -224,7 +228,7 @@ public class ProbeConfiguration {
 		if (dbConfig == null) {
 			log.debug("DB config not available, reading config from file. Should only happen once.");
 			Config fileConfig = getConfigFromFile();
-			DBUtil.getInstance().save(fileConfig);
+			DBUtil.getInstance().merge(fileConfig);
 			/*
 			 * Obtain the config stored in the DB to also obtain the ID.
 			 *
@@ -260,6 +264,7 @@ public class ProbeConfiguration {
 			for (Processor processor : dbProcessors) {
 				currentProcessors.put(processor.getName(), processor);
 			}
+			log.info("Using processors configuration from server!");
 		}
 	}
 
@@ -316,6 +321,7 @@ public class ProbeConfiguration {
 			 * Perform an update of the packet processors since they may have changed.
 			 */
 			updatePacketProcessors();
+			log.info("Using steps configuration from server!");
 
 		}
 	}
@@ -370,6 +376,8 @@ public class ProbeConfiguration {
 			for (QueryRun query : dbQueries) {
 				currentQueries.put(query.getName(), query);
 			}
+			log.info("Using queries configuration from server!");
+
 		}
 	}
 
@@ -444,7 +452,7 @@ public class ProbeConfiguration {
 	 * @return The obtained {@link Config} object.
 	 */
 	public Config getConfigFromDatabase() {
-		List<Config> configs = DBUtil.getInstance().findAll(new Config());
+		List<Config> configs = DBUtil.getInstance().findAll(Config.class);
 		if (configs != null && configs.size() == 1) {
 			return configs.get(0);
 		}
@@ -503,7 +511,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<Processor> getProcessorsFromDatabase() {
-		List<Processor> processors = DBUtil.getInstance().findByFieldName("active", 1, new Processor());
+		List<Processor> processors = DBUtil.getInstance().findAll(Processor.class);
 		return processors;
 	}
 
@@ -552,7 +560,7 @@ public class ProbeConfiguration {
 	 * @return
 	 */
 	private List<Step> getStepsFromDatabase() {
-		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, new Step());
+		List<Step> dbSteps = DBUtil.getInstance().findByFieldName("active", 1, Step.class);
 		return dbSteps;
 	}
 

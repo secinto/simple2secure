@@ -94,6 +94,7 @@ public class LicenseGUIController {
 
 		ProbeConfiguration.authKey = authToken;
 		ProbeConfiguration.probeId = licenseForAuth.getProbeId();
+		ProbeConfiguration.groupId = licenseForAuth.getGroupId();
 		ProbeConfiguration.setAPIAvailablitity(true);
 
 		ProbeGUI.initRootPane();

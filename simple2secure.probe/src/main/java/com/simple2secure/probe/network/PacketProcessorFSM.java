@@ -42,9 +42,9 @@ public class PacketProcessorFSM implements Runnable {
 				}
 				if (lastPacket.isPacketInProcess()) {
 					processingQueue.push(lastPacket);
-					log.debug("Processing of packet with ID {} not finished. Pushing it onto the queue.", lastPacket.getId());
+					log.trace("Processing of packet with ID {} not finished. Pushing it onto the queue.", lastPacket.getId());
 				} else {
-					log.debug("Processing for this packet with ID {} has finished all steps.", lastPacket.getId());
+					log.trace("Processing for this packet with ID {} has finished all steps.", lastPacket.getId());
 				}
 			} catch (Exception e) {
 				if (lastPacket != null) {
