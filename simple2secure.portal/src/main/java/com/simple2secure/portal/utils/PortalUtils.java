@@ -58,10 +58,6 @@ public class PortalUtils {
 			if (processor_item.getName().trim().equals(processor.getName().trim())) {
 				return true;
 			}
-			if (processor_item.getProcessor_class().trim().equals(processor.getProcessor_class().trim())) {
-				return true;
-			}
-
 		}
 		return false;
 	}
