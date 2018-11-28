@@ -125,10 +125,19 @@
             <div *ngIf="showGroupTable" class="example-container mat-elevation-z8 table table-striped">
                 <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)" >
                     <ng-template #treeNodeTemplate let-node let-index="index">
-                        <span class="node-s2s-item">{{ node.data.name }}</span>
-                        <button class="mat-green-button node-s2s-button float-right" mat-button [matMenuTriggerFor]="menuGrp" (click)="onMenuTriggerClick(node.data)">
-                            <i class="fas fa-bars"></i>
-                        </button>
+                        <table class="myGroupNodesTable">
+                            <tr>
+                                <td>
+                                    <span class="node-s2s-item">{{ node.data.name }}</span>
+                                </td>
+                                <td align="right">
+                                    <button class="mat-green-button node-s2s-button float-right" mat-button
+                                            [matMenuTriggerFor]="menuGrp" (click)="onMenuTriggerClick(node.data)">
+                                        <i class="fas fa-bars"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
                     </ng-template>
                 </tree-root>
                 <mat-menu #menuGrp="matMenu">
