@@ -19,9 +19,7 @@ import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
 
 import ro.fortsoft.licensius.License;
-import ro.fortsoft.licensius.LicenseGenerator;
 import ro.fortsoft.licensius.LicenseManager;
-import ro.fortsoft.licensius.OrderedProperties;
 
 public class LicenseUtil {
 	private static Logger log = LoggerFactory.getLogger(LicenseUtil.class);
@@ -331,8 +329,6 @@ public class LicenseUtil {
 	 *          The public key of the license file.
 	 */
 	private static void initLicenseManager(String licenseFile, String publicKeyFile) {
-		// licenseFilePath = licenseFile;
-		// publicKeyFilePath = publicKeyFile;
 		LicenseManager.setPublicKeyFile(publicKeyFile);
 		LicenseManager.setLicenseFile(licenseFile);
 	}

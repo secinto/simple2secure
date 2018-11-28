@@ -29,8 +29,8 @@ public class TestLicenseUtil {
 	public void testCreateExpiredLicense() throws Exception {
 		String licenseId = LicenseUtil.generateLicenseId();
 		LicenseUtil.createLicense("testgroup", licenseId, "24/11/2018");
-		LicenseUtil.generateLicenseZIPFile(licenseFilePath + "\\" + licenseId + "\\license.dat", publicKeyPath,
-				licenseFilePath + "\\" + licenseId + "\\license-" + licenseId + ".zip");
+		LicenseUtil.generateLicenseZIPFile(licenseFilePath + licenseId + "\\license.dat", publicKeyPath,
+				licenseFilePath + licenseId + "\\license-" + licenseId + ".zip");
 	}
 
 }
