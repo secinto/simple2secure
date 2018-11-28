@@ -124,7 +124,7 @@
 
             <div *ngIf="showGroupTable" class="example-container mat-elevation-z8 table table-striped">
                 <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)" >
-                    <ng-template #treeNodeTemplate let-node let-index="index">
+                    <ng-template #treeNodeTemplate let-node let-index="index" draggable="false" ng-reflect-tree-drag-enabled="false">
                         <table class="myGroupNodesTable">
                             <tr>
                                 <td>

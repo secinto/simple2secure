@@ -5,21 +5,31 @@ import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class AdminGroup extends GenericDBObject{
+public class AdminGroup extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5969701189053689561L;
-	
+
+	private String name;
+
 	private List<String> admins = new ArrayList<String>();
-	
+
 	private String licensePlanId;
-	
+
 	private int currentNumberOfLicenseDownloads;
-	
+
 	public AdminGroup() {
-		
+
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getLicensePlanId() {
@@ -37,13 +47,13 @@ public class AdminGroup extends GenericDBObject{
 	public void setAdmins(List<String> admins) {
 		this.admins = admins;
 	}
-	
+
 	public void addAdmin(String userId) {
-		this.admins.add(userId);
+		admins.add(userId);
 	}
-	
+
 	public void removeAdmin(String userId) {
-		this.admins.remove(userId);
+		admins.remove(userId);
 	}
 
 	public int getCurrentNumberOfLicenseDownloads() {
@@ -53,6 +63,5 @@ public class AdminGroup extends GenericDBObject{
 	public void setCurrentNumberOfLicenseDownloads(int currentNumberOfLicenseDownloads) {
 		this.currentNumberOfLicenseDownloads = currentNumberOfLicenseDownloads;
 	}
-	
-	
+
 }

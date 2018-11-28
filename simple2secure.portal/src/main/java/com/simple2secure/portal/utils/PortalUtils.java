@@ -53,7 +53,7 @@ public class PortalUtils {
 	 * @param processor
 	 * @return
 	 */
-	public static boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
+	public boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
 		for (Processor processor_item : processors) {
 			if (processor_item.getName().trim().equals(processor.getName().trim())) {
 				return true;

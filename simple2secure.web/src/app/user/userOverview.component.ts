@@ -300,6 +300,49 @@ export class UserOverviewComponent {
       }
   }
 
+    checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup){
+
+        if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+            return true;
+        }
+        else if (this.currentUser.userRole == UserRole.SUPERUSER){
+            if (fromGroup && toGroup){
+                if (fromGroup.superUserIds && toGroup.superUserIds){
+                    if (fromGroup.superUserIds.indexOf(this.currentUser.userID) > -1 && toGroup.superUserIds.indexOf(this.currentUser.userID) > -1){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                else{
+                    if(toGroup.id){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+            }
+            else if (fromGroup && !toGroup){
+                if (fromGroup.superUserIds){
+                    if (fromGroup.superUserIds.indexOf(this.currentUser.userID) > -1){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+            }
+            else{
+                return false;
+            }
+    }
+
   checkIfUserCanEditGroup(group: CompanyGroup){
       if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
           return true;
@@ -509,8 +552,7 @@ export class UserOverviewComponent {
     }
 
     onMoveGroupNode($event) {
-        if (this.checkIfUserCanEditGroup($event.node) && this.checkIfUserCanEditGroup($event.to.parent)){
-            console.log("Moving from " + $event.node.superUserIds + " to " + $event.to.parent.name);
+        if (this.checkIfUserCanMoveGroup($event.node, $event.to.parent)){
             this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
             this.httpService.post(null, this.url).subscribe(
                 data => {
@@ -524,16 +566,17 @@ export class UserOverviewComponent {
                     else{
                         this.alertService.error(error.error.errorMessage);
                     }
+                    this.moveNotPossible = true;
                     this.loading = false;
+                    this.loadMyProfile();
                 });
         }
-        else {
+        else{
             this.moveNotPossible = true;
             this.alertService.error(this.translate.instant('node.move.error'));
             this.loadMyProfile();
         }
     }
-
 
   public onDownloadClick(){
       this.loading = true;
@@ -562,7 +605,7 @@ export class UserOverviewComponent {
               content: this.translate.instant('message.user.dialog')
           };
       }
-      else if(type == 'probe'){
+      else if (type == 'probe'){
           dialogConfig.data = {
               id: 1,
               title: this.translate.instant('message.arayousure'),
@@ -588,7 +631,7 @@ export class UserOverviewComponent {
               else if (type == 'group'){
                   this.deleteGroup(this.selectedItem);
               }
-              else if(type == 'probe') {
+              else if (type == 'probe') {
                   this.deleteProbe(this.selectedItem);
               }
           }

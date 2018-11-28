@@ -426,6 +426,8 @@ public class UserController {
 						}
 					}
 				} else {
+					// If user already
+					inviteUserToAdminGroup(userRegistration);
 					return new ResponseEntity(
 							new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_already_exists", locale)),
 							HttpStatus.NOT_FOUND);
@@ -476,6 +478,7 @@ public class UserController {
 
 					if (licensePlan != null) {
 						AdminGroup adminGroup = new AdminGroup();
+						adminGroup.setName(user.getEmail().substring(user.getEmail().indexOf("@")));
 						adminGroup.setLicensePlanId(licensePlan.getId());
 						adminGroup.addAdmin(userID.toString());
 						ObjectId admingGroupId = adminGroupRepository.saveAndReturnId(adminGroup);
@@ -513,6 +516,10 @@ public class UserController {
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	private void inviteUserToAdminGroup(UserRegistration userRegistration) {
+
 	}
 
 	/**
@@ -1186,7 +1193,8 @@ public class UserController {
 					}
 				} else {
 					// NEW PARENT GROUP!
-					AdminGroup adminGroup = adminGroupRepository.getAdminGroupByUserId(userId);
+					//
+					AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
 					if (adminGroup != null) {
 
 						if (user.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -1333,52 +1341,102 @@ public class UserController {
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
 		CompanyGroup toGroup = groupRepository.find(destGroupId);
-		// TODO - additional checks and error handling
-		if (sourceGroup != null && toGroup != null && !Strings.isNullOrEmpty(userId)) {
-			if (sourceGroup.getSuperUserIds().contains(userId) && toGroup.getSuperUserIds().contains(userId)) {
-				CompanyGroup parentGroup = groupRepository.find(sourceGroup.getParentId());
-				if (parentGroup != null) {
-					parentGroup.removeChildrenId(sourceGroupId);
-					groupRepository.update(parentGroup);
+		User user = userRepository.find(userId);
 
-					sourceGroup.setParentId(destGroupId);
-					toGroup.addChildrenId(sourceGroupId);
+		if (sourceGroup != null && user != null) {
+			return checkIfGroupCanBeMoved(sourceGroup, toGroup, user, locale);
+		} else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+					HttpStatus.NOT_FOUND);
+		}
+	}
 
-					groupRepository.update(sourceGroup);
-					groupRepository.update(toGroup);
-				}
-				// This is the root group!
-				else {
-					if (sourceGroup.isRootGroup()) {
-						sourceGroup.setParentId(destGroupId);
-						sourceGroup.setRootGroup(false);
-						toGroup.addChildrenId(sourceGroupId);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user, String locale)
+			throws ItemNotFoundRepositoryException {
 
-						groupRepository.update(sourceGroup);
-						groupRepository.update(toGroup);
+		// SUPERADMIN
+		if (user.getUserRole().equals(UserRole.SUPERADMIN)) {
+			// SUPERADMIN can move everything
+			moveGroup(fromGroup, toGroup);
+			return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+		}
+		// SUPERUSER
+		else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
+			// Move only if superuser belongs to the both groups(both groups are assigned to him)
+			if (fromGroup.getSuperUserIds().contains(user.getId())) {
+				// in this case the moved group will be root group
+				if (toGroup == null) {
+					moveGroup(fromGroup, toGroup);
+				} else {
+					// check if to group is assigned to this user
+					if (toGroup.getSuperUserIds().contains(user.getId())) {
+						moveGroup(fromGroup, toGroup);
+					} else {
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+								HttpStatus.NOT_FOUND);
 					}
 				}
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-						HttpStatus.NOT_FOUND);
 			}
+			return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
 
 		}
-		// Group will be moved to root!
-		else if (sourceGroup != null && toGroup == null) {
-			CompanyGroup parentGroup = groupRepository.find(sourceGroup.getParentId());
+		// ADMIN
+		else if (user.getUserRole().equals(UserRole.ADMIN)) {
+			// Move only if both groups in the same adminGroup and admin belongs to this adminGroup
+			if (!Strings.isNullOrEmpty(fromGroup.getAdminGroupId()) && !Strings.isNullOrEmpty(toGroup.getAdminGroupId())) {
+				if (fromGroup.getAdminGroupId().equals(toGroup.getAdminGroupId())) {
+					if (user.getAdminGroupId().equals(fromGroup.getAdminGroupId())) {
+						moveGroup(fromGroup, toGroup);
+						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+					}
+				}
+			}
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+					HttpStatus.NOT_FOUND);
+
+		} else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	private void moveGroup(CompanyGroup fromGroup, CompanyGroup toGroup) throws ItemNotFoundRepositoryException {
+		if (toGroup != null) {
+			CompanyGroup parentGroup = groupRepository.find(fromGroup.getParentId());
 			if (parentGroup != null) {
-				parentGroup.removeChildrenId(sourceGroupId);
+				parentGroup.removeChildrenId(fromGroup.getId());
 				groupRepository.update(parentGroup);
 
-				sourceGroup.setParentId(null);
-				sourceGroup.setRootGroup(true);
+				fromGroup.setParentId(toGroup.getId());
+				toGroup.addChildrenId(fromGroup.getId());
 
-				groupRepository.update(sourceGroup);
+				groupRepository.update(fromGroup);
+				groupRepository.update(toGroup);
+			}
+			// This is the root group!
+			else {
+				if (fromGroup.isRootGroup()) {
+					fromGroup.setParentId(toGroup.getId());
+					fromGroup.setRootGroup(false);
+					toGroup.addChildrenId(fromGroup.getId());
+
+					groupRepository.update(fromGroup);
+					groupRepository.update(toGroup);
+				}
+			}
+		} else {
+			CompanyGroup parentGroup = groupRepository.find(fromGroup.getParentId());
+			if (parentGroup != null) {
+				parentGroup.removeChildrenId(fromGroup.getId());
+				groupRepository.update(parentGroup);
+
+				fromGroup.setParentId(null);
+				fromGroup.setRootGroup(true);
+
+				groupRepository.update(fromGroup);
 			}
 		}
-
-		return new ResponseEntity<CompanyGroup>(sourceGroup, HttpStatus.OK);
 	}
 
 	private void deleteGroup(String groupId) {
