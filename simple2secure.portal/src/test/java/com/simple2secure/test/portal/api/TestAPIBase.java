@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +27,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
+import com.simple2secure.portal.repository.AdminGroupRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -51,6 +54,9 @@ public class TestAPIBase {
 	private SettingsRepository settingsRepository;
 
 	@Autowired
+	private AdminGroupRepository adminGroupRepository;
+
+	@Autowired
 	UserRepository userRepository;
 
 	@Autowired
@@ -66,9 +72,13 @@ public class TestAPIBase {
 
 	private User probeUser;
 
+	private User superUser;
+
 	private String accessTokenAdmin;
 
 	private String accessTokenProbe;
+
+	private String accessTokenSuperUser;
 
 	HttpHeaders headers = new HttpHeaders();
 
@@ -88,9 +98,11 @@ public class TestAPIBase {
 
 		adminUser = createUser(UserRole.ADMIN);
 		probeUser = createUser(UserRole.PROBE);
+		superUser = createUser(UserRole.SUPERUSER);
 		createSettings();
 		setAccessTokenAdmin(obtainAccessToken(adminUser));
 		setAccessTokenProbe(obtainAccessToken(probeUser));
+		setAccessTokenSuperUser(obtainAccessToken(superUser));
 	}
 
 	/**
@@ -118,22 +130,44 @@ public class TestAPIBase {
 
 		user.setFirstName("test");
 		user.setLastName("test");
-		user.setEmail("testiing@test.com");
+		user.setEmail("probe@test.com");
 		user.setPassword(passwordEncoder.encode("test"));
-		user.setUsername("testiing@test.com");
+		user.setUsername("probe");
 		user.setActivated(true);
-		user.setActivationToken("12345");
+		user.setActivationToken("54321");
 		user.setUserRole(userRole);
 
-		if (userRole.equals(UserRole.PROBE)) {
-			user.setEmail("probe@test.com");
-			user.setUsername("probe");
-			user.setActivationToken("54321");
+		if (userRole.equals(UserRole.ADMIN)) {
+			user.setEmail("testiing@test.com");
+			user.setUsername("testiing@test.com");
+			user.setActivationToken("12345");
+			user.setAdminGroupId(createAdminGroup("AdminGroup").toString());
+		} else if (userRole.equals(UserRole.SUPERUSER)) {
+			user.setEmail("superuser@test.com");
+			user.setUsername("superuser@test.com");
+			user.setActivationToken("23145");
+			user.setAdminGroupId(createAdminGroup("AdminGroupSU").toString());
 		}
 
 		userRepository.save(user);
 
+		// We need an userId in some tests!!
+		// TODO: Implement a function in MongoRepository which returns an object after saving
+
+		user = userRepository.findByEmail(user.getEmail());
+
 		return user;
+	}
+
+	/**
+	 * This function adds new admin group to the database, because it is needed for some tests.
+	 *
+	 * @return
+	 */
+	private ObjectId createAdminGroup(String groupName) {
+		AdminGroup adminGroup = new AdminGroup();
+		adminGroup.setName(groupName);
+		return adminGroupRepository.saveAndReturnId(adminGroup);
 	}
 
 	/**
@@ -176,6 +210,8 @@ public class TestAPIBase {
 		headers.set("Accept-Language", "en");
 		if (userRole.equals(UserRole.ADMIN)) {
 			headers.set("Authorization", getAccessTokenAdmin());
+		} else if (userRole.equals(UserRole.SUPERUSER)) {
+			headers.set("Authorization", getAccessTokenSuperUser());
 		} else {
 			headers.set("Authorization", getAccessTokenProbe());
 		}
@@ -210,11 +246,23 @@ public class TestAPIBase {
 		this.accessTokenProbe = accessTokenProbe;
 	}
 
+	public String getAccessTokenSuperUser() {
+		return accessTokenSuperUser;
+	}
+
+	public void setAccessTokenSuperUser(String accessTokenSuperUser) {
+		this.accessTokenSuperUser = accessTokenSuperUser;
+	}
+
 	public User getAdminUser() {
 		return adminUser;
 	}
 
 	public User getProbeUser() {
 		return probeUser;
+	}
+
+	public User getSuperUser() {
+		return superUser;
 	}
 }

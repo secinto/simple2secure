@@ -1351,6 +1351,18 @@ public class UserController {
 		}
 	}
 
+	/**
+	 * This function checks the user role, which wants to move the group. Superadmins can move every group. Superusers can move only assigned
+	 * groups(both fromGroup and toGroup must be assigned to the super user). Admin can move every group if it belongs to the adminGroup to
+	 * which this admin belongs.
+	 *
+	 * @param fromGroup
+	 * @param toGroup
+	 * @param user
+	 * @param locale
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user, String locale)
 			throws ItemNotFoundRepositoryException {
@@ -1358,8 +1370,9 @@ public class UserController {
 		// SUPERADMIN
 		if (user.getUserRole().equals(UserRole.SUPERADMIN)) {
 			// SUPERADMIN can move everything
-			moveGroup(fromGroup, toGroup);
-			return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+			if (moveGroup(fromGroup, toGroup)) {
+				return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+			}
 		}
 		// SUPERUSER
 		else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -1367,41 +1380,58 @@ public class UserController {
 			if (fromGroup.getSuperUserIds().contains(user.getId())) {
 				// in this case the moved group will be root group
 				if (toGroup == null) {
-					moveGroup(fromGroup, toGroup);
+					if (moveGroup(fromGroup, toGroup)) {
+						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+					}
 				} else {
-					// check if to group is assigned to this user
+					// check if toGroup is assigned to this user
 					if (toGroup.getSuperUserIds().contains(user.getId())) {
-						moveGroup(fromGroup, toGroup);
-					} else {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-								HttpStatus.NOT_FOUND);
+						if (moveGroup(fromGroup, toGroup)) {
+							return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+						}
 					}
 				}
 			}
-			return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
-
 		}
 		// ADMIN
 		else if (user.getUserRole().equals(UserRole.ADMIN)) {
-			// Move only if both groups in the same adminGroup and admin belongs to this adminGroup
-			if (!Strings.isNullOrEmpty(fromGroup.getAdminGroupId()) && !Strings.isNullOrEmpty(toGroup.getAdminGroupId())) {
-				if (fromGroup.getAdminGroupId().equals(toGroup.getAdminGroupId())) {
-					if (user.getAdminGroupId().equals(fromGroup.getAdminGroupId())) {
-						moveGroup(fromGroup, toGroup);
-						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+
+			if (!Strings.isNullOrEmpty(fromGroup.getAdminGroupId())) {
+				// check if adminGroupIf of the from Group is same as adminGroupId assigned to the user
+				if (fromGroup.getAdminGroupId().equals(user.getAdminGroupId())) {
+					// In case that toGroup is null, fromGroup will be new root group
+					if (toGroup == null) {
+						if (moveGroup(fromGroup, toGroup)) {
+							return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+						}
+					} else {
+						if (!Strings.isNullOrEmpty(toGroup.getAdminGroupId())) {
+							// Check if fromGroup adminGroupId as same as toGroup adminGroupId. If both are same move the group
+							if (fromGroup.getAdminGroupId().equals(toGroup.getAdminGroupId())) {
+								if (moveGroup(fromGroup, toGroup)) {
+									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+								}
+							}
+						}
 					}
 				}
 			}
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-					HttpStatus.NOT_FOUND);
-
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
-	private void moveGroup(CompanyGroup fromGroup, CompanyGroup toGroup) throws ItemNotFoundRepositoryException {
+	/**
+	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
+	 * the destination group will be added in this function. If toGroup is null it means that fromGroup will be declared as new root group.
+	 *
+	 * @param fromGroup
+	 * @param toGroup
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	private boolean moveGroup(CompanyGroup fromGroup, CompanyGroup toGroup) throws ItemNotFoundRepositoryException {
 		if (toGroup != null) {
 			CompanyGroup parentGroup = groupRepository.find(fromGroup.getParentId());
 			if (parentGroup != null) {
@@ -1413,6 +1443,7 @@ public class UserController {
 
 				groupRepository.update(fromGroup);
 				groupRepository.update(toGroup);
+				return true;
 			}
 			// This is the root group!
 			else {
@@ -1423,7 +1454,9 @@ public class UserController {
 
 					groupRepository.update(fromGroup);
 					groupRepository.update(toGroup);
+					return true;
 				}
+				return false;
 			}
 		} else {
 			CompanyGroup parentGroup = groupRepository.find(fromGroup.getParentId());
@@ -1435,7 +1468,10 @@ public class UserController {
 				fromGroup.setRootGroup(true);
 
 				groupRepository.update(fromGroup);
+				return true;
 			}
+			// In other case no need to move because this is already root group
+			return false;
 		}
 	}
 
