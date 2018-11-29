@@ -1,23 +1,30 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
 @Repository
 @Transactional
 public class UserRepositoryImpl extends UserRepository {
+
+	@Autowired
+	ContextRepository contextRepository;
 
 	@PostConstruct
 	public void init() {
@@ -26,15 +33,8 @@ public class UserRepositoryImpl extends UserRepository {
 	}
 
 	@Override
-	public User findByUserID(String id) {
-		Query query = new Query(Criteria.where("id").is(id));
-		User user = this.mongoTemplate.findOne(query, User.class);
-		return user;
-	}
-
-	@Override
 	public User deleteByUserID(String id) {
-		User user = findByUserID(id);
+		User user = find(id);
 		this.delete(user);
 
 		return user;
@@ -43,14 +43,14 @@ public class UserRepositoryImpl extends UserRepository {
 	@Override
 	public User findUserByUsernameAndPwd(String username, String password) {
 		Query query = new Query(Criteria.where("username").is(username).and("password").is(password));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
 	@Override
 	public User findUserByUserName(String username) {
 		Query query = new Query(Criteria.where("username").is(username));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
@@ -58,14 +58,14 @@ public class UserRepositoryImpl extends UserRepository {
 	public int saveIfUserNotExists(User userToSave) {
 		User user = null;
 		Query query = new Query(Criteria.where("username").is(userToSave.getUsername()));
-		user = this.mongoTemplate.findOne(query, User.class);
+		user = mongoTemplate.findOne(query, User.class);
 
 		if (user == null) {
 			Query queryEmail = new Query(Criteria.where("email").is(userToSave.getEmail()));
-			user = this.mongoTemplate.findOne(queryEmail, User.class);
+			user = mongoTemplate.findOne(queryEmail, User.class);
 
 			if (user == null) {
-				this.mongoTemplate.save(userToSave);
+				mongoTemplate.save(userToSave);
 				return StaticConfigItems.user_created;
 			} else {
 
@@ -78,7 +78,7 @@ public class UserRepositoryImpl extends UserRepository {
 
 	@Override
 	public List<Probe> findDevicesByUserID(String id) {
-		User user = findByUserID(id);
+		User user = find(id);
 		return user.getMyProbes();
 	}
 
@@ -97,50 +97,67 @@ public class UserRepositoryImpl extends UserRepository {
 	@Override
 	public User findByActivationToken(String activationToken) {
 		Query query = new Query(Criteria.where("activationToken").is(activationToken));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
 	@Override
 	public User findByEmailOnlyActivated(String email) {
 		Query query = new Query(Criteria.where("email").is(email).andOperator(Criteria.where("activated").is(true)));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
 	@Override
 	public User findByPasswordResetToken(String token) {
 		Query query = new Query(Criteria.where("passwordResetToken").is(token));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
 	@Override
 	public User findByEmail(String email) {
 		Query query = new Query(Criteria.where("email").is(email));
-		User user = this.mongoTemplate.findOne(query, User.class);
+		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
 
 	@Override
 	public List<User> findByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
-		List<User> users = this.mongoTemplate.find(query, User.class);
+		List<User> users = mongoTemplate.find(query, User.class);
 		return users;
 	}
 
 	@Override
 	public User findAddedByUser(String userId) {
-		List<User> users = this.mongoTemplate.findAll(User.class);
-		if(users != null) {
-			for(User user : users) {
-				if(user.getMyUsers() != null) {
-					if(user.getMyUsers().contains(userId)) {
+		List<User> users = mongoTemplate.findAll(User.class);
+		if (users != null) {
+			for (User user : users) {
+				if (user.getMyUsers() != null) {
+					if (user.getMyUsers().contains(userId)) {
 						return user;
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<Context> findAssignedContextsByUserId(String userId) {
+		List<Context> contextList = new ArrayList<>();
+		User user = find(userId);
+		if (user != null) {
+			for (String contextId : user.getContextIds()) {
+				if (!Strings.isNullOrEmpty(contextId)) {
+					Context context = contextRepository.find(contextId);
+					if (context != null) {
+						contextList.add(context);
+					}
+				}
+			}
+		}
+		return contextList;
 	}
 }

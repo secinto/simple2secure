@@ -1,5 +1,6 @@
 package com.simple2secure.test.portal.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,13 +28,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.simple2secure.api.model.AdminGroup;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
-import com.simple2secure.portal.repository.AdminGroupRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -54,7 +55,7 @@ public class TestAPIBase {
 	private SettingsRepository settingsRepository;
 
 	@Autowired
-	private AdminGroupRepository adminGroupRepository;
+	private ContextRepository contextRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -141,12 +142,12 @@ public class TestAPIBase {
 			user.setEmail("testiing@test.com");
 			user.setUsername("testiing@test.com");
 			user.setActivationToken("12345");
-			user.setAdminGroupId(createAdminGroup("AdminGroup").toString());
+			user.setContextIds(createContext("Context 1"));
 		} else if (userRole.equals(UserRole.SUPERUSER)) {
 			user.setEmail("superuser@test.com");
 			user.setUsername("superuser@test.com");
 			user.setActivationToken("23145");
-			user.setAdminGroupId(createAdminGroup("AdminGroupSU").toString());
+			user.setContextIds(createContext("Context 2"));
 		}
 
 		userRepository.save(user);
@@ -164,10 +165,13 @@ public class TestAPIBase {
 	 *
 	 * @return
 	 */
-	private ObjectId createAdminGroup(String groupName) {
-		AdminGroup adminGroup = new AdminGroup();
-		adminGroup.setName(groupName);
-		return adminGroupRepository.saveAndReturnId(adminGroup);
+	private List<String> createContext(String groupName) {
+		List<String> contextIds = new ArrayList<>();
+		Context context = new Context();
+		context.setName(groupName);
+		ObjectId contextId = contextRepository.saveAndReturnId(context);
+		contextIds.add(contextId.toString());
+		return contextIds;
 	}
 
 	/**

@@ -85,7 +85,7 @@ const appRoutes: Routes = [
        {
            path: 'settings',
            component: SettingsComponent,
-           canActivate: [RoleGuard],
+           canActivate: [AuthGuard, RoleGuard],
            data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN},
        },
 		{

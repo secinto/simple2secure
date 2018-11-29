@@ -27,11 +27,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
-import com.simple2secure.api.model.User;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.AdminGroupRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
@@ -52,7 +52,7 @@ public class ReportController {
 	UserRepository userRepository;
 
 	@Autowired
-	AdminGroupRepository adminGroupRepository;
+	ContextRepository contextRepository;
 
 	@Autowired
 	GroupRepository groupRepository;
@@ -119,23 +119,28 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/reports/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> getReportsByUserId(@PathVariable("userId") String userId,
+	public ResponseEntity<List<Report>> getReportsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
-		// TODO Auto-generated method stub
-		User user = userRepository.find(userId);
-		List<CompanyGroup> groups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
-		if (groups != null) {
-			List<Report> reportsList = new ArrayList<Report>();
-			for (CompanyGroup group : groups) {
-				reportsList.addAll(reportsRepository.getReportsByGroupId(group.getId()));
+		if (!Strings.isNullOrEmpty(contextId)) {
+			Context context = contextRepository.find(contextId);
+			if (context != null) {
+				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+
+				if (groups != null) {
+					log.debug("Loading OSQuery reports for contextId {0}", contextId);
+					List<Report> reportsList = new ArrayList<Report>();
+					for (CompanyGroup group : groups) {
+						reportsList.addAll(reportsRepository.getReportsByGroupId(group.getId()));
+					}
+					return new ResponseEntity<List<Report>>(reportsList, HttpStatus.OK);
+				}
 			}
-			return new ResponseEntity<List<Report>>(reportsList, HttpStatus.OK);
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -178,24 +183,28 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/network/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/reports/network/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReport>> getNetworkReportsByUserId(@PathVariable("userId") String userId,
+	public ResponseEntity<List<NetworkReport>> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
-		// TODO Auto-generated method stub
-		User user = userRepository.find(userId);
-		List<CompanyGroup> groups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
-		if (groups != null) {
 
-			List<NetworkReport> reportsList = new ArrayList<NetworkReport>();
-			for (CompanyGroup group : groups) {
-				reportsList.addAll(networkReportRepository.getReportsByGroupId(group.getId()));
+		if (!Strings.isNullOrEmpty(contextId)) {
+			Context context = contextRepository.find(contextId);
+			if (context != null) {
+				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+				if (groups != null) {
+					log.debug("Loading network reports for contextId {0}", contextId);
+					List<NetworkReport> reportsList = new ArrayList<NetworkReport>();
+					for (CompanyGroup group : groups) {
+						reportsList.addAll(networkReportRepository.getReportsByGroupId(group.getId()));
+					}
+					return new ResponseEntity<List<NetworkReport>>(reportsList, HttpStatus.OK);
+				}
 			}
-			return new ResponseEntity<List<NetworkReport>>(reportsList, HttpStatus.OK);
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

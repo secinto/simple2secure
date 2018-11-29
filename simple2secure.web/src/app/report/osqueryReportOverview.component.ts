@@ -6,6 +6,7 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
+import {Context} from '../_models';
 
 @Component({
   moduleId: module.id,
@@ -14,6 +15,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 export class OsQueryReportOverviewComponent {
   reports: any[];
+  context: Context;
   selectedReport: any;
   currentUser: any;
   loading = false;
@@ -34,6 +36,7 @@ export class OsQueryReportOverviewComponent {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    this.context = JSON.parse(localStorage.getItem('context'));
     this.loadAllReports();
   }
 
@@ -50,7 +53,7 @@ export class OsQueryReportOverviewComponent {
 
   private loadAllReports() {
     this.loading = true;
-    this.httpService.get(environment.apiEndpoint + 'reports/' + this.currentUser['userID'])
+    this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.id)
       .subscribe(
       data => {
         this.reports = data;

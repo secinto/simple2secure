@@ -31,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.AdminGroupRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -85,7 +85,7 @@ public class LicenseController {
 	SettingsRepository settingsRepository;
 
 	@Autowired
-	AdminGroupRepository adminGroupRepository;
+	ContextRepository contextRepository;
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
@@ -176,12 +176,12 @@ public class LicenseController {
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
 
 		CompanyGroup group = groupRepository.find(groupId);
-		AdminGroup adminGroup = adminGroupRepository.find(group.getAdminGroupId());
+		Context context = contextRepository.find(group.getContextId());
 
-		if (adminGroup != null) {
-			LicensePlan licensePlan = licensePlanRepository.find(adminGroup.getLicensePlanId());
+		if (context != null) {
+			LicensePlan licensePlan = licensePlanRepository.find(context.getLicensePlanId());
 			if (licensePlan != null) {
-				if (adminGroup.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
+				if (context.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
 
 					String expirationDate = LicenseDateUtil.getLicenseExpirationDate(licensePlan.getValidity(), licensePlan.getValidityUnit());
 					/*
@@ -203,8 +203,8 @@ public class LicenseController {
 
 					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStream(licenseFile, licenseFilePath + "public.key");
 
-					// adminGroup.setCurrentNumberOfLicenseDownloads(adminGroup.getCurrentNumberOfLicenseDownloads() + 1);
-					// adminGroupRepository.update(adminGroup);
+					// context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
+					// contextRepository.update(context);
 
 					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 				}

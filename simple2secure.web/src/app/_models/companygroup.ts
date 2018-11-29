@@ -2,7 +2,7 @@ import {Generic} from './generic';
 
 export class CompanyGroup extends Generic {
     name: string;
-    adminGroupId: string;
+    contextId: string;
     children: string[];
     rootGroup: boolean;
     standardGroup: boolean;

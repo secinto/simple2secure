@@ -59,6 +59,7 @@ import {TreeTableModule} from 'ng-treetable';
 import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import { TreeviewModule } from 'ngx-treeview';
+import {SelectContextDialog} from './dialog/select-context';
 
 export const httpInterceptorProviders = [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -152,6 +153,7 @@ export const httpInterceptorProviders = [
     OrbiterToolTestComponent,
     OrbiterToolTestResultComponent,
     ConfirmationDialog,
+    SelectContextDialog,
     EmailComponent,
     EmailOverviewComponent,
     EmailInboxComponent,
@@ -170,6 +172,7 @@ export const httpInterceptorProviders = [
   ],
   entryComponents: [
     ConfirmationDialog,
+    SelectContextDialog,
     UserGroupDialogComponent,
     NetworkProcessorConfigurationEditComponent,
     NetworkStepConfigurationEditComponent,

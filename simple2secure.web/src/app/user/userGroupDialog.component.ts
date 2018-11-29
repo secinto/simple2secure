@@ -1,5 +1,5 @@
 import {Component, Inject} from '@angular/core';
-import {CompanyGroup} from '../_models/index';
+import {Context, CompanyGroup} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -25,6 +25,7 @@ export class UserGroupDialogComponent {
     isDialogOpen: boolean;
     parentGroup: CompanyGroup;
     parentGroupId: string;
+    context: Context;
 
     constructor(
         private router: Router,
@@ -47,7 +48,7 @@ export class UserGroupDialogComponent {
         });
 
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
+        this.context = JSON.parse(localStorage.getItem('context'));
     }
 
     saveGroup() {
@@ -59,7 +60,8 @@ export class UserGroupDialogComponent {
             this.parentGroupId = this.parentGroup.id;
         }
 
-        this.url = environment.apiEndpoint + 'users/group/' + this.currentUser.userID + '/' + this.parentGroupId;
+        this.url = environment.apiEndpoint + 'users/group/' + this.currentUser.userID + '/' + this.parentGroupId + '/'
+            + this.context.id;
         this.httpService.post(this.group, this.url).subscribe(
             data => {
                 this.dialogRef.close(true);

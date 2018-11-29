@@ -1,7 +1,8 @@
 <nav class="navbar">
 	<div class="container-fluid">
 	    <div class="navbar-header">
-	      <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
+	      	<a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
+			<p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: <b>{{currentContext.name}}</b></p>
 	    </div>
 	    <ul class="nav navbar-nav centered-nav">
 
@@ -22,27 +23,27 @@
 		        </li>                                          
 	    </ul>
 	    <ul class="nav navbar-nav navbar-right">
-		      <li>
-	    	  	<mat-form-field id="nav-right-custom-language-switcher">  	      
+			<li>
+				<mat-form-field id="nav-right-custom-language-switcher">
 				  <mat-select id="nav-right-custom-language-switcher-select" [(ngModel)]="currentLang" (selectionChange)="setLocale($event.value)">
-				    <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages" [value]="language.value">
-				      {{language.localeVal}}
-				    </mat-option>
+					<mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages" [value]="language.value">
+					  {{language.localeVal}}
+					</mat-option>
 				  </mat-select>
 				</mat-form-field>
-	    	  </li>    
-		      <li *ngIf="loggedIn">
-		      	<button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-2x" aria-hidden="true"></i></button>
-		      </li>    
-		      <li *ngIf="loggedIn && showSettings">
-		      	<button mat-icon-button routerLink="/settings" color="white"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></button>
-		      </li>  
-		      <li *ngIf="loggedIn">
-		      	<button mat-icon-button routerLink="/notification" color="white"><i class="fa fa-bell fa-2x" aria-hidden="true"></i></button>
-		      </li>        
-		      <li *ngIf="loggedIn">
-		      	<button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x" aria-hidden="true"></i></button>
-		      </li>
+			</li>
+			<li *ngIf="loggedIn">
+				<button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-2x" aria-hidden="true"></i></button>
+			</li>
+			<li *ngIf="loggedIn && showSettings">
+				<button mat-icon-button routerLink="/settings" color="white"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></button>
+			</li>
+			<li *ngIf="loggedIn">
+				<button mat-icon-button routerLink="/notification" color="white"><i class="fa fa-bell fa-2x" aria-hidden="true"></i></button>
+			</li>
+			<li *ngIf="loggedIn">
+				<button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x" aria-hidden="true"></i></button>
+			</li>
 	    </ul>    
     </div>
 </nav>

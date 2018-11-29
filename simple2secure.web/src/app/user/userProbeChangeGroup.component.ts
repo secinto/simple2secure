@@ -1,5 +1,5 @@
 import {Component, Inject} from '@angular/core';
-import {CompanyGroup, Probe} from '../_models/index';
+import {Context, CompanyGroup, Probe} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -21,6 +21,7 @@ export class UserProbeChangeGroupComponent {
     groups: CompanyGroup[];
     probe: Probe;
     selectedGroup: CompanyGroup;
+    context: Context;
 
     constructor(
         private router: Router,
@@ -38,12 +39,14 @@ export class UserProbeChangeGroupComponent {
 
     ngOnInit() {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.context = JSON.parse(localStorage.getItem('context'));
         this.loadGroups();
 
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID)
+        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID + '/'
+            + this.context.id)
             .subscribe(
                 data => {
                     this.extractGroups(data);

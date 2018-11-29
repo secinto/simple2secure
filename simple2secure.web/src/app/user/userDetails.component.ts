@@ -1,6 +1,13 @@
 import {Component, Inject} from '@angular/core';
 
-import {CompanyGroup, UrlParameter, UserRegistration, UserRegistrationType, UserRole} from '../_models/index';
+import {
+    Context,
+    CompanyGroup,
+    UrlParameter,
+    UserRegistration,
+    UserRegistrationType,
+    UserRole
+} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -23,6 +30,7 @@ export class UserDetailsComponent {
   rolesArray: UserRole[];
   groups: CompanyGroup[];
   action: string;
+  context: Context;
 
   constructor(
     private router: Router,
@@ -56,6 +64,7 @@ export class UserDetailsComponent {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    this.context = JSON.parse(localStorage.getItem('context'));
     this.loadGroups();
   }
 
@@ -85,7 +94,8 @@ export class UserDetailsComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID)
+        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID + '/' +
+            this.context.id)
             .subscribe(
                 data => {
                     this.groups = data;
@@ -117,6 +127,7 @@ export class UserDetailsComponent {
 
 	saveUser() {
         this.url = environment.apiEndpoint + 'users';
+        this.user.currentContextId = this.context.id;
         if (this.action === UrlParameter.NEW) {
             this.user.registrationType = UserRegistrationType.ADDED_BY_USER;
             this.user.addedByUserId = this.addedByUserId;

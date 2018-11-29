@@ -36,7 +36,8 @@
   "login.password.placeholder": "Bitte geben Sie Ihr Kennwort ein",
   "login.password.error": "Kennwort ist erforderlich",
   "login.password.forgot": "Kennwort vergessen?",
-  "login.password.update": "Kennwort aktualisieren",  
+  "login.password.update": "Kennwort aktualisieren",
+  "login.successful": "Anmeldung erfolgreich",
   "register.standard": "Registrierung",
   "register.email": "Emailregistrierung",
   "register.firstName": "Vorname",
@@ -285,5 +286,7 @@
   "message.apply.config": "Wenden Sie die Gruppenkonfiguration für OSQuery, Steps und Processors an",
   "node.move.error": "Sie haben keine Berechtigungen zum Verschieben der ausgewählten Gruppe!",
   "node.move.success": "Gruppe erfolgreich verschiebt!",
-  "probe.change.group": "Gruppe wechseln"
+  "probe.change.group": "Gruppe wechseln",
+  "message.contextDialog": "Um fortzufahren, müssen Sie den Arbeitskontext auswählen",
+  "message.contextDialog.select": "Wählen Sie Ihren Arbeitskontext aus"
 }

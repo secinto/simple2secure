@@ -5,34 +5,35 @@ import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class CompanyGroup extends GenericDBObject{
+public class CompanyGroup extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8637103644388176110L;
-	
+
 	private String parentId;
 	private String name;
-	private String adminGroupId;
-		
+	private String contextId;
+
 	List<String> childrenIds = new ArrayList<>();
-	
+
 	List<CompanyGroup> children = new ArrayList<>();
-	
+
 	private boolean rootGroup;
-	
+
 	private boolean standardGroup = false;
-	
+
 	private List<String> superUserIds = new ArrayList<>();
-	
-	public CompanyGroup() {}
-	
+
+	public CompanyGroup() {
+	}
+
 	public CompanyGroup(String name, List<String> childrenIds) {
 		this.name = name;
 		this.childrenIds = childrenIds;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -40,33 +41,33 @@ public class CompanyGroup extends GenericDBObject{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public List<String> getChildrenIds() {
 		return childrenIds;
 	}
 
 	public void addChildrenId(String companyGroupId) {
-		this.childrenIds.add(companyGroupId);
+		childrenIds.add(companyGroupId);
 	}
-	
+
 	public void addChildren(CompanyGroup child) {
-		this.children.add(child);
+		children.add(child);
 	}
-	
+
 	public void removeChildrenId(String companyGroupId) {
-		this.childrenIds.remove(companyGroupId);
+		childrenIds.remove(companyGroupId);
 	}
-	
+
 	public void removeChild(CompanyGroup child) {
-		this.children.remove(child);
+		children.remove(child);
 	}
 
-	public String getAdminGroupId() {
-		return adminGroupId;
+	public String getContextId() {
+		return contextId;
 	}
 
-	public void setAdminGroupId(String adminGroupId) {
-		this.adminGroupId = adminGroupId;
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 
 	public boolean isRootGroup() {
@@ -78,7 +79,7 @@ public class CompanyGroup extends GenericDBObject{
 	}
 
 	public void setChildrenIds(List<String> children) {
-		this.childrenIds = children;
+		childrenIds = children;
 	}
 
 	public String getParentId() {
@@ -112,12 +113,12 @@ public class CompanyGroup extends GenericDBObject{
 	public void setSuperUserIds(List<String> superUserIds) {
 		this.superUserIds = superUserIds;
 	}
-	
+
 	public void addSuperUserId(String superUserId) {
-		this.superUserIds.add(superUserId);
+		superUserIds.add(superUserId);
 	}
-	
+
 	public void removeSuperUserId(String superUserId) {
-		this.superUserIds.remove(superUserId);
+		superUserIds.remove(superUserId);
 	}
 }

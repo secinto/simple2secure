@@ -30,9 +30,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.UserDTO;
-import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
@@ -43,8 +43,8 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.AdminGroupRepository;
 import com.simple2secure.portal.repository.ConfigRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.DeviceRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
@@ -121,7 +121,7 @@ public class UserController {
 	TokenRepository tokenRepository;
 
 	@Autowired
-	AdminGroupRepository adminGroupRepository;
+	ContextRepository contextRepository;
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
@@ -228,50 +228,50 @@ public class UserController {
 
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
 			User user = userRepository.findByEmail(userRegistration.getEmail());
-
+			// TODO: this function must be adapted after changes on the contextId
 			if (user != null) {
 
 				// Check if user role has changed
 				if (!user.getUserRole().equals(userRegistration.getUserRole())) {
 					// if old user role was admin delete it from the admin group
 					if (user.getUserRole().equals(UserRole.ADMIN)) {
-						AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
-						if (adminGroup != null) {
-							adminGroup.removeAdmin(user.getId());
-							adminGroupRepository.update(adminGroup);
-						} else {
-							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-									HttpStatus.NOT_FOUND);
-						}
+						// Context context = contextRepository.find(user.getContextIds());
+						// if (context != null) {
+						// context.removeAdmin(user.getId());
+						// contextRepository.update(context);
+						// } else {
+						// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+						// HttpStatus.NOT_FOUND);
+						// }
 					}
 					// Delete the super user from all groups to which he has been assigned
 					else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
-						List<CompanyGroup> groups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
-						if (groups != null) {
-							for (CompanyGroup group : groups) {
-								if (!group.getSuperUserIds().contains(user.getId())) {
-									group.removeSuperUserId(user.getId());
-									groupRepository.update(group);
-								}
-							}
-						}
+						// List<CompanyGroup> groups = groupRepository.findByContextId(user.getContextIds());
+						// if (groups != null) {
+						// for (CompanyGroup group : groups) {
+						// if (!group.getSuperUserIds().contains(user.getId())) {
+						// group.removeSuperUserId(user.getId());
+						// groupRepository.update(group);
+						// }
+						// }
+						// }
 					}
 
 					user.setUserRole(userRegistration.getUserRole());
 
 					if (userRegistration.getUserRole().equals(UserRole.ADMIN)) {
-						// Assign user to the adminGroup adminIds
-						AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
-						if (adminGroup != null) {
-							if (!adminGroup.getAdmins().contains(user.getId())) {
-								adminGroup.addAdmin(user.getId());
-								adminGroupRepository.update(adminGroup);
-							}
-
-						} else {
-							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-									HttpStatus.NOT_FOUND);
-						}
+						// Assign user to the context adminIds
+						// Context context = contextRepository.find(user.getContextIds());
+						// if (context != null) {
+						// if (!context.getAdmins().contains(user.getId())) {
+						// context.addAdmin(user.getId());
+						// contextRepository.update(context);
+						// }
+						//
+						// } else {
+						// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+						// HttpStatus.NOT_FOUND);
+						// }
 					}
 
 					else if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -287,15 +287,15 @@ public class UserController {
 					}
 				} else {
 					if (userRegistration.getGroupIds() != null) {
-						List<CompanyGroup> oldGroups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
-						if (oldGroups != null) {
-							for (CompanyGroup group : oldGroups) {
-								if (group.getSuperUserIds().contains(user.getId())) {
-									group.removeSuperUserId(user.getId());
-									groupRepository.update(group);
-								}
-							}
-						}
+						// List<CompanyGroup> oldGroups = groupRepository.findByContextId(user.getContextIds());
+						// if (oldGroups != null) {
+						// for (CompanyGroup group : oldGroups) {
+						// if (group.getSuperUserIds().contains(user.getId())) {
+						// group.removeSuperUserId(user.getId());
+						// groupRepository.update(group);
+						// }
+						// }
+						// }
 
 						for (String groupId : userRegistration.getGroupIds()) {
 							CompanyGroup group = groupRepository.find(groupId);
@@ -338,16 +338,17 @@ public class UserController {
 							+ "/api/users/activate/" + user.getActivationToken();
 
 					if (user.getUserRole().equals(UserRole.ADMIN)) {
-						AdminGroup adminGroup = adminGroupRepository.getAdminGroupByUserId(userRegistration.getAddedByUserId());
+						Context context = contextRepository.getContextByUserId(userRegistration.getAddedByUserId());
 
-						if (adminGroup != null) {
+						if (context != null) {
 
-							user.setAdminGroupId(adminGroup.getId());
+							// Add current admin group to the current user
+							user.addContextId(userRegistration.getCurrentContextId());
 							userID = userRepository.saveAndReturnId(user);
 
-							adminGroup.addAdmin(userID.toString());
+							context.addAdmin(userID.toString());
 
-							User addedByUser = userRepository.findByUserID(userRegistration.getAddedByUserId());
+							User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
 
 							if (addedByUser == null) {
 								userRepository.deleteByUserID(userID.toString());
@@ -358,7 +359,7 @@ public class UserController {
 
 								if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_al)) {
 									userRepository.update(addedByUser);
-									adminGroupRepository.update(adminGroup);
+									contextRepository.update(context);
 
 									return new ResponseEntity<User>(user, HttpStatus.OK);
 								} else {
@@ -370,13 +371,13 @@ public class UserController {
 
 						}
 					} else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
-						User addedByUser = userRepository.findByUserID(userRegistration.getAddedByUserId());
+						User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
 
 						if (addedByUser == null) {
 							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_no_added_by_userId", locale)),
 									HttpStatus.NOT_FOUND);
 						} else {
-							user.setAdminGroupId(addedByUser.getAdminGroupId());
+							user.setContextIds(addedByUser.getContextIds());
 							userID = userRepository.saveAndReturnId(user);
 							addedByUser.addMyUser(userID.toString());
 							if (userRegistration.getGroupIds() != null && !userRegistration.getGroupIds().isEmpty()) {
@@ -405,13 +406,13 @@ public class UserController {
 						}
 					} else if (user.getUserRole().equals(UserRole.USER)) {
 
-						User addedByUser = userRepository.findByUserID(userRegistration.getAddedByUserId());
+						User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
 
 						if (addedByUser == null) {
 							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_no_added_by_userId", locale)),
 									HttpStatus.NOT_FOUND);
 						} else {
-							user.setAdminGroupId(addedByUser.getAdminGroupId());
+							user.setContextIds(addedByUser.getContextIds());
 							userID = userRepository.saveAndReturnId(user);
 							addedByUser.addMyUser(userID.toString());
 
@@ -426,8 +427,8 @@ public class UserController {
 						}
 					}
 				} else {
-					// If user already
-					inviteUserToAdminGroup(userRegistration);
+					// If user already exists call inviterUserToContext
+					inviterUserToContext(userRegistration);
 					return new ResponseEntity(
 							new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_already_exists", locale)),
 							HttpStatus.NOT_FOUND);
@@ -477,23 +478,38 @@ public class UserController {
 					LicensePlan licensePlan = licensePlanRepository.findByName("Default");
 
 					if (licensePlan != null) {
-						AdminGroup adminGroup = new AdminGroup();
-						adminGroup.setName(user.getEmail().substring(user.getEmail().indexOf("@")));
-						adminGroup.setLicensePlanId(licensePlan.getId());
-						adminGroup.addAdmin(userID.toString());
-						ObjectId admingGroupId = adminGroupRepository.saveAndReturnId(adminGroup);
+						Context context = new Context();
+						String tempContextName = user.getEmail().substring(user.getEmail().indexOf("@") + 1);
+						String contextName = tempContextName.substring(0, tempContextName.indexOf("."));
+						context.setName(contextName + 1);
+						context.setLicensePlanId(licensePlan.getId());
+						context.addAdmin(userID.toString());
+						ObjectId contextId = contextRepository.saveAndReturnId(context);
+
+						// This is only for test!
+						context.setName(contextName + 2);
+						ObjectId contextId2 = contextRepository.saveAndReturnId(context);
 
 						if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_al)) {
 
-							dataInitialization.addDefaultGroup(userID.toString(), admingGroupId.toString());
+							dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
+
+							// TEST ONLY
+							dataInitialization.addDefaultGroup(userID.toString(), contextId2.toString());
+
 							User userWithId = userRepository.find(userID.toString());
-							userWithId.setAdminGroupId(admingGroupId.toString());
+
+							// Adding new admin group for the current user
+							userWithId.addContextId(contextId.toString());
+
+							// TEST ONLY
+							userWithId.addContextId(contextId2.toString());
 							userRepository.update(userWithId);
 
 							return new ResponseEntity<User>(user, HttpStatus.OK);
 						} else {
 							userRepository.deleteByUserID(userID.toString());
-							adminGroupRepository.deleteByAdminGroupId(admingGroupId.toString());
+							contextRepository.deleteByContextId(contextId.toString());
 							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 									HttpStatus.NOT_FOUND);
 						}
@@ -518,7 +534,31 @@ public class UserController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	private void inviteUserToAdminGroup(UserRegistration userRegistration) {
+	/**
+	 *
+	 * @param userRegistration
+	 */
+	private void inviterUserToContext(UserRegistration userRegistration) {
+
+		// invite is only possible if user is added by another user
+		if (userRegistration.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
+			if (!Strings.isNullOrEmpty(userRegistration.getAddedByUserId())) {
+				User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
+				User currentUser = userRepository.findByEmail(userRegistration.getEmail());
+
+				// If this user is already part of this context, no need to invite
+				if (!currentUser.getContextIds().contains(userRegistration.getCurrentContextId())) {
+
+				}
+
+			}
+
+		}
+
+		String userName = userRegistration.getEmail();
+		String addedById = userRegistration.getAddedByUserId();
+		String test = userName;
+		String test2 = addedById;
 
 	}
 
@@ -753,26 +793,47 @@ public class UserController {
 	}
 
 	/**
+	 * This function returns all context for the provided user
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/api/users/context/{userId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<Context>> getContextsByUserId(@PathVariable("userId") String userId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(userId)) {
+			List<Context> contextList = userRepository.findAssignedContextsByUserId(userId);
+			return new ResponseEntity<List<Context>>(contextList, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
 	 * This function finds and returns user according to the user id
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/api/users/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/users/{id}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id, @PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
 
-		User user = userRepository.findByUserID(id);
+		User user = userRepository.find(id);
 		List<User> myUsers = new ArrayList<>();
 
-		if (user != null) {
+		if (user != null && !Strings.isNullOrEmpty(contextId)) {
 
-			// TODO - one user can be assigned to more admin groups
-			AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
+			// Retrieving the admingGroup according to the current selected group in the web
+			Context context = contextRepository.find(contextId);
 
 			// Retrieving my groups
 			List<CompanyGroup> myGroups = new ArrayList<>();
 			List<CompanyGroup> myGroupsWithChildren = new ArrayList<>();
-			if (adminGroup != null) {
-				myGroups = groupRepository.findRootGroupsByAdminGroupId(adminGroup.getId());
+			if (context != null) {
+				myGroups = groupRepository.findRootGroupsByContextId(context.getId());
 				if (myGroups == null) {
 					myGroups = new ArrayList<>();
 				} else {
@@ -786,13 +847,13 @@ public class UserController {
 				}
 			}
 
-			/* Set user users from the userRepository by the addedByUserId and adminGroup */
+			/* Set user users from the userRepository by the addedByUserId and context */
 			List<String> myUserIds = user.getMyUsers();
 			if (myUserIds == null) {
 				myUserIds = new ArrayList<>();
 			} else {
 				for (String userId : myUserIds) {
-					User myUser = userRepository.findByUserID(userId);
+					User myUser = userRepository.find(userId);
 					if (myUser != null) {
 						if (!myUser.getUserRole().equals(UserRole.SUPERADMIN)) {
 							myUsers.add(myUser);
@@ -802,8 +863,8 @@ public class UserController {
 				}
 			}
 
-			if (adminGroup != null) {
-				for (String userId : adminGroup.getAdmins()) {
+			if (context != null) {
+				for (String userId : context.getAdmins()) {
 					if (!userId.equals(user.getId())) {
 
 						User adminUser = userRepository.find(userId);
@@ -832,7 +893,7 @@ public class UserController {
 
 			/* Set user probes from the licenses - not from the users anymore */
 			List<Probe> myProbes = new ArrayList<Probe>();
-			List<CompanyGroup> assignedGroups = groupRepository.findByAdminGroupId(user.getAdminGroupId());
+			List<CompanyGroup> assignedGroups = groupRepository.findByContextId(contextId);
 			if (myGroups != null) {
 				for (CompanyGroup group : assignedGroups) {
 					List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(group.getId());
@@ -1087,7 +1148,7 @@ public class UserController {
 			// retrieve license from database
 			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
 			if (license != null) {
-				// TODO - check before deleting if we need to decrement the number of downloaded licenses in adminGroup
+				// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
 				licenseRepository.delete(license);
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
@@ -1162,13 +1223,13 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/group/{userId}/{parentGroupId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/users/group/{userId}/{parentGroupId}/{contextId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @PathVariable("userId") String userId,
-			@PathVariable("parentGroupId") String parentGroupId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
+			@PathVariable("parentGroupId") String parentGroupId, @PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
-		if (group != null && !Strings.isNullOrEmpty(userId)) {
+		if (group != null && !Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 			User user = userRepository.find(userId);
 			if (Strings.isNullOrEmpty(group.getId()) && user != null) {
 
@@ -1180,7 +1241,7 @@ public class UserController {
 							group.addSuperUserId(user.getId());
 						}
 
-						group.setAdminGroupId(parentGroup.getAdminGroupId());
+						group.setContextId(parentGroup.getContextId());
 						group.setRootGroup(false);
 						group.setParentId(parentGroupId);
 						ObjectId groupId = groupRepository.saveAndReturnId(group);
@@ -1194,14 +1255,14 @@ public class UserController {
 				} else {
 					// NEW PARENT GROUP!
 					//
-					AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
-					if (adminGroup != null) {
+					Context context = contextRepository.find(contextId);
+					if (context != null) {
 
 						if (user.getUserRole().equals(UserRole.SUPERUSER)) {
 							group.addSuperUserId(user.getId());
 						}
 
-						group.setAdminGroupId(adminGroup.getId());
+						group.setContextId(context.getId());
 						group.setRootGroup(true);
 						groupRepository.save(group);
 						return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
@@ -1244,17 +1305,17 @@ public class UserController {
 	 * This function returns all users from the user repository
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/group/user/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/users/group/user/{userId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByUserId(@PathVariable("userId") String userId,
-			@RequestHeader("Accept-Language") String locale) {
+			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
 		User user = userRepository.find(userId);
 
-		if (user != null) {
-			AdminGroup adminGroup = adminGroupRepository.find(user.getAdminGroupId());
+		if (user != null && !Strings.isNullOrEmpty(contextId)) {
+			Context context = contextRepository.find(contextId);
 
-			if (adminGroup != null) {
-				List<CompanyGroup> groups = groupRepository.findByAdminGroupId(adminGroup.getId());
+			if (context != null) {
+				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
 					return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
 				} else {
@@ -1272,35 +1333,35 @@ public class UserController {
 		}
 	}
 
-	/**
-	 * This function returns all users from the user repository
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/group/superuser/{userId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<String>> getGroupsBySuperUserId(@PathVariable("userId") String userId,
-			@RequestHeader("Accept-Language") String locale) {
-		User user = userRepository.find(userId);
-		List<String> superUserGroups = new ArrayList<>();
-		if (user != null) {
-			List<CompanyGroup> groups = groupRepository.findBySuperUserId(userId, user.getAdminGroupId());
-
-			if (groups != null) {
-				for (CompanyGroup group : groups) {
-					if (group != null) {
-						superUserGroups.add(group.getId());
-					}
-				}
-				return new ResponseEntity<List<String>>(superUserGroups, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-						HttpStatus.NOT_FOUND);
-			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-					HttpStatus.NOT_FOUND);
-		}
-	}
+	// /**
+	// * This function returns all groups by superuserId and contextId
+	// */
+	// @SuppressWarnings({ "unchecked", "rawtypes" })
+	// @RequestMapping(value = "/api/users/group/superuser/{userId}", method = RequestMethod.GET)
+	// @PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	// public ResponseEntity<List<String>> getGroupsBySuperUserId(@PathVariable("userId") String userId,
+	// @RequestHeader("Accept-Language") String locale) {
+	// User user = userRepository.find(userId);
+	// List<String> superUserGroups = new ArrayList<>();
+	// if (user != null) {
+	// List<CompanyGroup> groups = groupRepository.findBySuperUserId(userId, user.getContextIds());
+	//
+	// if (groups != null) {
+	// for (CompanyGroup group : groups) {
+	// if (group != null) {
+	// superUserGroups.add(group.getId());
+	// }
+	// }
+	// return new ResponseEntity<List<String>>(superUserGroups, HttpStatus.OK);
+	// } else {
+	// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+	// HttpStatus.NOT_FOUND);
+	// }
+	// } else {
+	// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+	// HttpStatus.NOT_FOUND);
+	// }
+	// }
 
 	/**
 	 * This function returns all users from the user repository
@@ -1353,8 +1414,8 @@ public class UserController {
 
 	/**
 	 * This function checks the user role, which wants to move the group. Superadmins can move every group. Superusers can move only assigned
-	 * groups(both fromGroup and toGroup must be assigned to the super user). Admin can move every group if it belongs to the adminGroup to
-	 * which this admin belongs.
+	 * groups(both fromGroup and toGroup must be assigned to the super user). Admin can move every group if it belongs to the context to which
+	 * this admin belongs.
 	 *
 	 * @param fromGroup
 	 * @param toGroup
@@ -1396,18 +1457,18 @@ public class UserController {
 		// ADMIN
 		else if (user.getUserRole().equals(UserRole.ADMIN)) {
 
-			if (!Strings.isNullOrEmpty(fromGroup.getAdminGroupId())) {
-				// check if adminGroupIf of the from Group is same as adminGroupId assigned to the user
-				if (fromGroup.getAdminGroupId().equals(user.getAdminGroupId())) {
+			if (!Strings.isNullOrEmpty(fromGroup.getContextId())) {
+				// check if contextId of the from Group is same as contextId assigned to the user
+				if (user.getContextIds().contains(fromGroup.getContextId())) {
 					// In case that toGroup is null, fromGroup will be new root group
 					if (toGroup == null) {
 						if (moveGroup(fromGroup, toGroup)) {
 							return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
 						}
 					} else {
-						if (!Strings.isNullOrEmpty(toGroup.getAdminGroupId())) {
-							// Check if fromGroup adminGroupId as same as toGroup adminGroupId. If both are same move the group
-							if (fromGroup.getAdminGroupId().equals(toGroup.getAdminGroupId())) {
+						if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
+							// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
+							if (fromGroup.getContextId().equals(toGroup.getContextId())) {
 								if (moveGroup(fromGroup, toGroup)) {
 									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
 								}

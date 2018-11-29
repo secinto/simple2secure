@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class AdminGroup extends GenericDBObject {
+public class Context extends GenericDBObject {
 
 	/**
 	 *
@@ -20,7 +20,7 @@ public class AdminGroup extends GenericDBObject {
 
 	private int currentNumberOfLicenseDownloads;
 
-	public AdminGroup() {
+	public Context() {
 
 	}
 

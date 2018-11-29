@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {CompanyGroup, User, UserDTO, UserRole} from '../_models/index';
+import {Context, CompanyGroup, User, UserDTO, UserRole} from '../_models/index';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -36,6 +36,7 @@ export class UserOverviewComponent {
   public user: User;
   private sub: any;
   currentUser: any;
+  context: Context;
   showMyUsers: boolean;
   addNewGroup: boolean;
   showGroupTable: boolean;
@@ -74,6 +75,7 @@ export class UserOverviewComponent {
   ngOnInit() {
       this.selectedItem = new CompanyGroup();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+      this.context = JSON.parse(localStorage.getItem('context'));
       this.loadMyProfile();
       if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN ||
           this.currentUser.userRole == UserRole.SUPERUSER){
@@ -107,7 +109,7 @@ export class UserOverviewComponent {
 
   private loadMyProfile() {
       this.loading = true;
-      this.httpService.get(environment.apiEndpoint + 'users/' + this.currentUser.userID)
+      this.httpService.get(environment.apiEndpoint + 'users/' + this.currentUser.userID + '/' + this.context.id)
       .subscribe(
       data => {
         this.myProfile = data;

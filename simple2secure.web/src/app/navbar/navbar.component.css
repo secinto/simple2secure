@@ -52,6 +52,16 @@
 	font-weight: bold;
 }
 
+#current-context-id{
+	margin-left: -10px;
+	overflow: hidden;
+	width: 100%;
+	white-space: nowrap;
+	font-size: 11px;
+	text-align: center;
+	cursor: pointer;
+}
+
 /* ############### onHover effects ###############
 		 Navigation item on hover effect */
 .navbar-nav li:hover {

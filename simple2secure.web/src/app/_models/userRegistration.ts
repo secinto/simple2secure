@@ -6,6 +6,7 @@ export class UserRegistration extends Generic{
     email: string;
     password: string;
     userRole: UserRole;
+    currentContextId: string;
     groupIds: string[];
     addedByUserId: string;
     registrationType: UserRegistrationType;

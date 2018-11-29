@@ -56,7 +56,7 @@ public class DataInitialization {
 
 	@Autowired
 	protected StepRepository stepRepository;
-	
+
 	@Autowired
 	protected LicensePlanRepository licensePlanRepository;
 
@@ -71,19 +71,19 @@ public class DataInitialization {
 	 *          This function adds a default group for the users which are registered using the standard registration. This function does not
 	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group while adding.
 	 */
-	public void addDefaultGroup(String userId, String adminGroupId) {
-		
+	public void addDefaultGroup(String userId, String contextId) {
+
 		List<CompanyGroup> groupList = groupRepository.findByOwnerId(userId);
 
 		if (groupList == null || groupList.isEmpty()) {
 			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(), CompanyGroup.class);
 			CompanyGroup group = response.getBody();
-			group.setAdminGroupId(adminGroupId);
+			group.setContextId(contextId);
 			group.setRootGroup(true);
 			group.setStandardGroup(true);
 			ObjectId groupId = groupRepository.saveAndReturnId(group);
 			log.debug("Default group added for user with id {}", userId);
-			if(!Strings.isNullOrEmpty(groupId.toString())) {
+			if (!Strings.isNullOrEmpty(groupId.toString())) {
 				addDefaultGroupQueries(groupId.toString());
 				addDefaultGroupProcessors(groupId.toString());
 				addDefaultGroupSteps(groupId.toString());
@@ -159,15 +159,15 @@ public class DataInitialization {
 			}
 		}
 	}
-	
+
 	public void addDefaultLicensePlan() {
 		List<LicensePlan> licensePlansDB = licensePlanRepository.findAll();
-		
-		if(licensePlansDB == null || licensePlansDB.isEmpty()) {
+
+		if (licensePlansDB == null || licensePlansDB.isEmpty()) {
 			ResponseEntity<LicensePlan> response = restTemplate.getForEntity(loadedConfigItems.getLicensePlanURL(), LicensePlan.class);
 			LicensePlan licensePlan = response.getBody();
 			licensePlanRepository.save(licensePlan);
-		}		
+		}
 	}
 
 	/**

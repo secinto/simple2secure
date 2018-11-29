@@ -6,7 +6,8 @@ import 'rxjs/add/operator/mergeMap';
 import {MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {UserRole} from '../_models';
+import {Context, UserRole} from '../_models';
+import {environment} from '../../environments/environment';
 declare var $: any;
 
 export interface Language {
@@ -25,6 +26,7 @@ export interface Language {
 export class NavbarComponent {
     @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: User;
+	currentContext: Context;
     loggedIn: boolean;
     currentLang: string;
     showSettings: boolean;
@@ -46,8 +48,10 @@ export class NavbarComponent {
         }
 
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.currentContext = JSON.parse(localStorage.getItem('context'));
 
-        if (this.currentUser){
+
+        if (this.currentUser && this.currentContext){
             this.loggedIn = true;
 
             if (this.currentUser.userRole == UserRole.SUPERADMIN){
@@ -88,6 +92,11 @@ export class NavbarComponent {
 
     public setLocale(lang: string){
         this.translate.use(lang);
+    }
+
+    changeContext(){
+        console.log("CHANGING CONTEXT");
+        // if number of contexts is greater than 1 open dialog to change context
     }
 
 
