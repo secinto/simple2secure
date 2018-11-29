@@ -33,6 +33,7 @@ import com.simple2secure.api.dto.UserDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
@@ -45,6 +46,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.DeviceRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
@@ -122,6 +124,9 @@ public class UserController {
 
 	@Autowired
 	ContextRepository contextRepository;
+
+	@Autowired
+	ContextUserAuthRepository contextUserAuthRepository;
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
@@ -501,6 +506,21 @@ public class UserController {
 
 							// Adding new admin group for the current user
 							userWithId.addContextId(contextId.toString());
+
+							UserRole userRole = UserRole.ADMIN;
+
+							if (user.getEmail().contains("@secinto.com")) {
+								userRole = UserRole.SUPERADMIN;
+							}
+
+							// Mapping the userId with the contextId and role
+							ContextUserAuthentication contextUserAuthentication = new ContextUserAuthentication(userWithId.getId(), contextId.toString(),
+									userRole);
+
+							contextUserAuthRepository.save(contextUserAuthentication);
+
+							contextUserAuthentication = new ContextUserAuthentication(userWithId.toString(), contextId2.toString(), userRole);
+							contextUserAuthRepository.save(contextUserAuthentication);
 
 							// TEST ONLY
 							userWithId.addContextId(contextId2.toString());
