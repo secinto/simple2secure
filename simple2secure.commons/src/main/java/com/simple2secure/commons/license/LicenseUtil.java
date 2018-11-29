@@ -30,7 +30,20 @@ public class LicenseUtil {
 	/**
 	 * Specifies the storage location of the generated license files.
 	 */
-	public static String licenseFilePath = "license/";
+	public static String licenseFilePath = "license" + File.separator;
+
+	/**
+	 * The file name which is used for the license file.
+	 */
+	public static final String licenseFileName = "license.dat";
+	/**
+	 * The file name which should be used to identify a private key
+	 */
+	public static String privateKeyFileName = "private.key";
+	/**
+	 * The file name which should be used to identify a public key
+	 */
+	public static String publicKeyFileName = "public.key";
 	/**
 	 * Specifies the private key which is used to generate the signature
 	 */
@@ -40,6 +53,15 @@ public class LicenseUtil {
 	 */
 	public static String publicKeyFilePath = "public.key";
 
+	/**
+	 * Needs to be performed to modify the default license path which should be used to store and load licenses as well as the default public
+	 * key file paths.
+	 *
+	 * @param filePath
+	 *          The path where the licenses should be stored and loaded from.
+	 * @param publicKey
+	 *          The file path to the default private key.
+	 */
 	public static void initialize(String filePath, String publicKey) {
 		initialize(filePath, null, publicKey);
 	}
@@ -58,11 +80,13 @@ public class LicenseUtil {
 	 */
 	public static void initialize(String filePath, String privateKey, String publicKey) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
+
 		publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
+
 		if (!Strings.isNullOrEmpty(privateKey)) {
 			privateKeyFilePath = LicenseUtil.getLicenseKeyPath(privateKey, licenseFilePath);
 		} else {
-			privateKeyFilePath = "private.key";
+			privateKeyFilePath = workingDirectory + File.separator + privateKeyFileName;
 		}
 	}
 
@@ -84,10 +108,10 @@ public class LicenseUtil {
 				log.error("Couldn't verify license file path. Reason {}", ioe);
 			}
 		} else {
-			if (FileUtil.isDirectory(checkedPath + "\\" + path)) {
-				return FileUtil.correctPathFormat(checkedPath + "\\" + path, true);
-			} else if (FileUtil.createFolder(checkedPath + "\\" + path)) {
-				return FileUtil.correctPathFormat(checkedPath + "\\" + path, true);
+			if (FileUtil.isDirectory(checkedPath + File.separator + path)) {
+				return FileUtil.correctPathFormat(checkedPath + File.separator + path, true);
+			} else if (FileUtil.createFolder(checkedPath + File.separator + path)) {
+				return FileUtil.correctPathFormat(checkedPath + File.separator + path, true);
 			}
 		}
 		return FileUtil.correctPathFormat(checkedPath, true);
@@ -107,26 +131,37 @@ public class LicenseUtil {
 	 *          The localFilePath where all the license data should be stored.
 	 * @return The resulting key path for the specified resource.
 	 */
-	public static String getLicenseKeyPath(String keyPath, String localFilePath) {
+	public static String getLicenseKeyPath(String keyPath, String localFilePath) throws IllegalArgumentException {
 		ClassLoader classLoader = LicenseUtil.class.getClassLoader();
 		URL keyURL = classLoader.getResource(keyPath);
 		if (keyURL != null) {
 			File file = new File(classLoader.getResource(keyPath).getFile());
-			if (FileUtil.copyToFolder(file, localFilePath)) {
-				return FileUtil.correctPathFormat(localFilePath + file.getName(), false);
-			} else {
-				return FileUtil.correctPathFormat(file.getAbsolutePath(), false);
-			}
+			return copyFileToFolder(file, localFilePath);
 		} else {
-			if (FileUtil.fileOrFolderExists(keyPath)) {
-				return FileUtil.correctPathFormat(keyPath, false);
+			File keyFile = new File(keyPath);
+			if (keyFile.exists() && !keyFile.isDirectory()) {
+				return copyFileToFolder(keyFile, localFilePath);
 			} else {
-				if (FileUtil.fileOrFolderExists(workingDirectory + "\\" + keyPath)) {
-					return FileUtil.correctPathFormat(workingDirectory + "\\" + keyPath, false);
+				if (keyFile.isDirectory()) {
+					if (FileUtil.fileOrFolderExists(keyFile.getAbsolutePath() + keyFile.getName())) {
+						return copyFileToFolder(new File(keyFile.getAbsolutePath() + keyFile.getName()), localFilePath);
+					}
 				}
-				throw new RuntimeException("Couldn't find provided key in path " + keyPath);
+				if (FileUtil.fileOrFolderExists(workingDirectory + File.separator + keyFile.getName())) {
+					return copyFileToFolder(new File(workingDirectory + File.separator + keyFile.getName()), localFilePath);
+				}
 			}
 		}
+		throw new IllegalArgumentException("Couldn't find provided key in path " + keyPath);
+	}
+
+	private static String copyFileToFolder(File file, String localFilePath) {
+		if (FileUtil.copyToFolder(file, localFilePath)) {
+			return FileUtil.correctPathFormat(localFilePath + file.getName(), false);
+		} else {
+			return FileUtil.correctPathFormat(file.getAbsolutePath(), false);
+		}
+
 	}
 
 	/**
@@ -169,7 +204,7 @@ public class LicenseUtil {
 	 */
 	public static void generateLicenseZIPFile(String licenseFile, String publicKeyFile, String zipFile) throws IOException {
 
-		List<File> files = getLicenseFileList();
+		List<File> files = getLicenseFileList(licenseFile);
 		ByteArrayOutputStream byteOutStream = ZIPUtils.createZIPStreamFromFiles(files);
 
 		OutputStream outputStream = new FileOutputStream(zipFile);
@@ -192,10 +227,10 @@ public class LicenseUtil {
 
 		File publicKey = new File(publicKeyFilePath);
 		File certificate = null;
-		if (!Strings.isNullOrEmpty(licenseFile)) {
+		if (!Strings.isNullOrEmpty(licenseFile) && licenseFile.endsWith(licenseFileName)) {
 			certificate = new File(licenseFile);
 		} else {
-			certificate = new File(licenseFilePath + "/license.dat");
+			certificate = new File(licenseFilePath + File.separator + licenseFileName);
 		}
 
 		files.add(publicKey);
@@ -256,9 +291,9 @@ public class LicenseUtil {
 		boolean publicKeyFile = false;
 
 		for (File file : licenseDir) {
-			if (file.getName().equals("license.dat")) {
+			if (file.getName().equals(licenseFileName)) {
 				licenseFile = true;
-			} else if (file.getName().equals("public.key")) {
+			} else if (file.getName().equals(publicKeyFileName)) {
 				publicKeyFile = true;
 			}
 		}
@@ -354,14 +389,14 @@ public class LicenseUtil {
 		properties.setProperty("groupId", groupId);
 		properties.setProperty("licenseId", licenseId.toString());
 
-		FileUtil.createFolder(licenseFilePath + "\\" + licenseId + "\\");
+		FileUtil.createFolder(licenseFilePath + licenseId + File.separator);
 
 		File privateKeyOriginal = new File(privateKeyFilePath);
-		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + "\\" + licenseId + "\\");
-		File privateKey = new File(licenseFilePath + "\\" + licenseId + "\\" + privateKeyOriginal.getName());
+		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + licenseId + File.separator);
+		File privateKey = new File(licenseFilePath + licenseId + File.separator + privateKeyOriginal.getName());
 
 		if (privateKey.exists()) {
-			File licenseFile = new File(licenseFilePath + "\\" + licenseId + "\\license.dat");
+			File licenseFile = new File(licenseFilePath + licenseId + File.separator + licenseFileName);
 			FileOutputStream fos = new FileOutputStream(licenseFile);
 			LicenseGenerator.generateLicense(properties, fos, privateKey.getAbsolutePath());
 			fos.flush();

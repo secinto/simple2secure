@@ -124,7 +124,7 @@ public class KeyUtils {
 		try {
 			File publicKeyFile = new File(fileName);
 
-			if (!publicKeyFile.exists()) {
+			if (!publicKeyFile.exists() && publicKeyFile.getParentFile().isDirectory() && !publicKeyFile.getParentFile().exists()) {
 				if (!publicKeyFile.getParentFile().mkdirs()) {
 					log.error("Couldn't create file {} for key export.", fileName);
 					return null;
