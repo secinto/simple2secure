@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -23,7 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import ro.fortsoft.licensius.License;
 
 public class LicenseGUIController {
 

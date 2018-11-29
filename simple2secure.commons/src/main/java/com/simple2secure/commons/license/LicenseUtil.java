@@ -2,10 +2,12 @@ package com.simple2secure.commons.license;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -15,11 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.simple2secure.commons.crypto.CryptoUtils;
+import com.simple2secure.commons.crypto.KeyUtils;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
-
-import ro.fortsoft.licensius.License;
-import ro.fortsoft.licensius.LicenseManager;
 
 public class LicenseUtil {
 	private static Logger log = LoggerFactory.getLogger(LicenseUtil.class);
@@ -38,14 +39,6 @@ public class LicenseUtil {
 	 * Specifies the public key which is used to verify the signature
 	 */
 	public static String publicKeyFilePath = "public.key";
-
-	static {
-		init();
-	}
-
-	private static void init() {
-		initLicenseManager(licenseFilePath + "license.dat", licenseFilePath + "public.key");
-	}
 
 	public static void initialize(String filePath, String publicKey) {
 		initialize(filePath, null, publicKey);
@@ -71,7 +64,6 @@ public class LicenseUtil {
 		} else {
 			privateKeyFilePath = "private.key";
 		}
-		init();
 	}
 
 	/**
@@ -177,8 +169,6 @@ public class LicenseUtil {
 	 */
 	public static void generateLicenseZIPFile(String licenseFile, String publicKeyFile, String zipFile) throws IOException {
 
-		initLicenseManager(licenseFile, publicKeyFile);
-
 		List<File> files = getLicenseFileList();
 		ByteArrayOutputStream byteOutStream = ZIPUtils.createZIPStreamFromFiles(files);
 
@@ -250,14 +240,11 @@ public class LicenseUtil {
 	 * @throws IOException
 	 */
 	public static ByteArrayOutputStream generateLicenseZIPStream(String licenseFile, String publicKeyFile) throws IOException {
-		initLicenseManager(licenseFile, publicKeyFile);
-
 		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList(licenseFile));
 	}
 
 	/**
-	 * Checks if the provided List of files contains the license.dat and public.key as required for default settings of the
-	 * {@link LicenseManager}.
+	 * Checks if the provided List of files contains the license.dat and public.key as required for default settings.
 	 *
 	 * @param List<File>
 	 *          licenseDir
@@ -315,22 +302,20 @@ public class LicenseUtil {
 	 * @throws Exception
 	 */
 	public static License getLicense(String licenseFile, String publicKeyFile) throws Exception {
-		initLicenseManager(licenseFile + "license.dat", licenseFile + publicKeyFile);
-		return LicenseManager.getInstance().getLicense();
-	}
+		FileInputStream input = new FileInputStream(licenseFile);
+		Properties properties = new OrderedProperties();
+		properties.load(input);
 
-	/**
-	 * Initializes the {@link LicenseManager} to use the provided licenseFile and publicKeyFile for its internal processes (signing, file
-	 * creation, verification).
-	 *
-	 * @param licenseFile
-	 *          The license file itself.
-	 * @param publicKeyFile
-	 *          The public key of the license file.
-	 */
-	private static void initLicenseManager(String licenseFile, String publicKeyFile) {
-		LicenseManager.setPublicKeyFile(publicKeyFile);
-		LicenseManager.setLicenseFile(licenseFile);
+		String signature = (String) properties.remove(LicenseGenerator.SIGNATURE_PROPERTY);
+		String encoded = properties.toString();
+
+		PublicKey publicKey = KeyUtils.readPublicKeyFromFile(publicKeyFile);
+
+		if (!CryptoUtils.verify(encoded, signature.getBytes(), publicKey)) {
+			return null;
+		}
+
+		return new License(properties);
 	}
 
 	/**

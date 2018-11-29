@@ -6,27 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 
-import ro.fortsoft.licensius.License;
-import ro.fortsoft.licensius.LicenseGenerator;
-import ro.fortsoft.licensius.LicenseManager;
-import ro.fortsoft.licensius.OrderedProperties;
-
 public class TestLicenseController {
 	public static String licenseFileWrongSignature = "licenses/licenseWrongSignature.dat";
 	public static String licenseFileExpiredAndWrongSignature = "licenses/licenseExpiredAndWrongSignature.dat";
 	public static String licenseValid = "licenses/licenseOK.dat";
+	public static String publicKey = "licenses/public.key";
 
 	public static String filePathLicenseValid = "licenses/licenseOK.zip";
 	public static String filePathLicenseWrongSignature = "licenses/licenseWrongSignature.zip";
@@ -44,8 +40,8 @@ public class TestLicenseController {
 
 		CompanyLicensePublic companyLicense = licenseController.createLicenseForAuth(license);
 
-		assertEquals(license.getFeature("licenseId"), companyLicense.getLicenseId());
-		assertEquals(license.getFeature("groupId"), companyLicense.getGroupId());
+		assertEquals(license.getProperty("licenseId"), companyLicense.getLicenseId());
+		assertEquals(license.getProperty("groupId"), companyLicense.getGroupId());
 		assertEquals(license.getExpirationDateAsString(), companyLicense.getExpirationDate());
 	}
 
@@ -60,7 +56,7 @@ public class TestLicenseController {
 		License license = getLicenseFromZip(filePathLicenseValid);
 
 		assertNotNull(license);
-		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getFeature("groupId"), "1", license.getFeature("licenseId"),
+		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getProperty("groupId"), "1", license.getProperty("licenseId"),
 				license.getExpirationDateAsString());
 
 		boolean result = licenseController.isLicenseExpired(companyLicense);
@@ -72,7 +68,7 @@ public class TestLicenseController {
 	public void testIsLicenseExpiredFail() throws Exception {
 		License license = getLicense(licenseFileExpiredAndWrongSignature);
 
-		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getFeature("groupId"), "1", license.getFeature("licenseId"),
+		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getProperty("groupId"), "1", license.getProperty("licenseId"),
 				license.getExpirationDateAsString());
 
 		boolean result = licenseController.isLicenseExpired(companyLicense);
@@ -86,7 +82,7 @@ public class TestLicenseController {
 		License license = getLicenseFromZip(filePathLicenseExpiredWrongSignature);
 		assertNotNull(license);
 
-		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getFeature("groupId"), "1", license.getFeature("licenseId"),
+		CompanyLicensePublic companyLicense = new CompanyLicensePublic(license.getProperty("groupId"), "1", license.getProperty("licenseId"),
 				license.getExpirationDateAsString());
 
 		boolean result = licenseController.isLicenseExpired(companyLicense);
@@ -162,30 +158,29 @@ public class TestLicenseController {
 	private License getLicense(String license) throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();
 		File file = new File(classLoader.getResource(license).getFile());
-		LicenseManager.LICENSE_FILE = file.getAbsolutePath();
-		return LicenseManager.getInstance().getLicense();
+		File publicKeyFile = new File(classLoader.getResource(publicKey).getFile());
+		return LicenseUtil.getLicense(file.getAbsolutePath(), publicKeyFile.getAbsolutePath());
 
 	}
 
-	private License getLicenseFromZip(String zipFile) throws Exception {
+	private License getLicenseFromZip(String zipFileName) throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();
-
-		List<File> files = ProbeUtils.unzipImportedFile(new File(classLoader.getResource(zipFile).getFile()));
+		File zipFile = new File(classLoader.getResource(zipFileName).getFile());
+		List<File> files = ProbeUtils.unzipImportedFile(zipFile);
+		String licenseFile = null;
+		String publicKeyFile = null;
 		for (File file : files) {
 			if (file.getName().contains("license.dat")) {
-				return LicenseManager.getInstance().getLicense(file);
+				licenseFile = file.getAbsolutePath();
+			}
+			if (file.getName().contains("public.key")) {
+				publicKeyFile = file.getAbsolutePath();
 			}
 		}
+		if (!Strings.isNullOrEmpty(licenseFile) && !Strings.isNullOrEmpty(publicKeyFile)) {
+			return LicenseUtil.getLicense(licenseFile, publicKeyFile);
+		}
+
 		return null;
 	}
-
-	private License createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
-		Properties properties = new OrderedProperties();
-		properties.setProperty("expirationDate", expirationDate);
-		properties.setProperty("groupId", groupId);
-		properties.setProperty("licenseId", licenseId);
-		LicenseGenerator.generateLicense(properties, StaticConfigItems.KEYS_LOCATION + "private.key");
-		return LicenseManager.getInstance().getLicense();
-	}
-
 }

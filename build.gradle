@@ -48,7 +48,6 @@ project(':simple2secure.commons') {
 		compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 		compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
-		compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.2.0-S2S'
 	}
 }
 

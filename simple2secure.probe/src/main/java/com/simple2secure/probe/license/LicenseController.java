@@ -11,14 +11,12 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
+import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
-
-import ro.fortsoft.licensius.License;
-import ro.fortsoft.licensius.LicenseNotFoundException;
 
 public class LicenseController {
 
@@ -97,7 +95,7 @@ public class LicenseController {
 	 */
 	public boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
-		if (!Strings.isNullOrEmpty(license.getFeature("groupId")) && !Strings.isNullOrEmpty(license.getFeature("licenseId"))
+		if (!Strings.isNullOrEmpty(license.getProperty("groupId")) && !Strings.isNullOrEmpty(license.getProperty("licenseId"))
 				&& !Strings.isNullOrEmpty(license.getExpirationDateAsString())) {
 			isLicensePropsValid = true;
 		}
@@ -196,8 +194,8 @@ public class LicenseController {
 			return null;
 		}
 
-		groupId = license.getFeature("groupId");
-		licenseId = license.getFeature("licenseId");
+		groupId = license.getProperty("groupId");
+		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
 
 		result = loadLicenseFromDB();
