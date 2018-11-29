@@ -1,6 +1,13 @@
-apply plugin: 'application'
+plugins {
+	id "org.sonarqube" version "2.6.2"
+	id 'application'
+}
 
 mainClassName = "com.simple2secure.probe.gui.ProbeGUI"
+
+sonarqube {
+	properties { property "sonar.projectBaseDir", "$projectDir/.." }
+}
 
 jar {
 	baseName = 'simple2secure.probe'

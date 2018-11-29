@@ -1,5 +1,6 @@
 package com.simple2secure.commons.license;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
@@ -21,6 +22,80 @@ public class LicenseGenerator {
 
 	public static String SIGNATURE_PROPERTY = "signature";
 	public static String EXPIRATION_DATE_PROPERTY = "expirationDate";
+
+	/**
+	 * Generates a license using the provided properties as input for the license. If the {@value #EXPIRATION_DATE_PROPERTY} property is not
+	 * available in the properties the generation fails. For generating the license the default key algorithm
+	 * {@link KeyUtils#ASYMMETRIC_KEY_ALGORITHM}, which is <code>EC</code> and the default signature algorithm
+	 * {@link CryptoUtils#SIGNATURE_ALGORITHM}, which is <code>SHA512withECDSA</code> are used. If the provided private key or the used
+	 * algorithm are not available or do not match the provided key, no license is created. If the signature generation fails also null is
+	 * returned.
+	 *
+	 * @param properties
+	 *          The properties which are part of the license.
+	 * @param privateKeyFile
+	 *          The file name of the private key which should be used to sign the license.
+	 * @return The {@link License} object as generated.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the private key couldn't be loaded using the default key algorithm.
+	 */
+	public static License generateLicense(Properties properties, String privateKeyFile) throws InvalidKeySpecException {
+		try {
+			String encoded = properties.toString();
+			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
+			byte[] signature = CryptoUtils.sign(encoded, privateKey);
+			String encodedSignature = Base64.getEncoder().encodeToString(signature);
+
+			Properties orderedProperties = new OrderedProperties();
+			orderedProperties.putAll(properties);
+			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
+
+			License license = new License(orderedProperties);
+
+			return license;
+		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+			log.error("Couldn't create signature for license. Reason {}", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Generates a license using the provided properties as input for the license. If the {@value #EXPIRATION_DATE_PROPERTY} property is not
+	 * available in the properties the generation fails. For generating the license the default key algorithm
+	 * {@link KeyUtils#ASYMMETRIC_KEY_ALGORITHM}, which is <code>EC</code> and the default signature algorithm
+	 * {@link CryptoUtils#SIGNATURE_ALGORITHM}, which is <code>SHA512withECDSA</code> are used. If the provided private key or the used
+	 * algorithm are not available or do not match the provided key, no license is created. If the signature generation fails also null is
+	 * returned.
+	 *
+	 * @param properties
+	 *          The properties which are part of the license.
+	 * @param privateKeyFile
+	 *          The file name of the private key which should be used to sign the license.
+	 * @return The {@link License} object as generated.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the private key couldn't be loaded using the default key algorithm.
+	 */
+	public static License generateLicense(Properties properties, File privateKeyFile) throws InvalidKeySpecException {
+		try {
+			String encoded = properties.toString();
+			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
+			byte[] signature = CryptoUtils.sign(encoded, privateKey);
+			String encodedSignature = Base64.getEncoder().encodeToString(signature);
+
+			Properties orderedProperties = new OrderedProperties();
+			orderedProperties.putAll(properties);
+			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
+
+			License license = new License(orderedProperties);
+
+			return license;
+		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+			log.error("Couldn't create signature for license. Reason {}", e);
+		}
+
+		return null;
+	}
 
 	/**
 	 * Generates a license using the provided properties as input for the license. If the {@value #EXPIRATION_DATE_PROPERTY} property is not

@@ -1,4 +1,7 @@
-apply plugin: 'application'
+plugins {
+	id "org.sonarqube" version "2.6.2"
+	id 'application'
+}
 
 mainClassName = "com.simple2secure.service.ProbeServiceRunner"
 

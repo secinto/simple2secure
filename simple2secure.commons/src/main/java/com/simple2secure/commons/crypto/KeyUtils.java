@@ -121,12 +121,24 @@ public class KeyUtils {
 	 * @return The {@link File} object if successful, otherwise null.
 	 */
 	public static File writeKeyToFile(Key key, String fileName) {
-		try {
-			File publicKeyFile = new File(fileName);
+		return writeKeyToFile(key, new File(fileName));
+	}
 
+	/**
+	 * Writes the provided {@link Key} to the file system using the specified file name. Returns the {@link File} object of the created key if
+	 * successful, otherwise null. The key is encoded using the default encoding, which is usually DER.
+	 *
+	 * @param key
+	 *          The key which should be written to the specified file name.
+	 * @param publicKeyFile
+	 *          The file of the key to be used to write to.
+	 * @return The {@link File} object if successful, otherwise null.
+	 */
+	public static File writeKeyToFile(Key key, File publicKeyFile) {
+		try {
 			if (!publicKeyFile.exists() && publicKeyFile.getParentFile().isDirectory() && !publicKeyFile.getParentFile().exists()) {
 				if (!publicKeyFile.getParentFile().mkdirs()) {
-					log.error("Couldn't create file {} for key export.", fileName);
+					log.error("Couldn't create file {} for key export.", publicKeyFile.getAbsolutePath());
 					return null;
 				}
 			}
@@ -134,7 +146,7 @@ public class KeyUtils {
 			FileUtils.writeByteArrayToFile(publicKeyFile, key.getEncoded());
 			return publicKeyFile;
 		} catch (Exception e) {
-			log.error("Couldn't write file {} for key export. Reason {}", fileName, e);
+			log.error("Couldn't write file {} for key export. Reason {}", publicKeyFile.getAbsolutePath(), e);
 		}
 		return null;
 	}
@@ -159,6 +171,25 @@ public class KeyUtils {
 	}
 
 	/**
+	 * Reads the private key from the file system using the specified file name creates a {@link PrivateKey} using the default algorithm
+	 * {@value #ASYMMETRIC_KEY_ALGORITHM}, which is Elliptic Curve (EC). The key file is expected to be DER encoded, otherwise the operation
+	 * fails.
+	 *
+	 * @param algorithm
+	 *          The key algorithm to be used.
+	 * @param file
+	 *          The file from which the {@link PrivateKey} is to be read.
+	 * @return The {@link PrivateKey} if successful, otherwise null.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the key doesn't match the algorithm.
+	 */
+	public static PrivateKey readPrivateKeyFromFile(File file) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		return readPrivateKeyFromFile(ASYMMETRIC_KEY_ALGORITHM, file);
+	}
+
+	/**
 	 * Reads the private key from the file system using the specified file name creates a {@link PrivateKey} using the specified algorithm.
 	 * The key file is expected to be DER encoded, otherwise the operation fails.
 	 *
@@ -175,15 +206,33 @@ public class KeyUtils {
 	public static PrivateKey readPrivateKeyFromFile(String algorithm, String fileName)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		File keyToRead = new File(fileName);
+		return readPrivateKeyFromFile(algorithm, keyToRead);
+	}
+
+	/**
+	 * Reads the private key from the file system using the specified file name creates a {@link PrivateKey} using the specified algorithm.
+	 * The key file is expected to be DER encoded, otherwise the operation fails.
+	 *
+	 * @param algorithm
+	 *          The key algorithm to be used.
+	 * @param file
+	 *          The key file which contains the {@link PrivateKey} to be read.
+	 * @return The {@link PrivateKey} if successful, otherwise null.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the key doesn't match the algorithm.
+	 */
+	public static PrivateKey readPrivateKeyFromFile(String algorithm, File file) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		try {
-			if (keyToRead != null && keyToRead.exists()) {
-				PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(FileUtils.readFileToByteArray(keyToRead));
+			if (file != null && file.exists()) {
+				PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(FileUtils.readFileToByteArray(file));
 				KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 				PrivateKey key = keyFactory.generatePrivate(keySpec);
 				return key;
 			}
 		} catch (IOException ioe) {
-			log.error("Couldn't read file {} for key import. Reason {}", fileName, ioe);
+			log.error("Couldn't read file {} for key import. Reason {}", file.getAbsolutePath(), ioe);
 		}
 		return null;
 	}

@@ -362,10 +362,27 @@ public class LicenseUtil {
 	 *          The licenseId which should be used in the license.
 	 * @param expirationDate
 	 *          The expiration date which should be used for the license.
+	 * @return The created {@link License} object.
 	 * @throws Exception
 	 */
-	public static String createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
+	public static License createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
 		return createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
+	}
+
+	/**
+	 * Creates a license from the provided parameters and uses the default private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @return The file name of the created license stored as file.
+	 * @throws Exception
+	 */
+	public static String createLicenseFile(String groupId, String licenseId, String expirationDate) throws Exception {
+		return createLicenseFile(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
 	/**
@@ -379,10 +396,47 @@ public class LicenseUtil {
 	 *          The expiration date which should be used for the license.
 	 * @param privateKeyFile
 	 *          The private key which should be used for the signature.
+	 * @return The created {@link License} object.
 	 * @throws Exception
 	 *           Thrown if something goes wrong.
 	 */
-	public static String createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
+	public static License createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
+
+		Properties properties = new OrderedProperties();
+		properties.setProperty("expirationDate", expirationDate);
+		properties.setProperty("groupId", groupId);
+		properties.setProperty("licenseId", licenseId.toString());
+
+		FileUtil.createFolder(licenseFilePath + licenseId + File.separator);
+
+		File privateKeyOriginal = new File(privateKeyFilePath);
+		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + licenseId + File.separator);
+		File privateKey = new File(licenseFilePath + licenseId + File.separator + privateKeyOriginal.getName());
+
+		if (privateKey.exists()) {
+			return LicenseGenerator.generateLicense(properties, privateKey);
+		} else {
+			log.error("Couldn't create License in folder {} because public key couldn't ne copied. ", licenseFilePath + licenseId + "/");
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a license from the provided parameters and uses the provided private key file for creating the signature.
+	 *
+	 * @param groupId
+	 *          The groupId which should be used in the license.
+	 * @param licenseId
+	 *          The licenseId which should be used in the license.
+	 * @param expirationDate
+	 *          The expiration date which should be used for the license.
+	 * @param privateKeyFile
+	 *          The private key which should be used for the signature.
+	 * @return The file name of the created license stored as file.
+	 * @throws Exception
+	 *           Thrown if something goes wrong.
+	 */
+	public static String createLicenseFile(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
 
 		Properties properties = new OrderedProperties();
 		properties.setProperty("expirationDate", expirationDate);

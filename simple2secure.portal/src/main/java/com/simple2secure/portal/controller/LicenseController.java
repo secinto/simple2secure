@@ -198,7 +198,7 @@ public class LicenseController {
 						licenseRepository.save(companyLicense);
 					}
 
-					String licenseFile = LicenseUtil.createLicense(companyLicense.getGroupId(), companyLicense.getLicenseId(),
+					String licenseFile = LicenseUtil.createLicenseFile(companyLicense.getGroupId(), companyLicense.getLicenseId(),
 							companyLicense.getExpirationDate());
 
 					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStream(licenseFile, licenseFilePath + "public.key");
