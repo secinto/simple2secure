@@ -244,6 +244,25 @@ public class KeyUtils {
 	 *
 	 * @param algorithm
 	 *          The key algorithm to be used.
+	 * @param file
+	 *          The file from which the {@link PublicKey} is to be read.
+	 * @return The {@link PublicKey} if successful, otherwise null.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the key doesn't match the algorithm.
+	 */
+	public static PublicKey readPublicKeyFromFile(File file) throws InvalidKeySpecException, NoSuchAlgorithmException {
+		return readPublicKeyFromFile(ASYMMETRIC_KEY_ALGORITHM, file);
+	}
+
+	/**
+	 * Reads the private key from the file system using the specified file name creates a {@link PublicKey} using the default algorithm
+	 * {@value #ASYMMETRIC_KEY_ALGORITHM}, which is Elliptic Curve (EC). The key file is expected to be DER encoded, otherwise the operation
+	 * fails.
+	 *
+	 * @param algorithm
+	 *          The key algorithm to be used.
 	 * @param fileName
 	 *          The file name from which the {@link PublicKey} is to be read.
 	 * @return The {@link PublicKey} if successful, otherwise null.
@@ -273,17 +292,36 @@ public class KeyUtils {
 	public static PublicKey readPublicKeyFromFile(String algorithm, String fileName)
 			throws InvalidKeySpecException, NoSuchAlgorithmException {
 		File keyToRead = new File(fileName);
-		try {
-			if (keyToRead != null && keyToRead.exists()) {
+		return readPublicKeyFromFile(algorithm, keyToRead);
+	}
 
-				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(FileUtils.readFileToByteArray(keyToRead));
+	/**
+	 * Reads the private key from the file system using the specified file name creates a {@link PublicKey} using the specified algorithm. The
+	 * key file is expected to be DER encoded, otherwise the operation fails.
+	 *
+	 * @param algorithm
+	 *          The key algorithm to be used.
+	 * @param file
+	 *          The file from which the {@link PublicKey} is to be read.
+	 * @return The {@link PublicKey} if successful, otherwise null.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the key doesn't match the algorithm.
+	 */
+	public static PublicKey readPublicKeyFromFile(String algorithm, File file) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		try {
+			if (file != null && file.exists()) {
+
+				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(FileUtils.readFileToByteArray(file));
 				KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 				PublicKey key = keyFactory.generatePublic(keySpec);
 				return key;
 			}
 		} catch (IOException ioe) {
-			log.error("Couldn't read file {} for key import. Reason {}", fileName, ioe);
+			log.error("Couldn't read file {} for key import. Reason {}", file.getAbsolutePath(), ioe);
 		}
 		return null;
+
 	}
 }

@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.crypto.KeyUtils;
 import com.simple2secure.commons.file.FileUtil;
@@ -21,8 +19,6 @@ import com.simple2secure.commons.license.LicenseUtil;
 
 public class TestLicenseUtil {
 
-	private static Logger log = LoggerFactory.getLogger(TestLicenseUtil.class);
-
 	private static String licenseFilePath = "licenses" + File.separator;
 
 	private static String privateKeyPath = "private.key";
@@ -30,8 +26,6 @@ public class TestLicenseUtil {
 	private static String publicKeyPath = "public.key";
 
 	private static String workingDirectory = System.getProperty("user.dir");
-
-	private final static String licenseFileName = LicenseUtil.licenseFileName;
 
 	private final static String licenseFileDir = "licenses" + File.separator;
 
@@ -52,10 +46,9 @@ public class TestLicenseUtil {
 	@Test
 	public void testCreateExpiredLicense() throws Exception {
 		String licenseId = LicenseUtil.generateLicenseId();
-		License license = LicenseUtil.createLicense("testgroup", licenseId, "24/11/2018");
-		Assertions.assertNotNull(license);
-		LicenseUtil.generateLicenseZIPFile(licenseFilePath + licenseId + File.separator + "license.dat", publicKeyPath,
-				licenseFilePath + licenseId + File.separator + "license-" + licenseId + ".zip");
+		String licenseFile = LicenseUtil.createLicenseFile("testgroup", licenseId, "24/11/2018");
+		Assertions.assertNotNull(licenseFile);
+		LicenseUtil.generateLicenseZIPFile(licenseFile, publicKeyPath, licenseFilePath);
 	}
 
 	@Test
@@ -67,19 +60,11 @@ public class TestLicenseUtil {
 	}
 
 	@Test
-	public void getLicense_NoParams_LicenseObject() {
-		Executable closureContainingCodeToTest = () -> {
-			LicenseUtil.getLicense(licenseFilePath + licenseFileName);
-		};
-		assertThrows(FileNotFoundException.class, closureContainingCodeToTest);
-	}
-
-	@Test
 	public void getLicense_ParamsValidParams_LicenseFile() throws Exception {
-
-		String fileSep = File.separator;
-		String filePath = workingDirectory + fileSep + licenseFileDir + "Xj9HttwmXunZb1EnjkIk" + fileSep;
-		License license = LicenseUtil.getLicense(filePath + licenseFileName, filePath + "public.key");
+		String licenseFile = LicenseUtil.createLicenseFile("test", "test", "12/31/2018");
+		License license = LicenseUtil.getLicense(licenseFile);
+		Assertions.assertNotNull(license);
+		license = LicenseUtil.getLicense(licenseFile, publicKeyPath);
 		Assertions.assertNotNull(license);
 	}
 
@@ -98,10 +83,5 @@ public class TestLicenseUtil {
 		Assertions.assertNotNull(dirExists);
 
 		FileUtil.deleteFolder(dirExists.getAbsolutePath());
-	}
-
-	// This testpath could not be reached
-	public void getLicensePath_ParamIsFile_AbsolutePathFile() throws IOException {
-		String licensePath = LicenseUtil.getLicensePath(licenseFileName);
 	}
 }

@@ -1,6 +1,5 @@
 package com.simple2secure.commons.license;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -8,8 +7,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class LicenseDateUtil {
-
-	public static final DateFormat LICENSE_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
 
 	/**
 	 * Returns the default expiration date for a license counted from the current date. The default expiration date is one month.
@@ -91,7 +88,7 @@ public class LicenseDateUtil {
 	 * @return The date as string representation in the {@link #LICENSE_DATE_FORMAT} date format.
 	 */
 	public static String convertDateToLicenseFormatString(Date expirationDate) {
-		return LICENSE_DATE_FORMAT.format(expirationDate);
+		return new SimpleDateFormat(License.LICENSE_DATE_FORMAT).format(expirationDate);
 	}
 
 	/**
@@ -104,7 +101,7 @@ public class LicenseDateUtil {
 	 *           Thrown if the provided date can't be parsed due to an illegal format.
 	 */
 	public static Date convertLicenseFormatStringToDate(String date) throws ParseException {
-		return LICENSE_DATE_FORMAT.parse(date);
+		return new SimpleDateFormat(License.LICENSE_DATE_FORMAT).parse(date);
 	}
 
 	/**

@@ -1,6 +1,5 @@
 package com.simple2secure.commons.license;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.Properties;
 
 public class License {
 	public static final String EXPIRATION_DATE = "expirationDate";
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	public static final String LICENSE_DATE_FORMAT = "MM/dd/YYYY";
 
 	private Properties licenseProperties;
 
@@ -21,7 +20,7 @@ public class License {
 
 	public Date getExpirationDate() {
 		try {
-			return DATE_FORMAT.parse(getProperty(EXPIRATION_DATE));
+			return new SimpleDateFormat(LICENSE_DATE_FORMAT).parse(getProperty(EXPIRATION_DATE));
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}

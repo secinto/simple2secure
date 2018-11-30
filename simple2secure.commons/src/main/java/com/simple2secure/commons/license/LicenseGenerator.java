@@ -39,7 +39,7 @@ public class LicenseGenerator {
 	 * @throws InvalidKeySpecException
 	 *           Thrown if the private key couldn't be loaded using the default key algorithm.
 	 */
-	public static License generateLicense(Properties properties, String privateKeyFile) throws InvalidKeySpecException {
+	public static License generateLicense(Properties properties, String privateKeyFile) {
 		try {
 			String encoded = properties.toString();
 			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
@@ -53,7 +53,7 @@ public class LicenseGenerator {
 			License license = new License(orderedProperties);
 
 			return license;
-		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
 			log.error("Couldn't create signature for license. Reason {}", e);
 		}
 
@@ -76,7 +76,7 @@ public class LicenseGenerator {
 	 * @throws InvalidKeySpecException
 	 *           Thrown if the private key couldn't be loaded using the default key algorithm.
 	 */
-	public static License generateLicense(Properties properties, File privateKeyFile) throws InvalidKeySpecException {
+	public static License generateLicense(Properties properties, File privateKeyFile) {
 		try {
 			String encoded = properties.toString();
 			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
@@ -90,7 +90,7 @@ public class LicenseGenerator {
 			License license = new License(orderedProperties);
 
 			return license;
-		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
 			log.error("Couldn't create signature for license. Reason {}", e);
 		}
 

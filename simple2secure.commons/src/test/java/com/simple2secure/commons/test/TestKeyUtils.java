@@ -36,18 +36,18 @@ public class TestKeyUtils {
 	@Test
 	public void testWriteKeyPairToFile() throws NoSuchAlgorithmException, NoSuchProviderException {
 		KeyPair ecKeyPair = KeyUtils.generateKeyPair(192);
-		File publicKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPublic(), "bin/keys/public.key");
+		File publicKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPublic(), "licenses/public.key");
 		assertNotNull(publicKeyFile);
-		File privateKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPrivate(), "bin/keys/private.key");
+		File privateKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPrivate(), "licenses/private.key");
 		assertNotNull(privateKeyFile);
 	}
 
 	@Test
 	public void testReadKeyPairToFile() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
 		KeyPair ecKeyPair = KeyUtils.generateKeyPair(192);
-		File publicKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPublic(), "bin/keys/public.key");
+		File publicKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPublic(), "licenses/public.key");
 		assertNotNull(publicKeyFile);
-		File privateKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPrivate(), "bin/keys/private.key");
+		File privateKeyFile = KeyUtils.writeKeyToFile(ecKeyPair.getPrivate(), "licenses/private.key");
 		assertNotNull(privateKeyFile);
 
 		PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile.getAbsolutePath());

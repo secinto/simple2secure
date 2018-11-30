@@ -22,8 +22,6 @@ public class ProbeCLI {
 	private static String OPTION_FILEPATH_SHORT = "l";
 	private static String OPTION_FILEPATH = "licensePath";
 
-	private LicenseController licenseController = new LicenseController();
-
 	/**
 	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
 	 * instance.
@@ -32,6 +30,8 @@ public class ProbeCLI {
 	 *          The absolute file path to the License ZIP File.
 	 */
 	public void init(String importFilePath) {
+		LicenseController licenseController = new LicenseController();
+
 		StartConditions startConditions = licenseController.checkProbeStartConditions();
 
 		CompanyLicensePublic licenseFile = null;

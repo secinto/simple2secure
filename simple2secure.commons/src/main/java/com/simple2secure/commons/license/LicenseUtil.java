@@ -7,7 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -101,12 +105,11 @@ public class LicenseUtil {
 	 */
 	public static String getLicensePath(String path) {
 		String checkedPath = System.getProperty("user.dir");
-		if (FileUtil.isDirectory(path)) {
-			try {
-				checkedPath = FileUtil.getFile(path).getAbsolutePath();
-			} catch (Exception ioe) {
-				log.error("Couldn't verify license file path. Reason {}", ioe);
-			}
+
+		File file = new File(path);
+
+		if (file.exists() && file.isDirectory()) {
+			return FileUtil.correctPathFormat(file.getAbsolutePath(), true);
 		} else {
 			if (FileUtil.isDirectory(checkedPath + File.separator + path)) {
 				return FileUtil.correctPathFormat(checkedPath + File.separator + path, true);
@@ -136,32 +139,23 @@ public class LicenseUtil {
 		URL keyURL = classLoader.getResource(keyPath);
 		if (keyURL != null) {
 			File file = new File(classLoader.getResource(keyPath).getFile());
-			return copyFileToFolder(file, localFilePath);
+			return FileUtil.copyFileToFolder(file, localFilePath);
 		} else {
 			File keyFile = new File(keyPath);
 			if (keyFile.exists() && !keyFile.isDirectory()) {
-				return copyFileToFolder(keyFile, localFilePath);
+				return FileUtil.copyFileToFolder(keyFile, localFilePath);
 			} else {
 				if (keyFile.isDirectory()) {
 					if (FileUtil.fileOrFolderExists(keyFile.getAbsolutePath() + keyFile.getName())) {
-						return copyFileToFolder(new File(keyFile.getAbsolutePath() + keyFile.getName()), localFilePath);
+						return FileUtil.copyFileToFolder(new File(keyFile.getAbsolutePath() + keyFile.getName()), localFilePath);
 					}
 				}
 				if (FileUtil.fileOrFolderExists(workingDirectory + File.separator + keyFile.getName())) {
-					return copyFileToFolder(new File(workingDirectory + File.separator + keyFile.getName()), localFilePath);
+					return FileUtil.copyFileToFolder(new File(workingDirectory + File.separator + keyFile.getName()), localFilePath);
 				}
 			}
 		}
 		throw new IllegalArgumentException("Couldn't find provided key in path " + keyPath);
-	}
-
-	private static String copyFileToFolder(File file, String localFilePath) {
-		if (FileUtil.copyToFolder(file, localFilePath)) {
-			return FileUtil.correctPathFormat(localFilePath + file.getName(), false);
-		} else {
-			return FileUtil.correctPathFormat(file.getAbsolutePath(), false);
-		}
-
 	}
 
 	/**
@@ -177,8 +171,8 @@ public class LicenseUtil {
 	}
 
 	/**
-	 * Generates a ZIP file from the default license (working directory license.dat file) and the publicKeyFile. The ZIP file is the complete
-	 * license since without the public.key the license.dat file can't be verified.
+	 * Generates a ZIP file from the default license in the {@value #licenseFilePath} and the specified publicKeyFile. The ZIP file is the
+	 * complete license since without the public.key the license.dat file can't be verified.
 	 *
 	 * @param publicKeyFile
 	 *          The public key of the license file.
@@ -204,50 +198,12 @@ public class LicenseUtil {
 	 */
 	public static void generateLicenseZIPFile(String licenseFile, String publicKeyFile, String zipFile) throws IOException {
 
-		List<File> files = getLicenseFileList(licenseFile);
+		List<File> files = getLicenseFileList(licenseFile, publicKeyFile);
 		ByteArrayOutputStream byteOutStream = ZIPUtils.createZIPStreamFromFiles(files);
 
 		OutputStream outputStream = new FileOutputStream(zipFile);
 
 		byteOutStream.writeTo(outputStream);
-	}
-
-	public static List<File> getLicenseFileList() {
-		return getLicenseFileList(licenseFilePath);
-	}
-
-	/**
-	 * Returns a List of files containing the default license (working directory license.dat file) and public key (working directory
-	 * public.key file).
-	 *
-	 * @return The List<File> containing license.dat and public.key.
-	 */
-	public static List<File> getLicenseFileList(String licenseFile) {
-		ArrayList<File> files = new ArrayList<>();
-
-		File publicKey = new File(publicKeyFilePath);
-		File certificate = null;
-		if (!Strings.isNullOrEmpty(licenseFile) && licenseFile.endsWith(licenseFileName)) {
-			certificate = new File(licenseFile);
-		} else {
-			certificate = new File(licenseFilePath + File.separator + licenseFileName);
-		}
-
-		files.add(publicKey);
-		files.add(certificate);
-
-		return files;
-	}
-
-	/**
-	 * Generates a {@link ByteArrayOutputStream} which represents the default license (working directory license.dat file) and public key
-	 * (working directory public.key file) as compressed data using the ZIP algorithm.
-	 *
-	 * @return The ZIP content as {@link ByteArrayOutputStream}
-	 * @throws IOException
-	 */
-	public static ByteArrayOutputStream generateLicenseZIPStream() throws IOException {
-		return generateLicenseZIPStream(publicKeyFilePath);
 	}
 
 	/**
@@ -258,9 +214,10 @@ public class LicenseUtil {
 	 *          The public key of the license file.
 	 * @return The ZIP content as {@link ByteArrayOutputStream}
 	 * @throws IOException
+	 *           Thrown if the ZIP file stream couldn't be created
 	 */
-	public static ByteArrayOutputStream generateLicenseZIPStream(String publicKeyFile) throws IOException {
-		return generateLicenseZIPStream(licenseFilePath, publicKeyFile);
+	public static ByteArrayOutputStream generateLicenseZIPStream(String licenseFile) throws IOException {
+		return generateLicenseZIPStream(licenseFile, publicKeyFilePath);
 	}
 
 	/**
@@ -273,9 +230,10 @@ public class LicenseUtil {
 	 *          The public key of the license file.
 	 * @return The ZIP content as {@link ByteArrayOutputStream}
 	 * @throws IOException
+	 *           Thrown if the ZIP file stream couldn't be created
 	 */
 	public static ByteArrayOutputStream generateLicenseZIPStream(String licenseFile, String publicKeyFile) throws IOException {
-		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList(licenseFile));
+		return ZIPUtils.createZIPStreamFromFiles(getLicenseFileList(licenseFile, publicKeyFile));
 	}
 
 	/**
@@ -289,6 +247,10 @@ public class LicenseUtil {
 		boolean isValidLicenseDir = false;
 		boolean licenseFile = false;
 		boolean publicKeyFile = false;
+
+		if (licenseDir == null || licenseDir.size() <= 1) {
+			return isValidLicenseDir;
+		}
 
 		for (File file : licenseDir) {
 			if (file.getName().equals(licenseFileName)) {
@@ -306,24 +268,146 @@ public class LicenseUtil {
 	}
 
 	/**
-	 * Returns the {@link License} object from the default license location (working directory license.dat file) and public key (working
-	 * directory public.key file).
+	 * Returns the {@link License} object using the specified license file and public key file from the list. The license is expected to be
+	 * named {@value #licenseFileName} and the public key is expected to be named {@link #publicKeyFileName}, otherwise null is returned.
 	 *
-	 * @return The {@link License} object from the default license location.
-	 * @throws Exception
+	 * @param licenseFiles
+	 *          The List of license files containing at least license.dat and public key.
+	 * @return The {@link License} object if the license could be read and verified.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws SignatureException
+	 *           Thrown if an error occurred during signature verification
+	 * @throws InvalidKeyException
+	 *           Thrown if the provided public key is not compliant with the algorithm.
+	 * @throws IOException
+	 *           Thrown if reading the license file or public key from the file system fails.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the provided public key doesn't comply with the required specification of the key algorithm
 	 */
-	public static License getLicense() throws Exception {
-		return getLicense(publicKeyFilePath);
+	public static License getLicense(List<File> licenseFiles)
+			throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+		String licenseFile = null;
+		String publicKeyFile = null;
+		if (licenseFiles == null || licenseFiles.size() <= 1) {
+			return null;
+		}
+
+		for (File file : licenseFiles) {
+			if (file.getName().equals(licenseFileName)) {
+				licenseFile = file.getAbsolutePath();
+			} else if (file.getName().equals(publicKeyFileName)) {
+				publicKeyFile = file.getAbsolutePath();
+			}
+		}
+
+		if (licenseFile != null && publicKeyFile != null) {
+			return getLicense(licenseFile, publicKeyFile);
+		}
+		return null;
+
 	}
 
 	/**
+	 * Returns a List of files containing the specified license and public key. If the files do not exist an exception is thrown.
 	 *
-	 * @param publicKeyFile
-	 * @return
-	 * @throws Exception
+	 * @return The List<File> containing license.dat and public.key.
+	 * @throws IOException
 	 */
-	public static License getLicense(String publicKeyFile) throws Exception {
-		return getLicense(licenseFilePath, publicKeyFile);
+	public static List<File> getLicenseFileList(String licenseFile, String publicFile) throws IOException {
+		ArrayList<File> files = new ArrayList<>();
+
+		File publicKey = new File(publicFile);
+
+		if (!publicKey.exists() || publicKey.isDirectory()) {
+			throw new IOException("Provided public key file doesn't exist");
+		}
+
+		File certificate = new File(licenseFile);
+
+		if (!certificate.exists() || certificate.isDirectory()) {
+			throw new IOException("Provided license file doesn't exist");
+		}
+
+		files.add(publicKey);
+		files.add(certificate);
+
+		return files;
+	}
+
+	/**
+	 * Returns the {@link License} object using the specified license file. For verifying the license file the default public key from path
+	 * {@value #publicKeyFilePath} is used.
+	 *
+	 * @param licenseFile
+	 *          The license file itself.
+	 * @return The {@link License} object if the license could be read and verified.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws SignatureException
+	 *           Thrown if an error occurred during signature verification
+	 * @throws InvalidKeyException
+	 *           Thrown if the provided public key is not compliant with the algorithm.
+	 * @throws IOException
+	 *           Thrown if reading the license file or public key from the file system fails.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the provided public key doesn't comply with the required specification of the key algorithm
+	 */
+	public static License getLicense(File licenseFile)
+			throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+		return getLicense(licenseFile, publicKeyFilePath);
+	}
+
+	/**
+	 * Returns the {@link License} object using the specified license file name. For verifying the license file the default public key from
+	 * path {@value #publicKeyFilePath} is used.
+	 *
+	 * @param licenseFile
+	 *          The license file itself.
+	 * @return The {@link License} object if the license could be read and verified.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws SignatureException
+	 *           Thrown if an error occurred during signature verification
+	 * @throws InvalidKeyException
+	 *           Thrown if the provided public key is not compliant with the algorithm.
+	 * @throws IOException
+	 *           Thrown if reading the license file or public key from the file system fails.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the provided public key doesn't comply with the required specification of the key algorithm
+	 */
+	public static License getLicense(String licenseFile)
+			throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+		return getLicense(licenseFile, publicKeyFilePath);
+	}
+
+	/**
+	 * Returns the {@link License} object using the specified license file name and public key.
+	 *
+	 * @param licenseFile
+	 *          The license file itself.
+	 * @param publicKeyFile
+	 *          The public key of the license file.
+	 * @return The {@link License} object if the license could be read and verified.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws SignatureException
+	 *           Thrown if an error occurred during signature verification
+	 * @throws InvalidKeyException
+	 *           Thrown if the provided public key is not compliant with the algorithm.
+	 * @throws IOException
+	 *           Thrown if reading the license file or public key from the file system fails.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the provided public key doesn't comply with the required specification of the key algorithm
+	 */
+	public static License getLicense(String licenseFile, String publicKeyFile)
+			throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+		File file = new File(licenseFile);
+		if (file.exists()) {
+			return getLicense(file, publicKeyFile);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -333,10 +417,20 @@ public class LicenseUtil {
 	 *          The license file itself.
 	 * @param publicKeyFile
 	 *          The public key of the license file.
-	 * @return
-	 * @throws Exception
+	 * @return The {@link License} object if the license could be read and verified.
+	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the key algorithm is not available.
+	 * @throws SignatureException
+	 *           Thrown if an error occurred during signature verification
+	 * @throws InvalidKeyException
+	 *           Thrown if the provided public key is not compliant with the algorithm.
+	 * @throws IOException
+	 *           Thrown if reading the license file or public key from the file system fails.
+	 * @throws InvalidKeySpecException
+	 *           Thrown if the provided public key doesn't comply with the required specification of the key algorithm
 	 */
-	public static License getLicense(String licenseFile, String publicKeyFile) throws Exception {
+	public static License getLicense(File licenseFile, String publicKeyFile)
+			throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, IOException, InvalidKeySpecException {
 		FileInputStream input = new FileInputStream(licenseFile);
 		Properties properties = new OrderedProperties();
 		properties.load(input);
@@ -365,7 +459,7 @@ public class LicenseUtil {
 	 * @return The created {@link License} object.
 	 * @throws Exception
 	 */
-	public static License createLicense(String groupId, String licenseId, String expirationDate) throws Exception {
+	public static License createLicense(String groupId, String licenseId, String expirationDate) {
 		return createLicense(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
@@ -379,9 +473,10 @@ public class LicenseUtil {
 	 * @param expirationDate
 	 *          The expiration date which should be used for the license.
 	 * @return The file name of the created license stored as file.
-	 * @throws Exception
+	 * @throws IOException
+	 *           Thrown if the license couldn't be written to the file system.
 	 */
-	public static String createLicenseFile(String groupId, String licenseId, String expirationDate) throws Exception {
+	public static String createLicenseFile(String groupId, String licenseId, String expirationDate) throws IOException {
 		return createLicenseFile(groupId, licenseId, expirationDate, privateKeyFilePath);
 	}
 
@@ -397,10 +492,8 @@ public class LicenseUtil {
 	 * @param privateKeyFile
 	 *          The private key which should be used for the signature.
 	 * @return The created {@link License} object.
-	 * @throws Exception
-	 *           Thrown if something goes wrong.
 	 */
-	public static License createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
+	public static License createLicense(String groupId, String licenseId, String expirationDate, String privateKeyFile) {
 
 		Properties properties = new OrderedProperties();
 		properties.setProperty("expirationDate", expirationDate);
@@ -433,10 +526,11 @@ public class LicenseUtil {
 	 * @param privateKeyFile
 	 *          The private key which should be used for the signature.
 	 * @return The file name of the created license stored as file.
-	 * @throws Exception
-	 *           Thrown if something goes wrong.
+	 * @throws IOException
+	 *           Thrown if the license couldn't be written to the file system.
 	 */
-	public static String createLicenseFile(String groupId, String licenseId, String expirationDate, String privateKeyFile) throws Exception {
+	public static String createLicenseFile(String groupId, String licenseId, String expirationDate, String privateKeyFile)
+			throws IOException {
 
 		Properties properties = new OrderedProperties();
 		properties.setProperty("expirationDate", expirationDate);

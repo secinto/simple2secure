@@ -65,7 +65,7 @@ public class FileUtil {
 	 */
 	public static String correctPathFormat(String path, boolean isDirectory) {
 		if (isDirectory && (!path.endsWith("\\") || !path.endsWith("/"))) {
-			path = path + "\\";
+			path = path + File.separator;
 		}
 
 		path = path.replace("\\", FileSystems.getDefault().getSeparator());
@@ -197,6 +197,24 @@ public class FileUtil {
 		log.info("File wasn't copied to folder " + folder + " because either the file or folder was null or didn't exist.");
 
 		return false;
+	}
+
+	/**
+	 * Copies the specified file to the provided folder name. Returns the final absolute path of the copied file.
+	 *
+	 * @param file
+	 *          The file which should be copied.
+	 * @param localFilePath
+	 *          The local file path to which the file should be copied.
+	 * @return The absolute file path of the copied file.
+	 */
+	public static String copyFileToFolder(File file, String localFilePath) {
+		if (FileUtil.copyToFolder(file, localFilePath)) {
+			return FileUtil.correctPathFormat(localFilePath + file.getName(), false);
+		} else {
+			return FileUtil.correctPathFormat(file.getAbsolutePath(), false);
+		}
+
 	}
 
 	/**

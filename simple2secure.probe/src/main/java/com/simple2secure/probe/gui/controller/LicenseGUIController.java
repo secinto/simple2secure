@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.license.LicenseController;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -56,7 +56,7 @@ public class LicenseGUIController {
 
 		// Unzips the zipped directory to a List
 		try {
-			filesFromDir = ProbeUtils.unzipImportedFile(licenseZip);
+			filesFromDir = ZIPUtils.unzipImportedFile(licenseZip);
 		} catch (IOException e) {
 			errorLabel.setText("Problem occured while unzipping the zip file");
 			log.error("Problem occured while unzipping the zip file");
@@ -65,7 +65,11 @@ public class LicenseGUIController {
 		// Load the license file from the imported directory
 		if (LicenseUtil.checkLicenseDirValidity(filesFromDir)) {
 			try {
-				downloadedLicense = LicenseUtil.getLicense();
+				for (File file : filesFromDir) {
+					if (file.getName().equals(LicenseUtil.licenseFileName)) {
+						downloadedLicense = LicenseUtil.getLicense(file);
+					}
+				}
 			} catch (Exception e) {
 				errorLabel.setText("A problem occured while loading the downloaded license.");
 				log.error("A problem occured while loading the downloaded license.");

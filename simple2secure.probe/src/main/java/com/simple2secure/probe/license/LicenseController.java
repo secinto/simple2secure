@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -23,38 +24,34 @@ public class LicenseController {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	public LicenseController() {
-		init();
-	}
-
-	public void init() {
-		LicenseUtil.initialize(System.getProperty("user.dir"), "public.key");
 	}
 
 	/**
-	 * Unzips the directory containing the license.dat in the /simple2secure/probe/ project directory. Further this method maps the License
-	 * object to a CompanyLicenseObj(has additionally probeId).
+	 * Obtains the license from the specified path. It requires a license ZIP file as input, containing the license.dat and the public key for
+	 * verification. If not an exception
 	 *
-	 * @param... The path to the license.zip-directory @throws... IOException if a problem occure during the unzipping @throws...
-	 * LicenseException if something went wrong while unzipping or the
-	 *
-	 * @throws LicenseNotFoundException
-	 * @throws InterruptedException
+	 * @param importFilePath
+	 * @return
+	 * @throws Exception
 	 */
 	public CompanyLicensePublic loadLicenseFromPath(String importFilePath) throws Exception {
 		CompanyLicensePublic license = null;
 		File inputFile = new File(importFilePath);
 
 		if (inputFile != null && inputFile.exists()) {
-			List<File> unzippedFiles = ProbeUtils.unzipImportedFile(inputFile);
-			if (unzippedFiles != null && unzippedFiles.size() == 2) {
-				License downloadedLicense = LicenseUtil.getLicense();
-
-				if (downloadedLicense != null && checkLicenseProps(downloadedLicense)) {
-					license = createLicenseForAuth(downloadedLicense);
+			List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
+			if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
+				License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
+				if (checkLicenseProps(downloadedLicense)) {
+					return createLicenseForAuth(downloadedLicense);
+				} else {
+					log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
 				}
 			} else {
-				log.error("Unzipping files didn't result in correct amount of files!");
+				log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
 			}
+		} else {
+			log.error("Specified ZIP file {} doesn't exist!", importFilePath);
 		}
 		return license;
 	}
@@ -95,6 +92,11 @@ public class LicenseController {
 	 */
 	public boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
+
+		if (license == null) {
+			return isLicensePropsValid;
+		}
+
 		if (!Strings.isNullOrEmpty(license.getProperty("groupId")) && !Strings.isNullOrEmpty(license.getProperty("licenseId"))
 				&& !Strings.isNullOrEmpty(license.getExpirationDateAsString())) {
 			isLicensePropsValid = true;
