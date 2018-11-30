@@ -14,9 +14,9 @@ allprojects {
 	targetCompatibility = 1.8
 
 	repositories {
-		flatDir { dirs 'libs' }
 		mavenCentral()
 		jcenter()
+		flatDir { dirs 'libs' }
 	}
 
 	dependencies {

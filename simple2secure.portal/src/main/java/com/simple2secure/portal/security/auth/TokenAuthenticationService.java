@@ -51,9 +51,6 @@ public class TokenAuthenticationService {
 	@Autowired
 	LicenseRepository licenseRepository;
 
-	@Autowired
-	PortalUtils portalUtils;
-
 	static final String TOKEN_PREFIX = "Bearer";
 	static final String HEADER_STRING = "Authorization";
 	static final String CLAIMS_SUBJECT = "data";
@@ -70,7 +67,7 @@ public class TokenAuthenticationService {
 
 			if (settings != null) {
 				if (settings.size() == 1) {
-					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
+					expirationTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
 							settings.get(0).getAccessTokenProbeValidityUnit());
 				} else {
 					return null;
@@ -111,11 +108,9 @@ public class TokenAuthenticationService {
 
 			long expirationTime = 0;
 
-			if (settings != null) {
-				if (settings.size() == 1) {
-					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
-							settings.get(0).getAccessTokenValidityUnit());
-				}
+			if (settings != null && settings.size() == 1) {
+				expirationTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
+						settings.get(0).getAccessTokenValidityUnit());
 			}
 
 			String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
@@ -166,10 +161,7 @@ public class TokenAuthenticationService {
 					log.error("User with following id: {} does not exist", token.getUserId());
 					return null;
 				}
-
-			}
-
-			else {
+			} else {
 				// Handle token for probeId
 				// Check if there is a token with this id in the licenseRepo - for probe
 				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
@@ -177,17 +169,12 @@ public class TokenAuthenticationService {
 				if (license != null) {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
 
-					if (isAccessTokenValid) {
-						return license != null
-								? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()))
-								: null;
-					} else {
-						return null;
-					}
+					return isAccessTokenValid
+							? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()))
+							: null;
 				} else {
 					log.error("Token not found");
 					return null;
-
 				}
 			}
 		} else {
@@ -209,23 +196,22 @@ public class TokenAuthenticationService {
 		try {
 			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
 
-			if (portalUtils.isAccessTokenExpired(expirationDate)) {
+			if (PortalUtils.isAccessTokenExpired(expirationDate)) {
 				return false;
 			}
-			log.info("Token still valid!" + " Expiration date: " + expirationDate.toString());
+			log.info("Token still valid! Expiration date {}", expirationDate.toString());
 			return true;
 		} catch (JwtException | IllegalArgumentException e) {
-			log.error("Error: {}", e);
+			log.error("Error during token validation {}", e);
 			return false;
 		}
 	}
 
 	public Date getTokenExpirationDate(String token, String secretKey) {
 		try {
-			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
-			return expirationDate;
+			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
 		} catch (JwtException | IllegalArgumentException e) {
-			log.error("Error: {}", e);
+			log.error("Error during getting token expiration date. Reason {}", e);
 			return null;
 		}
 	}
