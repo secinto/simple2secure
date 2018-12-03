@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {Context, CompanyGroup, User, UserDTO, UserRole} from '../_models/index';
+import {Context, CompanyGroup, User, UserDTO, UserRole, ContextDTO} from '../_models/index';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -36,7 +36,7 @@ export class UserOverviewComponent {
   public user: User;
   private sub: any;
   currentUser: any;
-  context: Context;
+  context: ContextDTO;
   showMyUsers: boolean;
   addNewGroup: boolean;
   showGroupTable: boolean;
@@ -77,8 +77,8 @@ export class UserOverviewComponent {
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
       this.context = JSON.parse(localStorage.getItem('context'));
       this.loadMyProfile();
-      if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN ||
-          this.currentUser.userRole == UserRole.SUPERUSER){
+      if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN ||
+          this.context.userRole == UserRole.SUPERUSER){
       	this.showMyUsers = true;
       	this.addNewGroup = true;
       }
@@ -109,7 +109,7 @@ export class UserOverviewComponent {
 
   private loadMyProfile() {
       this.loading = true;
-      this.httpService.get(environment.apiEndpoint + 'users/' + this.currentUser.userID + '/' + this.context.id)
+      this.httpService.get(environment.apiEndpoint + 'user/' + this.currentUser.userID + '/' + this.context.context.id)
       .subscribe(
       data => {
         this.myProfile = data;
@@ -189,7 +189,7 @@ export class UserOverviewComponent {
 
   updateUserInfo() {
       this.loading = true;
-      this.url = environment.apiEndpoint + 'users/update';
+      this.url = environment.apiEndpoint + 'user/update';
       this.httpService.post(this.myProfile.myProfile, this.url).subscribe(
               data => {
                   this.user = data;
@@ -217,7 +217,7 @@ export class UserOverviewComponent {
 
   public deleteUser(user: any) {
     this.loading = true;
-    this.httpService.delete(environment.apiEndpoint + 'users/' + user.id).subscribe(
+    this.httpService.delete(environment.apiEndpoint + 'user/' + user.id).subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.user.delete'));
         this.userDeleted = true;
@@ -278,12 +278,12 @@ export class UserOverviewComponent {
   public onMenuTriggerClick(item: any) {
       this.selectedItem = item;
 
-      if (this.currentUser.userRole === UserRole.SUPERADMIN || this.currentUser.userRole === UserRole.ADMIN){
+      if (this.context.userRole === UserRole.SUPERADMIN || this.context.userRole === UserRole.ADMIN){
           this.showEditAndDelete = true;
           this.dataService.setGroupEditable(this.showEditAndDelete);
       }
       else{
-          if (this.currentUser.userRole === UserRole.SUPERUSER){
+          if (this.context.userRole === UserRole.SUPERUSER){
               this.showEditAndDelete = this.checkIfUserCanEditGroup(item);
               this.dataService.setGroupEditable(this.showEditAndDelete);
           }
@@ -304,10 +304,10 @@ export class UserOverviewComponent {
 
     checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup){
 
-        if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+        if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN){
             return true;
         }
-        else if (this.currentUser.userRole == UserRole.SUPERUSER){
+        else if (this.context.userRole == UserRole.SUPERUSER){
             if (fromGroup && toGroup){
                 if (fromGroup.superUserIds && toGroup.superUserIds){
                     if (fromGroup.superUserIds.indexOf(this.currentUser.userID) > -1 && toGroup.superUserIds.indexOf(this.currentUser.userID) > -1){
@@ -346,10 +346,10 @@ export class UserOverviewComponent {
     }
 
   checkIfUserCanEditGroup(group: CompanyGroup){
-      if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+      if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN){
           return true;
       }
-      else if (this.currentUser.userRole == UserRole.SUPERUSER){
+      else if (this.context.userRole == UserRole.SUPERUSER){
           if (group){
               if (group.superUserIds){
                   if (group.superUserIds.indexOf(this.currentUser.userID) > -1){

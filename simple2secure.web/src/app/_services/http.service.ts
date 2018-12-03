@@ -3,14 +3,23 @@ import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
-import {User, UserRegistration} from '../_models';
+import {Context, User, UserRegistration} from '../_models';
 import {Response} from '@angular/http';
 import {catchError} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthenticationService} from './authentication.service';
 
 @Injectable()
 export class HttpService {
-  constructor(protected httpClient: HttpClient,
-              private translate: TranslateService) { }
+
+  returnUrl: string;
+  constructor(private route: ActivatedRoute,
+              protected httpClient: HttpClient,
+              private translate: TranslateService,
+              private router: Router,
+              private authenticationService: AuthenticationService) {
+      this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
 
     currentLang: string;
 
@@ -68,7 +77,7 @@ export class HttpService {
     }
 
     public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
-        return this.httpClient.post<any>(environment.apiEndpoint + 'register', user, { observe: 'response' });
+        return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, { observe: 'response' });
     }
 
     public postReset(email: String): Observable<HttpResponse<any>> {
@@ -79,7 +88,7 @@ export class HttpService {
         }
 
         const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
-        return this.httpClient.post<any>(environment.apiEndpoint + 'users/sendResetPasswordEmail', email,
+        return this.httpClient.post<any>(environment.apiEndpoint + 'user/sendResetPasswordEmail', email,
             { observe: 'response', headers });
     }
 
@@ -90,7 +99,7 @@ export class HttpService {
             this.currentLang = this.translate.defaultLang;
         }
         const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
-        return this.httpClient.post<any>(environment.apiEndpoint + 'users/updatePassword/' + token, password,
+        return this.httpClient.post<any>(environment.apiEndpoint + 'user/updatePassword/' + token, password,
             { observe: 'response', headers });
     }
 
@@ -102,7 +111,7 @@ export class HttpService {
         }
         const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
 
-        return this.httpClient.post<any>(environment.apiEndpoint + 'users/activate/updatePassword/' +
+        return this.httpClient.post<any>(environment.apiEndpoint + 'user/activate/updatePassword/' +
             authenticationToken, password, { observe: 'response', headers });
     }
 
@@ -117,5 +126,16 @@ export class HttpService {
         });
         reader.readAsText(err.error);
         return obs;
+    }
+
+    public updateContext(context: Context, userId: string){
+        this.post(context, environment.apiEndpoint + 'user/context/' + userId).subscribe(
+            data => {
+                // Navigate to the home route
+                this.router.navigate([this.returnUrl]);
+            },
+            error => {
+                this.authenticationService.logout();
+            });
     }
 }

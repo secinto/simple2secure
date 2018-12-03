@@ -289,53 +289,57 @@ public class GroupUtils {
 	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user, String locale)
 			throws ItemNotFoundRepositoryException {
 
-		// SUPERADMIN
-		if (user.getUserRole().equals(UserRole.SUPERADMIN)) {
-			// SUPERADMIN can move everything
-			if (moveGroup(fromGroup, toGroup)) {
-				return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
-			}
-		}
-		// SUPERUSER
-		else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
-			// Move only if superuser belongs to the both groups(both groups are assigned to him)
-			if (fromGroup.getSuperUserIds().contains(user.getId())) {
-				// in this case the moved group will be root group
-				if (toGroup == null) {
+		if (fromGroup != null) {
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(fromGroup.getContextId(),
+					user.getId());
+
+			if (contextUserAuthentication != null) {
+				// SUPERADMIN
+				if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
+					// SUPERADMIN can move everything
 					if (moveGroup(fromGroup, toGroup)) {
 						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
 					}
-				} else {
-					// check if toGroup is assigned to this user
-					if (toGroup.getSuperUserIds().contains(user.getId())) {
-						if (moveGroup(fromGroup, toGroup)) {
-							return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+				}
+				// SUPERUSER
+				else if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
+					// Move only if superuser belongs to the both groups(both groups are assigned to him)
+					if (fromGroup.getSuperUserIds().contains(user.getId())) {
+						// in this case the moved group will be root group
+						if (toGroup == null) {
+							if (moveGroup(fromGroup, toGroup)) {
+								return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+							}
+						} else {
+							// check if toGroup is assigned to this user
+							if (toGroup.getSuperUserIds().contains(user.getId())) {
+								if (moveGroup(fromGroup, toGroup)) {
+									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+								}
+							}
 						}
 					}
 				}
-			}
-		}
-		// ADMIN
-		else if (user.getUserRole().equals(UserRole.ADMIN)) {
+				// ADMIN
+				else if (contextUserAuthentication.getUserRole().equals(UserRole.ADMIN)) {
 
-			if (!Strings.isNullOrEmpty(fromGroup.getContextId())) {
-				// check if contextId of the from Group is same as contextId assigned to the user
+					if (!Strings.isNullOrEmpty(fromGroup.getContextId())) {
+						// check if contextId of the from Group is same as contextId assigned to the user
 
-				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(fromGroup.getContextId(),
-						user.getId());
-
-				if (contextUserAuthentication != null) {
-					// In case that toGroup is null, fromGroup will be new root group
-					if (toGroup == null) {
-						if (moveGroup(fromGroup, toGroup)) {
-							return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
-						}
-					} else {
-						if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
-							// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
-							if (fromGroup.getContextId().equals(toGroup.getContextId())) {
+						if (contextUserAuthentication != null) {
+							// In case that toGroup is null, fromGroup will be new root group
+							if (toGroup == null) {
 								if (moveGroup(fromGroup, toGroup)) {
 									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+								}
+							} else {
+								if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
+									// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
+									if (fromGroup.getContextId().equals(toGroup.getContextId())) {
+										if (moveGroup(fromGroup, toGroup)) {
+											return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+										}
+									}
 								}
 							}
 						}
@@ -350,7 +354,7 @@ public class GroupUtils {
 
 	/**
 	 * This function is used to generate the correct structure which will be shown in web
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */

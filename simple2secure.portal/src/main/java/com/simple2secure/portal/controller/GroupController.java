@@ -26,12 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -49,6 +51,9 @@ public class GroupController {
 
 	@Autowired
 	ContextRepository contextRepository;
+
+	@Autowired
+	ContextUserAuthRepository contextUserAuthRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -76,13 +81,14 @@ public class GroupController {
 
 		if (group != null && !Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 			User user = userRepository.find(userId);
-			if (Strings.isNullOrEmpty(group.getId()) && user != null) {
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+			if (Strings.isNullOrEmpty(group.getId()) && user != null && contextUserAuthentication != null) {
 
 				if (!parentGroupId.equals("null")) {
 					// THERE IS A PARENT GROUP!!
 					CompanyGroup parentGroup = groupRepository.find(parentGroupId);
 					if (parentGroup != null) {
-						if (user.getUserRole().equals(UserRole.SUPERUSER)) {
+						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
 							group.addSuperUserId(user.getId());
 						}
 
@@ -103,7 +109,7 @@ public class GroupController {
 					Context context = contextRepository.find(contextId);
 					if (context != null) {
 
-						if (user.getUserRole().equals(UserRole.SUPERUSER)) {
+						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
 							group.addSuperUserId(user.getId());
 						}
 

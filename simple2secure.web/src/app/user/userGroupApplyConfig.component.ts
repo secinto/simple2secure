@@ -1,5 +1,5 @@
 import {Component, Inject} from '@angular/core';
-import {Context, CompanyGroup} from '../_models/index';
+import {Context, CompanyGroup, ContextDTO} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -22,7 +22,7 @@ export class UserGroupApplyConfigComponent {
     url: string;
     loading = false;
     currentUser: any;
-    context: Context;
+    context: ContextDTO;
 
     constructor(
         private router: Router,
@@ -46,7 +46,7 @@ export class UserGroupApplyConfigComponent {
 
     private loadGroups() {
         this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/'
-            + this.context.id)
+            + this.context.context.id)
             .subscribe(
                 data => {
                     this.extractGroups(data);

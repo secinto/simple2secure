@@ -1,7 +1,5 @@
 package com.simple2secure.portal.repository.impl;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,19 +18,6 @@ public class ContextRepositoryImpl extends ContextRepository {
 	public void init() {
 		super.collectionName = "context"; //$NON-NLS-1$
 		super.className = Context.class;
-	}
-
-	@Override
-	public Context getContextByUserId(String userId) {
-		List<Context> contexts = mongoTemplate.findAll(Context.class);
-		if (contexts != null) {
-			for (Context context : contexts) {
-				if (context.getAdmins().contains(userId)) {
-					return context;
-				}
-			}
-		}
-		return null;
 	}
 
 	@Override

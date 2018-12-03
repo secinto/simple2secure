@@ -6,7 +6,7 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {Context, NetworkReport} from '../_models/index';
+import {Context, ContextDTO, NetworkReport} from '../_models/index';
 
 @Component({
   moduleId: module.id,
@@ -16,7 +16,7 @@ import {Context, NetworkReport} from '../_models/index';
 export class NetworkReportOverviewComponent {
   currentUser: any;
   reports: NetworkReport[]
-  context: Context;
+  context: ContextDTO;
   selectedReport: any;
   loading = false;
 
@@ -54,7 +54,7 @@ export class NetworkReportOverviewComponent {
 
   private loadAllReports() {
     this.loading = true;
-    this.httpService.get(environment.apiEndpoint + 'reports/network/' + this.context.id)
+    this.httpService.get(environment.apiEndpoint + 'reports/network/' + this.context.context.id)
       .subscribe(
       data => {
         this.reports = data;

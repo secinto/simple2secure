@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.ElementCollection;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -30,9 +28,6 @@ public class User extends GenericDBObject {
 	private String phone;
 	private boolean enabled;
 	private boolean passwordUpdated;
-
-	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
 
 	@ElementCollection
 	private List<String> myUsers = new ArrayList<>();
@@ -62,12 +57,10 @@ public class User extends GenericDBObject {
 		this.activated = activated;
 		this.passwordUpdated = passwordUpdated;
 		myUsers = new ArrayList<String>();
-		this.userRole = userRole;
 	}
 
 	public User(String email, UserRole userRole) {
 		this.email = email;
-		this.userRole = userRole;
 	}
 
 	public String getFirstName() {
@@ -227,13 +220,4 @@ public class User extends GenericDBObject {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-
-	public UserRole getUserRole() {
-		return userRole;
-	}
-
-	public void setUserRole(UserRole userRole) {
-		this.userRole = userRole;
-	}
-
 }

@@ -2,7 +2,7 @@
 	<div class="container-fluid">
 	    <div class="navbar-header">
 	      	<a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
-			<p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: <b>{{currentContext.name}}</b></p>
+			<p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: <b>{{currentContext.context.name}}</b></p>
 	    </div>
 	    <ul class="nav navbar-nav centered-nav">
 

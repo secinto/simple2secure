@@ -80,7 +80,7 @@ public class MailUtils {
 	}
 
 	public String generateEmailContent(User user, String locale) {
-		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/users/activate/"
+		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/user/activate/"
 				+ user.getActivationToken();
 	}
 

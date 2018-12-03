@@ -181,7 +181,7 @@ public class UserUtils {
 						ObjectId userID = userRepository.saveAndReturnId(user);
 
 						// Map current context to the current user
-						ObjectId contextUserId = addContextUserAuthentication(userID.toString(), context.getId(), user.getUserRole());
+						ObjectId contextUserId = addContextUserAuthentication(userID.toString(), context.getId(), userRegistration.getUserRole());
 
 						// Add this user to the addedByUser List
 						addedByUser.addMyUser(userID.toString());
@@ -192,7 +192,7 @@ public class UserUtils {
 							userRepository.update(addedByUser);
 
 							// Update the selected groups to be accessible for the superuser
-							if (user.getUserRole().equals(UserRole.SUPERUSER)) {
+							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
 								addSuperuserTotheSelectedGroup(userRegistration, userID.toString());
 							}
 
@@ -234,7 +234,6 @@ public class UserUtils {
 			user.setEnabled(true);
 			user.setActivated(false);
 			user.setPasswordUpdated(true);
-			user.setUserRole(getUserRoleStandardRegistration(user));
 			user.setPassword(userRegistration.getPassword());
 
 			// validate the user password
@@ -255,7 +254,7 @@ public class UserUtils {
 					// add standard group for current user
 					dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
 					// Map current context with the current user
-					addContextUserAuthentication(userID.toString(), contextId.toString(), user.getUserRole());
+					addContextUserAuthentication(userID.toString(), contextId.toString(), getUserRoleStandardRegistration(user));
 					return new ResponseEntity<User>(user, HttpStatus.OK);
 				} else {
 
@@ -298,7 +297,6 @@ public class UserUtils {
 			String contextName = tempContextName.substring(0, tempContextName.indexOf("."));
 			context.setName(contextName + 1);
 			context.setLicensePlanId(licensePlan.getId());
-			context.addAdmin(userId.toString());
 
 			log.debug("Added new context with name: {}", context.getName());
 
@@ -372,9 +370,9 @@ public class UserUtils {
 			if (user != null) {
 
 				// Check if user role has changed
-				if (!user.getUserRole().equals(userRegistration.getUserRole())) {
+				if (!userRegistration.getUserRole().equals(userRegistration.getUserRole())) {
 					// if old user role was admin delete it from the admin group
-					if (user.getUserRole().equals(UserRole.ADMIN)) {
+					if (userRegistration.getUserRole().equals(UserRole.ADMIN)) {
 						// Context context = contextRepository.find(user.getContextIds());
 						// if (context != null) {
 						// context.removeAdmin(user.getId());
@@ -385,7 +383,7 @@ public class UserUtils {
 						// }
 					}
 					// Delete the super user from all groups to which he has been assigned
-					else if (user.getUserRole().equals(UserRole.SUPERUSER)) {
+					else if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
 						// List<CompanyGroup> groups = groupRepository.findByContextId(user.getContextIds());
 						// if (groups != null) {
 						// for (CompanyGroup group : groups) {
@@ -397,7 +395,7 @@ public class UserUtils {
 						// }
 					}
 
-					user.setUserRole(userRegistration.getUserRole());
+					userRegistration.setUserRole(userRegistration.getUserRole());
 
 					if (userRegistration.getUserRole().equals(UserRole.ADMIN)) {
 						// Assign user to the context adminIds
@@ -581,17 +579,17 @@ public class UserUtils {
 	 * @return
 	 */
 	public User getPrivilegedUser(List<String> myUsers) {
+		// TODO: check this, context must also be
 		User adminUser = null;
 		User superUser = null;
 		if (myUsers != null) {
 			for (String myUserId : myUsers) {
 				User myUser = userRepository.find(myUserId);
 				if (myUser != null) {
-					if (myUser.getUserRole().equals(UserRole.ADMIN)) {
-						adminUser = myUser;
-					} else if (myUser.getUserRole().equals(UserRole.SUPERUSER)) {
-						superUser = myUser;
-					}
+					/*
+					 * if (myUser.getUserRole().equals(UserRole.ADMIN)) { adminUser = myUser; } else if
+					 * (myUser.getUserRole().equals(UserRole.SUPERUSER)) { superUser = myUser; }
+					 */
 				}
 			}
 
@@ -613,17 +611,17 @@ public class UserUtils {
 	 * @return
 	 */
 	public boolean containsPrivilegedUser(List<String> myUsers) {
-		if (myUsers != null) {
-			for (String myUserId : myUsers) {
-				User myUser = userRepository.find(myUserId);
-				if (myUser != null) {
-					if (myUser.getUserRole().equals(UserRole.ADMIN) || myUser.getUserRole().equals(UserRole.SUPERUSER)) {
-						return true;
-					}
-				}
-
-			}
-		}
+		// if (myUsers != null) {
+		// for (String myUserId : myUsers) {
+		// User myUser = userRepository.find(myUserId);
+		// if (myUser != null) {
+		// if (myUser.getUserRole().equals(UserRole.ADMIN) || myUser.getUserRole().equals(UserRole.SUPERUSER)) {
+		// return true;
+		// }
+		// }
+		//
+		// }
+		// }
 		return false;
 	}
 

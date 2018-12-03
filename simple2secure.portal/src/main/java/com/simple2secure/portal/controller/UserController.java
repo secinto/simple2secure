@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.ContextDTO;
 import com.simple2secure.api.dto.UserDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRegistration;
@@ -39,6 +41,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
@@ -51,6 +54,7 @@ import com.simple2secure.portal.utils.ProbeUtils;
 import com.simple2secure.portal.utils.UserUtils;
 
 @RestController
+@RequestMapping("/api/user")
 public class UserController {
 
 	static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -69,6 +73,9 @@ public class UserController {
 
 	@Autowired
 	ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
+	CurrentContextRepository currentContextRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -107,7 +114,7 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@RequestMapping(value = "/api/users", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
@@ -134,7 +141,7 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/register", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
@@ -154,7 +161,7 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/api/users/update", method = RequestMethod.POST)
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserInfo(@RequestBody User user, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
@@ -179,7 +186,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/activate/updatePassword/{authenticationToken}", method = RequestMethod.POST)
+	@RequestMapping(value = "/activate/updatePassword/{authenticationToken}", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable("authenticationToken") String authenticationToken,
 			@RequestBody String password, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
@@ -231,7 +238,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/activate/{activationToken}", method = RequestMethod.GET)
+	@RequestMapping(value = "/activate/{activationToken}", method = RequestMethod.GET)
 	public ResponseEntity<InputStreamResource> activateUser(@PathVariable("activationToken") String activationToken,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(activationToken);
@@ -275,7 +282,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/sendResetPasswordEmail", method = RequestMethod.POST)
+	@RequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
 	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
@@ -314,7 +321,7 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(value = "/api/users/resetPassword/{token}", method = RequestMethod.GET)
+	@RequestMapping(value = "/resetPassword/{token}", method = RequestMethod.GET)
 	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token, @RequestHeader("Accept-Language") String locale)
 			throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
@@ -333,7 +340,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/updatePassword/{token}", method = RequestMethod.POST)
+	@RequestMapping(value = "/updatePassword/{token}", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserPassword(@PathVariable("token") String token, @RequestBody String password,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
@@ -388,11 +395,45 @@ public class UserController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(value = "/api/users", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
 		List<User> userList = userRepository.findAll();
 		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
+	}
+
+	/**
+	 * This function updates the current user context or sets new one if the user was not logged in
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/context/{userId}", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+
+	public ResponseEntity<CurrentContext> selectUserContext(@PathVariable("userId") String userId, @RequestBody Context context,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(userId) && context != null) {
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), userId);
+
+			if (contextUserAuthentication != null) {
+				CurrentContext currentContext = currentContextRepository.findByUserId(userId);
+
+				if (currentContext != null) {
+					currentContext.setContextUserAuthenticationId(contextUserAuthentication.getId());
+					currentContextRepository.update(currentContext);
+				} else {
+					currentContext = new CurrentContext(userId, contextUserAuthentication.getId());
+					currentContextRepository.save(currentContext);
+				}
+
+				return new ResponseEntity<CurrentContext>(currentContext, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -401,23 +442,24 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/api/users/context/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/context/{userId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Context>> getContextsByUserId(@PathVariable("userId") String userId,
+	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(userId)) {
 			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
 			if (contextUserAuthList != null) {
-				List<Context> contextList = new ArrayList<>();
+				List<ContextDTO> contextList = new ArrayList<>();
 
 				for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
 					Context context = contextRepository.find(contextUserAuth.getContextId());
 					if (context != null) {
-						contextList.add(context);
+						ContextDTO contextDTO = new ContextDTO(context, contextUserAuth.getUserRole());
+						contextList.add(contextDTO);
 					}
 				}
-				return new ResponseEntity<List<Context>>(contextList, HttpStatus.OK);
+				return new ResponseEntity<List<ContextDTO>>(contextList, HttpStatus.OK);
 			}
 		}
 
@@ -429,7 +471,7 @@ public class UserController {
 	 * This function finds and returns user according to the user id
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/api/users/{id}/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id, @PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -464,7 +506,7 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/users/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {

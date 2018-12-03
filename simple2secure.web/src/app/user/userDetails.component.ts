@@ -6,7 +6,7 @@ import {
     UrlParameter,
     UserRegistration,
     UserRegistrationType,
-    UserRole
+    UserRole, ContextDTO
 } from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -30,7 +30,7 @@ export class UserDetailsComponent {
   rolesArray: UserRole[];
   groups: CompanyGroup[];
   action: string;
-  context: Context;
+  context: ContextDTO;
 
   constructor(
     private router: Router,
@@ -42,6 +42,7 @@ export class UserDetailsComponent {
     private dialogRef: MatDialogRef<UserDetailsComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private translate: TranslateService) {
+      this.context = JSON.parse(localStorage.getItem('context'));
       if (data.user == null){
           this.action = UrlParameter.NEW;
           this.user = new UserRegistration();
@@ -52,10 +53,9 @@ export class UserDetailsComponent {
           this.user = new UserRegistration();
           this.user.addedByUserId = data.user.addedByUserId;
           this.user.id = data.user.id;
-          this.user.userRole = data.user.userRole;
           this.user.email = data.user.email;
           this.user.groupIds = [];
-          if (this.user.userRole === UserRole.SUPERUSER){
+          if (this.context.userRole === UserRole.SUPERUSER){
               this.showGroupSelectBox = true;
       }
           this.addedByUserId = data.addedByUserId;
@@ -64,17 +64,16 @@ export class UserDetailsComponent {
 
   ngOnInit() {
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    this.context = JSON.parse(localStorage.getItem('context'));
     this.loadGroups();
   }
 
     userRoleKeys(): Array<string> {
-        if (this.currentUser.userRole == UserRole.SUPERADMIN || this.currentUser.userRole == UserRole.ADMIN){
+        if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN){
             // Return ADMIN, SUPERUSER and USER
             this.rolesArray = [UserRole.ADMIN, UserRole.SUPERUSER, UserRole.USER];
             return this.rolesArray;
         }
-        else if (this.currentUser.userRole == UserRole.SUPERUSER){
+        else if (this.context.userRole == UserRole.SUPERUSER){
             // Return USER
             this.rolesArray = [UserRole.USER];
             return this.rolesArray;
@@ -95,7 +94,7 @@ export class UserDetailsComponent {
 
     private loadGroups() {
         this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' +
-            this.context.id)
+            this.context.context.id)
             .subscribe(
                 data => {
                     this.groups = data;
@@ -113,7 +112,7 @@ export class UserDetailsComponent {
     }
 
     addMyGroups(groups: CompanyGroup[]){
-      if (this.user.userRole === UserRole.SUPERUSER){
+      if (this.context.userRole === UserRole.SUPERUSER){
           if (groups){
               groups.forEach(group => {
                   if (group.superUserIds.indexOf(this.user.id) > -1){
@@ -127,7 +126,7 @@ export class UserDetailsComponent {
 
 	saveUser() {
         this.url = environment.apiEndpoint + 'users';
-        this.user.currentContextId = this.context.id;
+        this.user.currentContextId = this.context.context.id;
         if (this.action === UrlParameter.NEW) {
             this.user.registrationType = UserRegistrationType.ADDED_BY_USER;
             this.user.addedByUserId = this.addedByUserId;

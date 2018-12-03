@@ -141,7 +141,6 @@ public class TestAPIBase {
 		user.setUsername("probe");
 		user.setActivated(true);
 		user.setActivationToken("54321");
-		user.setUserRole(userRole);
 
 		if (userRole.equals(UserRole.ADMIN)) {
 			user.setEmail("testiing@test.com");

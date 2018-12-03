@@ -6,7 +6,7 @@ import 'rxjs/add/operator/mergeMap';
 import {MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {Context, UserRole} from '../_models';
+import {Context, ContextDTO, UserRole} from '../_models';
 import {environment} from '../../environments/environment';
 declare var $: any;
 
@@ -26,7 +26,7 @@ export interface Language {
 export class NavbarComponent {
     @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: User;
-	currentContext: Context;
+	currentContext: ContextDTO;
     loggedIn: boolean;
     currentLang: string;
     showSettings: boolean;
@@ -54,7 +54,7 @@ export class NavbarComponent {
         if (this.currentUser && this.currentContext){
             this.loggedIn = true;
 
-            if (this.currentUser.userRole == UserRole.SUPERADMIN){
+            if (this.currentContext.userRole == UserRole.SUPERADMIN){
                 this.showSettings = true;
 
             }
