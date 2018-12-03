@@ -34,8 +34,6 @@ public class User extends GenericDBObject {
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
-	private List<String> contextIds = new ArrayList<>();
-
 	@ElementCollection
 	private List<String> myUsers = new ArrayList<>();
 
@@ -236,18 +234,6 @@ public class User extends GenericDBObject {
 
 	public void setUserRole(UserRole userRole) {
 		this.userRole = userRole;
-	}
-
-	public List<String> getContextIds() {
-		return contextIds;
-	}
-
-	public void setContextIds(List<String> contextId) {
-		contextIds = contextId;
-	}
-
-	public void addContextId(String contextId) {
-		contextIds.add(contextId);
 	}
 
 }

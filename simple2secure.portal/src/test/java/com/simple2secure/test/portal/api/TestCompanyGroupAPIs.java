@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -25,10 +26,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 
 @ExtendWith({ SpringExtension.class })
@@ -46,6 +49,9 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Autowired
 	private GroupRepository groupRepository;
+
+	@Autowired
+	private ContextUserAuthRepository contextUserAuthRepo;
 
 	HttpHeaders headers = new HttpHeaders();
 
@@ -70,8 +76,11 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void testCreateSubGroupPositive() {
+
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
+
 		CompanyGroup parentGroup = new CompanyGroup("Parent Group", new ArrayList<>());
-		parentGroup.setContextId(getAdminUser().getContextIds().get(0));
+		parentGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId parentGroupId = groupRepository.saveAndReturnId(parentGroup);
 
 		// We need to create CompanyGroup object and make an API call with it
@@ -92,15 +101,16 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithAdminUserPositive() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
 		// Create source root group with the contextId of the admin user
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getAdminUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
 		// Create destination root group with the contextId of the admin user
 		CompanyGroup destGroup = new CompanyGroup("Destination Group", new ArrayList<>());
-		destGroup.setContextId(getAdminUser().getContextIds().get(0));
+		destGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
 
 		// API call to move source group to destGroup
@@ -118,10 +128,12 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithAdminIfDestGroupIsNull() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
+
 		// Create source root group with the contextId of the admin user
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getAdminUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
 		// This group does not exist
@@ -142,16 +154,18 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveSubGroupWithAdminIfDestGroupIsNull() throws ItemNotFoundRepositoryException {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
+
 		// Create parent root group with the contextId of the admin user
 		CompanyGroup parentGroup = new CompanyGroup("Parent Group", new ArrayList<>());
 		parentGroup.setRootGroup(true);
-		parentGroup.setContextId(getAdminUser().getContextIds().get(0));
+		parentGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId parentGroupId = groupRepository.saveAndReturnId(parentGroup);
 
 		// Create child of the parent group
 		CompanyGroup childGroup = new CompanyGroup("Child Group", new ArrayList<>());
 		childGroup.setParentId(parentGroupId.toString());
-		childGroup.setContextId(getAdminUser().getContextIds().get(0));
+		childGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId childGroupId = groupRepository.saveAndReturnId(childGroup);
 
 		// Update parent group with the childGroup id
@@ -185,16 +199,18 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithSuperUserPositive() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
+
 		// Create source root group with the contextId of the superuser and add user id to the group list of the superusers
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getSuperUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		sourceGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
 		// Create destination root group with the contextId of the superuser
 		CompanyGroup destGroup = new CompanyGroup("Destination Group", new ArrayList<>());
-		destGroup.setContextId(getSuperUser().getContextIds().get(0));
+		destGroup.setContextId(contextUserAuth.get(0).getContextId());
 		destGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
 
@@ -213,10 +229,11 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithSuperUserIfDestGroupIsNull() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
 		// Create source root group with the contextId of the superuser and add user id to the group list of the superusers
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getSuperUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		sourceGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
@@ -238,11 +255,13 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithSuperUserIfGroupNotAssigned() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
+
 		// Create source root group with the contextId of the admin user but without adding superuser to the list of the superuser in the
 		// group
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getSuperUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
 		// This group does not exist
@@ -263,15 +282,17 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Test
 	public void moveRootGroupWithSuperUserIfBothGroupsNotAssigned() {
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
+
 		// Create source root group with the contextId of the superuser and add user id to the group list of the superusers
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(getSuperUser().getContextIds().get(0));
+		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
 
 		// Create destination root group with the contextId of the superuser
 		CompanyGroup destGroup = new CompanyGroup("Destination Group", new ArrayList<>());
-		destGroup.setContextId(getSuperUser().getContextIds().get(0));
+		destGroup.setContextId(contextUserAuth.get(0).getContextId());
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
 
 		// API call to move source group to destGroup

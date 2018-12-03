@@ -1,6 +1,5 @@
 package com.simple2secure.test.portal.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +28,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -56,6 +57,9 @@ public class TestAPIBase {
 
 	@Autowired
 	private ContextRepository contextRepository;
+
+	@Autowired
+	private ContextUserAuthRepository contextUserAuthRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -128,6 +132,7 @@ public class TestAPIBase {
 	 */
 	private User createUser(UserRole userRole) {
 		User user = new User();
+		String contextId = null;
 
 		user.setFirstName("test");
 		user.setLastName("test");
@@ -142,12 +147,12 @@ public class TestAPIBase {
 			user.setEmail("testiing@test.com");
 			user.setUsername("testiing@test.com");
 			user.setActivationToken("12345");
-			user.setContextIds(createContext("Context 1"));
+			contextId = createContext("Context 1");
 		} else if (userRole.equals(UserRole.SUPERUSER)) {
 			user.setEmail("superuser@test.com");
 			user.setUsername("superuser@test.com");
 			user.setActivationToken("23145");
-			user.setContextIds(createContext("Context 2"));
+			contextId = createContext("Context 2");
 		}
 
 		userRepository.save(user);
@@ -157,6 +162,9 @@ public class TestAPIBase {
 
 		user = userRepository.findByEmail(user.getEmail());
 
+		ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(user.getId(), contextId, userRole);
+		contextUserAuthRepository.save(contextUserAuth);
+
 		return user;
 	}
 
@@ -165,13 +173,11 @@ public class TestAPIBase {
 	 *
 	 * @return
 	 */
-	private List<String> createContext(String groupName) {
-		List<String> contextIds = new ArrayList<>();
+	private String createContext(String groupName) {
 		Context context = new Context();
 		context.setName(groupName);
 		ObjectId contextId = contextRepository.saveAndReturnId(context);
-		contextIds.add(contextId.toString());
-		return contextIds;
+		return contextId.toString();
 	}
 
 	/**

@@ -45,7 +45,7 @@ export class UserProbeChangeGroupComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID + '/'
+        this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/'
             + this.context.id)
             .subscribe(
                 data => {
@@ -66,7 +66,7 @@ export class UserProbeChangeGroupComponent {
 
         this.loading = true;
 
-        this.url = environment.apiEndpoint + 'users/changeGroup/' + this.probe.probeId;
+        this.url = environment.apiEndpoint + 'probe/changeGroup/' + this.probe.probeId;
         this.httpService.post(this.selectedGroup, this.url).subscribe(
             data => {
                 this.dialogRef.close(true);

@@ -60,7 +60,7 @@ export class UserGroupDialogComponent {
             this.parentGroupId = this.parentGroup.id;
         }
 
-        this.url = environment.apiEndpoint + 'users/group/' + this.currentUser.userID + '/' + this.parentGroupId + '/'
+        this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + this.parentGroupId + '/'
             + this.context.id;
         this.httpService.post(this.group, this.url).subscribe(
             data => {

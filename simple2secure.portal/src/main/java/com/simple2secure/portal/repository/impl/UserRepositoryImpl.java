@@ -1,6 +1,5 @@
 package com.simple2secure.portal.repository.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -11,8 +10,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Strings;
-import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -142,22 +139,5 @@ public class UserRepositoryImpl extends UserRepository {
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public List<Context> findAssignedContextsByUserId(String userId) {
-		List<Context> contextList = new ArrayList<>();
-		User user = find(userId);
-		if (user != null) {
-			for (String contextId : user.getContextIds()) {
-				if (!Strings.isNullOrEmpty(contextId)) {
-					Context context = contextRepository.find(contextId);
-					if (context != null) {
-						contextList.add(context);
-					}
-				}
-			}
-		}
-		return contextList;
 	}
 }

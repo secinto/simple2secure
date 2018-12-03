@@ -237,7 +237,7 @@ export class UserOverviewComponent {
 
   public deleteGroup(group: any) {
     this.loading = true;
-    this.httpService.delete(environment.apiEndpoint + 'users/group/' + group.id).subscribe(
+    this.httpService.delete(environment.apiEndpoint + 'group/' + group.id).subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.group.delete'));
         this.loadMyProfile();
@@ -257,7 +257,7 @@ export class UserOverviewComponent {
 
     public deleteProbe(probe: any) {
         this.loading = true;
-        this.httpService.delete(environment.apiEndpoint + 'users/deleteProbe/' + probe.probeId).subscribe(
+        this.httpService.delete(environment.apiEndpoint + 'probe/deleteProbe/' + probe.probeId).subscribe(
             data => {
                 this.alertService.success(this.translate.instant('message.probe.delete"'));
                 this.loadMyProfile();
@@ -555,7 +555,7 @@ export class UserOverviewComponent {
 
     onMoveGroupNode($event) {
         if (this.checkIfUserCanMoveGroup($event.node, $event.to.parent)){
-            this.url = environment.apiEndpoint + 'users/groups/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
+            this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id + '/' +  this.currentUser.userID;
             this.httpService.post(null, this.url).subscribe(
                 data => {
                     this.alertService.success(this.translate.instant('node.move.success'));

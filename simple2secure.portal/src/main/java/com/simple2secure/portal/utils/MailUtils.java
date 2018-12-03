@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.User;
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Configuration
 @Component
@@ -24,6 +26,12 @@ public class MailUtils {
 
 	@Autowired
 	JavaMailSender javaMailSender;
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	LoadedConfigItems loadedConfigItems;
 
 	/**
 	 * Sends an email with the activation token or in case of the password reset to the user
@@ -69,6 +77,11 @@ public class MailUtils {
 			}
 		}
 		return result;
+	}
+
+	public String generateEmailContent(User user, String locale) {
+		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/users/activate/"
+				+ user.getActivationToken();
 	}
 
 }

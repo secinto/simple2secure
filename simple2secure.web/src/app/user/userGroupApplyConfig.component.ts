@@ -45,7 +45,7 @@ export class UserGroupApplyConfigComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'users/group/user/' + this.currentUser.userID + '/'
+        this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/'
             + this.context.id)
             .subscribe(
                 data => {

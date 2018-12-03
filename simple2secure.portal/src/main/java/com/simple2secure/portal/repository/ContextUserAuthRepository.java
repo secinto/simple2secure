@@ -11,7 +11,13 @@ public abstract class ContextUserAuthRepository extends MongoRepository<ContextU
 
 	public abstract List<ContextUserAuthentication> getByUserId(String userId);
 
+	public abstract ContextUserAuthentication getByContextIdAndUserId(String contextId, String userId);
+
 	public abstract void deleteByContextId(String contextId);
 
 	public abstract void deleteByUserId(String userId);
+
+	public abstract void deleteByContextIdAndUserId(String contextId, String userId);
+
+	public abstract void deleteById(String id);
 }

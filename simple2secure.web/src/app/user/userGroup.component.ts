@@ -47,7 +47,7 @@ export class UserGroupComponent implements OnInit{
 
   public loadGroup() {
       this.loading = true;
-      this.httpService.get(environment.apiEndpoint + 'users/group/' + this.id)
+      this.httpService.get(environment.apiEndpoint + 'group/' + this.id)
           .subscribe(
               data => {
                   this.group = data;
@@ -74,7 +74,7 @@ export class UserGroupComponent implements OnInit{
   saveGroup() {
     this.loading = true;
 
-    this.url = environment.apiEndpoint + 'users/group/' + this.currentUser.userID + '/' + 'null';
+    this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + 'null';
     this.httpService.post(this.group, this.url).subscribe(
       data => {
           this.group = data;

@@ -59,4 +59,32 @@ public class ContextUserAuthRepositoryImpl extends ContextUserAuthRepository {
 		}
 	}
 
+	@Override
+	public ContextUserAuthentication getByContextIdAndUserId(String contextId, String userId) {
+		Query query = new Query(Criteria.where("userId").is(userId).and("contextId").is(contextId));
+		ContextUserAuthentication contextUserAuth = mongoTemplate.findOne(query, ContextUserAuthentication.class);
+		if (contextUserAuth != null) {
+			return contextUserAuth;
+		}
+		return null;
+	}
+
+	@Override
+	public void deleteByContextIdAndUserId(String contextId, String userId) {
+		ContextUserAuthentication contextUserAuth = getByContextIdAndUserId(contextId, userId);
+		if (contextUserAuth != null) {
+			mongoTemplate.remove(contextUserAuth);
+		}
+
+	}
+
+	@Override
+	public void deleteById(String id) {
+		ContextUserAuthentication contextUserAuth = find(id);
+
+		if (contextUserAuth != null) {
+			mongoTemplate.remove(contextUserAuth);
+		}
+	}
+
 }
