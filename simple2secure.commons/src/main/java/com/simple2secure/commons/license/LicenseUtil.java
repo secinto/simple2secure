@@ -204,6 +204,8 @@ public class LicenseUtil {
 		OutputStream outputStream = new FileOutputStream(zipFile);
 
 		byteOutStream.writeTo(outputStream);
+		outputStream.flush();
+		outputStream.close();
 	}
 
 	/**
@@ -539,9 +541,7 @@ public class LicenseUtil {
 
 		FileUtil.createFolder(licenseFilePath + licenseId + File.separator);
 
-		File privateKeyOriginal = new File(privateKeyFilePath);
-		FileUtil.copyToFolder(privateKeyOriginal, licenseFilePath + licenseId + File.separator);
-		File privateKey = new File(licenseFilePath + licenseId + File.separator + privateKeyOriginal.getName());
+		File privateKey = new File(privateKeyFilePath);
 
 		if (privateKey.exists()) {
 			File licenseFile = new File(licenseFilePath + licenseId + File.separator + licenseFileName);

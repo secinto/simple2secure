@@ -41,16 +41,16 @@ public class LicenseGenerator {
 	 */
 	public static License generateLicense(Properties properties, String privateKeyFile) {
 		try {
-			String encoded = properties.toString();
-			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
-			byte[] signature = CryptoUtils.sign(encoded, privateKey);
-			String encodedSignature = Base64.getEncoder().encodeToString(signature);
+			final String encoded = properties.toString();
+			final PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
+			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
+			final String encodedSignature = Base64.getEncoder().encodeToString(signature);
 
-			Properties orderedProperties = new OrderedProperties();
+			final Properties orderedProperties = new OrderedProperties();
 			orderedProperties.putAll(properties);
 			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
 
-			License license = new License(orderedProperties);
+			final License license = new License(orderedProperties);
 
 			return license;
 		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
@@ -78,16 +78,16 @@ public class LicenseGenerator {
 	 */
 	public static License generateLicense(Properties properties, File privateKeyFile) {
 		try {
-			String encoded = properties.toString();
-			PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
-			byte[] signature = CryptoUtils.sign(encoded, privateKey);
-			String encodedSignature = Base64.getEncoder().encodeToString(signature);
+			final String encoded = properties.toString();
+			final PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
+			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
+			final String encodedSignature = Base64.getEncoder().encodeToString(signature);
 
-			Properties orderedProperties = new OrderedProperties();
+			final Properties orderedProperties = new OrderedProperties();
 			orderedProperties.putAll(properties);
 			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
 
-			License license = new License(orderedProperties);
+			final License license = new License(orderedProperties);
 
 			return license;
 		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
@@ -113,15 +113,15 @@ public class LicenseGenerator {
 	 */
 	public static License generateLicense(Properties properties, PrivateKey privateKey) {
 		try {
-			String encoded = properties.toString();
-			byte[] signature = CryptoUtils.sign(encoded, privateKey);
-			String encodedSignature = Base64.getEncoder().encodeToString(signature);
+			final String encoded = properties.toString();
+			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
+			final String encodedSignature = new String(signature);
 
-			Properties orderedProperties = new OrderedProperties();
+			final Properties orderedProperties = new OrderedProperties();
 			orderedProperties.putAll(properties);
 			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
 
-			License license = new License(orderedProperties);
+			final License license = new License(orderedProperties);
 
 			return license;
 		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
@@ -148,7 +148,7 @@ public class LicenseGenerator {
 	 * @return The {@link License} object as generated.
 	 */
 	public static License generateLicense(Properties properties, OutputStream outputStream, PrivateKey privateKey) {
-		License license = generateLicense(properties, privateKey);
+		final License license = generateLicense(properties, privateKey);
 		if (license != null) {
 			try {
 				if (outputStream != null) {
@@ -156,7 +156,7 @@ public class LicenseGenerator {
 				} else {
 					log.error("The provided output stream can't be used to write to!");
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				log.error("Couldn't write license to output stream. Reason {}", e);
 			}
 		}

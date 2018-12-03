@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyPair;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,12 +45,16 @@ public class TestLicenseUtil {
 		LicenseUtil.initialize(licenseFilePath, privateKeyPath, publicKeyPath);
 	}
 
+	@AfterAll
+	public static void tearDown() throws IOException {
+		FileUtils.deleteDirectory(new File(licenseFilePath));
+	}
+
 	@Test
 	public void testCreateExpiredLicense() throws Exception {
-		String licenseId = LicenseUtil.generateLicenseId();
-		String licenseFile = LicenseUtil.createLicenseFile("testgroup", licenseId, "24/11/2018");
+		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "testlicense", "24/11/2018");
 		Assertions.assertNotNull(licenseFile);
-		LicenseUtil.generateLicenseZIPFile(licenseFile, publicKeyPath, licenseFilePath);
+		LicenseUtil.generateLicenseZIPFile(licenseFile, publicKeyPath, licenseFilePath + "testlicense" + File.separator + "license.zip");
 	}
 
 	@Test
@@ -59,12 +65,9 @@ public class TestLicenseUtil {
 		assertThrows(FileNotFoundException.class, closureContainingCodeToTest);
 	}
 
-	@Test
 	public void getLicense_ParamsValidParams_LicenseFile() throws Exception {
 		String licenseFile = LicenseUtil.createLicenseFile("test", "test", "12/31/2018");
 		License license = LicenseUtil.getLicense(licenseFile);
-		Assertions.assertNotNull(license);
-		license = LicenseUtil.getLicense(licenseFile, publicKeyPath);
 		Assertions.assertNotNull(license);
 	}
 
@@ -81,7 +84,7 @@ public class TestLicenseUtil {
 		File dirExists = FileUtil.getFile(licensePath);
 
 		Assertions.assertNotNull(dirExists);
-
-		FileUtil.deleteFolder(dirExists.getAbsolutePath());
+		Assertions.assertTrue(dirExists.exists());
+		FileUtils.deleteDirectory(dirExists);
 	}
 }
