@@ -438,41 +438,6 @@ public class UserUtils {
 	}
 
 	/**
-	 * This function deletes all user dependencies. Flag deleteMyUsers is used to distinguish if the users from the myUsers list should be
-	 * deleted or not
-	 *
-	 * @param user
-	 * @param deleteMyUsers
-	 */
-	public void deleteUserDependencies(User user, boolean deleteMyUsers, boolean updateMyUsers) {
-
-		/*
-		 * if (deleteMyUsers) { if (user.getMyUsers() != null) { for (String myUserId : user.getMyUsers()) { User myUser =
-		 * userRepository.find(myUserId);
-		 *
-		 * if (myUser != null) { deleteUserDependencies(user, false, false); } } } }
-		 *
-		 * if (updateMyUsers) { User addedByUser = userRepository.findAddedByUser(user.getId()); if (addedByUser != null) {
-		 * updateAddedByUser(addedByUser, user.getId(), null); } }
-		 */
-
-		// List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
-		//
-		// if (groups != null) {
-		// for (CompanyGroup group : groups) {
-		// licenseRepository.deleteByGroupId(group.getId());
-		// groupRepository.delete(group);
-		// }
-		// }
-		ruleRepository.deleteByUserId(user.getId());
-		toolRepository.deleteByUserID(user.getId());
-		emailConfigRepository.deleteByUserId(user.getId());
-		emailRepository.deleteByUserId(user.getId());
-		notificationRepository.deleteByUserId(user.getId());
-		tokenRepository.deleteByUserId(user.getId());
-	}
-
-	/**
 	 * This function is used to invite the user to the current context which is included in the UserRegistration object
 	 *
 	 * @param userRegistration

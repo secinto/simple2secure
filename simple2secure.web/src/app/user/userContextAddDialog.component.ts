@@ -24,6 +24,7 @@ export class UserContextAddDialogComponent {
     isDialogOpen: boolean;
     context = new Context();
     contextDTO: ContextDTO;
+    isNewContext: boolean;
 
     constructor(
         private router: Router,
@@ -36,7 +37,13 @@ export class UserContextAddDialogComponent {
         private datePipe: DatePipe,
         private dialogRef: MatDialogRef<UserContextAddDialogComponent>,
         @Inject(MAT_DIALOG_DATA) data) {
-
+        if (data.context != null){
+            this.context = data.context;
+            this.isNewContext = false;
+        }
+        else{
+            this.isNewContext = true;
+        }
     }
 
     ngOnInit() {

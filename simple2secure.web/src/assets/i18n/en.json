@@ -199,10 +199,12 @@
   "message.user.dialog": "With clicking on yes, selected user will be deleted!",
   "message.group.dialog": "With clicking on yes, selected group will be deleted!",
   "message.probe.dialog": "With clicking on yes, selected probe will be deleted!",
+  "message.context.dialog": "With clicking on yes, selected context will be deleted!",
   "message.config.dialog": "With clicking on yes, selected config will be deleted!",
   "message.config.delete": "Config deleted successfully!",
   "message.group.delete": "Group deleted successfully!",
   "message.probe.delete": "Probe deleted successfully!",
+  "message.context.delete": "Context deleted successfully!",
   "message.group.add": "Group added successfully!",
   "message.processor.dialog": "With clicking on yes, selected processor will be deleted!",
   "message.processor.delete": "Processor deleted successfully!",
@@ -294,5 +296,9 @@
   "context.name.placeholder": "Please enter the context name",
   "change.context": "Change Context",
   "message.contextDialogDashboard": "In order to work with another context, you have to select it from the box below.",
-  "message.contextChangeError": "You are part of only one context, cannot select another one!"
+  "message.contextChangeError": "You are part of only one context, cannot select another one!",
+  "table.mycontexts": "My Contexts",
+  "table.licenseDownloads": "License Downloads",
+  "message.context.edit": "Context updated successfully!",
+  "button.editContext": "Edit Context"
 }

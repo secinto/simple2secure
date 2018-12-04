@@ -49,6 +49,7 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.ContextUtils;
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.MailUtils;
@@ -111,6 +112,9 @@ public class UserController {
 	ProbeUtils probeUtils;
 
 	@Autowired
+	ContextUtils contextUtils;
+
+	@Autowired
 	DataInitialization dataInitialization;
 
 	/**
@@ -143,9 +147,8 @@ public class UserController {
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
 				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
-
-				user.setMyProbes(myProbes);
-				UserDTO userDTO = new UserDTO(user, myUsers, groups);
+				List<Context> myContexts = contextUtils.getContextsByUserId(user);
+				UserDTO userDTO = new UserDTO(user, myUsers, groups, myProbes, myContexts);
 				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
 			}
 		}
@@ -547,38 +550,75 @@ public class UserController {
 
 		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId) && context != null) {
 
-			if (!userUtils.checkIfContextAlreadyExists(context, userId)) {
-				Context currentContext = contextRepository.find(contextId);
-				User currentUser = userRepository.find(userId);
-				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
-				if (currentContext != null && currentUser != null && contextUserAuth != null) {
-					String licensePlanName = "Default";
-					LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
-					if (licensePlan != null) {
+			// Update context
+			if (!Strings.isNullOrEmpty(context.getId())) {
+				contextRepository.update(context);
+				return new ResponseEntity<Context>(context, HttpStatus.OK);
+			} else {
+				// Add new context
+				if (!userUtils.checkIfContextAlreadyExists(context, userId)) {
+					Context currentContext = contextRepository.find(contextId);
+					User currentUser = userRepository.find(userId);
+					ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+					if (currentContext != null && currentUser != null && contextUserAuth != null) {
+						String licensePlanName = "Default";
+						LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
+						if (licensePlan != null) {
 
-						context.setLicensePlanId(licensePlan.getId());
-						ObjectId savedContextId = contextRepository.saveAndReturnId(context);
+							context.setLicensePlanId(licensePlan.getId());
+							ObjectId savedContextId = contextRepository.saveAndReturnId(context);
 
-						if (savedContextId != null) {
-							ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId, savedContextId.toString(),
-									contextUserAuth.getUserRole());
-							contextUserAuthRepository.save(contextUserAuthenticationNew);
+							if (savedContextId != null) {
+								ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId, savedContextId.toString(),
+										contextUserAuth.getUserRole());
+								contextUserAuthRepository.save(contextUserAuthenticationNew);
 
-							// add standard group for current context
-							dataInitialization.addDefaultGroup(userId, savedContextId.toString());
-							return new ResponseEntity<Context>(context, HttpStatus.OK);
+								// add standard group for current context
+								dataInitialization.addDefaultGroup(userId, savedContextId.toString());
+								return new ResponseEntity<Context>(context, HttpStatus.OK);
+							}
 						}
 					}
+				} else {
+					log.error("Context {} already exist", context.getName());
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale)),
+							HttpStatus.NOT_FOUND);
 				}
-			} else {
-				log.error("Context {} already exist", context.getName());
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale)),
-						HttpStatus.NOT_FOUND);
 			}
-
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function deletes the selected Context
+	 *
+	 * @param userId
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/deleteContext/{contextId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Context> deleteContext(@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(contextId)) {
+			Context context = contextRepository.find(contextId);
+			if (context != null) {
+				List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(context.getId());
+				if (contextUserAuthList != null) {
+					for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
+						currentContextRepository.deleteByContextUserAuthenticationId(contextUserAuth.getId());
+					}
+				}
+				contextRepository.deleteByContextId(contextId);
+				contextUserAuthRepository.deleteByContextId(contextId);
+				return new ResponseEntity<Context>(context, HttpStatus.OK);
+			}
+
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 }

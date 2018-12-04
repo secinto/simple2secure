@@ -1,7 +1,5 @@
 package com.simple2secure.portal.repository.impl;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +8,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -38,56 +34,9 @@ public class UserRepositoryImpl extends UserRepository {
 	}
 
 	@Override
-	public User findUserByUsernameAndPwd(String username, String password) {
-		Query query = new Query(Criteria.where("username").is(username).and("password").is(password));
-		User user = mongoTemplate.findOne(query, User.class);
-		return user;
-	}
-
-	@Override
-	public User findUserByUserName(String username) {
+	public User findByUsername(String username) {
 		Query query = new Query(Criteria.where("username").is(username));
 		User user = mongoTemplate.findOne(query, User.class);
-		return user;
-	}
-
-	@Override
-	public int saveIfUserNotExists(User userToSave) {
-		User user = null;
-		Query query = new Query(Criteria.where("username").is(userToSave.getUsername()));
-		user = mongoTemplate.findOne(query, User.class);
-
-		if (user == null) {
-			Query queryEmail = new Query(Criteria.where("email").is(userToSave.getEmail()));
-			user = mongoTemplate.findOne(queryEmail, User.class);
-
-			if (user == null) {
-				mongoTemplate.save(userToSave);
-				return StaticConfigItems.user_created;
-			} else {
-
-				return StaticConfigItems.email_exists;
-			}
-		} else {
-			return StaticConfigItems.username_exists;
-		}
-	}
-
-	@Override
-	public List<Probe> findDevicesByUserID(String id) {
-		User user = find(id);
-		return user.getMyProbes();
-	}
-
-	@Override
-	public User findByUsernameOrEmail(String username, String email) {
-
-		User user = findUserByUserName(username);
-
-		if (user == null) {
-			user = findByEmail(email);
-		}
-
 		return user;
 	}
 

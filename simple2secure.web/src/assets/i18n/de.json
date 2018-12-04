@@ -200,9 +200,11 @@
   "message.group.dialog": "Mit einem Klick auf Ja wird die ausgewählte Gruppe gelöscht!",
   "message.probe.dialog": "Mit einem Klick auf Ja wird die ausgewählte Probe gelöscht!",
   "message.config.dialog": "Wenn Sie auf Ja klicken, wird die ausgewählte Konfiguration gelöscht!",
+  "message.context.dialog": "Mit einem Klick auf Ja wird der ausgewählte Kontext gelöscht!",
   "message.config.delete": "Die Konfiguration wurde erfolgreich gelöscht!",
   "message.group.delete": "Gruppe erfolgreich gelöscht!",
   "message.probe.delete": "Probe erfolgreich gelöscht!",
+  "message.context.delete": "Context erfolgreich gelöscht!",
   "message.group.add": "Gruppe wurde erfolgreich hinzugefügt!",
   "message.processor.dialog": "Mit Klick auf Ja wird der ausgewählte Prozessor gelöscht!",
   "message.processor.delete": "Prozessor erfolgreich gelöscht!",
@@ -294,6 +296,10 @@
   "context.name.placeholder": "Bitte geben Sie den Kontextnamen ein",
   "change.context": "Kontext ändern",
   "message.contextDialogDashboard": "Um mit einem anderen Kontext arbeiten zu können, müssen Sie ihn aus dem Feld unten auswählen.",
-  "message.contextChangeError": "Sie sind nur Teil eines Kontexts, können keinen anderen auswählen!"
+  "message.contextChangeError": "Sie sind nur Teil eines Kontexts, können keinen anderen auswählen!",
+  "table.mycontexts": "Meine Kontexte",
+  "table.licenseDownloads": "Lizenz-Downloads",
+  "message.context.edit": "Kontext wurde erfolgreich aktualisiert!",
+  "button.editContext": "Kontext bearbeiten"
 
 }

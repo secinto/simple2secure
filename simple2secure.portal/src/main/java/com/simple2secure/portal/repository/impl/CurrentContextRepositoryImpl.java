@@ -1,5 +1,7 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -26,4 +28,18 @@ public class CurrentContextRepositoryImpl extends CurrentContextRepository {
 		CurrentContext currentContext = mongoTemplate.findOne(query, CurrentContext.class);
 		return currentContext;
 	}
+
+	@Override
+	public void deleteByContextUserAuthenticationId(String contextUserAuthenticationId) {
+		Query query = new Query(Criteria.where("contextUserAuthenticationId").is(contextUserAuthenticationId));
+		List<CurrentContext> currentContextList = mongoTemplate.find(query, CurrentContext.class);
+		if (currentContextList != null) {
+			for (CurrentContext currentContext : currentContextList) {
+				if (currentContext != null) {
+					delete(currentContext);
+				}
+			}
+		}
+	}
+
 }

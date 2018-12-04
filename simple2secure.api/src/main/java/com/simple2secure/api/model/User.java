@@ -1,9 +1,5 @@
 package com.simple2secure.api.model;
 
-import java.util.List;
-
-import javax.persistence.OneToMany;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class User extends GenericDBObject {
@@ -26,10 +22,6 @@ public class User extends GenericDBObject {
 	private String phone;
 	private boolean enabled;
 	private boolean passwordUpdated;
-
-	@OneToMany
-	private List<Probe> myProbes;
-
 	private String activationToken;
 	private boolean activated;
 	private String passwordResetToken;
@@ -39,15 +31,14 @@ public class User extends GenericDBObject {
 
 	}
 
-	public User(String firstName, String lastName, String username, String email, String password, boolean enabled, List<Probe> myProbes,
-			UserRole userRole, String activationToken, boolean activated, boolean passwordUpdated) {
+	public User(String firstName, String lastName, String username, String email, String password, boolean enabled, UserRole userRole,
+			String activationToken, boolean activated, boolean passwordUpdated) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.enabled = enabled;
-		this.myProbes = myProbes;
 		this.activationToken = activationToken;
 		this.activated = activated;
 		this.passwordUpdated = passwordUpdated;
@@ -105,17 +96,8 @@ public class User extends GenericDBObject {
 		this.enabled = enabled;
 	}
 
-	public List<Probe> getMyProbes() {
-		return myProbes;
-	}
-
-	public void setMyProbes(List<Probe> myProbes) {
-		this.myProbes = myProbes;
-	}
-
 	public void setActivated(boolean activate) {
 		activated = activate;
-
 	}
 
 	public boolean isActivated() {

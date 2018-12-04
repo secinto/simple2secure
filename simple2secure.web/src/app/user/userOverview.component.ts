@@ -27,6 +27,7 @@ export class UserOverviewComponent {
   userDeleted = false;
   groupDeleted = false;
   probeDeleted = false;
+  contextDeleted = false;
   groupAdded = false;
   contextAdded = false;
   userAdded = false;
@@ -45,22 +46,27 @@ export class UserOverviewComponent {
   showGroupTable: boolean;
   showUserTable: boolean;
   showProbeTable: boolean;
+  showContextTable: boolean;
   showEditAndDelete: boolean;
   isGroupDeletable = false;
 
   displayedColumnsUsers = ['email', 'userRole', 'action'];
   displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
+  displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
 
   dataSource = new MatTableDataSource();
   dataSource2 = new MatTableDataSource();
   dataSource3 = new MatTableDataSource();
+  dataSource4 = new MatTableDataSource();
   options = { focused: true, allowDrag: true};
 
   @ViewChild('paginator') paginator: MatPaginator;
   @ViewChild('paginator2') paginator2: MatPaginator;
+  @ViewChild('paginator3') paginator3: MatPaginator;
   @ViewChild('sort') sort: MatSort;
   @ViewChild('sortDev') sortDev: MatSort;
   @ViewChild('sortGrp') sortGrp: MatSort;
+  @ViewChild('sortCntx') sortCntx: MatSort;
 
   constructor(
     private route: ActivatedRoute,
@@ -101,8 +107,10 @@ export class UserOverviewComponent {
   ngAfterViewInit() {
       this.dataSource.paginator = this.paginator;
       this.dataSource2.paginator = this.paginator2;
+      this.dataSource3.paginator = this.paginator3;
       this.dataSource.sort = this.sort;
       this.dataSource2.sort = this.sortDev;
+      this.dataSource3.sort = this.sortCntx;
   }
 
   applyFilter(filterValue: string) {
@@ -124,19 +132,22 @@ export class UserOverviewComponent {
       data => {
         this.myProfile = data;
         this.dataSource.data = this.myProfile.myUsersList;
-        this.dataSource2.data = this.myProfile.myProfile.myProbes;
+        this.dataSource2.data = this.myProfile.myProbes;
         this.dataSource3.data = this.myProfile.myGroups;
+        this.dataSource4.data = this.myProfile.myContexts;
         this.checkMyGroupSize(this.myProfile.myGroups);
         this.checkMyUsersSize(this.myProfile.myUsersList);
-        this.checkMyProbesSize(this.myProfile.myProfile.myProbes);
+        this.checkMyProbesSize(this.myProfile.myProbes);
+        this.checkMyContextsSize(this.myProfile.myContexts);
         this.dataService.setGroups(this.myProfile.myGroups);
-        if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible && !this.contextAdded){
+        if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.contextDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible && !this.contextAdded){
             this.alertService.success(this.translate.instant('message.user'));
         }
 
         this.moveNotPossible = false;
         this.groupDeleted = false;
         this.probeDeleted = false;
+        this.contextDeleted = false;
         this.groupAdded = false;
         this.contextAdded = false;
         this.userAdded = false;
@@ -180,6 +191,15 @@ export class UserOverviewComponent {
         }
         else{
             this.showProbeTable = false;
+        }
+    }
+
+    checkMyContextsSize(contexts: any){
+        if (contexts.length > 0){
+            this.showContextTable = true;
+        }
+        else{
+            this.showContextTable = false;
         }
     }
 
@@ -270,9 +290,29 @@ export class UserOverviewComponent {
         this.loading = true;
         this.httpService.delete(environment.apiEndpoint + 'probe/deleteProbe/' + probe.probeId).subscribe(
             data => {
-                this.alertService.success(this.translate.instant('message.probe.delete"'));
+                this.alertService.success(this.translate.instant('message.probe.delete'));
                 this.loadMyProfile();
                 this.probeDeleted = true;
+                this.loading = false;
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
+    }
+
+    public deleteContext(context: any) {
+        this.loading = true;
+        this.httpService.delete(environment.apiEndpoint + 'user/deleteContext/' + context.id).subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('message.context.delete'));
+                this.loadMyProfile();
+                this.contextDeleted = true;
                 this.loading = false;
             },
             error => {
@@ -397,6 +437,10 @@ export class UserOverviewComponent {
       // this.deleteUser(this.selectedUser);
   }
 
+  public onContextDeleteClick(){
+      this.openDialog('context');
+  }
+
   onProbeDeleteClick(){
       this.openDialog('probe');
   }
@@ -489,6 +533,64 @@ export class UserOverviewComponent {
         });
     }
 
+    openDialogNewContext(): void {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '350px';
+
+        dialogConfig.data = {
+            context: null
+        };
+        const dialogRef = this.dialog.open(UserContextAddDialogComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.context.add'));
+                this.contextAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    openDialogEditContext(): void {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '350px';
+
+        dialogConfig.data = {
+            context: this.selectedItem
+        };
+        const dialogRef = this.dialog.open(UserContextAddDialogComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.context.edit'));
+                this.contextAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+
+
 
     openDialogSubGroup(): void {
         const dialogRef = this.dialog2.open(UserGroupDialogComponent, {
@@ -564,29 +666,7 @@ export class UserOverviewComponent {
         });
     }
 
-    openDialogNewContext(): void {
-        const dialogRef = this.dialog.open(UserContextAddDialogComponent, {
-            width: '350px',
-        });
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result == true){
-                this.alertService.success(this.translate.instant('message.context.add'));
-                this.contextAdded = true;
-                this.loadMyProfile();
-            }
-            else{
-                if (result instanceof HttpErrorResponse){
-                    if (result.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(result.error.errorMessage);
-                    }
-                }
-            }
-        });
-    }
 
     onMoveGroupNode($event) {
         if (this.checkIfUserCanMoveGroup($event.node, $event.to.parent)){
@@ -649,7 +729,14 @@ export class UserOverviewComponent {
               content: this.translate.instant('message.probe.dialog')
           };
       }
-      else{
+      else if (type == 'context'){
+          dialogConfig.data = {
+              id: 1,
+              title: this.translate.instant('message.arayousure'),
+              content: this.translate.instant('message.context.dialog')
+          };
+      }
+      else if (type == 'group'){
           dialogConfig.data = {
               id: 1,
               title: this.translate.instant('message.areyousure'),
@@ -671,6 +758,9 @@ export class UserOverviewComponent {
               else if (type == 'probe') {
                   this.deleteProbe(this.selectedItem);
               }
+              else if(type == 'context'){
+                  this.deleteContext(this.selectedItem);
+              }
           }
         });
   }
@@ -682,7 +772,11 @@ export class UserOverviewComponent {
             !this.dataSource.paginator ? this.dataSource.paginator = this.paginator : null;
             !this.dataSource.sort ? this.dataSource.sort = this.sort : null;
             break;
-          case 3:
+          case 2:
+            !this.dataSource4.paginator ? this.dataSource4.paginator = this.paginator3 : null;
+            !this.dataSource4.sort ? this.dataSource4.sort = this.sortCntx : null;
+            break;
+          case 4:
             !this.dataSource2.paginator ? this.dataSource2.paginator = this.paginator2 : null;
             !this.dataSource2.sort ? this.dataSource2.sort = this.sortDev : null;
         }

@@ -8,6 +8,6 @@
 </div>
 <div mat-dialog-actions>
 	<button mat-button [disabled]="!groupForm.dirty" mat-raised-button class="mat-green-button" color="primary" (click)="saveGroup()">{{ 'button.save' | translate }}</button>
-	<button *ngIf="isDialogOpen" mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="group" cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
+	<button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="group" cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
 </div>
 
