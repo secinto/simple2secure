@@ -56,7 +56,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 		if (passwordEncoder.matches(password, user.getPassword())) {
 
 			userID = user.getId();
-			return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(UserRole.USER.name()));
+			return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(UserRole.LOGINUSER.name()));
 		} else {
 			throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
 		}

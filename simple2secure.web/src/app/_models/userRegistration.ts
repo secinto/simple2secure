@@ -8,6 +8,5 @@ export class UserRegistration extends Generic{
     userRole: UserRole;
     currentContextId: string;
     groupIds: string[];
-    addedByUserId: string;
     registrationType: UserRegistrationType;
 }

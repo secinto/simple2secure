@@ -13,24 +13,23 @@ import java.util.List;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.User;
 
-public class UserDTO{
+public class UserDTO {
 
-	private List<User> myUsersList;
+	private List<UserRoleDTO> myUsersList;
 	private List<CompanyGroup> myGroups;
 	private User myProfile;
 
-
-	public UserDTO(User user, List<User> myUsers, List<CompanyGroup> myGroups) {
-		this.myProfile = user;
-		this.myUsersList = myUsers;
+	public UserDTO(User user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups) {
+		myProfile = user;
+		myUsersList = myUsers;
 		this.myGroups = myGroups;
 	}
 
-	public List<User> getMyUsersList() {
+	public List<UserRoleDTO> getMyUsersList() {
 		return myUsersList;
 	}
 
-	public void setMyUsersList(List<User> myUsersList) {
+	public void setMyUsersList(List<UserRoleDTO> myUsersList) {
 		this.myUsersList = myUsersList;
 	}
 

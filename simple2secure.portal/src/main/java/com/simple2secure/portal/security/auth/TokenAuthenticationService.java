@@ -151,7 +151,7 @@ public class TokenAuthenticationService {
 		String accessToken = resolveToken(request);
 		if (accessToken != null) {
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
-			UserRole userRole = UserRole.USER;
+			UserRole userRole = UserRole.LOGINUSER;
 			if (token != null) {
 				User user = userRepository.find(token.getUserId());
 

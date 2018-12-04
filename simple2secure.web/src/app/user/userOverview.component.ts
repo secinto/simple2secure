@@ -41,6 +41,7 @@ export class UserOverviewComponent {
   context: ContextDTO;
   showMyUsers: boolean;
   addNewGroup: boolean;
+  addnewContext: boolean;
   showGroupTable: boolean;
   showUserTable: boolean;
   showProbeTable: boolean;
@@ -87,6 +88,13 @@ export class UserOverviewComponent {
       else{
       	this.showMyUsers = false;
       	this.addNewGroup = false;
+      }
+
+      if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN){
+          this.addnewContext = true;
+      }
+      else{
+          this.addnewContext = false;
       }
   }
 
@@ -220,7 +228,7 @@ export class UserOverviewComponent {
 
   public deleteUser(user: any) {
     this.loading = true;
-    this.httpService.delete(environment.apiEndpoint + 'user/' + user.id).subscribe(
+    this.httpService.delete(environment.apiEndpoint + 'user/' + user.id + '/' + this.context.context.id).subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.user.delete'));
         this.userDeleted = true;
@@ -321,7 +329,7 @@ export class UserOverviewComponent {
                     }
                 }
                 else{
-                    if(toGroup.id){
+                    if (toGroup.id){
                         return true;
                     }
                     else{

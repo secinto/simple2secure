@@ -16,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.ContextDTO;
 import com.simple2secure.api.dto.UserDTO;
+import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
@@ -113,6 +112,47 @@ public class UserController {
 
 	@Autowired
 	DataInitialization dataInitialization;
+
+	/**
+	 * This function returns all users from the user repository
+	 */
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
+		List<User> userList = userRepository.findAll();
+		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
+	}
+
+	/**
+	 * This function finds and returns user according to the user id
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<UserDTO> getUserByID(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		User user = userRepository.find(userId);
+
+		if (user != null && !Strings.isNullOrEmpty(contextId)) {
+
+			// Retrieving the context according to the current active context
+			Context context = contextRepository.find(contextId);
+
+			if (context != null) {
+				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
+				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
+				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
+
+				user.setMyProbes(myProbes);
+				UserDTO userDTO = new UserDTO(user, myUsers, groups);
+				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
 
 	/**
 	 * This function is used to add new user. For each user added it sets the configuration, queries, processors and steps from the default
@@ -208,7 +248,7 @@ public class UserController {
 				user.setActivated(true);
 				user.setPassword(password);
 
-				String error = userUtils.validateUserPasswordStandardRegistration(user);
+				String error = userUtils.validateUserPassword(user);
 
 				if (!Strings.isNullOrEmpty(error)) {
 					return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
@@ -364,14 +404,9 @@ public class UserController {
 
 					user.setPassword(password);
 
-					Errors errors = new BeanPropertyBindingResult(user, "user");
+					String error = userUtils.validateUserPassword(user);
 
-					passwordValidator.validate(user, errors);
-
-					if (errors.hasErrors()) {
-
-						String error = errors.getAllErrors().get(0).getDefaultMessage();
-
+					if (!Strings.isNullOrEmpty(error)) {
 						return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
 					}
 
@@ -403,69 +438,34 @@ public class UserController {
 	}
 
 	/**
-	 * This function returns all users from the user repository
-	 */
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
-		List<User> userList = userRepository.findAll();
-		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
-	}
-
-	/**
-	 * This function deletes configuration and user according to the user id TODO: this must be updated because of the latest mapping
+	 * This function deletes the user from the current context
 	 *
 	 * @param userId
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		boolean hasPrivilegedUser = false;
-		if (!Strings.isNullOrEmpty(userId)) {
+	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable("userId") String userId,
+			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context
+		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 
 			User user = userRepository.find(userId);
+			Context context = contextRepository.find(contextId);
 
-			if (user != null) {
-				// If user added users check if contains privileged(ADMIN or SUPERUSER)
-				if (user.getMyUsers() != null) {
-					hasPrivilegedUser = userUtils.containsPrivilegedUser(user.getMyUsers());
-
-					// If user contains privileged user(ADMIN or SUPERUSER) - copy groups and own users to one of them
-					if (hasPrivilegedUser) {
-						User privilegedUser = userUtils.getPrivilegedUser(user.getMyUsers());
-
-						if (privilegedUser != null) {
-							privilegedUser = userUtils.copyMyUsersToPrivilegedUser(privilegedUser, user.getMyUsers());
-							// groupUtils.copyMyGroupsToPrivilegedUser(privilegedUser, user);
-							userRepository.update(privilegedUser);
-							User addedByUser = userRepository.findAddedByUser(user.getId());
-							if (addedByUser != null) {
-								userUtils.updateAddedByUser(addedByUser, user.getId(), privilegedUser.getId());
-							}
-							userUtils.deleteUserDependencies(user, false, false);
-						}
-					} else {
-						userUtils.deleteUserDependencies(user, true, true);
-					}
-				} else {
-					userUtils.deleteUserDependencies(user, true, true);
+			if (user != null && context != null) {
+				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
+						user.getId());
+				if (contextUserAuthentication != null) {
+					contextUserAuthRepository.delete(contextUserAuthentication);
+					return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
 				}
-
-				userRepository.delete(user);
-
-				return new ResponseEntity<User>(user, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
-						HttpStatus.NOT_FOUND);
 			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -531,37 +531,6 @@ public class UserController {
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function finds and returns user according to the user id
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{id}/{contextId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<UserDTO> getUserByID(@PathVariable("id") String id, @PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		User user = userRepository.find(id);
-
-		if (user != null && !Strings.isNullOrEmpty(contextId)) {
-
-			// Retrieving the context according to the current active context
-			Context context = contextRepository.find(contextId);
-
-			if (context != null) {
-				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
-				List<User> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
-
-				user.setMyProbes(myProbes);
-				UserDTO userDTO = new UserDTO(user, myUsers, groups);
-				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
-			}
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-				HttpStatus.NOT_FOUND);
-
 	}
 
 	/**

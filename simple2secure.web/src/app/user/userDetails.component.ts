@@ -46,19 +46,17 @@ export class UserDetailsComponent {
       if (data.user == null){
           this.action = UrlParameter.NEW;
           this.user = new UserRegistration();
-          this.addedByUserId = data.addedByUserId;
       }
       else{
           this.action = UrlParameter.EDIT;
           this.user = new UserRegistration();
-          this.user.addedByUserId = data.user.addedByUserId;
-          this.user.id = data.user.id;
-          this.user.email = data.user.email;
-          this.user.groupIds = [];
-          if (this.context.userRole === UserRole.SUPERUSER){
+          this.user.id = data.user.user.id;
+          this.user.email = data.user.user.email;
+          this.user.userRole = data.user.userRole;
+          this.user.groupIds = data.user.groupIds;
+          if (this.user.userRole === UserRole.SUPERUSER){
               this.showGroupSelectBox = true;
       }
-          this.addedByUserId = data.addedByUserId;
       }
   }
 
@@ -125,11 +123,10 @@ export class UserDetailsComponent {
     }
 
 	saveUser() {
-        this.url = environment.apiEndpoint + 'users';
+        this.url = environment.apiEndpoint + 'user';
         this.user.currentContextId = this.context.context.id;
         if (this.action === UrlParameter.NEW) {
             this.user.registrationType = UserRegistrationType.ADDED_BY_USER;
-            this.user.addedByUserId = this.addedByUserId;
         }
         else{
             this.user.registrationType = UserRegistrationType.UPDATE_USER_INFO;

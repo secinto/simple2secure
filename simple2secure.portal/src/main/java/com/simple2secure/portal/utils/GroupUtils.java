@@ -375,4 +375,45 @@ public class GroupUtils {
 		return myGroupsWithChildren;
 	}
 
+	/**
+	 * This function updates the List of the currenty assigned super user to the group
+	 *
+	 * @param groupIds
+	 * @param user
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	public void updateGroupSuperUserList(List<String> groupIds, User user) throws ItemNotFoundRepositoryException {
+		if (groupIds != null) {
+			for (String groupId : groupIds) {
+				CompanyGroup group = groupRepository.find(groupId);
+				if (group != null) {
+					group.addSuperUserId(user.getId());
+					groupRepository.update(group);
+				}
+			}
+		}
+	}
+
+	/**
+	 * This function iterates over all groups in the context and removes the superuserid from those groups.
+	 *
+	 * @param user
+	 * @param context
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	public void removeSuperUserFromGroups(User user, Context context) throws ItemNotFoundRepositoryException {
+		if (user != null && context != null) {
+			List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
+			if (groups != null) {
+				for (CompanyGroup group : groups) {
+					if (group.getSuperUserIds().contains(user.getId())) {
+						group.removeSuperUserId(user.getId());
+						groupRepository.update(group);
+					}
+				}
+			}
+		}
+
+	}
+
 }

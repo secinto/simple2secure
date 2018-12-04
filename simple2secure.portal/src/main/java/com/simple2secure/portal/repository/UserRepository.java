@@ -26,8 +26,4 @@ public abstract class UserRepository extends MongoRepository<User> {
 	public abstract User findByPasswordResetToken(String token);
 
 	public abstract User findByEmail(String email);
-
-	public abstract List<User> findByGroupId(String groupId);
-
-	public abstract User findAddedByUser(String userId);
 }

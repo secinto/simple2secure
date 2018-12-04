@@ -29,3 +29,4 @@ export * from './userRegistration';
 export * from './userRegistrationType';
 export * from './context';
 export * from './contextDTO';
+export * from './userRoleDTO';

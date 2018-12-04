@@ -118,26 +118,4 @@ public class UserRepositoryImpl extends UserRepository {
 		User user = mongoTemplate.findOne(query, User.class);
 		return user;
 	}
-
-	@Override
-	public List<User> findByGroupId(String groupId) {
-		Query query = new Query(Criteria.where("groupId").is(groupId));
-		List<User> users = mongoTemplate.find(query, User.class);
-		return users;
-	}
-
-	@Override
-	public User findAddedByUser(String userId) {
-		List<User> users = mongoTemplate.findAll(User.class);
-		if (users != null) {
-			for (User user : users) {
-				if (user.getMyUsers() != null) {
-					if (user.getMyUsers().contains(userId)) {
-						return user;
-					}
-				}
-			}
-		}
-		return null;
-	}
 }

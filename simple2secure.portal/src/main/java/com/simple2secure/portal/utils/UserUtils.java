@@ -16,6 +16,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
@@ -53,6 +54,9 @@ public class UserUtils {
 
 	@Autowired
 	MailUtils mailUtils;
+
+	@Autowired
+	GroupUtils groupUtils;
 
 	@Autowired
 	UserRepository userRepository;
@@ -184,12 +188,12 @@ public class UserUtils {
 						ObjectId contextUserId = addContextUserAuthentication(userID.toString(), context.getId(), userRegistration.getUserRole());
 
 						// Add this user to the addedByUser List
-						addedByUser.addMyUser(userID.toString());
+						// addedByUser.addMyUser(userID.toString());
 
 						// If sending email was successful, update addedByUser, if not delete the user and userContextAuth
 						if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)
 								&& contextUserId != null) {
-							userRepository.update(addedByUser);
+							// userRepository.update(addedByUser);
 
 							// Update the selected groups to be accessible for the superuser
 							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -237,7 +241,7 @@ public class UserUtils {
 			user.setPassword(userRegistration.getPassword());
 
 			// validate the user password
-			String error = validateUserPasswordStandardRegistration(user);
+			String error = validateUserPassword(user);
 			if (!Strings.isNullOrEmpty(error)) {
 				return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
 			}
@@ -316,7 +320,7 @@ public class UserUtils {
 	 * @param locale
 	 * @return
 	 */
-	public String validateUserPasswordStandardRegistration(User user) {
+	public String validateUserPassword(User user) {
 		Errors errors = new BeanPropertyBindingResult(user, "user");
 
 		passwordValidator.validate(user, errors);
@@ -364,94 +368,39 @@ public class UserUtils {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<User> updateUser(UserRegistration userRegistration, String locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
+		if (userRegistration != null && !Strings.isNullOrEmpty(userRegistration.getEmail())
+				&& !Strings.isNullOrEmpty(userRegistration.getCurrentContextId())) {
 			User user = userRepository.findByEmail(userRegistration.getEmail());
-			// TODO: this function must be adapted after changes on the contextId
-			if (user != null) {
+			Context context = contextRepository.find(userRegistration.getCurrentContextId());
+			if (user != null && context != null) {
 
-				// Check if user role has changed
-				if (!userRegistration.getUserRole().equals(userRegistration.getUserRole())) {
-					// if old user role was admin delete it from the admin group
-					if (userRegistration.getUserRole().equals(UserRole.ADMIN)) {
-						// Context context = contextRepository.find(user.getContextIds());
-						// if (context != null) {
-						// context.removeAdmin(user.getId());
-						// contextRepository.update(context);
-						// } else {
-						// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-						// HttpStatus.NOT_FOUND);
-						// }
-					}
-					// Delete the super user from all groups to which he has been assigned
-					else if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
-						// List<CompanyGroup> groups = groupRepository.findByContextId(user.getContextIds());
-						// if (groups != null) {
-						// for (CompanyGroup group : groups) {
-						// if (!group.getSuperUserIds().contains(user.getId())) {
-						// group.removeSuperUserId(user.getId());
-						// groupRepository.update(group);
-						// }
-						// }
-						// }
-					}
+				// get current context user auth and check if user role has been changed
+				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
 
-					userRegistration.setUserRole(userRegistration.getUserRole());
+				if (contextUserAuth != null) {
+					if (!userRegistration.getUserRole().equals(contextUserAuth.getUserRole())) {
 
-					if (userRegistration.getUserRole().equals(UserRole.ADMIN)) {
-						// Assign user to the context adminIds
-						// Context context = contextRepository.find(user.getContextIds());
-						// if (context != null) {
-						// if (!context.getAdmins().contains(user.getId())) {
-						// context.addAdmin(user.getId());
-						// contextRepository.update(context);
-						// }
-						//
-						// } else {
-						// return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-						// HttpStatus.NOT_FOUND);
-						// }
-					}
+						if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+							groupUtils.removeSuperUserFromGroups(user, context);
+						}
 
-					else if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
-						if (userRegistration.getGroupIds() != null) {
-							for (String groupId : userRegistration.getGroupIds()) {
-								CompanyGroup group = groupRepository.find(groupId);
-								if (group != null) {
-									group.addSuperUserId(user.getId());
-									groupRepository.update(group);
-								}
-							}
+						if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
+							groupUtils.updateGroupSuperUserList(userRegistration.getGroupIds(), user);
+						}
+
+						// update contextUserAuthentication object with the current role
+						contextUserAuth.setUserRole(userRegistration.getUserRole());
+						contextUserAuthRepository.update(contextUserAuth);
+					} else {
+						if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
+							groupUtils.removeSuperUserFromGroups(user, context);
+							groupUtils.updateGroupSuperUserList(userRegistration.getGroupIds(), user);
 						}
 					}
-				} else {
-					if (userRegistration.getGroupIds() != null) {
-						// List<CompanyGroup> oldGroups = groupRepository.findByContextId(user.getContextIds());
-						// if (oldGroups != null) {
-						// for (CompanyGroup group : oldGroups) {
-						// if (group.getSuperUserIds().contains(user.getId())) {
-						// group.removeSuperUserId(user.getId());
-						// groupRepository.update(group);
-						// }
-						// }
-						// }
-
-						for (String groupId : userRegistration.getGroupIds()) {
-							CompanyGroup group = groupRepository.find(groupId);
-							if (group != null) {
-								group.addSuperUserId(user.getId());
-								groupRepository.update(group);
-							}
-						}
-					}
+					return new ResponseEntity<User>(user, HttpStatus.OK);
 				}
-				userRepository.update(user);
-				return new ResponseEntity<User>(user, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-						HttpStatus.NOT_FOUND);
 			}
 		}
-
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -489,30 +438,6 @@ public class UserUtils {
 	}
 
 	/**
-	 * This function updates the myUsers List for the user which added the user which is currently being deleted and new privileged user will
-	 * be added to this list
-	 *
-	 * @param addedByUser
-	 * @param oldUserId
-	 * @param newUserId
-	 */
-	public void updateAddedByUser(User addedByUser, String oldUserId, String newUserId) {
-		if (addedByUser != null) {
-			if (addedByUser.getMyUsers() != null) {
-				addedByUser.getMyUsers().remove(oldUserId);
-				if (!Strings.isNullOrEmpty(newUserId)) {
-					addedByUser.addMyUser(newUserId);
-				}
-				try {
-					userRepository.update(addedByUser);
-				} catch (ItemNotFoundRepositoryException e) {
-					log.error("User not found");
-				}
-			}
-		}
-	}
-
-	/**
 	 * This function deletes all user dependencies. Flag deleteMyUsers is used to distinguish if the users from the myUsers list should be
 	 * deleted or not
 	 *
@@ -521,24 +446,15 @@ public class UserUtils {
 	 */
 	public void deleteUserDependencies(User user, boolean deleteMyUsers, boolean updateMyUsers) {
 
-		if (deleteMyUsers) {
-			if (user.getMyUsers() != null) {
-				for (String myUserId : user.getMyUsers()) {
-					User myUser = userRepository.find(myUserId);
-
-					if (myUser != null) {
-						deleteUserDependencies(user, false, false);
-					}
-				}
-			}
-		}
-
-		if (updateMyUsers) {
-			User addedByUser = userRepository.findAddedByUser(user.getId());
-			if (addedByUser != null) {
-				updateAddedByUser(addedByUser, user.getId(), null);
-			}
-		}
+		/*
+		 * if (deleteMyUsers) { if (user.getMyUsers() != null) { for (String myUserId : user.getMyUsers()) { User myUser =
+		 * userRepository.find(myUserId);
+		 *
+		 * if (myUser != null) { deleteUserDependencies(user, false, false); } } } }
+		 *
+		 * if (updateMyUsers) { User addedByUser = userRepository.findAddedByUser(user.getId()); if (addedByUser != null) {
+		 * updateAddedByUser(addedByUser, user.getId(), null); } }
+		 */
 
 		// List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
 		//
@@ -554,75 +470,6 @@ public class UserUtils {
 		emailRepository.deleteByUserId(user.getId());
 		notificationRepository.deleteByUserId(user.getId());
 		tokenRepository.deleteByUserId(user.getId());
-	}
-
-	/**
-	 * This function copies the added users from the user which is being deleted to the privileged one
-	 *
-	 * @param privilegedUser
-	 * @param myUsers
-	 * @return
-	 */
-	public User copyMyUsersToPrivilegedUser(User privilegedUser, List<String> myUsers) {
-		for (String myUser : myUsers) {
-			if (!myUser.equals(privilegedUser.getId())) {
-				privilegedUser.addMyUser(myUser);
-			}
-		}
-		return privilegedUser;
-	}
-
-	/**
-	 * This function returns the privileged user from the list of myUsers
-	 *
-	 * @param myUsers
-	 * @return
-	 */
-	public User getPrivilegedUser(List<String> myUsers) {
-		// TODO: check this, context must also be
-		User adminUser = null;
-		User superUser = null;
-		if (myUsers != null) {
-			for (String myUserId : myUsers) {
-				User myUser = userRepository.find(myUserId);
-				if (myUser != null) {
-					/*
-					 * if (myUser.getUserRole().equals(UserRole.ADMIN)) { adminUser = myUser; } else if
-					 * (myUser.getUserRole().equals(UserRole.SUPERUSER)) { superUser = myUser; }
-					 */
-				}
-			}
-
-			if (adminUser != null) {
-				return adminUser;
-			} else if (superUser != null) {
-				return superUser;
-			} else {
-				return null;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * This function checks if the user which is being deleted contains a privileged user (ADMIN or SUPERUSER)
-	 *
-	 * @param myUsers
-	 * @return
-	 */
-	public boolean containsPrivilegedUser(List<String> myUsers) {
-		// if (myUsers != null) {
-		// for (String myUserId : myUsers) {
-		// User myUser = userRepository.find(myUserId);
-		// if (myUser != null) {
-		// if (myUser.getUserRole().equals(UserRole.ADMIN) || myUser.getUserRole().equals(UserRole.SUPERUSER)) {
-		// return true;
-		// }
-		// }
-		//
-		// }
-		// }
-		return false;
 	}
 
 	/**
@@ -661,8 +508,8 @@ public class UserUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<User> getAllUsersFromCurrentContext(Context context, String userId) {
-		List<User> users = new ArrayList<>();
+	public List<UserRoleDTO> getAllUsersFromCurrentContext(Context context, String userId) {
+		List<UserRoleDTO> myUsersWithRole = new ArrayList<UserRoleDTO>();
 		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(context.getId());
 
 		if (contextUserAuthList != null) {
@@ -671,14 +518,27 @@ public class UserUtils {
 					if (!contextUserAuth.getUserId().equals(userId)) {
 						User user = userRepository.find(contextUserAuth.getUserId());
 						if (user != null) {
-							users.add(user);
+							List<String> groupIds = new ArrayList<>();
+
+							if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+								List<CompanyGroup> groups = groupRepository.findBySuperUserId(user.getId(), context.getId());
+
+								if (groups != null) {
+									for (CompanyGroup group : groups) {
+										if (group != null) {
+											groupIds.add(group.getId());
+										}
+									}
+								}
+							}
+							myUsersWithRole.add(new UserRoleDTO(user, contextUserAuth.getUserRole(), groupIds));
 						}
 					}
 				}
 			}
 		}
 
-		return users;
+		return myUsersWithRole;
 	}
 
 	/**

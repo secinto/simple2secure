@@ -1,9 +1,7 @@
 package com.simple2secure.api.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
 import javax.persistence.OneToMany;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -29,9 +27,6 @@ public class User extends GenericDBObject {
 	private boolean enabled;
 	private boolean passwordUpdated;
 
-	@ElementCollection
-	private List<String> myUsers = new ArrayList<>();
-
 	@OneToMany
 	private List<Probe> myProbes;
 
@@ -56,7 +51,6 @@ public class User extends GenericDBObject {
 		this.activationToken = activationToken;
 		this.activated = activated;
 		this.passwordUpdated = passwordUpdated;
-		myUsers = new ArrayList<String>();
 	}
 
 	public User(String email, UserRole userRole) {
@@ -159,18 +153,6 @@ public class User extends GenericDBObject {
 
 	public void setPasswordUpdated(boolean passwordUpdated) {
 		this.passwordUpdated = passwordUpdated;
-	}
-
-	public List<String> getMyUsers() {
-		return myUsers;
-	}
-
-	public void setMyUsers(List<String> myUsers) {
-		this.myUsers = myUsers;
-	}
-
-	public void addMyUser(String userId) {
-		myUsers.add(userId);
 	}
 
 	public String getAddress() {
