@@ -5,7 +5,7 @@
     <mat-form-field class="full_width_input">
       <mat-select placeholder="{{data.selectMessage}}" [(ngModel)]="context" name="contextId" required>
         <mat-option *ngFor="let context of data.contextList" [value]="context">
-          {{context.name}}
+          {{context.context.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>

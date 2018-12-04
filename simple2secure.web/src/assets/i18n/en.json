@@ -288,5 +288,11 @@
   "node.move.success": "Group moved successfully!",
   "probe.change.group": "Change group",
   "message.contextDialog": "In order to continue you must select the working context",
-  "message.contextDialog.select": "Select your working context"
+  "button.addContext": "Add context",
+  "message.contextDialog.select": "Select your working context",
+  "message.context.add": "Context added successfully!",
+  "context.name.placeholder": "Please enter the context name",
+  "change.context": "Change Context",
+  "message.contextDialogDashboard": "In order to work with another context, you have to select it from the box below.",
+  "message.contextChangeError": "You are part of only one context, cannot select another one!"
 }

@@ -69,11 +69,11 @@ public class DataInitialization {
 	 * @param username
 	 *
 	 *          This function adds a default group for the users which are registered using the standard registration. This function does not
-	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group while adding.
+	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group before adding.
 	 */
 	public void addDefaultGroup(String userId, String contextId) {
 
-		List<CompanyGroup> groupList = groupRepository.findByOwnerId(userId);
+		List<CompanyGroup> groupList = groupRepository.findByContextId(contextId);
 
 		if (groupList == null || groupList.isEmpty()) {
 			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(), CompanyGroup.class);

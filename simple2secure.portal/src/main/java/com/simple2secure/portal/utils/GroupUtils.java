@@ -72,19 +72,19 @@ public class GroupUtils {
 	 * @param user
 	 */
 	public void copyMyGroupsToPrivilegedUser(User privilegedUser, User user) {
-		List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
-
-		if (groups != null) {
-			for (CompanyGroup group : groups) {
-				// group.setAddedByUserId(privilegedUser.getId());
-				// group.setOwner(privilegedUser.getEmail());
-				try {
-					groupRepository.update(group);
-				} catch (ItemNotFoundRepositoryException e) {
-					log.error("Group not found");
-				}
-			}
-		}
+		// List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
+		//
+		// if (groups != null) {
+		// for (CompanyGroup group : groups) {
+		// // group.setAddedByUserId(privilegedUser.getId());
+		// // group.setOwner(privilegedUser.getEmail());
+		// try {
+		// groupRepository.update(group);
+		// } catch (ItemNotFoundRepositoryException e) {
+		// log.error("Group not found");
+		// }
+		// }
+		// }
 	}
 
 	/**

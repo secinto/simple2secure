@@ -21,7 +21,7 @@ export class SelectContextDialog {
   }
 
   updateContext(){
-    console.log('Updating context, selected context ' + JSON.stringify(this.context));
+    //console.log('Updating context, selected context ' + JSON.stringify(this.context));
     localStorage.setItem('context', JSON.stringify(this.context));
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
     this.httpService.updateContext(this.context.context, this.currentUser.userID);

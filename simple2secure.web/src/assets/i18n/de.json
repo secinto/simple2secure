@@ -288,5 +288,12 @@
   "node.move.success": "Gruppe erfolgreich verschiebt!",
   "probe.change.group": "Gruppe wechseln",
   "message.contextDialog": "Um fortzufahren, müssen Sie den Arbeitskontext auswählen",
-  "message.contextDialog.select": "Wählen Sie Ihren Arbeitskontext aus"
+  "message.contextDialog.select": "Wählen Sie Ihren Arbeitskontext aus",
+  "button.addContext": "Kontext hinzufügen",
+  "message.context.add": "Kontext wurde erfolgreich hinzugefügt!",
+  "context.name.placeholder": "Bitte geben Sie den Kontextnamen ein",
+  "change.context": "Kontext ändern",
+  "message.contextDialogDashboard": "Um mit einem anderen Kontext arbeiten zu können, müssen Sie ihn aus dem Feld unten auswählen.",
+  "message.contextChangeError": "Sie sind nur Teil eines Kontexts, können keinen anderen auswählen!"
+
 }

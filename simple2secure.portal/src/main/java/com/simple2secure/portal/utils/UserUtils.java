@@ -540,14 +540,14 @@ public class UserUtils {
 			}
 		}
 
-		List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
-
-		if (groups != null) {
-			for (CompanyGroup group : groups) {
-				licenseRepository.deleteByGroupId(group.getId());
-				groupRepository.delete(group);
-			}
-		}
+		// List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
+		//
+		// if (groups != null) {
+		// for (CompanyGroup group : groups) {
+		// licenseRepository.deleteByGroupId(group.getId());
+		// groupRepository.delete(group);
+		// }
+		// }
 		ruleRepository.deleteByUserId(user.getId());
 		toolRepository.deleteByUserID(user.getId());
 		emailConfigRepository.deleteByUserId(user.getId());
@@ -679,7 +679,28 @@ public class UserUtils {
 		}
 
 		return users;
+	}
 
+	/**
+	 * This function checks if the context with the provided name already exists.
+	 *
+	 * @param context
+	 * @param userId
+	 * @return
+	 */
+	public boolean checkIfContextAlreadyExists(Context context, String userId) {
+		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
+		if (contextUserAuthList != null) {
+			for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
+				Context contextFromDb = contextRepository.find(contextUserAuth.getContextId());
+				if (contextFromDb != null) {
+					if (contextFromDb.getName().trim().toLowerCase().equals(context.getName().trim().toLowerCase())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }

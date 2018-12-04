@@ -122,6 +122,12 @@
 				<i class="glyphicon glyphicon-plus"></i> {{ 'button.addGroup' | translate }}
 			</button>
 
+
+			<button *ngIf="addNewGroup" mat-raised-button color="primary" id="addButtonContext" type="button" (click)="openDialogNewContext()"
+					class="pull-right mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i> {{ 'button.addContext' | translate }}
+			</button>
+
             <div *ngIf="showGroupTable" class="example-container mat-elevation-z8 table table-striped">
                 <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)" >
                     <ng-template #treeNodeTemplate let-node let-index="index" draggable="false" ng-reflect-tree-drag-enabled="false">

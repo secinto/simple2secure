@@ -26,22 +26,6 @@ public class GroupRepositoryImpl extends GroupRepository {
 	}
 
 	@Override
-	public List<CompanyGroup> findByOwnerId(String userId) {
-		Query query = new Query(Criteria.where("addedByUserId").is(userId)).with(new Sort(Direction.ASC, "name"));
-		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
-	}
-
-	@Override
-	public void deleteByOwnerId(String userId) {
-		List<CompanyGroup> groups = findByOwnerId(userId);
-
-		for (CompanyGroup group : groups) {
-			mongoTemplate.remove(group);
-		}
-
-	}
-
-	@Override
 	public List<CompanyGroup> findByContextId(String contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId)).with(new Sort(Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);

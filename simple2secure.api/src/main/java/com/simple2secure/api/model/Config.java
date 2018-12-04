@@ -1,13 +1,10 @@
 package com.simple2secure.api.model;
 
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -64,10 +61,9 @@ public class Config extends GenericDBObject {
 	 * @param communication_factory
 	 * @param db_config
 	 */
-	public Config(int version, String config_supplier, String task_supplier, String stylesheet,
-			boolean use_configured_iface, int interface_number, boolean show_interfaces, String external_address,
-			int connection_timeout, String processing_factory, String communication_factory, int wt_intervall,
-			DBConfig db_config, QueryConfig queries, String baseUrl) {
+	public Config(int version, String config_supplier, String task_supplier, String stylesheet, boolean use_configured_iface,
+			int interface_number, boolean show_interfaces, String external_address, int connection_timeout, String processing_factory,
+			String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, String baseUrl) {
 		super();
 		this.version = version;
 		this.config_supplier = config_supplier;
@@ -108,10 +104,9 @@ public class Config extends GenericDBObject {
 	 * @param baseUrl
 	 */
 
-	public Config(String probeId, String id, int version, String config_supplier, String task_supplier,
-			String stylesheet, boolean use_configured_iface, int interface_number, boolean show_interfaces,
-			String external_address, int connection_timeout, String processing_factory, String communication_factory,
-			int wt_intervall, DBConfig db_config, QueryConfig queries, String baseUrl) {
+	public Config(String probeId, String id, int version, String config_supplier, String task_supplier, String stylesheet,
+			boolean use_configured_iface, int interface_number, boolean show_interfaces, String external_address, int connection_timeout,
+			String processing_factory, String communication_factory, int wt_intervall, DBConfig db_config, QueryConfig queries, String baseUrl) {
 		super();
 		this.id = id;
 		this.version = version;

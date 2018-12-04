@@ -13,6 +13,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 import {UserProbeChangeGroupComponent} from './userProbeChangeGroup.component';
+import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 
 @Component({
   moduleId: module.id,
@@ -27,6 +28,7 @@ export class UserOverviewComponent {
   groupDeleted = false;
   probeDeleted = false;
   groupAdded = false;
+  contextAdded = false;
   userAdded = false;
   selectedItem: any;
   myProfile: any;
@@ -120,7 +122,7 @@ export class UserOverviewComponent {
         this.checkMyUsersSize(this.myProfile.myUsersList);
         this.checkMyProbesSize(this.myProfile.myProfile.myProbes);
         this.dataService.setGroups(this.myProfile.myGroups);
-        if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible){
+        if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible && !this.contextAdded){
             this.alertService.success(this.translate.instant('message.user'));
         }
 
@@ -128,6 +130,7 @@ export class UserOverviewComponent {
         this.groupDeleted = false;
         this.probeDeleted = false;
         this.groupAdded = false;
+        this.contextAdded = false;
         this.userAdded = false;
         this.userDeleted = false;
         this.loading = false;
@@ -538,6 +541,30 @@ export class UserOverviewComponent {
             if (result == true){
                 this.alertService.success(this.translate.instant('message.group.add'));
                 this.groupAdded = true;
+                this.loadMyProfile();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
+
+    openDialogNewContext(): void {
+        const dialogRef = this.dialog.open(UserContextAddDialogComponent, {
+            width: '350px',
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.context.add'));
+                this.contextAdded = true;
                 this.loadMyProfile();
             }
             else{

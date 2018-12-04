@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
+import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRegistration;
@@ -43,10 +45,12 @@ import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -78,6 +82,9 @@ public class UserController {
 	CurrentContextRepository currentContextRepository;
 
 	@Autowired
+	LicensePlanRepository licensePlanRepository;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
@@ -103,6 +110,9 @@ public class UserController {
 
 	@Autowired
 	ProbeUtils probeUtils;
+
+	@Autowired
+	DataInitialization dataInitialization;
 
 	/**
 	 * This function is used to add new user. For each user added it sets the configuration, queries, processors and steps from the default
@@ -403,6 +413,62 @@ public class UserController {
 	}
 
 	/**
+	 * This function deletes configuration and user according to the user id TODO: this must be updated because of the latest mapping
+	 *
+	 * @param userId
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		boolean hasPrivilegedUser = false;
+		if (!Strings.isNullOrEmpty(userId)) {
+
+			User user = userRepository.find(userId);
+
+			if (user != null) {
+				// If user added users check if contains privileged(ADMIN or SUPERUSER)
+				if (user.getMyUsers() != null) {
+					hasPrivilegedUser = userUtils.containsPrivilegedUser(user.getMyUsers());
+
+					// If user contains privileged user(ADMIN or SUPERUSER) - copy groups and own users to one of them
+					if (hasPrivilegedUser) {
+						User privilegedUser = userUtils.getPrivilegedUser(user.getMyUsers());
+
+						if (privilegedUser != null) {
+							privilegedUser = userUtils.copyMyUsersToPrivilegedUser(privilegedUser, user.getMyUsers());
+							// groupUtils.copyMyGroupsToPrivilegedUser(privilegedUser, user);
+							userRepository.update(privilegedUser);
+							User addedByUser = userRepository.findAddedByUser(user.getId());
+							if (addedByUser != null) {
+								userUtils.updateAddedByUser(addedByUser, user.getId(), privilegedUser.getId());
+							}
+							userUtils.deleteUserDependencies(user, false, false);
+						}
+					} else {
+						userUtils.deleteUserDependencies(user, true, true);
+					}
+				} else {
+					userUtils.deleteUserDependencies(user, true, true);
+				}
+
+				userRepository.delete(user);
+
+				return new ResponseEntity<User>(user, HttpStatus.OK);
+			} else {
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+						HttpStatus.NOT_FOUND);
+			}
+		} else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
 	 * This function updates the current user context or sets new one if the user was not logged in
 	 *
 	 * @throws ItemNotFoundRepositoryException
@@ -499,58 +565,51 @@ public class UserController {
 	}
 
 	/**
-	 * This function deletes configuration and user according to the user id TODO: this must be updated because of the latest mapping
+	 * This function adds new context (This is only possible for admins or superadmins)
 	 *
-	 * @param userId
-	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<User> deleteUser(@PathVariable("id") String userId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		boolean hasPrivilegedUser = false;
-		if (!Strings.isNullOrEmpty(userId)) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/context/add/{userId}/{contextId}", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
-			User user = userRepository.find(userId);
+	public ResponseEntity<Context> addContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
+			@RequestBody Context context, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
-			if (user != null) {
-				// If user added users check if contains privileged(ADMIN or SUPERUSER)
-				if (user.getMyUsers() != null) {
-					hasPrivilegedUser = userUtils.containsPrivilegedUser(user.getMyUsers());
+		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId) && context != null) {
 
-					// If user contains privileged user(ADMIN or SUPERUSER) - copy groups and own users to one of them
-					if (hasPrivilegedUser) {
-						User privilegedUser = userUtils.getPrivilegedUser(user.getMyUsers());
+			if (!userUtils.checkIfContextAlreadyExists(context, userId)) {
+				Context currentContext = contextRepository.find(contextId);
+				User currentUser = userRepository.find(userId);
+				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+				if (currentContext != null && currentUser != null && contextUserAuth != null) {
+					String licensePlanName = "Default";
+					LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
+					if (licensePlan != null) {
 
-						if (privilegedUser != null) {
-							privilegedUser = userUtils.copyMyUsersToPrivilegedUser(privilegedUser, user.getMyUsers());
-							groupUtils.copyMyGroupsToPrivilegedUser(privilegedUser, user);
-							userRepository.update(privilegedUser);
-							User addedByUser = userRepository.findAddedByUser(user.getId());
-							if (addedByUser != null) {
-								userUtils.updateAddedByUser(addedByUser, user.getId(), privilegedUser.getId());
-							}
-							userUtils.deleteUserDependencies(user, false, false);
+						context.setLicensePlanId(licensePlan.getId());
+						ObjectId savedContextId = contextRepository.saveAndReturnId(context);
+
+						if (savedContextId != null) {
+							ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId, savedContextId.toString(),
+									contextUserAuth.getUserRole());
+							contextUserAuthRepository.save(contextUserAuthenticationNew);
+
+							// add standard group for current context
+							dataInitialization.addDefaultGroup(userId, savedContextId.toString());
+							return new ResponseEntity<Context>(context, HttpStatus.OK);
 						}
-					} else {
-						userUtils.deleteUserDependencies(user, true, true);
 					}
-				} else {
-					userUtils.deleteUserDependencies(user, true, true);
 				}
-
-				userRepository.delete(user);
-
-				return new ResponseEntity<User>(user, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+				log.error("Context {} already exist", context.getName());
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale)),
 						HttpStatus.NOT_FOUND);
 			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
-					HttpStatus.NOT_FOUND);
+
 		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 }
