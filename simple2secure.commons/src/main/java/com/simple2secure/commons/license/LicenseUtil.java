@@ -198,6 +198,9 @@ public class LicenseUtil {
 	 */
 	public static void generateLicenseZIPFile(String licenseFile, String publicKeyFile, String zipFile) throws IOException {
 
+		if (!licenseFile.contains("license.dat")) {
+			licenseFile = licenseFile + "license.dat";
+		}
 		List<File> files = getLicenseFileList(licenseFile, publicKeyFile);
 		ByteArrayOutputStream byteOutStream = ZIPUtils.createZIPStreamFromFiles(files);
 
