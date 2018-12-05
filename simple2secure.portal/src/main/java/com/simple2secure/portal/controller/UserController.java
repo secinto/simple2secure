@@ -411,6 +411,8 @@ public class UserController {
 	@RequestMapping(value = "/invite/{invitationToken}", method = RequestMethod.GET)
 	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable("invitationToken") String invitationToken,
 			@RequestHeader("Accept-Language") String locale) throws URISyntaxException {
+
+		// TODO - check if token exists
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/invitation/" + invitationToken);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);

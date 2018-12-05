@@ -38,6 +38,7 @@
     "angular2-fontawesome": "^0.9.3",
     "angular2-jwt": "^0.2.3",
     "bootstrap": "^3.3.7",
+    "browser-sync": "^2.26.3",
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.5.3",
     "file-saver": "^1.3.8",
