@@ -13,7 +13,9 @@ import java.util.Map;
 
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
+import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.EthernetPacket.EthernetHeader;
+import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.IpV4Packet.IpV4Header;
 import org.pcap4j.packet.IpV6Packet.IpV6Header;
 import org.pcap4j.packet.Packet;
@@ -35,6 +37,11 @@ public class PcapUtil {
 			mapping.put(ipAddress, checkAddress(ipAddress));
 		}
 		return mapping;
+	}
+
+	public static Packet getPacketFromHexString(String hexStreamAsString, int offset) throws IllegalRawDataException {
+		byte[] hexStringAsBArray = hexStringToByteArray(hexStreamAsString);
+		return EthernetPacket.newPacket(hexStringAsBArray, offset, hexStringAsBArray.length);
 	}
 
 	public static boolean checkAddress(String ipAddress) {
@@ -63,9 +70,9 @@ public class PcapUtil {
 		return false;
 	}
 
-	public static String getMacAddress() {
+	public static String getMacAddress(InetAddress ipAddress) {
 		try {
-			InetAddress ipAddress = InetAddress.getLocalHost();
+			// InetAddress ipAddress = InetAddress.getLocalHost();
 			NetworkInterface networkInterface = NetworkInterface.getByInetAddress(ipAddress);
 			byte[] macAddressBytes = networkInterface.getHardwareAddress();
 			StringBuilder macAddressBuilder = new StringBuilder();
@@ -154,11 +161,21 @@ public class PcapUtil {
 
 	/**
 	 * Does exclude the traffic to the local portal
+	 *
 	 * @return
 	 */
 	public static String getBPFFilterLocal() {
 		StringBuilder bpfFilter = new StringBuilder();
 		bpfFilter.append("not host 127.0.0.1 and not port (8443 or 8080 or 9000)");
 		return bpfFilter.toString();
+	}
+
+	public static byte[] hexStringToByteArray(String s) {
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		}
+		return data;
 	}
 }

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Report;
@@ -17,6 +18,7 @@ import com.simple2secure.probe.dao.BaseDao;
 import com.simple2secure.probe.dao.impl.ConfigDaoImpl;
 import com.simple2secure.probe.dao.impl.LicenseDaoImpl;
 import com.simple2secure.probe.dao.impl.NetworkReportDaoImpl;
+import com.simple2secure.probe.dao.impl.ProbePacketDaoImpl;
 import com.simple2secure.probe.dao.impl.ProcessorDaoImpl;
 import com.simple2secure.probe.dao.impl.QueryDaoImpl;
 import com.simple2secure.probe.dao.impl.ReportDaoImpl;
@@ -37,6 +39,7 @@ public class DBUtil {
 	private ReportDaoImpl reportDao;
 	private QueryDaoImpl queryDao;
 	private StepDaoImpl stepDao;
+	private ProbePacketDaoImpl probePacketDao;
 
 	public static DBUtil getInstance() throws IllegalArgumentException {
 		return getInstance(null);
@@ -76,6 +79,10 @@ public class DBUtil {
 
 		if (stepDao == null) {
 			stepDao = new StepDaoImpl(persistenceUnitName);
+		}
+
+		if (probePacketDao == null) {
+			probePacketDao = new ProbePacketDaoImpl(persistenceUnitName);
 		}
 
 		if (log.isDebugEnabled()) {
@@ -169,6 +176,10 @@ public class DBUtil {
 
 		else if (t instanceof Step || t == Step.class) {
 			return stepDao;
+		}
+
+		else if (t instanceof ProbePacket || t == ProbePacket.class) {
+			return probePacketDao;
 		}
 		return null;
 	}

@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.junit.jupiter.api.Test;
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PacketListener;
@@ -39,6 +40,7 @@ public class TestSendArpRequest {
 
 	private static MacAddress resolvedAddr;
 
+	@Test
 	public void testSendArpRequest() throws PcapNativeException, NotOpenException {
 		String strSrcIpAddress = "192.0.2.100"; // for InetAddress.getByName()
 		String strDstIpAddress = "192.168.123.1"; // for InetAddress.getByName()
