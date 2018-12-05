@@ -36,7 +36,7 @@ public class PortalUtils {
 	GroupRepository groupRepository;
 
 	/**
-	 * This function generates an activation token for each user
+	 * This function generates a token(activation, invitation, paswordReset) for each user
 	 *
 	 * @return
 	 */
@@ -154,5 +154,18 @@ public class PortalUtils {
 			}
 		}
 		return foundGroups;
+	}
+
+	/**
+	 * This function checks if the invitation token is still valid
+	 *
+	 * @param expirationTime
+	 * @return
+	 */
+	public boolean checkIfTokenIsStillValid(long expirationTime) {
+		if (System.currentTimeMillis() <= expirationTime) {
+			return true;
+		}
+		return false;
 	}
 }

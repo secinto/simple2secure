@@ -34,6 +34,7 @@ import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
@@ -47,6 +48,7 @@ import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -84,6 +86,9 @@ public class UserController {
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
+
+	@Autowired
+	UserInvitationRepository userInvitationRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -387,13 +392,81 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(value = "/resetPassword/{token}", method = RequestMethod.GET)
+	@RequestMapping(value = "/resetPassword/{token}", method = RequestMethod.POST)
 	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token, @RequestHeader("Accept-Language") String locale)
 			throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);
 		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+	}
+
+	/**
+	 * This function only redirects the user to the correct page in the web for accepting the user invitation.
+	 *
+	 * @param user
+	 * @return
+	 * @throws URISyntaxException
+	 */
+	@RequestMapping(value = "/invite/{invitationToken}", method = RequestMethod.GET)
+	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable("invitationToken") String invitationToken,
+			@RequestHeader("Accept-Language") String locale) throws URISyntaxException {
+		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/invitation/" + invitationToken);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setLocation(url);
+		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+	}
+
+	/**
+	 * @throws ItemNotFoundRepositoryException
+	 *
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/invite/process/{invitationToken}/{isAccepted}", method = RequestMethod.GET)
+	public ResponseEntity<UserInvitation> processInvitation(@PathVariable("invitationToken") String invitationToken,
+			@PathVariable("isAccepted") boolean isAccepted, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(invitationToken)) {
+			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(invitationToken);
+			if (userInvitation != null) {
+				User user = userRepository.find(userInvitation.getUserId());
+				if (isAccepted && user != null) {
+					if (portalUtils.checkIfTokenIsStillValid(userInvitation.getInvitationTokenExpirationTime())) {
+						Context context = contextRepository.find(userInvitation.getContextId());
+						if (context != null) {
+							ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(userInvitation.getUserId(),
+									userInvitation.getContextId(), userInvitation.getUserRole());
+							// If user role is superuser add groups
+							if (userInvitation.getUserRole().equals(UserRole.SUPERUSER)) {
+								if (userInvitation.getGroupIds() != null) {
+									groupUtils.updateGroupAccessRightsforTheSuperuser(userInvitation.getGroupIds(), user, context);
+								}
+							}
+							contextUserAuthRepository.save(contextUserAuth);
+							userInvitationRepository.delete(userInvitation);
+							return new ResponseEntity<UserInvitation>(userInvitation, HttpStatus.OK);
+
+						} else {
+							userInvitationRepository.delete(userInvitation);
+							log.error("Context not found for following {}", invitationToken);
+						}
+					} else {
+						log.error("Invitation token expired {}", invitationToken);
+						userInvitationRepository.delete(userInvitation);
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_token_expired", locale)),
+								HttpStatus.NOT_FOUND);
+					}
+
+				} else {
+					userInvitationRepository.delete(userInvitation);
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_rejected", locale)),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -414,9 +487,7 @@ public class UserController {
 			User user = userRepository.findByPasswordResetToken(token);
 
 			if (user != null) {
-				if (user.getPasswordResetExpirationTime() >= System.currentTimeMillis()) {
-
-					// TODO - check if token is still valid!!!
+				if (portalUtils.checkIfTokenIsStillValid(user.getPasswordResetExpirationTime())) {
 
 					user.setPassword(password);
 
@@ -491,7 +562,7 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/context/{userId}", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
 	public ResponseEntity<CurrentContext> selectUserContext(@PathVariable("userId") String userId, @RequestBody Context context,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -525,7 +596,7 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/context/{userId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) {
 

@@ -21,6 +21,7 @@ import {RoleGuard} from './_guards/role.guard';
 import {UserRole} from './_models';
 import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
 import {ReportComponent, ReportOverviewComponent} from './report';
+import {UserInvitationComponent} from './invitation/userInvitation.component';
 const appRoutes: Routes = [
   {
     path: '', component: DashboardLayoutComponent, canActivate: [AuthGuard],
@@ -112,7 +113,7 @@ const appRoutes: Routes = [
         {
             path: 'updatePassword/:id',
             component: UpdatePasswordComponent
-        }
+        },
       ]
     },
   {
@@ -154,6 +155,15 @@ const appRoutes: Routes = [
             {
                 path: '',
                 component: UpdatePasswordComponent
+            }
+        ]
+    },
+    {
+        path: 'invitation/:id', component: LoginLayoutComponent,
+        children: [
+            {
+                path: '',
+                component: UserInvitationComponent
             }
         ]
     },

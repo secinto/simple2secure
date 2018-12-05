@@ -301,5 +301,10 @@
   "table.licenseDownloads": "License Downloads",
   "message.context.edit": "Context updated successfully!",
   "button.editContext": "Edit Context",
-  "actions.notavailable": "No available actions"
+  "actions.notavailable": "No available actions",
+  "invitation.context": "Context invitation",
+  "invitation.message": "You have been invited to the new context, you can accept or reject it",
+  "button.invitation.accept": "Accept",
+  "button.invitation.reject": "Reject",
+  "invitation.accept": "You have accepted the invitation successfully"
 }

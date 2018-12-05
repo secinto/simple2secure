@@ -9,7 +9,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(req).do(event => {}, err => {
-            if (err instanceof HttpErrorResponse && err.status == 401) {
+            if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('currentUser');
                 this.router.navigate(['/login']);

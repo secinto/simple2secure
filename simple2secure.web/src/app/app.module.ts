@@ -17,6 +17,7 @@ import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
+import {UserInvitationComponent} from './invitation/userInvitation.component';
 import {RegisterComponent, RegisterByEmailComponent} from './register/index';
 import {FooterComponent} from './components/index';
 import {FileUploadModule} from 'ng2-file-upload';
@@ -123,6 +124,7 @@ export const httpInterceptorProviders = [
     LoginComponent,
     ResetComponent,
     UpdatePasswordComponent,
+    UserInvitationComponent,
     RegisterComponent,
     RegisterByEmailComponent,
     DashboardLayoutComponent,

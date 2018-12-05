@@ -249,7 +249,7 @@ export class UserOverviewComponent {
 
   public deleteUser(user: any) {
     this.loading = true;
-    this.httpService.delete(environment.apiEndpoint + 'user/' + user.id + '/' + this.context.context.id).subscribe(
+    this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id + '/' + this.context.context.id).subscribe(
       data => {
         this.alertService.success(this.translate.instant('message.user.delete'));
         this.userDeleted = true;

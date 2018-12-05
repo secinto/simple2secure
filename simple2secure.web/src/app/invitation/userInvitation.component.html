@@ -1,0 +1,8 @@
+<div class="updatePasswordPageForm">
+	<h2 id="updatePwdH2">{{ 'invitation.context' | translate }}</h2>
+    <p id="context-message">{{ 'invitation.message' | translate }}</p>
+    <div class="controlButtons">
+        <button mat-raised-button class="mat-green-button" color="primary" (click)="performContextAction(true)"> {{ 'button.invitation.accept' | translate }}</button>
+        <button mat-raised-button class="mat-red-button" color="primary" (click)="performContextAction(false)"> {{ 'button.invitation.reject' | translate }}</button>
+    </div>
+</div>

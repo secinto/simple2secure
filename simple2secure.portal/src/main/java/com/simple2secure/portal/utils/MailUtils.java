@@ -13,7 +13,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
@@ -82,6 +84,22 @@ public class MailUtils {
 	public String generateEmailContent(User user, String locale) {
 		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/user/activate/"
 				+ user.getActivationToken();
+	}
+
+	/**
+	 * This function generates an email body for the invitation email.
+	 *
+	 * @param userInvitation
+	 * @param context
+	 * @param addedByUser
+	 * @param locale
+	 * @return
+	 */
+	public String generateInvitationEmail(UserInvitation userInvitation, Context context, User addedByUser, String locale) {
+		String content = "You have been invited by " + addedByUser.getEmail() + " to join " + context.getName()
+				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL() + "/api/user/invite/"
+				+ userInvitation.getInvitationToken();
+		return content;
 	}
 
 }

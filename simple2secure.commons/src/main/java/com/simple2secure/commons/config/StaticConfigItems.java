@@ -16,6 +16,7 @@ public class StaticConfigItems {
 	public static String email_subject_al = "simple2secure Activation Link";
 	public static String email_subject_pr = "simple2secure Reset Password Link";
 	public static String email_subjct_pcs = "simple2secure Password Change Successful";
+	public static String email_subject_inv = "simple2secure Context Invitation";
 	public static long expiration_time_password_reset = 1200000; // 20 minutes
 
 	public static String type_password_update = "password_update";

@@ -22,6 +22,7 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
@@ -41,6 +42,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.repository.ToolRepository;
+import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -97,6 +99,9 @@ public class UserUtils {
 
 	@Autowired
 	GroupAccesRightRepository groupAccessRightRepository;
+
+	@Autowired
+	UserInvitationRepository userInvitationRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -429,23 +434,41 @@ public class UserUtils {
 	 * This function is used to invite the user to the current context which is included in the UserRegistration object
 	 *
 	 * @param userRegistration
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ResponseEntity<User> inviteUserToContext(UserRegistration userRegistration, String locale) {
+	private ResponseEntity<User> inviteUserToContext(UserRegistration userRegistration, String locale) throws IOException {
 
 		// invite is only possible if user is added by another user
 		if (userRegistration.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
 			if (!Strings.isNullOrEmpty(userRegistration.getAddedByUserId())) {
-				// User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
-				// User currentUser = userRepository.findByEmail(userRegistration.getEmail());
 
-				// If this user is already part of this context, no need to invite
-				/*
-				 * if (!currentUser.getContextIds().contains(userRegistration.getCurrentContextId())) {
-				 *
-				 * }
-				 */
+				User addedByUser = userRepository.find(userRegistration.getAddedByUserId());
+				Context context = contextRepository.find(userRegistration.getCurrentContextId());
+				User user = userRepository.findByEmailOnlyActivated(userRegistration.getEmail());
+				if (addedByUser != null && context != null && user != null) {
+					// Check if user is already part of this context
+					ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
+							user.getId());
+					// user not part of this context
+					if (contextUserAuthentication == null) {
 
+						// TODO: obtain expiration_time_password_reset value from settings
+						long tokenExpirationTime = System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset;
+
+						// create new invitation
+						UserInvitation userInvitation = new UserInvitation(user.getId(), context.getId(), userRegistration.getUserRole(),
+								portalUtils.generateToken(), tokenExpirationTime, userRegistration.getGroupIds());
+
+						// If email has been sent save the user invitation to the database
+						if (mailUtils.sendEmail(user, mailUtils.generateInvitationEmail(userInvitation, context, addedByUser, locale),
+								StaticConfigItems.email_subject_inv)) {
+							userInvitationRepository.save(userInvitation);
+							return new ResponseEntity<User>(user, HttpStatus.OK);
+						}
+
+					}
+				}
 			}
 
 		}
@@ -518,7 +541,7 @@ public class UserUtils {
 
 	/**
 	 * This function checks if currently active user has privileges to update selected user
-	 * 
+	 *
 	 * @param userRegistration
 	 * @param context
 	 * @return

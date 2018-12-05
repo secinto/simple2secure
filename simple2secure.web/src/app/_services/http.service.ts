@@ -41,7 +41,6 @@ export class HttpService {
         if (!this.currentLang){
             this.currentLang = this.translate.defaultLang;
         }
-
         const headers = new HttpHeaders().set('Authorization', localStorage.
         getItem('token')).set('Accept-Language', this.currentLang);
         return this.httpClient.post<any>(url, item, {headers});
@@ -138,4 +137,17 @@ export class HttpService {
                 this.authenticationService.logout();
             });
     }
+
+    public processInvitation(url: string): Observable<any> {
+        this.currentLang = this.translate.currentLang;
+
+        if (!this.currentLang){
+            this.currentLang = this.translate.defaultLang;
+        }
+
+        const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
+        return this.httpClient.get<any>(url, {headers});
+    }
+
+
 }
