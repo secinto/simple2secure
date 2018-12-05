@@ -10,4 +10,5 @@ export class UserDTO{
     myGroups: CompanyGroup[];
     myProbes: Probe[];
     myContexts: Context[];
+    assignedGroups: string[];
 }

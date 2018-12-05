@@ -21,14 +21,17 @@ public class UserDTO {
 	private List<CompanyGroup> myGroups;
 	private List<Probe> myProbes;
 	private List<Context> myContexts;
+	private List<String> assignedGroups;
 	private User myProfile;
 
-	public UserDTO(User user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Context> myContexts) {
+	public UserDTO(User user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Context> myContexts,
+			List<String> assignedGroups) {
 		myProfile = user;
 		myUsersList = myUsers;
 		this.myGroups = myGroups;
 		this.myProbes = myProbes;
 		this.myContexts = myContexts;
+		this.assignedGroups = assignedGroups;
 	}
 
 	public List<UserRoleDTO> getMyUsersList() {
@@ -69,5 +72,13 @@ public class UserDTO {
 
 	public void setMyContexts(List<Context> myContexts) {
 		this.myContexts = myContexts;
+	}
+
+	public List<String> getAssignedGroups() {
+		return assignedGroups;
+	}
+
+	public void setAssignedGroups(List<String> assignedGroups) {
+		this.assignedGroups = assignedGroups;
 	}
 }

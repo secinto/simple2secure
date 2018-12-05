@@ -1,6 +1,5 @@
 package com.simple2secure.portal.repository.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -41,21 +40,5 @@ public class GroupRepositoryImpl extends GroupRepository {
 	public List<CompanyGroup> findByParentId(String parentId) {
 		Query query = new Query(Criteria.where("parentId").is(parentId)).with(new Sort(Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
-	}
-
-	@Override
-	public List<CompanyGroup> findBySuperUserId(String superUserId, String contextId) {
-		List<CompanyGroup> groups = findByContextId(contextId);
-		List<CompanyGroup> userGroups = new ArrayList<>();
-		if (groups != null) {
-			for (CompanyGroup group : groups) {
-				if (group.getSuperUserIds().contains(superUserId)) {
-					userGroups.add(group);
-				}
-			}
-			return userGroups;
-		}
-
-		return userGroups;
 	}
 }

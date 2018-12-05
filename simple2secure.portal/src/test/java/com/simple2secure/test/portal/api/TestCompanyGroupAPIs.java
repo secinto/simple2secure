@@ -27,11 +27,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 
 @ExtendWith({ SpringExtension.class })
@@ -49,6 +51,9 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	@Autowired
 	private GroupRepository groupRepository;
+
+	@Autowired
+	private GroupAccesRightRepository groupAccessRightRepository;
 
 	@Autowired
 	private ContextUserAuthRepository contextUserAuthRepo;
@@ -205,14 +210,21 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
 		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
-		sourceGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
+
+		// Map superuser with source group
+		GroupAccessRight groupAccessRight = new GroupAccessRight(getSuperUser().getId(), sourceGroupId.toString(),
+				contextUserAuth.get(0).getContextId());
+		groupAccessRightRepository.save(groupAccessRight);
 
 		// Create destination root group with the contextId of the superuser
 		CompanyGroup destGroup = new CompanyGroup("Destination Group", new ArrayList<>());
 		destGroup.setContextId(contextUserAuth.get(0).getContextId());
-		destGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
+
+		// Map superuser with dest group
+		groupAccessRight = new GroupAccessRight(getSuperUser().getId(), destGroupId.toString(), contextUserAuth.get(0).getContextId());
+		groupAccessRightRepository.save(groupAccessRight);
 
 		// API call to move source group to destGroup
 		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
@@ -234,8 +246,12 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
 		sourceGroup.setRootGroup(true);
 		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
-		sourceGroup.addSuperUserId(getSuperUser().getId());
 		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
+
+		// Map superuser with source group
+		GroupAccessRight groupAccessRight = new GroupAccessRight(getSuperUser().getId(), sourceGroupId.toString(),
+				contextUserAuth.get(0).getContextId());
+		groupAccessRightRepository.save(groupAccessRight);
 
 		// This group does not exist
 		String destGroupId = "1111";

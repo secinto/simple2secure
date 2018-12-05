@@ -23,7 +23,6 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 export class UserDetailsComponent {
   public user: UserRegistration;
-  addedByUserId: string;
   url: string;
   currentUser: any;
   showGroupSelectBox: boolean;
@@ -54,6 +53,7 @@ export class UserDetailsComponent {
           this.user.email = data.user.user.email;
           this.user.userRole = data.user.userRole;
           this.user.groupIds = data.user.groupIds;
+          console.log(JSON.stringify(data.user));
           if (this.user.userRole === UserRole.SUPERUSER){
               this.showGroupSelectBox = true;
       }
@@ -96,7 +96,7 @@ export class UserDetailsComponent {
             .subscribe(
                 data => {
                     this.groups = data;
-                    this.addMyGroups(this.groups);
+                    //this.addMyGroups(this.groups);
                 },
                 error => {
 
@@ -125,6 +125,7 @@ export class UserDetailsComponent {
 	saveUser() {
         this.url = environment.apiEndpoint + 'user';
         this.user.currentContextId = this.context.context.id;
+        this.user.addedByUserId = this.currentUser.userID;
         if (this.action === UrlParameter.NEW) {
             this.user.registrationType = UserRegistrationType.ADDED_BY_USER;
         }

@@ -300,6 +300,7 @@
   "table.mycontexts": "Meine Kontexte",
   "table.licenseDownloads": "Lizenz-Downloads",
   "message.context.edit": "Kontext wurde erfolgreich aktualisiert!",
-  "button.editContext": "Kontext bearbeiten"
+  "button.editContext": "Kontext bearbeiten",
+  "actions.notavailable": "Keine verfügbaren Aktionen"
 
 }

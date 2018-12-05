@@ -36,6 +36,7 @@ import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
+import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -144,11 +145,23 @@ public class UserController {
 			Context context = contextRepository.find(contextId);
 
 			if (context != null) {
+
+				// Retrieving the current UserContextAuth
+				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
+
+				List<String> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
 				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
-				UserDTO userDTO = new UserDTO(user, myUsers, groups, myProbes, myContexts);
+
+				if (contextUserAuth != null) {
+					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, user);
+					}
+				}
+
+				UserDTO userDTO = new UserDTO(user, myUsers, groups, myProbes, myContexts, assignedGroups);
 				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
 			}
 		}

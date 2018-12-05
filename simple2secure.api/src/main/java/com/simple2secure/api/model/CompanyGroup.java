@@ -24,8 +24,6 @@ public class CompanyGroup extends GenericDBObject {
 
 	private boolean standardGroup = false;
 
-	private List<String> superUserIds = new ArrayList<>();
-
 	public CompanyGroup() {
 	}
 
@@ -104,21 +102,5 @@ public class CompanyGroup extends GenericDBObject {
 
 	public void setStandardGroup(boolean standardGroup) {
 		this.standardGroup = standardGroup;
-	}
-
-	public List<String> getSuperUserIds() {
-		return superUserIds;
-	}
-
-	public void setSuperUserIds(List<String> superUserIds) {
-		this.superUserIds = superUserIds;
-	}
-
-	public void addSuperUserId(String superUserId) {
-		superUserIds.add(superUserId);
-	}
-
-	public void removeSuperUserId(String superUserId) {
-		superUserIds.remove(superUserId);
 	}
 }

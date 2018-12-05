@@ -105,8 +105,13 @@
 			</div>
 			
 			<mat-menu #menu="matMenu">
+			  <div *ngIf="canDeleteAndEditUser">
 			  <button mat-menu-item (click)="openDialogEditUser()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
 			  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+			  </div>
+				<div *ngIf="!canDeleteAndEditUser">
+					<p mat-menu-item><mat-icon>warning</mat-icon>{{'actions.notavailable' | translate}}</p>
+				</div>
 			</mat-menu>
         </mat-tab>
 

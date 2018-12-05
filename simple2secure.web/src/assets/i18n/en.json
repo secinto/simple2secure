@@ -300,5 +300,6 @@
   "table.mycontexts": "My Contexts",
   "table.licenseDownloads": "License Downloads",
   "message.context.edit": "Context updated successfully!",
-  "button.editContext": "Edit Context"
+  "button.editContext": "Edit Context",
+  "actions.notavailable": "No available actions"
 }

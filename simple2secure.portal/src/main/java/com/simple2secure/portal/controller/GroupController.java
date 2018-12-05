@@ -27,6 +27,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
@@ -34,6 +35,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -54,6 +56,9 @@ public class GroupController {
 
 	@Autowired
 	ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
+	GroupAccesRightRepository groupAccessRightRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -88,14 +93,19 @@ public class GroupController {
 					// THERE IS A PARENT GROUP!!
 					CompanyGroup parentGroup = groupRepository.find(parentGroupId);
 					if (parentGroup != null) {
-						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
-							group.addSuperUserId(user.getId());
-						}
 
 						group.setContextId(parentGroup.getContextId());
 						group.setRootGroup(false);
 						group.setParentId(parentGroupId);
 						ObjectId groupId = groupRepository.saveAndReturnId(group);
+
+						// If this is Superuser add new mapping between this superuser and group
+						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
+							GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
+									contextUserAuthentication.getContextId());
+							groupAccessRightRepository.save(groupAccessRight);
+						}
+
 						parentGroup.addChildrenId(groupId.toString());
 						groupRepository.update(parentGroup);
 						return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
@@ -109,13 +119,17 @@ public class GroupController {
 					Context context = contextRepository.find(contextId);
 					if (context != null) {
 
-						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
-							group.addSuperUserId(user.getId());
-						}
-
 						group.setContextId(context.getId());
 						group.setRootGroup(true);
-						groupRepository.save(group);
+						ObjectId groupId = groupRepository.saveAndReturnId(group);
+
+						// If this is Superuser add new mapping between this superuser and group
+						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
+							GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
+									contextUserAuthentication.getContextId());
+							groupAccessRightRepository.save(groupAccessRight);
+						}
+
 						return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 					} else {
 						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),

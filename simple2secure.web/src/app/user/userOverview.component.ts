@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {Context, CompanyGroup, User, UserDTO, UserRole, ContextDTO} from '../_models/index';
+import {CompanyGroup, ContextDTO, User, UserDTO, UserRole} from '../_models/index';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -31,6 +31,7 @@ export class UserOverviewComponent {
   groupAdded = false;
   contextAdded = false;
   userAdded = false;
+  canDeleteAndEditUser = false;
   selectedItem: any;
   myProfile: any;
   moveNotPossible = false;
@@ -342,7 +343,6 @@ export class UserOverviewComponent {
               this.showEditAndDelete = false;
               this.dataService.setGroupEditable(false);
           }
-
       }
 
       if (item.standardGroup){
@@ -351,17 +351,39 @@ export class UserOverviewComponent {
       else{
           this.isGroupDeletable = true;
       }
+
+      if (this.context.userRole === UserRole.SUPERADMIN){
+          this.canDeleteAndEditUser = true;
+      }
+      else if (this.context.userRole === UserRole.ADMIN){
+          if (item.userRole === UserRole.SUPERADMIN){
+              this.canDeleteAndEditUser = false;
+          }
+          else{
+              this.canDeleteAndEditUser = true;
+          }
+      }
+      else if (this.context.userRole === UserRole.SUPERUSER){
+          if (item.userRole === UserRole.SUPERUSER || item.userRole === UserRole.USER){
+              this.canDeleteAndEditUser = true;
+          }
+          else{
+              this.canDeleteAndEditUser = false;
+          }
+      }
   }
 
     checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup){
+
+        console.log(JSON.stringify(this.myProfile.assignedGroups));
 
         if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN){
             return true;
         }
         else if (this.context.userRole == UserRole.SUPERUSER){
             if (fromGroup && toGroup){
-                if (fromGroup.superUserIds && toGroup.superUserIds){
-                    if (fromGroup.superUserIds.indexOf(this.currentUser.userID) > -1 && toGroup.superUserIds.indexOf(this.currentUser.userID) > -1){
+                if (this.myProfile.assignedGroups){
+                    if (this.myProfile.assignedGroups.indexOf(fromGroup.id) > -1 && this.myProfile.assignedGroups.indexOf(toGroup.id) > -1){
                         return true;
                     }
                     else{
@@ -378,8 +400,8 @@ export class UserOverviewComponent {
                 }
             }
             else if (fromGroup && !toGroup){
-                if (fromGroup.superUserIds){
-                    if (fromGroup.superUserIds.indexOf(this.currentUser.userID) > -1){
+                if (this.myProfile.assignedGroups){
+                    if (this.myProfile.assignedGroups.indexOf(fromGroup.id) > -1){
                         return true;
                     }
                     else{
@@ -402,8 +424,8 @@ export class UserOverviewComponent {
       }
       else if (this.context.userRole == UserRole.SUPERUSER){
           if (group){
-              if (group.superUserIds){
-                  if (group.superUserIds.indexOf(this.currentUser.userID) > -1){
+              if (this.myProfile.assignedGroups){
+                  if (this.myProfile.assignedGroups.indexOf(group.id) > -1){
                       return true;
                   }
                   else{
@@ -477,7 +499,6 @@ export class UserOverviewComponent {
         dialogConfig.width = '450px';
         dialogConfig.data = {
             user: null,
-            addedByUserId: this.currentUser.userID,
             groups: this.myProfile.myGroups
         };
 
@@ -508,7 +529,6 @@ export class UserOverviewComponent {
         dialogConfig.width = '450px';
         dialogConfig.data = {
             user: this.selectedItem,
-            addedByUserId: null,
             groups: this.myProfile.myGroups
         };
 
@@ -758,7 +778,7 @@ export class UserOverviewComponent {
               else if (type == 'probe') {
                   this.deleteProbe(this.selectedItem);
               }
-              else if(type == 'context'){
+              else if (type == 'context'){
                   this.deleteContext(this.selectedItem);
               }
           }

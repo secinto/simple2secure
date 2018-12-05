@@ -15,12 +15,14 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
@@ -63,29 +65,10 @@ public class GroupUtils {
 	ContextUserAuthRepository contextUserAuthRepository;
 
 	@Autowired
-	MessageByLocaleService messageByLocaleService;
+	GroupAccesRightRepository groupAccessRightRepository;
 
-	/**
-	 * This function copies the groups from the user which is being deleted to the privileged one
-	 *
-	 * @param privilegedUser
-	 * @param user
-	 */
-	public void copyMyGroupsToPrivilegedUser(User privilegedUser, User user) {
-		// List<CompanyGroup> groups = groupRepository.findByOwnerId(user.getId());
-		//
-		// if (groups != null) {
-		// for (CompanyGroup group : groups) {
-		// // group.setAddedByUserId(privilegedUser.getId());
-		// // group.setOwner(privilegedUser.getEmail());
-		// try {
-		// groupRepository.update(group);
-		// } catch (ItemNotFoundRepositoryException e) {
-		// log.error("Group not found");
-		// }
-		// }
-		// }
-	}
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
 
 	/**
 	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
@@ -304,7 +287,9 @@ public class GroupUtils {
 				// SUPERUSER
 				else if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
 					// Move only if superuser belongs to the both groups(both groups are assigned to him)
-					if (fromGroup.getSuperUserIds().contains(user.getId())) {
+
+					GroupAccessRight groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(fromGroup.getId(), user.getId());
+					if (groupAccessRight != null) {
 						// in this case the moved group will be root group
 						if (toGroup == null) {
 							if (moveGroup(fromGroup, toGroup)) {
@@ -312,7 +297,8 @@ public class GroupUtils {
 							}
 						} else {
 							// check if toGroup is assigned to this user
-							if (toGroup.getSuperUserIds().contains(user.getId())) {
+							groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(toGroup.getId(), user.getId());
+							if (groupAccessRight != null) {
 								if (moveGroup(fromGroup, toGroup)) {
 									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
 								}
@@ -382,13 +368,14 @@ public class GroupUtils {
 	 * @param user
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	public void updateGroupSuperUserList(List<String> groupIds, User user) throws ItemNotFoundRepositoryException {
-		if (groupIds != null) {
+	public void updateGroupAccessRightsforTheSuperuser(List<String> groupIds, User user, Context context)
+			throws ItemNotFoundRepositoryException {
+		if (groupIds != null && user != null && context != null) {
 			for (String groupId : groupIds) {
-				CompanyGroup group = groupRepository.find(groupId);
-				if (group != null) {
-					group.addSuperUserId(user.getId());
-					groupRepository.update(group);
+				if (checkIfGroupExists(groupId)) {
+					GroupAccessRight groupAccessRight = new GroupAccessRight(user.getId(), groupId, context.getId());
+					groupAccessRightRepository.save(groupAccessRight);
+					log.debug("Superuser {} added to the following group {}", user.getEmail(), groupId);
 				}
 			}
 		}
@@ -401,19 +388,61 @@ public class GroupUtils {
 	 * @param context
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	public void removeSuperUserFromGroups(User user, Context context) throws ItemNotFoundRepositoryException {
+	public void removeSuperuserFromtheGroupAccessRights(User user, Context context) throws ItemNotFoundRepositoryException {
 		if (user != null && context != null) {
-			List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
-			if (groups != null) {
-				for (CompanyGroup group : groups) {
-					if (group.getSuperUserIds().contains(user.getId())) {
-						group.removeSuperUserId(user.getId());
-						groupRepository.update(group);
+
+			List<GroupAccessRight> groupAccessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
+
+			if (groupAccessRightList != null) {
+				for (GroupAccessRight groupAccessRight : groupAccessRightList) {
+					if (groupAccessRight != null) {
+						groupAccessRightRepository.delete(groupAccessRight);
 					}
 				}
 			}
 		}
 
+	}
+
+	/**
+	 * This function checks if the groups exists in the database according to the provided groupId
+	 *
+	 * @param groupId
+	 * @return
+	 */
+	public boolean checkIfGroupExists(String groupId) {
+		if (!Strings.isNullOrEmpty(groupId)) {
+			CompanyGroup group = groupRepository.find(groupId);
+			if (group != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function returns the groupIds of the superuser where he has been assigned to.
+	 * 
+	 * @param context
+	 * @param user
+	 * @return
+	 */
+	public List<String> getAllAssignedGroupIdsForSuperUser(Context context, User user) {
+		List<String> groupIds = new ArrayList<>();
+
+		List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
+
+		if (accessRightList != null) {
+			for (GroupAccessRight accessRight : accessRightList) {
+				if (accessRight != null) {
+					if (checkIfGroupExists(accessRight.getGroupId())) {
+						groupIds.add(accessRight.getGroupId());
+					}
+				}
+			}
+		}
+
+		return groupIds;
 	}
 
 }

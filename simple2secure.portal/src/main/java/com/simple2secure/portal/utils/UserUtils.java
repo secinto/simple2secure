@@ -17,9 +17,9 @@ import org.springframework.validation.Errors;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.UserRoleDTO;
-import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRegistration;
@@ -33,6 +33,7 @@ import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
+import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -93,6 +94,9 @@ public class UserUtils {
 
 	@Autowired
 	TokenRepository tokenRepository;
+
+	@Autowired
+	GroupAccesRightRepository groupAccessRightRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -197,7 +201,9 @@ public class UserUtils {
 
 							// Update the selected groups to be accessible for the superuser
 							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
-								addSuperuserTotheSelectedGroup(userRegistration, userID.toString());
+
+								groupUtils.updateGroupAccessRightsforTheSuperuser(userRegistration.getGroupIds(), user, context);
+
 							}
 
 							log.debug("User {} added successfully", user.getUsername());
@@ -345,26 +351,6 @@ public class UserUtils {
 		return UserRole.ADMIN;
 	}
 
-	/**
-	 * This function updates the superuserIds list in each group when new superuser is added.
-	 *
-	 * @param userRegistration
-	 * @param userId
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	private void addSuperuserTotheSelectedGroup(UserRegistration userRegistration, String userId) throws ItemNotFoundRepositoryException {
-		if (userRegistration.getGroupIds() != null) {
-			for (String groupId : userRegistration.getGroupIds()) {
-				CompanyGroup group = groupRepository.find(groupId);
-				if (group != null) {
-					group.addSuperUserId(userId);
-					groupRepository.update(group);
-					log.debug("Superuser {} added to the following group {}", userRegistration.getEmail(), group.getName());
-				}
-			}
-		}
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<User> updateUser(UserRegistration userRegistration, String locale) throws ItemNotFoundRepositoryException {
 
@@ -374,30 +360,32 @@ public class UserUtils {
 			Context context = contextRepository.find(userRegistration.getCurrentContextId());
 			if (user != null && context != null) {
 
-				// get current context user auth and check if user role has been changed
-				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
+				if (checkIfUserCanUpdateUser(userRegistration, context)) {
+					// get current context user auth and check if user role has been changed
+					ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
 
-				if (contextUserAuth != null) {
-					if (!userRegistration.getUserRole().equals(contextUserAuth.getUserRole())) {
+					if (contextUserAuth != null) {
+						if (!userRegistration.getUserRole().equals(contextUserAuth.getUserRole())) {
 
-						if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
-							groupUtils.removeSuperUserFromGroups(user, context);
+							if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+								groupUtils.removeSuperuserFromtheGroupAccessRights(user, context);
+							}
+
+							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
+								groupUtils.updateGroupAccessRightsforTheSuperuser(userRegistration.getGroupIds(), user, context);
+							}
+
+							// update contextUserAuthentication object with the current role
+							contextUserAuth.setUserRole(userRegistration.getUserRole());
+							contextUserAuthRepository.update(contextUserAuth);
+						} else {
+							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
+								groupUtils.removeSuperuserFromtheGroupAccessRights(user, context);
+								groupUtils.updateGroupAccessRightsforTheSuperuser(userRegistration.getGroupIds(), user, context);
+							}
 						}
-
-						if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
-							groupUtils.updateGroupSuperUserList(userRegistration.getGroupIds(), user);
-						}
-
-						// update contextUserAuthentication object with the current role
-						contextUserAuth.setUserRole(userRegistration.getUserRole());
-						contextUserAuthRepository.update(contextUserAuth);
-					} else {
-						if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
-							groupUtils.removeSuperUserFromGroups(user, context);
-							groupUtils.updateGroupSuperUserList(userRegistration.getGroupIds(), user);
-						}
+						return new ResponseEntity<User>(user, HttpStatus.OK);
 					}
-					return new ResponseEntity<User>(user, HttpStatus.OK);
 				}
 			}
 		}
@@ -486,12 +474,12 @@ public class UserUtils {
 							List<String> groupIds = new ArrayList<>();
 
 							if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
-								List<CompanyGroup> groups = groupRepository.findBySuperUserId(user.getId(), context.getId());
+								List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
 
-								if (groups != null) {
-									for (CompanyGroup group : groups) {
-										if (group != null) {
-											groupIds.add(group.getId());
+								for (GroupAccessRight accessRight : accessRightList) {
+									if (accessRight != null) {
+										if (groupUtils.checkIfGroupExists(accessRight.getGroupId())) {
+											groupIds.add(accessRight.getGroupId());
 										}
 									}
 								}
@@ -521,6 +509,36 @@ public class UserUtils {
 				if (contextFromDb != null) {
 					if (contextFromDb.getName().trim().toLowerCase().equals(context.getName().trim().toLowerCase())) {
 						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function checks if currently active user has privileges to update selected user
+	 * 
+	 * @param userRegistration
+	 * @param context
+	 * @return
+	 */
+	private boolean checkIfUserCanUpdateUser(UserRegistration userRegistration, Context context) {
+		if (!Strings.isNullOrEmpty(userRegistration.getAddedByUserId())) {
+			User user = userRepository.find(userRegistration.getAddedByUserId());
+			if (user != null) {
+				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
+				if (contextUserAuth != null) {
+					if (contextUserAuth.getUserRole().equals(UserRole.SUPERADMIN)) {
+						return true;
+					} else if (contextUserAuth.getUserRole().equals(UserRole.ADMIN)) {
+						if (!userRegistration.getUserRole().equals(UserRole.SUPERADMIN)) {
+							return true;
+						}
+					} else if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+						if (!userRegistration.getUserRole().equals(UserRole.SUPERADMIN) && !userRegistration.getUserRole().equals(UserRole.ADMIN)) {
+							return true;
+						}
 					}
 				}
 			}
