@@ -66,13 +66,13 @@ export class EmailInboxComponent {
      */
     private createTempEmail(){
         this.tempMails = new Email();
-        this.tempMails.configID = 'test';
+        this.tempMails.configId = 'test';
         this.tempMails.from = 'fakeMail@secinto.com';
         this.tempMails.id = '123123';
         this.tempMails.number = 121321;
         this.tempMails.subject = 'test subject';
         this.tempMails.text = 'This is only a test mail';
-        this.tempMails.userUUID = 'ksoadkosakdoakdoskaodkoadsa';
+        this.tempMails.contextId = 'ksoadkosakdoakdoskaodkoadsa';
     }
 
     private loadAllEmails() {

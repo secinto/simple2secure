@@ -1,8 +1,8 @@
 import {Generic} from './generic';
 
 export class Email extends Generic{
-    userUUID: string;
-    configID: string;
+    contextId: string;
+    configId: string;
     number: number;
     subject: string;
     from: string;

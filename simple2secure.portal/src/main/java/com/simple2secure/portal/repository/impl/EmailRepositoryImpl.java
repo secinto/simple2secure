@@ -23,30 +23,48 @@ public class EmailRepositoryImpl extends EmailRepository {
 	}
 
 	@Override
-	public Email findByUserUUIDConfigIDAndMsgID(String userUUID, String configID, String msgId) {
-		Query query = new Query(Criteria.where("userUUID").is(userUUID).and("configID").is(configID).and("messageID").is(msgId));
-		return this.mongoTemplate.findOne(query, Email.class);
+	public Email findByContextMessageAndConfigId(String contextId, String configId, String msgId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("configId").is(configId).and("messageId").is(msgId));
+		return mongoTemplate.findOne(query, Email.class);
 	}
 
 	@Override
-	public List<Email> findByUserUUIDAndConfigID(String userUUID, String configID) {
-		Query query = new Query(Criteria.where("userUUID").is(userUUID).and("configID").is(configID));
-		return this.mongoTemplate.find(query, Email.class);
+	public List<Email> findByContextAndConfigId(String contextId, String configId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("configId").is(configId));
+		return mongoTemplate.find(query, Email.class);
 	}
 
 	@Override
-	public List<Email> findByUserId(String userId) {
-		Query query = new Query(Criteria.where("userUUID").is(userId));
-		return this.mongoTemplate.find(query, Email.class);		
+	public List<Email> findByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		return mongoTemplate.find(query, Email.class);
 	}
 
 	@Override
-	public void deleteByUserId(String userId) {
-		List<Email> emails = findByUserId(userId);
-		if(emails != null) {
-			for(Email email : emails) {
-				this.mongoTemplate.remove(email);
+	public void deleteByContextId(String contextId) {
+		List<Email> emails = findByContextId(contextId);
+		if (emails != null) {
+			for (Email email : emails) {
+				mongoTemplate.remove(email);
 			}
-		}		
-	}	
+		}
+	}
+
+	@Override
+	public List<Email> findByConfigId(String configId) {
+		Query query = new Query(Criteria.where("configId").is(configId));
+		return mongoTemplate.find(query, Email.class);
+	}
+
+	@Override
+	public void deleteByConfigId(String configId) {
+		List<Email> emails = findByConfigId(configId);
+
+		if (emails != null) {
+			for (Email email : emails) {
+				delete(email);
+			}
+		}
+
+	}
 }

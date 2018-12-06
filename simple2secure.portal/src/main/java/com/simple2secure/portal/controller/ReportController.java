@@ -40,6 +40,7 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
+@RequestMapping("/api/reports")
 public class ReportController {
 
 	@Autowired
@@ -67,51 +68,7 @@ public class ReportController {
 
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
-	/**
-	 * This API returns JSON, with all reports listed in it.
-	 *
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> getAvailableReports(@RequestHeader("Accept-Language") String locale) {
-
-		List<Report> reportList = reportsRepository.findAll();
-		// List<ReportDTO> = new ArrayList<>();
-
-		if (reportList == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
-			// for (Report report : reportList) {
-			//
-			// if (!Strings.isNullOrEmpty(report.getProbeId())) {
-			// CompanyLicensePrivate license = licenseRepository.findByProbeId(report.getProbeId());
-			// if (license != null) {
-			// ReportDTO reportDTO = new ReportDTO(report);
-			// reportListDTO.add(reportDTO);
-			//
-			// } else {
-			// log.error("There is no license with the provided probeId");
-			// }
-			// } else {
-			// log.error("Report does not contain probe ID");
-			// }
-			//
-			// }
-			//
-			// if (reportListDTO == null || reportListDTO.isEmpty()) {
-			// return new ResponseEntity(
-			// new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-			// HttpStatus.NOT_FOUND);
-			// } else {
-			return new ResponseEntity<List<Report>>(reportList, HttpStatus.OK);
-			// }
-		}
-	}
-
-	@RequestMapping(value = "/api/reports", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('PROBE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
 		reportsRepository.save(report);
@@ -119,7 +76,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Report>> getReportsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -144,7 +101,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/report/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/report/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 		Report report = reportsRepository.find(id);
@@ -155,7 +112,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -174,7 +131,7 @@ public class ReportController {
 		}
 	}
 
-	@RequestMapping(value = "/api/reports/network", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/network", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('PROBE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@RequestHeader("Accept-Language") String locale) {
@@ -183,7 +140,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/network/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/network/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -208,7 +165,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/reports/network/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/network/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 

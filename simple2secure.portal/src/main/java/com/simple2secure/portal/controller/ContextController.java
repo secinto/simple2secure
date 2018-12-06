@@ -133,7 +133,7 @@ public class ContextController {
 				}
 			}
 		}
-
+		log.error("Problem occured while adding context " + context.getName());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -164,7 +164,7 @@ public class ContextController {
 				return new ResponseEntity<List<ContextDTO>>(contextList, HttpStatus.OK);
 			}
 		}
-
+		log.error("Problem occured while retrieving contexts for user ID {}" + userId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -196,7 +196,8 @@ public class ContextController {
 			}
 
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
+		log.error("Problem occured while deleting context {}" + contextId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_context", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -229,7 +230,7 @@ public class ContextController {
 				return new ResponseEntity<CurrentContext>(currentContext, HttpStatus.OK);
 			}
 		}
-
+		log.error("Problem occured while updating/creating context {}" + context.getName());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}

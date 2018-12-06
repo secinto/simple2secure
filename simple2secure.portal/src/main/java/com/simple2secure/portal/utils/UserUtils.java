@@ -360,7 +360,6 @@ public class UserUtils {
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
-
 	}
 
 	/**

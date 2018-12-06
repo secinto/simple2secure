@@ -1,7 +1,7 @@
 import {Generic} from './generic';
 
 export class EmailConfiguration extends Generic{
-    userUUID: string;
+    contextId: string;
     incomingServer: string;
     incomingPort: string;
     outgoingServer: string;

@@ -1,6 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {EmailConfiguration} from '../_models/index';
+import {ContextDTO, EmailConfiguration} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -19,8 +19,8 @@ export class EmailOverviewComponent {
     tempConfig: EmailConfiguration;
     loading = false;
     selectedConfig: EmailConfiguration;
-    currentUser: any;
     deleted = false;
+    context: ContextDTO;
 
     displayedColumns = ['email', 'id', 'incomingPort', 'action'];
     dataSource = new MatTableDataSource();
@@ -37,7 +37,7 @@ export class EmailOverviewComponent {
             private translate: TranslateService) {}
 
     ngOnInit() {
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.context = JSON.parse(localStorage.getItem('context'));
         this.loadAllConfigurations();
       }
 
@@ -64,7 +64,7 @@ export class EmailOverviewComponent {
         this.tempConfig.outgoingPort = 'outTestPort';
         this.tempConfig.outgoingServer = 'outTestServer';
         this.tempConfig.password = 'slapdlpsad';
-        this.tempConfig.userUUID = '222222';
+        this.tempConfig.contextId = '222222';
     }
 
     private loadAllConfigurations() {
@@ -78,7 +78,7 @@ export class EmailOverviewComponent {
         }
         else{
             this.loading = true;
-            this.httpService.get(environment.apiEndpoint + 'email/' + this.currentUser.userID)
+            this.httpService.get(environment.apiEndpoint + 'email/' + this.context.context.id)
               .subscribe(
               data => {
                 this.config = data;

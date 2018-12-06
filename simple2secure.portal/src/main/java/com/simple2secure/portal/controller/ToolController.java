@@ -41,6 +41,7 @@ import io.kubernetes.client.models.V1PodList;
 import io.kubernetes.client.util.Config;
 
 @RestController
+@RequestMapping("/api/tool")
 public class ToolController {
 
 	@Autowired
@@ -52,53 +53,34 @@ public class ToolController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@RequestMapping(value = "/api/tool/{user_id}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Tool>> getPacketByUserID(@PathVariable("user_id") String user_id,
-			@RequestHeader("Accept-Language") String locale) {
-		return new ResponseEntity<List<Tool>>(this.repository.getToolsByUserID(user_id), HttpStatus.OK);
-	}
-
-	/*
-	 * private Config initializeConnection() { Config config = new ConfigBuilder()
-	 * .withMasterUrl(ConfigItems.KUBERNETES_BASE_URL) .withTrustCerts(true)
-	 * .withOauthToken(ConfigItems.kubernetes_token.replaceAll("(\\r|\\n)", ""))
-	 * .build(); return config; }
-	 */
-
 	private ApiClient initialize() {
-		ApiClient client = Config.fromUserPassword(loadedConfigItems.getBaseKubernetesURL(), "admin",
-				"PxELDtfxo5p9jWWK", false);
+		ApiClient client = Config.fromUserPassword(loadedConfigItems.getBaseKubernetesURL(), "admin", "PxELDtfxo5p9jWWK", false);
 		client.getHttpClient().setReadTimeout(35, TimeUnit.SECONDS);
-		// ApiClient client = Config.fromToken(ConfigItems.KUBERNETES_BASE_URL,
-		// ConfigItems.kubernetes_token, false);
 		return client;
 	}
 
+	@RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<Tool>> getPacketByUserID(@PathVariable("userId") String userId,
+			@RequestHeader("Accept-Language") String locale) {
+		return new ResponseEntity<List<Tool>>(repository.getToolsByUserID(userId), HttpStatus.OK);
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/tools", method = RequestMethod.GET)
+	@RequestMapping(value = "/tools", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Tool>> getAllTools(@RequestHeader("Accept-Language") String locale) {
-
-		/*
-		 * KubernetesClient client = new
-		 * DefaultKubernetesClient(initializeConnection());
-		 * 
-		 * PodList pods = client.pods().inAnyNamespace().list();
-		 */
 
 		Configuration.setDefaultApiClient(initialize());
 
 		CoreV1Api api = new CoreV1Api();
 
 		try {
-			// V1PodList list = api.listNamespacedPod("default", null, null, null, null,
-			// null, null, null, null, null);
 			V1PodList list = api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
 
 			if (list != null) {
 				for (V1Pod pod : list.getItems()) {
-					Tool queryTool = this.repository.getToolByName(pod.getMetadata().getName());
+					Tool queryTool = repository.getToolByName(pod.getMetadata().getName());
 					if (queryTool == null) {
 						List<Command> commands = new ArrayList<Command>();
 						commands.add(new Command("nmap"));
@@ -106,22 +88,20 @@ public class ToolController {
 						Test test = new Test("nmap_simple_test", commands, true, false, null, false);
 						tests.add(test);
 
-						Tool tool = new Tool(pod.getMetadata().getName(), pod.getMetadata().getGenerateName(), null,
-								tests, true);
-						this.repository.save(tool);
+						Tool tool = new Tool(pod.getMetadata().getName(), pod.getMetadata().getGenerateName(), null, tests, true);
+						repository.save(tool);
 					}
 
 				}
 
-				List<Tool> tools = this.repository.findAll();
+				List<Tool> tools = repository.findAll();
 
 				return new ResponseEntity<List<Tool>>(tools, HttpStatus.OK);
 			} else {
-				List<Tool> tools = this.repository.findAll();
+				List<Tool> tools = repository.findAll();
 				if (tools == null) {
 					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService
-									.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
 							HttpStatus.NOT_FOUND);
 				} else {
 					return new ResponseEntity<List<Tool>>(tools, HttpStatus.OK);
@@ -135,20 +115,18 @@ public class ToolController {
 		}
 
 		/**
-		 * Create own namespace in kubernetes and add only those pods which are needed
-		 * So that pods which are automatically installed on the kubernetes are not
-		 * shown in the view
+		 * Create own namespace in kubernetes and add only those pods which are needed So that pods which are automatically installed on the
+		 * kubernetes are not shown in the view
 		 */
 
 		return new ResponseEntity(
-				new CustomErrorType(
-						messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
 				HttpStatus.NOT_FOUND);
 
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/tool/{name}/run", method = RequestMethod.POST)
+	@RequestMapping(value = "/{name}/run", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestResult> runCommand(@RequestBody Test test, @PathVariable("name") String podName,
 			@RequestHeader("Accept-Language") String locale) throws InterruptedException, ApiException, IOException {
@@ -170,6 +148,7 @@ public class ToolController {
 				commands.isEmpty() ? new String[] { "sh" } : commands.toArray(new String[commands.size()]), true, tty);
 
 		Thread in = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					ByteStreams.copy(System.in, proc.getOutputStream());
@@ -181,6 +160,7 @@ public class ToolController {
 		in.start();
 
 		Thread out = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					ByteStreams.copy(proc.getInputStream(), output);
@@ -212,7 +192,7 @@ public class ToolController {
 			test.setTestResult(tempResult);
 		}
 
-		Tool tool = this.repository.getToolByName(podName);
+		Tool tool = repository.getToolByName(podName);
 
 		if (tool != null) {
 
@@ -236,7 +216,7 @@ public class ToolController {
 		}
 
 		try {
-			this.repository.update(tool);
+			repository.update(tool);
 		} catch (ItemNotFoundRepositoryException e) {
 			return new ResponseEntity(new CustomErrorType(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
@@ -245,14 +225,14 @@ public class ToolController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/tool/{userID}", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/{userId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Tool> saveTool(@RequestBody Tool tool, @PathVariable("userID") String userID,
+	public ResponseEntity<Tool> saveTool(@RequestBody Tool tool, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (tool.getId() != null) {
-			if (!Strings.isNullOrEmpty(userID)) {
-				tool.setUserUUID(userID);
+			if (!Strings.isNullOrEmpty(userId)) {
+				tool.setUserUUID(userId);
 
 				List<Test> tests = new ArrayList<>();
 				for (int i = 1; i < 3; i++) {
@@ -261,35 +241,20 @@ public class ToolController {
 				}
 
 				tool.setTests(tests);
-				this.repository.save(tool);
+				repository.save(tool);
 				return new ResponseEntity<Tool>(tool, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("userId_not_provided", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("userId_not_provided", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 		} else {
 			if (!Strings.isNullOrEmpty(tool.getUserUUID())) {
-				this.repository.update(tool);
+				repository.update(tool);
 				return new ResponseEntity<Tool>(tool, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("userId_not_provided", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("userId_not_provided", locale)),
 						HttpStatus.NOT_FOUND);
 			}
 		}
 	}
 }
-
-/*
- * class SimpleListener implements ExecListener {
- * 
- * @Override public void onOpen(Response response) {
- * System.out.println(response.message()); }
- * 
- * @Override public void onFailure(Throwable t, Response response) {
- * System.err.println(response.message()); }
- * 
- * @Override public void onClose(int code, String reason) {
- * System.out.println(reason); } }
- */

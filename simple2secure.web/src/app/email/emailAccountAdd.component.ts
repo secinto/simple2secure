@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {EmailConfiguration, User} from '../_models/index';
+import {Context, ContextDTO, EmailConfiguration, User} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -14,8 +14,8 @@ import {TranslateService} from '@ngx-translate/core';
 export class EmailAccountAddComponent {
 
     public config: EmailConfiguration;
-    currentUser: any;
     loading = false;
+    context: ContextDTO;
 
     constructor(
             private route: ActivatedRoute,
@@ -27,13 +27,14 @@ export class EmailAccountAddComponent {
             private translate: TranslateService) {}
 
     ngOnInit() {
+
+      this.context = JSON.parse(localStorage.getItem('context'));
       if (this.router.url.includes('edit')){
           this.config = this.dataService.get();
       }
       else{
           this.config = new EmailConfiguration();
-          this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-          this.config.userUUID = this.currentUser.userID;
+          this.config.contextId = this.context.context.id;
       }
     }
     saveConfig(){

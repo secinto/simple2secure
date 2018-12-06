@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -24,40 +23,18 @@ public class EmailConfigurationRepositoryImpl extends EmailConfigurationReposito
 	}
 
 	@Override
-	public List<EmailConfiguration> findByUserUUID(String userUUID) {
-		Query query = new Query(Criteria.where("userUUID").is(userUUID));
-		return this.mongoTemplate.find(query, EmailConfiguration.class);
+	public List<EmailConfiguration> findByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		return mongoTemplate.find(query, EmailConfiguration.class);
 	}
 
 	@Override
-	public EmailConfiguration findByEmailConfigId(String emailConfigID) {
-		Query query = new Query(Criteria.where("_id").is(new ObjectId(emailConfigID)));
-		return this.mongoTemplate.findOne(query, EmailConfiguration.class);		
-	}
-
-	@Override
-	public EmailConfiguration findByConfigId(String emailConfigID) {
-		Query query = new Query(Criteria.where("_id").is(new ObjectId(emailConfigID)));
-		return this.mongoTemplate.findOne(query, EmailConfiguration.class);	
-	}
-
-	@Override
-	public EmailConfiguration deleteByConfigId(String emailConfigID) {
-		EmailConfiguration config = findByConfigId(emailConfigID);
-		if(config != null) {
-			this.mongoTemplate.remove(config);
-			return config;
-		}
-		return null;
-	}
-
-	@Override
-	public void deleteByUserId(String userId) {
-		List<EmailConfiguration> configs = findByUserUUID(userId);
-		if(configs != null) {
-			for(EmailConfiguration config : configs) {
-				this.mongoTemplate.remove(config);
+	public void deleteByContextId(String contextId) {
+		List<EmailConfiguration> configs = findByContextId(contextId);
+		if (configs != null) {
+			for (EmailConfiguration config : configs) {
+				mongoTemplate.remove(config);
 			}
-		}			
+		}
 	}
 }

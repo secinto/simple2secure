@@ -46,6 +46,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
+@RequestMapping("/api/config")
 public class ConfigController {
 
 	@Autowired
@@ -84,7 +85,7 @@ public class ConfigController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(value = "/api/config", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN')")
 	public ResponseEntity<Config> saveConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -100,7 +101,7 @@ public class ConfigController {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	public ResponseEntity<Config> getConfig(@RequestHeader("Accept-Language") String locale) {
 		List<Config> configs = configRepository.findAll();
@@ -117,7 +118,7 @@ public class ConfigController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(value = "/api/config/query", method = RequestMethod.POST)
+	@RequestMapping(value = "/query", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -138,7 +139,7 @@ public class ConfigController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(value = "/api/config/query/{queryId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/query/{queryId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteConfig(@PathVariable("queryId") String queryId, @RequestHeader("Accept-Language") String locale) {
 		QueryRun queryRun = queryRepository.find(queryId);
@@ -158,7 +159,7 @@ public class ConfigController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
-	@RequestMapping(value = "/api/config/query/{probeId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(value = "/query/{probeId}/{select_all}", method = RequestMethod.GET)
 	public ResponseEntity<List<QueryRun>> getQueriesByUserID(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 
@@ -210,7 +211,7 @@ public class ConfigController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/query/group/{groupId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(value = "/query/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -226,7 +227,7 @@ public class ConfigController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/query/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/query/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 		QueryRun queryConfig = queryRepository.find(id);
@@ -238,7 +239,7 @@ public class ConfigController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/config/copy/{sourceGroupId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/copy/{sourceGroupId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup,
 			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)

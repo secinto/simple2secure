@@ -15,37 +15,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
+@RequestMapping("/api/notification")
 public class NotificationController {
 
 	@Autowired
 	private NotificationRepository repository;
-	
-    @Autowired
-    MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
 
 	public static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
-	@RequestMapping(value = "/api/notification", method = RequestMethod.POST, consumes = "application/json")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @RequestHeader("Accept-Language") String locale) {
-		this.repository.save(notification);
-		return new ResponseEntity<Notification>(notification, HttpStatus.OK);
+	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification,
+			@RequestHeader("Accept-Language") String locale) {
+		if (notification != null) {
+			repository.save(notification);
+			return new ResponseEntity<Notification>(notification, HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/notification/{user_id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Notification>> getNoficitaionByUserID(@PathVariable("user_id") String userId, @RequestHeader("Accept-Language") String locale) {
-		List<Notification> notifications = this.repository.findByUserId(userId);
-		if(notifications == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale)), HttpStatus.NOT_FOUND);
+	public ResponseEntity<List<Notification>> getNotificationsByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId)) {
+			List<Notification> notifications = repository.findByContextId(contextId);
+			if (notifications != null) {
+				return new ResponseEntity<List<Notification>>(notifications, HttpStatus.OK);
+			}
 		}
-		return new ResponseEntity<List<Notification>>(notifications, HttpStatus.OK);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 }

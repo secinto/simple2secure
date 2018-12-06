@@ -71,7 +71,7 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
-					extractEmailsFromMessages(msg, cfg.getUserUUID(), cfg.getId());
+					extractEmailsFromMessages(msg, cfg.getContextId(), cfg.getId());
 				}
 			}
 		}
@@ -90,7 +90,7 @@ public class UpdateEmailScheduler {
 			UIDFolder uf = (UIDFolder) msg.getFolder();
 			Long messageId = uf.getUID(msg);
 
-			if (emailRepository.findByUserUUIDConfigIDAndMsgID(user_id, config_id, messageId.toString()) == null) {
+			if (emailRepository.findByContextMessageAndConfigId(user_id, config_id, messageId.toString()) == null) {
 				// TO-DO - check if there is a rule for this inbox and check it accordingly
 				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(),
 						msg.getFrom()[0].toString(), mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()),
@@ -110,7 +110,7 @@ public class UpdateEmailScheduler {
 
 	private void emailsRuleChecker(Email email) {
 
-		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigID());
+		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
 		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
 
 		List<Rule> rules = new ArrayList<>();
@@ -129,7 +129,7 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(email.getUserUUID(), email.getConfigID(), "Subject",
+						Notification notification = new Notification(email.getContextId(), email.getConfigId(), "Subject",
 								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
 						notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");

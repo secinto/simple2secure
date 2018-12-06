@@ -1,6 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {Notification} from '../_models/index';
+import {ContextDTO, Notification} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -17,7 +17,7 @@ export class NotificationOverviewComponent {
     notifications: Notification[];
     loading = false;
     selectedNotification: Notification;
-    currentUser: any;
+    context: ContextDTO;
 
     displayedColumns = ['tool', 'name', 'content', 'timestamp'];
     dataSource = new MatTableDataSource();
@@ -34,7 +34,7 @@ export class NotificationOverviewComponent {
             private translate: TranslateService) {}
 
     ngOnInit() {
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.context = JSON.parse(localStorage.getItem('context'));
         this.loadAllNotifications();
       }
 
@@ -51,7 +51,7 @@ export class NotificationOverviewComponent {
 
     private loadAllNotifications() {
             this.loading = true;
-            this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentUser.userID)
+            this.httpService.get(environment.apiEndpoint + 'notification/' + this.context.context.id)
               .subscribe(
               data => {
                 this.notifications = data;
