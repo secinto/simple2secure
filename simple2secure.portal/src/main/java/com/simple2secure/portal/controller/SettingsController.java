@@ -35,7 +35,7 @@ import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
-@RequestMapping("/api/settings/")
+@RequestMapping("/api/settings")
 public class SettingsController {
 
 	static final Logger log = LoggerFactory.getLogger(SettingsController.class);

@@ -92,7 +92,7 @@ public class GroupController {
 			User user = userRepository.find(userId);
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
 			if (Strings.isNullOrEmpty(group.getId()) && user != null && contextUserAuthentication != null) {
-				if (groupUtils.checkIfGroupNameIsAllowed(group.getName())) {
+				if (groupUtils.checkIfGroupNameIsAllowed(group.getName(), contextId)) {
 					if (!parentGroupId.equals("null")) {
 						// THERE IS A PARENT GROUP!!
 						CompanyGroup parentGroup = groupRepository.find(parentGroupId);
@@ -134,6 +134,10 @@ public class GroupController {
 							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 						}
 					}
+				} else {
+					log.error("Group cannot contain the standard name");
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_group_standard_name", locale)),
+							HttpStatus.NOT_FOUND);
 				}
 
 			} else {

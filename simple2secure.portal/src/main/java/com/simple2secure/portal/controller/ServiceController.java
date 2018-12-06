@@ -20,7 +20,7 @@ import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
-@RequestMapping("/api/service/")
+@RequestMapping("/api/service")
 public class ServiceController {
 
 	@Autowired

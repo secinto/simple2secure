@@ -745,14 +745,14 @@ export class UserOverviewComponent {
       else if (type == 'probe'){
           dialogConfig.data = {
               id: 1,
-              title: this.translate.instant('message.arayousure'),
+              title: this.translate.instant('message.areyousure'),
               content: this.translate.instant('message.probe.dialog')
           };
       }
       else if (type == 'context'){
           dialogConfig.data = {
               id: 1,
-              title: this.translate.instant('message.arayousure'),
+              title: this.translate.instant('message.areyousure'),
               content: this.translate.instant('message.context.dialog')
           };
       }

@@ -474,7 +474,7 @@ public class GroupUtils {
 
 	/**
 	 * This function copies the configuration from the source group to the destination group
-	 * 
+	 *
 	 * @param sourceGroupId
 	 * @param destGroupId
 	 */
@@ -514,10 +514,20 @@ public class GroupUtils {
 	 * @param groupName
 	 * @return
 	 */
-	public boolean checkIfGroupNameIsAllowed(String groupName) {
+	public boolean checkIfGroupNameIsAllowed(String groupName, String contextId) {
 
 		if (!Strings.isNullOrEmpty(groupName)) {
 			if (!groupName.toLowerCase().trim().equals(StaticConfigItems.STANDARD_GROUP_NAME.toLowerCase().trim())) {
+				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+				if (groups != null) {
+					for (CompanyGroup group : groups) {
+						if (group != null) {
+							if (group.getName().toLowerCase().trim().equals(groupName.toLowerCase().trim())) {
+								return false;
+							}
+						}
+					}
+				}
 				return true;
 			}
 		}

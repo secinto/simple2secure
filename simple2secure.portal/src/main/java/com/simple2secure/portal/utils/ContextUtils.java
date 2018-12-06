@@ -257,7 +257,28 @@ public class ContextUtils {
 		return contextName;
 	}
 
+	/**
+	 * This function checks if the current user can delete the provided context
+	 *
+	 * @param user
+	 * @param context
+	 * @return
+	 */
 	public boolean checkIfUserCanDeleteContext(User user, Context context) {
+		if (user != null && context != null) {
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
+					user.getId());
+			if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
+				return true;
+			}
+			// ADMIN CAN ONLY DELETE OWN CONTEXTS (those that he has been created)
+			else if (contextUserAuthentication.getUserRole().equals(UserRole.ADMIN)) {
+				if (contextUserAuthentication.isOwnContext()) {
+					return true;
+				}
+			}
+		}
+
 		return false;
 	}
 

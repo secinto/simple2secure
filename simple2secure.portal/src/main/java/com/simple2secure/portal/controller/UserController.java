@@ -535,7 +535,7 @@ public class UserController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable("userId") String userId,
 			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context
+		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
 		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 
 			User user = userRepository.find(userId);
@@ -545,8 +545,14 @@ public class UserController {
 				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
 						user.getId());
 				if (contextUserAuthentication != null) {
-					contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
-					return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
+					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
+						return new ResponseEntity(
+								new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_superadmin", locale)),
+								HttpStatus.NOT_FOUND);
+					} else {
+						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
+						return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
+					}
 				}
 			}
 		}
