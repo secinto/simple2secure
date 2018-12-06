@@ -1,16 +1,23 @@
 package com.simple2secure.probe.utils;
 
+import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.pcap4j.core.PcapAddress;
+import org.pcap4j.core.PcapNativeException;
+import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
 import org.pcap4j.packet.EthernetPacket;
@@ -44,6 +51,46 @@ public class PcapUtil {
 		return EthernetPacket.newPacket(hexStringAsBArray, offset, hexStringAsBArray.length);
 	}
 
+	/**
+	 * This function returns the network interface with the provided ip address.
+	 *
+	 * @param... ipAdress of the network interface you want to get @return... PcapNetworkInterface object with the network interface of the
+	 * provided ip
+	 */
+	public static PcapNetworkInterface getNetworkInterfaceByInetAddr(String ipAddress) {
+		try {
+			for (PcapNetworkInterface nI : Pcaps.findAllDevs()) {
+				List<PcapAddress> ipAdressList = nI.getAddresses();
+				for (PcapAddress add : ipAdressList) {
+					if (add.getAddress().toString().equals("/" + ipAddress)) {
+						return Pcaps.getDevByAddress(add.getAddress());
+					}
+				}
+			}
+		} catch (PcapNativeException e) {
+			log.error("Could not find network interface with the provided ip.");
+		}
+		return null;
+	}
+
+	/**
+	 * 8.8.8.8 the address does not have to be reachable
+	 * https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
+	 *
+	 * @return
+	 * @throws UnknownHostException
+	 * @throws SocketException
+	 */
+	public static String getIpAddrOfNetworkInterface() throws UnknownHostException, SocketException {
+		// seems like this method is taking advantage of a sideffect of the "socket.connect" method
+		String ipAddr;
+		try (final DatagramSocket socket = new DatagramSocket()) {
+			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+			ipAddr = socket.getLocalAddress().getHostAddress();
+		}
+		return ipAddr;
+	}
+
 	public static boolean checkAddress(String ipAddress) {
 		Socket soc = new java.net.Socket();
 		try {
@@ -72,7 +119,6 @@ public class PcapUtil {
 
 	public static String getMacAddress(InetAddress ipAddress) {
 		try {
-			// InetAddress ipAddress = InetAddress.getLocalHost();
 			NetworkInterface networkInterface = NetworkInterface.getByInetAddress(ipAddress);
 			byte[] macAddressBytes = networkInterface.getHardwareAddress();
 			StringBuilder macAddressBuilder = new StringBuilder();
