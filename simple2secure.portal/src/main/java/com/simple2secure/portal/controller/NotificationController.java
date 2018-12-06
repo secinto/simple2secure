@@ -25,13 +25,13 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 @RequestMapping("/api/notification")
 public class NotificationController {
 
+	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
+
 	@Autowired
 	private NotificationRepository repository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
-
-	public static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
@@ -42,6 +42,7 @@ public class NotificationController {
 			repository.save(notification);
 			return new ResponseEntity<Notification>(notification, HttpStatus.OK);
 		}
+		log.error("Problem occured while saving notification");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -58,6 +59,7 @@ public class NotificationController {
 				return new ResponseEntity<List<Notification>>(notifications, HttpStatus.OK);
 			}
 		}
+		log.error("Problem occured while retrieving notifications for context id {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale)),
 				HttpStatus.NOT_FOUND);
 	}

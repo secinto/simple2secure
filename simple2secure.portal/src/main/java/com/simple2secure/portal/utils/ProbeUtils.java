@@ -3,6 +3,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,17 @@ public class ProbeUtils {
 				}
 			}
 		}
+		log.debug("Retrieved {0} probes for context {1}", myProbes.size(), context.getName());
 		return myProbes;
+	}
+
+	public void deleteProbeDependencies(String probeId) {
+		if (!Strings.isNullOrEmpty(probeId)) {
+			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
+			licenseRepository.deleteByProbeId(probeId);
+			log.debug("Deleted dependencies for probe id {}", probeId);
+		}
+
 	}
 
 }

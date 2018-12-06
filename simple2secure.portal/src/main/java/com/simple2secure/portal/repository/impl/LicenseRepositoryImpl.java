@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.assertj.core.util.Strings;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -80,5 +81,16 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	public CompanyLicensePrivate findByAccessToken(String accessToken) {
 		Query query = new Query(Criteria.where("accessToken").is(accessToken));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public void deleteByProbeId(String probeId) {
+		if (!Strings.isNullOrEmpty(probeId)) {
+			CompanyLicensePrivate license = findByProbeId(probeId);
+			if (license != null) {
+				delete(license);
+			}
+		}
+
 	}
 }

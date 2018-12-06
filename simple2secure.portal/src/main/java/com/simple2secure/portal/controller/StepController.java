@@ -55,14 +55,14 @@ public class StepController {
 	@Autowired
 	PortalUtils portalUtils;
 
-	public static final Logger logger = LoggerFactory.getLogger(StepController.class);
+	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{probeId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-
+		log.debug("Retrieving steps for probe id {}", probeId);
 		if (!Strings.isNullOrEmpty(probeId)) {
 			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
 
@@ -92,6 +92,7 @@ public class StepController {
 				}
 			}
 		}
+		log.error("Error while retrieving steps for probe id {}", probeId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -108,6 +109,7 @@ public class StepController {
 				return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
 			}
 		}
+		log.error("Error while retrieving steps for group id {}", groupId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -133,6 +135,7 @@ public class StepController {
 
 			return new ResponseEntity<Step>(step, HttpStatus.OK);
 		}
+		log.error("Error while updating step");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -162,6 +165,7 @@ public class StepController {
 				return new ResponseEntity<>(step, HttpStatus.OK);
 			}
 		}
+		log.error("Error while deleting step with id {}", stepId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale)),
 				HttpStatus.NOT_FOUND);
 	}

@@ -182,7 +182,6 @@ public class ContextController {
 	public ResponseEntity<Context> deleteContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
-		// TODO: check if user can delete context + if it is default context
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
 			Context context = contextRepository.find(contextId);
 			User user = userRepository.find(userId);

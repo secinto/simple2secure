@@ -8,9 +8,8 @@
 
 package com.simple2secure.portal.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
-import com.simple2secure.api.model.Probe;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -35,10 +33,13 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
+import com.simple2secure.portal.utils.ProbeUtils;
 
 @RestController
 @RequestMapping("/api/probe")
 public class ProbeController {
+
+	public static final Logger log = LoggerFactory.getLogger(ProbeController.class);
 
 	@Autowired
 	UserRepository userRepository;
@@ -60,6 +61,9 @@ public class ProbeController {
 
 	@Autowired
 	GroupUtils groupUtils;
+
+	@Autowired
+	ProbeUtils probeUtils;
 
 	/**
 	 * This function returns all devices according to the user id
@@ -85,35 +89,11 @@ public class ProbeController {
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
 		}
+
+		log.error("Problem occured while updating probe group for probe id {}", probeId);
+
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_probe_group", locale)),
 				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function returns all devices according to the user id
-	 */
-	@RequestMapping(value = "/{userID}")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Probe>> getProbesByUserID(@PathVariable("userID") String userId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		List<Probe> probes = new ArrayList<Probe>();
-
-		List<CompanyLicensePrivate> licenses = licenseRepository.findByUserId(userId);
-
-		if (licenses != null) {
-			for (CompanyLicensePrivate license : licenses) {
-				// Retrieve only activated probes
-				if (license.isActivated()) {
-					CompanyGroup group = groupRepository.find(license.getGroupId());
-					if (group != null) {
-						Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
-						probes.add(probe);
-					}
-				}
-			}
-		}
-		return new ResponseEntity<List<Probe>>(probes, HttpStatus.OK);
 	}
 
 	/**
@@ -126,14 +106,11 @@ public class ProbeController {
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
-			// retrieve license from database
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
-			if (license != null) {
-				// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
-				licenseRepository.delete(license);
-				return new ResponseEntity<>(license, HttpStatus.OK);
-			}
+			// delete All Probe dependencies
+			probeUtils.deleteProbeDependencies(probeId);
 		}
+
+		log.error("Problem occured while deleting probe with id {}", probeId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_probe", locale)),
 				HttpStatus.NOT_FOUND);
 	}

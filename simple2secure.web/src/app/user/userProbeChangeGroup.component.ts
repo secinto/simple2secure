@@ -45,8 +45,7 @@ export class UserProbeChangeGroupComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/'
-            + this.context.context.id)
+        this.httpService.get(environment.apiEndpoint + 'group/' + this.context.context.id)
             .subscribe(
                 data => {
                     this.extractGroups(data);

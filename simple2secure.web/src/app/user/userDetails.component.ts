@@ -91,7 +91,7 @@ export class UserDetailsComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' +
+        this.httpService.get(environment.apiEndpoint + 'group/' +
             this.context.context.id)
             .subscribe(
                 data => {

@@ -10,6 +10,8 @@ package com.simple2secure.portal.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,8 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 @RequestMapping("/api/settings/")
 public class SettingsController {
 
+	static final Logger log = LoggerFactory.getLogger(SettingsController.class);
+
 	@Autowired
 	SettingsRepository settingsRepository;
 
@@ -59,6 +63,7 @@ public class SettingsController {
 				return new ResponseEntity<SettingsDTO>(new SettingsDTO(settings.get(0), licensePlans), HttpStatus.OK);
 			}
 		}
+		log.error("Problem occured while retrieving settings");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_settings", locale)),
 				HttpStatus.NOT_FOUND);
 
@@ -73,6 +78,7 @@ public class SettingsController {
 			settingsRepository.update(settings);
 			return new ResponseEntity<Settings>(settings, HttpStatus.OK);
 		}
+		log.error("Problem occured while updating settings");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -90,6 +96,7 @@ public class SettingsController {
 			}
 			return new ResponseEntity<LicensePlan>(licensePlan, HttpStatus.OK);
 		}
+		log.error("Problem occured while saving license plan");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -107,7 +114,7 @@ public class SettingsController {
 				return new ResponseEntity<LicensePlan>(licensePlan, HttpStatus.OK);
 			}
 		}
-
+		log.error("Problem occured while deleting license plan with id {}", licensePlanId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_license_plan", locale)),
 				HttpStatus.NOT_FOUND);
 

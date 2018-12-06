@@ -68,11 +68,17 @@ public class ReportController {
 
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('PROBE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
-		reportsRepository.save(report);
-		return new ResponseEntity<Report>(report, HttpStatus.OK);
+		if (report != null) {
+			reportsRepository.save(report);
+			return new ResponseEntity<Report>(report, HttpStatus.OK);
+		}
+		log.error("Error occured while saving report");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -95,7 +101,7 @@ public class ReportController {
 				}
 			}
 		}
-
+		log.error("Error occured while retrieving reports for context {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -104,11 +110,14 @@ public class ReportController {
 	@RequestMapping(value = "/report/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
-		Report report = reportsRepository.find(id);
-		if (report == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+		if (!Strings.isNullOrEmpty(id)) {
+			Report report = reportsRepository.find(id);
+			if (report != null) {
+				return new ResponseEntity<Report>(report, HttpStatus.OK);
+			}
 		}
-		return new ResponseEntity<Report>(report, HttpStatus.OK);
+		log.error("Error occured while retrieving report with id {}", id);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -116,27 +125,29 @@ public class ReportController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
-		if (Strings.isNullOrEmpty(id)) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
+		if (!Strings.isNullOrEmpty(id)) {
 			Report report = reportsRepository.find(id);
 			if (report != null) {
 				reportsRepository.delete(report);
 				return new ResponseEntity<Report>(report, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-						HttpStatus.NOT_FOUND);
 			}
 		}
+		log.error("Error occured while deleting report with id {}", id);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/network", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('PROBE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@RequestHeader("Accept-Language") String locale) {
-		networkReportRepository.save(networkReport);
-		return new ResponseEntity<NetworkReport>(networkReport, HttpStatus.OK);
+		if (networkReport != null) {
+			networkReportRepository.save(networkReport);
+			return new ResponseEntity<NetworkReport>(networkReport, HttpStatus.OK);
+		}
+		log.error("Error occured while saving network report");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -160,6 +171,7 @@ public class ReportController {
 			}
 		}
 
+		log.error("Error occured while retrieving network reports for context id {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -169,19 +181,15 @@ public class ReportController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
-		if (Strings.isNullOrEmpty(id)) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
+		if (!Strings.isNullOrEmpty(id)) {
+
 			NetworkReport report = networkReportRepository.find(id);
 			if (report != null) {
 				networkReportRepository.delete(report);
 				return new ResponseEntity<NetworkReport>(report, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)),
-						HttpStatus.NOT_FOUND);
 			}
 		}
+		log.error("Error occured while deleting network report with id {}", id);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
 	}
-
 }

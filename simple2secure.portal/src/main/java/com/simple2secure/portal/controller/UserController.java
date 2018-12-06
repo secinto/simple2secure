@@ -463,6 +463,7 @@ public class UserController {
 
 			}
 		}
+		log.error("Error occured during invitation for invitation token {}", invitationToken);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}

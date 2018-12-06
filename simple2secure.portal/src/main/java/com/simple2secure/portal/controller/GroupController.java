@@ -11,6 +11,8 @@ package com.simple2secure.portal.controller;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,8 @@ import com.simple2secure.portal.utils.GroupUtils;
 @RestController
 @RequestMapping("/api/group")
 public class GroupController {
+
+	static final Logger log = LoggerFactory.getLogger(GroupController.class);
 
 	@Autowired
 	UserRepository userRepository;
@@ -109,10 +113,6 @@ public class GroupController {
 							parentGroup.addChildrenId(groupId.toString());
 							groupRepository.update(parentGroup);
 							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
-									HttpStatus.NOT_FOUND);
 						}
 					} else {
 						// NEW PARENT GROUP!
@@ -132,10 +132,6 @@ public class GroupController {
 							}
 
 							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
-									HttpStatus.NOT_FOUND);
 						}
 					}
 				}
@@ -147,6 +143,7 @@ public class GroupController {
 				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 			}
 		}
+		log.error("Problem occured while saving/updating group");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -158,13 +155,15 @@ public class GroupController {
 	@RequestMapping(value = "/{groupID}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
-		CompanyGroup group = groupRepository.find(groupId);
-		if (group == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
-			return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+		if (!Strings.isNullOrEmpty(groupId)) {
+			CompanyGroup group = groupRepository.find(groupId);
+			if (group != null) {
+				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+			}
 		}
+		log.error("Problem occured while retrieving group with id {}", groupId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+				HttpStatus.NOT_FOUND);
 
 	}
 
@@ -172,32 +171,23 @@ public class GroupController {
 	 * This function returns all users from the user repository
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<CompanyGroup>> getGroupsByUserId(@PathVariable("userId") String userId,
-			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
-		User user = userRepository.find(userId);
+	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
 
-		if (user != null && !Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
-
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
 					return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
-				} else {
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-							HttpStatus.NOT_FOUND);
 				}
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-						HttpStatus.NOT_FOUND);
 			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+		log.error("Problem occured while retrieving group for context with id {}", contextId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -212,7 +202,7 @@ public class GroupController {
 			CompanyGroup group = groupRepository.find(groupId);
 			if (group != null) {
 				if (!group.isStandardGroup()) {
-					groupUtils.deleteGroup(groupId);
+					groupUtils.deleteGroup(groupId, true);
 					return new ResponseEntity<>(group, HttpStatus.OK);
 				} else {
 					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("standard_group_delete_error", locale)),
@@ -220,6 +210,7 @@ public class GroupController {
 				}
 			}
 		}
+		log.error("Problem occured while deleting group with id {}", groupId);
 		return new ResponseEntity<>(
 				new CustomErrorType(
 						messageByLocaleService.getMessage("problem_occured_while_deleting_group", ObjectUtils.toObjectArray(groupId), locale)),
@@ -244,6 +235,7 @@ public class GroupController {
 		if (sourceGroup != null && user != null) {
 			return groupUtils.checkIfGroupCanBeMoved(sourceGroup, toGroup, user, locale);
 		} else {
+			log.error("Problem occured while moving group with id {}", sourceGroupId);
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
 					HttpStatus.NOT_FOUND);
 		}
