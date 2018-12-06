@@ -1,6 +1,7 @@
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.mail.BodyPart;
 import javax.mail.internet.MimeMultipart;
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.repository.EmailConfigurationRepository;
+import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Configuration
@@ -25,6 +29,12 @@ public class MailUtils {
 
 	@Value("${mail.username}")
 	private String mailUser;
+
+	@Autowired
+	EmailConfigurationRepository emailConfigRepository;
+
+	@Autowired
+	EmailRepository emailRepository;
 
 	@Autowired
 	JavaMailSender javaMailSender;
@@ -100,6 +110,37 @@ public class MailUtils {
 				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL() + "/api/user/invite/"
 				+ userInvitation.getInvitationToken();
 		return content;
+	}
+
+	/**
+	 * This function deletes an email configuration object and its all dependencies
+	 *
+	 * @param emailConfiguration
+	 */
+	public void deleteEmailConfiguration(EmailConfiguration emailConfiguration) {
+		if (emailConfiguration != null) {
+			emailConfigRepository.delete(emailConfiguration);
+			emailRepository.deleteByConfigId(emailConfiguration.getId());
+		}
+	}
+
+	/**
+	 * This function iterates over all Email Configuration according the contextId and calls the deleteEmailConfiguration function to delete
+	 * each configuration
+	 * 
+	 * @param contextId
+	 */
+	public void deleteEmailConfigurationByContextId(String contextId) {
+		if (!Strings.isNullOrEmpty(contextId)) {
+			List<EmailConfiguration> emailConfigList = emailConfigRepository.findByContextId(contextId);
+			if (emailConfigList != null) {
+				for (EmailConfiguration emailConfig : emailConfigList) {
+					if (emailConfig != null) {
+						deleteEmailConfiguration(emailConfig);
+					}
+				}
+			}
+		}
 	}
 
 }

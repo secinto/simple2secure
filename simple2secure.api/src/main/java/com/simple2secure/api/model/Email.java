@@ -10,7 +10,6 @@ public class Email extends GenericDBObject {
 	private static final long serialVersionUID = -6339585681852758358L;
 
 	private String messageId;
-	private String contextId;
 	private String configId;
 	private int number;
 	private String subject;
@@ -18,9 +17,7 @@ public class Email extends GenericDBObject {
 	private String text;
 	private String receivedDate;
 
-	public Email(String messageId, String contexId, String configId, int number, String subject, String from, String text,
-			String receivedDate) {
-		contextId = contexId;
+	public Email(String messageId, String configId, int number, String subject, String from, String text, String receivedDate) {
 		this.configId = configId;
 		this.number = number;
 		this.subject = subject;
@@ -36,14 +33,6 @@ public class Email extends GenericDBObject {
 
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
-	}
-
-	public String getContextId() {
-		return contextId;
-	}
-
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
 	}
 
 	public void setConfigId(String configId) {

@@ -15,17 +15,23 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.CurrentContextRepository;
+import com.simple2secure.portal.repository.EmailConfigurationRepository;
+import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
+import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.StepRepository;
+import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
@@ -64,10 +70,31 @@ public class ContextUtils {
 	ContextRepository contextRepository;
 
 	@Autowired
+	CurrentContextRepository currentContextRepository;
+
+	@Autowired
+	UserInvitationRepository userInvitationRepository;
+
+	@Autowired
 	LicensePlanRepository licensePlanRepository;
 
 	@Autowired
+	NotificationRepository notificationRepository;
+
+	@Autowired
+	EmailConfigurationRepository emailConfigurationRepository;
+
+	@Autowired
+	EmailRepository emailRepository;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	GroupUtils groupUtils;
+
+	@Autowired
+	MailUtils mailUtils;
 
 	/**
 	 * This function returns all contexts which are created by the user or assigned to.
@@ -163,8 +190,7 @@ public class ContextUtils {
 	 * @return
 	 */
 	public ObjectId addNewContextForRegistration(User user, ObjectId userId) {
-		String licensePlanName = "Default";
-		LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
+		LicensePlan licensePlan = licensePlanRepository.findByName(StaticConfigItems.DEFAULT_LICENSE_PLAN);
 
 		if (licensePlan != null) {
 			Context context = new Context();
@@ -176,9 +202,44 @@ public class ContextUtils {
 			return contextRepository.saveAndReturnId(context);
 
 		} else {
-			log.error("License Plan {} not found", licensePlanName);
+			log.error("License Plan {} not found", StaticConfigItems.DEFAULT_LICENSE_PLAN);
 		}
 		return null;
+	}
+
+	/**
+	 * This function deletes all context dependencies
+	 *
+	 * @param contextId
+	 */
+	public void deleteContextDependencies(Context context) {
+		// delete all currentContext mappings
+		currentContextRepository.deleteByContextId(context.getId());
+		// delete all contextUserAuthentication mappings
+		contextUserAuthRepository.deleteByContextId(context.getId());
+		// delete all groups from this context
+		groupUtils.deleteGroupsByContextId(context.getId());
+		// delete email configuration and all dependencies accordingly
+		mailUtils.deleteEmailConfigurationByContextId(context.getId());
+		// delete notification
+		notificationRepository.deleteByContextId(context.getId());
+		// delete user invitation
+		userInvitationRepository.deleteByContexId(context.getId());
+
+		// delete context
+		contextRepository.delete(context);
+	}
+
+	/**
+	 * This function deletes all contextUserAuth dependencies
+	 *
+	 * @param contextUserAuth
+	 */
+	public void deleteContextAuthDependencies(ContextUserAuthentication contextUserAuth) {
+		if (contextUserAuth != null) {
+			currentContextRepository.deleteByContextUserAuthenticationId(contextUserAuth.getId());
+			contextUserAuthRepository.delete(contextUserAuth);
+		}
 	}
 
 	/**
@@ -194,6 +255,10 @@ public class ContextUtils {
 		String contextName = tempContextName.substring(0, tempContextName.indexOf("."));
 		contextName = contextName + "-" + System.currentTimeMillis();
 		return contextName;
+	}
+
+	public boolean checkIfUserCanDeleteContext(User user, Context context) {
+		return false;
 	}
 
 }

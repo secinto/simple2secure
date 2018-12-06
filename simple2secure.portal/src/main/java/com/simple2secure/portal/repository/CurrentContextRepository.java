@@ -8,4 +8,6 @@ public abstract class CurrentContextRepository extends MongoRepository<CurrentCo
 
 	public abstract void deleteByContextUserAuthenticationId(String contextUserAuthenticationId);
 
+	public abstract void deleteByContextId(String contextId);
+
 }

@@ -544,7 +544,7 @@ public class UserController {
 				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
 						user.getId());
 				if (contextUserAuthentication != null) {
-					contextUserAuthRepository.delete(contextUserAuthentication);
+					contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
 					return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
 				}
 			}

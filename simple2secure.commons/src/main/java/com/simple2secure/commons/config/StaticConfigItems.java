@@ -37,5 +37,7 @@ public class StaticConfigItems {
 	public static final String KEYS_LOCATION = "./src/main/resources/keys/";
 
 	public static final String[] SECINTO_EMAIL_LIST = { "emir.sahinovic@secinto.com", "emirsahinovic24@gmail.com" };
+	public static final String STANDARD_GROUP_NAME = "Standard";
+	public static final String DEFAULT_LICENSE_PLAN = "Default";
 
 }

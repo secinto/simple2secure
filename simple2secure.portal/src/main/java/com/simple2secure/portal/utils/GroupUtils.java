@@ -18,6 +18,7 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ConfigRepository;
@@ -154,7 +155,26 @@ public class GroupUtils {
 		// Remove OSQuery configuration
 		queryRepository.deleteByGroupId(groupId);
 
+		// Remove GroupAccessRights
+		groupAccessRightRepository.deleteByGroupId(groupId);
+
 		deleteGroupFromChildren(groupId);
+	}
+
+	/**
+	 * This function is used to delete all groups and its dependencies according to the contextId
+	 *
+	 * @param contextId
+	 */
+	public void deleteGroupsByContextId(String contextId) {
+		if (!Strings.isNullOrEmpty(contextId)) {
+			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+			if (groups != null) {
+				for (CompanyGroup group : groups) {
+					deleteGroup(group.getId());
+				}
+			}
+		}
 	}
 
 	/**
@@ -422,7 +442,7 @@ public class GroupUtils {
 
 	/**
 	 * This function returns the groupIds of the superuser where he has been assigned to.
-	 * 
+	 *
 	 * @param context
 	 * @param user
 	 * @return
@@ -443,6 +463,23 @@ public class GroupUtils {
 		}
 
 		return groupIds;
+	}
+
+	/**
+	 * This function checks if the current group name is allowed. Only standard group (which is added automatically) can be named as STANDARD.
+	 *
+	 * @param groupName
+	 * @return
+	 */
+	public boolean checkIfGroupNameIsAllowed(String groupName) {
+
+		if (!Strings.isNullOrEmpty(groupName)) {
+			if (!groupName.toLowerCase().trim().equals(StaticConfigItems.STANDARD_GROUP_NAME.toLowerCase().trim())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

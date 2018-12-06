@@ -4,17 +4,23 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
 
 @Repository
 @Transactional
 public class CurrentContextRepositoryImpl extends CurrentContextRepository {
+
+	@Autowired
+	ContextUserAuthRepository contextUserAuthRepository;
 
 	@PostConstruct
 	public void init() {
@@ -40,6 +46,17 @@ public class CurrentContextRepositoryImpl extends CurrentContextRepository {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void deleteByContextId(String contextId) {
+		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(contextId);
+		if (contextUserAuthList != null) {
+			for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
+				deleteByContextUserAuthenticationId(contextUserAuth.getId());
+			}
+		}
+
 	}
 
 }

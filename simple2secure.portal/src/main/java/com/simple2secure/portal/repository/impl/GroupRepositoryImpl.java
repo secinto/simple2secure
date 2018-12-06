@@ -41,4 +41,17 @@ public class GroupRepositoryImpl extends GroupRepository {
 		Query query = new Query(Criteria.where("parentId").is(parentId)).with(new Sort(Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
+
+	@Override
+	public void deleteByContextId(String contextId) {
+		List<CompanyGroup> groups = findByContextId(contextId);
+		if (groups != null) {
+			for (CompanyGroup group : groups) {
+				if (group != null) {
+					delete(group);
+				}
+			}
+		}
+
+	}
 }

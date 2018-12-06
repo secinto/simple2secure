@@ -88,52 +88,55 @@ public class GroupController {
 			User user = userRepository.find(userId);
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
 			if (Strings.isNullOrEmpty(group.getId()) && user != null && contextUserAuthentication != null) {
+				if (groupUtils.checkIfGroupNameIsAllowed(group.getName())) {
+					if (!parentGroupId.equals("null")) {
+						// THERE IS A PARENT GROUP!!
+						CompanyGroup parentGroup = groupRepository.find(parentGroupId);
+						if (parentGroup != null) {
 
-				if (!parentGroupId.equals("null")) {
-					// THERE IS A PARENT GROUP!!
-					CompanyGroup parentGroup = groupRepository.find(parentGroupId);
-					if (parentGroup != null) {
+							group.setContextId(parentGroup.getContextId());
+							group.setRootGroup(false);
+							group.setParentId(parentGroupId);
+							ObjectId groupId = groupRepository.saveAndReturnId(group);
 
-						group.setContextId(parentGroup.getContextId());
-						group.setRootGroup(false);
-						group.setParentId(parentGroupId);
-						ObjectId groupId = groupRepository.saveAndReturnId(group);
+							// If this is Superuser add new mapping between this superuser and group
+							if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
+								GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
+										contextUserAuthentication.getContextId());
+								groupAccessRightRepository.save(groupAccessRight);
+							}
 
-						// If this is Superuser add new mapping between this superuser and group
-						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
-							GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
-									contextUserAuthentication.getContextId());
-							groupAccessRightRepository.save(groupAccessRight);
+							parentGroup.addChildrenId(groupId.toString());
+							groupRepository.update(parentGroup);
+							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+						} else {
+							return new ResponseEntity(
+									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
+									HttpStatus.NOT_FOUND);
 						}
-
-						parentGroup.addChildrenId(groupId.toString());
-						groupRepository.update(parentGroup);
-						return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 					} else {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
-								HttpStatus.NOT_FOUND);
-					}
-				} else {
-					// NEW PARENT GROUP!
-					//
-					Context context = contextRepository.find(contextId);
-					if (context != null) {
+						// NEW PARENT GROUP!
+						//
+						Context context = contextRepository.find(contextId);
+						if (context != null) {
 
-						group.setContextId(context.getId());
-						group.setRootGroup(true);
-						ObjectId groupId = groupRepository.saveAndReturnId(group);
+							group.setContextId(context.getId());
+							group.setRootGroup(true);
+							ObjectId groupId = groupRepository.saveAndReturnId(group);
 
-						// If this is Superuser add new mapping between this superuser and group
-						if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
-							GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
-									contextUserAuthentication.getContextId());
-							groupAccessRightRepository.save(groupAccessRight);
+							// If this is Superuser add new mapping between this superuser and group
+							if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
+								GroupAccessRight groupAccessRight = new GroupAccessRight(contextUserAuthentication.getUserId(), groupId.toString(),
+										contextUserAuthentication.getContextId());
+								groupAccessRightRepository.save(groupAccessRight);
+							}
+
+							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+						} else {
+							return new ResponseEntity(
+									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
+									HttpStatus.NOT_FOUND);
 						}
-
-						return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
-					} else {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
-								HttpStatus.NOT_FOUND);
 					}
 				}
 
@@ -143,10 +146,9 @@ public class GroupController {
 				groupRepository.update(group);
 				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
 			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -205,23 +207,23 @@ public class GroupController {
 	@RequestMapping(value = "/{groupID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
-		// When the group is deleted we have also to delete the processors, configuration, etc.
-		CompanyGroup group = groupRepository.find(groupId);
-		if (group == null) {
-			return new ResponseEntity<>(
-					new CustomErrorType(
-							messageByLocaleService.getMessage("problem_occured_while_retrieving_group", ObjectUtils.toObjectArray(groupId), locale)),
-					HttpStatus.NOT_FOUND);
-		} else {
-			if (!group.isStandardGroup()) {
-				groupUtils.deleteGroup(groupId);
-				return new ResponseEntity<>(group, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("standard_group_delete_error", locale)),
-						HttpStatus.NOT_FOUND);
-			}
 
+		if (!Strings.isNullOrEmpty(groupId)) {
+			CompanyGroup group = groupRepository.find(groupId);
+			if (group != null) {
+				if (!group.isStandardGroup()) {
+					groupUtils.deleteGroup(groupId);
+					return new ResponseEntity<>(group, HttpStatus.OK);
+				} else {
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("standard_group_delete_error", locale)),
+							HttpStatus.NOT_FOUND);
+				}
+			}
 		}
+		return new ResponseEntity<>(
+				new CustomErrorType(
+						messageByLocaleService.getMessage("problem_occured_while_deleting_group", ObjectUtils.toObjectArray(groupId), locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**

@@ -32,6 +32,7 @@ import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.MailUtils;
 
 @RestController
 @RequestMapping("/api/email")
@@ -50,6 +51,9 @@ public class EmailController {
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	MailUtils mailUtils;
 
 	public static final Logger logger = LoggerFactory.getLogger(EmailController.class);
 
@@ -125,8 +129,7 @@ public class EmailController {
 			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId);
 
 			if (emailConfig != null) {
-				emailConfigRepository.delete(emailConfig);
-				emailRepository.deleteByConfigId(emailConfigId);
+				mailUtils.deleteEmailConfiguration(emailConfig);
 				return new ResponseEntity<EmailConfiguration>(emailConfig, HttpStatus.OK);
 
 			}

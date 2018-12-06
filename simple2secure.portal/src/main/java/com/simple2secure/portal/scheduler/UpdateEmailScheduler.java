@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.ExtendedRule;
@@ -71,7 +72,7 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
-					extractEmailsFromMessages(msg, cfg.getContextId(), cfg.getId());
+					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
 		}
@@ -85,22 +86,27 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String user_id, String config_id) throws Exception {
-		for (Message msg : messages) {
-			UIDFolder uf = (UIDFolder) msg.getFolder();
-			Long messageId = uf.getUID(msg);
+	public void extractEmailsFromMessages(Message[] messages, String configId) throws Exception {
+		if (!Strings.isNullOrEmpty(configId)) {
+			EmailConfiguration emailConfig = emailConfigRepository.find(configId);
+			if (emailConfig != null) {
+				for (Message msg : messages) {
+					UIDFolder uf = (UIDFolder) msg.getFolder();
+					Long messageId = uf.getUID(msg);
 
-			if (emailRepository.findByContextMessageAndConfigId(user_id, config_id, messageId.toString()) == null) {
-				// TO-DO - check if there is a rule for this inbox and check it accordingly
-				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(),
-						msg.getFrom()[0].toString(), mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()),
-						msg.getReceivedDate().toString());
+					if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
+						// TO-DO - check if there is a rule for this inbox and check it accordingly
+						Email email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+								mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
 
-				emailsRuleChecker(email);
+						emailsRuleChecker(email, emailConfig);
 
-				emailRepository.save(email);
+						emailRepository.save(email);
+					}
+				}
 			}
 		}
+
 	}
 
 	/**
@@ -108,7 +114,7 @@ public class UpdateEmailScheduler {
 	 * repository
 	 */
 
-	private void emailsRuleChecker(Email email) {
+	private void emailsRuleChecker(Email email, EmailConfiguration emailConfig) {
 
 		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
 		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
@@ -129,7 +135,7 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(email.getContextId(), email.getConfigId(), "Subject",
+						Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
 								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
 						notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");

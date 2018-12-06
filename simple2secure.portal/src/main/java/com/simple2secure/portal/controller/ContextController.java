@@ -32,6 +32,7 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -106,8 +107,7 @@ public class ContextController {
 					User currentUser = userRepository.find(userId);
 					ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
 					if (currentContext != null && currentUser != null && contextUserAuth != null) {
-						String licensePlanName = "Default";
-						LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
+						LicensePlan licensePlan = licensePlanRepository.findByName(StaticConfigItems.DEFAULT_LICENSE_PLAN);
 						if (licensePlan != null) {
 
 							context.setLicensePlanId(licensePlan.getId());
@@ -177,22 +177,28 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{contextId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/delete/{userId}/{contextId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Context> deleteContext(@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(contextId)) {
+	public ResponseEntity<Context> deleteContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+
+		// TODO: check if user can delete context + if it is default context
+		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
 			Context context = contextRepository.find(contextId);
-			if (context != null) {
-				List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(context.getId());
-				if (contextUserAuthList != null) {
-					for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
-						currentContextRepository.deleteByContextUserAuthenticationId(contextUserAuth.getId());
-					}
+			User user = userRepository.find(userId);
+
+			if (context != null && user != null) {
+				if (contextUtils.checkIfUserCanDeleteContext(user, context)) {
+					// call delete context dependencies
+					contextUtils.deleteContextDependencies(context);
+					return new ResponseEntity<Context>(context, HttpStatus.OK);
+				} else {
+					// User not allowed to delete
+					log.error("{} not allowed to delete this default context {}", user.getEmail(), context.getName());
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("not_allowed_to_delete_this_context", locale)),
+							HttpStatus.NOT_FOUND);
 				}
-				contextRepository.deleteByContextId(contextId);
-				contextUserAuthRepository.deleteByContextId(contextId);
-				return new ResponseEntity<Context>(context, HttpStatus.OK);
+
 			}
 
 		}

@@ -11,4 +11,6 @@ public abstract class GroupRepository extends MongoRepository<CompanyGroup> {
 	public abstract List<CompanyGroup> findByContextId(String contextId);
 
 	public abstract List<CompanyGroup> findRootGroupsByContextId(String contextId);
+
+	public abstract void deleteByContextId(String contextId);
 }
