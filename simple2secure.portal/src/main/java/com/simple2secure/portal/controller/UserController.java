@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +23,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.ContextDTO;
 import com.simple2secure.api.dto.UserDTO;
 import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.CurrentContext;
-import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
@@ -437,7 +433,7 @@ public class UserController {
 						Context context = contextRepository.find(userInvitation.getContextId());
 						if (context != null) {
 							ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(userInvitation.getUserId(),
-									userInvitation.getContextId(), userInvitation.getUserRole());
+									userInvitation.getContextId(), userInvitation.getUserRole(), false);
 							// If user role is superuser add groups
 							if (userInvitation.getUserRole().equals(UserRole.SUPERUSER)) {
 								if (userInvitation.getGroupIds() != null) {
@@ -552,157 +548,6 @@ public class UserController {
 					return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
 				}
 			}
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function updates the current user context or sets new one if the user was not logged in
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/context/{userId}", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
-
-	public ResponseEntity<CurrentContext> selectUserContext(@PathVariable("userId") String userId, @RequestBody Context context,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(userId) && context != null) {
-			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), userId);
-
-			if (contextUserAuthentication != null) {
-				CurrentContext currentContext = currentContextRepository.findByUserId(userId);
-
-				if (currentContext != null) {
-					currentContext.setContextUserAuthenticationId(contextUserAuthentication.getId());
-					currentContextRepository.update(currentContext);
-				} else {
-					currentContext = new CurrentContext(userId, contextUserAuthentication.getId());
-					currentContextRepository.save(currentContext);
-				}
-
-				return new ResponseEntity<CurrentContext>(currentContext, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function returns all context for the provided user
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/context/{userId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
-	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@PathVariable("userId") String userId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		if (!Strings.isNullOrEmpty(userId)) {
-			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
-			if (contextUserAuthList != null) {
-				List<ContextDTO> contextList = new ArrayList<>();
-
-				for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
-					Context context = contextRepository.find(contextUserAuth.getContextId());
-					if (context != null) {
-						ContextDTO contextDTO = new ContextDTO(context, contextUserAuth.getUserRole());
-						contextList.add(contextDTO);
-					}
-				}
-				return new ResponseEntity<List<ContextDTO>>(contextList, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function adds new context (This is only possible for admins or superadmins)
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/context/add/{userId}/{contextId}", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
-
-	public ResponseEntity<Context> addContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
-			@RequestBody Context context, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId) && context != null) {
-
-			// Update context
-			if (!Strings.isNullOrEmpty(context.getId())) {
-				contextRepository.update(context);
-				return new ResponseEntity<Context>(context, HttpStatus.OK);
-			} else {
-				// Add new context
-				if (!userUtils.checkIfContextAlreadyExists(context, userId)) {
-					Context currentContext = contextRepository.find(contextId);
-					User currentUser = userRepository.find(userId);
-					ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
-					if (currentContext != null && currentUser != null && contextUserAuth != null) {
-						String licensePlanName = "Default";
-						LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
-						if (licensePlan != null) {
-
-							context.setLicensePlanId(licensePlan.getId());
-							ObjectId savedContextId = contextRepository.saveAndReturnId(context);
-
-							if (savedContextId != null) {
-								ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId, savedContextId.toString(),
-										contextUserAuth.getUserRole());
-								contextUserAuthRepository.save(contextUserAuthenticationNew);
-
-								// add standard group for current context
-								dataInitialization.addDefaultGroup(userId, savedContextId.toString());
-								return new ResponseEntity<Context>(context, HttpStatus.OK);
-							}
-						}
-					}
-				} else {
-					log.error("Context {} already exist", context.getName());
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale)),
-							HttpStatus.NOT_FOUND);
-				}
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * This function deletes the selected Context
-	 *
-	 * @param userId
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/deleteContext/{contextId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Context> deleteContext(@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
-			if (context != null) {
-				List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(context.getId());
-				if (contextUserAuthList != null) {
-					for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
-						currentContextRepository.deleteByContextUserAuthenticationId(contextUserAuth.getId());
-					}
-				}
-				contextRepository.deleteByContextId(contextId);
-				contextUserAuthRepository.deleteByContextId(contextId);
-				return new ResponseEntity<Context>(context, HttpStatus.OK);
-			}
-
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
 				HttpStatus.NOT_FOUND);

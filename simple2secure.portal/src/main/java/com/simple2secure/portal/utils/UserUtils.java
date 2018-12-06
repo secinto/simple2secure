@@ -20,7 +20,6 @@ import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
-import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
@@ -60,6 +59,9 @@ public class UserUtils {
 
 	@Autowired
 	GroupUtils groupUtils;
+
+	@Autowired
+	ContextUtils contextUtils;
 
 	@Autowired
 	UserRepository userRepository;
@@ -152,6 +154,8 @@ public class UserUtils {
 						return addUserAddedByRegistration(userRegistration, locale);
 					} else if (userRegistration.getRegistrationType().equals(UserRegistrationType.STANDARD)) {
 						return addUserStandardRegistration(userRegistration, locale);
+					} else if (userRegistration.getRegistrationType().equals(UserRegistrationType.INITIALIZATION)) {
+						return initializeSecintoUsers(userRegistration, locale);
 					}
 				}
 			}
@@ -180,7 +184,7 @@ public class UserUtils {
 			// if addedByUser not null continue
 			if (addedByUser != null) {
 				if (!Strings.isNullOrEmpty(userRegistration.getEmail()) && userRegistration.getUserRole() != null) {
-					User user = new User(userRegistration.getEmail(), userRegistration.getUserRole());
+					User user = new User(userRegistration.getEmail());
 					user.setUsername(userRegistration.getEmail());
 					user.setEnabled(true);
 					user.setActivationToken(portalUtils.generateToken());
@@ -194,7 +198,8 @@ public class UserUtils {
 						ObjectId userID = userRepository.saveAndReturnId(user);
 
 						// Map current context to the current user
-						ObjectId contextUserId = addContextUserAuthentication(userID.toString(), context.getId(), userRegistration.getUserRole());
+						ObjectId contextUserId = contextUtils.addContextUserAuthentication(userID.toString(), context.getId(),
+								userRegistration.getUserRole(), false);
 
 						// Add this user to the addedByUser List
 						// addedByUser.addMyUser(userID.toString());
@@ -240,10 +245,10 @@ public class UserUtils {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ResponseEntity<User> addUserStandardRegistration(UserRegistration userRegistration, String locale) throws IOException {
+	public ResponseEntity<User> addUserStandardRegistration(UserRegistration userRegistration, String locale) throws IOException {
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail()) && !Strings.isNullOrEmpty(userRegistration.getPassword())) {
 
-			User user = new User(userRegistration.getEmail(), userRegistration.getUserRole());
+			User user = new User(userRegistration.getEmail());
 			user.setUsername(userRegistration.getEmail());
 			user.setActivationToken(portalUtils.generateToken());
 			user.setEnabled(true);
@@ -262,14 +267,17 @@ public class UserUtils {
 			// Return userId and get user with id from this id
 			ObjectId userID = userRepository.saveAndReturnId(user);
 
-			ObjectId contextId = addNewContextForStandardRegistration(user, userID);
+			ObjectId contextId = contextUtils.addNewContextForRegistration(user, userID);
 
 			if (contextId != null) {
 				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
 					// add standard group for current user
 					dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
 					// Map current context with the current user
-					addContextUserAuthentication(userID.toString(), contextId.toString(), getUserRoleStandardRegistration(user));
+					contextUtils.addContextUserAuthentication(userID.toString(), contextId.toString(), UserRole.ADMIN, true);
+
+					// Map all SUPERADMINs to this context
+					contextUtils.mapSuperAdminsTotheContext(contextId.toString());
 					return new ResponseEntity<User>(user, HttpStatus.OK);
 				} else {
 
@@ -296,31 +304,63 @@ public class UserUtils {
 	}
 
 	/**
-	 * This functions creates the new context for each user which is created using standard registration.
+	 * This function is used to initialize secinto users if those are not already added. For the addition users, add an email address to the
+	 * SECINTO_EMAIL_LIST array in the StaticConfigItems.
 	 *
-	 * @param user
+	 * @param userRegistration
+	 * @param locale
 	 * @return
+	 * @throws IOException
 	 */
-	private ObjectId addNewContextForStandardRegistration(User user, ObjectId userId) {
-		String licensePlanName = "Default";
-		LicensePlan licensePlan = licensePlanRepository.findByName(licensePlanName);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<User> initializeSecintoUsers(UserRegistration userRegistration, String locale) throws IOException {
+		if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
 
-		if (licensePlan != null) {
-			Context context = new Context();
-			// TODO: Find better way to define context name
-			String tempContextName = user.getEmail().substring(user.getEmail().indexOf("@") + 1);
-			String contextName = tempContextName.substring(0, tempContextName.indexOf("."));
-			context.setName(contextName + 1);
-			context.setLicensePlanId(licensePlan.getId());
+			User user = new User(userRegistration.getEmail());
+			user.setUsername(userRegistration.getEmail());
+			user.setActivationToken(portalUtils.generateToken());
+			user.setEnabled(true);
+			user.setActivated(false);
 
-			log.debug("Added new context with name: {}", context.getName());
+			// Return userId and get user with id from this id
+			ObjectId userID = userRepository.saveAndReturnId(user);
 
-			return contextRepository.saveAndReturnId(context);
+			ObjectId contextId = contextUtils.addNewContextForRegistration(user, userID);
 
-		} else {
-			log.error("License Plan {} not found", licensePlanName);
+			if (contextId != null) {
+				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+					// add standard group for current user
+					dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
+
+					// Map current context with the current user
+					contextUtils.addContextUserAuthentication(userID.toString(), contextId.toString(), UserRole.SUPERADMIN, true);
+
+					// Map all SUPERADMINs to this context
+					contextUtils.mapSuperAdminsTotheContext(contextId.toString());
+
+					return new ResponseEntity<User>(user, HttpStatus.OK);
+				} else {
+
+					userRepository.deleteByUserID(userID.toString());
+					contextRepository.deleteByContextId(contextId.toString());
+
+					log.error("Error while sending activation email, user {} has been deleted", user.getUsername());
+
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+							HttpStatus.NOT_FOUND);
+				}
+
+			} else {
+				userRepository.deleteByUserID(userID.toString());
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+						HttpStatus.NOT_FOUND);
+			}
+
 		}
-		return null;
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 	/**
@@ -340,20 +380,6 @@ public class UserUtils {
 			return errors.getAllErrors().get(0).getDefaultMessage();
 		}
 		return null;
-	}
-
-	/**
-	 * This function is used to define the user role for the standard registration
-	 *
-	 * @param user
-	 * @return
-	 */
-	private UserRole getUserRoleStandardRegistration(User user) {
-		// TODO: This should be done somewhere on the startup, we have to add already static users with the role SUPERADMIN.
-		if (user.getEmail().contains("@secinto.com")) {
-			return UserRole.SUPERADMIN;
-		}
-		return UserRole.ADMIN;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -410,24 +436,6 @@ public class UserUtils {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * This function adds new ContextUserAuthentication for each added user
-	 *
-	 * @param userId
-	 * @param contextId
-	 * @param userRole
-	 */
-	private ObjectId addContextUserAuthentication(String userId, String contextId, UserRole userRole) {
-
-		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(userId) && userRole != null) {
-			ContextUserAuthentication contextUserAuthentication = new ContextUserAuthentication(userId, contextId, userRole);
-
-			return contextUserAuthRepository.saveAndReturnId(contextUserAuthentication);
-		}
-		return null;
-
 	}
 
 	/**
@@ -518,28 +526,6 @@ public class UserUtils {
 	}
 
 	/**
-	 * This function checks if the context with the provided name already exists.
-	 *
-	 * @param context
-	 * @param userId
-	 * @return
-	 */
-	public boolean checkIfContextAlreadyExists(Context context, String userId) {
-		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
-		if (contextUserAuthList != null) {
-			for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
-				Context contextFromDb = contextRepository.find(contextUserAuth.getContextId());
-				if (contextFromDb != null) {
-					if (contextFromDb.getName().trim().toLowerCase().equals(context.getName().trim().toLowerCase())) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * This function checks if currently active user has privileges to update selected user
 	 *
 	 * @param userRegistration
@@ -568,5 +554,4 @@ public class UserUtils {
 		}
 		return false;
 	}
-
 }

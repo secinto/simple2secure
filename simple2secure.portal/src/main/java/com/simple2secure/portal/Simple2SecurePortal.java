@@ -8,6 +8,7 @@
 
 package com.simple2secure.portal;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -120,13 +121,14 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		return application.sources(Simple2SecurePortal.class);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		ConfigurableApplicationContext context = SpringApplication.run(Simple2SecurePortal.class, args);
 		DataInitialization dataInitializer = context.getBean(DataInitialization.class);
 		if (dataInitializer != null) {
 			dataInitializer.addDefaultConfiguration();
 			dataInitializer.addDefaultSettings();
 			dataInitializer.addDefaultLicensePlan();
+			dataInitializer.addDefaultUsers();
 		}
 	}
 

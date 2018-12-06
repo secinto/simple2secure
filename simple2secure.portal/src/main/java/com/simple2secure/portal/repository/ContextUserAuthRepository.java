@@ -3,6 +3,7 @@ package com.simple2secure.portal.repository;
 import java.util.List;
 
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class ContextUserAuthRepository extends MongoRepository<ContextUserAuthentication> {
@@ -20,4 +21,6 @@ public abstract class ContextUserAuthRepository extends MongoRepository<ContextU
 	public abstract void deleteByContextIdAndUserId(String contextId, String userId);
 
 	public abstract void deleteById(String id);
+
+	public abstract List<String> getUserIdsByUserRole(UserRole userRole);
 }

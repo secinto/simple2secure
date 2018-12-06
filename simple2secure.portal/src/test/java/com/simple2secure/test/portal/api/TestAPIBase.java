@@ -161,7 +161,7 @@ public class TestAPIBase {
 
 		user = userRepository.findByEmail(user.getEmail());
 
-		ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(user.getId(), contextId, userRole);
+		ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(user.getId(), contextId, userRole, true);
 		contextUserAuthRepository.save(contextUserAuth);
 
 		return user;

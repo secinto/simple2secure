@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit {
 
     private getContexts(userId: string) {
         this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'user/context/' + userId)
+        this.httpService.get(environment.apiEndpoint + 'context/' + userId)
             .subscribe(
                 data => {
                     this.openSelectContextModal(data);

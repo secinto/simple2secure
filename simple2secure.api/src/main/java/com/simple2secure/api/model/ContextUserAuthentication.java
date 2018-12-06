@@ -13,6 +13,7 @@ public class ContextUserAuthentication extends GenericDBObject {
 	private static final long serialVersionUID = -1144793004982781563L;
 	private String userId;
 	private String contextId;
+	private boolean defaultContext;
 
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
@@ -20,10 +21,11 @@ public class ContextUserAuthentication extends GenericDBObject {
 	public ContextUserAuthentication() {
 	}
 
-	public ContextUserAuthentication(String userId, String contextId, UserRole userRole) {
+	public ContextUserAuthentication(String userId, String contextId, UserRole userRole, boolean defaultContext) {
 		this.userId = userId;
 		this.contextId = contextId;
 		this.userRole = userRole;
+		this.defaultContext = defaultContext;
 	}
 
 	public String getUserId() {
@@ -48,5 +50,13 @@ public class ContextUserAuthentication extends GenericDBObject {
 
 	public void setUserRole(UserRole userRole) {
 		this.userRole = userRole;
+	}
+
+	public boolean isDefaultContext() {
+		return defaultContext;
+	}
+
+	public void setDefaultContext(boolean defaultContext) {
+		this.defaultContext = defaultContext;
 	}
 }

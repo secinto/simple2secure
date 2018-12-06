@@ -44,7 +44,7 @@ public class User extends GenericDBObject {
 		this.passwordUpdated = passwordUpdated;
 	}
 
-	public User(String email, UserRole userRole) {
+	public User(String email) {
 		this.email = email;
 	}
 

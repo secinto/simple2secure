@@ -58,7 +58,7 @@ export class UserContextAddDialogComponent {
     saveContext() {
         this.loading = true;
 
-        this.url = environment.apiEndpoint + 'user/context/add/' + this.currentUser.userID + '/' + this.contextDTO.context.id;
+        this.url = environment.apiEndpoint + 'context/add/' + this.currentUser.userID + '/' + this.contextDTO.context.id;
         this.httpService.post(this.context, this.url).subscribe(
             data => {
                 this.dialogRef.close(true);

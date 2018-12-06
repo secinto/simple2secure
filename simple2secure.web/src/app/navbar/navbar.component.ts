@@ -110,7 +110,7 @@ export class NavbarComponent {
     }
 
     private getContexts(userId: string) {
-        this.httpService.get(environment.apiEndpoint + 'user/context/' + userId)
+        this.httpService.get(environment.apiEndpoint + 'context/' + userId)
             .subscribe(
                 data => {
                     this.openSelectContextModal(data);

@@ -309,7 +309,7 @@ export class UserOverviewComponent {
 
     public deleteContext(context: any) {
         this.loading = true;
-        this.httpService.delete(environment.apiEndpoint + 'user/deleteContext/' + context.id).subscribe(
+        this.httpService.delete(environment.apiEndpoint + 'context/delete/' + context.id).subscribe(
             data => {
                 this.alertService.success(this.translate.instant('message.context.delete'));
                 this.loadMyProfile();
