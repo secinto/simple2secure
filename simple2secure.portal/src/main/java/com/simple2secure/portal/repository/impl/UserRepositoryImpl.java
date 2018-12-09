@@ -34,13 +34,6 @@ public class UserRepositoryImpl extends UserRepository {
 	}
 
 	@Override
-	public User findByUsername(String username) {
-		Query query = new Query(Criteria.where("username").is(username));
-		User user = mongoTemplate.findOne(query, User.class);
-		return user;
-	}
-
-	@Override
 	public User findByActivationToken(String activationToken) {
 		Query query = new Query(Criteria.where("activationToken").is(activationToken));
 		User user = mongoTemplate.findOne(query, User.class);

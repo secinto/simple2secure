@@ -64,6 +64,36 @@ public class ProcessorController {
 	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		// TODO - implement a method to check it the processor with the provided id exists in the update case and check if probe or group id are
+		// empty!!!
+
+		if (processor != null) {
+			if (Strings.isNullOrEmpty(processor.getId())) {
+				if (!Strings.isNullOrEmpty(processor.getGroupId())) {
+					List<Processor> processors = repository.getProcessorsByGroupId(processor.getGroupId());
+
+					if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale)),
+								HttpStatus.NOT_FOUND);
+					}
+				}
+				repository.save(processor);
+			} else {
+				repository.update(processor);
+			}
+			return new ResponseEntity<Processor>(processor, HttpStatus.OK);
+		}
+		log.error("Error occured while saving/updating processor");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{probeId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
@@ -120,36 +150,6 @@ public class ProcessorController {
 		}
 		log.error("Error while retrieving processors for group with id {}", groupId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/processors", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		// TODO - implement a method to check it the processor with the provided id exists in the update case and check if probe or group id are
-		// empty!!!
-
-		if (processor != null) {
-			if (Strings.isNullOrEmpty(processor.getId())) {
-				if (!Strings.isNullOrEmpty(processor.getGroupId())) {
-					List<Processor> processors = repository.getProcessorsByGroupId(processor.getGroupId());
-
-					if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale)),
-								HttpStatus.NOT_FOUND);
-					}
-				}
-				repository.save(processor);
-			} else {
-				repository.update(processor);
-			}
-			return new ResponseEntity<Processor>(processor, HttpStatus.OK);
-		}
-		log.error("Error occured while saving/updating processor");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

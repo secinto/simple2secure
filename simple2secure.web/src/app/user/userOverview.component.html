@@ -1,7 +1,7 @@
  <div class="container">
     <mat-tab-group #tabGroup (selectedIndexChange)="_setDataSource($event)">
         <mat-tab label="{{ 'table.myprofile' | translate }}">
-			<h3>{{ 'user.details' | translate }} {{myProfile.username}}</h3>
+			<h3>{{ 'user.details' | translate }} {{myProfile.email}}</h3>
 			<form #userForm="ngForm" (ngSubmit)="updateUserInfo()">
 			
 				  <table class="full_width_input" cellspacing="0"><tr>
@@ -27,10 +27,10 @@
 				  
 			  	 <table class="full_width_input" cellspacing="2px"><tr>
 				    <td><mat-form-field class="full_width_input">
-				      <input matInput type="text" placeholder="{{ 'register.firstName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.mobile" name="mobile">
+				      <input matInput type="text" placeholder="{{ 'register.mobile.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.mobile" name="mobile">
 				    </mat-form-field></td>
 				    <td><mat-form-field class="full_width_input">
-				      <input matInput type="text" placeholder="{{ 'register.lastName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.phone" name="phone">
+				      <input matInput type="text" placeholder="{{ 'register.phone.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.phone" name="phone">
 				    </mat-form-field></td>    
 				  </tr></table>
 				  

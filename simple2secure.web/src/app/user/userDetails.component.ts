@@ -30,6 +30,7 @@ export class UserDetailsComponent {
   groups: CompanyGroup[];
   action: string;
   context: ContextDTO;
+  isEmailFieldDisabled = false;
 
   constructor(
     private router: Router,
@@ -56,7 +57,8 @@ export class UserDetailsComponent {
           console.log(JSON.stringify(data.user));
           if (this.user.userRole === UserRole.SUPERUSER){
               this.showGroupSelectBox = true;
-      }
+          }
+          this.isEmailFieldDisabled = true;
       }
   }
 
@@ -91,12 +93,11 @@ export class UserDetailsComponent {
     }
 
     private loadGroups() {
-        this.httpService.get(environment.apiEndpoint + 'group/' +
+        this.httpService.get(environment.apiEndpoint + 'group/context/' +
             this.context.context.id)
             .subscribe(
                 data => {
                     this.groups = data;
-                    //this.addMyGroups(this.groups);
                 },
                 error => {
 
@@ -107,19 +108,6 @@ export class UserDetailsComponent {
                         this.alertService.error(error.error.errorMessage);
                     }
                 });
-    }
-
-    addMyGroups(groups: CompanyGroup[]){
-      if (this.context.userRole === UserRole.SUPERUSER){
-          if (groups){
-              groups.forEach(group => {
-                  if (group.superUserIds.indexOf(this.user.id) > -1){
-                      this.user.groupIds.push(group.id);
-                  }
-              });
-          }
-      }
-
     }
 
 	saveUser() {

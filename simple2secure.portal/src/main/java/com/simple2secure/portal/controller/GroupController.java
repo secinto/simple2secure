@@ -153,7 +153,7 @@ public class GroupController {
 	}
 
 	/**
-	 * This function returns all users from the user repository
+	 * This function returns the group according to the group id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{groupID}", method = RequestMethod.GET)
@@ -172,10 +172,10 @@ public class GroupController {
 	}
 
 	/**
-	 * This function returns all users from the user repository
+	 * This function returns all groups according to the contextId
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/context/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -186,6 +186,35 @@ public class GroupController {
 				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
 					return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+				}
+			}
+		}
+		log.error("Problem occured while retrieving group for context with id {}", contextId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function returns all groups according to the contextId
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@PathVariable("contextId") String contextId,
+			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
+			Context context = contextRepository.find(contextId);
+			User user = userRepository.find(userId);
+			if (context != null && user != null) {
+				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+				if (contextUserAuthentication != null) {
+
+					// TODO: check according to the user role which groups will be visible to the user
+					List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+					if (groups != null) {
+						return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+					}
 				}
 			}
 		}

@@ -1,11 +1,11 @@
-import {User} from './user';
 import {Probe} from './probe';
 import {CompanyGroup} from './companygroup';
 import {UserRoleDTO} from './userRoleDTO';
 import {Context} from './context';
+import {UserInfo} from './userInfo';
 
 export class UserDTO{
-    myProfile: User;
+    myProfile: UserInfo;
     myUsersList: UserRoleDTO[];
     myGroups: CompanyGroup[];
     myProbes: Probe[];

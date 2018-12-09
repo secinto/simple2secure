@@ -1,8 +1,8 @@
-import {User} from './user';
 import {UserRole} from './userRole';
+import {UserInfo} from './userInfo';
 
 export class UserRoleDTO{
-    user: User;
+    user: UserInfo;
     userRole: UserRole;
     groupIds: string[];
 }

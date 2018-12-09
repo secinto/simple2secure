@@ -4,7 +4,7 @@
 	<form #userForm="ngForm">
 
 		<mat-form-field class="full_width_input">
-			<input matInput type="email" placeholder="{{ 'login.email.placeholder' | translate }}"
+			<input matInput type="email" [disabled]="isEmailFieldDisabled" placeholder="{{ 'login.email.placeholder' | translate }}"
 				   [(ngModel)]="user.email" name="email" autocomplete="email" required>
 		</mat-form-field>
 

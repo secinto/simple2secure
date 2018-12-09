@@ -21,6 +21,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInfo;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
@@ -41,6 +42,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.repository.ToolRepository;
+import com.simple2secure.portal.repository.UserInfoRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
@@ -104,6 +106,9 @@ public class UserUtils {
 
 	@Autowired
 	UserInvitationRepository userInvitationRepository;
+
+	@Autowired
+	UserInfoRepository userInfoRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -185,7 +190,6 @@ public class UserUtils {
 			if (addedByUser != null) {
 				if (!Strings.isNullOrEmpty(userRegistration.getEmail()) && userRegistration.getUserRole() != null) {
 					User user = new User(userRegistration.getEmail());
-					user.setUsername(userRegistration.getEmail());
 					user.setEnabled(true);
 					user.setActivationToken(portalUtils.generateToken());
 					user.setActivated(false);
@@ -201,13 +205,12 @@ public class UserUtils {
 						ObjectId contextUserId = contextUtils.addContextUserAuthentication(userID.toString(), context.getId(),
 								userRegistration.getUserRole(), false);
 
-						// Add this user to the addedByUser List
-						// addedByUser.addMyUser(userID.toString());
-
 						// If sending email was successful, update addedByUser, if not delete the user and userContextAuth
 						if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)
 								&& contextUserId != null) {
-							// userRepository.update(addedByUser);
+
+							// Add userInfo to the current user
+							addUserInfo(userID.toString(), user.getEmail());
 
 							// Update the selected groups to be accessible for the superuser
 							if (userRegistration.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -216,13 +219,13 @@ public class UserUtils {
 
 							}
 
-							log.debug("User {} added successfully", user.getUsername());
+							log.debug("User {} added successfully", user.getEmail());
 							return new ResponseEntity<User>(user, HttpStatus.OK);
 						} else {
 							userRepository.deleteByUserID(userID.toString());
 							contextUserAuthRepository.deleteById(contextUserId.toString());
 
-							log.error("Error while sending activation email, user {} has been deleted", user.getUsername());
+							log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 
 							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
 									HttpStatus.NOT_FOUND);
@@ -249,7 +252,6 @@ public class UserUtils {
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail()) && !Strings.isNullOrEmpty(userRegistration.getPassword())) {
 
 			User user = new User(userRegistration.getEmail());
-			user.setUsername(userRegistration.getEmail());
 			user.setActivationToken(portalUtils.generateToken());
 			user.setEnabled(true);
 			user.setActivated(false);
@@ -271,6 +273,10 @@ public class UserUtils {
 
 			if (contextId != null) {
 				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+
+					// add user info to the current user
+					addUserInfo(userID.toString(), user.getEmail());
+
 					// add standard group for current user
 					dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
 					// Map current context with the current user
@@ -284,7 +290,7 @@ public class UserUtils {
 					userRepository.deleteByUserID(userID.toString());
 					contextRepository.deleteByContextId(contextId.toString());
 
-					log.error("Error while sending activation email, user {} has been deleted", user.getUsername());
+					log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 
 					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 							HttpStatus.NOT_FOUND);
@@ -317,7 +323,6 @@ public class UserUtils {
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
 
 			User user = new User(userRegistration.getEmail());
-			user.setUsername(userRegistration.getEmail());
 			user.setActivationToken(portalUtils.generateToken());
 			user.setEnabled(true);
 			user.setActivated(false);
@@ -329,6 +334,9 @@ public class UserUtils {
 
 			if (contextId != null) {
 				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+					// add user info for current user
+					addUserInfo(userID.toString(), user.getEmail());
+
 					// add standard group for current user
 					dataInitialization.addDefaultGroup(userID.toString(), contextId.toString());
 
@@ -344,7 +352,7 @@ public class UserUtils {
 					userRepository.deleteByUserID(userID.toString());
 					contextRepository.deleteByContextId(contextId.toString());
 
-					log.error("Error while sending activation email, user {} has been deleted", user.getUsername());
+					log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 
 					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 							HttpStatus.NOT_FOUND);
@@ -501,20 +509,24 @@ public class UserUtils {
 					if (!contextUserAuth.getUserId().equals(userId)) {
 						User user = userRepository.find(contextUserAuth.getUserId());
 						if (user != null) {
-							List<String> groupIds = new ArrayList<>();
+							UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
+							if (userInfo != null) {
+								List<String> groupIds = new ArrayList<>();
 
-							if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
-								List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
+								if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
+									List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(),
+											user.getId());
 
-								for (GroupAccessRight accessRight : accessRightList) {
-									if (accessRight != null) {
-										if (groupUtils.checkIfGroupExists(accessRight.getGroupId())) {
-											groupIds.add(accessRight.getGroupId());
+									for (GroupAccessRight accessRight : accessRightList) {
+										if (accessRight != null) {
+											if (groupUtils.checkIfGroupExists(accessRight.getGroupId())) {
+												groupIds.add(accessRight.getGroupId());
+											}
 										}
 									}
 								}
+								myUsersWithRole.add(new UserRoleDTO(userInfo, contextUserAuth.getUserRole(), groupIds));
 							}
-							myUsersWithRole.add(new UserRoleDTO(user, contextUserAuth.getUserRole(), groupIds));
 						}
 					}
 				}
@@ -552,5 +564,16 @@ public class UserUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * This function adds the userInfo for the provided user
+	 *
+	 * @param userId
+	 * @param email
+	 */
+	private void addUserInfo(String userId, String email) {
+		UserInfo userInfo = new UserInfo(userId, email);
+		userInfoRepository.save(userInfo);
 	}
 }

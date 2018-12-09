@@ -59,13 +59,8 @@ public class TestUserLogin {
 	@BeforeAll
 	public void init() {
 		user = new User();
-
-		user.setFirstName("test");
-		user.setLastName("test");
-		user.setUsername("test");
 		user.setEmail("testiing@test.com");
 		user.setPassword(passwordEncoder.encode("test"));
-		user.setUsername("test");
 		user.setActivated(true);
 		user.setActivationToken("12345");
 		userRepository.save(user);

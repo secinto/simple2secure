@@ -5,8 +5,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class UserRepository extends MongoRepository<User> {
 
-	public abstract User findByUsername(String username);
-
 	public abstract User findByActivationToken(String activationToken);
 
 	public abstract User findByEmailOnlyActivated(String email);

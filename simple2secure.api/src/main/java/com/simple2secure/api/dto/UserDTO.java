@@ -13,7 +13,7 @@ import java.util.List;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Probe;
-import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInfo;
 
 public class UserDTO {
 
@@ -22,9 +22,9 @@ public class UserDTO {
 	private List<Probe> myProbes;
 	private List<Context> myContexts;
 	private List<String> assignedGroups;
-	private User myProfile;
+	private UserInfo myProfile;
 
-	public UserDTO(User user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Context> myContexts,
+	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Context> myContexts,
 			List<String> assignedGroups) {
 		myProfile = user;
 		myUsersList = myUsers;
@@ -42,11 +42,11 @@ public class UserDTO {
 		this.myUsersList = myUsersList;
 	}
 
-	public User getMyProfile() {
+	public UserInfo getMyProfile() {
 		return myProfile;
 	}
 
-	public void setMyProfile(User myProfile) {
+	public void setMyProfile(UserInfo myProfile) {
 		this.myProfile = myProfile;
 	}
 

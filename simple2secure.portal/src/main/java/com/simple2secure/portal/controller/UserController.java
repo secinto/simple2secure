@@ -30,6 +30,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserInfo;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
@@ -44,6 +45,7 @@ import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.UserInfoRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.PasswordValidator;
@@ -85,6 +87,9 @@ public class UserController {
 
 	@Autowired
 	UserInvitationRepository userInvitationRepository;
+
+	@Autowired
+	UserInfoRepository userInfoRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -155,6 +160,7 @@ public class UserController {
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
 				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
+				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
 
 				if (contextUserAuth != null) {
 					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
@@ -162,7 +168,7 @@ public class UserController {
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(user, myUsers, groups, myProbes, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myContexts, assignedGroups);
 				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
 			}
 		}
@@ -229,17 +235,19 @@ public class UserController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserInfo(@RequestBody User user, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
-		if (user != null) {
-			userRepository.update(user);
+		if (userInfo != null) {
+			User user = userRepository.find(userInfo.getUserId());
 
-			return new ResponseEntity<User>(user, HttpStatus.OK);
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-					HttpStatus.NOT_FOUND);
+			if (user != null) {
+				userInfoRepository.update(userInfo);
+				return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
+			}
 		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**

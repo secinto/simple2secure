@@ -14,6 +14,7 @@ import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 import {UserProbeChangeGroupComponent} from './userProbeChangeGroup.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
+import {UserInfo} from '../_models/userInfo';
 
 @Component({
   moduleId: module.id,
@@ -33,7 +34,7 @@ export class UserOverviewComponent {
   userAdded = false;
   canDeleteAndEditUser = false;
   selectedItem: any;
-  myProfile: any;
+  myProfile: UserDTO;
   moveNotPossible = false;
   url: string;
   id: string;
@@ -79,7 +80,7 @@ export class UserOverviewComponent {
     private dialog2: MatDialog,
     private translate: TranslateService) {
       this.myProfile = new UserDTO();
-      this.myProfile.myProfile = new User();
+      this.myProfile.myProfile = new UserInfo();
   }
 
   ngOnInit() {
@@ -227,6 +228,7 @@ export class UserOverviewComponent {
                   this.user = data;
                   this.alertService.success(this.translate.instant('message.user.update'));
                   this.router.navigate(['user']);
+                  this.loading = false;
               },
               error => {
                   if (error.status == 0){

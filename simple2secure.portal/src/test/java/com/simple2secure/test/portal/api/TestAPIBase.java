@@ -133,23 +133,17 @@ public class TestAPIBase {
 	private User createUser(UserRole userRole) {
 		User user = new User();
 		String contextId = null;
-
-		user.setFirstName("test");
-		user.setLastName("test");
 		user.setEmail("probe@test.com");
 		user.setPassword(passwordEncoder.encode("test"));
-		user.setUsername("probe");
 		user.setActivated(true);
 		user.setActivationToken("54321");
 
 		if (userRole.equals(UserRole.ADMIN)) {
 			user.setEmail("testiing@test.com");
-			user.setUsername("testiing@test.com");
 			user.setActivationToken("12345");
 			contextId = createContext("Context 1");
 		} else if (userRole.equals(UserRole.SUPERUSER)) {
 			user.setEmail("superuser@test.com");
-			user.setUsername("superuser@test.com");
 			user.setActivationToken("23145");
 			contextId = createContext("Context 2");
 		}
