@@ -65,43 +65,7 @@ public class NetworkMonitor {
 
 		boolean show = configuration.isShow_interfaces();
 
-		String previousAddress = "";
-
-		boolean use_iface = configuration.isUse_configured_iface();
-		if (use_iface) {
-			int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
-			int iface = config;
-			if (iface < interfaces.size()) {
-				singleInterface = interfaces.get(iface);
-			}
-		}
-
-		if (singleInterface == null) {
-
-			for (int i = 0; i < interfaces.size(); i++) {
-				PcapNetworkInterface currentInterface = interfaces.get(i);
-				if (show) {
-					log.info(i + ":" + currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
-				}
-				/*
-				 * Iterate through the addresses of the interfaces and check if someone fits. TODO: We should store the interfaces which have
-				 * relevant addresses.
-				 */
-				List<PcapAddress> addresses = interfaces.get(i).getAddresses();
-				for (PcapAddress address : addresses) {
-					if (address instanceof PcapIpV4Address) {
-						String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
-						if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
-							if (singleInterface != null) {
-								log.info("Found another usable address {}, discarding old one {}", ipAddress, previousAddress);
-							}
-							singleInterface = currentInterface;
-							previousAddress = ipAddress;
-						}
-					}
-				}
-			}
-		}
+		getSingleInterface(show);
 
 		if (singleInterface == null) {
 			throw new NetworkException(LocaleHolder.getMessage("no_usable_address"));
@@ -121,7 +85,7 @@ public class NetworkMonitor {
 					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
 				}
 			}
-			processingQueue = new ProcessingQueue<PacketContainer>();
+			processingQueue = new ProcessingQueue<>();
 
 			receiver = new PacketReceiver(receiverHandle, processingQueue);
 			packetProcessor = new PacketProcessorFSM(processingQueue);
@@ -139,6 +103,34 @@ public class NetworkMonitor {
 			throw new NetworkException(LocaleHolder.getMessage("pcap_interface_open_error"));
 		}
 
+	}
+
+	private void getSingleInterface(boolean show) {
+		String previousAddress = "";
+
+		for (PcapNetworkInterface currentInterface : interfaces) {
+			if (show) {
+				log.info(currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
+			}
+			/*
+			 * Iterate through the addresses of the interfaces and check if someone fits.
+			 *
+			 * TODO: We should store the interfaces which have relevant addresses.
+			 */
+			List<PcapAddress> addresses = currentInterface.getAddresses();
+			for (PcapAddress address : addresses) {
+				if (address instanceof PcapIpV4Address) {
+					String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
+					if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
+						if (singleInterface != null) {
+							log.info("Found another usable address {}, discarding old one {}", ipAddress, previousAddress);
+						}
+						singleInterface = currentInterface;
+						previousAddress = ipAddress;
+					}
+				}
+			}
+		}
 	}
 
 	public PacketReceiver getReceiver() {
