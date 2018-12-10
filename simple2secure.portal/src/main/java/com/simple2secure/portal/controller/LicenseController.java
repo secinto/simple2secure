@@ -204,8 +204,8 @@ public class LicenseController {
 
 					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStream(licenseFile, licenseFilePath + "public.key");
 
-					// context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
-					// contextRepository.update(context);
+					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
+					contextRepository.update(context);
 
 					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 				}

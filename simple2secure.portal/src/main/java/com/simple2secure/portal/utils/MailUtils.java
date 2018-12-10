@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.mail.BodyPart;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -63,6 +66,30 @@ public class MailUtils {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * This function sends an email message as html
+	 * 
+	 * @param user
+	 * @param emailContent
+	 * @param subject
+	 * @return
+	 * @throws MessagingException
+	 */
+	public boolean sendHTMLEmail(User user, String emailContent, String subject) throws MessagingException {
+		if (user != null && !Strings.isNullOrEmpty(emailContent) && !Strings.isNullOrEmpty(subject)) {
+			MimeMessage message = javaMailSender.createMimeMessage();
+			message.setSubject(subject);
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true);
+			mimeMessageHelper.setFrom(mailUser);
+			mimeMessageHelper.setTo(user.getEmail());
+			mimeMessageHelper.setText(emailContent, true);
+			javaMailSender.send(message);
+			return true;
+		}
+		return false;
+
 	}
 
 	/**
@@ -127,7 +154,7 @@ public class MailUtils {
 	/**
 	 * This function iterates over all Email Configuration according the contextId and calls the deleteEmailConfiguration function to delete
 	 * each configuration
-	 * 
+	 *
 	 * @param contextId
 	 */
 	public void deleteEmailConfigurationByContextId(String contextId) {

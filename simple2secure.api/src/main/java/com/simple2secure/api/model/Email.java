@@ -17,6 +17,10 @@ public class Email extends GenericDBObject {
 	private String text;
 	private String receivedDate;
 
+	public Email() {
+
+	}
+
 	public Email(String messageId, String configId, int number, String subject, String from, String text, String receivedDate) {
 		this.configId = configId;
 		this.number = number;

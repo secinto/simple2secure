@@ -96,10 +96,18 @@ public class UpdateEmailScheduler {
 
 					if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
 						// TO-DO - check if there is a rule for this inbox and check it accordingly
-						Email email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-								mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+						Email email = new Email();
+						Object content = msg.getContent();
+						if (content instanceof String) {
+							String body = (String) content;
+							email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(), body,
+									msg.getReceivedDate().toString());
+						} else if (content instanceof MimeMultipart) {
+							email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+									mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+						}
 
-						emailsRuleChecker(email, emailConfig);
+						// emailsRuleChecker(email, emailConfig);
 
 						emailRepository.save(email);
 					}
