@@ -15,10 +15,15 @@ public class TestProcessUtils {
 
 	private CountDownLatch lock = new CountDownLatch(1);
 
+	public void testDemoApplicationStart() throws Exception {
+		ProcessUtils.invokeJavaProcess(null, false, "-cp", "../../release/simple2secure.service-0.1.0.jar",
+				"com.simple2secure.service.test.EchoClient", "localhost", "8000");
+	}
+
 	@Test
 	public void testCreateProcess() throws Exception {
-		TestLoggingObserver observer = new TestLoggingObserver();
 		ProcessContainer container = ProcessUtils.createProcess("cmd.exe", "/c", "java", "-version");
+		TestLoggingObserver observer = new TestLoggingObserver();
 		container.getObservable().addObserver(observer);
 		container.startObserving();
 		lock.await(2000, TimeUnit.MILLISECONDS);
