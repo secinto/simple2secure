@@ -23,9 +23,10 @@ public class ProbePacket extends GenericDBObject {
 	private TimeUnit analysisIntervalUnit;
 	private String hexAsStringFrame;
 
-	public ProbePacket() {}
+	private ProbePacket() {
+	}
 
-	ProbePacket(String groupId, String name, boolean always, int requestCount, long analysisInterval, TimeUnit analysisIntervalUnit,
+	public ProbePacket(String groupId, String name, boolean always, int requestCount, long analysisInterval, TimeUnit analysisIntervalUnit,
 			String hexAsStringFrame) {
 		this.groupId = groupId;
 		this.name = name;
@@ -40,7 +41,7 @@ public class ProbePacket extends GenericDBObject {
 		return groupId;
 	}
 
-	void setGroupId(String groupId) {
+	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
 

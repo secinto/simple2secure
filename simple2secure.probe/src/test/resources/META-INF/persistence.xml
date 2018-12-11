@@ -21,6 +21,7 @@
 		<class>com.simple2secure.api.model.CompanyGroup</class>
 		<class>com.simple2secure.api.model.CompanyLicensePublic</class>
 		<class>com.simple2secure.api.model.NetworkReport</class>
+		<class>com.simple2secure.api.model.ProbePacket</class>
 		<properties>
 			<property name="hibernate.dialect"
 				value="org.hibernate.dialect.H2Dialect" />
