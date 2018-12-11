@@ -40,7 +40,7 @@ public class PcapUtil {
 	private static Logger log = LoggerFactory.getLogger(PcapUtil.class);
 
 	public static Map<String, Boolean> findOutgoingInterfaces(List<String> addresses) {
-		Map<String, Boolean> mapping = new HashMap<String, Boolean>();
+		Map<String, Boolean> mapping = new HashMap<>();
 		for (String ipAddress : addresses) {
 			mapping.put(ipAddress, checkAddress(ipAddress));
 		}
@@ -98,8 +98,7 @@ public class PcapUtil {
 	}
 
 	public static boolean checkAddress(String ipAddress) {
-		Socket soc = new java.net.Socket();
-		try {
+		try (Socket socket = new java.net.Socket()) {
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 
 			while (nets.hasMoreElements()) {
@@ -110,9 +109,9 @@ public class PcapUtil {
 					InetAddress inet = InetAddress.getByName(ipAddress);
 
 					if (address.getAddress() instanceof Inet4Address && address.getAddress().equals(inet)) {
-						soc.bind(new InetSocketAddress(address.getAddress(), 0));
-						soc.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
-						soc.close();
+						socket.bind(new InetSocketAddress(address.getAddress(), 0));
+						socket.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
+						socket.close();
 						return true;
 					}
 				}
