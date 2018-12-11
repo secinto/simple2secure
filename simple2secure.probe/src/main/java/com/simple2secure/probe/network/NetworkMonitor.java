@@ -63,18 +63,18 @@ public class NetworkMonitor {
 
 		Config configuration = ProbeConfiguration.getInstance().getConfig();
 
-		boolean show = configuration.isShow_interfaces();
+		boolean show = configuration.isShowInterfaces();
 
 		String previousAddress = "";
 
-		boolean use_iface = configuration.isUse_configured_iface();
-		if (use_iface) {
-			int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
-			int iface = config;
-			if (iface < interfaces.size()) {
-				singleInterface = interfaces.get(iface);
-			}
-		}
+		// boolean use_iface = configuration.isUse_configured_iface();
+		// if (use_iface) {
+		// int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
+		// int iface = config;
+		// if (iface < interfaces.size()) {
+		// singleInterface = interfaces.get(iface);
+		// }
+		// }
 
 		if (singleInterface == null) {
 

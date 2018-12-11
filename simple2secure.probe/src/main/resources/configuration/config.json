@@ -1,28 +1,7 @@
 {
 	"version": 1, 
-	"config_supplier": "http://localhost:8080/api/config",
-	"task_supplier": "http://localhost:8080/api/getTasks",
-	"stylesheet": "/gui/css/simple2secure.css",
-	"use_configured_iface": "false",
-	"interface_number": "0",
 	"show_interfaces": "false",
 	"external_address": "monitor.simple2secure.com",
-	"connection_timeout": "1000",
-	"communication_factory": "com.simple2secure.probe.comm.LocalCommConfiguration",
-	"wt_intervall": 20,
-	"bpfFilter" : "not (host 127.0.0.1 and port (8080 or 9000))",
-	"db_config": {
-	  "location": "plocal",
-	  "dbURI": "/temp/mydb",
-	  "write_user": "admin",
-	  "write_password": "admin",
-	  "read_user": "report",
-	  "read_password": "report",
-	  "time_slot_size": "360000"
-	},
-	"queries": {
-	  "querystrings": "src/test/resources/osqueries.json",
-	  "queryconfig": "src/test/resources/osqueryconfig.json",
-	  "osquerypath": ".\\\\bin\\\\osquery\\\\os_win7"
-	}
+	"processing_factory": "com.simple2secure.probe.processor.DefaultPacketProcessingFactory",
+	"bpfFilter" : "not (host 127.0.0.1 and port (8080 or 9000))"
 }

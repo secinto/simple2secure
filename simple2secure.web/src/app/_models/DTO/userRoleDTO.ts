@@ -1,5 +1,5 @@
-import {UserRole} from './userRole';
-import {UserInfo} from './userInfo';
+import {UserRole} from '../userRole';
+import {UserInfo} from '../userInfo';
 
 export class UserRoleDTO{
     user: UserInfo;

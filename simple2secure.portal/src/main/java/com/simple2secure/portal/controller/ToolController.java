@@ -41,7 +41,7 @@ import io.kubernetes.client.models.V1PodList;
 import io.kubernetes.client.util.Config;
 
 @RestController
-@RequestMapping("/api/tool")
+@RequestMapping("/api/tools")
 public class ToolController {
 
 	@Autowired
@@ -67,7 +67,7 @@ public class ToolController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/tools", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Tool>> getAllTools(@RequestHeader("Accept-Language") String locale) {
 

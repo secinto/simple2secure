@@ -1,5 +1,5 @@
-import {Settings} from './settings';
-import {LicensePlan} from './LicensePlan';
+import {Settings} from '../settings';
+import {LicensePlan} from '../LicensePlan';
 
 export class SettingsDTO{
     public settings: Settings;

@@ -226,6 +226,7 @@
   "config.externalAddress": "Externe Adresse",
   "config.connectionTimeout": "Verbindungszeitüberschreitung",
   "config.processingFactory": "Verarbeitungsfabrik",
+  "config.bpfFilter": "BPF Filter",
   "config.communicationFactory": "Kommunikationsfabrik",
   "config.wtIntervall": "Worker Thread Intervall",
   "config.dbconfigLocation": "Ort",

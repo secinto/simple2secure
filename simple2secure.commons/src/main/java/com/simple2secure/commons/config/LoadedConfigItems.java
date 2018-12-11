@@ -19,7 +19,9 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String baseKubernetesURL = "https://35.232.109.156";
+	// private String baseKubernetesURL = "https://35.232.109.156";
+
+	private String baseKubernetesURL = "http://192.168.123.63:8080";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
@@ -216,5 +218,4 @@ public class LoadedConfigItems {
 	public String getLicensePlanURL() {
 		return getBaseURL() + licensePlanURL;
 	}
-
 }

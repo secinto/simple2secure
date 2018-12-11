@@ -18,8 +18,6 @@ import {TranslateService} from '@ngx-translate/core';
 export class ConfigurationDetailsComponent {
   config: Config;
   loading: boolean;
-  id: string;
-  private sub: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,15 +25,11 @@ export class ConfigurationDetailsComponent {
     private alertService: AlertService,
     private location: Location,
     private translate: TranslateService) {
-    this.config = new Config();
-    this.loading = false;
+        this.config = new Config();
+        this.loading = false;
   }
 
   ngOnInit() {
-    this.sub = this.route.params.subscribe(params => {
-      this.id = params['id'];
-    });
-
     this.loadConfiguration();
   }
 
@@ -75,14 +69,5 @@ export class ConfigurationDetailsComponent {
           }
           this.loading = false;
       });
-  }
-
-  public addNewAPI() {
-    if (this.config['apis'] == null) {
-      this.config['apis'] = [{id: '', name: '', url: ''}];
-    }
-    else {
-      this.config['apis'].push({id: '', name: '', url: ''});
-    }
   }
 }

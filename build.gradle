@@ -44,6 +44,7 @@ project(':simple2secure.api') {
 }
 project(':simple2secure.commons') {
 	dependencies {
+		implementation project(':simple2secure.api')
 		compile group: 'commons-io', name: 'commons-io', version: '2.6'
 		compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
