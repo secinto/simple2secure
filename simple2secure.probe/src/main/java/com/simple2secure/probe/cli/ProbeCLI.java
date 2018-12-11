@@ -7,6 +7,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.pcap4j.packet.IllegalRawDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
+import com.simple2secure.probe.utils.PacketUtil;
 
 public class ProbeCLI {
 	private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
@@ -98,6 +100,17 @@ public class ProbeCLI {
 			}
 
 			client.start();
+
+			// just for testing
+			///////////////////////////////////////////////////
+			try {
+				PacketUtil.craftProbePacketsForTest();
+			} catch (IllegalRawDataException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			///////////////////////////////////////////////////
+
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
 			String footer = "\nPlease report issues at http://simple2secure.com/issues";

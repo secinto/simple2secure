@@ -9,6 +9,7 @@ import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +47,14 @@ public class PcapUtil {
 		return mapping;
 	}
 
-	public static Packet getPacketFromHexString(String hexStreamAsString, int offset) throws IllegalRawDataException {
-		byte[] hexStringAsBArray = hexStringToByteArray(hexStreamAsString);
-		return EthernetPacket.newPacket(hexStringAsBArray, offset, hexStringAsBArray.length);
+	public static Packet convertHexStreamToPacket(String hexStreamAsString, int offset) throws IllegalRawDataException {
+		byte[] decodedString = Base64.getDecoder().decode(hexStreamAsString);
+		return EthernetPacket.newPacket(decodedString, offset, decodedString.length);
+	}
+
+	public static String convertPackRawDataToHexStreamString(byte[] rawData) {
+		byte[] encodedRawData = Base64.getEncoder().encode(rawData);
+		return new String(encodedRawData);
 	}
 
 	/**
