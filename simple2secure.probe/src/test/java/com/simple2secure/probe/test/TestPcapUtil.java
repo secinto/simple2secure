@@ -62,8 +62,4 @@ public class TestPcapUtil {
 		Assertions.assertEquals(SRC_MAC_ADDR.toString(), packetInfo.getSource_mac());
 		Assertions.assertEquals(60, packetInfo.getLength());
 	}
-
-	@Test
-	public void f
-
 }

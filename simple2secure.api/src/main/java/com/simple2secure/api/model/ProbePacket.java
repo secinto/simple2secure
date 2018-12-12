@@ -21,20 +21,20 @@ public class ProbePacket extends GenericDBObject {
 	private int requestCount;
 	private long analysisInterval;
 	private TimeUnit analysisIntervalUnit;
-	private String hexAsStringFrame;
+	private String packetAsHexStream;
 
 	private ProbePacket() {
 	}
 
 	public ProbePacket(String groupId, String name, boolean always, int requestCount, long analysisInterval, TimeUnit analysisIntervalUnit,
-			String hexAsStringFrame) {
+			String packetAsHexStream) {
 		this.groupId = groupId;
 		this.name = name;
 		this.always = always;
 		this.requestCount = requestCount;
 		this.analysisInterval = analysisInterval;
 		this.analysisIntervalUnit = analysisIntervalUnit;
-		this.hexAsStringFrame = hexAsStringFrame;
+		this.packetAsHexStream = packetAsHexStream;
 	}
 
 	public String getGroupId() {
@@ -85,11 +85,12 @@ public class ProbePacket extends GenericDBObject {
 		this.analysisIntervalUnit = analysisIntervalUnit;
 	}
 
-	public String getHexAsStringFrame() {
-		return hexAsStringFrame;
+	public String getPacketAsHexStream() {
+		return packetAsHexStream;
 	}
 
-	public void setHexAsStringFrame(String hexAsStringFrame) {
-		this.hexAsStringFrame = hexAsStringFrame;
+	public void setPacketAsHexStream(String packetAsHexStream) {
+		this.packetAsHexStream = packetAsHexStream;
 	}
+
 }

@@ -36,23 +36,23 @@ public class ProbePacketCrafter {
 	private int requestCount;
 	private long analysisInterval;
 	private static TimeUnit analysisIntervalUnit;
-	private static String hexAsStringFrame;
+	private static String packetAsHexStream;
 
 	public static ProbePacket craftProbePacket(String type, String groupId, String name, boolean always, int requestCount,
 			long analysisInterval) throws UnsupportedEncodingException {
 		analysisIntervalUnit = analysisIntervalUnit.SECONDS;
 		if (type.equals("arp")) {
 			Packet result = craftArpPacket("192.168.123.111", "192.168.123.1", MacAddress.getByName("30:24:32:FC:89:38"));
-			hexAsStringFrame = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
+			packetAsHexStream = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
 		} else if (type.equals("ping")) {
 			Packet result = craftIcmpEchoPacket(MacAddress.getByName("30:24:32:FC:89:38"));
-			hexAsStringFrame = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
+			packetAsHexStream = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
 		} else if (type.equals("icmpCommon")) {
 			Packet result = craftIcmpCommonPacket(MacAddress.getByName("30:24:32:FC:89:38"), "test");
-			hexAsStringFrame = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
+			packetAsHexStream = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
 		}
 
-		return new ProbePacket(groupId, name, always, requestCount, analysisInterval, analysisIntervalUnit, hexAsStringFrame);
+		return new ProbePacket(groupId, name, always, requestCount, analysisInterval, analysisIntervalUnit, packetAsHexStream);
 	}
 
 	private static Packet craftArpPacket(String srcIpAddress, String dstIpAddress, MacAddress srcMacAddress) {
