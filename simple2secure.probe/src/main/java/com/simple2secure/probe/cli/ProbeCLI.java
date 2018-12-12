@@ -13,8 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
+import com.simple2secure.probe.network.packet.ProbePacketQueueHandler;
+import com.simple2secure.probe.network.packet.ProbePacketRequestHandler;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.PacketUtil;
 
@@ -109,6 +112,12 @@ public class ProbeCLI {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			ProbePacket craftedPacket = PacketUtil.craftOneProbePacket("ping", "3", "ping-packet2", false, 10, 1);
+			craftedPacket.setId("4");
+			Thread probeRequestThread = new Thread(new ProbePacketRequestHandler(craftedPacket));
+			probeRequestThread.start();
+			Thread probePacketQueueThread = new Thread(new ProbePacketQueueHandler());
+			probePacketQueueThread.start();
 			///////////////////////////////////////////////////
 
 		} catch (ParseException e) {

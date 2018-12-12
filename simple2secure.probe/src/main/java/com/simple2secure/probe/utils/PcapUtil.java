@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.pcap4j.core.PcapAddress;
+import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
@@ -55,6 +57,21 @@ public class PcapUtil {
 	public static String convertPackRawDataToHexStreamString(byte[] rawData) {
 		byte[] encodedRawData = Base64.getEncoder().encode(rawData);
 		return new String(encodedRawData);
+	}
+
+	public static PcapHandle getPcapHandle() {
+		final int SNAP_LEN = 65536;
+		final int READ_TIMEOUT = 10;
+		PcapHandle handle = null;
+		String ip = null;
+		try {
+			ip = PcapUtil.getIpAddrOfNetworkInterface();
+			PcapNetworkInterface nI = PcapUtil.getNetworkInterfaceByInetAddr(ip);
+			handle = nI.openLive(SNAP_LEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
+		} catch (UnknownHostException | SocketException | PcapNativeException e) {
+			log.error("Could not retreive the ip address of the network interface.");
+		}
+		return handle;
 	}
 
 	/**
@@ -219,14 +236,5 @@ public class PcapUtil {
 		StringBuilder bpfFilter = new StringBuilder();
 		bpfFilter.append("not host 127.0.0.1 and not port (8443 or 8080 or 9000)");
 		return bpfFilter.toString();
-	}
-
-	public static byte[] hexStringToByteArray(String s) {
-		int len = s.length();
-		byte[] data = new byte[len / 2];
-		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-		}
-		return data;
 	}
 }

@@ -14,7 +14,7 @@ public class PacketUtil {
 		boolean isPacketInDB = false;
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 		for (ProbePacket pPacket : probePacketList) {
-			if (pPacket.getId() == probePacket.getId()) {
+			if (pPacket.getId().equals(probePacket.getId())) {
 				isPacketInDB = true;
 			}
 		}
@@ -32,7 +32,7 @@ public class PacketUtil {
 				&& probePacketToUpdate.getGroupId().equals(updatedProbePacket.getGroupId())
 				&& probePacketToUpdate.getAnalysisInterval() == updatedProbePacket.getAnalysisInterval()
 				&& probePacketToUpdate.getAnalysisIntervalUnit().equals(updatedProbePacket.getAnalysisIntervalUnit())
-				&& probePacketToUpdate.getHexAsStringFrame().equals(updatedProbePacket.getHexAsStringFrame())
+				&& probePacketToUpdate.getPacketAsHexStream().equals(updatedProbePacket.getPacketAsHexStream())
 				&& probePacketToUpdate.getRequestCount() == updatedProbePacket.getRequestCount())) {
 
 			hasValsToUpdate = true;
@@ -45,7 +45,12 @@ public class PacketUtil {
 	}
 
 	public static ProbePacket getProbePacketFromDB(ProbePacket probePacket) {
-		return (ProbePacket) DBUtil.getInstance().findByFieldName("name", probePacket.getName(), ProbePacket.class);
+		ProbePacket resultPacket = null;
+		List<ProbePacket> packetList = DBUtil.getInstance().findByFieldName("name", probePacket.getName(), ProbePacket.class);
+		if (packetList.get(0) != null) {
+			resultPacket = packetList.get(0);
+		}
+		return resultPacket;
 	}
 
 	public static void craftProbePacketsForTest() throws IllegalRawDataException {
@@ -66,7 +71,18 @@ public class PacketUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
 
+	public static ProbePacket craftOneProbePacket(String type, String groupId, String name, boolean always, int requestCount,
+			long analysisInterval) {
+		ProbePacket packetToCraft = null;
+		try {
+			packetToCraft = ProbePacketCrafter.craftProbePacket(type, groupId, name, always, requestCount, analysisInterval);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return packetToCraft;
 	}
 
 }
