@@ -21,7 +21,7 @@ public class LoadedConfigItems {
 
 	// private String baseKubernetesURL = "https://35.232.109.156";
 
-	private String baseKubernetesURL = "http://192.168.123.63:8080";
+	private String baseKubernetesURL = "https://192.168.123.95:6443";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";

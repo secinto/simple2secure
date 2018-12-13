@@ -1,5 +1,6 @@
 package com.simple2secure.api.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.OneToMany;
@@ -9,7 +10,7 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Test extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4242956528915218942L;
 	private String name;
@@ -18,7 +19,7 @@ public class Test extends GenericDBObject {
 	private boolean scheduled;
 	private boolean finished;
 	@OneToMany
-	private List<TestResult> result;
+	private List<TestResult> result = new ArrayList<>();
 	private boolean customTest;
 	private boolean createInstance;
 
@@ -35,7 +36,7 @@ public class Test extends GenericDBObject {
 	}
 
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(String name) {
@@ -43,26 +44,31 @@ public class Test extends GenericDBObject {
 	}
 
 	public boolean isScheduled() {
-		return this.scheduled;
+		return scheduled;
 	}
 
 	public void setIsScheduled(boolean scheduled) {
 		this.scheduled = scheduled;
 	}
-	
+
 	public boolean isFinished() {
-		return this.finished;
+		return finished;
 	}
-	
+
 	public void setIsFinished(boolean finished) {
 		this.finished = finished;
 	}
+
 	public void setTestResult(List<TestResult> result) {
 		this.result = result;
 	}
 
 	public List<TestResult> getTestResult() {
-		return this.result;
+		return result;
+	}
+
+	public void addTestResult(TestResult testResult) {
+		result.add(testResult);
 	}
 
 	public List<Command> getCommands() {
@@ -80,12 +86,12 @@ public class Test extends GenericDBObject {
 	public void setIsCustomTest(boolean customTest) {
 		this.customTest = customTest;
 	}
-	
+
 	public void SetCreateInstance(boolean createInstance) {
 		this.createInstance = createInstance;
 	}
-	
+
 	public boolean getCreateInstance() {
-		return this.createInstance;
+		return createInstance;
 	}
 }

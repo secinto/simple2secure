@@ -76,7 +76,7 @@ export class OrbiterToolTestRunComponent {
         this.loading = true;
         this.tool.tests.push(this.selectedTest);
 
-        this.httpService.post(this.selectedTest, environment.apiEndpoint + 'tool/' + this.tool.name + '/run').subscribe(
+        this.httpService.post(this.selectedTest, environment.apiEndpoint + 'tools/' + this.tool.name + '/run').subscribe(
             data => {
                 this.testResult = data;
                 this.testExecuted = true;

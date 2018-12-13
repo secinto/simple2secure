@@ -9,13 +9,13 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Tool extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5117460854837863203L;
 
 	private String name;
 	private String generatedName;
-	private String userUUID;
+	private String contextId;
 	@OneToMany
 	private List<Test> tests;
 
@@ -24,16 +24,24 @@ public class Tool extends GenericDBObject {
 	public Tool() {
 	}
 
-	public Tool(String name, String generatedName, String userUUID, List<Test> tests, boolean active) {
+	public Tool(String name, String generatedName, String contextId, List<Test> tests, boolean active) {
 		this.name = name;
 		this.generatedName = generatedName;
-		this.userUUID = userUUID;
+		this.contextId = contextId;
 		this.tests = tests;
 		this.active = active;
 	}
 
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
+	}
+
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	public void setName(String name) {
@@ -48,24 +56,16 @@ public class Tool extends GenericDBObject {
 		this.generatedName = generatedName;
 	}
 
-	public String getUserUUID() {
-		return this.userUUID;
-	}
-
-	public void setUserUUID(String userUUID) {
-		this.userUUID = userUUID;
-	}
-
 	public void setTests(List<Test> tests) {
 		this.tests = tests;
 	}
 
 	public List<Test> getTests() {
-		return this.tests;
+		return tests;
 	}
 
 	public boolean isActive() {
-		return this.active;
+		return active;
 	}
 
 	public void setActive(boolean active) {
