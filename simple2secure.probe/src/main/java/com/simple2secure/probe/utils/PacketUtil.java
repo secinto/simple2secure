@@ -2,14 +2,21 @@ package com.simple2secure.probe.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.pcap4j.packet.IllegalRawDataException;
 
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.probe.network.packet.ProbePacketCrafter;
+import com.simple2secure.probe.network.packet.ProbePacketQueueHandler;
 
 public class PacketUtil {
 
+	/**
+	 * This method checks the DB for the provided ProbePacket.
+	 *
+	 * @param... the ProbePacket to look for @return... true if the packet was found in the DB
+	 */
 	public static boolean isPacketInDB(ProbePacket probePacket) {
 		boolean isPacketInDB = false;
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
@@ -21,29 +28,45 @@ public class PacketUtil {
 		return isPacketInDB;
 	}
 
+	/**
+	 * This method merges the ProbePacket in the DB. If the ProbePacket already exists in DB it updates the packet, if the packet don't exist
+	 * in the DB it creates a new entry in the DB.
+	 */
 	public static void updateProbePacketInDB(ProbePacket probePacket) {
 		DBUtil.getInstance().merge(probePacket);
 	}
 
-	public static boolean isPacketChanged(ProbePacket updatedProbePacket) {
-		ProbePacket probePacketToUpdate = getProbePacketFromDB(updatedProbePacket);
-		boolean hasValsToUpdate = false;
-		if (!(probePacketToUpdate.getName().equals(updatedProbePacket.getName())
-				&& probePacketToUpdate.getGroupId().equals(updatedProbePacket.getGroupId())
-				&& probePacketToUpdate.getAnalysisInterval() == updatedProbePacket.getAnalysisInterval()
-				&& probePacketToUpdate.getAnalysisIntervalUnit().equals(updatedProbePacket.getAnalysisIntervalUnit())
-				&& probePacketToUpdate.getPacketAsHexStream().equals(updatedProbePacket.getPacketAsHexStream())
-				&& probePacketToUpdate.getRequestCount() == updatedProbePacket.getRequestCount())) {
+	/**
+	 * This method checks if the provided ProbePacket which already exists in the DB has been changed.
+	 *
+	 * @param... the ProbePacket to check if it has changed @return... true if the packet contains one not matching value
+	 */
+	public static List<ProbePacket> packetChanged(Map<String, ProbePacketQueueHandler> taskMap) {
+		List<ProbePacket> changedPacketList = null;
+		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 
-			hasValsToUpdate = true;
+		for (ProbePacket probePacket : probePacketList) {
+			ProbePacketQueueHandler task = taskMap.get(probePacket.getId());
+			if (!(task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
+					&& task.getProbePacket().getAnalysisInterval() == probePacket.getAnalysisInterval()
+					&& task.getProbePacket().getAnalysisIntervalUnit().equals(probePacket.getAnalysisIntervalUnit())
+					&& task.getProbePacket().getPacketAsHexStream().equals(probePacket.getPacketAsHexStream()))) {
+				changedPacketList.add(probePacket);
+			}
 		}
-		return hasValsToUpdate;
+		return changedPacketList;
 	}
 
+	/**
+	 * This method returns a list of all ProbePackets stored in the DB
+	 */
 	public static List<ProbePacket> getAllProbePacketsFromDB() {
 		return DBUtil.getInstance().findAll(ProbePacket.class);
 	}
 
+	/**
+	 * This method returns specifically the provided ProbePacket from the DB.
+	 */
 	public static ProbePacket getProbePacketFromDB(ProbePacket probePacket) {
 		ProbePacket resultPacket = null;
 		List<ProbePacket> packetList = DBUtil.getInstance().findByFieldName("name", probePacket.getName(), ProbePacket.class);
@@ -53,6 +76,7 @@ public class PacketUtil {
 		return resultPacket;
 	}
 
+	// only for test
 	public static void craftProbePacketsForTest() throws IllegalRawDataException {
 
 		try {

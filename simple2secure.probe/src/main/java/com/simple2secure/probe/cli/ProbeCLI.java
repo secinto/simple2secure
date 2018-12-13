@@ -16,8 +16,8 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
-import com.simple2secure.probe.network.packet.ProbePacketQueueHandler;
 import com.simple2secure.probe.network.packet.ProbePacketRequestHandler;
+import com.simple2secure.probe.network.packet.ReceiveProbePacket;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.PacketUtil;
 
@@ -114,10 +114,15 @@ public class ProbeCLI {
 			}
 			ProbePacket craftedPacket = PacketUtil.craftOneProbePacket("ping", "3", "ping-packet2", false, 10, 1);
 			craftedPacket.setId("4");
-			Thread probeRequestThread = new Thread(new ProbePacketRequestHandler(craftedPacket));
+			Thread probeRequestThread = new Thread(new ProbePacketRequestHandler());
 			probeRequestThread.start();
-			Thread probePacketQueueThread = new Thread(new ProbePacketQueueHandler());
-			probePacketQueueThread.start();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ReceiveProbePacket recPack = new ReceiveProbePacket(craftedPacket);
 			///////////////////////////////////////////////////
 
 		} catch (ParseException e) {

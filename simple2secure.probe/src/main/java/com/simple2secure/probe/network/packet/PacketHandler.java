@@ -9,6 +9,7 @@ import org.pcap4j.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.commons.collections.ProcessingQueue;
 import com.simple2secure.probe.utils.PcapUtil;
 
 public class PacketHandler extends TimerTask {
@@ -17,14 +18,19 @@ public class PacketHandler extends TimerTask {
 	private PcapHandle handler;
 	private Packet packet;
 
-	public PacketHandler(Packet packet) {
-		this.packet = packet;
+	public PacketHandler(ProcessingQueue<Packet> processingQueue) {
+		packet = processingQueue.pop();
 		handler = PcapUtil.getPcapHandle();
-
-		if (this.packet != null && handler != null) {
+		if (packet != null && handler != null) {
 			sendPackets(handler, packet);
 		}
+	}
 
+	@Override
+	public void run() {
+		if (packet != null && handler != null) {
+			sendPackets(handler, packet);
+		}
 	}
 
 	public void sendPackets(PcapHandle handler, Packet packet) {
@@ -39,11 +45,6 @@ public class PacketHandler extends TimerTask {
 				handler.close();
 			}
 		}
-	}
-
-	@Override
-	public void run() {
-		// sendPackets(PcapUtil.getPcapHandle(), packet);
 	}
 
 }

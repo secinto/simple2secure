@@ -49,16 +49,32 @@ public class PcapUtil {
 		return mapping;
 	}
 
+	/**
+	 * This method converts a packet converted to a hex stream, back to a packet.
+	 *
+	 * @param... a string object which contains a network packet converted to a hex stream string. @param... offset @return... a network
+	 * packet converted from a hex stream string
+	 */
 	public static Packet convertHexStreamToPacket(String hexStreamAsString, int offset) throws IllegalRawDataException {
 		byte[] decodedString = Base64.getDecoder().decode(hexStreamAsString);
 		return EthernetPacket.newPacket(decodedString, offset, decodedString.length);
 	}
 
+	/**
+	 * This method converts a network packet to a hex stream string
+	 *
+	 * @param... raw data of a packet as byte array @return... returns the converted network packet as hex stream string
+	 */
 	public static String convertPackRawDataToHexStreamString(byte[] rawData) {
 		byte[] encodedRawData = Base64.getEncoder().encode(rawData);
 		return new String(encodedRawData);
 	}
 
+	/**
+	 * This method creates automatically a PcapHandle with the outgoing network interface
+	 *
+	 * @return... PcapHandle
+	 */
 	public static PcapHandle getPcapHandle() {
 		final int SNAP_LEN = 65536;
 		final int READ_TIMEOUT = 10;
@@ -100,7 +116,7 @@ public class PcapUtil {
 	 * 8.8.8.8 the address does not have to be reachable
 	 * https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
 	 *
-	 * @return
+	 * @return IP-address of the outgoing network interface as string
 	 * @throws UnknownHostException
 	 * @throws SocketException
 	 */
