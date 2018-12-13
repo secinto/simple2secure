@@ -78,6 +78,30 @@ public class ProbeCLI {
 		}
 	}
 
+	public void demoPacketSending() {
+		// just for testing
+		///////////////////////////////////////////////////
+		try {
+			PacketUtil.craftProbePacketsForTest();
+		} catch (IllegalRawDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ProbePacket craftedPacket = PacketUtil.craftOneProbePacket("ping", "3", "ping-packet2", false, 10, 1);
+		craftedPacket.setId("4");
+		Thread probeRequestThread = new Thread(new ProbePacketRequestHandler());
+		probeRequestThread.start();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ReceiveProbePacket recPack = new ReceiveProbePacket(craftedPacket);
+		///////////////////////////////////////////////////
+
+	}
+
 	/**
 	 * Starts the Probe itself. Hope the best.
 	 */
@@ -104,26 +128,7 @@ public class ProbeCLI {
 
 			client.start();
 
-			// just for testing
-			///////////////////////////////////////////////////
-			try {
-				PacketUtil.craftProbePacketsForTest();
-			} catch (IllegalRawDataException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ProbePacket craftedPacket = PacketUtil.craftOneProbePacket("ping", "3", "ping-packet2", false, 10, 1);
-			craftedPacket.setId("4");
-			Thread probeRequestThread = new Thread(new ProbePacketRequestHandler());
-			probeRequestThread.start();
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ReceiveProbePacket recPack = new ReceiveProbePacket(craftedPacket);
-			///////////////////////////////////////////////////
+			// client.demoPacketSending();
 
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
