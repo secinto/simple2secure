@@ -2,7 +2,7 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class TestResult extends GenericDBObject {
+public class TestCaseResult extends GenericDBObject {
 
 	/**
 	 *
@@ -12,10 +12,10 @@ public class TestResult extends GenericDBObject {
 	private String content;
 	private long timestamp;
 
-	public TestResult() {
+	public TestCaseResult() {
 	}
 
-	public TestResult(String name, String content, long timestamp) {
+	public TestCaseResult(String name, String content, long timestamp) {
 		this.name = name;
 		this.content = content;
 		this.timestamp = timestamp;

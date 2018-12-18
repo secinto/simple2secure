@@ -30,11 +30,11 @@ export class DataService {
         localStorage.setItem('probe', JSON.stringify(data));
     }
 
-    static setTool(data: any){
+    setTool(data: any){
         localStorage.setItem('tool', JSON.stringify(data));
     }
 
-    static getTool(){
+    getTool(){
         return JSON.parse(localStorage.getItem('tool'));
     }
 

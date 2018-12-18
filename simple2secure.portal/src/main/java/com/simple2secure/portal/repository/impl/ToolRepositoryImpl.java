@@ -36,4 +36,11 @@ public class ToolRepositoryImpl extends ToolRepository {
 		return tools;
 	}
 
+	@Override
+	public Tool getToolByNameAndContextId(String toolName, String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("name").is(toolName));
+		Tool tool = mongoTemplate.findOne(query, Tool.class);
+		return tool;
+	}
+
 }

@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.ToolDTO;
 import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Test;
-import com.simple2secure.api.model.TestResult;
+import com.simple2secure.api.model.TestCase;
+import com.simple2secure.api.model.TestCaseSequence;
 import com.simple2secure.api.model.Tool;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -25,6 +26,7 @@ import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ToolRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.TestUtils;
 import com.simple2secure.portal.utils.ToolUtils;
 
 import io.kubernetes.client.ApiException;
@@ -48,21 +50,20 @@ public class ToolController {
 	@Autowired
 	ToolUtils toolUtils;
 
+	@Autowired
+	TestUtils testUtils;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Tool>> getToolsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<ToolDTO>> getToolsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 
 			if (context != null) {
-				List<Tool> tools = toolRepository.getToolsByContextId(contextId);
-
-				if (tools != null) {
-					return new ResponseEntity<List<Tool>>(tools, HttpStatus.OK);
-				}
+				return toolUtils.getKubernetesTools(locale, contextId);
 			}
 		}
 
@@ -71,21 +72,20 @@ public class ToolController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Tool>> getAllTools(@RequestHeader("Accept-Language") String locale) {
-		return toolUtils.getKubernetesTools(locale);
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{name}/run", method = RequestMethod.POST)
+	@RequestMapping(value = "/{toolId}/run", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestResult> runCommand(@RequestBody Test test, @PathVariable("name") String podName,
+	public ResponseEntity<TestCaseSequence> runCommand(@RequestBody TestCase test, @PathVariable("toolId") String toolId,
 			@RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, ApiException, IOException, InterruptedException {
 
-		if (test != null && !Strings.isNullOrEmpty(podName)) {
-			return toolUtils.runTest(test, podName, locale);
+		if (test != null && !Strings.isNullOrEmpty(toolId)) {
+			Tool tool = toolRepository.find(toolId);
+
+			if (tool != null) {
+				return testUtils.addTestCaseToTheList(test, locale);
+			}
+
 		}
 
 		return new ResponseEntity(

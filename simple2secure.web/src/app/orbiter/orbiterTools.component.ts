@@ -2,9 +2,11 @@ import { Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Tool, User} from '../_models/index';
+import {ContextDTO, Tool, User} from '../_models/index';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {ToolDTO} from '../_models/DTO/toolDTO';
+import {JSONP_ERR_NO_CALLBACK} from '@angular/common/http/src/jsonp';
 
 @Component({
     moduleId: module.id,
@@ -14,11 +16,11 @@ import {TranslateService} from '@ngx-translate/core';
 export class OrbiterToolsComponent {
 
     currentUser: any;
-    tools: Tool[];
-    selectedTool: Tool;
+    tools: ToolDTO[];
+    selectedTool: ToolDTO;
     loading = false;
     type: number;
-    private sub: any;
+    context: ContextDTO;
     displayedColumns = ['name', 'length', 'state', 'action'];
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
@@ -35,6 +37,7 @@ export class OrbiterToolsComponent {
 
     ngOnInit() {
         this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        this.context = JSON.parse(localStorage.getItem('context'));
         this.loadTools();
     }
 
@@ -51,10 +54,11 @@ export class OrbiterToolsComponent {
 
     loadTools(){
         this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'tools')
+        this.httpService.get(environment.apiEndpoint + 'tools/' + this.context.context.id)
             .subscribe(
                 data => {
                     this.tools = data;
+                    console.log(JSON.stringify(this.tools));
                     this.dataSource.data = this.tools;
                     if (data.length > 0){
                         this.alertService.success(this.translate.instant('message.data'));
@@ -75,17 +79,17 @@ export class OrbiterToolsComponent {
                 });
     }
 
-    public onMenuTriggerClick(tool: Tool) {
+    public onMenuTriggerClick(tool: ToolDTO) {
         this.selectedTool = tool;
      }
 
     runTests(){
-        DataService.setTool(this.selectedTool);
+        this.dataService.setTool(this.selectedTool);
         this.router.navigate(['test/run'], { relativeTo: this.route});
     }
 
     showTests(){
-        DataService.setTool(this.selectedTool);
+        this.dataService.setTool(this.selectedTool);
         this.router.navigate(['test'], {relativeTo: this.route});
     }
 }

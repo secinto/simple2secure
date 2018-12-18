@@ -10,4 +10,6 @@ public abstract class ToolRepository extends MongoRepository<Tool> {
 	public abstract List<Tool> getToolsByContextId(String contextId);
 
 	public abstract Tool getToolByName(String toolName);
+
+	public abstract Tool getToolByNameAndContextId(String toolName, String contextId);
 }

@@ -307,6 +307,7 @@
   "invitation.message": "Sie wurden zu dem neuen Kontext eingeladen, Sie können ihn akzeptieren oder ablehnen",
   "button.invitation.accept": "Akzeptieren",
   "button.invitation.reject": "Ablehnen",
-  "invitation.accept": "Sie haben die Einladung erfolgreich angenommen"
+  "invitation.accept": "Sie haben die Einladung erfolgreich angenommen",
+  "test.scheduled": "Test wurde geplant"
 
 }

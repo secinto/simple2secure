@@ -10,7 +10,7 @@ export * from './emailconfig';
 export * from './tool';
 export * from './testResult';
 export * from './command';
-export * from './test';
+export * from './testCase';
 export * from './notification';
 export * from './portalRule';
 export * from './companygroup';

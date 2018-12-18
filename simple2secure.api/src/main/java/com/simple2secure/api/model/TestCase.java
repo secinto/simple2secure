@@ -1,53 +1,31 @@
 package com.simple2secure.api.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.OneToMany;
-
-import com.simple2secure.api.dbo.GenericDBObject;
-
-public class Test extends GenericDBObject {
+public class TestCase extends TestCaseTemplate {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -4242956528915218942L;
-	private String name;
-	@OneToMany
-	private List<Command> commands;
+
 	private boolean scheduled;
 	private boolean finished;
-	@OneToMany
-	private List<TestResult> result = new ArrayList<>();
-	private boolean customTest;
-	private boolean createInstance;
 
-	public Test() {
+	public TestCase() {
 	}
 
-	public Test(String name, List<Command> commands, boolean scheduled, boolean finished, List<TestResult> result, boolean customTest) {
-		this.name = name;
+	public TestCase(String name, String toolId, List<Command> commands, boolean scheduled, boolean finished) {
+		super(name, toolId, commands);
 		this.scheduled = scheduled;
 		this.finished = finished;
-		this.result = result;
-		this.commands = commands;
-		this.customTest = customTest;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public boolean isScheduled() {
 		return scheduled;
 	}
 
-	public void setIsScheduled(boolean scheduled) {
+	public void setScheduled(boolean scheduled) {
 		this.scheduled = scheduled;
 	}
 
@@ -55,43 +33,7 @@ public class Test extends GenericDBObject {
 		return finished;
 	}
 
-	public void setIsFinished(boolean finished) {
+	public void setFinished(boolean finished) {
 		this.finished = finished;
-	}
-
-	public void setTestResult(List<TestResult> result) {
-		this.result = result;
-	}
-
-	public List<TestResult> getTestResult() {
-		return result;
-	}
-
-	public void addTestResult(TestResult testResult) {
-		result.add(testResult);
-	}
-
-	public List<Command> getCommands() {
-		return commands;
-	}
-
-	public void setCommands(List<Command> commands) {
-		this.commands = commands;
-	}
-
-	public boolean isCustomTest() {
-		return customTest;
-	}
-
-	public void setIsCustomTest(boolean customTest) {
-		this.customTest = customTest;
-	}
-
-	public void SetCreateInstance(boolean createInstance) {
-		this.createInstance = createInstance;
-	}
-
-	public boolean getCreateInstance() {
-		return createInstance;
 	}
 }

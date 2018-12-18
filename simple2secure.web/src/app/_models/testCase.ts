@@ -1,8 +1,4 @@
-import {Base} from './base';
-import {Command} from './command';
+import {TestCaseTemplate} from './testCaseTemplate';
 
-export class Test extends Base{
-    name: string;
-    toolId: string;
-    commands: Command[];
+export class TestCase extends TestCaseTemplate{
 }

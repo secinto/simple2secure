@@ -4,7 +4,7 @@ public class FrontendRule {
 	
 	private String id;
 	private String toolId;
-	private String userId;
+	private String contextId;
 	private String name;
 	private String description;
 	private int priority;
@@ -14,10 +14,10 @@ public class FrontendRule {
 	public FrontendRule() {
 	}
 
-	public FrontendRule(String id, String toolId, String userId, String name, String description, int priority, String createdOn, boolean active) {
+	public FrontendRule(String id, String toolId, String contextId, String name, String description, int priority, String createdOn, boolean active) {
 		this.id = id;
 		this.toolId = toolId;
-		this.userId = userId;
+		this.contextId = contextId;
 		this.name = name;
 		this.description = description;
 		this.priority = priority;
@@ -41,12 +41,12 @@ public class FrontendRule {
 		this.toolId = toolId;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getContextId() {
+		return contextId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 
 	public String getCreatedOn() {

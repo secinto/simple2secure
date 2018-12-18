@@ -58,12 +58,11 @@ public class RuleController {
 			ExtendedRule r1 = new ExtendedRule(rule.getName(), "input.subject == 'test'", "notificationAction", rule.getPriority(),
 					"com.simple2secure.api.model.Email", rule.getDescription());
 
+			PortalRule portalRule = new PortalRule(rule.getToolId(), rule.getContextId(), r1, dateTime, true);
 			if (!Strings.isNullOrEmpty(rule.getId())) {
-				PortalRule portalRule = new PortalRule(rule.getToolId(), rule.getUserId(), r1, dateTime, true);
 				portalRule.setId(rule.getId());
 				ruleRepository.update(portalRule);
 			} else {
-				PortalRule portalRule = new PortalRule(rule.getToolId(), rule.getUserId(), r1, dateTime, true);
 				ruleRepository.save(portalRule);
 			}
 
@@ -74,18 +73,18 @@ public class RuleController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{toolId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{toolId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<FrontendRule>> getEmailMessagesByUserID(@PathVariable("toolId") String toolId,
-			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
+			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
 
-		if (!Strings.isNullOrEmpty(toolId) && !Strings.isNullOrEmpty(userId)) {
-			List<PortalRule> rules = ruleRepository.findByToolAndUserId(toolId, userId);
+		if (!Strings.isNullOrEmpty(toolId) && !Strings.isNullOrEmpty(contextId)) {
+			List<PortalRule> rules = ruleRepository.findByToolAndContextId(toolId, contextId);
 
 			if (rules != null) {
 				List<FrontendRule> frontRules = new ArrayList<>();
 				for (PortalRule rule : rules) {
-					FrontendRule fr = new FrontendRule(rule.getId(), rule.getToolId(), rule.getUserId(), rule.getRule().getName(),
+					FrontendRule fr = new FrontendRule(rule.getId(), rule.getToolId(), rule.getContextId(), rule.getRule().getName(),
 							rule.getRule().getDescription(), rule.getRule().getPriority(), rule.getCreatedOn(), rule.isActive());
 					frontRules.add(fr);
 				}

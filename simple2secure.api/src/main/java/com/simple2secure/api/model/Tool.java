@@ -1,9 +1,5 @@
 package com.simple2secure.api.model;
 
-import java.util.List;
-
-import javax.persistence.OneToMany;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class Tool extends GenericDBObject {
@@ -16,19 +12,15 @@ public class Tool extends GenericDBObject {
 	private String name;
 	private String generatedName;
 	private String contextId;
-	@OneToMany
-	private List<Test> tests;
-
 	private boolean active;
 
 	public Tool() {
 	}
 
-	public Tool(String name, String generatedName, String contextId, List<Test> tests, boolean active) {
+	public Tool(String name, String generatedName, String contextId, boolean active) {
 		this.name = name;
 		this.generatedName = generatedName;
 		this.contextId = contextId;
-		this.tests = tests;
 		this.active = active;
 	}
 
@@ -54,14 +46,6 @@ public class Tool extends GenericDBObject {
 
 	public void setGeneratedName(String generatedName) {
 		this.generatedName = generatedName;
-	}
-
-	public void setTests(List<Test> tests) {
-		this.tests = tests;
-	}
-
-	public List<Test> getTests() {
-		return tests;
 	}
 
 	public boolean isActive() {

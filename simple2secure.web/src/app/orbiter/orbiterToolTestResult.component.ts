@@ -5,7 +5,7 @@ import {QueryRun} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
-import {Test, TestResult, Command} from '../_models/index';
+import {TestCase, TestResult, Command} from '../_models/index';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 
 @Component({
@@ -15,7 +15,7 @@ import {Nl2BrPipeModule} from 'nl2br-pipe';
 
 export class OrbiterToolTestResultComponent {
 
-  test: Test;
+  test: TestCase;
 
   constructor(
     private alertService: AlertService,
@@ -24,7 +24,7 @@ export class OrbiterToolTestResultComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {
-      this.test = new Test();
+      this.test = new TestCase();
   }
 
   testExecuted = false;
@@ -32,5 +32,6 @@ export class OrbiterToolTestResultComponent {
 
   ngOnInit() {
     this.test = this.dataService.get();
+    console.log(this.test);
   }
 }

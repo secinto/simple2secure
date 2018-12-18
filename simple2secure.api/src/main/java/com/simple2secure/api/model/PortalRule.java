@@ -5,12 +5,12 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class PortalRule extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -6811188688302072478L;
-	
+
 	private String toolId;
-	private String userId;
+	private String contextId;
 	private ExtendedRule rule;
 	private String createdOn;
 	private boolean active;
@@ -18,9 +18,9 @@ public class PortalRule extends GenericDBObject {
 	public PortalRule() {
 	}
 
-	public PortalRule(String toolId, String userId, ExtendedRule rule, String createdOn, boolean active) {
+	public PortalRule(String toolId, String contextId, ExtendedRule rule, String createdOn, boolean active) {
 		this.toolId = toolId;
-		this.userId = userId;
+		this.contextId = contextId;
 		this.rule = rule;
 		this.createdOn = createdOn;
 		this.active = active;
@@ -34,12 +34,12 @@ public class PortalRule extends GenericDBObject {
 		this.toolId = toolId;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getContextId() {
+		return contextId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 
 	public ExtendedRule getRule() {

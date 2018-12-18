@@ -9,7 +9,7 @@
     <!-- Position Column -->
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.tool.name}} </mat-cell>
     </ng-container>
 
     <!-- Name Column -->
@@ -22,8 +22,8 @@
     <ng-container matColumnDef="state">
       <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header>{{ 'table.state' | translate }}</mat-header-cell>     
       <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
-      	<button *ngIf="element.active === true" mat-raised-button color="primary" class="mat-green-button"> {{ 'button.active' | translate }}</button> 
-      	<button *ngIf="element.active === false" mat-raised-button color="warn" class="mat-red-button"> {{ 'button.inactive' | translate }}</button>
+      	<button *ngIf="element.tool.active === true" mat-raised-button color="primary" class="mat-green-button"> {{ 'button.active' | translate }}</button>
+      	<button *ngIf="element.tool.active === false" mat-raised-button color="warn" class="mat-red-button"> {{ 'button.inactive' | translate }}</button>
       </mat-cell>
     </ng-container>
 	
