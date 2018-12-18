@@ -1,6 +1,6 @@
 import {Base} from './base';
 
-export class TestResult extends Base{
+export class TestCaseResult extends Base{
     content: string;
     timestamp: string;
 }

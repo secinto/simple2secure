@@ -23,6 +23,7 @@ import com.simple2secure.api.model.Tool;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.TestRepository;
+import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestTemplateRepository;
 import com.simple2secure.portal.repository.ToolRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -47,6 +48,9 @@ public class ToolUtils {
 
 	@Autowired
 	TestRepository testRepository;
+
+	@Autowired
+	TestResultRepository testResultRepository;
 
 	@Autowired
 	LoadedConfigItems loadedConfigItems;
@@ -138,6 +142,7 @@ public class ToolUtils {
 							testDtoList.add(testDTO);
 						}
 					}
+					toolDto.setTests(testDtoList);
 				}
 				// Add toolDTO object to the list
 				toolDTOList.add(toolDto);

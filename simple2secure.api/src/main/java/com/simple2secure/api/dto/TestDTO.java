@@ -35,4 +35,8 @@ public class TestDTO {
 	public void setResults(List<TestCaseResult> results) {
 		this.results = results;
 	}
+
+	public void addResult(TestCaseResult result) {
+		results.add(result);
+	}
 }

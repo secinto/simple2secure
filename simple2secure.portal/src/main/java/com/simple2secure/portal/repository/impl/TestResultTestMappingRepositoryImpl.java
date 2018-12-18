@@ -34,4 +34,11 @@ public class TestResultTestMappingRepositoryImpl extends TestResultTestMappingRe
 		return testResultTestMapping;
 	}
 
+	@Override
+	public List<TestResultTestMapping> getByToolId(String toolId) {
+		Query query = new Query(Criteria.where("toolId").is(toolId));
+		List<TestResultTestMapping> testResultTestMapping = mongoTemplate.find(query, TestResultTestMapping.class);
+		return testResultTestMapping;
+	}
+
 }

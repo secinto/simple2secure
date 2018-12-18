@@ -79,8 +79,8 @@ public class ToolController {
 			@RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, ApiException, IOException, InterruptedException {
 
-		if (test != null && !Strings.isNullOrEmpty(toolId)) {
-			Tool tool = toolRepository.find(toolId);
+		if (test != null && !Strings.isNullOrEmpty(test.getToolId())) {
+			Tool tool = toolRepository.find(test.getToolId());
 
 			if (tool != null) {
 				return testUtils.addTestCaseToTheList(test, locale);
@@ -92,4 +92,5 @@ public class ToolController {
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
 }

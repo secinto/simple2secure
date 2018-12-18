@@ -58,7 +58,6 @@ export class OrbiterToolsComponent {
             .subscribe(
                 data => {
                     this.tools = data;
-                    console.log(JSON.stringify(this.tools));
                     this.dataSource.data = this.tools;
                     if (data.length > 0){
                         this.alertService.success(this.translate.instant('message.data'));

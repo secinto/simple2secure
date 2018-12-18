@@ -51,7 +51,7 @@ export class OrbiterToolTestRunComponent {
   submitTestRun(){
 
         this.loading = true;
-
+        this.selectedTest.id = null;
         this.httpService.post(this.selectedTest, environment.apiEndpoint + 'tools/' + this.tool.tool.id + '/run').subscribe(
             data => {
                 this.alertService.success(this.translate.instant('test.scheduled'));

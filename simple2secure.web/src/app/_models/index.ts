@@ -8,7 +8,7 @@ export * from './alert';
 export * from './email';
 export * from './emailconfig';
 export * from './tool';
-export * from './testResult';
+export * from './testCaseResult';
 export * from './command';
 export * from './testCase';
 export * from './notification';

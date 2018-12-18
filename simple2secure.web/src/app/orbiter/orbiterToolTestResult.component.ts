@@ -1,37 +1,26 @@
-import {Component} from '@angular/core';
-
-import {QueryRun} from '../_models/index';
-
+import {Component, Inject} from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services';
-import {ActivatedRoute, Router} from '@angular/router';
-import {environment} from '../../environments/environment';
-import {TestCase, TestResult, Command} from '../_models/index';
-import {Nl2BrPipeModule} from 'nl2br-pipe';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {TestDTO} from '../_models/DTO/testDTO';
+import {DatePipe} from '@angular/common';
 
 @Component({
   moduleId: module.id,
-  templateUrl: 'orbiterToolTestResult.component.html'
+  templateUrl: 'orbiterToolTestResult.component.html',
+  selector: 'orbiterToolTestResultComponent'
 })
 
 export class OrbiterToolTestResultComponent {
 
-  test: TestCase;
+  test: TestDTO;
 
   constructor(
     private alertService: AlertService,
     private httpService: HttpService,
     private dataService: DataService,
-    private router: Router,
-    private route: ActivatedRoute
+    private dialogRef: MatDialogRef<OrbiterToolTestResultComponent>,
+    @Inject(MAT_DIALOG_DATA) data,
   ) {
-      this.test = new TestCase();
-  }
-
-  testExecuted = false;
-  loading = false;
-
-  ngOnInit() {
-    this.test = this.dataService.get();
-    console.log(this.test);
+      this.test = data.test;
   }
 }

@@ -1,8 +1,11 @@
 import {Component, ViewChild} from '@angular/core';
-import {Tool, TestCase} from '../_models/index';
-import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
+import {Tool} from '../_models/index';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
-import {ActivatedRoute, Router} from '@angular/router';
+import {TestDTO} from '../_models/DTO/testDTO';
+import {OrbiterToolTestResultComponent} from './orbiterToolTestResult.component';
+import {environment} from '../../environments/environment';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   moduleId: module.id,
@@ -12,8 +15,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 export class OrbiterToolTestComponent {
 
     tool: Tool;
-    customTests: TestCase[];
-    displayedColumns = ['name', 'commands', 'testResults', 'action'];
+    displayedColumns = ['name', 'testResults', 'action'];
+    selectedTest: TestDTO;
+    loading = false;
     dataSource = new MatTableDataSource();
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -22,20 +26,16 @@ export class OrbiterToolTestComponent {
     private alertService: AlertService,
     private httpService: HttpService,
     private dataService: DataService,
-    private router: Router,
-    private route: ActivatedRoute
+    private dialog: MatDialog,
+    private translate: TranslateService,
   ) {
     this.tool = new Tool();
-    this.customTests = new Array();
   }
-
-  testExecuted = false;
-  loading = false;
 
   ngOnInit() {
 
     this.tool = this.dataService.getTool();
-    this.getCustomTests();
+    this.dataSource.data = this.tool.tests;
   }
 
   ngAfterViewInit() {
@@ -49,19 +49,42 @@ export class OrbiterToolTestComponent {
       this.dataSource.filter = filterValue;
   }
 
-  showTestResults(item: Tool){
-      this.dataService.set(item);
-      this.router.navigate(['result'], { relativeTo: this.route});
+  public onMenuTriggerClick(test: TestDTO) {
+      this.selectedTest = test;
   }
 
-  getCustomTests(){
-      this.customTests = [];
-      /*for (let i = 0; i < this.tool.tests.length; i++){
-       if (this.tool.tests[i].customTest == true){
-           this.customTests.push(this.tool.tests[i]);
-       }
+  showTestResults(){
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = '450px';
+      dialogConfig.data = {
+          test: this.selectedTest,
+      };
 
-       this.dataSource.data = this.customTests;
-      }*/
-   }
+
+      const dialogRef = this.dialog.open(OrbiterToolTestResultComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe(result => {
+
+      });
+  }
+
+    repeatTest(){
+
+        this.loading = true;
+
+        this.httpService.post(this.selectedTest.test, environment.apiEndpoint + 'tools/' + this.tool.id + '/run').subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('test.scheduled'));
+                this.loading = false;
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
+    }
 }

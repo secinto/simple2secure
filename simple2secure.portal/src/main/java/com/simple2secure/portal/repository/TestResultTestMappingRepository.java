@@ -9,4 +9,6 @@ public abstract class TestResultTestMappingRepository extends MongoRepository<Te
 
 	public abstract List<TestResultTestMapping> getByTestId(String testId);
 
+	public abstract List<TestResultTestMapping> getByToolId(String toolId);
+
 }

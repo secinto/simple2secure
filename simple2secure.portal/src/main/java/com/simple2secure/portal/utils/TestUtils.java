@@ -81,13 +81,26 @@ public class TestUtils {
 
 				if (tool != null) {
 
-					log.debug("Adding Test case for tool {}", tool.getName());
-
-					testCase.setName(testCase.getName() + "_" + System.currentTimeMillis());
-					testRepository.save(testCase);
-
 					List<TestCase> testCaseList = new ArrayList<TestCase>();
-					testCaseList.add(testCase);
+
+					if (!Strings.isNullOrEmpty(testCase.getId())) {
+
+						log.debug("Adding existing Test case {}", testCase.getName());
+
+						TestCase dbTest = testRepository.find(testCase.getId());
+
+						if (dbTest != null) {
+							testCaseList.add(testCase);
+						}
+
+					} else {
+						log.debug("Adding new Test case for tool {}", tool.getName());
+						testCase.setName(testCase.getName() + "_" + System.currentTimeMillis());
+						ObjectId testCaseId = testRepository.saveAndReturnId(testCase);
+						testCase.setId(testCaseId.toString());
+						testCaseList.add(testCase);
+					}
+
 					TestCaseSequence testCaseSequence = new TestCaseSequence(testCase.getToolId(), testCaseList);
 					testSequenceRepository.save(testCaseSequence);
 
@@ -126,7 +139,6 @@ public class TestUtils {
 	/**
 	 * This function maps the test result to the test.
 	 *
-	 * TODO: This function must be changed completely!!!
 	 *
 	 * @param result
 	 * @param test
@@ -139,16 +151,13 @@ public class TestUtils {
 		// TODO: user does not need to wait for the test result. Test result must be saved async
 
 		if (!Strings.isNullOrEmpty(result) && test != null && tool != null) {
+			log.debug("Adding Test case result for test case: {}", test.getName());
 			TestCaseResult testResult = new TestCaseResult("nmap", result, System.currentTimeMillis());
 			ObjectId testResultId = testResultRepository.saveAndReturnId(testResult);
 
 			if (tool != null) {
 
-				test.setName(test.getName() + "_" + System.currentTimeMillis());
-				test.setToolId(tool.getId());
-				ObjectId testId = testRepository.saveAndReturnId(test);
-
-				TestResultTestMapping testResultTestMapping = new TestResultTestMapping(testResultId.toString(), testId.toString());
+				TestResultTestMapping testResultTestMapping = new TestResultTestMapping(testResultId.toString(), test.getId());
 				testResultTestMappingRepository.save(testResultTestMapping);
 
 			}
@@ -177,6 +186,8 @@ public class TestUtils {
 
 		// TODO: This must be changed in the future to run more tests from the sequence. Currently sequence contains only one test case
 		TestCase test = testCaseSequence.getTestCases().get(0);
+
+		log.debug("Running test case: {}", test.getName());
 
 		List<String> commands = generateCommands(test.getCommands());
 
