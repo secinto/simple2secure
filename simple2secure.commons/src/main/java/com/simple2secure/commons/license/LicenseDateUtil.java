@@ -6,7 +6,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LicenseDateUtil {
+
+	private static Logger log = LoggerFactory.getLogger(LicenseDateUtil.class);
 
 	/**
 	 * Returns the default expiration date for a license counted from the current date. The default expiration date is one month.
@@ -114,8 +119,13 @@ public class LicenseDateUtil {
 	 * @throws ParseException
 	 *           Thrown if the provided date can't be parsed due to an illegal format.
 	 */
-	public static boolean isLicenseExpired(String expirationDateString) throws ParseException {
-		Date expirationDate = convertLicenseFormatStringToDate(expirationDateString);
-		return System.currentTimeMillis() > expirationDate.getTime();
+	public static boolean isLicenseExpired(String expirationDateString) {
+		try {
+			Date expirationDate = convertLicenseFormatStringToDate(expirationDateString);
+			return System.currentTimeMillis() > expirationDate.getTime();
+		} catch (Exception e) {
+			log.error("Couldn't check license expiration due to parsing error. Reason {}", e);
+		}
+		return true;
 	}
 }

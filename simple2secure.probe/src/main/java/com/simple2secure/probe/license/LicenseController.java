@@ -13,11 +13,11 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.License;
+import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 public class LicenseController {
 
@@ -68,7 +68,7 @@ public class LicenseController {
 	public StartConditions checkProbeStartConditions() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			if (!isLicenseExpired(license)) {
+			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
 					ProbeConfiguration.probeId = license.getProbeId();
@@ -165,10 +165,10 @@ public class LicenseController {
 	/**
 	 * Sets the needed Flags in the DB to mark the license activated.
 	 *
-	 * @param license
-	 *          ...CompanyLicenseObj
 	 * @param authToken
-	 *          ...the token which the server returns if the activation succeeded.
+	 *          The token which the server returns if the activation succeeded.
+	 * @param license
+	 *          The {@link CompanyLicensePublic} which should be set to activated.
 	 *
 	 */
 	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
@@ -177,58 +177,60 @@ public class LicenseController {
 		updateLicenseInDB(license);
 	}
 
-	// TODO: Possibly null check required
 	/**
 	 * Creates a CompanyLicenseObj to send it to the server for authentication. Also checks if there is already a license stored in the DB, if
 	 * there is a license stored it just updates the license. If there is no license stored in the DB, it creates a new entry in the DB.
 	 *
-	 * @param ...License
-	 *          object
-	 * @return ...CompanyLicenseObj for authentication.
+	 * @param license
+	 *          The {@link License} object which should be used for creating a {@link CompanyLicensePublic} for authentication
+	 * @return The {@link CompanyLicensePublic} for authentication.
 	 *
 	 */
 	public CompanyLicensePublic createLicenseForAuth(License license) {
 		String probeId = "";
 		String groupId, licenseId, expirationDate;
-		CompanyLicensePublic result;
 
 		if (license == null) {
 			return null;
 		}
-
+		/*
+		 * Obtain the important parameters from the license object.
+		 */
 		groupId = license.getProperty("groupId");
 		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
 
-		result = loadLicenseFromDB();
+		/*
+		 * Obtain license stored in DB if any.
+		 */
+		CompanyLicensePublic storedLicense = loadLicenseFromDB();
 
-		if (result != null) {
-			if (Strings.isNullOrEmpty(result.getProbeId())) {
+		/*
+		 * If license is already available in DB, update the content with the one provided as input. Otherwise create a new Probe ID and create
+		 * a new CompanyLisnecePublic object from it.
+		 */
+		if (storedLicense != null) {
+			if (Strings.isNullOrEmpty(storedLicense.getProbeId())) {
 				probeId = UUID.randomUUID().toString();
-				result.setProbeId(probeId);
+				storedLicense.setProbeId(probeId);
 			}
-			result.setGroupId(groupId);
-			result.setLicenseId(licenseId);
-			result.setExpirationDate(expirationDate);
+			storedLicense.setGroupId(groupId);
+			storedLicense.setLicenseId(licenseId);
+			storedLicense.setExpirationDate(expirationDate);
 		} else {
 			probeId = UUID.randomUUID().toString();
-			result = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
+			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
 		}
-
-		updateLicenseInDB(result);
-		return result;
+		/*
+		 * Update the license in the local DB.
+		 */
+		updateLicenseInDB(storedLicense);
+		return storedLicense;
 	}
 
 	/**
-	 * Checks if a license is expired.
-	 *
-	 * @return ...true if the license is expired, false if the license is not expired
-	 */
-	public boolean isLicenseExpired(CompanyLicensePublic license) {
-		return System.currentTimeMillis() > ProbeUtils.convertStringtoDate(license.getExpirationDate()).getTime();
-	}
-
-	/**
+	 * Verifies the validity of the stored license using the Token service from the Portal. If the response contains a
+	 * {@link CompanyLicensePublic} it returns it otherwise null is returned.
 	 *
 	 * @return
 	 */
@@ -239,11 +241,10 @@ public class LicenseController {
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			}
+			log.error("The reponse from the Token service from the Portal didn't return a CompanyLicensePublic object.");
+		} else {
+			log.error("Couldn't find license in DB. Need to do something here");
 		}
-		/*
-		 * TODO: Create handling if license is not stored in DB.
-		 */
-		log.error("Couldn't find license in DB. Need to do something here");
 		return null;
 
 	}

@@ -1,5 +1,7 @@
 package com.simple2secure.probe.cli;
 
+import java.util.Scanner;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -14,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.ProbePacket;
+import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
+import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.network.packet.ProbePacketRequestHandler;
@@ -102,12 +107,49 @@ public class ProbeCLI {
 
 	}
 
+	private void stopWorkerThreads() {
+
+	}
+
+	private void startWorkerThreads() {
+		/*
+		 * Starting background worker threads.
+		 */
+		ProbeWorkerThread workerThread = new ProbeWorkerThread();
+		workerThread.run();
+
+	}
+
 	/**
 	 * Starts the Probe itself. Hope the best.
 	 */
-	public void start() {
-		ProbeWorkerThread workerThread = new ProbeWorkerThread();
-		workerThread.run();
+	public void startInstrumentation() {
+		/*
+		 * Starting instrumentation listening to obtain commands from the ProbeControllerService.
+		 */
+		Scanner commandService = new Scanner(System.in);
+		ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
+		while (command.getCommand() != ServiceCommands.STOP && command.getCommand() != ServiceCommands.TERMINATE) {
+			command = ServiceCommand.fromString(commandService.nextLine());
+			switch (command.getCommand()) {
+			case START:
+				startWorkerThreads();
+			case GET_VERSION:
+			case RESET:
+				stopWorkerThreads();
+				startWorkerThreads();
+				break;
+			case STOP:
+			case TERMINATE:
+			case OTHER:
+				log.debug("Obtained not recognized command {}", command);
+				break;
+			default:
+				break;
+			}
+		}
+		log.info("Exit command {} received from probe controller service. Exiting", command);
+		commandService.close();
 	}
 
 	public static void main(String[] args) {
@@ -125,9 +167,11 @@ public class ProbeCLI {
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
 			}
-
-			client.start();
-
+			if (ProbeConfiguration.isInstrumented) {
+				client.startInstrumentation();
+			} else {
+				client.startWorkerThreads();
+			}
 			// client.demoPacketSending();
 
 		} catch (ParseException e) {
