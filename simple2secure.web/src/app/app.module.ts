@@ -54,7 +54,8 @@ import {ActivationComponent, ActivatedComponent} from './activation/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
 import {AnalysisComponent} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
-import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent, OrbiterToolTestResultComponent} from './orbiter/index';
+import {OrbiterComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent,
+	OrbiterToolTestResultComponent, OrbiterToolTemplateComponent, OrbiterTestTemplateComponent} from './orbiter/index';
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import { ChartModule } from 'angular-highcharts';
 import { TreeModule } from 'angular-tree-component';
@@ -152,11 +153,12 @@ export const httpInterceptorProviders = [
     FooterComponent,
     EqualValidator,
     OrbiterComponent,
-    OrbiterConfigurationComponent,
     OrbiterToolsComponent,
     OrbiterToolTestRunComponent,
     OrbiterToolTestComponent,
     OrbiterToolTestResultComponent,
+    OrbiterToolTemplateComponent,
+	OrbiterTestTemplateComponent,
     ConfirmationDialog,
     SelectContextDialog,
     EmailComponent,
@@ -184,7 +186,10 @@ export const httpInterceptorProviders = [
     OsqueryConfigurationEditComponent,
     UserGroupApplyConfigComponent,
     UserProbeChangeGroupComponent,
-    UserContextAddDialogComponent
+    UserContextAddDialogComponent,
+	OrbiterTestTemplateComponent,
+	OrbiterToolTestResultComponent,
+	OrbiterToolTestRunComponent
   ],
   providers: [
     AuthGuard,

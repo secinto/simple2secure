@@ -249,4 +249,28 @@ public class TestUtils {
 		return commands;
 	}
 
+	/**
+	 *
+	 * @param testId
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<TestCase> deleteTestCaseAndDependencies(String testId, String locale) {
+
+		if (!Strings.isNullOrEmpty(testId)) {
+			TestCase testCase = testRepository.find(testId);
+
+			if (testCase != null) {
+				testResultTestMappingRepository.deleteByTestId(testId);
+				testRepository.delete(testCase);
+
+				return new ResponseEntity<TestCase>(testCase, HttpStatus.OK);
+			}
+
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
 }

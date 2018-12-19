@@ -4,5 +4,5 @@ import {Command} from './command';
 export class TestCaseTemplate extends Base{
     name: string;
     toolId: string;
-    commands: Command[];
+    commands: Command[] = [];
 }

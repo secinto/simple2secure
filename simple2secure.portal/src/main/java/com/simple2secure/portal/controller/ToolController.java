@@ -19,11 +19,13 @@ import com.simple2secure.api.dto.ToolDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.TestCase;
 import com.simple2secure.api.model.TestCaseSequence;
+import com.simple2secure.api.model.TestCaseTemplate;
 import com.simple2secure.api.model.Tool;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.TestTemplateRepository;
 import com.simple2secure.portal.repository.ToolRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.TestUtils;
@@ -37,6 +39,9 @@ public class ToolController {
 
 	@Autowired
 	ToolRepository toolRepository;
+
+	@Autowired
+	TestTemplateRepository testTemplateRepository;
 
 	@Autowired
 	ContextRepository contextRepository;
@@ -88,8 +93,65 @@ public class ToolController {
 
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_adding_test_sequence", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/{templateId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<TestCaseTemplate> deleteTemplate(@PathVariable("templateId") String templateId,
+			@RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException, ApiException, IOException, InterruptedException {
+
+		if (!Strings.isNullOrEmpty(templateId)) {
+			TestCaseTemplate template = testTemplateRepository.find(templateId);
+			if (template != null) {
+				testTemplateRepository.delete(template);
+				return new ResponseEntity<TestCaseTemplate>(template, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_template", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/test/{testId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<TestCase> deleteTest(@PathVariable("testId") String testId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException, ApiException, IOException, InterruptedException {
+
+		if (!Strings.isNullOrEmpty(testId)) {
+			return testUtils.deleteTestCaseAndDependencies(testId, locale);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_template", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/updateTemplate", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<TestCaseTemplate> updateTestTemplate(@RequestBody TestCaseTemplate template, @PathVariable("toolId") String toolId,
+			@RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException, ApiException, IOException, InterruptedException {
+
+		if (template != null && !Strings.isNullOrEmpty(template.getToolId())) {
+			Tool tool = toolRepository.find(template.getToolId());
+
+			if (tool != null) {
+				if (!Strings.isNullOrEmpty(template.getId())) {
+					testTemplateRepository.update(template);
+				} else {
+					testTemplateRepository.save(template);
+				}
+				return new ResponseEntity<TestCaseTemplate>(template, HttpStatus.OK);
+			}
+
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_adding_test_template", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

@@ -1,5 +1,3 @@
-import {Generic} from './generic';
-
-export class Command extends Generic {
+export class Command{
   content: string;
 }

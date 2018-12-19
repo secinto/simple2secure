@@ -1,13 +1,19 @@
 <h3 mat-dialog-title>{{ 'button.testresults' | translate }} {{test.test.name}}</h3>
 
 <div mat-dialog-content>
-	<fieldset *ngFor="let item of test.results">
-		<p><b>Timestamp: </b> {{item.timestamp | date:'fullDate'}}</p>
-		<fieldset>
-			<div [innerHTML] = "'<b>Result:</b><br>' + item.content | nl2br "></div>
-		</fieldset>
-        <hr>
-	</fieldset>
+	<div *ngIf="hasTestResults">
+		<div  *ngFor="let item of test.results">
+			<p><b>Timestamp: </b> {{item.timestamp | date:'fullDate'}}</p>
+			<div>
+				<div [innerHTML] = "'<b>Result:</b><br>' + item.content | nl2br "></div>
+			</div>
+			<hr>
+		</div>
+	</div>
+
+	<div *ngIf="!hasTestResults">
+        <div> <p>{{'test.noResults' | translate}}</p></div>
+	</div>
 </div>
 
 <div mat-dialog-actions>

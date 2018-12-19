@@ -1,37 +1,46 @@
-<h3 >Run new test {{tool.tool.name}}</h3>
-<form #userForm="ngForm" (ngSubmit)="submitTestRun()">
-	<div>
+<h3 mat-dialog-title>Run new test {{tool.tool.name}}</h3>
 
-		<mat-form-field>
-		  <mat-select [(ngModel)]="selectedTest" name="test" placeholder="{{ 'test.select' | translate }}"
-					  (change)="onSelectChange()">
-			<mat-option *ngFor="let t of tool.templates" [value]="t">
-			  {{t.name}}
-			</mat-option>
-		  </mat-select>
-		</mat-form-field>
-				
-		<div class="form-group" *ngIf="selectedTest">
-			<button mat-raised-button id="addCommand" type="button" [disabled]="loading" (click)="addCommand()" class="btn-sm btn-info
-			pull-right mat-green-button"><i class="glyphicon glyphicon-plus"></i> {{ 'button.addCommand' |
-				translate }}</button>
+<div mat-dialog-content>
+	<form #testRunForm="ngForm" (ngSubmit)="submitTestRun()">
+		<div>
 
-            <p>{{ 'table.commands' | translate }}</p>
-				
-				<div *ngFor="let cmd of selectedTest.commands; let in=index" ngModelGroup="commands">
-					<legend>{{cmd.content}}</legend>
-					
-					<div class="form-group">
-						<mat-form-field class="full_width_input">
-							<input type="text" matInput placeholder="{{ 'table.name' | translate }}"
-								   [(ngModel)]="selectedTest.commands[in].content" name="content{{in}}">
-							<mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-						</mat-form-field>
+			<mat-form-field>
+			  <mat-select [(ngModel)]="selectedTest" name="test" placeholder="{{ 'test.select' | translate }}"
+						  (change)="onSelectChange()">
+				<mat-option *ngFor="let t of tool.templates" [value]="t">
+				  {{t.name}}
+				</mat-option>
+			  </mat-select>
+			</mat-form-field>
+
+			<div class="form-group" *ngIf="selectedTest">
+				<button mat-raised-button id="addCommand" type="button" [disabled]="loading" (click)="addCommand()" class="btn-sm btn-info
+				pull-right mat-green-button"><i class="glyphicon glyphicon-plus"></i> {{ 'button.addCommand' |
+					translate }}</button>
+
+				<p>{{ 'table.commands' | translate }}</p>
+
+					<div *ngFor="let cmd of selectedTest.commands; let in=index" ngModelGroup="commands">
+						<legend>{{cmd.content}}</legend>
+
+						<div class="form-group">
+							<mat-form-field class="full_width_input">
+								<input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+									   [(ngModel)]="selectedTest.commands[in].content" name="content{{in}}">
+								<mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
+							</mat-form-field>
+						</div>
+
 					</div>
-					
-				</div>
-        </div>
-	</div>
-	<button type="submit" mat-raised-button class="mat-green-button" *ngIf="isTestSelected" [disabled]="loading"><i
-			class="fa fa-play" aria-hidden="true"></i> Run <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" /></button>
-</form>
+			</div>
+		</div>
+	</form>
+</div>
+<div mat-dialog-actions>
+	<button mat-button [disabled]="!testRunForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+			(click)="submitTestRun()">{{ 'button.save' | translate }}
+	</button>
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="tool"
+			cdkFocusInitial>{{ 'button.cancel' | translate }}
+	</button>
+</div>

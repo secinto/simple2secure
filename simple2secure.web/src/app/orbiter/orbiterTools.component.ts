@@ -1,12 +1,13 @@
+import {HttpErrorResponse} from '@angular/common/http';
 import { Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, Tool, User} from '../_models/index';
+import {ContextDTO} from '../_models/index';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ToolDTO} from '../_models/DTO/toolDTO';
-import {JSONP_ERR_NO_CALLBACK} from '@angular/common/http/src/jsonp';
+import {OrbiterToolTestRunComponent} from './orbiterToolTestRun.component';
 
 @Component({
     moduleId: module.id,
@@ -32,6 +33,7 @@ export class OrbiterToolsComponent {
         private router: Router,
         private dataService: DataService,
         private route: ActivatedRoute,
+        private dialog: MatDialog,
         private translate: TranslateService
     ) {}
 
@@ -82,13 +84,40 @@ export class OrbiterToolsComponent {
         this.selectedTool = tool;
      }
 
-    runTests(){
-        this.dataService.setTool(this.selectedTool);
-        this.router.navigate(['test/run'], { relativeTo: this.route});
-    }
-
     showTests(){
         this.dataService.setTool(this.selectedTool);
         this.router.navigate(['test'], {relativeTo: this.route});
     }
+
+    showTemplates(){
+        this.dataService.setTool(this.selectedTool);
+        this.router.navigate(['template'], {relativeTo: this.route});
+    }
+
+	openDialogScheduleTest(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '500px';
+
+		dialogConfig.data = {
+			tool: this.selectedTool,
+		};
+		const dialogRef = this.dialog.open(OrbiterToolTestRunComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true){
+				this.alertService.success(this.translate.instant('test.scheduled'));
+				this.loadTools();
+			}
+			else{
+				if (result instanceof HttpErrorResponse){
+					if (result.status == 0){
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else{
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
 }

@@ -10,7 +10,8 @@ import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user
 import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './network/index';
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
-import {OrbiterComponent, OrbiterConfigurationComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent, OrbiterToolTestResultComponent} from './orbiter/index';
+import {OrbiterComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent,
+	OrbiterToolTestComponent, OrbiterToolTemplateComponent} from './orbiter/index';
 import {EmailComponent, EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
@@ -53,11 +54,9 @@ const appRoutes: Routes = [
             component: OrbiterComponent,
             data: {title: 'menu.orbiter'},
             children: [
-                {path: '', component: OrbiterConfigurationComponent, data: {title: 'menu.orbiterConfig'}},
-                {path: 'tools', component: OrbiterToolsComponent, data: {title: 'menu.orbiterTools'}},
-                {path: 'tools/test/run', component: OrbiterToolTestRunComponent, data: {title: 'button.runtests'}},
-                {path: 'tools/test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
-                {path: 'tools/test/result', component: OrbiterToolTestResultComponent, data: {title: 'button.testresults'}},
+                {path: '', component: OrbiterToolsComponent, data: {title: 'menu.orbiterTools'}},
+                {path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
+	            {path: 'template', component: OrbiterToolTemplateComponent, data: {title: 'menu.templates'}},
             ]
         },
       {

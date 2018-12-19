@@ -1,3 +1,8 @@
+<button mat-raised-button color="primary" id="addButton" type="button" (click)="openDialogAddTemplate()"
+        class="pull-right mat-green-button">
+  <i class="glyphicon glyphicon-plus"></i> {{ 'button.addTemplate' | translate }}
+</button>
+
 <div class="example-container mat-elevation-z8 table table-striped">
   <div class="header-filter-table">
     <mat-form-field class="header-filter-field">
@@ -8,14 +13,14 @@
 
     <!-- Position Column -->
     <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.test.name}} </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.template' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
     </ng-container>
     
         <!-- Name Column -->
-    <ng-container matColumnDef="testResults">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.numoftestsresults' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.results.length}}</mat-cell>
+    <ng-container matColumnDef="toolName">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'tool.name' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{tool.tool.name}}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="action">
@@ -39,10 +44,8 @@
 </div>
 
 <mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="repeatTest()"><mat-icon>repeat</mat-icon> {{ 'button.runTestAgain' | translate }}</button>
-  <button mat-menu-item (click)="showTestDetails()"><mat-icon>details</mat-icon> {{ 'test.details' | translate }}</button>
-  <button mat-menu-item (click)="showTestResults()"><mat-icon>receipt</mat-icon> {{ 'button.showtestsresults' | translate }}</button>
-  <button mat-menu-item (click)="openDialogDeleteTest()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+    <button mat-menu-item (click)="openDialogEditTemplate()"><mat-icon>edit</mat-icon> {{ 'test.modify' | translate }}</button>
+    <button mat-menu-item (click)="openDialogDeleteTemplate()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
 </mat-menu>
 
 

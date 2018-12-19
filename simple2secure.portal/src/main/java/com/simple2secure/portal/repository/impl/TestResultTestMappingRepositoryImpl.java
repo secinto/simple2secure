@@ -10,16 +10,17 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.model.TestCaseResult;
 import com.simple2secure.api.model.TestResultTestMapping;
+import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestResultTestMappingRepository;
-import com.simple2secure.portal.repository.UserRepository;
 
 @Repository
 @Transactional
 public class TestResultTestMappingRepositoryImpl extends TestResultTestMappingRepository {
 
 	@Autowired
-	UserRepository userRepository;
+	TestResultRepository testResultRepository;
 
 	@PostConstruct
 	public void init() {
@@ -39,6 +40,24 @@ public class TestResultTestMappingRepositoryImpl extends TestResultTestMappingRe
 		Query query = new Query(Criteria.where("toolId").is(toolId));
 		List<TestResultTestMapping> testResultTestMapping = mongoTemplate.find(query, TestResultTestMapping.class);
 		return testResultTestMapping;
+	}
+
+	@Override
+	public void deleteByTestId(String testId) {
+		List<TestResultTestMapping> trtList = getByTestId(testId);
+
+		if (trtList != null) {
+			for (TestResultTestMapping trt : trtList) {
+				if (trt != null) {
+					TestCaseResult testCaseResult = testResultRepository.find(trt.getTestResultId());
+					if (testCaseResult != null) {
+						testResultRepository.delete(testCaseResult);
+					}
+					delete(trt);
+				}
+			}
+		}
+
 	}
 
 }
