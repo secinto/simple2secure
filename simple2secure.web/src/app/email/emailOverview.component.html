@@ -14,19 +14,19 @@
         <!-- Position Column -->
         <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'login.email' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.email}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.configuration.email}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
         <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.version' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.id}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.configuration.id}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
         <ng-container matColumnDef="incomingPort">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'email.incomingport' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.incomingPort}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.configuration.incomingPort}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -52,7 +52,7 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="onViewClick()">
+    <button mat-menu-item (click)="openDialogViewInbox()">
         <mat-icon>email</mat-icon>
         {{ 'table.inbox' | translate }}
     </button>
@@ -63,5 +63,13 @@
     <button mat-menu-item (click)="openDialogDeleteConfig()">
         <mat-icon>delete</mat-icon>
         {{ 'table.delete' | translate }}
+    </button>
+    <button mat-menu-item (click)="openDialogAddRule()">
+        <mat-icon>add</mat-icon>
+        {{ 'button.addRule' | translate }}
+    </button>
+    <button mat-menu-item (click)="openDialogShowRules()">
+        <mat-icon>view_list</mat-icon>
+        {{ 'button.showRules' | translate }}
     </button>
 </mat-menu>

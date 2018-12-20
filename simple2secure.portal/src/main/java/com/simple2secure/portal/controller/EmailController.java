@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -82,15 +82,15 @@ public class EmailController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<EmailConfiguration>> getEmailConfigByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
-				List<EmailConfiguration> emailConfigurationList = emailConfigRepository.findByContextId(context.getId());
+				List<EmailConfigurationDTO> emailConfigurationList = mailUtils.getEmailConfigDTO(contextId);
 				if (emailConfigurationList != null) {
-					return new ResponseEntity<List<EmailConfiguration>>(emailConfigurationList, HttpStatus.OK);
+					return new ResponseEntity<List<EmailConfigurationDTO>>(emailConfigurationList, HttpStatus.OK);
 				}
 			}
 		}
@@ -98,27 +98,6 @@ public class EmailController {
 		log.error("Error occured while getting email config for user with id {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale)),
 				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/inbox/{emailConfigId}", method = RequestMethod.GET)
-	public ResponseEntity<List<Email>> getEmailMessagesByConfigId(@PathVariable("emailConfigId") String emailConfigId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		if (!Strings.isNullOrEmpty(emailConfigId)) {
-			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId);
-			if (emailConfig != null) {
-				List<Email> emails = emailRepository.findByConfigId(emailConfigId);
-				if (emails != null) {
-					return new ResponseEntity<List<Email>>(emails, HttpStatus.OK);
-				}
-			}
-		}
-		log.error("Error occured while getting email messages for email configuration with id {}", emailConfigId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale)),
-				HttpStatus.NOT_FOUND);
-
 	}
 
 	/**

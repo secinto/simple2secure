@@ -29,6 +29,7 @@ import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 
 import ch.maxant.rules.AbstractAction;
 import ch.maxant.rules.CompileException;
@@ -63,6 +64,9 @@ public class UpdateEmailScheduler {
 	@Autowired
 	MailUtils mailUtils;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
 	@Scheduled(fixedRate = 50000)
@@ -86,31 +90,42 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String configId) throws Exception {
+	public void extractEmailsFromMessages(Message[] messages, String configId) {
 		if (!Strings.isNullOrEmpty(configId)) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(configId);
 			if (emailConfig != null) {
 				for (Message msg : messages) {
 					UIDFolder uf = (UIDFolder) msg.getFolder();
-					Long messageId = uf.getUID(msg);
+					Long messageId;
+					try {
+						messageId = uf.getUID(msg);
+						if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
+							// TO-DO - check if there is a rule for this inbox and check it accordingly
+							Email email = new Email();
+							Object content;
+							try {
+								content = msg.getContent();
+								if (content instanceof String) {
+									String body = (String) content;
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											body, msg.getReceivedDate().toString());
+								} else if (content instanceof MimeMultipart) {
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+								}
 
-					if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
-						// TO-DO - check if there is a rule for this inbox and check it accordingly
-						Email email = new Email();
-						Object content = msg.getContent();
-						if (content instanceof String) {
-							String body = (String) content;
-							email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(), body,
-									msg.getReceivedDate().toString());
-						} else if (content instanceof MimeMultipart) {
-							email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-									mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+								// emailsRuleChecker(email, emailConfig);
+
+								emailRepository.save(email);
+							} catch (Exception e) {
+								log.error("Problem occured {}", e.getMessage());
+							}
 						}
 
-						// emailsRuleChecker(email, emailConfig);
-
-						emailRepository.save(email);
+					} catch (MessagingException e1) {
+						log.error("Problem occured messageId not found");
 					}
+
 				}
 			}
 		}
@@ -217,6 +232,7 @@ public class UpdateEmailScheduler {
 		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
 		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
 		props.setProperty("mail.imap.auth", IMAP_AUTH);
+		props.setProperty("mail.mime.ignoreunknownencoding", "true");
 
 		return props;
 

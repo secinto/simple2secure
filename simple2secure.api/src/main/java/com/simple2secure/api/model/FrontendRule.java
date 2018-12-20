@@ -1,36 +1,36 @@
 package com.simple2secure.api.model;
 
-public class FrontendRule {
-	
-	private String id;
+import com.simple2secure.api.dbo.GenericDBObject;
+
+public class FrontendRule extends GenericDBObject {
+
+	/**
+	 *
+	 */
+
+	private static final long serialVersionUID = 3173461203987223971L;
 	private String toolId;
 	private String contextId;
+	private String clazz;
 	private String name;
 	private String description;
 	private int priority;
-	private String createdOn;
-	private boolean active;
-	
+	private long timestamp;
+	private boolean active = true;
+
 	public FrontendRule() {
 	}
 
-	public FrontendRule(String id, String toolId, String contextId, String name, String description, int priority, String createdOn, boolean active) {
-		this.id = id;
+	public FrontendRule(String toolId, String contextId, String clazz, String name, String description, int priority, long timestamp,
+			boolean active) {
 		this.toolId = toolId;
 		this.contextId = contextId;
+		this.clazz = clazz;
 		this.name = name;
 		this.description = description;
 		this.priority = priority;
-		this.createdOn = createdOn;
+		this.timestamp = timestamp;
 		this.active = active;
-	}
-	
-	public String getId() {
-		return id;
-	}
-	
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getToolId() {
@@ -49,12 +49,12 @@ public class FrontendRule {
 		this.contextId = contextId;
 	}
 
-	public String getCreatedOn() {
-		return createdOn;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
-	public void setCreatedOn(String createdOn) {
-		this.createdOn = createdOn;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public boolean isActive() {
@@ -87,5 +87,13 @@ public class FrontendRule {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public String getClazz() {
+		return clazz;
+	}
+
+	public void setClazz(String clazz) {
+		this.clazz = clazz;
 	}
 }

@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {MatDialogRef} from '@angular/material';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {ContextDTO} from '../_models';
 import {HttpService} from '../_services';
 
@@ -15,7 +15,8 @@ export class SelectContextDialog {
 	currentUser: any;
 
 	constructor(private dialogRef: MatDialogRef<SelectContextDialog>,
-	            private httpService: HttpService)
+	            private httpService: HttpService,
+	            @Inject(MAT_DIALOG_DATA) public data: any)
 	{
 
 	}

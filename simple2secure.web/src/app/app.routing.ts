@@ -14,7 +14,7 @@ import {
 	OrbiterComponent, OrbiterToolsComponent,
 	OrbiterToolTestComponent, OrbiterToolTemplateComponent
 } from './orbiter/index';
-import {EmailComponent, EmailOverviewComponent, EmailInboxComponent} from './email/index';
+import {EmailOverviewComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
@@ -74,11 +74,9 @@ const appRoutes: Routes = [
 			},
 			{
 				path: 'email',
-				component: EmailComponent,
+				component: EmailOverviewComponent,
 				data: {title: 'menu.email'},
 				children: [
-					{path: '', component: EmailOverviewComponent},
-					{path: ':id/inbox', component: EmailInboxComponent, data: {title: 'table.inbox'}},
 					{path: ':id/inbox/rule/overview', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
 					{path: ':id/inbox/rule/add', component: RuleAddComponent, data: {title: 'button.addRule'}},
 					{path: ':id/inbox/rule/edit', component: RuleAddComponent, data: {title: 'menu.editRule'}}

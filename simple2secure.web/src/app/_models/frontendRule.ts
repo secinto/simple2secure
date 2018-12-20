@@ -1,12 +1,10 @@
 import {Base} from './base';
 
-export class FrontendRule {
-	id: string;
+export class FrontendRule extends Base{
 	toolId: string;
-	userId: string;
-	name: string;
+	contextId: string;
+	clazz: string;
 	description: string;
 	priority: number;
 	createdOn: string;
-	active: boolean;
 }

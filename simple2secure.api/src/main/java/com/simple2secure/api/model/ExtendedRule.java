@@ -1,38 +1,37 @@
 package com.simple2secure.api.model;
 
-import com.simple2secure.api.dbo.GenericDBObject;
+public class ExtendedRule {
 
-public class ExtendedRule extends GenericDBObject{
-	
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3105456893362818450L;
-	
 	private String name;
-    private String expression;
-    private String outcome;
-    private int priority;
-    private String namespace;
-    private String description;
-    
-    public ExtendedRule() {
-    }
-    
-    public ExtendedRule(final String name, final String expression, final String outcome, final int priority,
-            final String namespace, final String description) {
+	private String expression;
+	private String outcome;
+	private int priority;
+	private String namespace;
+	private String description;
 
-        if(name == null) throw new AssertionError("name may not be null");
-        if(expression == null) throw new AssertionError("expression may not be null");
-        if(namespace == null) throw new AssertionError("namespace may not be null");
-        
-        this.name = name;
-        this.expression = expression;
-        this.outcome = outcome;
-        this.priority = priority;
-        this.namespace = namespace;
-        this.description = description;
-    }
+	public ExtendedRule() {
+	}
+
+	public ExtendedRule(final String name, final String expression, final String outcome, final int priority, final String namespace,
+			final String description) {
+
+		if (name == null) {
+			throw new AssertionError("name may not be null");
+		}
+		if (expression == null) {
+			throw new AssertionError("expression may not be null");
+		}
+		if (namespace == null) {
+			throw new AssertionError("namespace may not be null");
+		}
+
+		this.name = name;
+		this.expression = expression;
+		this.outcome = outcome;
+		this.priority = priority;
+		this.namespace = namespace;
+		this.description = description;
+	}
 
 	public String getName() {
 		return name;

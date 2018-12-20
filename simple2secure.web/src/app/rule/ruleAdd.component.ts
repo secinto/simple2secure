@@ -1,4 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FrontendRule} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
@@ -14,13 +15,10 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class RuleAddComponent {
 
-	public rule: any;
-	currentUser: any;
+	rule: FrontendRule;
 	loading = false;
-	toolId: string;
-	operators = ['==', '<', '<=', '>', '>=', '&&', '||', 'contains'];
-	toolItems = ['subject', 'body'];
-	action: string;
+	isNewRuleAdded = false;
+
 
 	constructor(
 		private route: ActivatedRoute,
@@ -30,44 +28,27 @@ export class RuleAddComponent {
 		private dataService: DataService,
 		private url: LocationStrategy,
 		private translate: TranslateService,
-		private location: Location)
-	{}
-
-	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.route.queryParams.subscribe(params => {
-			this.action = params['action'];
-		});
-
-
-		if (this.action === 'edit') {
-			this.rule = this.dataService.get();
+		private location: Location,
+		private dialogRef: MatDialogRef<RuleAddComponent>,
+		@Inject(MAT_DIALOG_DATA) data)
+	{
+		this.rule = data.rule;
+		if (data.rule.id) {
+			this.isNewRuleAdded = false;
 		}
 		else {
-			this.rule = new FrontendRule();
-			this.toolId = this.route.snapshot.paramMap.get('id');
-			this.rule.userId = this.currentUser.userID;
-			this.rule.toolId = this.toolId;
+			this.isNewRuleAdded = true;
 		}
-
-
 	}
 
 	saveRule() {
 		this.httpService.post(this.rule, environment.apiEndpoint + 'rule').subscribe(
 			data => {
-				this.rule = data;
-				this.alertService.success(this.translate.instant('message.rule.add'));
-				this.location.back();
+				this.dialogRef.close(true);
 			},
 			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
+				this.dialogRef.close(error);
 			});
+		this.loading = false;
 	}
 }

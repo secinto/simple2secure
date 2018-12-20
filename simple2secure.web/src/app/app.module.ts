@@ -53,7 +53,7 @@ import {
 	OsQueryReportDetailsComponent, ReportOverviewComponent
 } from './report/index';
 
-import {EmailComponent, EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
+import {EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {SettingsComponent} from './settings/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
@@ -168,7 +168,6 @@ export const httpInterceptorProviders = [
 		OrbiterTestTemplateComponent,
 		ConfirmationDialog,
 		SelectContextDialog,
-		EmailComponent,
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
@@ -197,7 +196,10 @@ export const httpInterceptorProviders = [
 		OrbiterTestTemplateComponent,
 		OrbiterToolTestResultComponent,
 		OrbiterToolTestRunComponent,
-		EmailAccountAddComponent
+		EmailAccountAddComponent,
+		EmailInboxComponent,
+		RuleOverviewComponent,
+		RuleAddComponent
 	],
 	providers: [
 		AuthGuard,

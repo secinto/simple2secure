@@ -1,6 +1,7 @@
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.BodyPart;
@@ -17,13 +18,18 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
+import com.simple2secure.api.model.FrontendRule;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
+import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Configuration
@@ -40,6 +46,12 @@ public class MailUtils {
 	EmailRepository emailRepository;
 
 	@Autowired
+	ContextRepository contextRepository;
+
+	@Autowired
+	RuleRepository ruleRepository;
+
+	@Autowired
 	JavaMailSender javaMailSender;
 
 	@Autowired
@@ -47,6 +59,9 @@ public class MailUtils {
 
 	@Autowired
 	LoadedConfigItems loadedConfigItems;
+
+	@Autowired
+	RuleUtils ruleUtils;
 
 	/**
 	 * Sends an email with the activation token or in case of the password reset to the user
@@ -185,6 +200,30 @@ public class MailUtils {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This function retrieves all configuration according to the contextId. It iterates over the retrieved configs and retrieves emails for
+	 * that config. After that new DTO object will be constructed with config and emails.
+	 *
+	 * @param contextId
+	 * @return
+	 */
+	public List<EmailConfigurationDTO> getEmailConfigDTO(String contextId) {
+		List<EmailConfigurationDTO> configurationList = new ArrayList<>();
+		List<EmailConfiguration> emailConfigList = emailConfigRepository.findByContextId(contextId);
+		if (emailConfigList != null) {
+			for (EmailConfiguration emailConfig : emailConfigList) {
+				if (emailConfig != null) {
+					List<Email> emailList = emailRepository.findByConfigId(emailConfig.getId());
+					List<FrontendRule> rules = ruleUtils.getFrontendRulesByToolId(emailConfig.getId());
+					EmailConfigurationDTO emailConfigDTO = new EmailConfigurationDTO(emailConfig, emailList, rules);
+					configurationList.add(emailConfigDTO);
+				}
+			}
+		}
+
+		return configurationList;
 	}
 
 }

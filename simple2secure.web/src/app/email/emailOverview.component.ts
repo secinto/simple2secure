@@ -1,13 +1,15 @@
 import {HttpErrorResponse} from '@angular/common/http';
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {ContextDTO, EmailConfiguration} from '../_models/index';
+import {ContextDTO, EmailConfiguration, EmailConfigurationDTO, FrontendRule} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
+import {RuleAddComponent, RuleOverviewComponent} from '../rule';
 import {EmailAccountAddComponent} from './emailAccountAdd.component';
+import {EmailInboxComponent} from './emailInbox.component';
 
 @Component({
 	moduleId: module.id,
@@ -17,14 +19,15 @@ import {EmailAccountAddComponent} from './emailAccountAdd.component';
 })
 export class EmailOverviewComponent {
 
-	config: EmailConfiguration[];
-	tempConfig: EmailConfiguration;
+	config: EmailConfigurationDTO[];
 	loading = false;
-	selectedConfig: EmailConfiguration;
+	selectedConfig: EmailConfigurationDTO;
 	deleted = false;
 	context: ContextDTO;
 	isConfigUpdated = false;
 	isConfigAdded = false;
+	isRuleAdded = false;
+	rule = new FrontendRule();
 
 	displayedColumns = ['email', 'id', 'incomingPort', 'action'];
 	dataSource = new MatTableDataSource();
@@ -57,74 +60,54 @@ export class EmailOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	/**
-	 * Dummy configuration in case that we are using the mock environment
-	 */
-	private createTempConfiguration() {
-		this.tempConfig = new EmailConfiguration();
-		this.tempConfig.email = 'fakeMail@secinto.com';
-		this.tempConfig.id = '11111';
-		this.tempConfig.incomingPort = 'testPort';
-		this.tempConfig.incomingServer = 'testServer';
-		this.tempConfig.outgoingPort = 'outTestPort';
-		this.tempConfig.outgoingServer = 'outTestServer';
-		this.tempConfig.password = 'slapdlpsad';
-		this.tempConfig.contextId = '222222';
-	}
-
 	private loadAllConfigurations() {
-		if (environment.envName === 'mock') {
-			this.config = [];
-			this.createTempConfiguration();
-			this.config.push(this.tempConfig);
-			this.dataSource.data = this.config;
-			this.loading = false;
-			this.alertService.success(this.translate.instant('message.emailConfig'));
-		}
-		else {
-			this.loading = true;
-			this.httpService.get(environment.apiEndpoint + 'email/' + this.context.context.id)
-				.subscribe(
-					data => {
-						this.config = data;
-						this.dataSource.data = this.config;
 
-						if (!this.deleted && !this.isConfigUpdated && !this.isConfigAdded) {
-							if (data.length > 0) {
-								this.alertService.success(this.translate.instant('message.emailConfig'));
-							}
-							else {
-								this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
-							}
-							this.loading = false;
-						}
-						this.deleted = false;
-						this.isConfigUpdated = false;
-						this.isConfigAdded = false;
-						this.loading = false;
-					},
-					error => {
-						if (error.status == 0) {
-							this.alertService.error(this.translate.instant('server.notresponding'));
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'email/' + this.context.context.id)
+			.subscribe(
+				data => {
+					this.config = data;
+					this.dataSource.data = this.config;
+
+					if (!this.deleted && !this.isConfigUpdated && !this.isConfigAdded && !this.isRuleAdded) {
+						if (data.length > 0) {
+							this.alertService.success(this.translate.instant('message.emailConfig'));
 						}
 						else {
-							this.alertService.error(error.error.errorMessage);
+							this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
 						}
 						this.loading = false;
-					});
-		}
+					}
+					this.deleted = false;
+					this.isConfigUpdated = false;
+					this.isRuleAdded = false;
+					this.isConfigAdded = false;
+					this.loading = false;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
 	}
 
-	public onMenuTriggerClick(config: EmailConfiguration) {
+	public onMenuTriggerClick(config: EmailConfigurationDTO) {
 		this.selectedConfig = config;
 	}
 
-	public onViewClick() {
-		this.viewInbox(this.selectedConfig);
-	}
+	openDialogViewInbox(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
 
-	public viewInbox(selectedConfig: EmailConfiguration) {
-		this.router.navigate([selectedConfig.id, 'inbox'], {relativeTo: this.route});
+		dialogConfig.data = {
+			emails: this.selectedConfig.emails
+		};
+		this.dialog.open(EmailInboxComponent, dialogConfig);
+
 	}
 
 	openDialogAddConfig(): void {
@@ -160,7 +143,7 @@ export class EmailOverviewComponent {
 		dialogConfig.width = '500px';
 
 		dialogConfig.data = {
-			config: this.selectedConfig,
+			config: this.selectedConfig.configuration,
 		};
 		const dialogRef = this.dialog.open(EmailAccountAddComponent, dialogConfig);
 
@@ -168,7 +151,6 @@ export class EmailOverviewComponent {
 			if (result == true) {
 				this.alertService.success(this.translate.instant('message.emailConfig.update'));
 				this.isConfigUpdated = true;
-				//this.loadAllConfigurations();
 			}
 			else {
 				if (result instanceof HttpErrorResponse) {
@@ -199,7 +181,7 @@ export class EmailOverviewComponent {
 
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
-				this.deleteConfig(this.selectedConfig);
+				this.deleteConfig(this.selectedConfig.configuration);
 			}
 		});
 	}
@@ -221,5 +203,48 @@ export class EmailOverviewComponent {
 				}
 				this.loading = false;
 			});
+	}
+
+	openDialogAddRule(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		this.rule.toolId = this.selectedConfig.configuration.id;
+		this.rule.contextId = this.context.context.id;
+		this.rule.clazz = "com.simple2secure.api.model.Email";
+
+		dialogConfig.data = {
+			rule: this.rule
+		};
+
+		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.rule.add'));
+				this.isRuleAdded = true;
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
+
+	openDialogShowRules(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+
+		dialogConfig.data = {
+			rules: this.selectedConfig.rules
+		};
+
+		this.dialog.open(RuleOverviewComponent, dialogConfig);
+
 	}
 }

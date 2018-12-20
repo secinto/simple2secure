@@ -10,6 +10,7 @@ package com.simple2secure.portal.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,4 +202,16 @@ public class PortalUtils {
 		byte[] array = Files.readAllBytes(probe[0].toPath());
 		return array;
 	}
+
+	/**
+	 * This function converts an input stream object to string
+	 * 
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public String convertInputStreamToString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream, "UTF-8");
+	}
+
 }

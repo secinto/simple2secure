@@ -59,7 +59,7 @@ export class OrbiterToolTestComponent {
 
 	showTestResults() {
 		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
+		dialogConfig.width = '600px';
 		dialogConfig.data = {
 			test: this.selectedTest,
 		};
