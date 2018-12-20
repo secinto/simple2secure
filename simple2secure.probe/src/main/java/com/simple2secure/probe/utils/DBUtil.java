@@ -40,7 +40,6 @@ public class DBUtil {
 	private QueryDaoImpl queryDao;
 	private StepDaoImpl stepDao;
 	private ProbePacketDaoImpl probePacketDao;
-	public static boolean hasDBChanged = false;
 
 	public static DBUtil getInstance() throws IllegalArgumentException {
 		return getInstance(null);
