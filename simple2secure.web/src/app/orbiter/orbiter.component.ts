@@ -1,8 +1,8 @@
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
-    moduleId: module.id,
-    templateUrl: 'orbiter.component.html'
+	moduleId: module.id,
+	templateUrl: 'orbiter.component.html'
 })
 
 export class OrbiterComponent {

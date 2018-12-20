@@ -11,63 +11,64 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'orbiterToolTest.component.html'
+	moduleId: module.id,
+	templateUrl: 'orbiterToolTest.component.html'
 })
 
 export class OrbiterToolTestComponent {
 
-    tool: Tool;
-    displayedColumns = ['name', 'testResults', 'action'];
-    selectedTest: TestDTO;
-    loading = false;
-    dataSource = new MatTableDataSource();
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+	tool: Tool;
+	displayedColumns = ['name', 'testResults', 'action'];
+	selectedTest: TestDTO;
+	loading = false;
+	dataSource = new MatTableDataSource();
+	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(
-    private alertService: AlertService,
-    private httpService: HttpService,
-    private dataService: DataService,
-    private dialog: MatDialog,
-    private translate: TranslateService,
-  ) {
-    this.tool = new Tool();
-  }
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private dialog: MatDialog,
+		private translate: TranslateService,
+	)
+	{
+		this.tool = new Tool();
+	}
 
-  ngOnInit() {
+	ngOnInit() {
 
-    this.tool = this.dataService.getTool();
-    this.dataSource.data = this.tool.tests;
-  }
+		this.tool = this.dataService.getTool();
+		this.dataSource.data = this.tool.tests;
+	}
 
-  ngAfterViewInit() {
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
-    }
+	ngAfterViewInit() {
+		this.dataSource.sort = this.sort;
+		this.dataSource.paginator = this.paginator;
+	}
 
-  applyFilter(filterValue: string) {
-      filterValue = filterValue.trim(); // Remove whitespace
-      filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-      this.dataSource.filter = filterValue;
-  }
+	applyFilter(filterValue: string) {
+		filterValue = filterValue.trim(); // Remove whitespace
+		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+		this.dataSource.filter = filterValue;
+	}
 
-  public onMenuTriggerClick(test: TestDTO) {
-      this.selectedTest = test;
-  }
+	public onMenuTriggerClick(test: TestDTO) {
+		this.selectedTest = test;
+	}
 
-  showTestResults(){
-      const dialogConfig = new MatDialogConfig();
-      dialogConfig.width = '450px';
-      dialogConfig.data = {
-          test: this.selectedTest,
-      };
+	showTestResults() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			test: this.selectedTest,
+		};
 
-      this.dialog.open(OrbiterToolTestResultComponent, dialogConfig);
+		this.dialog.open(OrbiterToolTestResultComponent, dialogConfig);
 
-  }
+	}
 
-	public openDialogDeleteTest(){
+	public openDialogDeleteTest() {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -82,7 +83,7 @@ export class OrbiterToolTestComponent {
 		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(data => {
-			if (data === true){
+			if (data === true) {
 				this.deleteTest();
 			}
 		});
@@ -96,37 +97,37 @@ export class OrbiterToolTestComponent {
 				this.loading = false;
 			},
 			error => {
-				if (error.status == 0){
+				if (error.status == 0) {
 					this.alertService.error(this.translate.instant('server.notresponding'));
 				}
-				else{
+				else {
 					this.alertService.error(error.error.errorMessage);
 				}
 				this.loading = false;
 			});
 	}
 
-    repeatTest(){
+	repeatTest() {
 
-        this.loading = true;
+		this.loading = true;
 
-        this.httpService.post(this.selectedTest.test, environment.apiEndpoint + 'tools/' + this.tool.id + '/run').subscribe(
-            data => {
-                this.alertService.success(this.translate.instant('test.scheduled'));
-                this.loading = false;
-            },
-            error => {
-                if (error.status == 0){
-                    this.alertService.error(this.translate.instant('server.notresponding'));
-                }
-                else{
-                    this.alertService.error(error.error.errorMessage);
-                }
-                this.loading = false;
-            });
-    }
+		this.httpService.post(this.selectedTest.test, environment.apiEndpoint + 'tools/' + this.tool.id + '/run').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('test.scheduled'));
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
 
-	showTestDetails(){
+	showTestDetails() {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
@@ -138,19 +139,19 @@ export class OrbiterToolTestComponent {
 		const dialogRef = this.dialog.open(OrbiterTestTemplateComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
-			if (result == true){
+			if (result == true) {
 				this.alertService.success(this.translate.instant('test.template.update'));
 			}
-			else{
-				if (result instanceof HttpErrorResponse){
-					if (result.status == 0){
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
 						this.alertService.error(this.translate.instant('server.notresponding'));
 					}
-					else{
+					else {
 						this.alertService.error(result.error.errorMessage);
 					}
 				}
 			}
 		});
-    }
+	}
 }

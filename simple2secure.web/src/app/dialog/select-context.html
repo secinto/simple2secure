@@ -1,19 +1,20 @@
 <h2 mat-dialog-title>{{data.title}}</h2>
 <div mat-dialog-content>
-  <mat-dialog-content class="error">{{data.content}}</mat-dialog-content>
-  <form #contextForm="ngForm">
-    <mat-form-field class="full_width_input">
-      <mat-select placeholder="{{data.selectMessage}}" [(ngModel)]="context" name="contextId" required>
-        <mat-option *ngFor="let context of data.contextList" [value]="context">
-          {{context.context.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </form>
+    <mat-dialog-content class="error">{{data.content}}</mat-dialog-content>
+    <form #contextForm="ngForm">
+        <mat-form-field class="full_width_input">
+            <mat-select placeholder="{{data.selectMessage}}" [(ngModel)]="context" name="contextId" required>
+                <mat-option *ngFor="let context of data.contextList" [value]="context">
+                    {{context.context.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
 </div>
 
 <mat-dialog-actions>
-  <button mat-raised-button class="mat-green-button" [disabled]="!contextForm.dirty" (click)="updateContext()">Save</button>
+    <button mat-raised-button class="mat-green-button" [disabled]="!contextForm.dirty" (click)="updateContext()">Save
+    </button>
 </mat-dialog-actions>
 
 

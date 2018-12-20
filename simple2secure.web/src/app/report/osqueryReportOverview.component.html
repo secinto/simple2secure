@@ -1,47 +1,50 @@
 <div class="example-container mat-elevation-z8 table table-striped">
-  <div class="header-filter-table">
-    <mat-form-field class="header-filter-field">
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-    </mat-form-field>
-  </div>
-  <mat-table #table [dataSource]="dataSource" matSort>
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="dataSource" matSort>
 
-    <!-- Position Column -->
-    <ng-container matColumnDef="query">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.query' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.query}} </mat-cell>
-    </ng-container>
-    
-    <!-- Position Column -->
-    <ng-container matColumnDef="probe">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.probe' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.probeId}} </mat-cell>
-    </ng-container>    
+        <!-- Position Column -->
+        <ng-container matColumnDef="query">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.query' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.query}}</mat-cell>
+        </ng-container>
 
-    <!-- Name Column -->
-    <ng-container matColumnDef="timestamp">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'table.time' | translate }}</mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.queryTimestamp}} </mat-cell>
-    </ng-container>    
-    
-    <ng-container matColumnDef="action">
-      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>     
-      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
-      	<button mat-button color="primary" class="mat-green-button" (click)="onDeleteClick(element)">
-          <i class="fas fa-trash-alt"></i>
-        </button> 
-      </mat-cell>
-    </ng-container>
+        <!-- Position Column -->
+        <ng-container matColumnDef="probe">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.probe' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+        </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)"></mat-row>
-  </mat-table>
-  <mat-paginator #paginator
-                 [pageSize]="10"
-                 [pageSizeOptions]="[5, 10, 20]"
-                 [showFirstLastButtons]="true">
-  </mat-paginator>  
-  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+        <!-- Name Column -->
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'table.time' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.queryTimestamp}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate
+                }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button mat-button color="primary" class="mat-green-button" (click)="onDeleteClick(element)">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
+                 (click)="showDetails(row)"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>
 
 

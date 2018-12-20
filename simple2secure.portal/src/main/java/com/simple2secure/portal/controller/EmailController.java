@@ -27,6 +27,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
@@ -61,14 +62,21 @@ public class EmailController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
-			@RequestHeader("Accept-Language") String locale) {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (config != null) {
-			emailConfigRepository.save(config);
-			return new ResponseEntity<EmailConfiguration>(config, HttpStatus.OK);
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
-					HttpStatus.NOT_FOUND);
+			if (!mailUtils.checkIfEmailConfigExists(config.getEmail(), config.getContextId())) {
+				if (!Strings.isNullOrEmpty(config.getId())) {
+					emailConfigRepository.update(config);
+				} else {
+					emailConfigRepository.save(config);
+				}
+				return new ResponseEntity<EmailConfiguration>(config, HttpStatus.OK);
+			}
+
 		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

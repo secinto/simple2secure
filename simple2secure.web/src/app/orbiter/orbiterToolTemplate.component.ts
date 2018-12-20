@@ -1,25 +1,23 @@
 import {HttpErrorResponse} from '@angular/common/http';
 import {Component, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {Command} from '../_models';
 import {ToolDTO} from '../_models/DTO/toolDTO';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {TestCaseTemplate} from '../_models/testCaseTemplate';
 import {AlertService, HttpService, DataService} from '../_services';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {UserContextAddDialogComponent, UserDetailsComponent} from '../user';
 import {TranslateService} from '@ngx-translate/core';
 import {OrbiterTestTemplateComponent} from './orbiterTestTemplate.component';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'orbiterToolTemplate.component.html'
+	moduleId: module.id,
+	templateUrl: 'orbiterToolTemplate.component.html'
 })
 
 export class OrbiterToolTemplateComponent {
 
 	tool: ToolDTO;
-	displayedColumns = ['toolName', 'name' , 'action'];
+	displayedColumns = ['toolName', 'name', 'action'];
 	selectedTemplate: TestCaseTemplate;
 	loading = false;
 	dataSource = new MatTableDataSource();
@@ -27,12 +25,13 @@ export class OrbiterToolTemplateComponent {
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	constructor(
-	private alertService: AlertService,
-	private httpService: HttpService,
-	private dataService: DataService,
-	private dialog: MatDialog,
-	private translate: TranslateService,
-	) {
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private dialog: MatDialog,
+		private translate: TranslateService,
+	)
+	{
 		this.tool = new ToolDTO();
 	}
 
@@ -72,15 +71,15 @@ export class OrbiterToolTemplateComponent {
 		const dialogRef = this.dialog.open(OrbiterTestTemplateComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
-			if (result == true){
+			if (result == true) {
 				this.alertService.success(this.translate.instant('test.template.update'));
 			}
-			else{
-				if (result instanceof HttpErrorResponse){
-					if (result.status == 0){
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
 						this.alertService.error(this.translate.instant('server.notresponding'));
 					}
-					else{
+					else {
 						this.alertService.error(result.error.errorMessage);
 					}
 				}
@@ -100,15 +99,15 @@ export class OrbiterToolTemplateComponent {
 		const dialogRef = this.dialog.open(OrbiterTestTemplateComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
-			if (result == true){
+			if (result == true) {
 				this.alertService.success(this.translate.instant('test.template.update'));
 			}
-			else{
-				if (result instanceof HttpErrorResponse){
-					if (result.status == 0){
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
 						this.alertService.error(this.translate.instant('server.notresponding'));
 					}
-					else{
+					else {
 						this.alertService.error(result.error.errorMessage);
 					}
 				}
@@ -124,17 +123,17 @@ export class OrbiterToolTemplateComponent {
 				this.loading = false;
 			},
 			error => {
-				if (error.status == 0){
+				if (error.status == 0) {
 					this.alertService.error(this.translate.instant('server.notresponding'));
 				}
-				else{
+				else {
 					this.alertService.error(error.error.errorMessage);
 				}
 				this.loading = false;
 			});
 	}
 
-	public openDialogDeleteTemplate(){
+	public openDialogDeleteTemplate() {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -149,7 +148,7 @@ export class OrbiterToolTemplateComponent {
 		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(data => {
-			if (data === true){
+			if (data === true) {
 				this.deleteTemplate();
 			}
 		});

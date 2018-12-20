@@ -70,7 +70,7 @@ public class MailUtils {
 
 	/**
 	 * This function sends an email message as html
-	 * 
+	 *
 	 * @param user
 	 * @param emailContent
 	 * @param subject
@@ -137,6 +137,23 @@ public class MailUtils {
 				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL() + "/api/user/invite/"
 				+ userInvitation.getInvitationToken();
 		return content;
+	}
+
+	/**
+	 * This function checks if the emailConfiguration already Exists according to the email and contextId
+	 *
+	 * @param name
+	 * @param contextId
+	 * @return
+	 */
+	public boolean checkIfEmailConfigExists(String email, String contextId) {
+
+		EmailConfiguration emailConfig = emailConfigRepository.findByEmailAndContextId(email.trim(), contextId);
+		if (emailConfig != null) {
+			return true;
+		}
+		return false;
+
 	}
 
 	/**

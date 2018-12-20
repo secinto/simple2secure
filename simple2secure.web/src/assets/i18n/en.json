@@ -183,6 +183,7 @@
   "message.email.load": "Emails loaded successfully!",
   "message.email.notProvided": "Emails for this configuration id not provided!",
   "message.emailConfig": "Email configurations loaded successfully!",
+  "message.emailConfig.update": "Account updated successfully!",
   "message.emailConfig.notProvided": "Email configuration not provided!",
   "message.emailConfig.delete": "Account deleted successfully!",
   "message.emailConfig.dialog": "With clicking on yes, selected account will be deleted!",
@@ -324,5 +325,6 @@
   "button.invitation.accept": "Accept",
   "button.invitation.reject": "Reject",
   "invitation.accept": "You have accepted the invitation successfully",
-  "test.scheduled": "Test has been scheduled"
+  "test.scheduled": "Test has been scheduled",
+  "menu.emailConfig": "Email Configuration"
 }

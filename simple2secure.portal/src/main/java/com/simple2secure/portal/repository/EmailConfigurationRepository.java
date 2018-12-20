@@ -9,5 +9,7 @@ public abstract class EmailConfigurationRepository extends MongoRepository<Email
 
 	public abstract List<EmailConfiguration> findByContextId(String contexId);
 
+	public abstract EmailConfiguration findByEmailAndContextId(String email, String contextId);
+
 	public abstract void deleteByContextId(String contextId);
 }

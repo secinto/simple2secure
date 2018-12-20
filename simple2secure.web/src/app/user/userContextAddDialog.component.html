@@ -1,14 +1,19 @@
 <h1 mat-dialog-title *ngIf="isNewContext">{{ 'button.addContext' | translate }}</h1>
 <h1 mat-dialog-title *ngIf="!isNewContext">{{ 'button.editContext' | translate }}</h1>
 <div mat-dialog-content>
-	<form #contextForm="ngForm">
-	<mat-form-field class="full_width_input">
-		<input matInput type="text" placeholder="{{ 'context.name.placeholder' | translate }}" [(ngModel)]="context.name" name="name" required>
-	</mat-form-field>
-	</form>
+    <form #contextForm="ngForm">
+        <mat-form-field class="full_width_input">
+            <input matInput type="text" placeholder="{{ 'context.name.placeholder' | translate }}"
+                   [(ngModel)]="context.name" name="name" required>
+        </mat-form-field>
+    </form>
 </div>
 <div mat-dialog-actions>
-	<button mat-button [disabled]="!contextForm.dirty" mat-raised-button class="mat-green-button" color="primary" (click)="saveContext()">{{ 'button.save' | translate }}</button>
-	<button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="context" cdkFocusInitial>{{ 'button.cancel' | translate }}</button>
+    <button mat-button [disabled]="!contextForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+            (click)="saveContext()">{{ 'button.save' | translate }}
+    </button>
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="context"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
 </div>
 

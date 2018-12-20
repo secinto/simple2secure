@@ -1,3 +1,3 @@
-export class Command{
-  content: string;
+export class Command {
+	content: string;
 }

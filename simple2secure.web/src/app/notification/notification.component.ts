@@ -1,8 +1,8 @@
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
-    moduleId: module.id,
-    templateUrl: 'notification.component.html'
+	moduleId: module.id,
+	templateUrl: 'notification.component.html'
 })
 
 export class NotificationComponent {

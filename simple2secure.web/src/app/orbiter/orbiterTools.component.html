@@ -1,54 +1,71 @@
 <div class="example-container mat-elevation-z8 table table-striped">
-  <div class="header-filter-table">
-    <mat-form-field class="header-filter-field">
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-    </mat-form-field>
-  </div>
-  <mat-table #table [dataSource]="dataSource" matSort>
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="dataSource" matSort>
 
-    <!-- Position Column -->
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.tool.name}} </mat-cell>
-    </ng-container>
+        <!-- Position Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.tool.name}}</mat-cell>
+        </ng-container>
 
-    <!-- Name Column -->
-    <ng-container matColumnDef="length">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.numoftests' | translate }} </mat-header-cell>
-      <mat-cell  *matCellDef="let element"> <p *ngIf="element.tests">{{element.tests.length}} </p><p *ngIf="!element.tests">0</p>
-      </mat-cell>
-    </ng-container>    
-    
-    <ng-container matColumnDef="state">
-      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header>{{ 'table.state' | translate }}</mat-header-cell>     
-      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
-      	<button *ngIf="element.tool.active === true" mat-raised-button color="primary" class="mat-green-button"> {{ 'button.active' | translate }}</button>
-      	<button *ngIf="element.tool.active === false" mat-raised-button color="warn" class="mat-red-button"> {{ 'button.inactive' | translate }}</button>
-      </mat-cell>
-    </ng-container>
-	
-	<ng-container matColumnDef="action">
-      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action </mat-header-cell>     
-      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
-      	<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu" (click)="onMenuTriggerClick(element)">
-          <i class="fas fa-bars"></i>
-        </button> 
-      </mat-cell>
-    </ng-container>     
+        <!-- Name Column -->
+        <ng-container matColumnDef="length">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.numoftests' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"><p *ngIf="element.tests">{{element.tests.length}} </p>
+                <p *ngIf="!element.tests">0</p>
+            </mat-cell>
+        </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
-  <mat-paginator #paginator
-                 [pageSize]="10"
-                 [pageSizeOptions]="[5, 10, 20]"
-                 [showFirstLastButtons]="true">
-  </mat-paginator>  
-  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+        <ng-container matColumnDef="state">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header>{{ 'table.state' | translate
+                }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button *ngIf="element.tool.active === true" mat-raised-button color="primary" class="mat-green-button">
+                    {{ 'button.active' | translate }}
+                </button>
+                <button *ngIf="element.tool.active === false" mat-raised-button color="warn" class="mat-red-button"> {{
+                    'button.inactive' | translate }}
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+                        (click)="onMenuTriggerClick(element)">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>
 
 <mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="openDialogScheduleTest()"><mat-icon>schedule</mat-icon> {{ 'button.runtests' | translate }}</button>
-  <button mat-menu-item (click)="showTests()"><mat-icon>receipt</mat-icon> {{ 'button.showtests' | translate }}</button>
-  <button mat-menu-item (click)="showTemplates()"><mat-icon>description</mat-icon> {{ 'test.templates' | translate }}</button>
+    <button mat-menu-item (click)="openDialogScheduleTest()">
+        <mat-icon>schedule</mat-icon>
+        {{ 'button.runtests' | translate }}
+    </button>
+    <button mat-menu-item (click)="showTests()">
+        <mat-icon>receipt</mat-icon>
+        {{ 'button.showtests' | translate }}
+    </button>
+    <button mat-menu-item (click)="showTemplates()">
+        <mat-icon>description</mat-icon>
+        {{ 'test.templates' | translate }}
+    </button>
 </mat-menu>

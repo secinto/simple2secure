@@ -6,9 +6,9 @@ import {AlertService, HttpService, DataService} from '../_services';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'orbiterTestTemplate.component.html',
-  selector: 'orbiterTestTemplateComponent'
+	moduleId: module.id,
+	templateUrl: 'orbiterTestTemplate.component.html',
+	selector: 'orbiterTestTemplateComponent'
 })
 
 export class OrbiterTestTemplateComponent {
@@ -25,12 +25,13 @@ export class OrbiterTestTemplateComponent {
 		private dataService: DataService,
 		private dialogRef: MatDialogRef<OrbiterTestTemplateComponent>,
 		@Inject(MAT_DIALOG_DATA) data,
-	) {
-		if (data.isTestTemplate){
+	)
+	{
+		if (data.isTestTemplate) {
 			this.isTestTemplate = true;
 			this.template = data.template;
 		}
-		else{
+		else {
 			this.isTestTemplate = false;
 			this.test = data.template;
 
@@ -39,10 +40,10 @@ export class OrbiterTestTemplateComponent {
 
 	}
 
-	saveTemplate(){
+	saveTemplate() {
 
 		this.loading = true;
-		this.url = environment.apiEndpoint + 'tools/updateTemplate' ;
+		this.url = environment.apiEndpoint + 'tools/updateTemplate';
 		this.httpService.post(this.template, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);
@@ -54,7 +55,7 @@ export class OrbiterTestTemplateComponent {
 
 	}
 
-	addCommand(){
+	addCommand() {
 		this.template.commands.push(new Command());
 	}
 }

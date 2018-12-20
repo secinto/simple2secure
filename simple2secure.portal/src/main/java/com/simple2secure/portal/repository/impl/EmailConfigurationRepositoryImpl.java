@@ -37,4 +37,11 @@ public class EmailConfigurationRepositoryImpl extends EmailConfigurationReposito
 			}
 		}
 	}
+
+	@Override
+	public EmailConfiguration findByEmailAndContextId(String name, String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("name").is(name));
+		return mongoTemplate.findOne(query, EmailConfiguration.class);
+
+	}
 }
