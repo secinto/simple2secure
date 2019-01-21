@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -38,6 +39,7 @@ import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.ReportUtils;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -60,6 +62,9 @@ public class ReportController {
 
 	@Autowired
 	LicenseRepository licenseRepository;
+
+	@Autowired
+	ReportUtils reportUtils;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -117,6 +122,20 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while retrieving report with id {}", id);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/report/name", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @RequestHeader("Accept-Language") String locale) {
+		if (!Strings.isNullOrEmpty(name)) {
+			List<GraphReport> reports = reportUtils.prepareReportsForGraph(name);
+			if (reports != null) {
+				return new ResponseEntity<List<GraphReport>>(reports, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving report with name {}", name);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 

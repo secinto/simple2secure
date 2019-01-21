@@ -1,3 +1,4 @@
+import {DatePipe} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -65,7 +66,7 @@ import {
 	OrbiterToolTestResultComponent, OrbiterToolTemplateComponent, OrbiterTestTemplateComponent
 } from './orbiter/index';
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
-import {ChartModule} from 'angular-highcharts';
+import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
 import {TreeModule} from 'angular-tree-component';
 import {TreeTableModule} from 'ng-treetable';
 import {RoleGuard} from './_guards/role.guard';
@@ -208,7 +209,8 @@ export const httpInterceptorProviders = [
 		AuthenticationService,
 		HttpService,
 		DataService,
-		httpInterceptorProviders
+		httpInterceptorProviders,
+		DatePipe
 	],
 	bootstrap: [AppComponent]
 })

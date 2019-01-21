@@ -1,2 +1,18 @@
-<button (click)="add()">Add Point!</button>
-<div [chart]="chart"></div>
+<!--<button (click)="add()">Add Point!</button>
+<div [chart]="chart"></div> -->
+<div class="container">
+    <mat-card>
+        <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
+                    name="query" (change)="onQueryChange($event.value)" required>
+            <mat-option *ngFor="let query of queries" [value]="query">
+                {{query.name}}
+            </mat-option>
+        </mat-select>
+    </mat-card>
+<mat-card>
+
+    <button (click)="add()">Add Point!</button>
+    <div [chart]="chart"></div>
+
+</mat-card>
+</div>

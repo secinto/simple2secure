@@ -328,5 +328,6 @@
   "button.invitation.reject": "Ablehnen",
   "invitation.accept": "Sie haben die Einladung erfolgreich angenommen",
   "test.scheduled": "Test wurde geplant",
-  "menu.emailConfig": "E-Mail-Konfiguration"
+  "menu.emailConfig": "E-Mail-Konfiguration",
+  "chart.query.select": "Abfragezeichenfolge auswählen"
 }

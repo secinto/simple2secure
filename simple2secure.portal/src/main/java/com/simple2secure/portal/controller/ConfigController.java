@@ -30,10 +30,12 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Config;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ConfigRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
@@ -65,6 +67,9 @@ public class ConfigController {
 
 	@Autowired
 	ProcessorRepository processorRepository;
+
+	@Autowired
+	ContextRepository contextRepository;
 
 	@Autowired
 	StepRepository stepRepository;
@@ -177,7 +182,7 @@ public class ConfigController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	@RequestMapping(value = "/query/{probeId}/{select_all}", method = RequestMethod.GET)
-	public ResponseEntity<List<QueryRun>> getQueriesByUserID(@PathVariable("probeId") String probeId,
+	public ResponseEntity<List<QueryRun>> getQueriesByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
@@ -237,6 +242,42 @@ public class ConfigController {
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function returns query config by the id
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/query/context/{contextId}/{select_all}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
+			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId)) {
+
+			Context context = contextRepository.find(contextId);
+
+			if (context != null) {
+
+				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
+
+				if (groups != null) {
+
+					List<QueryRun> queryRunList = new ArrayList();
+					for (CompanyGroup group : groups) {
+						List<QueryRun> queryConfig = queryRepository.findByGroupId(group.getId(), select_all);
+						if (queryConfig != null) {
+							queryRunList.addAll(queryConfig);
+						}
+					}
+					return new ResponseEntity<List<QueryRun>>(queryRunList, HttpStatus.OK);
+				}
+
+			}
+
+		}
+		log.error("Query configuration not found for the context ID {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 

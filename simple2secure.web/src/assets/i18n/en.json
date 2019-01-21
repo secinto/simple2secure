@@ -328,5 +328,6 @@
   "button.invitation.reject": "Reject",
   "invitation.accept": "You have accepted the invitation successfully",
   "test.scheduled": "Test has been scheduled",
-  "menu.emailConfig": "Email Configuration"
+  "menu.emailConfig": "Email Configuration",
+  "chart.query.select": "Select query string"
 }
