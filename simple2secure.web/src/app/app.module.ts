@@ -73,6 +73,7 @@ import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
+import * as highstock from 'highcharts/modules/stock.src';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -210,6 +211,7 @@ export const httpInterceptorProviders = [
 		HttpService,
 		DataService,
 		httpInterceptorProviders,
+		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock ]},
 		DatePipe
 	],
 	bootstrap: [AppComponent]

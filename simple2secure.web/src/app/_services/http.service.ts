@@ -64,7 +64,7 @@ export class HttpService {
 		}
 
 		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token')).set('Accept-Language', this.currentLang);
-		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe(catchError(this.parseErrorBlob));
+		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe();
 	}
 
 	public postLogin(username: string, password: string): Observable<HttpResponse<any>> {
@@ -111,7 +111,7 @@ export class HttpService {
 			authenticationToken, password, {observe: 'response', headers});
 	}
 
-	parseErrorBlob(err: HttpErrorResponse): Observable<any> {
+	/*parseErrorBlob(err: HttpErrorResponse): Observable<any> {
 		const reader: FileReader = new FileReader();
 
 		const obs = Observable.create((observer: any) => {
@@ -122,15 +122,15 @@ export class HttpService {
 		});
 		reader.readAsText(err.error);
 		return obs;
-	}
+	}*/
 
 	public updateContext(context: Context, userId: string) {
 		this.post(context, environment.apiEndpoint + 'context/' + userId).subscribe(
-			data => {
+			() => {
 				// Navigate to the home route
 				this.router.navigate([this.returnUrl]);
 			},
-			error => {
+			() => {
 				this.authenticationService.logout();
 			});
 	}

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import 'rxjs/add/operator/map';
+
 import {JwtHelper} from 'angular2-jwt';
 
 @Injectable()

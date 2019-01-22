@@ -1,7 +1,10 @@
+
+import {map, filter} from 'rxjs/operators';
 import {Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 import {Title} from '@angular/platform-browser';
+import 'hammerjs';
 
 @Component({
 	moduleId: module.id,
@@ -25,9 +28,9 @@ export class AppComponent implements OnInit {
 
 	ngOnInit() {
 		this.router
-			.events
-			.filter(event => event instanceof NavigationEnd)
-			.map(() => {
+			.events.pipe(
+			filter(event => event instanceof NavigationEnd),
+			map(() => {
 				let child = this.activatedRoute.firstChild;
 				while (child) {
 					if (child.firstChild) {
@@ -39,7 +42,7 @@ export class AppComponent implements OnInit {
 					}
 				}
 				return null;
-			}).subscribe((title: any) => {
+			}),).subscribe((title: any) => {
 			if (title) {
 				this.translatedTitle = this.translate.instant(title);
 				this.titleService.setTitle(this.translatedTitle);

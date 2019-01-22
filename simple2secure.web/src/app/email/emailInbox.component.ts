@@ -4,7 +4,7 @@ import {Email} from '../_models/index';
 import {AlertService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import 'rxjs/add/observable/of';
+
 
 @Component({
 	moduleId: module.id,

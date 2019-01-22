@@ -6,7 +6,7 @@
 
             <mat-form-field>
                 <mat-select [(ngModel)]="selectedTest" name="test" placeholder="{{ 'test.select' | translate }}"
-                            (change)="onSelectChange()">
+                            (selectionChange)="onSelectChange()">
                     <mat-option *ngFor="let t of tool.templates" [value]="t">
                         {{t.name}}
                     </mat-option>

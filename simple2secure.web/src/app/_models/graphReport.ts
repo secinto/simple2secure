@@ -1,6 +1,7 @@
-export class GraphReport{
+
+export class GraphReport {
 	reportId: string;
 	reportName: string;
 	numberOfReports: number;
-	timestamp: string;
+	timestamp: number;
 }

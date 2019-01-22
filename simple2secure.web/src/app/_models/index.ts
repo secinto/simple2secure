@@ -28,3 +28,4 @@ export * from './context';
 export * from './DTO/contextDTO';
 export * from './DTO/userRoleDTO';
 export * from './DTO/emailConfigurationDTO';
+export * from './graphReport';

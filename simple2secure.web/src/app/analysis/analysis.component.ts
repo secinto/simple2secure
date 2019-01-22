@@ -1,9 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Chart} from 'angular-highcharts';
+import {Chart, StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO} from '../_models';
-import {GraphReport} from '../_models/graphReport';
+import {ContextDTO, GraphReport} from '../_models';
 import {HttpService} from '../_services';
 
 @Component({
@@ -22,12 +21,16 @@ export class AnalysisComponent implements OnInit{
 	currentUser: any;
 	selectedQuery: any;
 	private chart: Chart;
+	chartOptions: any;
+
 
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
 		private httpService: HttpService)
 	{}
+
+
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -68,7 +71,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	createChart(name: string, type: string){
-		this.chart = new Chart({
+		this.chartOptions = {
 			chart: {
 				type: type
 			},
@@ -96,6 +99,13 @@ export class AnalysisComponent implements OnInit{
 			time: {
 				useUTC: false
 			},
+			exporting: {
+				enabled: true
+			},
+			tooltip: {
+				animation: true
+			},
+			noData: true,
 			plotOptions: {
 				series: {
 					cursor: 'pointer',
@@ -108,7 +118,41 @@ export class AnalysisComponent implements OnInit{
 					}
 				}
 			},
-		});
+			rangeSelector: {
+				enabled: true,
+				inputEnabled: false,
+				selected: 'all',
+				allButtonsEnabled: false,
+
+				buttons: [{
+					type: 'month',
+					count: 1,
+					text: '1m'
+				}, {
+					type: 'month',
+					count: 3,
+					text: '3m'
+				}, {
+					type: 'month',
+					count: 6,
+					text: '6m'
+				}, {
+					type: 'ytd',
+					text: 'YTD'
+				}, {
+					type: 'year',
+					count: 1,
+					text: '1y'
+				}, {
+					type: 'all',
+					text: 'All'
+				}]
+			},
+			navigator: {
+				enabled: true
+			}
+		};
+		this.chart = new Chart(this.chartOptions);
 	}
 
 }
