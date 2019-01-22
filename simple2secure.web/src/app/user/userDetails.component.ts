@@ -48,7 +48,6 @@ export class UserDetailsComponent {
 			this.user.email = data.user.user.email;
 			this.user.userRole = data.user.userRole;
 			this.user.groupIds = data.user.groupIds;
-			console.log(JSON.stringify(data.user));
 			if (this.user.userRole === UserRole.SUPERUSER) {
 				this.showGroupSelectBox = true;
 			}

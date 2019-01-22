@@ -1,9 +1,14 @@
 import {Component, OnInit} from '@angular/core';
+import {MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Chart, StockChart} from 'angular-highcharts';
+import {TranslateService} from '@ngx-translate/core';
+import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
 import {ContextDTO, GraphReport} from '../_models';
 import {HttpService} from '../_services';
+import {OsQueryReportDetailsComponent} from '../report';
+import {NgxSpinnerService} from 'ngx-spinner';
+import {AddQueryDialog} from './addQueryDialog';
 
 @Component({
 	moduleId: module.id,
@@ -20,17 +25,19 @@ export class AnalysisComponent implements OnInit{
 	context: ContextDTO;
 	currentUser: any;
 	selectedQuery: any;
-	private chart: Chart;
+	private chart: StockChart;
 	chartOptions: any;
-
+	seriesOption: any;
+	loading = false;
 
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
-		private httpService: HttpService)
+		private httpService: HttpService,
+		private dialog: MatDialog,
+		private spinner: NgxSpinnerService,
+		private translate: TranslateService)
 	{}
-
-
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -60,14 +67,76 @@ export class AnalysisComponent implements OnInit{
 					this.createChart(name, 'line');
 					for (const report of this.graphReports) {
 						const date = new Date(report.timestamp);
-						this.chart.addPoint([Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-							date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()), report.numberOfReports]);
+						this.chartOptions.series[0].data.push({
+							x: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()),
+							y: report.numberOfReports,
+							id: report.reportId});
 					}
 				});
 	}
 
 	onQueryChange(value: any){
 		this.loadReportsByName(value.sqlQuery);
+	}
+
+	public openDialogShowReportDetails(event: any): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		this.spinner.show();
+		this.httpService.get(environment.apiEndpoint + 'reports/report/' + event.point.id)
+			.subscribe(
+				data => {
+					dialogConfig.data = {
+						report: data,
+					};
+					this.dialog.open(OsQueryReportDetailsComponent, dialogConfig);
+					this.spinner.hide();
+				});
+		this.spinner.hide();
+	}
+
+	public openDialogAddQuery(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.autoFocus = true;
+		dialogConfig.width = '450px';
+
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('chart.query.select'),
+			content: this.translate.instant('chart.additional.query'),
+			selectMessage: this.translate.instant('chart.query.select'),
+			queryList: this.queries,
+			button: this.translate.instant('button.select')
+		};
+
+		const dialogRef = this.dialog.open(AddQueryDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			this.addSeriesToChart(result);
+		});
+	}
+
+	addSeriesToChart(reportAPI: any[]){
+
+		if (reportAPI){
+			this.seriesOption = {
+				name: reportAPI[0].reportName,
+				data: []
+			};
+
+			for (const report of reportAPI) {
+				const date = new Date(report.timestamp);
+				this.seriesOption.data.push({
+					x: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()),
+					y: report.numberOfReports,
+					id: report.reportId});
+			}
+
+			this.chart.ref.addSeries(this.seriesOption);
+
+			this.chart.ref.redraw(true);
+		}
+
 	}
 
 	createChart(name: string, type: string){
@@ -81,9 +150,15 @@ export class AnalysisComponent implements OnInit{
 			credits: {
 				enabled: false
 			},
+			legend: {
+				enabled: true
+			},
 			series: [{
 				name: name,
-				data: []
+				data: [],
+				lineColor: '#A7BD26',
+				shadow: true,
+				color: '#A7BD26'
 			}],
 			xAxis: {
 				type: 'datetime',
@@ -100,7 +175,13 @@ export class AnalysisComponent implements OnInit{
 				useUTC: false
 			},
 			exporting: {
-				enabled: true
+				enabled: true,
+				buttons: {
+					contextButton: {
+						symbolFill: '#A7BD26',
+						symbolStroke: '#A7BD26'
+					}
+				}
 			},
 			tooltip: {
 				animation: true
@@ -111,9 +192,7 @@ export class AnalysisComponent implements OnInit{
 					cursor: 'pointer',
 					point: {
 						events: {
-							click: function () {
-								alert('Category: ' + this.category + ', value: ' + this.y);
-							}
+							click: this.openDialogShowReportDetails.bind(this)
 						}
 					}
 				}
@@ -125,20 +204,25 @@ export class AnalysisComponent implements OnInit{
 				allButtonsEnabled: false,
 
 				buttons: [{
+					type: 'hour',
+					count: 12,
+					text: '12h'
+				}, {
+					type: 'day',
+					count: 1,
+					text: '1d'
+				}, {
+					type: 'day',
+					count: 7,
+					text: '7d'
+				}, {
 					type: 'month',
 					count: 1,
 					text: '1m'
 				}, {
 					type: 'month',
-					count: 3,
-					text: '3m'
-				}, {
-					type: 'month',
 					count: 6,
 					text: '6m'
-				}, {
-					type: 'ytd',
-					text: 'YTD'
 				}, {
 					type: 'year',
 					count: 1,
@@ -146,13 +230,38 @@ export class AnalysisComponent implements OnInit{
 				}, {
 					type: 'all',
 					text: 'All'
-				}]
+				}],
+
+				buttonTheme: {
+					fill: 'none',
+					stroke: 'none',
+					'stroke-width': 0,
+					r: 8,
+					style: {
+						color: '#A7BD26',
+						fontWeight: 'bold'
+					},
+					states: {
+						hover: {
+						},
+						select: {
+							fill: '#A7BD26',
+							style: {
+								color: 'white'
+							}
+						}
+					}
+				},
+			},
+			scrollbar: {
+				enabled: false
 			},
 			navigator: {
-				enabled: true
+				enabled: true,
+				maskFill: 'rgba(167, 189, 38, 0.3)'
 			}
 		};
-		this.chart = new Chart(this.chartOptions);
+		this.chart = new StockChart(this.chartOptions);
 	}
 
 }

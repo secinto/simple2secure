@@ -23,6 +23,7 @@
   "button.showtestsresults": "Show Test Results",
   "button.runTestAgain": "Repeat Test",
   "button.testresults": "Test Results",
+  "button.select": "Select",
   "test.noResults": "There are no provided test results",
   "test.templates": "Show Templates",
   "test.modify": "Edit template",
@@ -329,5 +330,6 @@
   "invitation.accept": "You have accepted the invitation successfully",
   "test.scheduled": "Test has been scheduled",
   "menu.emailConfig": "Email Configuration",
-  "chart.query.select": "Select query string"
+  "chart.query.select": "Select query string",
+  "chart.additional.query": "Add additional query to the chart"
 }

@@ -1,4 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 import {DataService} from '../_services/index';
 
@@ -13,11 +14,11 @@ export class OsQueryReportDetailsComponent {
 	loading = false;
 
 	constructor(
-		private dataService: DataService)
-	{}
-
-	ngOnInit() {
-		this.report = this.dataService.get();
+		private dataService: DataService,
+		private dialogRef: MatDialogRef<OsQueryReportDetailsComponent>,
+		@Inject(MAT_DIALOG_DATA) data)
+	{
+		this.report = data.report;
 	}
 
 	getQueryResult() {

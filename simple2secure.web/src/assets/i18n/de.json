@@ -23,6 +23,7 @@
   "button.showtestsresults": "Testergebnisse anzeigen",
   "button.runTestAgain": "Test wiederholen",
   "button.testresults": "Testergebnisse",
+  "button.select": "Auswählen",
   "test.noResults": "Es sind keine Testergebnisse verfügbar",
   "test.templates": "Vorlagen anzeigen",
   "test.modify": "Vorlage bearbeiten",
@@ -329,5 +330,6 @@
   "invitation.accept": "Sie haben die Einladung erfolgreich angenommen",
   "test.scheduled": "Test wurde geplant",
   "menu.emailConfig": "E-Mail-Konfiguration",
-  "chart.query.select": "Abfragezeichenfolge auswählen"
+  "chart.query.select": "Abfragezeichenfolge auswählen",
+  "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu"
 }

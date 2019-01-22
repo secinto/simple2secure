@@ -7,6 +7,7 @@ import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {ContextDTO} from '../_models';
+import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 
 @Component({
 	moduleId: module.id,
@@ -124,9 +125,14 @@ export class OsQueryReportOverviewComponent {
 			});
 	}
 
-	public showDetails(report: any) {
-		this.loading = true;
-		this.dataService.set(report);
-		this.router.navigate([report.id], {relativeTo: this.route});
+	openDialogShowReportDetails(report: any): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			report: report,
+		};
+
+		this.dialog.open(OsQueryReportDetailsComponent, dialogConfig);
+
 	}
 }

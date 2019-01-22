@@ -59,7 +59,7 @@ import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/ind
 import {SettingsComponent} from './settings/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
-import {AnalysisComponent} from './analysis/index';
+import {AnalysisComponent, AddQueryDialog} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
 import {
 	OrbiterComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent,
@@ -74,6 +74,8 @@ import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
 import * as highstock from 'highcharts/modules/stock.src';
+import * as exporting from 'highcharts/modules/exporting.src';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -117,6 +119,7 @@ export const httpInterceptorProviders = [
 		HttpClientModule,
 		ChartModule,
 		TreeTableModule,
+		NgxSpinnerModule,
 		TreeviewModule.forRoot(),
 		TreeModule.forRoot(),
 		TranslateModule.forRoot({
@@ -182,6 +185,7 @@ export const httpInterceptorProviders = [
 		RuleOverviewComponent,
 		RuleAddComponent,
 		AnalysisComponent,
+		AddQueryDialog,
 		ReportComponent,
 		ReportOverviewComponent
 	],
@@ -201,7 +205,10 @@ export const httpInterceptorProviders = [
 		EmailAccountAddComponent,
 		EmailInboxComponent,
 		RuleOverviewComponent,
-		RuleAddComponent
+		RuleAddComponent,
+		OsQueryReportDetailsComponent,
+		UserDetailsComponent,
+		AddQueryDialog
 	],
 	providers: [
 		AuthGuard,
@@ -211,7 +218,7 @@ export const httpInterceptorProviders = [
 		HttpService,
 		DataService,
 		httpInterceptorProviders,
-		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock ]},
+		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
 		DatePipe
 	],
 	bootstrap: [AppComponent]

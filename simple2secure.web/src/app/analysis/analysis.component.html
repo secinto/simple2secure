@@ -1,5 +1,4 @@
-<!--<button (click)="add()">Add Point!</button>
-<div [chart]="chart"></div> -->
+
 <div class="container">
     <mat-card>
         <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
@@ -11,7 +10,12 @@
     </mat-card>
 <mat-card>
 
-    <div [chart]="chart"></div>
+    <button mat-raised-button color="primary" id="addButton" type="button"
+            (click)="openDialogAddQuery()"
+            class="mat-green-button">
+        <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+    </button>
 
+    <div [chart]="chart"></div>
 </mat-card>
 </div>
