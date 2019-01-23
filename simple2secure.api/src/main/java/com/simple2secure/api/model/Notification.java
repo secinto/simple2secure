@@ -5,10 +5,10 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Notification extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3081134740537811621L;
-	private String userId;
+	private String contextId;
 	private String toolId;
 	private String name;
 	private String content;
@@ -18,9 +18,9 @@ public class Notification extends GenericDBObject {
 	public Notification() {
 	}
 
-	public Notification(String userId, String toolId, String name, String content, String timestamp, boolean read) {
+	public Notification(String contextId, String toolId, String name, String content, String timestamp, boolean read) {
 		super();
-		this.userId = userId;
+		this.contextId = contextId;
 		this.toolId = toolId;
 		this.name = name;
 		this.content = content;
@@ -28,12 +28,12 @@ public class Notification extends GenericDBObject {
 		this.read = read;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getContextId() {
+		return contextId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 
 	public String getToolId() {

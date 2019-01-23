@@ -53,6 +53,14 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 				delete(report);
 			}
 		}
-
 	}
+
+	@Override
+	public List<NetworkReport> getReportsByName(String name) {
+		List<NetworkReport> reports = new ArrayList<>();
+		Query query = new Query(Criteria.where("processorName").is(name));
+		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
+		return reports;
+	}
+
 }

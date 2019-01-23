@@ -1,8 +1,8 @@
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
-    moduleId: module.id,
-    templateUrl: 'report.component.html'
+	moduleId: module.id,
+	templateUrl: 'report.component.html'
 })
 
 export class ReportComponent {

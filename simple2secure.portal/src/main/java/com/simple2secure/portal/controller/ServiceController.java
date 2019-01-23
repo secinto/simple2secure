@@ -20,6 +20,7 @@ import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
+@RequestMapping("/api/service")
 public class ServiceController {
 
 	@Autowired
@@ -28,12 +29,13 @@ public class ServiceController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@RequestMapping(value = "/api/service/", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
 		return new ResponseEntity<Service>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/api/service/{versionId}", method = RequestMethod.GET)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{versionId}", method = RequestMethod.GET)
 	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable("version") String version,
 			@RequestHeader("Accept-Language") String locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);

@@ -73,6 +73,8 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	private int maxLength;
 
+	Map<String, String> ipPair;
+
 	public CommonStatisticProcessor(String name, Map<String, String> options) {
 		super(name, options);
 		analysisStartTime = new Date();
@@ -89,6 +91,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		destinationMac = new TreeMap<>();
 		protocols = new TreeMap<>();
 		maxLength = 0;
+		ipPair = new TreeMap<>();
 	}
 
 	@Override
@@ -183,6 +186,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
 					report.setStringContent(content);
+					report.setIpPair(ipPair);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
@@ -216,6 +220,9 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 * This function counts the network traffic data provided by each packet.
 	 */
 	private void countNetworkTraffic() {
+
+		ipPair.put(srcIp, destIp);
+
 		// Count sourceIPs
 		Integer countSrcIp = sourceIp.get(srcIp);
 

@@ -56,4 +56,12 @@ public class ReportRepositoryImpl extends ReportRepository {
 
 	}
 
+	@Override
+	public List<Report> getReportsByName(String name) {
+		List<Report> reports = new ArrayList<>();
+		Query query = new Query(Criteria.where("query").is(name));
+		reports = mongoTemplate.find(query, Report.class, collectionName);
+		return reports;
+	}
+
 }

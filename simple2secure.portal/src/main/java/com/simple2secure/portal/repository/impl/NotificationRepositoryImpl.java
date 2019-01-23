@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.portal.repository.NotificationRepository;
 
@@ -22,32 +23,32 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> findByUserId(String userId) {
-		Query query = new Query(Criteria.where("userId").is(userId));
-		return this.mongoTemplate.find(query, Notification.class);
+	public List<Notification> findByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		return mongoTemplate.find(query, Notification.class);
 	}
 
 	@Override
 	public List<Notification> findByToolId(String toolId) {
 		Query query = new Query(Criteria.where("toolId").is(toolId));
-		return this.mongoTemplate.find(query, Notification.class);
+		return mongoTemplate.find(query, Notification.class);
 	}
 
 	@Override
-	public List<Notification> findByUserAndToolId(String userId, String toolId) {
-		Query query = new Query(Criteria.where("toolId").is(toolId).and("userId").is(userId));
-		return this.mongoTemplate.find(query, Notification.class);
+	public List<Notification> findByContextAndToolId(String contextId, String toolId) {
+		Query query = new Query(Criteria.where("toolId").is(toolId).and("contextId").is(contextId));
+		return mongoTemplate.find(query, Notification.class);
 	}
 
 	@Override
-	public void deleteByUserId(String userId) {
-		List<Notification> notifications = findByUserId(userId);
-		
-		if(notifications != null) {
-			for(Notification notification : notifications) {
+	public void deleteByContextId(String contextId) {
+		List<Notification> notifications = findByContextId(contextId);
+
+		if (notifications != null) {
+			for (Notification notification : notifications) {
 				delete(notification);
 			}
 		}
-		
-	}	
+
+	}
 }

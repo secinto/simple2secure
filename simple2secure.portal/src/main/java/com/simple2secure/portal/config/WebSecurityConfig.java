@@ -55,8 +55,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/users/activate/**", "/api/download/**",
-				"/api/users/sendResetPasswordEmail", "/api/device/**", "/api/users/resetPassword/**", "/api/users/updatePassword/**",
+		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/**", "/api/download/**",
+				"/api/user/sendResetPasswordEmail", "/api/device/**", "/api/user/resetPassword/**", "/api/user/updatePassword/**",
 				"/api/license/activateProbe", "/api/license/token", "/api/service/**", "/assets/**", "/favicon.ico", "/index.html", "/*.js",
 				"/*.map", "/fontawesome*", "/glyphicons*");
 	}
@@ -67,12 +67,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll()
 				.antMatchers("/api/service/").permitAll().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/login").anonymous().and().authorizeRequests().antMatchers("/api/users/activate/").anonymous().and()
+				.antMatchers("/api/login").anonymous().and().authorizeRequests().antMatchers("/api/user/activate/").anonymous().and()
 				.authorizeRequests().antMatchers("/api/service/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/users/sendResetPasswordEmail").anonymous().and().authorizeRequests().antMatchers("/api/users/resetPassword/**")
-				.anonymous().and().authorizeRequests().antMatchers("/api/users/updatePassword/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/download/**").anonymous().and().authorizeRequests().antMatchers("/api/device/**").anonymous().and()
-				.authorizeRequests().antMatchers("/api/license/activateProbe").anonymous().and()
+				.antMatchers("/api/user/sendResetPasswordEmail").anonymous().and().authorizeRequests().antMatchers("/api/users/resetPassword/**")
+				.anonymous().and().authorizeRequests().antMatchers("/api/user/updatePassword/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and()
+				.authorizeRequests().antMatchers("/api/device/**").anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe")
+				.anonymous().and()
 				// We filter the api/login requests
 				.addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 				// And filter other requests to check the presence of JWT in header

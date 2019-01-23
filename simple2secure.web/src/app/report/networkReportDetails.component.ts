@@ -1,26 +1,27 @@
 import {Component} from '@angular/core';
 import {NetworkReport} from '../_models/index';
-import {DataService, AlertService} from '../_services/index';
+import {DataService} from '../_services/index';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'networkReportDetails.component.html'
+	moduleId: module.id,
+	templateUrl: 'networkReportDetails.component.html'
 })
 
 export class NetworkReportDetailsComponent {
-  report: NetworkReport;
-  loading = false;
-  //objectKeys = Object.keys;
-  result: string;
-  constructor(
-    private dataService: DataService) {}
+	report: NetworkReport;
+	loading = false;
+	result: string;
 
-  ngOnInit() {
-    this.report = this.dataService.get();
-  }
+	constructor(
+		private dataService: DataService)
+	{}
 
-    getStringResult () {
-        this.result = JSON.parse(this.report.stringContent);
-        return this.result;
-    }
+	ngOnInit() {
+		this.report = this.dataService.get();
+	}
+
+	getStringResult() {
+		this.result = JSON.parse(this.report.stringContent);
+		return this.result;
+	}
 }

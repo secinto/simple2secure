@@ -8,12 +8,19 @@
 
 package com.simple2secure.portal.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +28,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -36,11 +44,11 @@ public class PortalUtils {
 	GroupRepository groupRepository;
 
 	/**
-	 * This function generates an activation token for each user
+	 * This function generates a token(activation, invitation, paswordReset) for each user
 	 *
 	 * @return
 	 */
-	public static synchronized String generateToken() {
+	public synchronized String generateToken() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
 	}
@@ -53,15 +61,11 @@ public class PortalUtils {
 	 * @param processor
 	 * @return
 	 */
-	public static boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
+	public boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
 		for (Processor processor_item : processors) {
 			if (processor_item.getName().trim().equals(processor.getName().trim())) {
 				return true;
 			}
-			if (processor_item.getProcessor_class().trim().equals(processor.getProcessor_class().trim())) {
-				return true;
-			}
-
 		}
 		return false;
 	}
@@ -72,7 +76,7 @@ public class PortalUtils {
 	 * @param expirationDate
 	 * @return
 	 */
-	public static boolean isAccessTokenExpired(Date expirationDate) {
+	public boolean isAccessTokenExpired(Date expirationDate) {
 		Date currentDate = new Date(System.currentTimeMillis());
 
 		if (expirationDate.before(currentDate)) {
@@ -92,7 +96,7 @@ public class PortalUtils {
 	 *          The unit in which the time is measured.
 	 * @return The specified amount of time in milliseconds.
 	 */
-	public static long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
+	public long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
 		if (timeUnit != null) {
 			return timeUnit.toMillis(time);
 		} else {
@@ -159,4 +163,55 @@ public class PortalUtils {
 		}
 		return foundGroups;
 	}
+
+	/**
+	 * This function checks if the invitation token is still valid
+	 *
+	 * @param expirationTime
+	 * @return
+	 */
+	public boolean checkIfTokenIsStillValid(long expirationTime) {
+		if (System.currentTimeMillis() <= expirationTime) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This function reads the files from the resources folder according to the folder name
+	 *
+	 * @param folder
+	 * @return
+	 */
+	private static File[] getResourceFolderFiles(String folder) {
+		URL url = Resources.getResource(folder);
+		String path = url.getPath();
+		log.debug("Folder on the following path {} found", path);
+		return new File(path).listFiles();
+	}
+
+	/**
+	 * This is a function which reads the files from the resources folder and converts to the byte array in order to prepare them for download
+	 *
+	 * @return
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public byte[] downloadFile() throws IOException, URISyntaxException {
+		File[] probe = getResourceFolderFiles("probe");
+		byte[] array = Files.readAllBytes(probe[0].toPath());
+		return array;
+	}
+
+	/**
+	 * This function converts an input stream object to string
+	 * 
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public String convertInputStreamToString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream, "UTF-8");
+	}
+
 }

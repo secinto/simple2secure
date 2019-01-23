@@ -4,13 +4,19 @@
         <h1>{{ 'menu.networkanalysisReports' | translate }}</h1>
         <i class="fas fa-newspaper fa-4x container-jumbotron-icon"></i>
         <p>{{ 'network.checkReports' | translate }}</p>
-        <button mat-raised-button id="osconfigbtn1" class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button" (click)="showReports('network')"> {{ 'button.more' | translate }} </button>
+        <button mat-raised-button id="osconfigbtn1"
+                class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button"
+                (click)="showReports('network')"> {{ 'button.more' | translate }}
+        </button>
     </div>
 
     <div class="jumbotron-bottom jumbotron text-center col-md-5 osconfigjumb" id="osconfigjumb2">
         <h1>{{ 'menu.queryReport' | translate }}</h1>
         <i class="fas fa-newspaper fa-4x container-jumbotron-icon"></i>
         <p>{{ 'network.checkReports' | translate }}</p>
-        <button mat-raised-button id="osconfigbtn2" class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button" (click)="showReports('osquery')"> {{ 'button.more' | translate }} </button>
+        <button mat-raised-button id="osconfigbtn2"
+                class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button"
+                (click)="showReports('osquery')"> {{ 'button.more' | translate }}
+        </button>
     </div>
 </div>

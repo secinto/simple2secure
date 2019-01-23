@@ -31,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.AdminGroup;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.AdminGroupRepository;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -54,6 +54,7 @@ import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
+@RequestMapping("/api/license")
 public class LicenseController {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
@@ -85,7 +86,7 @@ public class LicenseController {
 	SettingsRepository settingsRepository;
 
 	@Autowired
-	AdminGroupRepository adminGroupRepository;
+	ContextRepository contextRepository;
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
@@ -120,7 +121,7 @@ public class LicenseController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/license/activateProbe", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/activateProbe", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<String> activateLicense(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (licensePublic != null) {
@@ -168,7 +169,7 @@ public class LicenseController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/api/license/{groupId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
@@ -176,12 +177,12 @@ public class LicenseController {
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
 
 		CompanyGroup group = groupRepository.find(groupId);
-		AdminGroup adminGroup = adminGroupRepository.find(group.getAdminGroupId());
+		Context context = contextRepository.find(group.getContextId());
 
-		if (adminGroup != null) {
-			LicensePlan licensePlan = licensePlanRepository.find(adminGroup.getLicensePlanId());
+		if (context != null) {
+			LicensePlan licensePlan = licensePlanRepository.find(context.getLicensePlanId());
 			if (licensePlan != null) {
-				if (adminGroup.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
+				if (context.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
 
 					String expirationDate = LicenseDateUtil.getLicenseExpirationDate(licensePlan.getValidity(), licensePlan.getValidityUnit());
 					/*
@@ -203,8 +204,8 @@ public class LicenseController {
 
 					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStream(licenseFile, licenseFilePath + "public.key");
 
-					// adminGroup.setCurrentNumberOfLicenseDownloads(adminGroup.getCurrentNumberOfLicenseDownloads() + 1);
-					// adminGroupRepository.update(adminGroup);
+					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
+					contextRepository.update(context);
 
 					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 				}
@@ -214,7 +215,7 @@ public class LicenseController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/api/license/{licenseId}/{groupId}/{probeId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{licenseId}/{groupId}/{probeId}", method = RequestMethod.GET)
 	public ResponseEntity<Boolean> checkLicense(@PathVariable("licenseId") String licenseId, @PathVariable("groupId") String groupId,
 			@PathVariable("probeId") String probeId, @RequestHeader("Accept-Language") String locale) throws Exception {
 		CompanyLicensePrivate license = licenseRepository.find(licenseId);
@@ -226,7 +227,7 @@ public class LicenseController {
 		return new ResponseEntity<>(Boolean.FALSE, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/api/license/token", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/token", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> checkAccessToken(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
 		if (!Strings.isNullOrEmpty(licensePublic.getAccessToken())) {
@@ -242,7 +243,7 @@ public class LicenseController {
 					// settings
 					List<Settings> settings = settingsRepository.findAll();
 					if (settings != null && settings.size() == 1) {
-						long tokenMinValidityTime = PortalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
+						long tokenMinValidityTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
 								settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
 						long tokenExpirationTime = tokenAuthenticationService.getTokenExpirationDate(accessToken, licensePrivate.getTokenSecret())
 								.getTime();
