@@ -331,5 +331,7 @@
   "test.scheduled": "Test wurde geplant",
   "menu.emailConfig": "E-Mail-Konfiguration",
   "chart.query.select": "Abfragezeichenfolge auswählen",
-  "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu"
+  "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu",
+  "osquery.reports.charts": "OSQuery-Berichtsdiagramme",
+  "network.report.charts": "Netzwerkreportdiagramme"
 }

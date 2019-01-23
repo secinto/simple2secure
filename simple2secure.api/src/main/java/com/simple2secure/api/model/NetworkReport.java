@@ -1,7 +1,12 @@
 package com.simple2secure.api.model;
 
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -16,10 +21,11 @@ public class NetworkReport extends GenericDBObject {
 	private static final long serialVersionUID = -5984944130903360444L;
 	private String groupId;
 	private String probeId;
-	// @ElementCollection
-	// @MapKeyColumn(name = "key")
-	// @Column(name = "value")
-	// private Map<String, String> content;
+
+	@ElementCollection
+	@MapKeyColumn(name = "key")
+	@Column(name = "value")
+	private Map<String, String> ipPair;
 
 	@Lob
 	private String stringContent;
@@ -32,7 +38,7 @@ public class NetworkReport extends GenericDBObject {
 		// content = new TreeMap<String, String>();
 	}
 
-	public NetworkReport(String probeId, String content, String startTime, boolean sent) {
+	public NetworkReport(String probeId, String content, String startTime, Map<String, String> ipPair, boolean sent) {
 		this.probeId = probeId;
 		// this.content = content;
 		this.startTime = startTime;
@@ -85,5 +91,13 @@ public class NetworkReport extends GenericDBObject {
 
 	public void setProcessorName(String processorName) {
 		this.processorName = processorName;
+	}
+
+	public Map<String, String> getIpPair() {
+		return ipPair;
+	}
+
+	public void setIpPair(Map<String, String> ipPair) {
+		this.ipPair = ipPair;
 	}
 }

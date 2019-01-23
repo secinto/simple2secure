@@ -51,3 +51,7 @@
 .deg315 {
     transform: rotate(315deg) translate(12em) rotate(-315deg);
 }
+
+agm-map{
+    height: 300px
+}

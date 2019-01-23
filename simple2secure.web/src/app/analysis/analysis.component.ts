@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport} from '../_models';
+import {ContextDTO, GraphReport, Marker, NetworkReportDTO} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
@@ -21,6 +21,7 @@ export class AnalysisComponent implements OnInit{
 
 	reports: any[];
 	graphReports: GraphReport[];
+	networkReports: NetworkReportDTO[];
 	queries: any[];
 	context: ContextDTO;
 	currentUser: any;
@@ -29,6 +30,7 @@ export class AnalysisComponent implements OnInit{
 	chartOptions: any;
 	seriesOption: any;
 	loading = false;
+	markers: Marker[] = [];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -39,10 +41,36 @@ export class AnalysisComponent implements OnInit{
 		private translate: TranslateService)
 	{}
 
+	pieChartData =  {
+		chartType: 'LineChart',
+		dataTable: [
+			['Date', 'Query'],
+			['Work',     11],
+			['Eat',      2],
+			['Commute',  2],
+			['Watch TV', 2],
+			['Sleep',    7]
+		],
+		options: {'title': 'Tasks'},
+	};
+
 	ngOnInit() {
+		/*google.charts.load('current', { 'packages': ['map'], 'mapsApiKey': 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI' });
+		google.charts.setOnLoadCallback(this.drawChart);*/
+
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllQueries(true);
+		this.loadNetworkReports();
+	}
+
+	loadNetworkReports(){
+		this.httpService.get(environment.apiEndpoint + 'reports/report/network/geo')
+			.subscribe(
+				data => {
+					this.networkReports = data;
+					this.addLabels(this.networkReports);
+				});
 	}
 
 
@@ -264,4 +292,29 @@ export class AnalysisComponent implements OnInit{
 		this.chart = new StockChart(this.chartOptions);
 	}
 
+
+	/// ###This part is used for maps###
+
+	addLabels(networkReports: NetworkReportDTO[]){
+		for (const report of networkReports) {
+			if (this.markers.length < 400){
+				this.markers.push({
+					lat: report.latitude,
+					lng: report.longitude,
+					draggable: false
+				});
+			}
+
+		}
+	}
+
+	clickedMarker(label: string, index: number) {
+		console.log(`clicked the marker: ${label || index}`);
+	}
+
+
+
+
 }
+
+

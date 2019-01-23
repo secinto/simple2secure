@@ -12,4 +12,6 @@ public abstract class NetworkReportRepository extends MongoRepository<NetworkRep
 	public abstract List<NetworkReport> getReportsByGroupId(String groupId);
 
 	public abstract void deleteByProbeId(String probeId);
+
+	public abstract List<NetworkReport> getReportsByName(String name);
 }

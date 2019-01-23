@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.GraphReport;
@@ -210,5 +211,32 @@ public class ReportController {
 		}
 		log.error("Error occured while deleting network report with id {}", id);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/report/network/name", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
+			@RequestHeader("Accept-Language") String locale) {
+		if (!Strings.isNullOrEmpty(name)) {
+			List<NetworkReport> reports = networkReportRepository.getReportsByName(name);
+			if (reports != null) {
+				return new ResponseEntity<List<NetworkReport>>(reports, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving report with name {}", name);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/report/network/geo", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<NetworkReportDTO>> getNetworkReportsForGeoLocation(@RequestHeader("Accept-Language") String locale) {
+		List<NetworkReportDTO> reports = reportUtils.prepareNetworkReports();
+		if (reports != null) {
+			return new ResponseEntity<List<NetworkReportDTO>>(reports, HttpStatus.OK);
+		}
+		log.error("Error occured while retrieving reports for geolocation");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 }

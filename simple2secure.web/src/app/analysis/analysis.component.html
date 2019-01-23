@@ -1,21 +1,64 @@
 
 <div class="container">
-    <mat-card>
-        <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
-                    name="query" (selectionChange)="onQueryChange($event.value)" required>
-            <mat-option *ngFor="let query of queries" [value]="query">
-                {{query.name}}
-            </mat-option>
-        </mat-select>
-    </mat-card>
-<mat-card>
+    <mat-tab-group>
+        <mat-tab label="{{ 'osquery.reports.charts' | translate }}">
+            <mat-card>
+                <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
+                            name="query" (selectionChange)="onQueryChange($event.value)" required>
+                    <mat-option *ngFor="let query of queries" [value]="query">
+                        {{query.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-card>
+            <mat-card>
 
-    <button mat-raised-button color="primary" id="addButton" type="button"
-            (click)="openDialogAddQuery()"
-            class="mat-green-button">
-        <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
-    </button>
+                <button mat-raised-button color="primary" id="addButton" type="button"
+                        (click)="openDialogAddQuery()"
+                        class="mat-green-button">
+                    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+                </button>
 
-    <div [chart]="chart"></div>
-</mat-card>
+                <div [chart]="chart"></div>
+            </mat-card>
+
+        </mat-tab>
+
+        <mat-tab label="{{ 'network.report.charts' | translate }}">
+
+            <agm-map
+                    [latitude]="51"
+                    [longitude]="7"
+                    [zoom]="2"
+                    [disableDefaultUI]="false"
+                    [zoomControl]="false">
+
+                <agm-marker
+                        *ngFor="let m of markers; let i = index"
+                        (markerClick)="clickedMarker(m.label, i)"
+                        [latitude]="m.lat"
+                        [longitude]="m.lng"
+                        [label]="m.label"
+                        [markerDraggable]="m.draggable">
+
+                    <agm-info-window>
+                        <strong>InfoWindow content</strong>
+                    </agm-info-window>
+
+                </agm-marker>
+
+                <agm-polyline
+                        [visible]="true"
+                        [strokeWeight]="1">
+                    <agm-polyline-point
+                            *ngFor="let coordinate of markers; let i=index"
+                            [latitude]="coordinate.lat"
+                            [longitude]="coordinate.lng">
+
+                    </agm-polyline-point>
+                </agm-polyline>
+
+            </agm-map>
+        </mat-tab>
+
+    </mat-tab-group>
 </div>

@@ -29,3 +29,5 @@ export * from './DTO/contextDTO';
 export * from './DTO/userRoleDTO';
 export * from './DTO/emailConfigurationDTO';
 export * from './graphReport';
+export * from './DTO/networkReportDTO';
+export * from './marker';

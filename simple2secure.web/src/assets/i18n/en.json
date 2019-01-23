@@ -331,5 +331,7 @@
   "test.scheduled": "Test has been scheduled",
   "menu.emailConfig": "Email Configuration",
   "chart.query.select": "Select query string",
-  "chart.additional.query": "Add additional query to the chart"
+  "chart.additional.query": "Add additional query to the chart",
+  "osquery.reports.charts": "OSQuery Reports Charts",
+  "network.report.charts": "Network Reports Charts"
 }

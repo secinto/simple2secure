@@ -76,6 +76,8 @@ import {SelectContextDialog} from './dialog/select-context';
 import * as highstock from 'highcharts/modules/stock.src';
 import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { Ng2GoogleChartsModule } from 'ng2-google-charts';
+import { AgmCoreModule } from '@agm/core';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -120,6 +122,7 @@ export const httpInterceptorProviders = [
 		ChartModule,
 		TreeTableModule,
 		NgxSpinnerModule,
+		Ng2GoogleChartsModule,
 		TreeviewModule.forRoot(),
 		TreeModule.forRoot(),
 		TranslateModule.forRoot({
@@ -128,6 +131,11 @@ export const httpInterceptorProviders = [
 				useFactory: HttpLoaderFactory,
 				deps: [HttpClient]
 			}
+		}),
+		AgmCoreModule.forRoot({
+			// please get your own API key here:
+			// https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
+			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		})
 
 	],
