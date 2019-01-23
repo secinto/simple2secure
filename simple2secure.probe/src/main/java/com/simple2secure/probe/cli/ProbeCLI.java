@@ -14,7 +14,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
-import com.simple2secure.probe.network.packet.CraftPacketsForTests;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 
 public class ProbeCLI {
@@ -100,7 +99,7 @@ public class ProbeCLI {
 
 			client.start();
 
-			CraftPacketsForTests.craft();
+			// CraftPacketsForTests.craft();
 
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
