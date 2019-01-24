@@ -10,7 +10,7 @@ public class PortalWatchdog extends TimerTask {
 
 	@Override
 	public void run() {
-		log.debug("Executing {}", ProbeUpdater.class);
+		log.debug("Executing {}", PortalWatchdog.class);
 
 	}
 

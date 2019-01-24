@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
 import com.simple2secure.service.interfaces.Engine;
+import com.simple2secure.service.observer.SimpleLoggingObserver;
 import com.simple2secure.service.tasks.PortalWatchdog;
 import com.simple2secure.service.tasks.ProbeMonitor;
 import com.simple2secure.service.tasks.ProbeUpdater;
-import com.simple2secure.service.test.utils.TestLoggingObserver;
 
 public class ProbeControllerEngine implements Engine {
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerEngine.class);
@@ -31,7 +31,7 @@ public class ProbeControllerEngine implements Engine {
 	private ScheduledFuture<?> portalWatchdog;
 
 	private ProcessContainer probeProcess;
-	private TestLoggingObserver observer;
+	private SimpleLoggingObserver observer;
 	private int exitValue = 0;
 
 	public ProbeControllerEngine() {
@@ -46,7 +46,7 @@ public class ProbeControllerEngine implements Engine {
 		scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(true);
 		scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
-		observer = new TestLoggingObserver();
+		observer = new SimpleLoggingObserver();
 
 	}
 
@@ -75,13 +75,13 @@ public class ProbeControllerEngine implements Engine {
 
 	private boolean startProbe() {
 		try {
-			probeProcess = ProcessUtils.invokeJavaProcess("-jar", "simple2secure.probe.jar", "-l", "license.zip");
+			probeProcess = ProcessUtils.invokeJavaProcess("-jar", "simple2secure.probe-0.1.0.jar", "-l", "license.zip");
 
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();
-
-		} catch (FileNotFoundException fnfe) {
-			log.error("Couldn't invoke Probe using standard parameters. Reason {}", fnfe);
+			return true;
+		} catch (FileNotFoundException | InterruptedException ie) {
+			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
 		}
 		return false;
 	}

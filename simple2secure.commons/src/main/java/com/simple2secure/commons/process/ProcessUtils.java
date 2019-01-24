@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,9 @@ public class ProcessUtils {
 
 	/**
 	 * Tries to create a process from the provided executable string using {@link ProcessBuilder}. The input, output and error streams a
-	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the {@link ProcessContainer}.
-	 * Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is provided to the input and
-	 * error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}.
+	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the
+	 * {@link ProcessContainer}. Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is
+	 * provided to the input and error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}.
 	 *
 	 * @param executable
 	 *          The string which should be used to start a process via ProcessBuilder.
@@ -36,11 +37,11 @@ public class ProcessUtils {
 
 	/**
 	 * Tries to create a process from the provided executable string using {@link ProcessBuilder}. The input, output and error streams a
-	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the {@link ProcessContainer}.
-	 * Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is provided to the input and
-	 * error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}. The a map with environment
-	 * variables is provided, it is applied to the created {@link ProcessBuilder} as environment settings. If the cleanEnv is set to true all
-	 * existing environment variables from the system are cleared upfront.
+	 * wrapped in a StreamGobbler. The {@link Process} and the {@link ProcessStreamObservable} are returned as members of the
+	 * {@link ProcessContainer}. Call {@link ProcessContainer#startObserving()} to allow consumption of the output from the process which is
+	 * provided to the input and error stream via running an explicit thread for this using {@link Executors#newSingleThreadExecutor()}. The a
+	 * map with environment variables is provided, it is applied to the created {@link ProcessBuilder} as environment settings. If the
+	 * cleanEnv is set to true all existing environment variables from the system are cleared upfront.
 	 *
 	 * @param environment
 	 *          The map with the environment variables which should be applied.
@@ -70,6 +71,7 @@ public class ProcessUtils {
 			Process process;
 			process = builder.start();
 
+			log.debug("Started process");
 			return new ProcessContainer(process, new ProcessStreamObservable(process.getInputStream()));
 		} catch (IOException e) {
 			log.error("Couldn't create process for executable {} for reason {}", executable, e);
@@ -136,10 +138,18 @@ public class ProcessUtils {
 	 *
 	 * @return The absolute file name of the Java executable.
 	 * @throws FileNotFoundException
+	 * @throws InterruptedException
 	 */
-	public static String getJavaExecutable() throws FileNotFoundException {
+	public static String getJavaExecutable() throws FileNotFoundException, InterruptedException {
 
 		ProcessContainer container = createConsoleProcess("java.exe -version", null, false);
+		log.debug("Java command using version argument started.");
+
+		while (container.getProcess().isAlive()) {
+			log.debug("Java process is still alive, waiting to finish");
+			TimeUnit.SECONDS.sleep(1);
+		}
+		log.debug("Obtaining exit value of Java process.");
 		if (container.getProcess().exitValue() == 0) {
 			/*
 			 * Just using the java keyword functions since the environment is set up. Thus we don't mingle with the path.
@@ -178,8 +188,9 @@ public class ProcessUtils {
 	 *          The list of parameters which should be applied as input to the Java process.
 	 * @return The {@link ProcessContainer} which wraps the relevant streams, processes and consumers.
 	 * @throws FileNotFoundException
+	 * @throws InterruptedException
 	 */
-	public static ProcessContainer invokeJavaProcess(String... arguments) throws FileNotFoundException {
+	public static ProcessContainer invokeJavaProcess(String... arguments) throws FileNotFoundException, InterruptedException {
 		return invokeJavaProcess(null, false, arguments);
 	}
 
@@ -197,9 +208,10 @@ public class ProcessUtils {
 	 *          True if all existing variables should be deleted.
 	 * @return The {@link ProcessContainer} which wraps the relevant streams, processes and consumers.
 	 * @throws FileNotFoundException
+	 * @throws InterruptedException
 	 */
 	public static ProcessContainer invokeJavaProcess(Map<String, String> environment, boolean cleanEnv, String... arguments)
-			throws FileNotFoundException {
+			throws FileNotFoundException, InterruptedException {
 		/*
 		 * Add the java executable path to the command parameters.
 		 */

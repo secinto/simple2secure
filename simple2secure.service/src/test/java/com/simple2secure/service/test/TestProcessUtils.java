@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
-import com.simple2secure.service.test.utils.TestLoggingObserver;
+import com.simple2secure.service.observer.SimpleLoggingObserver;
 
 public class TestProcessUtils {
 
@@ -18,7 +18,7 @@ public class TestProcessUtils {
 	@Test
 	public void testCreateProcess() throws Exception {
 		ProcessContainer container = ProcessUtils.createProcess("java", "-version");
-		TestLoggingObserver observer = new TestLoggingObserver();
+		SimpleLoggingObserver observer = new SimpleLoggingObserver();
 		container.getObservable().addObserver(observer);
 		container.startObserving();
 		lock.await(2000, TimeUnit.MILLISECONDS);

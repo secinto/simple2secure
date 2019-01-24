@@ -7,14 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
-import com.simple2secure.service.test.utils.TestLoggingObserver;
+import com.simple2secure.service.observer.SimpleLoggingObserver;
 
 public class ProbeMonitor extends TimerTask {
 
 	private Logger log = LoggerFactory.getLogger(ProbeMonitor.class);
 
 	private ProcessContainer container;
-	private TestLoggingObserver observer;
+	private SimpleLoggingObserver observer;
 
 	public ProbeMonitor() throws FileNotFoundException {
 		// ProcessUtils.invokeJavaProcess(null, false, "-cp", "../../release/simple2secure.probe-0.1.0.jar",

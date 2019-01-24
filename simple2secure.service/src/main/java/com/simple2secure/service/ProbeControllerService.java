@@ -1,5 +1,7 @@
 package com.simple2secure.service;
 
+import java.util.Arrays;
+
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class ProbeControllerService implements Daemon {
 		if (args.length > 0) {
 			cmd = args[0];
 		}
+		log.debug("windowsService parameters", Arrays.toString(args));
 		System.out.println("Starting service");
 		if ("start".equals(cmd)) {
 			engineLauncherInstance.windowsStart();
