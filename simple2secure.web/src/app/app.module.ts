@@ -78,6 +78,7 @@ import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
+import { NgxJsonViewModule } from 'ng-json-view';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -125,6 +126,7 @@ export const httpInterceptorProviders = [
 		Ng2GoogleChartsModule,
 		TreeviewModule.forRoot(),
 		TreeModule.forRoot(),
+		NgxJsonViewModule,
 		TranslateModule.forRoot({
 			loader: {
 				provide: TranslateLoader,

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.PacketContainer;
@@ -71,9 +72,11 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	Map<String, Integer> protocols;
 
-	private int maxLength;
+	List<PacketInfo> ipPairs;
 
-	Map<String, String> ipPair;
+	String ipPairsContent;
+
+	private int maxLength;
 
 	public CommonStatisticProcessor(String name, Map<String, String> options) {
 		super(name, options);
@@ -91,7 +94,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		destinationMac = new TreeMap<>();
 		protocols = new TreeMap<>();
 		maxLength = 0;
-		ipPair = new TreeMap<>();
+		ipPairs = new ArrayList<>();
 	}
 
 	@Override
@@ -186,7 +189,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
 					report.setStringContent(content);
-					report.setIpPair(ipPair);
+					report.setIpPairs(ipPairs);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
@@ -221,7 +224,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 */
 	private void countNetworkTraffic() {
 
-		ipPair.put(srcIp, destIp);
+		ipPairs.add(new PacketInfo(destIp, srcIp, "", "", 0, ""));
 
 		// Count sourceIPs
 		Integer countSrcIp = sourceIp.get(srcIp);
@@ -336,6 +339,11 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		content = content.replace("}\"", "}");
 		content = content.replace("'", "\"");
 		log.debug(content);
+
+		ipPairsContent = JSONUtils.toString(ipPairs);
+		ipPairsContent = ipPairsContent.replace("\"{", "{");
+		ipPairsContent = ipPairsContent.replace("}\"", "}");
+		ipPairsContent = ipPairsContent.replace("'", "\"");
 		// entry.put("Source MAC", contentSrcMac);
 		// entry.put("Destination MAC", contentDstMac);
 		// entry.put("Protocol", contentProtocol);

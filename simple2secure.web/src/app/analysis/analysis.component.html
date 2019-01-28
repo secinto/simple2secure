@@ -25,39 +25,49 @@
 
         <mat-tab label="{{ 'network.report.charts' | translate }}">
 
-            <agm-map
-                    [latitude]="51"
-                    [longitude]="7"
-                    [zoom]="2"
-                    [disableDefaultUI]="false"
-                    [zoomControl]="false">
 
-                <agm-marker
-                        *ngFor="let m of markers; let i = index"
-                        (markerClick)="clickedMarker(m.label, i)"
-                        [latitude]="m.lat"
-                        [longitude]="m.lng"
-                        [label]="m.label"
-                        [markerDraggable]="m.draggable">
+            <mat-card>
+                <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedNetworkReport"
+                            name="networkReport" (selectionChange)="onQueryChangeNetworkRep($event.value)" required>
+                    <mat-option *ngFor="let networkReport of networkReports" [value]="networkReport">
+                        {{networkReport.processorName}} ({{networkReport.startTime}})
+                    </mat-option>
+                </mat-select>
+            </mat-card>
 
-                    <agm-info-window>
-                        <strong>InfoWindow content</strong>
-                    </agm-info-window>
+            <mat-card>
+                <agm-map
+                        [latitude]="51"
+                        [longitude]="7"
+                        [zoom]="4"
+                        [disableDefaultUI]="true"
+                        [zoomControl]="false">
 
-                </agm-marker>
+                    <agm-marker
+                            *ngFor="let m of markers; let i = index"
+                            [latitude]="m.lat"
+                            [longitude]="m.lng"
+                            [label]="m.label"
+                            [markerDraggable]="m.draggable">
 
-                <agm-polyline
-                        [visible]="true"
-                        [strokeWeight]="1">
-                    <agm-polyline-point
-                            *ngFor="let coordinate of markers; let i=index"
-                            [latitude]="coordinate.lat"
-                            [longitude]="coordinate.lng">
+                    </agm-marker>
 
-                    </agm-polyline-point>
-                </agm-polyline>
+                    <agm-polyline
+                            [visible]="true"
+                            [strokeWeight]="1"
+                            [strokeColor]="A7BD26"
+                            [strokeOpacity]="1">
 
-            </agm-map>
+                        <agm-polyline-point
+                                *ngFor="let coordinate of markers; let i=index"
+                                [latitude]="coordinate.latDest"
+                                [longitude]="coordinate.lngDest">
+
+                        </agm-polyline-point>
+                    </agm-polyline>
+
+                </agm-map>
+            </mat-card>
         </mat-tab>
 
     </mat-tab-group>

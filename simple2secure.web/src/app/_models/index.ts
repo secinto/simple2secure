@@ -31,3 +31,4 @@ export * from './DTO/emailConfigurationDTO';
 export * from './graphReport';
 export * from './DTO/networkReportDTO';
 export * from './marker';
+export * from './coordinates';

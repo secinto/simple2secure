@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport, Marker, NetworkReportDTO} from '../_models';
+import {ContextDTO, GraphReport, Marker, NetworkReportDTO, Coordinates} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
@@ -31,6 +31,8 @@ export class AnalysisComponent implements OnInit{
 	seriesOption: any;
 	loading = false;
 	markers: Marker[] = [];
+	selectedNetworkReport: NetworkReportDTO;
+	private coordinates: Coordinates[];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -40,19 +42,6 @@ export class AnalysisComponent implements OnInit{
 		private spinner: NgxSpinnerService,
 		private translate: TranslateService)
 	{}
-
-	pieChartData =  {
-		chartType: 'LineChart',
-		dataTable: [
-			['Date', 'Query'],
-			['Work',     11],
-			['Eat',      2],
-			['Commute',  2],
-			['Watch TV', 2],
-			['Sleep',    7]
-		],
-		options: {'title': 'Tasks'},
-	};
 
 	ngOnInit() {
 		/*google.charts.load('current', { 'packages': ['map'], 'mapsApiKey': 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI' });
@@ -69,7 +58,6 @@ export class AnalysisComponent implements OnInit{
 			.subscribe(
 				data => {
 					this.networkReports = data;
-					this.addLabels(this.networkReports);
 				});
 	}
 
@@ -105,6 +93,11 @@ export class AnalysisComponent implements OnInit{
 
 	onQueryChange(value: any){
 		this.loadReportsByName(value.sqlQuery);
+	}
+
+	onQueryChangeNetworkRep(value: NetworkReportDTO){
+		this.selectedNetworkReport = value;
+		this.addLabels(this.selectedNetworkReport);
 	}
 
 	public openDialogShowReportDetails(event: any): void {
@@ -295,12 +288,15 @@ export class AnalysisComponent implements OnInit{
 
 	/// ###This part is used for maps###
 
-	addLabels(networkReports: NetworkReportDTO[]){
-		for (const report of networkReports) {
-			if (this.markers.length < 400){
+	addLabels(networkReport: NetworkReportDTO){
+		this.coordinates = networkReport.coordinates;
+		for (const coord of this.coordinates) {
+			if (this.markers.length < 5000){
 				this.markers.push({
-					lat: report.latitude,
-					lng: report.longitude,
+					lat: coord.srclatitude,
+					lng: coord.srclongitude,
+					latDest: coord.destlatitude,
+					lngDest: coord.destlongitude,
 					draggable: false
 				});
 			}

@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class License {
 	public static final String EXPIRATION_DATE = "expirationDate";
-	public static final String LICENSE_DATE_FORMAT = "MM/dd/YYYY";
+	public static final String LICENSE_DATE_FORMAT = "MM/dd/yyyy";
 
 	private Properties licenseProperties;
 

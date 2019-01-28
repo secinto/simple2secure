@@ -11,7 +11,6 @@ import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,10 @@ import org.springframework.stereotype.Component;
 
 import com.maxmind.geoip2.model.CityResponse;
 import com.simple2secure.api.dto.NetworkReportDTO;
+import com.simple2secure.api.model.Coordinates;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
@@ -89,34 +90,44 @@ public class ReportUtils {
 		List<NetworkReportDTO> preparedReports = new ArrayList<>();
 		for (NetworkReport report : networkReports) {
 
-			try {
-				JSONObject reportContent = new JSONObject(report.getStringContent());
-				JSONObject sourceIP = reportContent.getJSONObject("Source IP");
-				JSONObject destinationIP = reportContent.getJSONObject("Destination IP");
-				JSONArray valuesSourceIP = sourceIP.names();
-				JSONArray valuesDestIP = destinationIP.names();
+			List<Coordinates> coordinates = new ArrayList<Coordinates>();
+			if (report.getIpPairs() != null) {
 
-				int arraySize = valuesSourceIP.length();
+				for (PacketInfo info : report.getIpPairs()) {
 
-				if (valuesDestIP.length() < arraySize) {
-					arraySize = valuesDestIP.length();
-				}
-				// JSONArray destIPvalues =
-				if (valuesSourceIP != null) {
-					for (int valuesIndex = 0; valuesIndex < arraySize; valuesIndex++) {
-						String sourceIp = valuesSourceIP.getString(valuesIndex);
-						String destIp = valuesDestIP.getString(valuesIndex);
-						CityResponse response = iptoGeoUtils.convertIPtoGeoLocation("87.243.178.234");
+					String destIp = info.getDestination_ip();
+					String srcIp = info.getSource_ip();
 
-						if (response != null) {
-							NetworkReportDTO reportDTO = new NetworkReportDTO(response.getLocation().getLatitude(), response.getLocation().getLongitude(),
-									report.getId(), report.getGroupId(), report.getStartTime(), report.getProcessorName());
-							preparedReports.add(reportDTO);
+					if (destIp.contains("192.168")) {
+						destIp = "87.243.178.234";
+					}
+
+					if (srcIp.contains("192.168")) {
+						srcIp = "87.243.178.234";
+					}
+
+					if (!srcIp.equals(destIp)) {
+						CityResponse responseSrcIp = iptoGeoUtils.convertIPtoGeoLocation(srcIp.replaceAll("/", ""));
+						CityResponse responsedestIp = iptoGeoUtils.convertIPtoGeoLocation(destIp.replaceAll("/", ""));
+
+						if (responseSrcIp != null && responsedestIp != null) {
+
+							Coordinates coord = new Coordinates(responseSrcIp.getLocation().getLatitude(), responseSrcIp.getLocation().getLongitude(),
+									responsedestIp.getLocation().getLatitude(), responsedestIp.getLocation().getLongitude());
+
+							if (!coordinates.contains(coord)) {
+								coordinates.add(coord);
+							}
+
 						}
 					}
 				}
-			} catch (JSONException e) {
-				log.error(e.getMessage());
+
+				NetworkReportDTO reportDTO = new NetworkReportDTO(coordinates, report.getId(), report.getGroupId(), report.getStartTime(),
+						report.getProcessorName());
+
+				preparedReports.add(reportDTO);
+
 			}
 		}
 		return preparedReports;

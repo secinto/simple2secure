@@ -6,10 +6,11 @@
         </fieldset>
         <fieldset>
             <legend>{{ 'networkreport.results' | translate }}:</legend>
-            <ngx-json-viewer [json]="getStringResult()"></ngx-json-viewer>
-            <!--<div *ngFor="let key of objectKeys(report.content)">
+            <!--<ngx-json-viewer [json]="getStringResult()"></ngx-json-viewer>
+            <div *ngFor="let key of objectKeys(report.content)">
                 <p>{{report.content[key]}}</p>
             </div>-->
+            <ngx-json-view [data]="getStringResult()"></ngx-json-view>
         </fieldset>
     </fieldset>
 </fieldset>
