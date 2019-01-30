@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport, Marker, NetworkReportDTO, Coordinates} from '../_models';
+import {ContextDTO, GraphReport, Marker, NetworkReportDTO, Coordinates, NetworkReport} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
@@ -32,7 +32,7 @@ export class AnalysisComponent implements OnInit{
 	loading = false;
 	markers: Marker[] = [];
 	selectedNetworkReport: NetworkReportDTO;
-	private coordinates: Coordinates[];
+	coordinates: Coordinates[] = [];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -44,11 +44,10 @@ export class AnalysisComponent implements OnInit{
 	{}
 
 	ngOnInit() {
-		/*google.charts.load('current', { 'packages': ['map'], 'mapsApiKey': 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI' });
-		google.charts.setOnLoadCallback(this.drawChart);*/
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
+		this.selectedNetworkReport = new NetworkReportDTO();
 		this.loadAllQueries(true);
 		this.loadNetworkReports();
 	}
@@ -58,6 +57,11 @@ export class AnalysisComponent implements OnInit{
 			.subscribe(
 				data => {
 					this.networkReports = data;
+					if (this.networkReports){
+						this.selectedNetworkReport = this.networkReports[0];
+						this.addLabels(this.selectedNetworkReport);
+					}
+
 				});
 	}
 
@@ -289,8 +293,11 @@ export class AnalysisComponent implements OnInit{
 	/// ###This part is used for maps###
 
 	addLabels(networkReport: NetworkReportDTO){
+		this.markers = [];
 		this.coordinates = networkReport.coordinates;
-		for (const coord of this.coordinates) {
+
+		for (const coord of this.coordinates){
+			// We are showing only 5000 ip pairs beacuse of the rendering time
 			if (this.markers.length < 5000){
 				this.markers.push({
 					lat: coord.srclatitude,
@@ -300,13 +307,12 @@ export class AnalysisComponent implements OnInit{
 					draggable: false
 				});
 			}
-
+			else{
+				break;
+			}
 		}
 	}
 
-	clickedMarker(label: string, index: number) {
-		console.log(`clicked the marker: ${label || index}`);
-	}
 
 
 

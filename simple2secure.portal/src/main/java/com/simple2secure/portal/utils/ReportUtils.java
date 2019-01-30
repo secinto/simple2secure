@@ -107,6 +107,7 @@ public class ReportUtils {
 					}
 
 					if (!srcIp.equals(destIp)) {
+
 						CityResponse responseSrcIp = iptoGeoUtils.convertIPtoGeoLocation(srcIp.replaceAll("/", ""));
 						CityResponse responsedestIp = iptoGeoUtils.convertIPtoGeoLocation(destIp.replaceAll("/", ""));
 
@@ -118,7 +119,6 @@ public class ReportUtils {
 							if (!coordinates.contains(coord)) {
 								coordinates.add(coord);
 							}
-
 						}
 					}
 				}

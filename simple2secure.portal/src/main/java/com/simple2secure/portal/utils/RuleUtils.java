@@ -20,7 +20,7 @@ public class RuleUtils {
 	RuleRepository ruleRepository;
 
 	/**
-	 * This function retrieves portal rules from db and converts portal rules to the frontend rules.
+	 * This function retrieves portal rules by the toolId from db and converts portal rules to the frontend rules.
 	 *
 	 * @param toolId
 	 * @return
@@ -41,6 +41,28 @@ public class RuleUtils {
 
 		return rules;
 
+	}
+
+	/**
+	 * This function retrieves all rules by the contextId from the database and converts them to the fronted rules
+	 *
+	 * @param contextId
+	 * @return
+	 */
+	public List<FrontendRule> getFrontendRulesByContextId(String contextId) {
+		List<FrontendRule> rules = new ArrayList<FrontendRule>();
+
+		List<PortalRule> portalRules = ruleRepository.findByContextId(contextId);
+
+		if (portalRules != null) {
+			for (PortalRule portalRule : portalRules) {
+				if (portalRule != null) {
+					rules.add(convertPortalRuleToFrontend(portalRule));
+				}
+			}
+		}
+
+		return rules;
 	}
 
 	/**

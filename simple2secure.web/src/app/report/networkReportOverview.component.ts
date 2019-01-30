@@ -1,5 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
+import {NgxSpinnerService} from 'ngx-spinner';
 import {HttpService, AlertService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Modal} from 'ngx-modialog/plugins/bootstrap';
@@ -7,6 +8,8 @@ import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {ContextDTO, NetworkReport} from '../_models/index';
+import {NetworkReportDetailsComponent} from './networkReportDetails.component';
+import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 
 @Component({
 	moduleId: module.id,
@@ -124,9 +127,14 @@ export class NetworkReportOverviewComponent {
 		});
 	}
 
-	public showDetails(report: NetworkReport) {
-		this.loading = true;
-		this.dataService.set(report);
-		this.router.navigate([report.id], {relativeTo: this.route});
+	openDialogShowReportDetails(report: any): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			report: report,
+		};
+
+		this.dialog.open(NetworkReportDetailsComponent, dialogConfig);
+
 	}
 }

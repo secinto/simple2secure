@@ -8,6 +8,7 @@ import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {v4} from 'uuid';
+import {RuleOverviewComponent} from '../rule';
 import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
@@ -169,6 +170,29 @@ export class UserOverviewComponent {
 
 					this.loading = false;
 				});
+	}
+
+	loadRulesByContextId(){
+		this.loading = true;
+
+		this.httpService.get(environment.apiEndpoint + 'rule/' + this.selectedItem.id)
+			.subscribe(
+				data => {
+					this.loading = false;
+					this.openDialogShowRules(data);
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+		this.loading = false;
+
 	}
 
 	checkMyGroupSize(groups: any) {
@@ -728,6 +752,18 @@ export class UserOverviewComponent {
 					this.alertService.error(error.errorMessage);
 					this.loading = false;
 				});
+	}
+
+	openDialogShowRules(frontendRules: any): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '700px';
+
+		dialogConfig.data = {
+			rules: frontendRules
+		};
+
+		this.dialog.open(RuleOverviewComponent, dialogConfig);
+
 	}
 
 	public openDialog(type: string) {

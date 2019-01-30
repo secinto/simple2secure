@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -60,6 +61,8 @@ public class ReportRepositoryImpl extends ReportRepository {
 	public List<Report> getReportsByName(String name) {
 		List<Report> reports = new ArrayList<>();
 		Query query = new Query(Criteria.where("query").is(name));
+		Sort sort = new Sort(Sort.Direction.ASC, "queryTimestamp");
+		query.with(sort);
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 		return reports;
 	}

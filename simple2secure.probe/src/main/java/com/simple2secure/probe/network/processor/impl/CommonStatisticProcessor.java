@@ -82,6 +82,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
+		report.setProcessorName(name);
 		report.setProbeId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());

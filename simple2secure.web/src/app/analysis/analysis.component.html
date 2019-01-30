@@ -52,18 +52,28 @@
 
                     </agm-marker>
 
-                    <agm-polyline
+                    <agm-marker
+                            *ngFor="let m of markers; let i = index"
+                            [latitude]="m.latDest"
+                            [longitude]="m.lngDest"
+                            [label]="m.label"
+                            [iconUrl] ="'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'"
+                            [markerDraggable]="m.draggable">
+
+                    </agm-marker>
+
+                   <agm-polyline
                             [visible]="true"
                             [strokeWeight]="1"
-                            [strokeColor]="A7BD26"
-                            [strokeOpacity]="1">
+                            [strokeColor]="'#A7BD26'"
+                            [strokeOpacity]=0.8>
 
                         <agm-polyline-point
-                                *ngFor="let coordinate of markers; let i=index"
-                                [latitude]="coordinate.latDest"
-                                [longitude]="coordinate.lngDest">
-
+                                *ngFor="let m of markers; let i=index"
+                                [latitude]="m.lat"
+                                [longitude]="m.lng">
                         </agm-polyline-point>
+
                     </agm-polyline>
 
                 </agm-map>

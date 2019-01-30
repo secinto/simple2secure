@@ -38,7 +38,7 @@
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
-                 (click)="showDetails(row)"></mat-row>
+                 (click)="openDialogShowReportDetails(row)"></mat-row>
     </mat-table>
     <mat-paginator #paginator
                    [pageSize]="10"

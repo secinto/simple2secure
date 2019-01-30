@@ -86,4 +86,24 @@ public class RuleController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<FrontendRule>> getRulesByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId)) {
+
+			List<FrontendRule> frontRules = ruleUtils.getFrontendRulesByContextId(contextId);
+
+			if (frontRules != null) {
+				return new ResponseEntity<List<FrontendRule>>(frontRules, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
 }

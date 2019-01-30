@@ -79,6 +79,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
+import { AgmDirectionModule } from 'agm-direction'
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -138,7 +139,8 @@ export const httpInterceptorProviders = [
 			// please get your own API key here:
 			// https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
-		})
+		}),
+		AgmDirectionModule,
 
 	],
 	declarations: [
@@ -217,6 +219,7 @@ export const httpInterceptorProviders = [
 		RuleOverviewComponent,
 		RuleAddComponent,
 		OsQueryReportDetailsComponent,
+		NetworkReportDetailsComponent,
 		UserDetailsComponent,
 		AddQueryDialog
 	],

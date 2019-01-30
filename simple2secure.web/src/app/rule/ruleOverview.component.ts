@@ -1,5 +1,5 @@
-import {Component, ViewChild} from '@angular/core';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {FrontendRule} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
@@ -34,13 +34,18 @@ export class RuleOverviewComponent {
 		private alertService: AlertService,
 		private dataService: DataService,
 		private dialog: MatDialog,
-		private translate: TranslateService)
-	{}
+		private translate: TranslateService,
+		private dialogRef: MatDialogRef<RuleOverviewComponent>,
+		@Inject(MAT_DIALOG_DATA) data)
+	{
+		this.rules = data.rules;
+		this.dataSource.data = this.rules;
+	}
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.toolId = this.route.snapshot.paramMap.get('id');
-		this.loadRules();
+		//this.loadRules();
 	}
 
 	ngAfterViewInit() {
