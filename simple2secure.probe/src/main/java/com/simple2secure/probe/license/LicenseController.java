@@ -154,6 +154,7 @@ public class LicenseController {
 				ProbeConfiguration.probeId = license.getProbeId();
 				ProbeConfiguration.groupId = license.getGroupId();
 				ProbeConfiguration.setAPIAvailablitity(true);
+				log.info("License successfully activated and AuthToken obtained");
 				return true;
 			} else {
 				log.error("A problem occured while loading the license from path.");

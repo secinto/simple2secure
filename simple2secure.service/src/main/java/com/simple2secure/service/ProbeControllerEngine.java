@@ -60,11 +60,15 @@ public class ProbeControllerEngine implements Engine {
 
 	@Override
 	public boolean start() {
+		log.debug("Starting {}", this.getName());
 		if (startProbe()) {
 			try {
-				probeMonitor = scheduler.scheduleAtFixedRate(new ProbeMonitor(), 0, 1000, TimeUnit.MILLISECONDS);
-				probeUpdater = scheduler.scheduleAtFixedRate(new ProbeUpdater(), 100, 1000, TimeUnit.MILLISECONDS);
-				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(), 200, 1000, TimeUnit.MILLISECONDS);
+				log.debug("Creating ProbeMonitor scheduled task");
+				probeMonitor = scheduler.scheduleAtFixedRate(new ProbeMonitor(), 0, 10000, TimeUnit.MILLISECONDS);
+				log.debug("Creating ProbeUpdater scheduled task");
+				probeUpdater = scheduler.scheduleAtFixedRate(new ProbeUpdater(), 100, 10000, TimeUnit.MILLISECONDS);
+				log.debug("Creating PortalWatchdog scheduled task");
+				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(), 200, 10000, TimeUnit.MILLISECONDS);
 				return true;
 			} catch (Exception e) {
 				log.error("Couldn't start probe controller engine. Reason {}", e);
@@ -73,12 +77,37 @@ public class ProbeControllerEngine implements Engine {
 		return false;
 	}
 
+	public ScheduledFuture<?> getProbeMonitor() {
+		return probeMonitor;
+	}
+
+	public void setProbeMonitor(ScheduledFuture<?> probeMonitor) {
+		this.probeMonitor = probeMonitor;
+	}
+
+	public ScheduledFuture<?> getProbeUpdater() {
+		return probeUpdater;
+	}
+
+	public void setProbeUpdater(ScheduledFuture<?> probeUpdater) {
+		this.probeUpdater = probeUpdater;
+	}
+
+	public ScheduledFuture<?> getPortalWatchdog() {
+		return portalWatchdog;
+	}
+
+	public void setPortalWatchdog(ScheduledFuture<?> portalWatchdog) {
+		this.portalWatchdog = portalWatchdog;
+	}
+
 	private boolean startProbe() {
 		try {
 			probeProcess = ProcessUtils.invokeJavaProcess("-jar", "simple2secure.probe-0.1.0.jar", "-l", "license.zip");
-
+			log.debug("Probe started using JAR. Alive {}", probeProcess.getProcess().isAlive());
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();
+			log.debug("Added output observer to probe process.");
 			return true;
 		} catch (FileNotFoundException | InterruptedException ie) {
 			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
@@ -89,11 +118,22 @@ public class ProbeControllerEngine implements Engine {
 	@Override
 	public boolean stop() {
 		if (probeProcess != null) {
-			probeProcess.getProcess().destroy();
-			exitValue = probeProcess.getProcess().exitValue();
-			log.debug("Destroyed Probe process. Exit value was {}", exitValue);
+			try {
+				probeProcess.getProcess().destroy();
+				log.debug("Destroyed Probe process. Exit value was {}", exitValue);
+				if (!probeProcess.getProcess().isAlive()) {
+					exitValue = probeProcess.getProcess().exitValue();
+					log.debug("Exit value was {}", exitValue);
+				}
+			} catch (Exception e) {
+				log.error("Stopping didn't work correctly! Reason {}", e);
+			}
 		}
-		scheduler.shutdown();
+		try {
+			scheduler.shutdown();
+		} catch (Exception e) {
+			log.error("Shuting down scheduler didn't work. Reason {}", e);
+		}
 		return true;
 	}
 

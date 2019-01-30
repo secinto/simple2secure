@@ -22,15 +22,18 @@ public class ProbeControllerService implements Daemon {
 	 *          Arguments from prunsrv command line
 	 **/
 	public static void windowsService(String args[]) {
+		log.info("Received windowsService call");
 		String cmd = "start";
 		if (args.length > 0) {
 			cmd = args[0];
 		}
 		log.debug("windowsService parameters", Arrays.toString(args));
-		System.out.println("Starting service");
+		log.debug("Starting service");
 		if ("start".equals(cmd)) {
+			log.debug("Starting engine");
 			engineLauncherInstance.windowsStart();
 		} else {
+			log.debug("Stoping engine");
 			engineLauncherInstance.windowsStop();
 		}
 	}
@@ -43,6 +46,7 @@ public class ProbeControllerService implements Daemon {
 			synchronized (this) {
 				try {
 					this.wait(60000); // wait 1 minute and check if stopped
+					log.debug("Finished waiting for checking engine status");
 				} catch (InterruptedException ie) {
 					log.error("The execution of {} has been interrupted because {}", engine.getName(), ie);
 				}
@@ -87,14 +91,15 @@ public class ProbeControllerService implements Daemon {
 	private void initialize() {
 		if (engine == null) {
 			engine = new ProbeControllerEngine();
-		} else {
-			log.info("Starting {}", engine.getName());
-			if (engine.start()) {
-				log.info("{} started successfully!", engine.getName());
-			} else {
-				log.error("Couldn't start {}", engine.getName());
-			}
 		}
+
+		log.info("Starting {}", engine.getName());
+		if (engine.start()) {
+			log.info("{} started successfully!", engine.getName());
+		} else {
+			log.error("Couldn't start {}", engine.getName());
+		}
+
 	}
 
 	/**
