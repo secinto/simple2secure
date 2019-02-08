@@ -4,88 +4,118 @@
             <mat-tab label="{{ 'menu.general' | translate }}">
                 <configurationDetails></configurationDetails>
             </mat-tab>
-             <mat-tab label="{{ 'menu.tokens' | translate }}">
-                     <div>
-                         <mat-card class="mat-card-custom">
-                             <mat-card-header>
-                                 <mat-card-title>{{ 'accessToken.validity' | translate }}</mat-card-title>
-                             </mat-card-header>
-                             <mat-card-content>
-                                 <table cellspacing="0"><tr>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.settings.accessTokenValidityTime" name="accessTokenValidityTime">
-                                         </mat-form-field>
-                                     </td>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <mat-select [(ngModel)]="settingsObj.settings.accessTokenValidityUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenValidityUnit">
-                                                 <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-                                                 </mat-option>
-                                             </mat-select>
-                                         </mat-form-field>
-                                     </td>
-                                 </tr></table>
-                             </mat-card-content>
-                         </mat-card>
-                         <mat-card class="mat-card-custom">
-                             <mat-card-header>
-                                 <mat-card-title>{{ 'accessToken.probe.validity' | translate }}</mat-card-title>
-                             </mat-card-header>
-                             <mat-card-content>
-                                 <table cellspacing="0"><tr>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.settings.accessTokenProbeValidityTime" name="accessTokenProbeValidityTime">
-                                         </mat-form-field>
-                                     </td>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <mat-select [(ngModel)]="settingsObj.settings.accessTokenProbeValidityUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenProbeValidityUnit">
-                                                 <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-                                                 </mat-option>
-                                             </mat-select>
-                                         </mat-form-field>
-                                     </td>
-                                 </tr></table>
-                             </mat-card-content>
-                         </mat-card>
-                         <mat-card class="mat-card-custom">
-                             <mat-card-header>
-                                 <mat-card-title>{{ 'accessToken.probe.minimum.validity' | translate }}</mat-card-title>
-                             </mat-card-header>
-                             <mat-card-content>
-                                 <table cellspacing="0"><tr>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.settings.accessTokenProbeRestValidityTime" name="accessTokenProbeRestValidityTime">
-                                         </mat-form-field>
-                                     </td>
-                                     <td>
-                                         <mat-form-field class="full_width_input">
-                                             <mat-select [(ngModel)]="settingsObj.settings.accessTokenProbeRestValidityTimeUnit" placeholder="{{ 'table.unit' | translate }}" name="accessTokenProbeRestValidityTimeUnit">
-                                                 <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-                                                 </mat-option>
-                                             </mat-select>
-                                         </mat-form-field>
-                                     </td>
-                                 </tr></table>
-                             </mat-card-content>
-                         </mat-card>
-                     </div>
-                 <button class="mat-green-button" type="button" (click)="updateSettings()" [disabled]="!settingsForm.dirty" id="saveButton" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
+            <mat-tab label="{{ 'menu.tokens' | translate }}">
+                <div>
+                    <mat-card class="mat-card-custom">
+                        <mat-card-header>
+                            <mat-card-title>{{ 'accessToken.validity' | translate }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <table cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="number" matInput
+                                                   placeholder="{{ 'table.unitValue' | translate }}"
+                                                   [(ngModel)]="settingsObj.settings.accessTokenValidityTime"
+                                                   name="accessTokenValidityTime">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select [(ngModel)]="settingsObj.settings.accessTokenValidityUnit"
+                                                        placeholder="{{ 'table.unit' | translate }}"
+                                                        name="accessTokenValidityUnit">
+                                                <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                            [value]="ttimeUnit">{{ttimeUnit}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                            </table>
+                        </mat-card-content>
+                    </mat-card>
+                    <mat-card class="mat-card-custom">
+                        <mat-card-header>
+                            <mat-card-title>{{ 'accessToken.probe.validity' | translate }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <table cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="number" matInput
+                                                   placeholder="{{ 'table.unitValue' | translate }}"
+                                                   [(ngModel)]="settingsObj.settings.accessTokenProbeValidityTime"
+                                                   name="accessTokenProbeValidityTime">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select [(ngModel)]="settingsObj.settings.accessTokenProbeValidityUnit"
+                                                        placeholder="{{ 'table.unit' | translate }}"
+                                                        name="accessTokenProbeValidityUnit">
+                                                <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                            [value]="ttimeUnit">{{ttimeUnit}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                            </table>
+                        </mat-card-content>
+                    </mat-card>
+                    <mat-card class="mat-card-custom">
+                        <mat-card-header>
+                            <mat-card-title>{{ 'accessToken.probe.minimum.validity' | translate }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <table cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="number" matInput
+                                                   placeholder="{{ 'table.unitValue' | translate }}"
+                                                   [(ngModel)]="settingsObj.settings.accessTokenProbeRestValidityTime"
+                                                   name="accessTokenProbeRestValidityTime">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select
+                                                    [(ngModel)]="settingsObj.settings.accessTokenProbeRestValidityTimeUnit"
+                                                    placeholder="{{ 'table.unit' | translate }}"
+                                                    name="accessTokenProbeRestValidityTimeUnit">
+                                                <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                            [value]="ttimeUnit">{{ttimeUnit}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                            </table>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <button class="mat-green-button" type="button" (click)="updateSettings()"
+                        [disabled]="!settingsForm.dirty" id="saveButton" mat-raised-button color="primary">{{
+                    'button.save' | translate }}
+                </button>
             </mat-tab>
             <mat-tab label="{{ 'table.licensePlans' | translate }}">
                 <button mat-raised-button color="primary" id="addButton" type="button" (click)="addNewLicensePlan()"
                         class="pull-right mat-green-button">
                     <i class="glyphicon glyphicon-plus"></i> {{ 'licensePlan.add.button' | translate }}
                 </button>
-                <div *ngFor="let licensePlanUnit of settingsObj.licensePlan; let in=index" ngModelGroup="settingsObj.licensePlan">
+                <div *ngFor="let licensePlanUnit of settingsObj.licensePlan; let in=index"
+                     ngModelGroup="settingsObj.licensePlan">
                     <mat-card class="mat-card-custom mat-card-license-plan">
                         <mat-card-header>
                             <mat-card-title class="mat-card-title-left">{{licensePlanUnit.name}}</mat-card-title>
                             <mat-card-title class="mat-card-title-right">
-                                <button mat-raised-button color="primary" type="button" (click)="deleteLicensePlan(licensePlanUnit)"
+                                <button mat-raised-button color="primary" type="button"
+                                        (click)="deleteLicensePlan(licensePlanUnit)"
                                         class="mat-red-button"><i class="glyphicon glyphicon-remove"></i>
                                     {{ 'button.delete' | translate }}
                                 </button>
@@ -93,33 +123,50 @@
                         </mat-card-header>
 
                         <mat-card-content>
-                            <table class="full_width_input" cellspacing="0"><tr>
-                                <td><mat-form-field class="full_width_input">
-                                    <input matInput type="text" placeholder="{{ 'licensePlan.name.placeholder' | translate }}" [(ngModel)]="settingsObj.licensePlan[in].name" name="name{{in}}">
-                                </mat-form-field></td>
-                                <td>
-                                    <mat-form-field class="full_width_input">
-                                        <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}" [(ngModel)]="settingsObj.licensePlan[in].validity" name="validity{{in}}">
-                                    </mat-form-field>
-                                </td>
-                                <td>
-                                    <mat-form-field class="full_width_input">
-                                        <mat-select [(ngModel)]="settingsObj.licensePlan[in].validityUnit" placeholder="{{ 'table.unit' | translate }}" name="validityUnit{{in}}">
-                                            <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">{{ttimeUnit}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </td>
-                            </tr></table>
+                            <table class="full_width_input" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input matInput type="text"
+                                                   placeholder="{{ 'licensePlan.name.placeholder' | translate }}"
+                                                   [(ngModel)]="settingsObj.licensePlan[in].name" name="name{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="number" matInput
+                                                   placeholder="{{ 'table.unitValue' | translate }}"
+                                                   [(ngModel)]="settingsObj.licensePlan[in].validity"
+                                                   name="validity{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select [(ngModel)]="settingsObj.licensePlan[in].validityUnit"
+                                                        placeholder="{{ 'table.unit' | translate }}"
+                                                        name="validityUnit{{in}}">
+                                                <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                            [value]="ttimeUnit">{{ttimeUnit}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                            </table>
 
                             <div class="form-group">
                                 <mat-form-field class="full_width_input">
-                                    <input type="text" matInput placeholder="{{ 'group.maxNumberOfLicenses.placeholder' | translate }}" [(ngModel)]="settingsObj.licensePlan[in].maxNumberOfDownloads" name="maxNumberOfDownloads{{in}}">
+                                    <input type="text" matInput
+                                           placeholder="{{ 'group.maxNumberOfLicenses.placeholder' | translate }}"
+                                           [(ngModel)]="settingsObj.licensePlan[in].maxNumberOfDownloads"
+                                           name="maxNumberOfDownloads{{in}}">
                                     <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
                                 </mat-form-field>
                             </div>
                         </mat-card-content>
-                        <button class="mat-green-button" type="button" (click)="saveLicensePlan(licensePlanUnit)" id="saveButton" mat-raised-button color="primary">{{ 'button.save' | translate }}</button>
+                        <button class="mat-green-button" type="button" (click)="saveLicensePlan(licensePlanUnit)"
+                                id="saveButton" mat-raised-button color="primary">{{ 'button.save' | translate }}
+                        </button>
                     </mat-card>
                 </div>
             </mat-tab>

@@ -3,4 +3,6 @@ export * from './userDetails.component';
 export * from './userOverview.component';
 export * from './userGroup.component';
 export * from './userGroupDialog.component';
-export * from './userGroupApplyConfig.component'
+export * from './userGroupApplyConfig.component';
+export * from './userProbeChangeGroup.component';
+export * from './userContextAddDialog.component';

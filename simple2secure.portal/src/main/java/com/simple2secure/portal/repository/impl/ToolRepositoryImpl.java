@@ -23,28 +23,24 @@ public class ToolRepositoryImpl extends ToolRepository {
 	}
 
 	@Override
-	public List<Tool> getToolsByUserID(String user_id) {
-		Query query = new Query(Criteria.where("user_id").is(user_id));
-		List<Tool> tools = this.mongoTemplate.find(query, Tool.class);
+	public Tool getToolByName(String toolName) {
+		Query query = new Query(Criteria.where("name").is(toolName));
+		Tool tool = mongoTemplate.findOne(query, Tool.class);
+		return tool;
+	}
+
+	@Override
+	public List<Tool> getToolsByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		List<Tool> tools = mongoTemplate.find(query, Tool.class);
 		return tools;
 	}
 
 	@Override
-	public void deleteByUserID(String user_id) {
-		List<Tool> tools = getToolsByUserID(user_id);
-
-		for (Tool tool : tools) {
-			this.mongoTemplate.remove(tool);
-		}
-	}
-
-	@Override
-	public Tool getToolByName(String tool_name) {
-		Query query = new Query(Criteria.where("name").is(tool_name));
-		Tool tool= this.mongoTemplate.findOne(query, Tool.class);
+	public Tool getToolByNameAndContextId(String toolName, String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("name").is(toolName));
+		Tool tool = mongoTemplate.findOne(query, Tool.class);
 		return tool;
 	}
-	
-	
 
 }

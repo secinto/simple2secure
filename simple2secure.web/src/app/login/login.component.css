@@ -1,59 +1,59 @@
 div.input {
-	position: relative;
-	margin-top: 20px;
+    position: relative;
+    margin-top: 20px;
 }
 
 div.input label {
-	position: absolute;
-	top: 0;
-	transform: translateY(-50%);
-	left: 10px;
-	background: white;
-	padding: 5px 2px;
-	font-size: 20px;
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+    left: 10px;
+    background: white;
+    padding: 5px 2px;
+    font-size: 20px;
 }
 
 div.input input {
-	padding: 10px 20px;
-	font-size: 15px;
-	outline: 0;
-	height: 60px;
+    padding: 10px 20px;
+    font-size: 15px;
+    outline: 0;
+    height: 60px;
 }
 
 .loginPageForm {
-	position: relative;
-	top: 50%;
-	transform: translateY(50%);
+    position: relative;
+    top: 50%;
+    transform: translateY(50%);
 }
 
 #forgotPwd {
-	text-align: center;	
+    text-align: center;
 }
 
 .login-same-level {
-	display:flex;
+    display: flex;
 }
 
-.login-fields{
-	display: inline-block;
-	width: 70%;
-	margin-right: 10px;
+.login-fields {
+    display: inline-block;
+    width: 70%;
+    margin-right: 10px;
 }
 
-.login-button{
-	display: inline-block;
-	width: 20%;
+.login-button {
+    display: inline-block;
+    width: 20%;
 }
 
-#forgotPasswordButton{
-	display: inline-block;
+#forgotPasswordButton {
+    display: inline-block;
 }
 
-#registerButton{
-	display: inline-block;
+#registerButton {
+    display: inline-block;
 }
 
-.login-same-level{
+.login-same-level {
 
 }
 
@@ -69,13 +69,15 @@ div.input input {
     margin-top: 15%;
 }
 
-.button5 {border-radius: 50%;}
-
-.password-field-login .form-control-feedback{
-	line-height: 5px !important;
-	pointer-events: auto !important;
+.button5 {
+    border-radius: 50%;
 }
 
-.password-field-login .form-control-feedback:hover{
-	cursor: pointer;
+.password-field-login .form-control-feedback {
+    line-height: 5px !important;
+    pointer-events: auto !important;
+}
+
+.password-field-login .form-control-feedback:hover {
+    cursor: pointer;
 }

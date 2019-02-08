@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.ExtendedRule;
@@ -28,6 +29,7 @@ import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 
 import ch.maxant.rules.AbstractAction;
 import ch.maxant.rules.CompileException;
@@ -62,6 +64,9 @@ public class UpdateEmailScheduler {
 	@Autowired
 	MailUtils mailUtils;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
 	@Scheduled(fixedRate = 50000)
@@ -71,7 +76,7 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
-					extractEmailsFromMessages(msg, cfg.getUserUUID(), cfg.getId());
+					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
 		}
@@ -85,22 +90,46 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String user_id, String config_id) throws Exception {
-		for (Message msg : messages) {
-			UIDFolder uf = (UIDFolder) msg.getFolder();
-			Long messageId = uf.getUID(msg);
+	public void extractEmailsFromMessages(Message[] messages, String configId) {
+		if (!Strings.isNullOrEmpty(configId)) {
+			EmailConfiguration emailConfig = emailConfigRepository.find(configId);
+			if (emailConfig != null) {
+				for (Message msg : messages) {
+					UIDFolder uf = (UIDFolder) msg.getFolder();
+					Long messageId;
+					try {
+						messageId = uf.getUID(msg);
+						if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
+							// TO-DO - check if there is a rule for this inbox and check it accordingly
+							Email email = new Email();
+							Object content;
+							try {
+								content = msg.getContent();
+								if (content instanceof String) {
+									String body = (String) content;
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											body, msg.getReceivedDate().toString());
+								} else if (content instanceof MimeMultipart) {
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+								}
 
-			if (emailRepository.findByUserUUIDConfigIDAndMsgID(user_id, config_id, messageId.toString()) == null) {
-				// TO-DO - check if there is a rule for this inbox and check it accordingly
-				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(),
-						msg.getFrom()[0].toString(), mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()),
-						msg.getReceivedDate().toString());
+								// emailsRuleChecker(email, emailConfig);
 
-				emailsRuleChecker(email);
+								emailRepository.save(email);
+							} catch (Exception e) {
+								log.error("Problem occured {}", e.getMessage());
+							}
+						}
 
-				emailRepository.save(email);
+					} catch (MessagingException e1) {
+						log.error("Problem occured messageId not found");
+					}
+
+				}
 			}
 		}
+
 	}
 
 	/**
@@ -108,9 +137,9 @@ public class UpdateEmailScheduler {
 	 * repository
 	 */
 
-	private void emailsRuleChecker(Email email) {
+	private void emailsRuleChecker(Email email, EmailConfiguration emailConfig) {
 
-		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigID());
+		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
 		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
 
 		List<Rule> rules = new ArrayList<>();
@@ -129,7 +158,7 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(email.getUserUUID(), email.getConfigID(), "Subject",
+						Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
 								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
 						notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
@@ -203,6 +232,7 @@ public class UpdateEmailScheduler {
 		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
 		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
 		props.setProperty("mail.imap.auth", IMAP_AUTH);
+		props.setProperty("mail.mime.ignoreunknownencoding", "true");
 
 		return props;
 

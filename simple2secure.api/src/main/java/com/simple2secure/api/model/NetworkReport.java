@@ -1,5 +1,8 @@
 package com.simple2secure.api.model;
 
+import java.util.List;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -16,14 +19,12 @@ public class NetworkReport extends GenericDBObject {
 	private static final long serialVersionUID = -5984944130903360444L;
 	private String groupId;
 	private String probeId;
-	// @ElementCollection
-	// @MapKeyColumn(name = "key")
-	// @Column(name = "value")
-	// private Map<String, String> content;
 
 	@Lob
 	private String stringContent;
 
+	@ElementCollection
+	private List<PacketInfo> ipPairs;
 	private String startTime;
 	private String processorName;
 	private boolean sent;
@@ -85,5 +86,13 @@ public class NetworkReport extends GenericDBObject {
 
 	public void setProcessorName(String processorName) {
 		this.processorName = processorName;
+	}
+
+	public List<PacketInfo> getIpPairs() {
+		return ipPairs;
+	}
+
+	public void setIpPairs(List<PacketInfo> ipPairs) {
+		this.ipPairs = ipPairs;
 	}
 }

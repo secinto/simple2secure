@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.PacketContainer;
@@ -71,12 +72,17 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	Map<String, Integer> protocols;
 
+	List<PacketInfo> ipPairs;
+
+	String ipPairsContent;
+
 	private int maxLength;
 
 	public CommonStatisticProcessor(String name, Map<String, String> options) {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
+		report.setProcessorName(name);
 		report.setProbeId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
@@ -89,6 +95,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		destinationMac = new TreeMap<>();
 		protocols = new TreeMap<>();
 		maxLength = 0;
+		ipPairs = new ArrayList<>();
 	}
 
 	@Override
@@ -183,6 +190,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
 					report.setStringContent(content);
+					report.setIpPairs(ipPairs);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
@@ -216,6 +224,9 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 * This function counts the network traffic data provided by each packet.
 	 */
 	private void countNetworkTraffic() {
+
+		ipPairs.add(new PacketInfo(destIp, srcIp, "", "", 0, ""));
+
 		// Count sourceIPs
 		Integer countSrcIp = sourceIp.get(srcIp);
 
@@ -329,6 +340,11 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		content = content.replace("}\"", "}");
 		content = content.replace("'", "\"");
 		log.debug(content);
+
+		ipPairsContent = JSONUtils.toString(ipPairs);
+		ipPairsContent = ipPairsContent.replace("\"{", "{");
+		ipPairsContent = ipPairsContent.replace("}\"", "}");
+		ipPairsContent = ipPairsContent.replace("'", "\"");
 		// entry.put("Source MAC", contentSrcMac);
 		// entry.put("Destination MAC", contentDstMac);
 		// entry.put("Protocol", contentProtocol);

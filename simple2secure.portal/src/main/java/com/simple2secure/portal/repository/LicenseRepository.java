@@ -22,4 +22,6 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract void deleteByGroupId(String groupId);
 
+	public abstract void deleteByProbeId(String probeId);
+
 }

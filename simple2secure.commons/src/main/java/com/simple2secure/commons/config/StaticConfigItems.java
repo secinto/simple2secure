@@ -16,6 +16,7 @@ public class StaticConfigItems {
 	public static String email_subject_al = "simple2secure Activation Link";
 	public static String email_subject_pr = "simple2secure Reset Password Link";
 	public static String email_subjct_pcs = "simple2secure Password Change Successful";
+	public static String email_subject_inv = "simple2secure Context Invitation";
 	public static long expiration_time_password_reset = 1200000; // 20 minutes
 
 	public static String type_password_update = "password_update";
@@ -34,5 +35,10 @@ public class StaticConfigItems {
 	public static final String PROCESSORS_JSON_LOCATION = "/configuration/processors.json";
 	public static final String STEPS_JSON_LOCATION = "/configuration/steps.json";
 	public static final String KEYS_LOCATION = "./src/main/resources/keys/";
+	public static final String OSQUERY_PATH = ".\\\\\\\\bin\\\\\\\\osquery\\\\\\\\os_win7";
+
+	public static final String[] SECINTO_EMAIL_LIST = { "emir.sahinovic@secinto.com", "emirsahinovic24@gmail.com" };
+	public static final String STANDARD_GROUP_NAME = "Standard";
+	public static final String DEFAULT_LICENSE_PLAN = "Default";
 
 }
