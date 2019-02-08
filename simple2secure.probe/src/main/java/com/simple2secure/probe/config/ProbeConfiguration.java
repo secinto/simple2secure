@@ -42,6 +42,8 @@ public class ProbeConfiguration {
 	private static ProbeConfiguration instance;
 
 	private static boolean apiAvailable = false;
+	public static boolean runInTesting = true;
+	public static boolean isInstrumented = true;
 
 	public static String authKey = "";
 	public static String groupId = "";

@@ -39,7 +39,7 @@ public class ServiceUtils {
 	 * @return True if the JVM is 64 bit.
 	 */
 	public static boolean isJVM_ARCH_64bit() {
-		return System.getProperty("sun.arch.data.model") == "64" ? true : false;
+		return System.getProperty("sun.arch.data.model").equalsIgnoreCase("64");
 	}
 
 	/**
@@ -132,10 +132,10 @@ public class ServiceUtils {
 	 *          The name of the stop method. The method must be static.
 	 * @return A map containing all service relevant environment variables.
 	 */
-	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName, String serviceDescription,
-			String library, String startClass, String startMethod, String stopClass, String stopMethod) {
-		return createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass, startMethod, stopClass, stopMethod,
-				installPath);
+	public static Map<String, String> createInstallEnvironment(boolean useOwnPrunSrv, String installPath, String serviceName,
+			String serviceDescription, String library, String startClass, String startMethod, String stopClass, String stopMethod) {
+		return createInstallEnvironment(useOwnPrunSrv, installPath, serviceName, serviceDescription, library, startClass, startMethod,
+				stopClass, stopMethod, installPath);
 	}
 
 	/**
@@ -164,13 +164,14 @@ public class ServiceUtils {
 	 *          The path where the log files should be written to.
 	 * @return A map containing all service relevant environment variables.
 	 */
-	public static Map<String, String> createInstallEnvironment(String installPath, String serviceName, String serviceDescription,
-			String library, String startClass, String startMethod, String stopClass, String stopMethod, String logPath) {
+	public static Map<String, String> createInstallEnvironment(boolean useOwnPrunSrv, String installPath, String serviceName,
+			String serviceDescription, String library, String startClass, String startMethod, String stopClass, String stopMethod,
+			String logPath) {
 		/*
 		 * Creates an environment with default settings except the service specific ones.
 		 */
-		return createInstallEnvironment(false, installPath, serviceName, serviceDescription, library, DEFAULT_STARTUP, startClass, startMethod,
-				DEFAULT_START_STOP_MODE, DEFAULT_START_IMAGE, stopClass, stopMethod, DEFAULT_START_STOP_MODE, DEFAULT_STOP_TIMEOUT,
+		return createInstallEnvironment(useOwnPrunSrv, installPath, serviceName, serviceDescription, library, DEFAULT_STARTUP, startClass,
+				startMethod, DEFAULT_START_STOP_MODE, DEFAULT_START_IMAGE, stopClass, stopMethod, DEFAULT_START_STOP_MODE, DEFAULT_STOP_TIMEOUT,
 				DEFAULT_STOP_IMAGE, logPath, DEFAULT_LOG_LEVEL, DEFAULT_STDOUT, DEFAULT_STDOUT, DEFAULT_JVM, DEFAULT_JVMMS, DEFAULT_JVMMX,
 				DEFAULT_JVMSS, DEFAULT_JVM_OPTIONS);
 	}
@@ -324,6 +325,9 @@ public class ServiceUtils {
 	 * directory. The logging output will be created also in the installPath directory. The provided class name and methods are used for
 	 * starting and stopping the service.
 	 *
+	 * @param useOwnPrunSrv
+	 *          Specifies if a own prunsrv executable should be used. The prunsrv.exe is expected to be located in the specified installPath.
+	 *          The provided prunsrv.exe must match the target system (32 or 64-bit).
 	 * @param installPath
 	 *          The path into which all the relevant files (procsrv, jar file, images) are installed and available from.
 	 * @param serviceName
@@ -342,12 +346,12 @@ public class ServiceUtils {
 	 *          The name of the stop method. The method must be static.
 	 * @return
 	 */
-	public static ProcessContainer installService(String installPath, String serviceName, String serviceDescription, String library,
-			String startClass, String startMethod, String stopClass, String stopMethod) {
+	public static ProcessContainer installService(boolean useOwnPrunSrv, String installPath, String serviceName, String serviceDescription,
+			String library, String startClass, String startMethod, String stopClass, String stopMethod) {
 		StringBuilder serviceString = new StringBuilder();
 		serviceString.append("%PR_INSTALL% //IS//%SERVICE_NAME%");
-		Map<String, String> environment = createInstallEnvironment(installPath, serviceName, serviceDescription, library, startClass,
-				startMethod, stopClass, stopMethod);
+		Map<String, String> environment = createInstallEnvironment(useOwnPrunSrv, installPath, serviceName, serviceDescription, library,
+				startClass, startMethod, stopClass, stopMethod);
 		return ProcessUtils.manageServiceWindows(serviceString.toString(), true, environment);
 	}
 

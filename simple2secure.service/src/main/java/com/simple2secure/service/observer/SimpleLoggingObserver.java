@@ -1,4 +1,4 @@
-package com.simple2secure.service.test.utils;
+package com.simple2secure.service.observer;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -6,8 +6,8 @@ import java.util.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestLoggingObserver implements Observer {
-	private static Logger log = LoggerFactory.getLogger(TestLoggingObserver.class);
+public class SimpleLoggingObserver implements Observer {
+	private static Logger log = LoggerFactory.getLogger(SimpleLoggingObserver.class);
 
 	private String firstObservable = null;
 	private String lastObservable = null;

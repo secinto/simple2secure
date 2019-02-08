@@ -33,7 +33,7 @@
 			<property name="hibernate.connection.driver_class"
 				value="org.h2.Driver" />
 			<property name="hibernate.connection.url"
-				value="jdbc:h2:file:~/s2sDb/s2sProbeDB-test" />
+				value="jdbc:h2:file:./db/s2sProbeDB-test" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
 			<property name="javax.persistence.jdbc.password"

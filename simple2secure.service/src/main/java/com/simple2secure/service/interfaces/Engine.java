@@ -1,4 +1,4 @@
-package com.simple2secure.service;
+package com.simple2secure.service.interfaces;
 
 public interface Engine {
 

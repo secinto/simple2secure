@@ -14,7 +14,7 @@ jar {
 	version =  '0.1.0'
 
 	manifest {
-		attributes 'Main-Class': 'com.simple2secure.probe.gui.ProbeGUI',
+		attributes 'Main-Class': 'com.simple2secure.probe.cli.ProbeCLI',
 		'Implementation-Title': 'simple2secure Probe',
 		'Implementation-Version': version,
 		'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.utils.DBUtil;
@@ -33,7 +34,7 @@ public class TestLicenseController {
 
 		CompanyLicensePublic companyLicense = new CompanyLicensePublic("test", "1", "10/10/2018", "1");
 
-		boolean result = licenseController.isLicenseExpired(companyLicense);
+		boolean result = LicenseDateUtil.isLicenseExpired(companyLicense.getExpirationDate());
 
 		assertEquals(true, result);
 

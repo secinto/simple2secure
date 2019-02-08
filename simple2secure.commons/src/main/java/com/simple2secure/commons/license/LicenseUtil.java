@@ -439,6 +439,7 @@ public class LicenseUtil {
 		FileInputStream input = new FileInputStream(licenseFile);
 		Properties properties = new OrderedProperties();
 		properties.load(input);
+		input.close();
 
 		String signature = (String) properties.remove(LicenseGenerator.SIGNATURE_PROPERTY);
 		String encoded = properties.toString();
@@ -544,7 +545,7 @@ public class LicenseUtil {
 
 		FileUtil.createFolder(licenseFilePath + licenseId + File.separator);
 
-		File privateKey = new File(privateKeyFilePath);
+		File privateKey = new File(privateKeyFile);
 
 		if (privateKey.exists()) {
 			File licenseFile = new File(licenseFilePath + licenseId + File.separator + licenseFileName);
