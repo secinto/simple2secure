@@ -1,6 +1,7 @@
 package com.simple2secure.service;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -11,11 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
+import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
+import com.simple2secure.commons.service.ServiceInstrumentation;
 import com.simple2secure.service.interfaces.Engine;
-import com.simple2secure.service.observer.SimpleLoggingObserver;
 import com.simple2secure.service.tasks.PortalWatchdog;
 import com.simple2secure.service.tasks.ProbeMonitor;
 import com.simple2secure.service.tasks.ProbeUpdater;
+import com.simple2secure.service.test.utils.TestLoggingObserver;
 
 public class ProbeControllerEngine implements Engine {
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerEngine.class);
@@ -25,13 +29,13 @@ public class ProbeControllerEngine implements Engine {
 	private static final String COMPLETE_NAME = NAME + ":" + VERSION;
 
 	private ScheduledThreadPoolExecutor scheduler;
-
+	private ServiceInstrumentation serviceInstrument;
 	private ScheduledFuture<?> probeMonitor;
 	private ScheduledFuture<?> probeUpdater;
 	private ScheduledFuture<?> portalWatchdog;
 
 	private ProcessContainer probeProcess;
-	private SimpleLoggingObserver observer;
+	private TestLoggingObserver observer;
 	private int exitValue = 0;
 
 	public ProbeControllerEngine() {
@@ -46,7 +50,7 @@ public class ProbeControllerEngine implements Engine {
 		scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(true);
 		scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
-		observer = new SimpleLoggingObserver();
+		observer = new TestLoggingObserver();
 
 	}
 
@@ -60,15 +64,11 @@ public class ProbeControllerEngine implements Engine {
 
 	@Override
 	public boolean start() {
-		log.debug("Starting {}", this.getName());
 		if (startProbe()) {
 			try {
-				log.debug("Creating ProbeMonitor scheduled task");
-				probeMonitor = scheduler.scheduleAtFixedRate(new ProbeMonitor(), 0, 10000, TimeUnit.MILLISECONDS);
-				log.debug("Creating ProbeUpdater scheduled task");
-				probeUpdater = scheduler.scheduleAtFixedRate(new ProbeUpdater(), 100, 10000, TimeUnit.MILLISECONDS);
-				log.debug("Creating PortalWatchdog scheduled task");
-				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(), 200, 10000, TimeUnit.MILLISECONDS);
+				probeMonitor = scheduler.scheduleAtFixedRate(new ProbeMonitor(), 0, 1000, TimeUnit.MILLISECONDS);
+				probeUpdater = scheduler.scheduleAtFixedRate(new ProbeUpdater(), 100, 1000, TimeUnit.MILLISECONDS);
+				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(), 200, 1000, TimeUnit.MILLISECONDS);
 				return true;
 			} catch (Exception e) {
 				log.error("Couldn't start probe controller engine. Reason {}", e);
@@ -77,40 +77,29 @@ public class ProbeControllerEngine implements Engine {
 		return false;
 	}
 
-	public ScheduledFuture<?> getProbeMonitor() {
-		return probeMonitor;
-	}
-
-	public void setProbeMonitor(ScheduledFuture<?> probeMonitor) {
-		this.probeMonitor = probeMonitor;
-	}
-
-	public ScheduledFuture<?> getProbeUpdater() {
-		return probeUpdater;
-	}
-
-	public void setProbeUpdater(ScheduledFuture<?> probeUpdater) {
-		this.probeUpdater = probeUpdater;
-	}
-
-	public ScheduledFuture<?> getPortalWatchdog() {
-		return portalWatchdog;
-	}
-
-	public void setPortalWatchdog(ScheduledFuture<?> portalWatchdog) {
-		this.portalWatchdog = portalWatchdog;
-	}
-
 	private boolean startProbe() {
 		try {
-			probeProcess = ProcessUtils.invokeJavaProcess("-jar", "simple2secure.probe-0.1.0.jar", "-l", "license.zip");
-			log.debug("Probe started using JAR. Alive {}", probeProcess.getProcess().isAlive());
+			/*
+			 * Starting probe using ProbeCLI and the initial license.
+			 */
+			probeProcess = ProcessUtils.invokeJavaProcess("-cp", "./release/simple2secure.probe-0.1.0.jar",
+					"com.simple2secure.probe.cli.ProbeCLI", "-l", "license.zip");
+
+			serviceInstrument = new ServiceInstrumentation(probeProcess.getProcess().getInputStream(),
+					probeProcess.getProcess().getOutputStream());
+
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();
-			log.debug("Added output observer to probe process.");
-			return true;
-		} catch (FileNotFoundException | InterruptedException ie) {
-			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
+
+			/*
+			 * Sending to probe that it should start monitoring.
+			 */
+			serviceInstrument.sendCommand(new ServiceCommand(ServiceCommands.START, null));
+
+		} catch (FileNotFoundException fnfe) {
+			log.error("Couldn't create Probe process using standard parameters. Reason {}", fnfe);
+		} catch (IOException e) {
+			log.error("Couldn't send start command to created probe process. Reason {}", e);
 		}
 		return false;
 	}
@@ -118,22 +107,11 @@ public class ProbeControllerEngine implements Engine {
 	@Override
 	public boolean stop() {
 		if (probeProcess != null) {
-			try {
-				probeProcess.getProcess().destroy();
-				log.debug("Destroyed Probe process. Exit value was {}", exitValue);
-				if (!probeProcess.getProcess().isAlive()) {
-					exitValue = probeProcess.getProcess().exitValue();
-					log.debug("Exit value was {}", exitValue);
-				}
-			} catch (Exception e) {
-				log.error("Stopping didn't work correctly! Reason {}", e);
-			}
+			probeProcess.getProcess().destroy();
+			exitValue = probeProcess.getProcess().exitValue();
+			log.debug("Destroyed Probe process. Exit value was {}", exitValue);
 		}
-		try {
-			scheduler.shutdown();
-		} catch (Exception e) {
-			log.error("Shuting down scheduler didn't work. Reason {}", e);
-		}
+		scheduler.shutdown();
 		return true;
 	}
 

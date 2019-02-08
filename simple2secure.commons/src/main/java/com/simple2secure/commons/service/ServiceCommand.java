@@ -3,6 +3,7 @@ package com.simple2secure.commons.service;
 import java.util.Arrays;
 
 public class ServiceCommand {
+
 	private ServiceCommands command;
 	private String[] arguments;
 

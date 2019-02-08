@@ -202,7 +202,7 @@ public class LicenseController {
 					String licenseFile = LicenseUtil.createLicenseFile(companyLicense.getGroupId(), companyLicense.getLicenseId(),
 							companyLicense.getExpirationDate());
 
-					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStream(licenseFile, licenseFilePath + "public.key");
+					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStreamFromFile(licenseFile, licenseFilePath + "public.key");
 
 					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
 					contextRepository.update(context);

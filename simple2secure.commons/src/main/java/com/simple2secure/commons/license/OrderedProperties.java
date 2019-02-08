@@ -17,6 +17,14 @@ public class OrderedProperties extends Properties {
 
 	private final Map<Object, Object> orderedMap = new LinkedHashMap<>();
 
+	public OrderedProperties() {
+
+	}
+
+	public OrderedProperties(Properties properties) {
+		properties.forEach((key, value) -> orderedMap.put(key, value));
+	}
+
 	@Override
 	public Object get(Object key) {
 		return orderedMap.get(key);

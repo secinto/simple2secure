@@ -17,13 +17,13 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.network.packet.ProbePacketRequestHandler;
 import com.simple2secure.probe.network.packet.ReceiveProbePacket;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
-import com.simple2secure.probe.security.TLSConfig;
 import com.simple2secure.probe.utils.PacketUtil;
 
 public class ProbeCLI {
@@ -40,10 +40,6 @@ public class ProbeCLI {
 	 *          The absolute file path to the License ZIP File.
 	 */
 	public void init(String importFilePath) {
-
-		TLSConfig.initializeTLSConfiguration(
-				new String[] { "1009697567", "93791718698785438451096221151509119784", "132145755450301565074331139870923558714" });
-
 		LicenseController licenseController = new LicenseController();
 
 		StartConditions startConditions = licenseController.checkProbeStartConditions();
@@ -128,42 +124,41 @@ public class ProbeCLI {
 	 * Starts the Probe itself. Hope the best.
 	 */
 	public void startInstrumentation() {
-		boolean running = true;
 		/*
 		 * Starting instrumentation listening to obtain commands from the ProbeControllerService.
 		 */
 		Scanner commandService = new Scanner(System.in);
-		try {
-			ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
-
-			while (running) {
-				switch (command.getCommand()) {
-				case START:
-					startWorkerThreads();
-					break;
-				case GET_VERSION:
-				case RESET:
-					stopWorkerThreads();
-					startWorkerThreads();
-					break;
-				case STOP:
-				case TERMINATE:
-				case OTHER:
-					log.debug("Obtained not recognized command {}", command);
-					stopWorkerThreads();
-					running = false;
-					break;
-				default:
-					break;
-				}
-				command = ServiceCommand.fromString(commandService.nextLine());
+		ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
+		while (command.getCommand() != ServiceCommands.STOP && command.getCommand() != ServiceCommands.TERMINATE) {
+			command = ServiceCommand.fromString(commandService.nextLine());
+			switch (command.getCommand()) {
+			case START:
+				startWorkerThreads();
+				break;
+			case GET_VERSION:
+				System.out.println("0.1.0");
+				break;
+			case RESET:
+				stopWorkerThreads();
+				startWorkerThreads();
+				break;
+			case STOP:
+				stopWorkerThreads();
+				break;
+			case TERMINATE:
+				stopWorkerThreads();
+				System.exit(0);
+				break;
+			case OTHER:
+				log.debug("Obtained not recognized command {}", command);
+				break;
+			default:
+				log.debug("Default case for command {}", command);
+				break;
 			}
-			log.info("Exit command {} received from probe controller service. Exiting", command);
-		} catch (Exception e) {
-			log.error("Receiving instrumentation command failed. Reason {}", e);
-		} finally {
-			commandService.close();
 		}
+		log.info("Exit command {} received from probe controller service. Exiting", command);
+		commandService.close();
 	}
 
 	public static void main(String[] args) {
@@ -174,20 +169,22 @@ public class ProbeCLI {
 
 		options.addOption(filePath);
 		try {
+			ProbeCLI client = new ProbeCLI();
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);
-			ProbeCLI client = new ProbeCLI();
 
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
 			}
+
 			if (ProbeConfiguration.isInstrumented) {
 				client.startInstrumentation();
 			} else {
 				client.startWorkerThreads();
+				if (ProbeConfiguration.runInTesting) {
+					client.demoPacketSending();
+				}
 			}
-			// client.demoPacketSending();
-
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
 			String footer = "\nPlease report issues at http://simple2secure.com/issues";
