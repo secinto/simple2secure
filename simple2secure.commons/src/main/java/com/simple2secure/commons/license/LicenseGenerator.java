@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -40,24 +39,7 @@ public class LicenseGenerator {
 	 *           Thrown if the private key couldn't be loaded using the default key algorithm.
 	 */
 	public static License generateLicense(Properties properties, String privateKeyFile) {
-		try {
-			final String encoded = properties.toString();
-			final PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
-			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
-			final String encodedSignature = Base64.getEncoder().encodeToString(signature);
-
-			final Properties orderedProperties = new OrderedProperties();
-			orderedProperties.putAll(properties);
-			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
-
-			final License license = new License(orderedProperties);
-
-			return license;
-		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
-			log.error("Couldn't create signature for license. Reason {}", e);
-		}
-
-		return null;
+		return generateLicense(properties, new File(privateKeyFile));
 	}
 
 	/**
@@ -78,22 +60,10 @@ public class LicenseGenerator {
 	 */
 	public static License generateLicense(Properties properties, File privateKeyFile) {
 		try {
-			final String encoded = properties.toString();
-			final PrivateKey privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
-			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
-			final String encodedSignature = Base64.getEncoder().encodeToString(signature);
-
-			final Properties orderedProperties = new OrderedProperties();
-			orderedProperties.putAll(properties);
-			orderedProperties.put(SIGNATURE_PROPERTY, encodedSignature);
-
-			final License license = new License(orderedProperties);
-
-			return license;
-		} catch (InvalidKeySpecException | InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
-			log.error("Couldn't create signature for license. Reason {}", e);
+			return generateLicense(properties, KeyUtils.readPrivateKeyFromFile(privateKeyFile));
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			log.error("Couldn't read private key from provided file. Reason {}", e);
 		}
-
 		return null;
 	}
 
@@ -113,6 +83,10 @@ public class LicenseGenerator {
 	 */
 	public static License generateLicense(Properties properties, PrivateKey privateKey) {
 		try {
+			if (properties == null || privateKey == null) {
+				return null;
+			}
+
 			final String encoded = properties.toString();
 			final byte[] signature = CryptoUtils.sign(encoded, privateKey);
 			final String encodedSignature = new String(signature);
@@ -176,16 +150,37 @@ public class LicenseGenerator {
 	 * @param outputStream
 	 *          An output stream to which the license should be directly written after generation.
 	 * @param privateKeyFile
+	 *          The private key as file object which should be used to sign the license
+	 * @return The {@link License} object as generated.
+	 */
+	public static License generateLicense(Properties properties, OutputStream outputStream, File privateKeyFile) {
+		try {
+			return generateLicense(properties, outputStream, KeyUtils.readPrivateKeyFromFile(privateKeyFile));
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			log.error("Couldn't generate license because private key file {} couldn't be loaded. Reason {}", privateKeyFile, e);
+		}
+		return null;
+	}
+
+	/**
+	 * Generates a license using the provided properties as input for the license. If the {@value #EXPIRATION_DATE_PROPERTY} property is not
+	 * available in the properties the generation fails. For generating the license the default key algorithm
+	 * {@link KeyUtils#ASYMMETRIC_KEY_ALGORITHM}, which is <code>EC</code> and the default signature algorithm
+	 * {@link CryptoUtils#SIGNATURE_ALGORITHM}, which is <code>SHA512withECDSA</code> are used. If the provided private key or the used
+	 * algorithm are not available or do not match the provided key, no license is created. If the signature generation fails also null is
+	 * returned.
+	 *
+	 * @param properties
+	 *          The properties which are part of the license.
+	 * @param outputStream
+	 *          An output stream to which the license should be directly written after generation.
+	 * @param privateKeyFile
 	 *          The private key as file name which should be used to sign the license
 	 * @return The {@link License} object as generated.
 	 */
 	public static License generateLicense(Properties properties, OutputStream outputStream, String privateKeyFile) {
-		PrivateKey privateKey;
 		try {
-			privateKey = KeyUtils.readPrivateKeyFromFile(privateKeyFile);
-			if (privateKey != null) {
-				return generateLicense(properties, outputStream, privateKey);
-			}
+			return generateLicense(properties, outputStream, KeyUtils.readPrivateKeyFromFile(privateKeyFile));
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			log.error("Couldn't generate license because private key file {} couldn't be loaded. Reason {}", privateKeyFile, e);
 		}

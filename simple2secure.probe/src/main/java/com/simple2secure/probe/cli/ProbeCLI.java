@@ -134,17 +134,26 @@ public class ProbeCLI {
 			switch (command.getCommand()) {
 			case START:
 				startWorkerThreads();
+				break;
 			case GET_VERSION:
+				System.out.println("0.1.0");
+				break;
 			case RESET:
 				stopWorkerThreads();
 				startWorkerThreads();
 				break;
 			case STOP:
+				stopWorkerThreads();
+				break;
 			case TERMINATE:
+				stopWorkerThreads();
+				System.exit(0);
+				break;
 			case OTHER:
 				log.debug("Obtained not recognized command {}", command);
 				break;
 			default:
+				log.debug("Default case for command {}", command);
 				break;
 			}
 		}
@@ -160,20 +169,22 @@ public class ProbeCLI {
 
 		options.addOption(filePath);
 		try {
+			ProbeCLI client = new ProbeCLI();
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);
-			ProbeCLI client = new ProbeCLI();
 
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
 			}
+
 			if (ProbeConfiguration.isInstrumented) {
 				client.startInstrumentation();
 			} else {
 				client.startWorkerThreads();
+				if (ProbeConfiguration.runInTesting) {
+					client.demoPacketSending();
+				}
 			}
-			// client.demoPacketSending();
-
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
 			String footer = "\nPlease report issues at http://simple2secure.com/issues";

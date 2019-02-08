@@ -1,6 +1,7 @@
 package com.simple2secure.service;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -11,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
+import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
+import com.simple2secure.commons.service.ServiceInstrumentation;
 import com.simple2secure.service.interfaces.Engine;
 import com.simple2secure.service.tasks.PortalWatchdog;
 import com.simple2secure.service.tasks.ProbeMonitor;
@@ -25,7 +29,7 @@ public class ProbeControllerEngine implements Engine {
 	private static final String COMPLETE_NAME = NAME + ":" + VERSION;
 
 	private ScheduledThreadPoolExecutor scheduler;
-
+	private ServiceInstrumentation serviceInstrument;
 	private ScheduledFuture<?> probeMonitor;
 	private ScheduledFuture<?> probeUpdater;
 	private ScheduledFuture<?> portalWatchdog;
@@ -75,13 +79,27 @@ public class ProbeControllerEngine implements Engine {
 
 	private boolean startProbe() {
 		try {
-			probeProcess = ProcessUtils.invokeJavaProcess("-jar", "simple2secure.probe.jar", "-l", "license.zip");
+			/*
+			 * Starting probe using ProbeCLI and the initial license.
+			 */
+			probeProcess = ProcessUtils.invokeJavaProcess("-cp", "./release/simple2secure.probe-0.1.0.jar",
+					"com.simple2secure.probe.cli.ProbeCLI", "-l", "license.zip");
+
+			serviceInstrument = new ServiceInstrumentation(probeProcess.getProcess().getInputStream(),
+					probeProcess.getProcess().getOutputStream());
 
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();
 
+			/*
+			 * Sending to probe that it should start monitoring.
+			 */
+			serviceInstrument.sendCommand(new ServiceCommand(ServiceCommands.START, null));
+
 		} catch (FileNotFoundException fnfe) {
-			log.error("Couldn't invoke Probe using standard parameters. Reason {}", fnfe);
+			log.error("Couldn't create Probe process using standard parameters. Reason {}", fnfe);
+		} catch (IOException e) {
+			log.error("Couldn't send start command to created probe process. Reason {}", e);
 		}
 		return false;
 	}
