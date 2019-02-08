@@ -217,45 +217,55 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 */
 	private void countNetworkTraffic() {
 		// Count sourceIPs
-		Integer countSrcIp = sourceIp.get(srcIp);
+		if (!Strings.isNullOrEmpty(srcIp)) {
+			Integer countSrcIp = sourceIp.get(srcIp);
 
-		if (countSrcIp == null) {
-			sourceIp.put(srcIp, 1);
-		} else {
-			sourceIp.put(srcIp, countSrcIp + 1);
+			if (countSrcIp == null) {
+				sourceIp.put(srcIp, 1);
+			} else {
+				sourceIp.put(srcIp, countSrcIp + 1);
+			}
 		}
 
-		// Count destination IPs
-		Integer countDestIp = destinationIp.get(destIp);
+		if (!Strings.isNullOrEmpty(destIp)) {
+			// Count destination IPs
+			Integer countDestIp = destinationIp.get(destIp);
 
-		if (countDestIp == null) {
-			destinationIp.put(destIp, 1);
-		} else {
-			destinationIp.put(destIp, countDestIp + 1);
+			if (countDestIp == null) {
+				destinationIp.put(destIp, 1);
+			} else {
+				destinationIp.put(destIp, countDestIp + 1);
+			}
 		}
 
-		// Count source MACs
-		Integer countSrcMac = sourceMac.get(srcMac);
-		if (countSrcMac == null) {
-			sourceMac.put(srcMac, 1);
-		} else {
-			sourceMac.put(srcMac, countSrcMac + 1);
+		if (!Strings.isNullOrEmpty(srcMac)) {
+			// Count source MACs
+			Integer countSrcMac = sourceMac.get(srcMac);
+			if (countSrcMac == null) {
+				sourceMac.put(srcMac, 1);
+			} else {
+				sourceMac.put(srcMac, countSrcMac + 1);
+			}
 		}
 
-		// Count dest MACs
-		Integer countDestMac = destinationMac.get(destMac);
-		if (countDestMac == null) {
-			destinationMac.put(destMac, 1);
-		} else {
-			destinationMac.put(destMac, countDestMac + 1);
+		if (!Strings.isNullOrEmpty(destMac)) {
+			// Count dest MACs
+			Integer countDestMac = destinationMac.get(destMac);
+			if (countDestMac == null) {
+				destinationMac.put(destMac, 1);
+			} else {
+				destinationMac.put(destMac, countDestMac + 1);
+			}
 		}
 
-		// Count protocols
-		Integer countProtocol = protocols.get(protocol);
-		if (countProtocol == null) {
-			protocols.put(protocol, 1);
-		} else {
-			protocols.put(protocol, countProtocol + 1);
+		if (!Strings.isNullOrEmpty(protocol)) {
+			// Count protocols
+			Integer countProtocol = protocols.get(protocol);
+			if (countProtocol == null) {
+				protocols.put(protocol, 1);
+			} else {
+				protocols.put(protocol, countProtocol + 1);
+			}
 		}
 
 		if (length > maxLength) {
@@ -273,58 +283,60 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		sourceMac = sortByValue(sourceMac);
 		protocols = sortByValue(protocols);
 
-		String srcIP = "{";
-		for (Map.Entry<String, Integer> entry : sourceIp.entrySet()) {
-			srcIP = srcIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		Map<String, String> resultEntry = new LinkedHashMap<String, String>();
+
+		if (!sourceIp.isEmpty()) {
+			String srcIP = "{";
+			for (Map.Entry<String, Integer> entry : sourceIp.entrySet()) {
+				srcIP = srcIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			}
+			srcIP = srcIP.substring(0, srcIP.length() - 2);
+			srcIP = srcIP + "}";
+
+			resultEntry.put("Source IP", srcIP);
 		}
-		srcIP = srcIP.substring(0, srcIP.length() - 2);
-		srcIP = srcIP + "}";
+		if (!destinationIp.isEmpty()) {
+			String destIP = "{";
+			for (Map.Entry<String, Integer> entry : destinationIp.entrySet()) {
+				destIP = destIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			}
+			destIP = destIP.substring(0, destIP.length() - 2);
+			destIP = destIP + "}";
 
-		String destIP = "{";
-		for (Map.Entry<String, Integer> entry : destinationIp.entrySet()) {
-			destIP = destIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			resultEntry.put("Destination IP", destIP);
 		}
-		destIP = destIP.substring(0, destIP.length() - 2);
-		destIP = destIP + "}";
+		if (!destinationMac.isEmpty()) {
+			String destMAC = "{";
+			for (Map.Entry<String, Integer> entry : destinationMac.entrySet()) {
+				destMAC = destMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			}
+			destMAC = destMAC.substring(0, destMAC.length() - 2);
+			destMAC = destMAC + "}";
 
-		String destMAC = "{";
-		for (Map.Entry<String, Integer> entry : destinationMac.entrySet()) {
-			destMAC = destMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			resultEntry.put("Destination MAC", destMAC);
 		}
-		destMAC = destMAC.substring(0, destMAC.length() - 2);
-		destMAC = destMAC + "}";
+		if (!sourceMac.isEmpty()) {
+			String srcMAC = "{";
+			for (Map.Entry<String, Integer> entry : sourceMac.entrySet()) {
+				srcMAC = srcMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			}
+			srcMAC = srcMAC.substring(0, srcMAC.length() - 2);
+			srcMAC = srcMAC + "}";
 
-		String srcMAC = "{";
-		for (Map.Entry<String, Integer> entry : sourceMac.entrySet()) {
-			srcMAC = srcMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			resultEntry.put("Source MAC", srcMAC);
 		}
-		srcMAC = srcMAC.substring(0, srcMAC.length() - 2);
-		srcMAC = srcMAC + "}";
+		if (!protocols.isEmpty()) {
+			String protocol = "{";
+			for (Map.Entry<String, Integer> entry : protocols.entrySet()) {
+				protocol = protocol + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			}
+			protocol = protocol.substring(0, protocol.length() - 2);
+			protocol = protocol + "}";
 
-		String protocol = "{";
-		for (Map.Entry<String, Integer> entry : protocols.entrySet()) {
-			protocol = protocol + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+			resultEntry.put("Protocols", protocol);
 		}
-		protocol = protocol.substring(0, protocol.length() - 2);
-		protocol = protocol + "}";
-		// String contentSrcIp = "Most used source IP: " + mostUsedSourceIP.getKey() + " - used: " + mostUsedSourceIP.getValue() + " times";
-		// String contentDstIp = "Most used destination IP: " + mostUsedDestinationIP.getKey() + " - used: " + mostUsedDestinationIP.getValue()
-		// + " times";
-		// String contentSrcMac = "Most used source MAC: " + mostUsedSourceMac.getKey() + " - used: " + mostUsedSourceMac.getValue() + " times";
-		// String contentDstMac = "Most used destination MAC: " + mostUsedDestinationMac.getKey() + " - used: " +
-		// mostUsedDestinationMac.getValue()
-		// + " times";
-		// String contentProtocol = "Most used protocol; " + mostUsedProtocol.getKey() + " - used: " + mostUsedProtocol.getValue() + " times";
-		// String contentMaxPacketLength = "Maximum packet length was: " + maxLength;
-		Map<String, String> entry = new LinkedHashMap<String, String>();
 
-		entry.put("Source IP", srcIP);
-		entry.put("Destination IP", destIP);
-		entry.put("Source MAC", srcMAC);
-		entry.put("Destination MAC", destMAC);
-		entry.put("Protocols", protocol);
-
-		content = JSONUtils.toString(entry);
+		content = JSONUtils.toString(resultEntry);
 		content = content.replace("\"{", "{");
 		content = content.replace("}\"", "}");
 		content = content.replace("'", "\"");
