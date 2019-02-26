@@ -34,8 +34,6 @@ public class TestLicenseUtil {
 
 	private static String workingDirectory = System.getProperty("user.dir");
 
-	private final static String licenseFileDir = "licenses" + File.separator;
-
 	@BeforeAll
 	public static void init() throws Exception {
 		licenseFilePath = LicenseUtil.getLicensePath(licenseFilePath);
@@ -78,12 +76,6 @@ public class TestLicenseUtil {
 		String licenseFile = LicenseUtil.createLicenseFile("test", "test", "12/31/2018");
 		License license = LicenseUtil.getLicense(licenseFile);
 		Assertions.assertNotNull(license);
-	}
-
-	@Test
-	public void getLicensePath_ParamIsDir_AbsolutePathOfDir() {
-		String licensePath = LicenseUtil.getLicensePath(licenseFilePath);
-		Assertions.assertEquals(workingDirectory + File.separator + licenseFileDir, licensePath);
 	}
 
 	@Test
@@ -172,7 +164,7 @@ public class TestLicenseUtil {
 		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
 		File pubKeyFile = new File("public.key");
 		File licFile = new File("license.dat");
-		File fileToOverwrite = new File("/licenses/license.dat");
+		File fileToOverwrite = new File(licenseFilePath + "license.dat");
 		boolean containsLicense = false;
 		boolean containsPublickey = false;
 		ByteArrayOutputStream result = LicenseUtil.generateLicenseZIPStreamFromFile(licFile.getPath().toString(),
