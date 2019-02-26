@@ -6,13 +6,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.license.License;
 
 public class ServiceInstrumentation {
+	private static Logger log = LoggerFactory.getLogger(ServiceInstrumentation.class);
+
 	public static final String AUTHENTICATED_TAG = "AUTHENTICATED";
 	private InputStream serviceOutput;
 
@@ -27,13 +35,73 @@ public class ServiceInstrumentation {
 
 	private String token;
 
-	private boolean useSignatureAuthentication = false;
+	private boolean useSignatureAuthentication = true;
 	private boolean useAuthentication = true;
+
+	private boolean useFallbackNoSecurity = false;
 
 	public ServiceInstrumentation(InputStream output, OutputStream input) {
 		serviceOutput = output;
 		serviceInput = input;
 		serviceCommandWriter = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream(serviceInput)));
+	}
+
+	/**
+	 * Returns whether signature authentication is used or not.
+	 *
+	 * @return Boolean value of the current state
+	 */
+	public boolean isUseSignatureAuthentication() {
+		return useSignatureAuthentication;
+	}
+
+	/**
+	 * Specifies if signature authentication should be used for command authentication. As default it is used.
+	 *
+	 * @param useSignatureAuthentication
+	 *          Boolean value to set signature authentication state
+	 */
+	public void setUseSignatureAuthentication(boolean useSignatureAuthentication) {
+		this.useSignatureAuthentication = useSignatureAuthentication;
+	}
+
+	/**
+	 * Returns the current state of using command authentication.
+	 *
+	 * @return Boolean value off the state.
+	 */
+	public boolean isUseAuthentication() {
+		return useAuthentication;
+	}
+
+	/**
+	 * Sets the value if authentication should be used for each command. Default this also implies to use signature authentication, which is
+	 * set implicitly if <code>true</code> is provided as input.
+	 *
+	 * @param useAuthentication
+	 *          True or False whether authentication should be used or not.
+	 */
+	public void setUseAuthentication(boolean useAuthentication) {
+		this.useAuthentication = useAuthentication;
+	}
+
+	/**
+	 * Returns if NO security is used as fallback.
+	 *
+	 * @return Boolean if NO security is used.
+	 */
+	public boolean isUseFallbackNoSecurity() {
+		return useFallbackNoSecurity;
+	}
+
+	/**
+	 * Sets the value for using NO security as fallback to the provided value. As default the value is set to false.
+	 *
+	 * @param useFallbackNoSecurity
+	 *          True if NO security should be used as fallback.
+	 */
+	public void setUseFallbackNoSecurity(boolean useFallbackNoSecurity) {
+		this.useFallbackNoSecurity = useFallbackNoSecurity;
 	}
 
 	/**
@@ -139,23 +207,37 @@ public class ServiceInstrumentation {
 	 *          The command which should be sent to the connected service.
 	 * @throws IOException
 	 *           Thrown if writing to the output stream fails.
+	 * @throws NoSuchAlgorithmException
+	 * @throws SignatureException
+	 * @throws InvalidKeyException
 	 */
-	public synchronized void sendCommand(ServiceCommand command) throws IOException {
+	public synchronized void sendCommand(ServiceCommand command)
+			throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 		/*
 		 * TODO: Add some authentication mechanism which allows to verify the sender authenticity of the sender at the service.
 		 */
+		boolean authenticationStatus = true;
 		String commandToSend = command.getCommand() + " " + String.join(" ", command.getArguments());
 		if (useAuthentication) {
 			if (useSignatureAuthentication && privateKey != null) {
-				byte[] signedCommand = CryptoUtils.sign(commandToSend, privateKey);
-				commandToSend = new String(signedCommand, "UTF-8");
+				try {
+					byte[] signedCommand = CryptoUtils.sign(commandToSend, privateKey);
+					commandToSend = new String(signedCommand, "UTF-8");
+				} catch (Exception e) {
+					log.error("Couldn't sign command. Reason {}", e);
+					if (useFallbackNoSecurity) {
+						log.info("Proceeding with fallback NO security");
+						authenticationStatus = false;
+					}
+				}
 			} else {
 				commandToSend = commandToSend + " " + token;
 			}
 			commandToSend = AUTHENTICATED_TAG + " " + commandToSend;
 		}
-
-		serviceCommandWriter.write(commandToSend);
+		if (authenticationStatus) {
+			serviceCommandWriter.write(commandToSend);
+		}
 
 	}
 }

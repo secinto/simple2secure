@@ -2,6 +2,9 @@ package com.simple2secure.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -16,10 +19,10 @@ import com.simple2secure.commons.service.ServiceCommand;
 import com.simple2secure.commons.service.ServiceCommands;
 import com.simple2secure.commons.service.ServiceInstrumentation;
 import com.simple2secure.service.interfaces.Engine;
+import com.simple2secure.service.observer.SimpleLoggingObserver;
 import com.simple2secure.service.tasks.PortalWatchdog;
 import com.simple2secure.service.tasks.ProbeMonitor;
 import com.simple2secure.service.tasks.ProbeUpdater;
-import com.simple2secure.service.test.utils.TestLoggingObserver;
 
 public class ProbeControllerEngine implements Engine {
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerEngine.class);
@@ -35,7 +38,7 @@ public class ProbeControllerEngine implements Engine {
 	private ScheduledFuture<?> portalWatchdog;
 
 	private ProcessContainer probeProcess;
-	private TestLoggingObserver observer;
+	private SimpleLoggingObserver observer;
 	private int exitValue = 0;
 
 	public ProbeControllerEngine() {
@@ -50,7 +53,7 @@ public class ProbeControllerEngine implements Engine {
 		scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(true);
 		scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
-		observer = new TestLoggingObserver();
+		observer = new SimpleLoggingObserver();
 
 	}
 
@@ -100,6 +103,10 @@ public class ProbeControllerEngine implements Engine {
 			log.error("Couldn't create Probe process using standard parameters. Reason {}", fnfe);
 		} catch (IOException e) {
 			log.error("Couldn't send start command to created probe process. Reason {}", e);
+		} catch (InterruptedException e) {
+			log.error("Exception during execution of Probe process. Reason {}", e);
+		} catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
+			log.error("Couldn't send command to running Probe process. Reason {}", e);
 		}
 		return false;
 	}

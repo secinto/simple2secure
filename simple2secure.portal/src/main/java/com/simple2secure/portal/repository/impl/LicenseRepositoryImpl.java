@@ -4,12 +4,12 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.assertj.core.util.Strings;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.repository.LicenseRepository;
 

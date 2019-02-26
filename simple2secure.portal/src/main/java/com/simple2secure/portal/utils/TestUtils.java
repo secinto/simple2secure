@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.assertj.core.util.Strings;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.simple2secure.api.model.Command;
 import com.simple2secure.api.model.TestCase;
@@ -81,7 +81,7 @@ public class TestUtils {
 
 				if (tool != null) {
 
-					List<TestCase> testCaseList = new ArrayList<TestCase>();
+					List<TestCase> testCaseList = new ArrayList<>();
 
 					if (!Strings.isNullOrEmpty(testCase.getId())) {
 
@@ -104,7 +104,7 @@ public class TestUtils {
 					TestCaseSequence testCaseSequence = new TestCaseSequence(testCase.getToolId(), testCaseList);
 					testSequenceRepository.save(testCaseSequence);
 
-					return new ResponseEntity<TestCaseSequence>(testCaseSequence, HttpStatus.OK);
+					return new ResponseEntity<>(testCaseSequence, HttpStatus.OK);
 				}
 			}
 		}
@@ -264,7 +264,7 @@ public class TestUtils {
 				testResultTestMappingRepository.deleteByTestId(testId);
 				testRepository.delete(testCase);
 
-				return new ResponseEntity<TestCase>(testCase, HttpStatus.OK);
+				return new ResponseEntity<>(testCase, HttpStatus.OK);
 			}
 
 		}

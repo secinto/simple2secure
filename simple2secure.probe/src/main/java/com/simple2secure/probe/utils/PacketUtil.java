@@ -1,10 +1,14 @@
 package com.simple2secure.probe.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.pcap4j.packet.IllegalRawDataException;
+
 import com.simple2secure.api.model.ProbePacket;
+import com.simple2secure.probe.network.packet.ProbePacketCrafter;
 import com.simple2secure.probe.network.packet.ProbePacketQueueHandler;
 
 public class PacketUtil {
@@ -88,4 +92,37 @@ public class PacketUtil {
 		}
 		return resultPacket;
 	}
+
+	public static void craftProbePacketsForTest() throws IllegalRawDataException {
+
+		try {
+			ProbePacket arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
+			arpPacket.setId("1");
+			ProbePacket pingPacket = ProbePacketCrafter.craftProbePacket("ping", "2", "ping-packet", false, 50, 1);
+			pingPacket.setId("2");
+			ProbePacket icmpCommonPacket = ProbePacketCrafter.craftProbePacket("icmpCommon", "2", "common-packet", false, 1, 1);
+			icmpCommonPacket.setId("3");
+
+			DBUtil.getInstance().merge(arpPacket);
+			DBUtil.getInstance().merge(pingPacket);
+			DBUtil.getInstance().merge(icmpCommonPacket);
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static ProbePacket craftOneProbePacket(String type, String groupId, String name, boolean always, int requestCount,
+			long analysisInterval) {
+		ProbePacket packetToCraft = null;
+		try {
+			packetToCraft = ProbePacketCrafter.craftProbePacket(type, groupId, name, always, requestCount, analysisInterval);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return packetToCraft;
+	}
+
 }
