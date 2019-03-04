@@ -81,6 +81,8 @@ public class ReportUtils {
 	}
 
 	/**
+	 * This function retrieves all network reports for the common-stats processor, iterates through each packet which has been saved in the
+	 * report and converts an IP Address to the GeoLocation.
 	 *
 	 * @return
 	 * @throws IOException

@@ -10,6 +10,7 @@
   "button.downloadProbe": "Download Probe",
   "button.save": "Save",
   "button.cancel": "Cancel",
+  "button.close": "Close",
   "button.more": "More",
   "button.addQuery": "Add Query",
   "button.addProcessor": "Add Processor",  
