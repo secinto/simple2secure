@@ -1,0 +1,67 @@
+[
+	{
+		"id": "test1",
+		"description": "Simple tool for running some tests",
+		"version": "0.0.1",
+		"precondition": {
+			"id": "pre1",
+			"description": "Remove some file if exists",
+			"command": {
+				"id": "cmdpre1",
+				"executable": "DELETE_RESULT",
+				"parameter": {
+					"id": "cmdpre1param",
+					"description": "File name",
+					"prefix": "",
+					"value": "./result/result.json"
+				}
+			},
+			"rule": {
+				"name": "File Rule",
+				"description": "Rule will execute some action according to the provided result",
+				"condition": "no-condition",
+				"actions": "no-action"
+			}
+		},
+		"step": {
+			"id": "stp1",
+			"description": "Execute nmap",
+			"command": {
+				"id": "cmdstp1",
+				"executable": "nmap",
+				"parameter": {
+					"id": "cmdstp1param",
+					"description": "Some simple nmap execution",
+					"prefix": "",
+					"value": "www.secinto.com"
+				}
+			},
+			"rule": {
+				"name": "Nmap Rule",
+				"description": "Rule will execute some action according to the provided result",
+				"condition": "no-condition",
+				"actions": "no-action"
+			}
+		},
+		"postcondition": {
+			"id": "post1",
+			"description": "Save result to the file",
+			"command": {
+				"id": "cmdpost1",
+				"executable": "SAVE_RESULT",
+				"parameter": {
+					"id": "cmdpost1param",
+					"description": "File Name",
+					"prefix": "",
+					"value": "result/result.json"
+				}
+			},
+			"rule": {
+				"name": "File Save Rule",
+				"description": "Rule will execute some action according to the provided result",
+				"condition": "no-condition",
+				"actions": "no-action"
+			}
+		}
+	}
+]

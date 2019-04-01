@@ -19,3 +19,10 @@ simple2secure.portal/temp/
 simple2secure.service/release/
 simple2secure.commons/licenses/
 simple2secure.probe/db/
+simple2secure.testservice/.idea/
+simple2secure.testservice/__pycache__/
+simple2secure.testservice/Include/
+simple2secure.testservice/Lib/
+simple2secure.testservice/result/
+simple2secure.testservice/Scripts/
+simple2secure.testservice/tcl/

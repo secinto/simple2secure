@@ -1,0 +1,22 @@
+Building docker image simple2secure-testservice
+
+1) Navigate to the root folder "simple2secure.testservice"
+2) Open cmd and type "docker build -t flask-service-s2s:latest ."
+4) Delete the running container (if already exists ) using "docker rm containerId -f" ----> "docker container ls" will list all containers
+3) Run the app in docker using "docker run --name=s2s-test-service -d -p 5000:5000 flask-service-s2s"
+
+
+To save image to the custom location run:
+
+docker save -o C:\DockerData\flask-service-s2s.tar flask-service-s2s
+
+To load saved image
+
+docker load -i flask-service-s2s.tar
+
+
+http://localhost:5000/services/run?test=test1&step=stp1%command=cmdstp1%executable=nmap
+
+http://localhost:5000/services/run?test=test1&step=stp1%command=cmdstp1%executable=nmap%20-RF%parameter=cmdstp1param%value=www.orf.at
+
+http://localhost:5000/services/run?test=test1&step=stp1%parameter=cmdstp1param%value=www.orf.at
