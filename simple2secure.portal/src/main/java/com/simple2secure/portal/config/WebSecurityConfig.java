@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/**", "/api/download/**",
 				"/api/user/sendResetPasswordEmail", "/api/device/**", "/api/user/resetPassword/**", "/api/user/updatePassword/**",
 				"/api/license/activateProbe", "/api/license/token", "/api/service/**", "/assets/**", "/favicon.ico", "/index.html", "/*.js",
-				"/*.map", "/fontawesome*", "/glyphicons*");
+				"/*.map", "/fontawesome*", "/glyphicons*", "/api/test");
 	}
 
 	// TODO - find better solution for antMatchers!
@@ -68,7 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll()
 				.antMatchers("/api/service/").permitAll().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
 				.antMatchers("/api/login").anonymous().and().authorizeRequests().antMatchers("/api/user/activate/").anonymous().and()
-				.authorizeRequests().antMatchers("/api/service/**").anonymous().and().authorizeRequests()
+				.authorizeRequests().antMatchers("/api/service/**").anonymous().antMatchers("/api/test").anonymous().and().authorizeRequests()
 				.antMatchers("/api/user/sendResetPasswordEmail").anonymous().and().authorizeRequests().antMatchers("/api/users/resetPassword/**")
 				.anonymous().and().authorizeRequests().antMatchers("/api/user/updatePassword/**").anonymous().and().authorizeRequests()
 				.antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and()

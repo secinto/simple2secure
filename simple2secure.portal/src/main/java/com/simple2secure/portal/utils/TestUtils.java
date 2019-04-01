@@ -3,6 +3,7 @@ package com.simple2secure.portal.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.util.Strings;
@@ -14,14 +15,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.common.io.ByteStreams;
-import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestCase;
 import com.simple2secure.api.model.TestCaseResult;
 import com.simple2secure.api.model.TestCaseSequence;
+import com.simple2secure.api.model.TestCommand;
 import com.simple2secure.api.model.TestResultTestMapping;
 import com.simple2secure.api.model.Tool;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.TestRepository;
@@ -44,7 +48,13 @@ public class TestUtils {
 	TestResultRepository testResultRepository;
 
 	@Autowired
+	protected LoadedConfigItems loadedConfigItems;
+
+	@Autowired
 	TestRepository testRepository;
+
+	@Autowired
+	RestTemplate restTemplate;
 
 	@Autowired
 	ToolRepository toolRepository;
@@ -239,10 +249,10 @@ public class TestUtils {
 	 * @param cmdList
 	 * @return
 	 */
-	private List<String> generateCommands(List<Command> cmdList) {
+	private List<String> generateCommands(List<TestCommand> cmdList) {
 		List<String> commands = new ArrayList<>();
 		if (cmdList != null) {
-			for (Command cmd : cmdList) {
+			for (TestCommand cmd : cmdList) {
 				commands.add(cmd.getContent());
 			}
 		}
@@ -271,6 +281,14 @@ public class TestUtils {
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	public List<Test> getTestsFromDocker() {
+		ResponseEntity<Test[]> response = restTemplate.getForEntity(loadedConfigItems.getBaseDockerContainer() + "/services", Test[].class);
+		// String testResponse = response.getBody();
+		List<Test> tests = Arrays.asList(response.getBody());
+		// List<Test> tests = new ArrayList<>();
+		return tests;
 	}
 
 }

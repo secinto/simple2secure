@@ -15,7 +15,7 @@ public class TestCase extends TestCaseTemplate {
 	public TestCase() {
 	}
 
-	public TestCase(String name, String toolId, List<Command> commands, boolean scheduled, boolean finished) {
+	public TestCase(String name, String toolId, List<TestCommand> commands, boolean scheduled, boolean finished) {
 		super(name, toolId, commands);
 		this.scheduled = scheduled;
 		this.finished = finished;

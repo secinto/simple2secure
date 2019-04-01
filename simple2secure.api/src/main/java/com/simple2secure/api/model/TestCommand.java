@@ -2,7 +2,7 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class Command extends GenericDBObject {
+public class TestCommand extends GenericDBObject {
 
 	/**
 	 *
@@ -11,11 +11,11 @@ public class Command extends GenericDBObject {
 
 	private String content;
 
-	public Command() {
+	public TestCommand() {
 
 	}
 
-	public Command(String content) {
+	public TestCommand(String content) {
 		this.content = content;
 	}
 

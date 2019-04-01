@@ -14,13 +14,13 @@ public class TestCaseTemplate extends GenericDBObject {
 
 	private String name;
 	private String toolId;
-	private List<Command> commands = new ArrayList<>();
+	private List<TestCommand> commands = new ArrayList<>();
 
 	public TestCaseTemplate() {
 
 	}
 
-	public TestCaseTemplate(String name, String toolId, List<Command> commands) {
+	public TestCaseTemplate(String name, String toolId, List<TestCommand> commands) {
 		this.name = name;
 		this.toolId = toolId;
 		this.commands = commands;
@@ -42,11 +42,11 @@ public class TestCaseTemplate extends GenericDBObject {
 		this.toolId = toolId;
 	}
 
-	public List<Command> getCommands() {
+	public List<TestCommand> getCommands() {
 		return commands;
 	}
 
-	public void setCommands(List<Command> commands) {
+	public void setCommands(List<TestCommand> commands) {
 		this.commands = commands;
 	}
 }

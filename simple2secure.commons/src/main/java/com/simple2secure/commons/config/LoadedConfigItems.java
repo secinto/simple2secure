@@ -23,6 +23,8 @@ public class LoadedConfigItems {
 
 	private String baseKubernetesURL = "https://192.168.123.95:6443";
 
+	private String baseDockerContainer = "http://192.168.99.100:5000";
+
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
 	private String configURL = "/config/config.json";
@@ -85,6 +87,10 @@ public class LoadedConfigItems {
 
 	public void setBaseProtocol(String baseProtocol) {
 		this.baseProtocol = baseProtocol;
+	}
+
+	public String getBaseDockerContainer() {
+		return baseDockerContainer;
 	}
 
 	public String getBaseHost() {

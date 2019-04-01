@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.dto.TestDTO;
 import com.simple2secure.api.dto.ToolDTO;
-import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.TestCommand;
 import com.simple2secure.api.model.TestCase;
 import com.simple2secure.api.model.TestCaseTemplate;
 import com.simple2secure.api.model.Tool;
@@ -178,8 +178,8 @@ public class ToolUtils {
 
 		// Create default test/template for the tool
 		// TODO: check - how to add default command
-		List<Command> commands = new ArrayList<Command>();
-		commands.add(new Command("nmap"));
+		List<TestCommand> commands = new ArrayList<TestCommand>();
+		commands.add(new TestCommand("nmap"));
 		TestCaseTemplate testTemplate = new TestCaseTemplate("nmap_simple_test", toolId.toString(), commands);
 		testTemplateRepository.save(testTemplate);
 	}
