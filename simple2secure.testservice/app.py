@@ -1,18 +1,22 @@
-from flask import Flask, Response, jsonify, json, request
+from flask import Flask, Response, jsonify, json, request, render_template, flash, redirect
 from flask_cors import CORS
 from scanner import scanner
 from utils import *
+from werkzeug.utils import secure_filename
 import threading
+import os
 
 app = Flask(__name__)
 CORS(app)
+app.secret_key = "ChangeIt2019!"
+
+UPLOAD_FOLDER = 'static/license'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route("/")
 def get_available_tests():
-    data = json.loads(read_json_testfile())
-    test_id = request.args.get('test')
-    return get_test_item_value(data, request.args.get('step'), test_id, 'step', 'command')
+    return parse_license_file(get_license_file(), "expirationDate")
 
 
 @app.route("/services")
@@ -63,6 +67,29 @@ def run_service():
     # write_to_result_log(json.dumps(results))
 
     return jsonify(results)
+
+
+@app.route('/license/upload')
+def upload_license():
+    return render_template('uploadLicense.html')
+
+
+@app.route('/license/doUpload', methods=['POST'])
+def do_license_upload():
+    if request.method == 'POST':
+        # Check if post request has file in it
+        if 'file' not in request.files:
+            flash('No file part!')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No file selected for uploading')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File(s) successfully uploaded')
+            return redirect('/license/upload')
 
 
 if __name__ == '__main__':

@@ -22,13 +22,21 @@ docker run --name=s2s-test-service -d -p 5000:5000 flask-service-s2s
 ```
 
 (Optional) Access image using bash to update services.json file or install new
-tools
+tools.
+services.json file is located in the root folder of the image.
 
 ```
 docker exec -i -t s2s-test-service /bin/bash
 ```
 
 ## Running the tests
+
+Our local docker machine is running under http://192.168.99.100 and service runs on the port 5000.
+You can discover your docker machine ip address by calling following command:
+
+```
+docker-machine ip
+```
 
 List all available tests
 
