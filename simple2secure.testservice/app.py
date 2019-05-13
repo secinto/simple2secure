@@ -1,22 +1,37 @@
-from flask import Flask, Response, jsonify, json, request, render_template, flash, redirect
+from flask import Flask, Response, jsonify, request, render_template, flash, redirect
 from flask_cors import CORS
 from scanner import scanner
-from utils import *
+from src.models.TestResult import TestResult
+from src.util.utils import *
 from werkzeug.utils import secure_filename
+from datetime import datetime
 import threading
 import os
+import secrets
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = "ChangeIt2019!"
-
-UPLOAD_FOLDER = 'static/license'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+auth_token = ""
+LICENSE_FOLDER = 'static/license'
+app.config['LICENSE_FOLDER'] = LICENSE_FOLDER
+PORTAL_URL = "https://localhost:8443/api/"
+podId = secrets.token_urlsafe(20)
+licenseFile = parse_license_file(get_license_file())
+license_id = licenseFile.licenseId
 
 
 @app.route("/")
 def get_available_tests():
-    return parse_license_file(get_license_file(), "expirationDate")
+    timestamp = datetime.now().timestamp()*1000
+    test_result = TestResult("Result - " + timestamp.__str__(), "test", license_id, licenseFile.groupId, timestamp)
+
+    if not auth_token:
+        get_auth_token()
+
+    portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
+    # testResults.append(test_result)
+    return "haha"
 
 
 @app.route("/services")
@@ -55,7 +70,7 @@ def run_service():
 
     # Create threads for each part
     precondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_precondition), parameter_precondition), results, "Precondition"))
-    step_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_step), parameter_step), results, "Step"))
+    step_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_step), parameter_step), results, "step"))
     postcondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_postcondition), parameter_postcondition), results, "Postcondition"))
 
     # Start each tread
@@ -65,6 +80,15 @@ def run_service():
 
     # Write to the result.log
     # write_to_result_log(json.dumps(results))
+
+    timestamp = datetime.now().timestamp()*1000
+    test_result = TestResult("Result - " + timestamp.__str__(), results, license_id, licenseFile.groupId, timestamp)
+
+    # testResults.append(test_result)
+    if not auth_token:
+        get_auth_token()
+
+    portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
 
     return jsonify(results)
 
@@ -93,4 +117,4 @@ def do_license_upload():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', threaded=True)

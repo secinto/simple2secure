@@ -11,7 +11,7 @@ import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
 import {
-	OrbiterComponent, OrbiterToolsComponent,
+	OrbiterComponent,
 	OrbiterToolTestComponent, OrbiterToolTemplateComponent
 } from './orbiter/index';
 import {EmailOverviewComponent} from './email/index';
@@ -25,6 +25,7 @@ import {UserRole} from './_models';
 import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
 import {ReportComponent, ReportOverviewComponent} from './report';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
+import {TestResultComponent} from './orbiter/testResult.component';
 
 const appRoutes: Routes = [
 	{
@@ -57,7 +58,7 @@ const appRoutes: Routes = [
 				component: OrbiterComponent,
 				data: {title: 'menu.orbiter'},
 				children: [
-					{path: '', component: OrbiterToolsComponent, data: {title: 'menu.orbiterTools'}},
+					{path: '', component: TestResultComponent, data: {title: 'button.testresults'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
 					{path: 'template', component: OrbiterToolTemplateComponent, data: {title: 'menu.templates'}},
 				]

@@ -2,8 +2,15 @@ import platform
 import os
 import app
 import zipfile
+import requests
+from src.models.CompanyLicensePublic import CompanyLicensePublic
+from flask import json
 
 ALLOWED_EXTENSIONS = set(['zip'])
+EXPIRATION_DATE = "expirationDate"
+GROUP_ID = "groupId"
+LICENSE_ID = "licenseId"
+SIGNATURE = "signature"
 
 
 def read_json_testfile():
@@ -94,9 +101,9 @@ def allowed_file(filename):
 
 
 def get_license_file():
-    files = os.listdir(app.UPLOAD_FOLDER)
+    files = os.listdir(app.LICENSE_FOLDER)
     if len(files) == 1:
-        archive = zipfile.ZipFile(app.UPLOAD_FOLDER + "/" + files[0], 'r')
+        archive = zipfile.ZipFile(app.LICENSE_FOLDER + "/" + files[0], 'r')
 
         zip_files = [name for name in archive.namelist() if name.endswith('.dat')]
 
@@ -107,18 +114,37 @@ def get_license_file():
             return decoded_license_file
 
 
-def parse_license_file(license_file, attribute):
+def parse_license_file(license_file):
     lines = license_file.split("\n")
-    new_lines = []
+    group_id = ""
+    pod_id = app.podId
     for line in lines:
         if "#" not in line:
             row = line.split("=")
-            if row[0] == attribute:
-                return row[1]
+            if row[0] == GROUP_ID:
+                group_id = row[1]
+            elif row[0] == LICENSE_ID:
+                app.license_id = row[1]
 
-            # new_lines.append(line)
+    if group_id and app.license_id:
+        # send post to the portal to activate license
+        licenseObj = CompanyLicensePublic(group_id.rstrip(), app.license_id.rstrip(), pod_id)
+        return licenseObj
 
-    # return new_lines
+
+def portal_post(url, data):
+    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': app.auth_token}
+    requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+
+
+def get_auth_token():
+    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
+    app.auth_token = "Bearer " + requests.post(app.PORTAL_URL + "license/activatePod",
+                               data=json.dumps(parse_license_file(get_license_file()).__dict__),
+                               verify=False,
+                               headers=headers).text
+
+
 
 
 

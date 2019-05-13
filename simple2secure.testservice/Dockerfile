@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER Martin "emir.sahinovic@secinto.com"
+MAINTAINER "emir.sahinovic@secinto.com"
 
 RUN apt-get update -y && \
  		apt-get install -y python3-pip python3-dev nmap build-essential

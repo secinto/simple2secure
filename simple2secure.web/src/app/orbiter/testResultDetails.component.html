@@ -1,0 +1,15 @@
+<h3 mat-dialog-title>{{ 'query.details' | translate }}</h3>
+
+<div mat-dialog-content>
+    <p><b>{{ 'table.query' | translate }}: </b> {{testResult.result.precondition}}</p>
+    <p><b>{{ 'table.query' | translate }} ID: </b> {{testResult.result.step}}</p>
+    <p><b>{{ 'table.time' | translate }}: </b> {{testResult.result.postcondition}}</p>
+    <!--<ngx-json-viewer [json]="getQueryResult()" [expanded]="false"></ngx-json-viewer>-->
+    <!--<ngx-json-view [data]="getQueryResult()"></ngx-json-view>-->
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="testResult"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>

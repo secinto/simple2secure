@@ -4,12 +4,12 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.assertj.core.util.Strings;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.repository.LicenseRepository;
 
@@ -92,5 +92,11 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 			}
 		}
 
+	}
+
+	@Override
+	public CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId) {
+		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("podId").is(podId));
+		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 }

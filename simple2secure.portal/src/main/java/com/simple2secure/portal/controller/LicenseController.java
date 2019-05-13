@@ -112,6 +112,62 @@ public class LicenseController {
 	}
 
 	/**
+	 *
+	 * @param groupId
+	 * @param licenseId
+	 * @param locale
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/activatePod", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePublic licensePublic,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		if (licensePublic != null) {
+			String groupId = licensePublic.getGroupId();
+			String licenseId = licensePublic.getLicenseId();
+			String podId = licensePublic.getPodId();
+
+			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)) {
+				CompanyGroup group = groupRepository.find(groupId);
+				CompanyLicensePrivate license = licenseRepository.findByLicenseIdAndPodId(licenseId, podId);
+
+				if (license == null) {
+					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
+					if (licenses != null && licenses.size() > 0) {
+						CompanyLicensePrivate tempLicense = licenses.get(0);
+						if (!Strings.isNullOrEmpty(tempLicense.getPodId())) {
+							license = tempLicense.copyLicense();
+						} else {
+							license = tempLicense;
+						}
+					}
+				}
+
+				if (group != null && license != null) {
+
+					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
+					String accessToken = tokenAuthenticationService.addPodAuthentication(podId, group, license);
+
+					if (!Strings.isNullOrEmpty(accessToken)) {
+
+						license.setPodId(podId);
+						license.setAccessToken(accessToken);
+						license.setActivated(true);
+
+						licenseRepository.save(license);
+
+						return new ResponseEntity(accessToken, HttpStatus.OK);
+					}
+				}
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
 	 * This function is used to update the license in the mongodb and activate the probe when the license is imported for the first time
 	 *
 	 * @param groupId
@@ -148,7 +204,7 @@ public class LicenseController {
 				if (group != null && license != null) {
 
 					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
-					String accessToken = tokenAuthenticationService.addLicenseAuthentication(probeId, group, license);
+					String accessToken = tokenAuthenticationService.addProbeAuthentication(probeId, group, license);
 
 					if (!Strings.isNullOrEmpty(accessToken)) {
 
@@ -252,7 +308,7 @@ public class LicenseController {
 							if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
 								CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
 								if (group != null) {
-									accessToken = tokenAuthenticationService.addLicenseAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
+									accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
 									licensePrivate.setAccessToken(accessToken);
 									licenseRepository.update(licensePrivate);
 								}
@@ -265,7 +321,7 @@ public class LicenseController {
 					if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
 						CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
 						if (group != null) {
-							accessToken = tokenAuthenticationService.addLicenseAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
+							accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
 							licensePrivate.setAccessToken(accessToken);
 							licenseRepository.update(licensePrivate);
 							/*

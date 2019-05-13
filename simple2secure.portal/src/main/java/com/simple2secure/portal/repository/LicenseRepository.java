@@ -16,6 +16,8 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract CompanyLicensePrivate findByLicenseIdAndProbeId(String licenseId, String probeId);
 
+	public abstract CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId);
+
 	public abstract CompanyLicensePrivate findByAccessToken(String accessToken);
 
 	public abstract CompanyLicensePrivate findByGroupAndUserId(String groupId, String userId);

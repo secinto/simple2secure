@@ -14,7 +14,7 @@
     <button mat-button [disabled]="!groupForm.dirty" mat-raised-button class="mat-green-button" color="primary"
             (click)="applyConfig()">{{ 'button.save' | translate }}
     </button>
-    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="group" cdkFocusInitial>
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="groups" cdkFocusInitial>
         {{ 'button.cancel' | translate }}
     </button>
 </div>

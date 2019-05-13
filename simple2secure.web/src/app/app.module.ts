@@ -16,6 +16,7 @@ import {AuthGuard} from './_guards/index';
 import {AlertService, AuthenticationService, DataService, HttpService} from './_services/index';
 import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
+import {TestResultDetailsComponent} from './orbiter/testResultDetails.component';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
@@ -79,7 +80,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
-import { AgmDirectionModule } from 'agm-direction'
+import { AgmDirectionModule } from 'agm-direction';
+import {TestResultComponent} from './orbiter/testResult.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -183,6 +185,7 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestResultComponent,
 		OrbiterToolTemplateComponent,
 		OrbiterTestTemplateComponent,
+		TestResultComponent,
 		ConfirmationDialog,
 		SelectContextDialog,
 		EmailOverviewComponent,
@@ -199,7 +202,8 @@ export const httpInterceptorProviders = [
 		AnalysisComponent,
 		AddQueryDialog,
 		ReportComponent,
-		ReportOverviewComponent
+		ReportOverviewComponent,
+		TestResultDetailsComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -221,7 +225,8 @@ export const httpInterceptorProviders = [
 		OsQueryReportDetailsComponent,
 		NetworkReportDetailsComponent,
 		UserDetailsComponent,
-		AddQueryDialog
+		AddQueryDialog,
+		TestResultDetailsComponent
 	],
 	providers: [
 		AuthGuard,

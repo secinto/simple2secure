@@ -19,6 +19,8 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String probeId;
 
+	protected String podId;
+
 	protected String licenseId;
 
 	@Lob
@@ -60,6 +62,14 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setProbeId(String probeId) {
 		this.probeId = probeId;
+	}
+
+	public String getPodId() {
+		return podId;
+	}
+
+	public void setPodId(String podId) {
+		this.podId = podId;
 	}
 
 	public String getLicenseId() {

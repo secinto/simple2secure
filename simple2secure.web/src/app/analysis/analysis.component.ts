@@ -26,7 +26,7 @@ export class AnalysisComponent implements OnInit{
 	context: ContextDTO;
 	currentUser: any;
 	selectedQuery: any;
-	private chart: StockChart;
+	chart: StockChart;
 	chartOptions: any;
 	seriesOption: any;
 	loading = false;

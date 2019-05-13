@@ -15,7 +15,6 @@ import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -69,7 +68,7 @@ public class UpdateEmailScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	@Scheduled(fixedRate = 50000)
+	// @Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		if (configs != null) {
