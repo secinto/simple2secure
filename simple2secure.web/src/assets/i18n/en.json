@@ -334,5 +334,9 @@
   "chart.query.select": "Select query string",
   "chart.additional.query": "Add additional query to the chart",
   "osquery.reports.charts": "OSQuery Reports Charts",
-  "network.report.charts": "Network Reports Charts"
+  "network.report.charts": "Network Reports Charts",
+  "test.precondition": "Precondition",
+  "test.step": "Step",
+  "test.postcondition": "Postcondition",
+  "test.testresult": "Test Result"
 }

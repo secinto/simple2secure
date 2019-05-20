@@ -4,7 +4,6 @@ plugins {
 	id 'application'
 	id "io.spring.dependency-management" version "1.0.6.RELEASE"
 	id 'war'
-	id 'docker'
 }
 
 mainClassName = "com.secinto.portal.Simple2SecurePortal"
@@ -30,15 +29,3 @@ compileJava {
 }
 
 war { baseName = 's2s-portal' }
-
-task buildDocker(type: Docker, dependsOn: build) {
-  push = false
-  applicationName = war.baseName
-  dockerfile = file('Dockerfile')
-  doFirst {
-    copy {
-      from war
-      into "build/docker/target"
-    }
-  }
-}

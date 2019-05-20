@@ -19,7 +19,7 @@ export class TestResultComponent {
 	testResults: TestResultDTO[];
 	loading = false;
 	context: ContextDTO;
-	displayedColumns = ['name', 'license', 'group', 'action'];
+	displayedColumns = ['name', 'license', 'group'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -88,8 +88,4 @@ export class TestResultComponent {
 		this.dialog.open(TestResultDetailsComponent, dialogConfig);
 
 	}
-
-	public onMenuTriggerClick(tool: any) {
-	}
-
 }

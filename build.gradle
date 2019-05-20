@@ -9,7 +9,6 @@ allprojects {
 
 	apply plugin: 'java'
 	apply plugin: 'eclipse-wtp'
-	apply plugin: 'docker'
 
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8

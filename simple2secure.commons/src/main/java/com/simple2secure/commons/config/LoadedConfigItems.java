@@ -14,9 +14,9 @@ import com.google.common.io.Resources;
 public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
-	private String baseProtocol = "https";
+	private String baseProtocol = "http";
 	private String baseHost = "localhost";
-	private String basePort = "8443";
+	private String basePort = "32820/s2s";
 	private String basePortWeb = "9000";
 
 	// private String baseKubernetesURL = "https://35.232.109.156";

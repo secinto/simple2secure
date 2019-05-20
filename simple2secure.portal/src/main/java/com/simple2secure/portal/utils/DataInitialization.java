@@ -1,6 +1,8 @@
 package com.simple2secure.portal.utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.LicensePlan;
@@ -76,6 +79,8 @@ public class DataInitialization {
 	@Autowired
 	protected UserUtils userUtils;
 
+	private Gson gson = new Gson();
+
 	/**
 	 *
 	 * @param userId
@@ -97,7 +102,12 @@ public class DataInitialization {
 			ObjectId groupId = groupRepository.saveAndReturnId(group);
 			log.debug("Default group added for user with id {}", userId);
 			if (!Strings.isNullOrEmpty(groupId.toString())) {
-				addDefaultGroupQueries(groupId.toString());
+				try {
+					addDefaultGroupQueries(groupId.toString());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				addDefaultGroupProcessors(groupId.toString());
 				addDefaultGroupSteps(groupId.toString());
 			}
@@ -108,13 +118,15 @@ public class DataInitialization {
 	 * This function adds default configuration for each group which is created
 	 *
 	 * @param probeId
+	 * @throws IOException
 	 */
-	public void addDefaultConfiguration() {
+	public void addDefaultConfiguration() throws IOException {
 		List<Config> configDB = configRepository.findAll();
 		if (configDB == null || configDB.isEmpty()) {
-			ResponseEntity<Config> response = restTemplate.getForEntity(loadedConfigItems.getConfigURL(), Config.class);
-			Config configuration = response.getBody();
-			configRepository.save(configuration);
+			File file = new File(getClass().getResource("/server/config.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			Config config = gson.fromJson(content, Config.class);
+			configRepository.save(config);
 		}
 	}
 
@@ -122,15 +134,20 @@ public class DataInitialization {
 	 * This function adds default queries for each group which is created
 	 *
 	 * @param probeId
+	 * @throws IOException
 	 */
-	public void addDefaultGroupQueries(String groupId) {
+	public void addDefaultGroupQueries(String groupId) throws IOException {
 		List<QueryRun> queriesDB = queryRepository.findByGroupId(groupId, true);
 
 		if (queriesDB == null || queriesDB.isEmpty()) {
-			ResponseEntity<QueryRun[]> response = restTemplate.getForEntity(loadedConfigItems.getQueryURL(), QueryRun[].class);
-			List<QueryRun> queries = Arrays.asList(response.getBody());
 
-			for (QueryRun query : queries) {
+			File file = new File(getClass().getResource("/server/queries.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			QueryRun[] queries = gson.fromJson(content, QueryRun[].class);
+
+			List<QueryRun> queryList = Arrays.asList(queries);
+
+			for (QueryRun query : queryList) {
 				query.setGroupId(groupId);
 				queryRepository.save(query);
 			}
@@ -158,27 +175,29 @@ public class DataInitialization {
 	/**
 	 * This function adds default settings at the system startup if settings does not exist in the Portal DB
 	 *
+	 * @throws IOException
+	 *
 	 */
-	public void addDefaultSettings() {
+	public void addDefaultSettings() throws IOException {
 		List<Settings> settingsDB = settingsRepository.findAll();
 
 		if (settingsDB == null || settingsDB.isEmpty()) {
-			try {
-				ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(), Settings.class);
-				Settings settings = response.getBody();
-				settingsRepository.save(settings);
-			} catch (Exception e) {
 
-			}
+			File file = new File(getClass().getResource("/server/settings.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			Settings settings = gson.fromJson(content, Settings.class);
+			settingsRepository.save(settings);
 		}
 	}
 
-	public void addDefaultLicensePlan() {
+	public void addDefaultLicensePlan() throws IOException {
 		List<LicensePlan> licensePlansDB = licensePlanRepository.findAll();
 
 		if (licensePlansDB == null || licensePlansDB.isEmpty()) {
-			ResponseEntity<LicensePlan> response = restTemplate.getForEntity(loadedConfigItems.getLicensePlanURL(), LicensePlan.class);
-			LicensePlan licensePlan = response.getBody();
+
+			File file = new File(getClass().getResource("/server/licensePlan.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			LicensePlan licensePlan = gson.fromJson(content, LicensePlan.class);
 			licensePlanRepository.save(licensePlan);
 		}
 	}

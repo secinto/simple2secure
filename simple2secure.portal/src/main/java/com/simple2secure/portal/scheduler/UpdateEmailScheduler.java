@@ -193,14 +193,17 @@ public class UpdateEmailScheduler {
 	 */
 
 	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
+		Properties props = new Properties();
 
 		// create a new session with the provided properties
-		Session session = Session.getDefaultInstance(setEmailConfiguration(config), null);
+		Session session = Session.getDefaultInstance(props, null);
 
 		// connect to the store using the provided credentials
 		Store store = session.getStore(STORE);
 
-		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+		store.connect("imap.gmail.com", 993, config.getEmail(), config.getPassword());
+
+		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
 		log.info("Connected to the store: " + store);
 
@@ -226,12 +229,15 @@ public class UpdateEmailScheduler {
 	 */
 	private Properties setEmailConfiguration(EmailConfiguration config) {
 		Properties props = new Properties();
+
 		props.setProperty("mail.imap.host", config.getIncomingServer());
 		props.setProperty("mail.imap.port", config.getIncomingPort());
 		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
+		props.setProperty("mail.imap.socketFactory.port", config.getIncomingPort());
 		props.setProperty("mail.imap.auth", IMAP_AUTH);
 		props.setProperty("mail.mime.ignoreunknownencoding", "true");
+
+		props.put("mail.store.protocol", STORE);
 
 		return props;
 

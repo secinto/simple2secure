@@ -25,7 +25,6 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,7 +35,6 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
-import com.simple2secure.portal.utils.DataInitialization;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
@@ -73,6 +71,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		props.put("mail.smtp.auth", mailSMTPAuth);
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.debug", "true");
+		// props.put("mail.smtp.socketFactory.port", mailSMTPPort);
+		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		// props.put("mail.smtp.socketFactory.fallback", "false");
 
 		return mailSender;
 	}
@@ -103,7 +104,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	}
 
 	@PostConstruct
-	public void initialize() {
+	public void initialize() throws IOException {
 		// ClassLoader classLoader = getClass().getClassLoader();
 		// File file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.0.jar").getFile());
 		// ServiceLibrary library = new ServiceLibrary("Probe", "0.1.0", file.getAbsolutePath());
@@ -114,6 +115,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		// file = new File(classLoader.getResource("probe/simple2secure.probe-0.1.2.jar").getFile());
 		// library = new ServiceLibrary("Probe", "0.1.2", file.getAbsolutePath());
 		// serviceLibraryRepository.save(library);
+
 	}
 
 	@Override
@@ -122,14 +124,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	}
 
 	public static void main(String[] args) throws IOException {
-		ConfigurableApplicationContext context = SpringApplication.run(Simple2SecurePortal.class, args);
-		DataInitialization dataInitializer = context.getBean(DataInitialization.class);
-		if (dataInitializer != null) {
-			dataInitializer.addDefaultConfiguration();
-			dataInitializer.addDefaultSettings();
-			dataInitializer.addDefaultLicensePlan();
-			dataInitializer.addDefaultUsers();
-		}
+		SpringApplication.run(Simple2SecurePortal.class, args);
 	}
 
 }

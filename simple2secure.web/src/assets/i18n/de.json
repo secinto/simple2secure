@@ -334,5 +334,9 @@
   "chart.query.select": "Abfragezeichenfolge auswählen",
   "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu",
   "osquery.reports.charts": "OSQuery-Berichtsdiagramme",
-  "network.report.charts": "Netzwerkreportdiagramme"
+  "network.report.charts": "Netzwerkreportdiagramme",
+  "test.precondition": "Precondition",
+  "test.step": "Step",
+  "test.postcondition": "Postcondition",
+  "test.testresult": "Test Result"
 }

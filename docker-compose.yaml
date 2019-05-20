@@ -1,0 +1,27 @@
+version: '3.1'
+
+services: 
+    s2s-portal:
+        build: ./simple2secure.portal/.
+        container_name: s2s-portal
+        ports:
+            - 32820:8080
+        depends_on:
+            - mongodb
+        working_dir: /opt/app
+                
+    mongodb:
+        image: mongo
+        container_name: s2s-mongodb
+        hostname: localhost
+        volumes:
+            - $HOME/mongo/data/db:/data/db
+        restart: always
+        
+    s2s-web:
+        build: ./simple2secure.web/.
+        container_name: s2s-web
+        ports: 
+            - 9000:80
+        depends_on:
+            - s2s-portal
