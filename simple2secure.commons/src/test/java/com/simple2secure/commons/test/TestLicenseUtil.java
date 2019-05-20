@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -33,8 +34,6 @@ public class TestLicenseUtil {
 
 	private static String workingDirectory = System.getProperty("user.dir");
 
-	private final static String licenseFileDir = "licenses" + File.separator;
-
 	@BeforeAll
 	public static void init() throws Exception {
 		licenseFilePath = LicenseUtil.getLicensePath(licenseFilePath);
@@ -50,8 +49,12 @@ public class TestLicenseUtil {
 	}
 
 	@AfterAll
-	public static void tearDown() throws IOException {
-		FileUtils.deleteDirectory(new File(licenseFilePath));
+	public static void tearDown() throws IOException, InterruptedException {
+		TimeUnit.SECONDS.sleep(1);
+		File tempDirectory = new File(licenseFilePath);
+		if (tempDirectory.exists() && tempDirectory.isDirectory()) {
+			FileUtils.deleteDirectory(tempDirectory);
+		}
 	}
 
 	@Test
@@ -76,12 +79,6 @@ public class TestLicenseUtil {
 	}
 
 	@Test
-	public void getLicensePath_ParamIsDir_AbsolutePathOfDir() {
-		String licensePath = LicenseUtil.getLicensePath(licenseFilePath);
-		Assertions.assertEquals(workingDirectory + File.separator + licenseFileDir, licensePath);
-	}
-
-	@Test
 	public void getLicensePath_ParamDoNotExist_AbsolutePathOfCreatedDir() throws IOException {
 		String path = "notExistingDir" + File.separator;
 		String licensePath = LicenseUtil.getLicensePath(path);
@@ -94,19 +91,19 @@ public class TestLicenseUtil {
 
 	@Test
 	public void generateLicenseZIPFile_zipFilePathAsParam_createdLicenseZip() throws IOException {
-		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
+		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
 		String pathOfZipFile = "licenses" + File.separator + "license.zip";
-		LicenseUtil.generateLicenseZIPFile(pathOfZipFile);
+		LicenseUtil.generateLicenseZIPFromFile(pathOfZipFile);
 		File zipFile = new File("licenses" + File.separator + "license.zip");
 		Assertions.assertNotNull(zipFile);
 	}
 
 	@Test
 	public void generateLicenseZIPFile_publicKeyAndZipPathAsParam_createdLicenseZip() throws IOException {
-		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
+		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
 		String publicKeyFile = "licenses" + File.separator + "public.key";
 		String licenseZipFile = "licenses" + File.separator + "license.zip";
-		LicenseUtil.generateLicenseZIPFile(publicKeyFile, licenseZipFile);
+		LicenseUtil.generateLicenseZIPFromFile(publicKeyFile, licenseZipFile);
 
 		File file = new File(licenseZipFile);
 
@@ -114,21 +111,32 @@ public class TestLicenseUtil {
 	}
 
 	@Test
-	public void generateLicenseZIPFile_publicKeyPrivateKeyZipFilePathAsParam_createdLicenseZip() throws IOException {
-		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
+	public void generateLicenseZIPFile_LicenseFilePublicKeyZipFileAsParam_createdLicenseZip() throws IOException {
+		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
 		String publicKeyFile = "licenses" + File.separator + "public.key";
-		String privateKeyFile = "licenses" + File.separator + "private.key";
 		String licenseZipFile = "licenses" + File.separator + "license.zip";
-		LicenseUtil.generateLicenseZIPFile("licenses" + File.separator, publicKeyFile, licenseZipFile);
+		LicenseUtil.generateLicenseZIPFromFile("licenses" + File.separator + "license.dat", publicKeyFile, licenseZipFile);
 
 		File file = new File(licenseZipFile);
 		Assertions.assertNotNull(file);
+	}
+
+	@Test
+	public void generateLicenseZIPFile_InvalidLicensePath_ThrowException() throws IOException {
+		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
+		String publicKeyFile = "licenses" + File.separator + "public.key";
+		String licenseZipFile = "licenses" + File.separator + "license.zip";
+
+		Executable closureContainingCodeToTest = () -> {
+			LicenseUtil.generateLicenseZIPFromFile("licenses" + File.separator, publicKeyFile, licenseZipFile);
+		};
+		assertThrows(IOException.class, closureContainingCodeToTest);
 	}
 
 	@Test
 	public void generateLicenseZIPStream_licenseAsParam_licenseZipStream() throws IOException {
 		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
-		ByteArrayOutputStream result = LicenseUtil.generateLicenseZIPStream(licenseFile);
+		ByteArrayOutputStream result = LicenseUtil.generateLicenseZIPStreamFromFile(licenseFile);
 		boolean containsLicense = false;
 		boolean containsPublickey = false;
 		byte[] resultArray = result.toByteArray();
@@ -153,13 +161,14 @@ public class TestLicenseUtil {
 
 	@Test
 	public void generateLicenseZIPStream_licenseAndPublicKeyAsParam_licenseZipStream() throws IOException {
-		String licenseFile = LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
+		LicenseUtil.createLicenseFile("testgroup", "", "24/11/2018");
 		File pubKeyFile = new File("public.key");
 		File licFile = new File("license.dat");
-		File fileToOverwrite = new File("/licenses/license.dat");
+		File fileToOverwrite = new File(licenseFilePath + "license.dat");
 		boolean containsLicense = false;
 		boolean containsPublickey = false;
-		ByteArrayOutputStream result = LicenseUtil.generateLicenseZIPStream(licFile.getPath().toString(), pubKeyFile.getPath().toString());
+		ByteArrayOutputStream result = LicenseUtil.generateLicenseZIPStreamFromFile(licFile.getPath().toString(),
+				pubKeyFile.getPath().toString());
 		FileUtils.writeByteArrayToFile(fileToOverwrite, result.toByteArray());
 
 		List<File> unzippedFiles = ZIPUtils.unzipImportedFile(fileToOverwrite);

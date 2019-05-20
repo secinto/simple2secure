@@ -2,7 +2,6 @@ package com.simple2secure.portal.utils;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,10 +64,8 @@ public class ReportUtils {
 								graphReports.add(new GraphReport(report.getId(), report.getQuery(), jsonArrayQueryResult.length(), date.getTime()));
 							}
 
-						} catch (JSONException e) {
+						} catch (Exception e) {
 							log.error("Error occured while trying to parse string to jsonArray: {}", e);
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -90,7 +86,7 @@ public class ReportUtils {
 		List<NetworkReportDTO> preparedReports = new ArrayList<>();
 		for (NetworkReport report : networkReports) {
 
-			List<Coordinates> coordinates = new ArrayList<Coordinates>();
+			List<Coordinates> coordinates = new ArrayList<>();
 			if (report.getIpPairs() != null) {
 
 				for (PacketInfo info : report.getIpPairs()) {

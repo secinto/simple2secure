@@ -3,12 +3,12 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.assertj.core.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
@@ -68,7 +68,7 @@ public class ProbeUtils {
 	public List<Probe> getAllProbesFromCurrentContext(Context context) {
 		log.debug("Retrieving probes for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
-		List<Probe> myProbes = new ArrayList<Probe>();
+		List<Probe> myProbes = new ArrayList<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		for (CompanyGroup group : assignedGroups) {
 			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(group.getId());

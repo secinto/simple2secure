@@ -34,7 +34,7 @@ public class TestJWTToken {
 		log.info("Date {}", new Date(currentDate + EXPIRATIONTIME));
 
 		String JWT = Jwts.builder().setClaims(claims).setSubject("testuser").setExpiration(new Date(currentDate + EXPIRATIONTIME))
-				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
+				.signWith(SignatureAlgorithm.ES512, SECRET).compact();
 
 		if (!Strings.isNullOrEmpty(JWT)) {
 			log.info("JWT Token {}", JWT);
