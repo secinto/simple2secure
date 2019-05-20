@@ -27,6 +27,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -34,6 +35,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 
 @EnableScheduling
@@ -56,6 +58,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	@Autowired
 	private ServiceLibraryRepository serviceLibraryRepository;
+
+	@Autowired
+	private Environment env;
 
 	@Bean
 	public JavaMailSender getJavaMailSender() {
@@ -121,6 +126,17 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(Simple2SecurePortal.class);
+	}
+
+	@PostConstruct
+	public void currentActiveProfile() {
+		String[] activeProfiles = env.getActiveProfiles();
+
+		for (String profile : activeProfiles) {
+			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+				LoadedConfigItems.getInstance().setBasePort("8443");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws IOException {

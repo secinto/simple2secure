@@ -1,16 +1,3 @@
-server:
-  port: 8443
-  ssl:
-    enabled: true
-    key-store: classpath:keys/keystore.p12
-    key-store-password: Latinica.1
-    key-store-type: PKCS12
-    key-alias: tomcat
-    trust-store: classpath:keys/cacerts
-    trust-store-password: testtest
-  certificate:
-    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784
-
 mail:
   username: secure.s2s.secinto@gmail.com
   password: latinica1
@@ -48,6 +35,19 @@ spring:
       host: localhost
       port: 27017
       database: s2s
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:keys/keystore.p12
+    key-store-password: Latinica.1
+    key-store-type: PKCS12
+    key-alias: tomcat
+    trust-store: classpath:keys/cacerts
+    trust-store-password: testtest
+  certificate:
+    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784      
 ---      
 spring:
   profiles: deployment
