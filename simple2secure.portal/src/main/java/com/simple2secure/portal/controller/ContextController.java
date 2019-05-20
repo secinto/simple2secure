@@ -8,6 +8,7 @@
 
 package com.simple2secure.portal.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,10 +120,16 @@ public class ContextController {
 								contextUserAuthRepository.save(contextUserAuthenticationNew);
 
 								// add standard group for current context
-								dataInitialization.addDefaultGroup(userId, savedContextId.toString());
+								try {
+									dataInitialization.addDefaultGroup(userId, savedContextId.toString());
+									contextUtils.mapSuperAdminsTotheContext(savedContextId.toString());
+									return new ResponseEntity<Context>(context, HttpStatus.OK);
+								} catch (IOException e) {
+									log.error(e.getMessage());
+									return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+											HttpStatus.NOT_FOUND);
+								}
 
-								contextUtils.mapSuperAdminsTotheContext(savedContextId.toString());
-								return new ResponseEntity<Context>(context, HttpStatus.OK);
 							}
 						}
 					}

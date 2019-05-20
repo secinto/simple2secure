@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -88,14 +87,16 @@ public class DataInitialization {
 	 *
 	 *          This function adds a default group for the users which are registered using the standard registration. This function does not
 	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group before adding.
+	 * @throws IOException
 	 */
-	public void addDefaultGroup(String userId, String contextId) {
+	public void addDefaultGroup(String userId, String contextId) throws IOException {
 
 		List<CompanyGroup> groupList = groupRepository.findByContextId(contextId);
 
 		if (groupList == null || groupList.isEmpty()) {
-			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(), CompanyGroup.class);
-			CompanyGroup group = response.getBody();
+			File file = new File(getClass().getResource("/server/group.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			CompanyGroup group = gson.fromJson(content, CompanyGroup.class);
 			group.setContextId(contextId);
 			group.setRootGroup(true);
 			group.setStandardGroup(true);
@@ -158,13 +159,17 @@ public class DataInitialization {
 	 * This function adds default processors for each group which is created
 	 *
 	 * @param user_id
+	 * @throws IOException
 	 */
-	public void addDefaultGroupProcessors(String groupId) {
+	public void addDefaultGroupProcessors(String groupId) throws IOException {
 		List<Processor> processorsDB = processorRepository.getProcessorsByGroupId(groupId);
 
 		if (processorsDB == null || processorsDB.isEmpty()) {
-			ResponseEntity<Processor[]> response = restTemplate.getForEntity(loadedConfigItems.getProcessorsURL(), Processor[].class);
-			List<Processor> processors = Arrays.asList(response.getBody());
+
+			File file = new File(getClass().getResource("/server/processors.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			Processor[] processorsArray = gson.fromJson(content, Processor[].class);
+			List<Processor> processors = Arrays.asList(processorsArray);
 			for (Processor processor : processors) {
 				processor.setGroupId(groupId);
 				processorRepository.save(processor);
@@ -206,12 +211,17 @@ public class DataInitialization {
 	 * This function adds default steps for the new licensed probe
 	 *
 	 * @param user_id
+	 * @throws IOException
 	 */
-	public void addDefaultGroupSteps(String groupId) {
+	public void addDefaultGroupSteps(String groupId) throws IOException {
 		List<Step> stepsDB = stepRepository.getStepsByGroupId(groupId, true);
 		if (stepsDB == null || stepsDB.isEmpty()) {
-			ResponseEntity<Step[]> response = restTemplate.getForEntity(loadedConfigItems.getStepsURL(), Step[].class);
-			List<Step> steps = Arrays.asList(response.getBody());
+
+			File file = new File(getClass().getResource("/server/steps.json").getFile());
+			String content = new String(Files.readAllBytes(file.toPath()));
+			Step[] stepArray = gson.fromJson(content, Step[].class);
+
+			List<Step> steps = Arrays.asList(stepArray);
 			for (Step step : steps) {
 				List<Step> stepsDBsize = stepRepository.getStepsByGroupId(groupId, true);
 				if (stepsDBsize == null || stepsDBsize.isEmpty()) {
