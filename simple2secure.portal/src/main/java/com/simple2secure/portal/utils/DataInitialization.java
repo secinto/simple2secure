@@ -97,20 +97,22 @@ public class DataInitialization {
 			File file = new File(getClass().getResource("/server/group.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 			CompanyGroup group = gson.fromJson(content, CompanyGroup.class);
-			group.setContextId(contextId);
-			group.setRootGroup(true);
-			group.setStandardGroup(true);
-			ObjectId groupId = groupRepository.saveAndReturnId(group);
-			log.debug("Default group added for user with id {}", userId);
-			if (!Strings.isNullOrEmpty(groupId.toString())) {
-				try {
-					addDefaultGroupQueries(groupId.toString());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+			if (group != null) {
+				group.setContextId(contextId);
+				group.setRootGroup(true);
+				group.setStandardGroup(true);
+				ObjectId groupId = groupRepository.saveAndReturnId(group);
+				log.debug("Default group added for user with id {}", userId);
+				if (!Strings.isNullOrEmpty(groupId.toString())) {
+					try {
+						addDefaultGroupQueries(groupId.toString());
+					} catch (IOException e) {
+						log.error(e.getMessage());
+					}
+					addDefaultGroupProcessors(groupId.toString());
+					addDefaultGroupSteps(groupId.toString());
 				}
-				addDefaultGroupProcessors(groupId.toString());
-				addDefaultGroupSteps(groupId.toString());
 			}
 		}
 	}
@@ -127,7 +129,9 @@ public class DataInitialization {
 			File file = new File(getClass().getResource("/server/config.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 			Config config = gson.fromJson(content, Config.class);
-			configRepository.save(config);
+			if (config != null) {
+				configRepository.save(config);
+			}
 		}
 	}
 
@@ -146,11 +150,13 @@ public class DataInitialization {
 			String content = new String(Files.readAllBytes(file.toPath()));
 			QueryRun[] queries = gson.fromJson(content, QueryRun[].class);
 
-			List<QueryRun> queryList = Arrays.asList(queries);
+			if (queries != null) {
+				List<QueryRun> queryList = Arrays.asList(queries);
 
-			for (QueryRun query : queryList) {
-				query.setGroupId(groupId);
-				queryRepository.save(query);
+				for (QueryRun query : queryList) {
+					query.setGroupId(groupId);
+					queryRepository.save(query);
+				}
 			}
 		}
 	}
@@ -169,10 +175,13 @@ public class DataInitialization {
 			File file = new File(getClass().getResource("/server/processors.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 			Processor[] processorsArray = gson.fromJson(content, Processor[].class);
-			List<Processor> processors = Arrays.asList(processorsArray);
-			for (Processor processor : processors) {
-				processor.setGroupId(groupId);
-				processorRepository.save(processor);
+
+			if (processorsArray != null) {
+				List<Processor> processors = Arrays.asList(processorsArray);
+				for (Processor processor : processors) {
+					processor.setGroupId(groupId);
+					processorRepository.save(processor);
+				}
 			}
 		}
 	}
@@ -191,7 +200,10 @@ public class DataInitialization {
 			File file = new File(getClass().getResource("/server/settings.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 			Settings settings = gson.fromJson(content, Settings.class);
-			settingsRepository.save(settings);
+
+			if (settings != null) {
+				settingsRepository.save(settings);
+			}
 		}
 	}
 
@@ -203,7 +215,10 @@ public class DataInitialization {
 			File file = new File(getClass().getResource("/server/licensePlan.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 			LicensePlan licensePlan = gson.fromJson(content, LicensePlan.class);
-			licensePlanRepository.save(licensePlan);
+
+			if (licensePlan != null) {
+				licensePlanRepository.save(licensePlan);
+			}
 		}
 	}
 
@@ -221,17 +236,19 @@ public class DataInitialization {
 			String content = new String(Files.readAllBytes(file.toPath()));
 			Step[] stepArray = gson.fromJson(content, Step[].class);
 
-			List<Step> steps = Arrays.asList(stepArray);
-			for (Step step : steps) {
-				List<Step> stepsDBsize = stepRepository.getStepsByGroupId(groupId, true);
-				if (stepsDBsize == null || stepsDBsize.isEmpty()) {
-					step.setNumber(1);
-				} else {
-					step.setNumber(stepsDBsize.size() + 1);
+			if (stepArray != null) {
+				List<Step> steps = Arrays.asList(stepArray);
+				for (Step step : steps) {
+					List<Step> stepsDBsize = stepRepository.getStepsByGroupId(groupId, true);
+					if (stepsDBsize == null || stepsDBsize.isEmpty()) {
+						step.setNumber(1);
+					} else {
+						step.setNumber(stepsDBsize.size() + 1);
+					}
+					step.setGroupId(groupId);
+					step.setActive(1);
+					stepRepository.save(step);
 				}
-				step.setGroupId(groupId);
-				step.setActive(1);
-				stepRepository.save(step);
 			}
 		}
 	}

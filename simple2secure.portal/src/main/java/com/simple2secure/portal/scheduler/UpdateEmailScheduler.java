@@ -173,8 +173,7 @@ public class UpdateEmailScheduler {
 					Engine engine = new Engine(rules, true);
 					engine.executeAllActions(email, actions);
 				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error(e.getMessage());
 				}
 			}
 		} else {

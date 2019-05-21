@@ -1,8 +1,10 @@
 version: '3.1'
 
-services: 
+services:
     s2s-portal:
-        build: ./simple2secure.portal/.
+        build:
+            context: .
+            dockerfile: simple2secure.portal/Dockerfile
         container_name: s2s-portal
         ports:
             - 32820:8080
@@ -22,6 +24,7 @@ services:
         build: ./simple2secure.web/.
         container_name: s2s-web
         ports: 
-            - 9000:80
+            - 9001:80
+            - 9000:443
         depends_on:
             - s2s-portal
