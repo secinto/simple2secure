@@ -35,7 +35,7 @@ export class HttpService {
 
 		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
 			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<any>(url, {headers});
 	}
@@ -48,7 +48,7 @@ export class HttpService {
 		}
 		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
 			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(url, item, {headers});
 	}
@@ -62,7 +62,7 @@ export class HttpService {
 
 		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
 			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.delete<any>(url, {headers});
 	}
@@ -76,14 +76,14 @@ export class HttpService {
 
 		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
 			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe();
 	}
 
 	public postLogin(username: string, password: string): Observable<HttpResponse<any>> {
 		const headers = new HttpHeaders()
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'login',
 			JSON.stringify({username: username, password: password}), {observe: 'response', headers});
@@ -91,7 +91,7 @@ export class HttpService {
 
 	public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
 		const headers = new HttpHeaders()
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, {observe: 'response', headers});
 	}
@@ -104,7 +104,7 @@ export class HttpService {
 		}
 
 		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/sendResetPasswordEmail', email,
 			{observe: 'response', headers});
@@ -117,7 +117,7 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/updatePassword/' + token, password,
 			{observe: 'response', headers});
@@ -130,7 +130,7 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/activate/updatePassword/' +
@@ -170,7 +170,7 @@ export class HttpService {
 		}
 
 		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', 'https://localhost:9000')
+			.set('Access-Control-Allow-Origin', '*')
 			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<any>(url, {headers});
 	}

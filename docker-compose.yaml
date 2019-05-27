@@ -7,7 +7,11 @@ services:
             dockerfile: simple2secure.portal/Dockerfile
         container_name: s2s-portal
         ports:
-            - 32820:8080
+            - 32821:8080
+            - 32820:8443
+        volumes:
+            - ./ssl:/usr/local/tomcat/ssl
+            - ./server.xml:/usr/local/tomcat/conf/server.xml
         depends_on:
             - mongodb
         working_dir: /opt/app

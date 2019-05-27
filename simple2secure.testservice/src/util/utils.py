@@ -5,6 +5,7 @@ import zipfile
 import requests
 from src.models.CompanyLicensePublic import CompanyLicensePublic
 from flask import json
+from PodToken import podToken
 
 ALLOWED_EXTENSIONS = set(['zip'])
 EXPIRATION_DATE = "expirationDate"
@@ -138,8 +139,9 @@ def portal_post(url, data):
 
 
 def get_auth_token():
+    # TODO: get complete object with both tokens
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-    app.auth_token = "Bearer " + requests.post(app.PORTAL_URL + "license/activatePod",
+    podToken = requests.post(app.PORTAL_URL + "license/activatePod",
                                data=json.dumps(parse_license_file(get_license_file()).__dict__),
                                verify=False,
                                headers=headers).text

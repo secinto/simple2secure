@@ -36,6 +36,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
+import com.simple2secure.api.model.PodToken;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -121,7 +122,7 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/activatePod", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePublic licensePublic,
+	public ResponseEntity<PodToken> activatePod(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
@@ -148,16 +149,19 @@ public class LicenseController {
 
 					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
 					String accessToken = tokenAuthenticationService.addPodAuthentication(podId, group, license);
-
+					String podToken = portalUtils.generatePodToken(podId, license.getTokenSecret());
 					if (!Strings.isNullOrEmpty(accessToken)) {
 
 						license.setPodId(podId);
 						license.setAccessToken(accessToken);
+						license.setPodToken(podToken);
 						license.setActivated(true);
 
 						licenseRepository.save(license);
 
-						return new ResponseEntity(accessToken, HttpStatus.OK);
+						PodToken podLicense = new PodToken(accessToken, podToken);
+
+						return new ResponseEntity(podLicense, HttpStatus.OK);
 					}
 				}
 			}
