@@ -24,9 +24,10 @@ services:
             - $HOME/mongo/data/db:/data/db
         restart: always
         
-    s2s-web:
+    s2s-web:  
         build: ./simple2secure.web/.
         container_name: s2s-web
+        network_mode: bridge
         ports: 
             - 9001:80
             - 9000:443
