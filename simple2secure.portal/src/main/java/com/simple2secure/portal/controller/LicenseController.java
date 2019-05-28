@@ -122,7 +122,7 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/activatePod", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<PodToken> activatePod(@RequestBody CompanyLicensePublic licensePublic,
+	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
@@ -161,7 +161,7 @@ public class LicenseController {
 
 						PodToken podLicense = new PodToken(accessToken, podToken);
 
-						return new ResponseEntity(podLicense, HttpStatus.OK);
+						return new ResponseEntity(accessToken, HttpStatus.OK);
 					}
 				}
 			}
