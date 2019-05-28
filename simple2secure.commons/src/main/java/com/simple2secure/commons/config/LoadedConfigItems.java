@@ -15,7 +15,7 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "http://144.76.93.104";
+	private String baseHost = "144.76.93.104";
 	private String basePort = "32820/s2s";
 	private String basePortWeb = "9000";
 
