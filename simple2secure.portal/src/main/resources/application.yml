@@ -1,7 +1,6 @@
 mail:
   username: secure.s2s.secinto@gmail.com
   password: latinica1
-  tls: true
   imap:
     host: imap.ionos.de
     auth: true
@@ -11,10 +10,12 @@ mail:
       class: javax.net.ssl.SSLSocketFactory
   smtp:
     auth: true
-    host: smtp.gmail.com
-    port: 587
     starttls.enable: true
+    host: smtp.gmail.com
     ssl.trust: smtp.gmail.com
+    port: 587   
+    socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
 
 license:
   filepath: temp/license/

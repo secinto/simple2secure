@@ -1,36 +1,57 @@
-from flask import Flask, Response, jsonify, request, render_template, flash, redirect
+from webbrowser import get
+from flask import Flask, Response, jsonify, request, render_template, flash, redirect, session
 from flask_cors import CORS
 from scanner import scanner
 from src.models.TestResult import TestResult
 from src.util.utils import *
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from src.models.CompanyLicensePublic import CompanyLicensePublic
 import threading
 import os
+import urllib3
 import secrets
+
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = "ChangeIt2019!"
-auth_token = ""
 LICENSE_FOLDER = 'static/license'
-app.config['LICENSE_FOLDER'] = LICENSE_FOLDER
-PORTAL_URL = "https://localhost:8443/api/"
-podId = secrets.token_urlsafe(20)
-licenseFile = parse_license_file(get_license_file())
-license_id = licenseFile.licenseId
+PORTAL_URL = 'https://localhost:8443/api/'
+POD_ID = secrets.token_urlsafe(20)
+license_id = ""
+licenseFile = CompanyLicensePublic("", "", "")
+
+
+@app.before_first_request
+def init():
+    urllib3.disable_warnings()
+    print("-----------------------------")
+    print("-------Initialization--------")
+    print("-----------------------------")
+    print(" * Extracting the pod license")
+    app.licenseFile = parse_license_file(get_license_file())
+    app.license_id = app.licenseFile.licenseId
+    print(" * Pod License Id : " + app.licenseFile.licenseId)
+    print(" * Pod Group Id : " + app.licenseFile.groupId)
+    print(" * Pod Id : " + app.licenseFile.podId)
+    print(" ****************************")
+    session['auth_token'] = get_auth_token()
+    print(" * Activating the license")
+    print(" * Auth Token : " + session['auth_token'])
+    print("-----------------------------")
+    print("-----Initialization END------")
+    print("-----------------------------")
 
 
 @app.route("/")
 def get_available_tests():
     timestamp = datetime.now().timestamp()*1000
-    test_result = TestResult("Result - " + timestamp.__str__(), "test", license_id, licenseFile.groupId, timestamp)
-
-    if not auth_token:
-        get_auth_token()
-
+    test_result = TestResult("Result - " + timestamp.__str__(), None, license_id, licenseFile.groupId, timestamp)
+    print(" * Auth Token before posting: " + session['auth_token'])
     portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
     # testResults.append(test_result)
+    print()
     return "haha"
 
 
@@ -43,6 +64,7 @@ def parse_tests():
 
 @app.route("/services/run")
 def run_service():
+
     data = json.loads(read_json_testfile())
     results = {}
 
@@ -84,10 +106,6 @@ def run_service():
     timestamp = datetime.now().timestamp()*1000
     test_result = TestResult("Result - " + timestamp.__str__(), results, license_id, licenseFile.groupId, timestamp)
 
-    # testResults.append(test_result)
-    if not auth_token:
-        get_auth_token()
-
     portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
 
     return jsonify(results)
@@ -117,4 +135,4 @@ def do_license_upload():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True)
+    app.run(ssl_context=('adhoc'), host='0.0.0.0', threaded=True)

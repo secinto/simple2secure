@@ -128,6 +128,7 @@ public class LicenseController {
 			String groupId = licensePublic.getGroupId();
 			String licenseId = licensePublic.getLicenseId();
 			String podId = licensePublic.getPodId();
+			boolean podExists = false;
 
 			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)) {
 				CompanyGroup group = groupRepository.find(groupId);
@@ -143,6 +144,8 @@ public class LicenseController {
 							license = tempLicense;
 						}
 					}
+				} else {
+					podExists = true;
 				}
 
 				if (group != null && license != null) {
@@ -157,7 +160,11 @@ public class LicenseController {
 						license.setPodToken(podToken);
 						license.setActivated(true);
 
-						licenseRepository.save(license);
+						if (podExists) {
+							licenseRepository.update(license);
+						} else {
+							licenseRepository.save(license);
+						}
 
 						PodToken podLicense = new PodToken(accessToken, podToken);
 

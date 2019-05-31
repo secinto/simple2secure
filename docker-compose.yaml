@@ -32,4 +32,4 @@ services:
             - 9001:80
             - 9000:443
         depends_on:
-            - s2s-portal
+            - s2s-portal  

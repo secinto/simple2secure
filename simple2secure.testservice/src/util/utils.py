@@ -4,8 +4,7 @@ import app
 import zipfile
 import requests
 from src.models.CompanyLicensePublic import CompanyLicensePublic
-from flask import json
-from PodToken import podToken
+from flask import json, session
 
 ALLOWED_EXTENSIONS = set(['zip'])
 EXPIRATION_DATE = "expirationDate"
@@ -118,7 +117,7 @@ def get_license_file():
 def parse_license_file(license_file):
     lines = license_file.split("\n")
     group_id = ""
-    pod_id = app.podId
+    pod_id = app.POD_ID
     for line in lines:
         if "#" not in line:
             row = line.split("=")
@@ -134,17 +133,22 @@ def parse_license_file(license_file):
 
 
 def portal_post(url, data):
-    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': app.auth_token}
+
+    if not session['auth_token']:
+        session['auth_token'] = get_auth_token()
+    print(" * Auth Token before posting function: " + session['auth_token'])
+    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
+                                                                                                session['auth_token']}
     requests.post(url, data=json.dumps(data), verify=False, headers=headers)
 
 
 def get_auth_token():
     # TODO: get complete object with both tokens
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-    app.auth_token = requests.post(app.PORTAL_URL + "license/activatePod",
-                               data=json.dumps(parse_license_file(get_license_file()).__dict__),
-                               verify=False,
-                               headers=headers).text
+    return requests.post(app.PORTAL_URL + "license/activatePod",
+                         data=json.dumps(parse_license_file(get_license_file()).__dict__),
+                         verify=False,
+                         headers=headers).text
 
 
 
