@@ -138,6 +138,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 				loadedConfigItems.setBasePort("8443");
 				loadedConfigItems.setBaseProtocol("https");
 				loadedConfigItems.setBaseHost("localhost");
+				loadedConfigItems.setBasePortWeb("9000");
 			}
 		}
 

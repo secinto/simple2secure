@@ -7,8 +7,8 @@ services:
             dockerfile: simple2secure.portal/Dockerfile
         container_name: s2s-portal
         ports:
-            - 32821:8080
-            - 32820:8443
+            - 51000:8080
+            - 51001:8443
         volumes:
             - ./ssl:/usr/local/tomcat/ssl
             - ./server.xml:/usr/local/tomcat/conf/server.xml
@@ -29,7 +29,7 @@ services:
         container_name: s2s-web
         network_mode: bridge
         ports: 
-            - 9001:80
-            - 9000:443
+            - 51002:80
+            - 51003:443
         depends_on:
             - s2s-portal  
