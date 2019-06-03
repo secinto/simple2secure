@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = "ChangeIt2019!"
 LICENSE_FOLDER = 'static/license'
-PORTAL_URL = 'https://localhost:8443/api/'
+PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
 POD_ID = secrets.token_urlsafe(20)
 license_id = ""
 licenseFile = CompanyLicensePublic("", "", "")
