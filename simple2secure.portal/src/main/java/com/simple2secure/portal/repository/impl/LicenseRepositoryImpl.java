@@ -66,6 +66,12 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
+	public CompanyLicensePrivate findByPodId(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId));
+		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
 	public void deleteByGroupId(String groupId) {
 		List<CompanyLicensePrivate> licenses = findByGroupId(groupId);
 
@@ -98,5 +104,16 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	public CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId) {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("podId").is(podId));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public void deleteByPodId(String podId) {
+		// TODO Auto-generated method stub
+		if (!Strings.isNullOrEmpty(podId)) {
+			CompanyLicensePrivate license = findByPodId(podId);
+			if (license != null) {
+				delete(license);
+			}
+		}
 	}
 }

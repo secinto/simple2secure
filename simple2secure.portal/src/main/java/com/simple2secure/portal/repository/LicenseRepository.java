@@ -12,6 +12,8 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract CompanyLicensePrivate findByProbeId(String probeId);
 
+	public abstract CompanyLicensePrivate findByPodId(String podId);
+
 	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
 
 	public abstract CompanyLicensePrivate findByLicenseIdAndProbeId(String licenseId, String probeId);
@@ -25,5 +27,7 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 	public abstract void deleteByGroupId(String groupId);
 
 	public abstract void deleteByProbeId(String probeId);
+
+	public abstract void deleteByPodId(String podId);
 
 }

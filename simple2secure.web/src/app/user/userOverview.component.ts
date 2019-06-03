@@ -49,6 +49,7 @@ export class UserOverviewComponent {
 	showGroupTable: boolean;
 	showUserTable: boolean;
 	showProbeTable: boolean;
+	showPodTable: boolean;
 	showContextTable: boolean;
 	showEditAndDelete: boolean;
 	isGroupDeletable = false;
@@ -61,15 +62,18 @@ export class UserOverviewComponent {
 	dataSource2 = new MatTableDataSource();
 	dataSource3 = new MatTableDataSource();
 	dataSource4 = new MatTableDataSource();
+	dataSource5 = new MatTableDataSource();
 	options = {focused: true, allowDrag: true};
 
 	@ViewChild('paginator') paginator: MatPaginator;
 	@ViewChild('paginator2') paginator2: MatPaginator;
 	@ViewChild('paginator3') paginator3: MatPaginator;
+	@ViewChild('paginator4') paginator4: MatPaginator;
 	@ViewChild('sort') sort: MatSort;
 	@ViewChild('sortDev') sortDev: MatSort;
 	@ViewChild('sortGrp') sortGrp: MatSort;
 	@ViewChild('sortCntx') sortCntx: MatSort;
+	@ViewChild('sortPod') sortPod: MatSort;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -140,10 +144,12 @@ export class UserOverviewComponent {
 					this.dataSource2.data = this.myProfile.myProbes;
 					this.dataSource3.data = this.myProfile.myGroups;
 					this.dataSource4.data = this.myProfile.myContexts;
+					this.dataSource5.data = this.myProfile.myPods;
 					this.checkMyGroupSize(this.myProfile.myGroups);
 					this.checkMyUsersSize(this.myProfile.myUsersList);
 					this.checkMyProbesSize(this.myProfile.myProbes);
 					this.checkMyContextsSize(this.myProfile.myContexts);
+					this.checkMyPodsSize(this.myProfile.myPods);
 					this.dataService.setGroups(this.myProfile.myGroups);
 					if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.contextDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible && !this.contextAdded) {
 						this.alertService.success(this.translate.instant('message.user'));
@@ -219,6 +225,15 @@ export class UserOverviewComponent {
 		}
 		else {
 			this.showProbeTable = false;
+		}
+	}
+
+	checkMyPodsSize(pods: any) {
+		if (pods.length > 0) {
+			this.showPodTable = true;
+		}
+		else {
+			this.showPodTable = false;
 		}
 	}
 
@@ -836,6 +851,9 @@ export class UserOverviewComponent {
 				case 4:
 					!this.dataSource2.paginator ? this.dataSource2.paginator = this.paginator2 : null;
 					!this.dataSource2.sort ? this.dataSource2.sort = this.sortDev : null;
+				case 5:
+					!this.dataSource5.paginator ? this.dataSource5.paginator = this.paginator4 : null;
+					!this.dataSource5.sort ? this.dataSource5.sort = this.sortPod : null;
 			}
 		});
 	}

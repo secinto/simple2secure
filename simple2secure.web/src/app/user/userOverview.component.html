@@ -387,25 +387,18 @@
 
         <mat-tab label="{{ 'table.mypods' | translate }}">
 
-            <button class="pull-right mat-green-button" [disabled]="loading" mat-raised-button color="primary"
-                    id="addButton" type="button" (click)="download()">
-                <i class="glyphicon glyphicon-download"></i> {{ 'button.downloadProbe' | translate }}
-                <img *ngIf="loading"
-                     src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="/>
-            </button>
-
-            <div *ngIf="showProbeTable" class="example-container mat-elevation-z8 table table-striped">
+            <div *ngIf="showPodTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
                         <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="dataSource2" matSort>
+                <mat-table #sortDev="matSort" #table [dataSource]="dataSource5" matSort>
 
                     <ng-container matColumnDef="probe">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+                        <mat-cell *matCellDef="let element"> {{element.podId}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">
