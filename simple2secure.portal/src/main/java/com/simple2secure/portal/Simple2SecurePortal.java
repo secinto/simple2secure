@@ -35,6 +35,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 
 @EnableScheduling
@@ -131,15 +132,15 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	public void currentActiveProfile() {
 		String[] activeProfiles = env.getActiveProfiles();
 
-		// for (String profile : activeProfiles) {
-		// if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
-		// LoadedConfigItems loadedConfigItems = LoadedConfigItems.getInstance();
-		// loadedConfigItems.setBasePort("8443");
-		// loadedConfigItems.setBaseProtocol("https");
-		// loadedConfigItems.setBaseHost("localhost");
-		// loadedConfigItems.setBasePortWeb("9000");
-		// }
-		// }
+		for (String profile : activeProfiles) {
+			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+				LoadedConfigItems loadedConfigItems = LoadedConfigItems.getInstance();
+				loadedConfigItems.setBasePort("8443");
+				loadedConfigItems.setBaseProtocol("https");
+				loadedConfigItems.setBaseHost("localhost");
+				loadedConfigItems.setBasePortWeb("9000");
+			}
+		}
 
 	}
 

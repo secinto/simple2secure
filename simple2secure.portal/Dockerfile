@@ -1,8 +1,7 @@
 FROM gradle:jdk10 as builder
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
-RUN pwd
-RUN gradle :simple2secure.portal:build -x test -Dspring.profiles.active=deployment
+RUN gradle :simple2secure.portal:build -x test
 
 FROM tomcat:8.5
 MAINTAINER secinto GmbH

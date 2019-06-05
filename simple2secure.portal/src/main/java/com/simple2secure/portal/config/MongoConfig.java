@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.ExtendedMongoTemplate;
 import com.simple2secure.portal.utils.YamlPropertySourceFactory;
 
@@ -69,11 +70,11 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	private String getHost() {
 		String[] activeProfiles = env.getActiveProfiles();
 
-		// for (String profile : activeProfiles) {
-		// if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
-		// return "localhost";
-		// }
-		// }
+		for (String profile : activeProfiles) {
+			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+				return "localhost";
+			}
+		}
 
 		return host;
 	}
