@@ -28,14 +28,8 @@ compileJava {
 	options.compilerArgs += ["-Xdoclint:none", "-Xlint:none", "-nowarn"]
 }
 
-task setSpringProfile {
-    run { systemProperty "spring.profiles.active", "deployment" }
-	println 'Spring profile deployment set successfully!'
-}
-
 war { 
 	baseName = 's2s-portal' 
-	mustRunAfter setSpringProfile
 }
 
 

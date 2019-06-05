@@ -4717,5 +4717,10 @@
         <welcome-file>index.htm</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+	
+	<context-param>
+		<param-name>spring.profiles.active</param-name>
+		<param-value>deployment</param-value>
+	</context-param>
 
 </web-app>
