@@ -5,17 +5,19 @@ public class Pod {
 	private String podId;
 	private CompanyGroup group;
 	private boolean activated;
+	private String hostname;
 
 	public Pod() {
 
 	}
 
-	public Pod(String podId, CompanyGroup group, boolean activated) {
+	public Pod(String podId, CompanyGroup group, boolean activated, String hostname) {
 		super();
 
 		this.podId = podId;
 		this.group = group;
 		this.activated = activated;
+		this.hostname = hostname;
 	}
 
 	public String getPodId() {
@@ -40,5 +42,13 @@ public class Pod {
 
 	public void setGroup(CompanyGroup group) {
 		this.group = group;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 }

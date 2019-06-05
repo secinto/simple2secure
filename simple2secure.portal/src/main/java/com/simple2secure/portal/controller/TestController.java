@@ -36,12 +36,11 @@ public class TestController {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = "application/json")
-	// @PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('POD')")
 	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @RequestHeader("Accept-Language") String locale) {
 
 		if (testResult != null) {
-			if (!Strings.isNullOrEmpty(testResult.getLicenseId()) && !Strings.isNullOrEmpty(testResult.getGroupId())
-					&& testResult.getResult() != null) {
+			if (!Strings.isNullOrEmpty(testResult.getLicenseId()) && !Strings.isNullOrEmpty(testResult.getGroupId())) {
 				return testUtils.saveTestResult(testResult, locale);
 			}
 		}

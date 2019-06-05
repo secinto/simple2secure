@@ -78,7 +78,7 @@ public class PodUtils {
 						if (!Strings.isNullOrEmpty(license.getPodId())) {
 
 						}
-						Pod pod = new Pod(license.getPodId(), group, license.isActivated());
+						Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname());
 						myPods.add(pod);
 					}
 				}

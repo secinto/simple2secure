@@ -128,11 +128,13 @@ public class LicenseController {
 			String groupId = licensePublic.getGroupId();
 			String licenseId = licensePublic.getLicenseId();
 			String podId = licensePublic.getPodId();
+			String hostname = licensePublic.getHostname();
 			boolean podExists = false;
 
-			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)) {
+			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)
+					&& !Strings.isNullOrEmpty(hostname)) {
 				CompanyGroup group = groupRepository.find(groupId);
-				CompanyLicensePrivate license = licenseRepository.findByLicenseIdAndPodId(licenseId, podId);
+				CompanyLicensePrivate license = licenseRepository.findByLicenseAndHostname(licenseId, hostname);
 
 				if (license == null) {
 					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
@@ -155,10 +157,13 @@ public class LicenseController {
 					String podToken = portalUtils.generatePodToken(podId, license.getTokenSecret());
 					if (!Strings.isNullOrEmpty(accessToken)) {
 
-						license.setPodId(podId);
+						if (Strings.isNullOrEmpty(license.getPodId())) {
+							license.setPodId(podId);
+						}
 						license.setAccessToken(accessToken);
 						license.setPodToken(podToken);
 						license.setActivated(true);
+						license.setHostname(licensePublic.getHostname());
 
 						if (podExists) {
 							licenseRepository.update(license);

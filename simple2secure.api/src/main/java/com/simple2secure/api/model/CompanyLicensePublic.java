@@ -33,6 +33,8 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected boolean activated;
 
+	protected String hostname;
+
 	public CompanyLicensePublic() {
 	}
 
@@ -113,5 +115,13 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setPodToken(String podToken) {
 		this.podToken = podToken;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 }

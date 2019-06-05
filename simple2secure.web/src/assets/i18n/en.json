@@ -289,6 +289,8 @@
   "groups.notfound.info": "Click on the button above to add new group",
   "probe.notfound": "Probes not found",
   "probe.notfound.info": "Click on the button above to download the probe",
+  "pod.notfound": "Pods not found",
+  "pod.notfound.info": "Es werden nur aktivierte Pods aufgelistet",
   "user.notfound": "User not found",
   "user.notfound.info": "Click on the button above to add new user",
   "user.notfound.infoNoGroup": "You have to add a new group to be able to add a new user",

@@ -17,10 +17,11 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = "ChangeIt2019!"
 LICENSE_FOLDER = 'static/license'
-PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
+# PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
+PORTAL_URL = 'https://localhost:8443/api/'
 POD_ID = secrets.token_urlsafe(20)
 license_id = ""
-licenseFile = CompanyLicensePublic("", "", "")
+licenseFile = CompanyLicensePublic("", "", "", "")
 
 
 @app.before_first_request
@@ -37,6 +38,8 @@ def init():
     print(" * Pod Id : " + app.licenseFile.podId)
     print(" ****************************")
     session['auth_token'] = get_auth_token()
+    session['license_id'] = app.licenseFile.licenseId
+    session['group_id'] = app.licenseFile.groupId
     print(" * Activating the license")
     print(" * Auth Token : " + session['auth_token'])
     print("-----------------------------")
@@ -47,11 +50,12 @@ def init():
 @app.route("/")
 def get_available_tests():
     timestamp = datetime.now().timestamp()*1000
-    test_result = TestResult("Result - " + timestamp.__str__(), None, license_id, licenseFile.groupId, timestamp)
+    test_result = TestResult("Result - " + timestamp.__str__(), None, session['license_id'], session['group_id'],
+                             socket.gethostname(), timestamp)
     print(" * Auth Token before posting: " + session['auth_token'])
     portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
     # testResults.append(test_result)
-    print()
+    # print()
     return "haha"
 
 
@@ -104,7 +108,8 @@ def run_service():
     # write_to_result_log(json.dumps(results))
 
     timestamp = datetime.now().timestamp()*1000
-    test_result = TestResult("Result - " + timestamp.__str__(), results, license_id, licenseFile.groupId, timestamp)
+    test_result = TestResult("Result - " + timestamp.__str__(), results, session['license_id'], session['group_id'],
+                             socket.gethostname(), timestamp)
 
     portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
 

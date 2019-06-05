@@ -12,6 +12,7 @@ public class TestResult extends GenericDBObject {
 	private String name;
 	private String licenseId;
 	private String groupId;
+	private String hostname;
 	private TestResultObj result;
 	private long timestamp;
 
@@ -19,10 +20,11 @@ public class TestResult extends GenericDBObject {
 
 	}
 
-	public TestResult(String name, String licenseId, String groupId, TestResultObj result, long timestamp) {
+	public TestResult(String name, String licenseId, String groupId, String hostname, TestResultObj result, long timestamp) {
 		this.name = name;
 		this.licenseId = licenseId;
 		this.groupId = groupId;
+		this.hostname = hostname;
 		this.result = result;
 		this.timestamp = timestamp;
 	}
@@ -65,5 +67,13 @@ public class TestResult extends GenericDBObject {
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 }

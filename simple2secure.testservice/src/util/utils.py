@@ -5,6 +5,7 @@ import zipfile
 import requests
 from src.models.CompanyLicensePublic import CompanyLicensePublic
 from flask import json, session
+import socket
 
 ALLOWED_EXTENSIONS = set(['zip'])
 EXPIRATION_DATE = "expirationDate"
@@ -128,7 +129,7 @@ def parse_license_file(license_file):
 
     if group_id and app.license_id:
         # send post to the portal to activate license
-        licenseObj = CompanyLicensePublic(group_id.rstrip(), app.license_id.rstrip(), pod_id)
+        licenseObj = CompanyLicensePublic(group_id.rstrip(), app.license_id.rstrip(), pod_id, socket.gethostname())
         return licenseObj
 
 

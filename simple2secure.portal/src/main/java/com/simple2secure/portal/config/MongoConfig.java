@@ -69,9 +69,11 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	private String getHost() {
 		String[] activeProfiles = env.getActiveProfiles();
 
-		/*
-		 * for (String profile : activeProfiles) { if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) { return "localhost"; } }
-		 */
+		// for (String profile : activeProfiles) {
+		// if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+		// return "localhost";
+		// }
+		// }
 
 		return host;
 	}

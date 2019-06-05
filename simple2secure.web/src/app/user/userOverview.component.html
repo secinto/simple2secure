@@ -398,7 +398,7 @@
                     <ng-container matColumnDef="probe">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.podId}}</mat-cell>
+                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">
@@ -440,11 +440,10 @@
                                       mode="indeterminate"></mat-progress-spinner>
             </div>
 
-            <div *ngIf="!showProbeTable" class="row jumbotron-row-error">
+            <div *ngIf="!showPodTable" class="row jumbotron-row-error">
                 <div class="jumbotron jumbotron-top-error">
-                    <span class="rotate-icon fas fa-arrow-up fa-7x"></span>
-                    <h2>{{ 'probe.notfound' | translate }}</h2>
-                    <h4>{{ 'probe.notfound.info' | translate }}</h4>
+                    <h2>{{ 'pod.notfound' | translate }}</h2>
+                    <h4>{{ 'pod.notfound.info' | translate }}</h4>
                 </div>
             </div>
 

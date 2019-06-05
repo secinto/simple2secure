@@ -289,6 +289,8 @@
   "groups.notfound.info": "Klicken Sie auf die Schaltfläche oben, um eine neue Gruppe hinzuzufügen",
   "probe.notfound": "Probes nicht gefunden",
   "probe.notfound.info": "Klicken Sie auf die Schaltfläche oben, um das Probe herunterzuladen",
+  "pod.notfound": "Pods nicht gefunden",
+  "pod.notfound.info": "Klicken Sie auf die Schaltfläche oben, um das Probe herunterzuladen",
   "user.notfound": "Benutzer nicht gefunden",
   "user.notfound.info": "Klicken Sie auf die Schaltfläche oben, um einen neuen Benutzer hinzuzufügen",
   "user.notfound.infoNoGroup": "Sie müssen eine neue Gruppe hinzufügen, um einen neuen Benutzer hinzufügen zu können",

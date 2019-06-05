@@ -4,4 +4,5 @@ export class Pod {
 	podId: string;
 	group: CompanyGroup;
 	activated: boolean;
+	hostname: string;
 }
