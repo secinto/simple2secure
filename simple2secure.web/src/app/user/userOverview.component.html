@@ -395,7 +395,7 @@
                 </div>
                 <mat-table #sortDev="matSort" #table [dataSource]="dataSource5" matSort>
 
-                    <ng-container matColumnDef="probe">
+                    <ng-container matColumnDef="pod">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
@@ -421,15 +421,15 @@
                             translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuProbe"
+                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuPod"
                                     (click)="onMenuTriggerClick(element)">
                                 <i class="fas fa-bars"></i>
                             </button>
                         </mat-cell>
                     </ng-container>
 
-                    <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
+                    <mat-header-row *matHeaderRowDef="displayedColumnsPods"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumnsPods;"></mat-row>
                 </mat-table>
                 <mat-paginator #paginator2
                                [pageSize]="10"
@@ -448,6 +448,17 @@
             </div>
 
             <mat-menu #menuProbe="matMenu">
+                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
+                    <mat-icon>edit</mat-icon>
+                    {{ 'probe.change.group' | translate }}
+                </button>
+                <button mat-menu-item (click)="onProbeDeleteClick()">
+                    <mat-icon>delete</mat-icon>
+                    {{ 'button.delete' | translate }}
+                </button>
+            </mat-menu>
+
+            <mat-menu #menuPod="matMenu">
                 <button mat-menu-item (click)="openDialogChangeProbeGroup()">
                     <mat-icon>edit</mat-icon>
                     {{ 'probe.change.group' | translate }}

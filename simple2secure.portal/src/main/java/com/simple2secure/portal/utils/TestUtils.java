@@ -3,6 +3,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +46,11 @@ public class TestUtils {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
-		if (testResult != null) {
-			testResultRepository.save(testResult);
-			return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
+		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
+			if (!Strings.isNullOrEmpty(testResult.getLicenseId()) && !Strings.isNullOrEmpty(testResult.getGroupId())) {
+				testResultRepository.save(testResult);
+				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
+			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
 				HttpStatus.NOT_FOUND);
@@ -62,27 +65,50 @@ public class TestUtils {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ResponseEntity<List<TestResultDTO>> getTestResultByContextId(String contextId, String locale) {
+		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
+			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+			List<TestResultDTO> results = new ArrayList<TestResultDTO>();
+			if (groups != null) {
+				for (CompanyGroup group : groups) {
+					List<TestResult> grpResults = testResultRepository.getByGroupId(group.getId());
 
-		List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-		List<TestResultDTO> results = new ArrayList<TestResultDTO>();
-		if (groups != null) {
-			for (CompanyGroup group : groups) {
-				List<TestResult> grpResults = testResultRepository.getByGroupId(group.getId());
-
-				for (TestResult result : grpResults) {
-					if (result != null) {
-						TestResultDTO testResultDTO = new TestResultDTO(result, group);
-						results.add(testResultDTO);
+					for (TestResult result : grpResults) {
+						if (result != null) {
+							TestResultDTO testResultDTO = new TestResultDTO(result, group);
+							results.add(testResultDTO);
+						}
 					}
 				}
-			}
-			if (results != null) {
-				return new ResponseEntity<List<TestResultDTO>>(results, HttpStatus.OK);
+				if (results != null) {
+					return new ResponseEntity<List<TestResultDTO>>(results, HttpStatus.OK);
+				}
 			}
 		}
-
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function checks if the test result with the provide id exists, and deletes it accordingly.
+	 *
+	 * @param testResultId
+	 * @param locale
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<TestResult> deleteTestResult(String testResultId, String locale) {
+		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale)) {
+			TestResult testResult = testResultRepository.find(testResultId);
+			if (testResult != null) {
+				testResultRepository.delete(testResult);
+				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
+			}
+			log.error("Problem occured while deleting test result");
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 }

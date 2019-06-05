@@ -1,10 +1,12 @@
 import {Component, ViewChild} from '@angular/core';
+import {TestDTO} from '../_models/DTO/testDTO';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextDTO, TestResult, TestResultDTO} from '../_models/index';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {NetworkReportDetailsComponent} from '../report';
 import {TestResultDetailsComponent} from './testResultDetails.component';
 
@@ -17,9 +19,10 @@ export class TestResultComponent {
 
 	currentUser: any;
 	testResults: TestResultDTO[];
+	selectedResult: TestResultDTO;
 	loading = false;
 	context: ContextDTO;
-	displayedColumns = ['name', 'license', 'group'];
+	displayedColumns = ['name', 'license', 'group', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -87,5 +90,49 @@ export class TestResultComponent {
 
 		this.dialog.open(TestResultDetailsComponent, dialogConfig);
 
+	}
+
+	public onMenuTriggerClick(testResult: TestResultDTO) {
+		this.selectedResult = testResult;
+	}
+
+	public openDialogDeleteTestResult() {
+		const dialogConfig = new MatDialogConfig();
+
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
+
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.test.dialog')
+		};
+
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteTestResult();
+			}
+		});
+	}
+
+	public deleteTestResult() {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'test/testresult/delete/' + this.selectedResult.testResult.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.test.delete'));
+				this.loading = false;
+				this.loadTestResults();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
 	}
 }

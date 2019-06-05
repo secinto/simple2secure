@@ -22,6 +22,16 @@
             <mat-cell *matCellDef="let element"> {{(element.testResult.timestamp) | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+                        (click)="onMenuTriggerClick(element)">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
                  (click)="openDialogShowTestResult(row)"></mat-row>
@@ -35,6 +45,10 @@
 </div>
 
 <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="openDialogDeleteTestResult()">
+        <mat-icon>delete</mat-icon>
+        {{ 'button.delete' | translate }}
+    </button>
 </mat-menu>
 
 

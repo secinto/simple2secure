@@ -1,11 +1,9 @@
 <h3 mat-dialog-title>{{ 'test.testresult' | translate }}</h3>
 
 <div mat-dialog-content>
-    <p><b>{{ 'test.precondition' | translate }}: </b> {{testResult.result.precondition}}</p>
-    <p><b>{{ 'test.step' | translate }} ID: </b> {{testResult.result.step}}</p>
-    <p><b>{{ 'test.postcondition' | translate }}: </b> {{testResult.result.postcondition}}</p>
-    <!--<ngx-json-viewer [json]="getQueryResult()" [expanded]="false"></ngx-json-viewer>-->
-    <!--<ngx-json-view [data]="getQueryResult()"></ngx-json-view>-->
+    <p *ngIf="testResult.result"><b>{{ 'test.precondition' | translate }}: </b> {{testResult.result.precondition}}</p>
+    <p *ngIf="testResult.result"><b>{{ 'test.step' | translate }} ID: </b> {{testResult.result.step}}</p>
+    <p *ngIf="testResult.result"><b>{{ 'test.postcondition' | translate }}: </b> {{testResult.result.postcondition}}</p>
 </div>
 
 <div mat-dialog-actions>

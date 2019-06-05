@@ -93,7 +93,6 @@ public class PodUtils {
 			licenseRepository.deleteByPodId(podId);
 			log.debug("Deleted dependencies for probe id {}", podId);
 		}
-
 	}
 
 }
