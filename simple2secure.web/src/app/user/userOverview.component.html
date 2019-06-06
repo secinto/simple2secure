@@ -390,10 +390,10 @@
             <div *ngIf="showPodTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterPod($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="dataSource5" matSort>
+                <mat-table #sortPod="matSort" #table [dataSource]="dataSource5" matSort>
 
                     <ng-container matColumnDef="pod">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}

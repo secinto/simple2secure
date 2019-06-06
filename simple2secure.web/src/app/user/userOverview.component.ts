@@ -126,13 +126,19 @@ export class UserOverviewComponent {
 	applyFilter(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource.filter = filterValue;
+		this.dataSource3.filter = filterValue;
 	}
 
 	applyFilterDev(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
 		this.dataSource2.filter = filterValue;
+	}
+
+	applyFilterPod(filterValue: string) {
+		filterValue = filterValue.trim(); // Remove whitespace
+		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+		this.dataSource5.filter = filterValue;
 	}
 
 	private loadMyProfile() {

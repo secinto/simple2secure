@@ -4,7 +4,7 @@
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
     </div>
-    <mat-table #tableTestResult [dataSource]="dataSource" matSort>
+    <mat-table #table [dataSource]="dataSource" matSort>
 
         <!-- Position Column -->
         <ng-container matColumnDef="name">
