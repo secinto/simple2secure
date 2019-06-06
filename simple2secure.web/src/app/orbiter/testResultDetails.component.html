@@ -1,9 +1,9 @@
 <h3 mat-dialog-title>{{ 'test.testresult' | translate }}</h3>
 
 <div mat-dialog-content>
-    <p *ngIf="testResult.result"><b>{{ 'test.precondition' | translate }}: </b> {{testResult.result.precondition}}</p>
-    <p *ngIf="testResult.result"><b>{{ 'test.step' | translate }} ID: </b> {{testResult.result.step}}</p>
-    <p *ngIf="testResult.result"><b>{{ 'test.postcondition' | translate }}: </b> {{testResult.result.postcondition}}</p>
+    <!--<p *ngIf="testResult.result"><b>{{ 'test.precondition' | translate }}: </b> {{testResult.result.precondition}}</p>-->
+    <p *ngIf="testResult.result">{{testResult.result.step}}</p>
+    <!--<p *ngIf="testResult.result"><b>{{ 'test.postcondition' | translate }}: </b> {{testResult.result.postcondition}}</p>-->
 </div>
 
 <div mat-dialog-actions>

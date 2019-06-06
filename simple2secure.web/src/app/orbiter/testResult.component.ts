@@ -1,13 +1,11 @@
 import {Component, ViewChild} from '@angular/core';
-import {TestDTO} from '../_models/DTO/testDTO';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, TestResult, TestResultDTO} from '../_models/index';
+import {ContextDTO, TestResultDTO} from '../_models/index';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {NetworkReportDetailsComponent} from '../report';
 import {TestResultDetailsComponent} from './testResultDetails.component';
 
 @Component({

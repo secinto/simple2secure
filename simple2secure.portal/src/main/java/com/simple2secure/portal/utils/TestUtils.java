@@ -42,7 +42,8 @@ public class TestUtils {
 	MessageByLocaleService messageByLocaleService;
 
 	/**
-	 * This function saves the Test Result which has been executed by the pod
+	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
+	 * the license which has been used for the activation.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
@@ -57,7 +58,8 @@ public class TestUtils {
 	}
 
 	/**
-	 * This function returns the test results by context id
+	 * This function returns the test results by context id. It collects all groups from the provided context and then iterates over each
+	 * group and collects test results from those groups.
 	 *
 	 * @param contextId
 	 * @param locale
@@ -89,7 +91,7 @@ public class TestUtils {
 	}
 
 	/**
-	 * This function checks if the test result with the provide id exists, and deletes it accordingly.
+	 * This function checks if the test result with the provided id exists, and deletes it accordingly.
 	 *
 	 * @param testResultId
 	 * @param locale
