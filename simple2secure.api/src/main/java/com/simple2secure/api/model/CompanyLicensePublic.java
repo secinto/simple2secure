@@ -26,9 +26,6 @@ public class CompanyLicensePublic extends GenericDBObject {
 	@Lob
 	protected String accessToken;
 
-	@Lob
-	protected String podToken;
-
 	protected String expirationDate;
 
 	protected boolean activated;
@@ -107,14 +104,6 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setExpirationDate(String expirationDate) {
 		this.expirationDate = expirationDate;
-	}
-
-	public String getPodToken() {
-		return podToken;
-	}
-
-	public void setPodToken(String podToken) {
-		this.podToken = podToken;
 	}
 
 	public String getHostname() {

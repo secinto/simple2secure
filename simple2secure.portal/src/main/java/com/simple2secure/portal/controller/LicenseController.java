@@ -36,7 +36,6 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
-import com.simple2secure.api.model.PodToken;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -154,14 +153,12 @@ public class LicenseController {
 
 					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
 					String accessToken = tokenAuthenticationService.addPodAuthentication(podId, group, license);
-					String podToken = portalUtils.generatePodToken(podId, license.getTokenSecret());
 					if (!Strings.isNullOrEmpty(accessToken)) {
 
 						if (Strings.isNullOrEmpty(license.getPodId())) {
 							license.setPodId(podId);
 						}
 						license.setAccessToken(accessToken);
-						license.setPodToken(podToken);
 						license.setActivated(true);
 						license.setHostname(licensePublic.getHostname());
 
@@ -170,8 +167,6 @@ public class LicenseController {
 						} else {
 							licenseRepository.save(license);
 						}
-
-						PodToken podLicense = new PodToken(accessToken, podToken);
 
 						return new ResponseEntity(accessToken, HttpStatus.OK);
 					}
