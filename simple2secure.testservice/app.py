@@ -1,4 +1,3 @@
-from webbrowser import get
 from flask import Flask, Response, jsonify, request, render_template, flash, redirect, session
 from flask_cors import CORS
 from scanner import scanner

@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 MAINTAINER "Secinto GmbH"
 
 RUN apt-get update -y && \
- 		apt-get install -y python3-pip python3-dev nmap build-essential
+ 		apt-get install -y python3-pip python3-dev nmap build-essential libssl-dev libffi-dev
 
 COPY ./requirements.txt /app/requirements.txt
 
