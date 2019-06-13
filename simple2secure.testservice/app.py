@@ -5,7 +5,7 @@ from src.models.TestResult import TestResult
 from src.util.utils import *
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from src.models.CompanyLicensePublic import CompanyLicensePublic
+from src.models.CompanyLicensePod import CompanyLicensePod
 import threading
 import os
 import urllib3
@@ -16,11 +16,11 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = "ChangeIt2019!"
 LICENSE_FOLDER = 'static/license'
-PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
-# PORTAL_URL = 'https://localhost:8443/api/'
+# PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
+PORTAL_URL = 'https://localhost:8443/api/'
 POD_ID = secrets.token_urlsafe(20)
 license_id = ""
-licenseFile = CompanyLicensePublic("", "", "", "")
+licenseFile = CompanyLicensePod("", "", "", "", "")
 
 
 @app.before_first_request

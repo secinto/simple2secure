@@ -83,7 +83,7 @@ public class PodUtils {
 				}
 			}
 		}
-		log.debug("Retrieved {0} probes for context {1}", myPods.size(), context.getName());
+		log.debug("Retrieved {0} pods for context {1}", myPods.size(), context.getName());
 		return myPods;
 	}
 

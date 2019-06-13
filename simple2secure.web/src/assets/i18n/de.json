@@ -78,7 +78,7 @@
   "menu.networkanalysis": "Kommunikation",
   "menu.orbiter": "Orbiter",
   "menu.tools": "Werkzeuge",
-  "menu.tests": "Tests",
+  "menu.tests": "Orbiter tests",
   "menu.email": "Email",
   "menu.emails": "Emails",
   "menu.users": "Benutzer",
@@ -168,6 +168,8 @@
   "network.editDeviceConfig": "Probekonfiguration bearbeiten",
   "network.editConfigGeneral": "Bearbeiten Sie die Konfiguration für eine bestimmte Probe oder Gruppe",
   "network.checkReports": "Überprüfen Sie die bereitgestellten Berichte",
+  "test.pod": "Aktualisieren Sie die Testkonfiguration",
+  "testResult.pod": "Testergebnisse anzeigen",
   "network.steps": "Schritte",
   "network.processors": "Prozessoren",
   "network.editSteps": "Schritte bearbeiten",
@@ -341,5 +343,6 @@
   "test.precondition": "Precondition",
   "test.step": "Step",
   "test.postcondition": "Postcondition",
-  "test.testresult": "Test Result"
+  "test.testresult": "Test Result",
+  "table.pod": "Pod"
 }

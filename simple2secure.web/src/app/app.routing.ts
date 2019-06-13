@@ -3,6 +3,7 @@ import {HomeComponent} from './home/index';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {LoginComponent} from './login/index';
+import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
 import {ResetComponent} from './resetPassword/index';
 import {AnalysisComponent} from './analysis/index';
 import {RegisterComponent} from './register/index';
@@ -58,7 +59,8 @@ const appRoutes: Routes = [
 				component: OrbiterComponent,
 				data: {title: 'menu.orbiter'},
 				children: [
-					{path: '', component: TestResultComponent, data: {title: 'button.testresults'}},
+					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
+					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
 					{path: 'template', component: OrbiterToolTemplateComponent, data: {title: 'menu.templates'}},
 				]

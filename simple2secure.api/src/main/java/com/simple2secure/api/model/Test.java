@@ -1,7 +1,5 @@
 package com.simple2secure.api.model;
 
-import java.util.ArrayList;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class Test extends GenericDBObject {
@@ -11,14 +9,23 @@ public class Test extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -914338716345452064L;
 
+	private String podId;
 	private String description;
 	private String version;
-	private ArrayList<TestStep> precondition;
-	private ArrayList<TestStep> step;
-	private ArrayList<TestStep> postcondition;
+	private TestStep precondition;
+	private TestStep step;
+	private TestStep postcondition;
 
 	public Test() {
 
+	}
+
+	public String getPodId() {
+		return podId;
+	}
+
+	public void setPodId(String podId) {
+		this.podId = podId;
 	}
 
 	public String getDescription() {
@@ -37,27 +44,27 @@ public class Test extends GenericDBObject {
 		this.version = version;
 	}
 
-	public ArrayList<TestStep> getPrecondition() {
+	public TestStep getPrecondition() {
 		return precondition;
 	}
 
-	public void setPrecondition(ArrayList<TestStep> precondition) {
+	public void setPrecondition(TestStep precondition) {
 		this.precondition = precondition;
 	}
 
-	public ArrayList<TestStep> getStep() {
+	public TestStep getStep() {
 		return step;
 	}
 
-	public void setStep(ArrayList<TestStep> step) {
+	public void setStep(TestStep step) {
 		this.step = step;
 	}
 
-	public ArrayList<TestStep> getPostcondition() {
+	public TestStep getPostcondition() {
 		return postcondition;
 	}
 
-	public void setPostcondition(ArrayList<TestStep> postcondition) {
+	public void setPostcondition(TestStep postcondition) {
 		this.postcondition = postcondition;
 	}
 }

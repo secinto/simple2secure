@@ -3,7 +3,7 @@ import os
 import app
 import zipfile
 import requests
-from src.models.CompanyLicensePublic import CompanyLicensePublic
+from src.models.CompanyLicensePod import CompanyLicensePod
 from flask import json, session
 import socket
 
@@ -129,7 +129,8 @@ def parse_license_file(license_file):
 
     if group_id and app.license_id:
         # send post to the portal to activate license
-        licenseObj = CompanyLicensePublic(group_id.rstrip(), app.license_id.rstrip(), pod_id, socket.gethostname())
+        licenseObj = CompanyLicensePod(group_id.rstrip(), app.license_id.rstrip(), pod_id, socket.gethostname(),
+                                       read_json_testfile())
         return licenseObj
 
 
@@ -144,7 +145,6 @@ def portal_post(url, data):
 
 
 def get_auth_token():
-    # TODO: get complete object with both tokens
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
     return requests.post(app.PORTAL_URL + "license/activatePod",
                          data=json.dumps(parse_license_file(get_license_file()).__dict__),

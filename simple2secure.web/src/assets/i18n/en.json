@@ -167,7 +167,9 @@
   "network.editConfigStandard": "Edit configuration",  
   "network.editDeviceConfig": "Edit configuration for specific probe",
   "network.editConfigGeneral": "Edit configuration for specific probe or group",
-  "network.checkReports": "Check the provided reports",  
+  "network.checkReports": "Check the provided reports",
+  "test.pod": "Update the test configuration",
+  "testResult.pod": "Show the test results",
   "network.steps": "Steps",
   "network.processors": "Processors",
   "network.editSteps": "Edit steps",
@@ -290,7 +292,7 @@
   "probe.notfound": "Probes not found",
   "probe.notfound.info": "Click on the button above to download the probe",
   "pod.notfound": "Pods not found",
-  "pod.notfound.info": "Es werden nur aktivierte Pods aufgelistet",
+  "pod.notfound.info": "Only activated pods are listed",
   "user.notfound": "User not found",
   "user.notfound.info": "Click on the button above to add new user",
   "user.notfound.infoNoGroup": "You have to add a new group to be able to add a new user",
@@ -341,5 +343,6 @@
   "test.precondition": "Precondition",
   "test.step": "Step",
   "test.postcondition": "Postcondition",
-  "test.testresult": "Test Result"
+  "test.testresult": "Test Result",
+  "table.pod": "Pod"
 }

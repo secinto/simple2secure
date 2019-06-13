@@ -29,3 +29,4 @@ simple2secure.testservice/tcl/
 simple2secure.web/dist/
 simple2secure.commons/license.dat
 simple2secure.commons/public.key
+simple2secure.testservice/src/models/__pycache__/

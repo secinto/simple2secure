@@ -16,6 +16,7 @@ import {AuthGuard} from './_guards/index';
 import {AlertService, AuthenticationService, DataService, HttpService} from './_services/index';
 import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
+import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
 import {TestResultDetailsComponent} from './orbiter/testResultDetails.component';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
@@ -185,6 +186,7 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestResultComponent,
 		OrbiterToolTemplateComponent,
 		OrbiterTestTemplateComponent,
+		OrbiterOverviewComponent,
 		TestResultComponent,
 		ConfirmationDialog,
 		SelectContextDialog,
