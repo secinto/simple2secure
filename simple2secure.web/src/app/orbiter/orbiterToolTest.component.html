@@ -9,14 +9,14 @@
         <!-- Position Column -->
         <ng-container matColumnDef="pod">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.pod' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
         <ng-container matColumnDef="group">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -41,7 +41,7 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="showConfiguration()">
+    <button mat-menu-item (click)="openDialogShowTest()">
         <mat-icon>edit</mat-icon>
         {{ 'button.edit' | translate }}
     </button>

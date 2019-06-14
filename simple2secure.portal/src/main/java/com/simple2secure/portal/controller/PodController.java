@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.PodDTO;
 import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Pod;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -70,16 +70,16 @@ public class PodController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Pod>> getPodsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<PodDTO>> getPodsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
-				List<Pod> pods = podUtils.getAllPodsFromCurrentContext(context);
+				List<PodDTO> pods = podUtils.getAllPodsFromCurrentContextWithTests(context);
 
 				if (pods != null) {
-					return new ResponseEntity<List<Pod>>(pods, HttpStatus.OK);
+					return new ResponseEntity<List<PodDTO>>(pods, HttpStatus.OK);
 				}
 			}
 		}

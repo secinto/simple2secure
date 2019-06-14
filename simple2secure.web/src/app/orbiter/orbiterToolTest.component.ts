@@ -1,15 +1,12 @@
-import {HttpErrorResponse} from '@angular/common/http';
 import {Component, ViewChild} from '@angular/core';
-import {ContextDTO, TestResultDTO, Tool} from '../_models/index';
+import {PodDTO} from '../_models/DTO/podDTO';
+import {ContextDTO} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {Pod} from '../_models/pod';
 import {AlertService, HttpService, DataService} from '../_services';
-import {TestDTO} from '../_models/DTO/testDTO';
-import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {OrbiterTestTemplateComponent} from './orbiterTestTemplate.component';
-import {OrbiterToolTestResultComponent} from './orbiterToolTestResult.component';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {TestDetailsComponent} from './testDetails.component';
 
 @Component({
 	moduleId: module.id,
@@ -18,8 +15,8 @@ import {TranslateService} from '@ngx-translate/core';
 
 export class OrbiterToolTestComponent {
 
-	selectedPod: Pod;
-	pods: Pod[];
+	selectedPod: PodDTO;
+	pods: PodDTO[];
 	context: ContextDTO;
 	displayedColumns = ['pod', 'group', 'action'];
 	loading = false;
@@ -53,7 +50,7 @@ export class OrbiterToolTestComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public onMenuTriggerClick(pod: Pod) {
+	public onMenuTriggerClick(pod: PodDTO) {
 		this.selectedPod = pod;
 	}
 
@@ -83,7 +80,15 @@ export class OrbiterToolTestComponent {
 				});
 	}
 
-	public showConfiguration(){
+	openDialogShowTest(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		console.log(this.selectedPod.test);
+		dialogConfig.data = {
+			tests: this.selectedPod.test,
+		};
+
+		this.dialog.open(TestDetailsComponent, dialogConfig);
 
 	}
 }

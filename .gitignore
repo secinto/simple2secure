@@ -30,3 +30,4 @@ simple2secure.web/dist/
 simple2secure.commons/license.dat
 simple2secure.commons/public.key
 simple2secure.testservice/src/models/__pycache__/
+simple2secure.testservice/static/license/

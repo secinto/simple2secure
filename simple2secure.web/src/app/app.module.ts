@@ -17,6 +17,7 @@ import {AlertService, AuthenticationService, DataService, HttpService} from './_
 import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
 import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
+import {TestDetailsComponent} from './orbiter/testDetails.component';
 import {TestResultDetailsComponent} from './orbiter/testResultDetails.component';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
@@ -205,7 +206,8 @@ export const httpInterceptorProviders = [
 		AddQueryDialog,
 		ReportComponent,
 		ReportOverviewComponent,
-		TestResultDetailsComponent
+		TestResultDetailsComponent,
+		TestDetailsComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -228,7 +230,8 @@ export const httpInterceptorProviders = [
 		NetworkReportDetailsComponent,
 		UserDetailsComponent,
 		AddQueryDialog,
-		TestResultDetailsComponent
+		TestResultDetailsComponent,
+		TestDetailsComponent
 	],
 	providers: [
 		AuthGuard,

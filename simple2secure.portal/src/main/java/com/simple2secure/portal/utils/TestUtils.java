@@ -14,10 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
@@ -28,6 +30,9 @@ public class TestUtils {
 
 	@Autowired
 	TestResultRepository testResultRepository;
+
+	@Autowired
+	TestRepository testRepository;
 
 	@Autowired
 	protected LoadedConfigItems loadedConfigItems;
@@ -111,6 +116,26 @@ public class TestUtils {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
 				HttpStatus.NOT_FOUND);
 
+	}
+
+	/**
+	 * This function returns all tests by pod Id.
+	 * 
+	 * @param podId
+	 * @param locale
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ResponseEntity<List<Test>> getTestByPodId(String podId, String locale) {
+		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+			List<Test> testList = testRepository.getByPodId(podId);
+
+			if (testList != null) {
+				return new ResponseEntity<List<Test>>(testList, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 }
