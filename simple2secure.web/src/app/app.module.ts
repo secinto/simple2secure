@@ -32,7 +32,7 @@ import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
 	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
 	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule
+	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule
 } from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -65,8 +65,7 @@ import {NotificationComponent, NotificationOverviewComponent} from './notificati
 import {AnalysisComponent, AddQueryDialog} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
 import {
-	OrbiterComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent,
-	OrbiterToolTestResultComponent, OrbiterToolTemplateComponent, OrbiterTestTemplateComponent
+	OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent
 } from './orbiter/index';
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
@@ -124,6 +123,7 @@ export const httpInterceptorProviders = [
 		MatDatepickerModule,
 		MatNativeDateModule,
 		MatCardModule,
+		MatExpansionModule,
 		HttpClientModule,
 		ChartModule,
 		TreeTableModule,
@@ -181,12 +181,6 @@ export const httpInterceptorProviders = [
 		FooterComponent,
 		EqualValidator,
 		OrbiterComponent,
-		OrbiterToolsComponent,
-		OrbiterToolTestRunComponent,
-		OrbiterToolTestComponent,
-		OrbiterToolTestResultComponent,
-		OrbiterToolTemplateComponent,
-		OrbiterTestTemplateComponent,
 		OrbiterOverviewComponent,
 		TestResultComponent,
 		ConfirmationDialog,
@@ -207,7 +201,9 @@ export const httpInterceptorProviders = [
 		ReportComponent,
 		ReportOverviewComponent,
 		TestResultDetailsComponent,
-		TestDetailsComponent
+		TestDetailsComponent,
+		OrbiterToolTestComponent,
+		OrbiterToolTestListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -219,9 +215,6 @@ export const httpInterceptorProviders = [
 		UserGroupApplyConfigComponent,
 		UserProbeChangeGroupComponent,
 		UserContextAddDialogComponent,
-		OrbiterTestTemplateComponent,
-		OrbiterToolTestResultComponent,
-		OrbiterToolTestRunComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,
 		RuleOverviewComponent,

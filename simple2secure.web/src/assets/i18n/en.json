@@ -19,7 +19,7 @@
   "button.inactive": "Inactive",
   "button.true": "True",
   "button.false": "False",    
-  "button.runtests": "Schedule Test",
+  "button.runtests": "Run Test",
   "button.showtests": "Show Tests",
   "button.showtestsresults": "Show Test Results",
   "button.runTestAgain": "Repeat Test",
@@ -177,7 +177,7 @@
   "network.processorDetails": "Processor details",
   "network.stepDetails": "Step details",
   "orbiter.toolsconfig": "Edit tools configuration",
-  "orbiter.edittests": "Edit tests",
+  "orbiter.edittests": "Edit test",
   "select.pleaseselect": "Please select",
   "query.details": "Query Details",
   "user.details": "User Details",
@@ -344,5 +344,11 @@
   "test.step": "Step",
   "test.postcondition": "Postcondition",
   "test.testresult": "Test Result",
-  "table.pod": "Pod"
+  "table.pod": "Pod",
+  "table.executable": "Executable",
+  "table.prefix": "Prefix",
+  "table.value": "Value",
+  "test.parameter": "Parameter",
+  "table.hostname": "Hostname",
+  "button.addTest": "Add Test"
 }

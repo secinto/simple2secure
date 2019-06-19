@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef, MatExpansionPanel} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Test} from '../_models';
 import {AlertService, DataService, HttpService} from '../_services/index';
@@ -11,7 +11,9 @@ import {AlertService, DataService, HttpService} from '../_services/index';
 
 export class TestDetailsComponent{
 	loading = false;
-	test: Test[];
+	test: Test;
+	type: string;
+	isNewTest = false;
 
 	constructor(
 		private dataService: DataService,
@@ -21,8 +23,16 @@ export class TestDetailsComponent{
 		private translate: TranslateService,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-		this.test = data.tests;
 
+		this.type = data.type;
+		if (
+			this.type == 'new'){
+			this.isNewTest = true;
+			this.test = new Test();
+		}
+		else{
+			this.test = data.tests;
+		}
 	}
 
 }

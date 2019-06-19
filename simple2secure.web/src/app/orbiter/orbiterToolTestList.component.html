@@ -1,9 +1,11 @@
-<button mat-raised-button color="primary" id="addButton" type="button" (click)="openDialogAddTemplate()"
+<button mat-raised-button color="primary" id="addButton" type="button"
+        (click)="openDialogShowTest('new')"
         class="pull-right mat-green-button">
-    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addTemplate' | translate }}
+    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addTest' | translate }}
 </button>
 
 <div class="example-container mat-elevation-z8 table table-striped">
+
     <div class="header-filter-table">
         <mat-form-field class="header-filter-field">
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
@@ -12,15 +14,21 @@
     <mat-table #table [dataSource]="dataSource" matSort>
 
         <!-- Position Column -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.template' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+        <ng-container matColumnDef="testId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.id}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="toolName">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'tool.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{tool.tool.name}}</mat-cell>
+        <ng-container matColumnDef="version">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.version}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -45,13 +53,14 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="openDialogEditTemplate()">
+    <button mat-menu-item (click)="openDialogShowTest('edit')">
         <mat-icon>edit</mat-icon>
-        {{ 'test.modify' | translate }}
+        {{ 'button.edit' | translate }}
     </button>
-    <button mat-menu-item (click)="openDialogDeleteTemplate()">
-        <mat-icon>delete</mat-icon>
-        {{ 'button.delete' | translate }}
+
+    <button mat-menu-item (click)="runTest()">
+        <mat-icon>play_arrow</mat-icon>
+        {{ 'button.runtests' | translate }}
     </button>
 </mat-menu>
 

@@ -3,7 +3,7 @@ import {Command} from './command';
 import {Rule} from './rule';
 
 export class TestStep extends Base {
-	description: string;
-	command: Command;
-	condition: Rule;
+	description = '';
+	command = new Command();
+	condition = new Rule();
 }

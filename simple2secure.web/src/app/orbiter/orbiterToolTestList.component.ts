@@ -1,23 +1,25 @@
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO} from '../_models/index';
+import {ContextDTO, Test} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {TestDetailsComponent} from './testDetails.component';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'orbiterToolTest.component.html'
+	templateUrl: 'orbiterToolTestList.component.html'
 })
 
-export class OrbiterToolTestComponent {
+export class OrbiterToolTestListComponent {
 
-	selectedPod: PodDTO;
-	pods: PodDTO[];
+	selectedTest: Test = new Test();
+	podId: string;
+	pod: PodDTO;
 	context: ContextDTO;
-	displayedColumns = ['pod', 'group', 'action'];
+	displayedColumns = ['testId', 'hostname', 'version', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
@@ -34,8 +36,10 @@ export class OrbiterToolTestComponent {
 	) {}
 
 	ngOnInit() {
+
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadPods();
+		this.pod = this.dataService.getPods();
+		this.dataSource.data = this.pod.test;
 	}
 
 	ngAfterViewInit() {
@@ -49,38 +53,24 @@ export class OrbiterToolTestComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public onMenuTriggerClick(pod: PodDTO) {
-		this.selectedPod = pod;
+	public onMenuTriggerClick(test: Test) {
+		this.selectedTest = test;
 	}
 
-	loadPods() {
-		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'pod/' + this.context.context.id)
-			.subscribe(
-				data => {
-					this.pods = data;
-					this.dataSource.data = this.pods;
-					if (data.length > 0) {
-						this.alertService.success(this.translate.instant('message.data'));
-					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
-					this.loading = false;
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
+	openDialogShowTest(type: string): void {
+
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		dialogConfig.data = {
+			tests: this.selectedTest,
+			type: type
+		};
+
+		this.dialog.open(TestDetailsComponent, dialogConfig);
+
 	}
 
-	public showPodTests() {
-		this.dataService.setPods(this.selectedPod);
-		this.router.navigate([this.selectedPod.pod.podId], {relativeTo: this.route});
+	public runTest(){
+		console.log('Run test');
 	}
 }

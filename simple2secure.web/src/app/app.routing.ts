@@ -11,10 +11,7 @@ import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user
 import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './network/index';
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
-import {
-	OrbiterComponent,
-	OrbiterToolTestComponent, OrbiterToolTemplateComponent
-} from './orbiter/index';
+import {OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent} from './orbiter/index';
 import {EmailOverviewComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
@@ -62,7 +59,7 @@ const appRoutes: Routes = [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
 					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
-					{path: 'template', component: OrbiterToolTemplateComponent, data: {title: 'menu.templates'}},
+					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 				]
 			},
 			{

@@ -3,9 +3,13 @@ import os
 import app
 import zipfile
 import requests
+import threading
 from src.models.CompanyLicensePod import CompanyLicensePod
+from src.models.TestResult import TestResult
 from flask import json, session
 import socket
+from datetime import datetime
+from scanner import scanner
 
 ALLOWED_EXTENSIONS = set(['zip'])
 EXPIRATION_DATE = "expirationDate"
@@ -144,12 +148,52 @@ def portal_post(url, data):
     requests.post(url, data=json.dumps(data), verify=False, headers=headers)
 
 
+def portal_get(url):
+    PORTAL_URL = 'https://localhost:8443/api/'
+    results = {}
+    data_request = requests.get(url, verify=False).text
+    data_array = json.loads(data_request)
+
+    for data in data_array:
+        # This is current temporary solution to read only first test
+        tool_precondition = get_json_test_object_new(data, "test1", "precondition", "command")
+        parameter_precondition = get_json_test_object_new(data, "test1", "precondition", "parameter")
+        tool_postcondition = get_json_test_object_new(data, "test1", "postcondition", "command")
+        parameter_postcondition = get_json_test_object_new(data, "test1", "postcondition", "parameter")
+        tool_step = get_json_test_object_new(data, "test1", "step", "command")
+        parameter_step = get_json_test_object_new(data, "test1", "step", "parameter")
+        precondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_precondition), parameter_precondition), results, "Precondition"))
+        step_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_step), parameter_step), results, "step"))
+        postcondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_postcondition), parameter_postcondition), results, "Postcondition"))
+
+        precondition_scan.start()
+        step_scan.start()
+        postcondition_scan.start()
+
+        timestamp = datetime.now().timestamp() * 1000
+        test_result = TestResult("Result - " + timestamp.__str__(), results, session['license_id'], session['group_id'],
+                                 socket.gethostname(), timestamp)
+
+        portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
+
+
 def get_auth_token():
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
     return requests.post(app.PORTAL_URL + "license/activatePod",
                          data=json.dumps(parse_license_file(get_license_file()).__dict__),
                          verify=False,
                          headers=headers).text
+
+
+def get_json_test_object_new(data, test_id, key, attribute):
+    # Check if provided test id is equal to the test_id of the current object
+    if data["id"] == test_id:
+        # Check what is the provided attribute name and get value of that attribute
+        if attribute == "command":
+            return data[key][attribute]["executable"]
+        # Check what is the provided attribute name and get value of that attribute
+        if attribute == "parameter":
+            return data[key]["command"][attribute]["value"]
 
 
 

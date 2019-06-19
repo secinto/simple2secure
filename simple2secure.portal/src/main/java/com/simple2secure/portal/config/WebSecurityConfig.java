@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private String[] antmatchers = { "/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
 			"/api/user/sendResetPasswordEmail", "/api/users/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
-			"/api/download/**", "/api/device/**", "/api/license/activateProbe", "/api/license/activatePod/**" };
+			"/api/download/**", "/api/device/**", "/api/license/activateProbe", "/api/license/activatePod/**", "/api/pod/config/**" };
 
 	@Bean
 	public DaoAuthenticationProvider authProvider() {

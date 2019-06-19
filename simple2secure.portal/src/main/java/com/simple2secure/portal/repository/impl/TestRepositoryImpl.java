@@ -28,4 +28,12 @@ public class TestRepositoryImpl extends TestRepository {
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}
+
+	@Override
+	public List<Test> getByHostname(String hostname) {
+		Query query = new Query(Criteria.where("hostname").is(hostname));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
 }

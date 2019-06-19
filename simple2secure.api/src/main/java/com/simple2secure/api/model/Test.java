@@ -10,6 +10,7 @@ public class Test extends GenericDBObject {
 	private static final long serialVersionUID = -914338716345452064L;
 
 	private String podId;
+	private String hostname;
 	private String description;
 	private String version;
 	private TestStep precondition;
@@ -26,6 +27,14 @@ public class Test extends GenericDBObject {
 
 	public void setPodId(String podId) {
 		this.podId = podId;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 	public String getDescription() {

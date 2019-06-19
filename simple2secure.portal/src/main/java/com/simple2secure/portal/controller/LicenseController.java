@@ -166,6 +166,7 @@ public class LicenseController {
 							if (podTest != null) {
 								if (Strings.isNullOrEmpty(podTest.getPodId())) {
 									podTest.setPodId(podId);
+									podTest.setHostname(licensePod.getHostname());
 								}
 							}
 						}

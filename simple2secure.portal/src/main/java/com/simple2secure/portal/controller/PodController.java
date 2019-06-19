@@ -25,12 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.PodDTO;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Test;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PodUtils;
@@ -52,6 +54,9 @@ public class PodController {
 
 	@Autowired
 	LicenseRepository licenseRepository;
+
+	@Autowired
+	TestRepository testRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -89,6 +94,19 @@ public class PodController {
 		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
 				HttpStatus.NOT_FOUND);
+
+	}
+
+	@RequestMapping(value = "/config/{podId}/{hostname}", method = RequestMethod.GET)
+	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("podId") String podId, @PathVariable("hostname") String hostname) {
+
+		List<Test> test = testRepository.getByPodId(podId);
+
+		if (test == null || test.isEmpty()) {
+			test = testRepository.getByHostname(hostname);
+		}
+
+		return new ResponseEntity<List<Test>>(test, HttpStatus.OK);
 
 	}
 

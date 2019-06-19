@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, render_template, flash, redirect, session
+from flask import Flask, Response, jsonify, request, render_template, flash, redirect, session, copy_current_request_context
 from flask_cors import CORS
 from scanner import scanner
 from src.models.TestResult import TestResult
@@ -6,6 +6,7 @@ from src.util.utils import *
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from src.models.CompanyLicensePod import CompanyLicensePod
+from apscheduler.schedulers.background import BackgroundScheduler
 import threading
 import os
 import urllib3
@@ -23,9 +24,14 @@ license_id = ""
 licenseFile = CompanyLicensePod("", "", "", "", "")
 
 
+def check_configuration():
+    portal_get(PORTAL_URL + "pod/config/" + POD_ID + "/" + socket.gethostname())
+
+
 @app.before_first_request
 def init():
     urllib3.disable_warnings()
+    session.clear()
     print("-----------------------------")
     print("-------Initialization--------")
     print("-----------------------------")
@@ -39,6 +45,11 @@ def init():
     session['auth_token'] = get_auth_token()
     session['license_id'] = app.licenseFile.licenseId
     session['group_id'] = app.licenseFile.groupId
+    session['pod_id'] = app.licenseFile.podId
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=check_configuration, trigger="interval",
+                      seconds=10)
+    scheduler.start()
     print(" * Activating the license")
     print(" * Auth Token : " + session['auth_token'])
     print("-----------------------------")
@@ -48,13 +59,6 @@ def init():
 
 @app.route("/")
 def get_available_tests():
-    timestamp = datetime.now().timestamp()*1000
-    test_result = TestResult("Result - " + timestamp.__str__(), None, session['license_id'], session['group_id'],
-                             socket.gethostname(), timestamp)
-    print(" * Auth Token before posting: " + session['auth_token'])
-    portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
-    # testResults.append(test_result)
-    # print()
     return "haha"
 
 

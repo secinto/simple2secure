@@ -1,7 +1,5 @@
 package com.simple2secure.api.model;
 
-import java.util.ArrayList;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class Command extends GenericDBObject {
@@ -12,7 +10,8 @@ public class Command extends GenericDBObject {
 	private static final long serialVersionUID = -2977516759831166624L;
 
 	private String command;
-	private ArrayList<Parameter> parameters;
+	private String executable;
+	private Parameter parameter;
 
 	public Command() {
 
@@ -26,12 +25,20 @@ public class Command extends GenericDBObject {
 		this.command = command;
 	}
 
-	public ArrayList<Parameter> getParameters() {
-		return parameters;
+	public Parameter getParameter() {
+		return parameter;
 	}
 
-	public void setParameters(ArrayList<Parameter> parameters) {
-		this.parameters = parameters;
+	public void setParameter(Parameter parameter) {
+		this.parameter = parameter;
+	}
+
+	public String getExecutable() {
+		return executable;
+	}
+
+	public void setExecutable(String executable) {
+		this.executable = executable;
 	}
 
 }
