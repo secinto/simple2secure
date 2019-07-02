@@ -1,146 +1,221 @@
-from flask import Flask, Response, jsonify, request, render_template, flash, redirect, session, copy_current_request_context
+from flask import Flask, Response, session, json
+from src.config.celery_config import make_celery
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from flask_cors import CORS
-from scanner import scanner
-from src.models.TestResult import TestResult
-from src.util.utils import *
-from werkzeug.utils import secure_filename
-from datetime import datetime
+from src.util import rest_utils
+from src.util import file_utils
+from src.util import json_utils
 from src.models.CompanyLicensePod import CompanyLicensePod
 from apscheduler.schedulers.background import BackgroundScheduler
-import threading
+from datetime import datetime
+from scanner import scanner
+import socket
 import os
+import threading
 import urllib3
 import secrets
+import time
+import requests
 
 
+# Setting env variable for celery to work on windows
+os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# App initialization
 app = Flask(__name__)
 CORS(app)
+
+# Setting some static variables
 app.secret_key = "ChangeIt2019!"
-LICENSE_FOLDER = 'static/license'
-# PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
-PORTAL_URL = 'https://localhost:8443/api/'
-POD_ID = secrets.token_urlsafe(20)
-license_id = ""
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pod.sqlite3'
+app.config['POD_ID'] = ''
+app.config['LICENSE_ID'] = ''
+app.config['PORTAL_URL'] = 'https://localhost:8443/api/'
+app.config['AUTH_TOKEN'] = ''
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+celery = make_celery(app)
+# DB, marshmallow and Celery initialization
+db = SQLAlchemy(app)
+ma = Marshmallow(app)
+
+# https://144.76.93.104:51001/s2s/api/
 licenseFile = CompanyLicensePod("", "", "", "", "")
 
 
-def check_configuration():
-    portal_get(PORTAL_URL + "pod/config/" + POD_ID + "/" + socket.gethostname())
+class TestResult(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    result = db.Column(db.Text)
+    testId = db.Column(db.String(120))
+    hostname = db.Column(db.String(120))
+    timestamp = db.Column(db.String(120))
+    isSent = db.Column(db.Boolean)
+
+    def __init__(self, name, result, test_id, hostname, timestamp, is_sent):
+        self.name = name
+        self.result = result
+        self.testId = test_id
+        self.hostname = hostname
+        self.timestamp = timestamp
+        self.isSent = is_sent
+
+
+class PodInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    generated_id = db.Column(db.Text)
+
+    def __init__(self, generated_id):
+        self.generated_id = generated_id
+
+
+class TestResultSchema(ma.ModelSchema):
+    class Meta:
+        model = TestResult
+
+
+class PodInfoSchema(ma.ModelSchema):
+    class Meta:
+        model = PodInfo
+
+
+db.create_all()
+db.session.commit()
 
 
 @app.before_first_request
 def init():
-    urllib3.disable_warnings()
     session.clear()
     print("-----------------------------")
     print("-------Initialization--------")
     print("-----------------------------")
     print(" * Extracting the pod license")
-    app.licenseFile = parse_license_file(get_license_file())
-    app.license_id = app.licenseFile.licenseId
+
+    pod_info = PodInfo.query.first()
+    # If there is not pod_info object in database, generate new pod_id and save object to db
+    if pod_info is None:
+        app.config['POD_ID'] = secrets.token_urlsafe(20)
+        pod_info = PodInfo(app.config['POD_ID'])
+        db.session.add(pod_info)
+        db.session.commit()
+    # if there is a podInfo object in database, set saved pod_id into the app.config[POD_ID] variable
+    else:
+        app.config['POD_ID'] = pod_info.generated_id
+
+    license_from_file = file_utils.get_license_file()
+    app.licenseFile = file_utils.parse_license_file(license_from_file, app)
+    app.config['LICENSE_ID'] = app.licenseFile.licenseId
     print(" * Pod License Id : " + app.licenseFile.licenseId)
     print(" * Pod Group Id : " + app.licenseFile.groupId)
     print(" * Pod Id : " + app.licenseFile.podId)
     print(" ****************************")
-    session['auth_token'] = get_auth_token()
-    session['license_id'] = app.licenseFile.licenseId
-    session['group_id'] = app.licenseFile.groupId
-    session['pod_id'] = app.licenseFile.podId
+    app.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app)
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=check_configuration, trigger="interval",
-                      seconds=10)
+                      seconds=15)
+    scheduler.add_job(func=get_test_results_from_db, trigger="interval",
+                      seconds=20)
     scheduler.start()
     print(" * Activating the license")
-    print(" * Auth Token : " + session['auth_token'])
+    print(" * Auth Token : " + app.config['AUTH_TOKEN'])
+    print(" ****************************")
     print("-----------------------------")
     print("-----Initialization END------")
     print("-----------------------------")
 
 
-@app.route("/")
-def get_available_tests():
-    return "haha"
+def check_configuration():
+
+    test_array = rest_utils.portal_get(app.config['PORTAL_URL'] + "pod/scheduledTests/" + app.config['POD_ID'], app)
+
+    for test in test_array:
+
+        schedule_test.delay(test)
+        # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
 
 
-@app.route("/services")
-def parse_tests():
-    tests_string = read_json_testfile()
-    resp = Response(tests_string, status=200, mimetype='application/json')
-    return resp
+def get_test_results_from_db():
+    test_results = TestResult.query.filter_by(isSent=False).all()
+    for test_result in test_results:
+        test_result_schema = TestResultSchema()
+        output = test_result_schema.dump(test_result).data
+
+        if not app.config['AUTH_TOKEN']:
+            app.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app)
+
+        send_test_results.delay(output, app.config['AUTH_TOKEN'])
+        # rest_utils.send_notification(test_result.testId, "Test has been finished", app)
+        test_result.isSent = True
+        db.session.commit()
 
 
-@app.route("/services/run")
-def run_service():
-
-    data = json.loads(read_json_testfile())
+@celery.task(name='celery.schedule_test')
+def schedule_test(test):
     results = {}
 
-    if is_blank(request.query_string) is True:
+    tool_precondition = json_utils.get_json_test_object_new(test, "precondition", "command")
+    parameter_precondition = json_utils.get_json_test_object_new(test, "precondition", "parameter")
+    tool_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "command")
+    parameter_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "parameter")
+    tool_step = json_utils.get_json_test_object_new(test, "step", "command")
+    parameter_step = json_utils.get_json_test_object_new(test, "step", "parameter")
 
-        # This is current temporary solution to read only first test
-        tool_precondition = get_json_test_object(data, "test1", "precondition", "command")
-        parameter_precondition = get_json_test_object(data, "test1", "precondition", "parameter")
+    precondition_scan = threading.Thread(target=scanner(json_utils.construct_command(json_utils.get_tool(
+        tool_precondition), parameter_precondition), results, "precondition"))
+    step_scan = threading.Thread(target=scanner(json_utils.construct_command(json_utils.get_tool(
+        tool_step), parameter_step), results, "step"))
+    postcondition_scan = threading.Thread(target=scanner(json_utils.construct_command(json_utils.get_tool(
+        tool_postcondition), parameter_postcondition), results, "postcondition"))
 
-        tool_postcondition = get_json_test_object(data, "test1", "postcondition", "command")
-        parameter_postcondition = get_json_test_object(data, "test1", "postcondition", "parameter")
-
-        tool_step = get_json_test_object(data, "test1", "step", "command")
-        parameter_step = get_json_test_object(data, "test1", "step", "parameter")
-
-    else:
-        test_id = request.args.get('test')
-
-        tool_precondition = get_test_item_value(data, request.args.get('precondition'), test_id, 'precondition', 'command')
-        parameter_precondition = get_test_item_value(data, request.args.get('precondition'), test_id, 'precondition', 'parameter')
-        tool_step = get_test_item_value(data, request.args.get('step'), test_id, 'step', 'command')
-        parameter_step = get_test_item_value(data, request.args.get('step'), test_id, 'step', 'parameter')
-        tool_postcondition = get_test_item_value(data, request.args.get('postcondition'), test_id, 'postcondition', 'command')
-        parameter_postcondition = get_test_item_value(data, request.args.get('postcondition'), test_id, 'postcondition', 'parameter')
-
-    # Create threads for each part
-    precondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_precondition), parameter_precondition), results, "Precondition"))
-    step_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_step), parameter_step), results, "step"))
-    postcondition_scan = threading.Thread(target=scanner(construct_command(get_tool(tool_postcondition), parameter_postcondition), results, "Postcondition"))
-
-    # Start each tread
     precondition_scan.start()
     step_scan.start()
     postcondition_scan.start()
 
-    # Write to the result.log
-    # write_to_result_log(json.dumps(results))
+    timestamp = datetime.now().timestamp() * 1000
+    test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test['id'],
+                             socket.gethostname(), timestamp, False)
 
-    timestamp = datetime.now().timestamp()*1000
-    test_result = TestResult("Result - " + timestamp.__str__(), results, session['license_id'], session['group_id'],
-                             socket.gethostname(), timestamp)
-
-    portal_post(PORTAL_URL + "test/saveTestResult", test_result.__dict__)
-
-    return jsonify(results)
+    db.session.add(test_result)
+    db.session.commit()
 
 
-@app.route('/license/upload')
-def upload_license():
-    return render_template('uploadLicense.html')
+@celery.task(name='celery.send_test_results')
+def send_test_results(test_result, auth_token):
+        rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, auth_token)
 
 
-@app.route('/license/doUpload', methods=['POST'])
-def do_license_upload():
-    if request.method == 'POST':
-        # Check if post request has file in it
-        if 'file' not in request.files:
-            flash('No file part!')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No file selected for uploading')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            flash('File(s) successfully uploaded')
-            return redirect('/license/upload')
+@app.route("/services")
+def parse_tests():
+    tests_string = json_utils.read_json_testfile()
+    resp = Response(tests_string, status=200, mimetype='application/json')
+    return resp
+
+
+@app.route("/")
+def hello():
+    return "Hello World!"
+
+
+def start_runner():
+    def start_loop():
+        not_started = True
+
+        while not_started:
+            r = requests.get('https://localhost:5000/', verify=False)
+            if r.status_code == 200:
+                print('Server started, quiting start_loop')
+                not_started = False
+            time.sleep(2)
+
+    print('Started runner thread')
+    thread = threading.Thread(target=start_loop)
+    thread.start()
 
 
 if __name__ == '__main__':
-    app.run(ssl_context=('adhoc'), host='0.0.0.0', threaded=True)
+    start_runner()
+    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)

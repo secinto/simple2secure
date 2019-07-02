@@ -5,6 +5,7 @@ import {ViewChild, Component} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
 import {Context, ContextDTO, UserRole} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
@@ -29,11 +30,13 @@ export class NavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: any;
 	currentContext: ContextDTO;
+	notifications: Notification[];
 	loggedIn: boolean;
 	currentLang: string;
 	showSettings: boolean;
 	returnUrl: string;
-
+	numOfNotifications = 3;
+	private timer;
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -49,7 +52,22 @@ export class NavbarComponent {
 	            private dialog: MatDialog)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+		this.timer = Observable.timer(5000, 5000);
+		this.timer.subscribe((t) => this.getNotifications());
 	}
+
+	public getNotifications() {
+
+		this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
+			.subscribe(
+				data => {
+					this.notifications = data;
+				},
+				error => {
+					 console.log(error);
+				});
+	}
+
 
 	ngDoCheck() {
 

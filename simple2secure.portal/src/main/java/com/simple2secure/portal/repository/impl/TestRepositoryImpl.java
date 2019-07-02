@@ -36,4 +36,11 @@ public class TestRepositoryImpl extends TestRepository {
 		return tests;
 	}
 
+	@Override
+	public List<Test> getScheduledTest() {
+		Query query = new Query(Criteria.where("scheduled").is(true));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
 }

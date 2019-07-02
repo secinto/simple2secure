@@ -6,3 +6,8 @@ requests
 pyopenssl
 urllib3
 APScheduler
+celery
+flask-sqlalchemy
+flask_marshmallow
+marshmallow-sqlalchemy
+sqlalchemy

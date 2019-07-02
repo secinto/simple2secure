@@ -35,7 +35,7 @@ public class NotificationController {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'POD')")
 	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification,
 			@RequestHeader("Accept-Language") String locale) {
 		if (notification != null) {

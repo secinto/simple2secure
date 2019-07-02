@@ -21,7 +21,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.ExtendedRule;
-import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.PortalRule;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
@@ -157,9 +156,11 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
-								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
-						notificationRepository.save(notification);
+						/*
+						 * Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
+						 * "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
+						 */
+						// notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
 						return null;
 					}

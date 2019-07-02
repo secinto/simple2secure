@@ -11,4 +11,6 @@ public abstract class TestResultRepository extends MongoRepository<TestResult> {
 
 	public abstract List<TestResult> getByLicenseId(String licenseId);
 
+	public abstract List<TestResult> getByTestId(String testId);
+
 }

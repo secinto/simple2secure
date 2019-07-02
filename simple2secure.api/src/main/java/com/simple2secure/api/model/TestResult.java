@@ -10,20 +10,18 @@ public class TestResult extends GenericDBObject {
 	private static final long serialVersionUID = -6306698374548193553L;
 
 	private String name;
-	private String licenseId;
-	private String groupId;
+	private String testId;
 	private String hostname;
-	private TestResultObj result;
-	private long timestamp;
+	private String result;
+	private String timestamp;
 
 	public TestResult() {
 
 	}
 
-	public TestResult(String name, String licenseId, String groupId, String hostname, TestResultObj result, long timestamp) {
+	public TestResult(String name, String testId, String hostname, String result, String timestamp) {
 		this.name = name;
-		this.licenseId = licenseId;
-		this.groupId = groupId;
+		this.testId = testId;
 		this.hostname = hostname;
 		this.result = result;
 		this.timestamp = timestamp;
@@ -37,35 +35,27 @@ public class TestResult extends GenericDBObject {
 		this.name = name;
 	}
 
-	public TestResultObj getResult() {
+	public String getResult() {
 		return result;
 	}
 
-	public void setResult(TestResultObj result) {
+	public void setResult(String result) {
 		this.result = result;
 	}
 
-	public String getLicenseId() {
-		return licenseId;
+	public String getTestId() {
+		return testId;
 	}
 
-	public void setLicenseId(String licenseId) {
-		this.licenseId = licenseId;
+	public void setTestId(String testId) {
+		this.testId = testId;
 	}
 
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
-	public long getTimestamp() {
+	public String getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(long timestamp) {
+	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
 

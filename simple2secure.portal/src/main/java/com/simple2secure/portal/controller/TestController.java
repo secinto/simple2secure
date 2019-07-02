@@ -17,11 +17,14 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestResult;
+import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
+import com.simple2secure.portal.repository.TestRunRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.TestUtils;
 
@@ -42,7 +45,25 @@ public class TestController {
 	TestRepository testRepository;
 
 	@Autowired
+	TestRunRepository testRunRepository;
+
+	@Autowired
 	TestUtils testUtils;
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/scheduleTest", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody Test test, @RequestHeader("Accept-Language") String locale) {
+		if (test != null) {
+			TestRun testRun = new TestRun(test.getId(), test.getPodId(), false);
+			// TODO: Add notification that test has been scheduled
+			testRunRepository.save(testRun);
+			return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
 
 	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('POD')")
@@ -70,26 +91,28 @@ public class TestController {
 		return testUtils.getTestByPodId(podId, locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Test> updateSaveTest(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<TestStatus> updateSaveTest(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
-
+		TestStatus status = new TestStatus();
 		if (!Strings.isNullOrEmpty(locale) && test != null) {
 			if (!Strings.isNullOrEmpty(test.getPodId())) {
 				if (Strings.isNullOrEmpty(test.getId())) {
+					status = new TestStatus("Added", "Test has been added successfully");
 					testRepository.save(test);
 				} else {
+					status = new TestStatus("Updated", "Test has been updated successfully");
 					testRepository.update(test);
 				}
 
-				return new ResponseEntity<Test>(test, HttpStatus.OK);
+				return new ResponseEntity<TestStatus>(status, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
+		status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test", locale));
+
+		return new ResponseEntity<TestStatus>(status, HttpStatus.NOT_FOUND);
 	}
 
 }

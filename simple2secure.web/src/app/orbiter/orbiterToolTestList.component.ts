@@ -21,6 +21,7 @@ export class OrbiterToolTestListComponent {
 	context: ContextDTO;
 	displayedColumns = ['testId', 'hostname', 'version', 'action'];
 	loading = false;
+	url: string;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -63,7 +64,8 @@ export class OrbiterToolTestListComponent {
 		dialogConfig.width = '750px';
 		dialogConfig.data = {
 			tests: this.selectedTest,
-			type: type
+			type: type,
+			podId: this.pod.pod.podId
 		};
 
 		this.dialog.open(TestDetailsComponent, dialogConfig);
@@ -71,6 +73,23 @@ export class OrbiterToolTestListComponent {
 	}
 
 	public runTest(){
-		console.log('Run test');
+
+		this.loading = true;
+
+		this.url = environment.apiEndpoint + 'test/scheduleTest';
+		this.httpService.post(this.selectedTest, this.url).subscribe(
+			data => {
+
+				this.alertService.success(this.translate.instant('message.test.schedule'));
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+			});
+			this.loading = false;
 	}
 }

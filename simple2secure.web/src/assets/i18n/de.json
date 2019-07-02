@@ -350,5 +350,9 @@
   "table.value": "Wert",
   "test.parameter": "Parameter",
   "table.hostname": "Hostname",
-  "button.addTest": "Test hinzufügen"
+  "button.addTest": "Test hinzufügen",
+  "message.test.create": "Test erfolgreich erstellt!",
+  "message.test.update": "Test erfolgreich aktualisiert!",
+  "message.test.delete": "Test erfolgreich gelöscht!",
+  "message.test.schedule": "Test wurde geplant!"
 }

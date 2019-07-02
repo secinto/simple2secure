@@ -36,6 +36,7 @@ import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PodUtils;
+import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
 @RequestMapping("/api/pod")
@@ -66,6 +67,9 @@ public class PodController {
 
 	@Autowired
 	PodUtils podUtils;
+
+	@Autowired
+	TestUtils testUtils;
 
 	/**
 	 * This function returns all devices according to the user id
@@ -108,6 +112,13 @@ public class PodController {
 
 		return new ResponseEntity<List<Test>>(test, HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/scheduledTests/{podId}", method = RequestMethod.GET, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('POD')")
+	public ResponseEntity<List<Test>> getScheduledTests(@PathVariable("podId") String podId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		return testUtils.getScheduledTestsByPodId(podId, locale);
 	}
 
 }

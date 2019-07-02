@@ -122,4 +122,10 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("hostname").is(hostname));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
+
+	@Override
+	public CompanyLicensePrivate findByHostname(String hostname) {
+		Query query = new Query(Criteria.where("hostname").is(hostname));
+		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
+	}
 }

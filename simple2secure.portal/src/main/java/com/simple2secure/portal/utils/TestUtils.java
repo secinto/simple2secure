@@ -14,13 +14,18 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestResult;
+import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
+import com.simple2secure.portal.repository.TestRunRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
@@ -35,6 +40,9 @@ public class TestUtils {
 	TestRepository testRepository;
 
 	@Autowired
+	LicenseRepository licenseRepository;
+
+	@Autowired
 	protected LoadedConfigItems loadedConfigItems;
 
 	@Autowired
@@ -42,6 +50,9 @@ public class TestUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
+
+	@Autowired
+	TestRunRepository testRunRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -53,7 +64,7 @@ public class TestUtils {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
 		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
-			if (!Strings.isNullOrEmpty(testResult.getLicenseId()) && !Strings.isNullOrEmpty(testResult.getGroupId())) {
+			if (!Strings.isNullOrEmpty(testResult.getTestId())) {
 				testResultRepository.save(testResult);
 				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
 			}
@@ -77,12 +88,26 @@ public class TestUtils {
 			List<TestResultDTO> results = new ArrayList<TestResultDTO>();
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
-					List<TestResult> grpResults = testResultRepository.getByGroupId(group.getId());
 
-					for (TestResult result : grpResults) {
-						if (result != null) {
-							TestResultDTO testResultDTO = new TestResultDTO(result, group);
-							results.add(testResultDTO);
+					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupId(group.getId());
+
+					if (licensesByGroup != null) {
+						for (CompanyLicensePrivate license : licensesByGroup) {
+							if (!Strings.isNullOrEmpty(license.getPodId())) {
+								List<Test> testList = testRepository.getByPodId(license.getPodId());
+								if (testList != null) {
+									for (Test test : testList) {
+										List<TestResult> testResults = testResultRepository.getByTestId(test.getId());
+
+										if (testResults != null) {
+											for (TestResult testResult : testResults) {
+												TestResultDTO testResultDTO = new TestResultDTO(testResult, group);
+												results.add(testResultDTO);
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -91,7 +116,38 @@ public class TestUtils {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<List<TestResultDTO>> getTestResultsByPodId(String podId, String locale) {
+		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+			List<Test> tests = testRepository.getByPodId(podId);
+			List<TestResultDTO> testResults = new ArrayList<>();
+			if (tests != null) {
+				for (Test test : tests) {
+					List<TestResult> testResultByTest = testResultRepository.getByTestId(test.getId());
+
+					if (testResultByTest != null) {
+						for (TestResult testResult : testResultByTest) {
+
+							// TODO: check if CompanyGroup is necesarry
+							TestResultDTO trDto = new TestResultDTO(testResult, new CompanyGroup("test", null));
+							testResults.add(trDto);
+						}
+					}
+				}
+			}
+
+			if (testResults != null) {
+				return new ResponseEntity<List<TestResultDTO>>(testResults, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -120,7 +176,7 @@ public class TestUtils {
 
 	/**
 	 * This function returns all tests by pod Id.
-	 * 
+	 *
 	 * @param podId
 	 * @param locale
 	 * @return
@@ -134,7 +190,46 @@ public class TestUtils {
 				return new ResponseEntity<List<Test>>(testList, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function returns all tests which are not executed.
+	 *
+	 * @param hostname
+	 * @param locale
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<List<Test>> getScheduledTestsByPodId(String podId, String locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+
+			List<TestRun> testRunList = testRunRepository.getTestNotExecutedByPodId(podId);
+
+			if (testRunList != null) {
+				List<Test> testList = new ArrayList();
+				for (TestRun testRun : testRunList) {
+					if (testRun != null) {
+						if (!Strings.isNullOrEmpty(testRun.getTestId())) {
+							Test test = testRepository.find(testRun.getTestId());
+
+							if (test != null) {
+								testList.add(test);
+							}
+
+							testRun.setExecuted(true);
+							testRunRepository.update(testRun);
+						}
+					}
+				}
+				if (testList != null) {
+					return new ResponseEntity<List<Test>>(testList, HttpStatus.OK);
+				}
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

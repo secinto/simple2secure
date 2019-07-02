@@ -27,6 +27,38 @@
                         </mat-form-field>
                     </div>
 
+                    <div class="form-group">
+                        <label for="scheduled">{{ 'osquery.runalways' | translate }}</label><br>
+                        <mat-button-toggle-group id="scheduled" name="scheduled" [(ngModel)]="test.scheduled" required="">
+                            <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
+                            <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+
+                    <table *ngIf="test.scheduled" cellspacing="0">
+                        <tr>
+                            <td>
+                                <mat-form-field class="full_width_input">
+                                    <input type="number" matInput
+                                           placeholder="{{ 'table.unitValue' | translate }}"
+                                           [(ngModel)]="test.scheduledTime"
+                                           name="scheduledTime">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="full_width_input">
+                                    <mat-select [(ngModel)]="test.scheduledTimeUnit"
+                                                placeholder="{{ 'table.unit' | translate }}"
+                                                name="scheduledTimeUnit">
+                                        <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                    [value]="ttimeUnit">{{ttimeUnit}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                    </table>
+
                 </mat-expansion-panel>
 
                 <mat-expansion-panel>
@@ -193,6 +225,6 @@
     <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="podId"
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
-    <button class="mat-green-button" type="button" mat-raised-button color="success">{{ 'button.save' | translate }}
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveTest()">{{ 'button.save' | translate }}
     </button>
 </div>

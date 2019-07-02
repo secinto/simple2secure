@@ -12,8 +12,6 @@ public class NotificationDTO extends Notification {
 	private Tool tool;
 
 	public NotificationDTO(Tool tool, Notification notification) {
-		super(notification.getContextId(), notification.getToolId(), notification.getName(), notification.getContent(),
-				notification.getTimestamp(), notification.isRead());
 		this.tool = tool;
 	}
 

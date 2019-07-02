@@ -32,7 +32,7 @@ import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
 	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
 	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule
+	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule, MatBadgeModule
 } from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -112,6 +112,7 @@ export const httpInterceptorProviders = [
 		MatSelectModule,
 		MatMenuModule,
 		MatIconModule,
+		MatBadgeModule,
 		MatSidenavModule,
 		MatButtonToggleModule,
 		MatTableModule,

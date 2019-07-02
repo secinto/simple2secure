@@ -2,7 +2,7 @@
 
 <div mat-dialog-content>
     <!--<p *ngIf="testResult.result"><b>{{ 'test.precondition' | translate }}: </b> {{testResult.result.precondition}}</p>-->
-    <p *ngIf="testResult.result">{{testResult.result.step}}</p>
+    <ngx-json-view *ngIf="testResult.result" [data]="testResult.result"></ngx-json-view>
     <!--<p *ngIf="testResult.result"><b>{{ 'test.postcondition' | translate }}: </b> {{testResult.result.postcondition}}</p>-->
 </div>
 
