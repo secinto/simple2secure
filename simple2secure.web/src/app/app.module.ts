@@ -75,6 +75,7 @@ import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
+import {NotificationDialog} from './dialog/notification-dialog';
 import * as highstock from 'highcharts/modules/stock.src';
 import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -186,6 +187,7 @@ export const httpInterceptorProviders = [
 		TestResultComponent,
 		ConfirmationDialog,
 		SelectContextDialog,
+		NotificationDialog,
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
@@ -209,6 +211,7 @@ export const httpInterceptorProviders = [
 	entryComponents: [
 		ConfirmationDialog,
 		SelectContextDialog,
+		NotificationDialog,
 		UserGroupDialogComponent,
 		NetworkProcessorConfigurationEditComponent,
 		NetworkStepConfigurationEditComponent,

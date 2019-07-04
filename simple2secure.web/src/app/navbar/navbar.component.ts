@@ -2,7 +2,7 @@ import {ViewChild, Component} from '@angular/core';
 
 
 
-import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
+import {DialogPosition, MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs';
@@ -57,15 +57,16 @@ export class NavbarComponent {
 	}
 
 	public getNotifications() {
-
-		this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
-			.subscribe(
-				data => {
-					this.notifications = data;
-				},
-				error => {
-					 console.log(error);
-				});
+		if (this.loggedIn){
+			this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
+				.subscribe(
+					data => {
+						this.notifications = data;
+					},
+					error => {
+						console.log(error);
+					});
+		}
 	}
 
 
@@ -182,6 +183,26 @@ export class NavbarComponent {
 			this.alertService.error(this.translate.instant('server.notresponding'));
 			this.authenticationService.logout();
 		}
+	}
+
+	openNotificationModal(event) {
+
+		const dialogPosition: DialogPosition = {
+			top: event.y + 'px',
+			right: event.x + 'px',
+			left: event.x + 'px',
+			bottom: event.y + 'px'
+		};
+
+		const dialogConfig = new MatDialogConfig();
+
+		dialogConfig.data = {
+			id: 1,
+			position: dialogPosition
+		};
+
+		const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);
+
 	}
 
 

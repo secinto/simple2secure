@@ -1,12 +1,6 @@
 import platform
 
 
-def read_json_testfile():
-    # Read test file and return it
-    tests_file = open('services.json', 'r')
-    return tests_file.read()
-
-
 def get_json_test_object(data, test_id, key, attribute):
     # Iterate over data object
     for test in data:
@@ -87,4 +81,3 @@ def construct_command(tool, argument):
         return ""
     else:
         return tool + ' ' + argument
-

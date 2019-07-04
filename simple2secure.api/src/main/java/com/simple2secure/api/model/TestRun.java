@@ -9,16 +9,18 @@ public class TestRun extends GenericDBObject {
 	private static final long serialVersionUID = 8963088362714211548L;
 	private String testId;
 	private String podId;
+	private TestRunType testRunType;
 	private boolean executed;
 
 	public TestRun() {
 
 	}
 
-	public TestRun(String testId, String podId, boolean executed) {
+	public TestRun(String testId, String podId, boolean executed, TestRunType testRunType) {
 		this.testId = testId;
 		this.podId = podId;
 		this.executed = executed;
+		this.testRunType = testRunType;
 	}
 
 	public String getTestId() {
@@ -43,5 +45,13 @@ public class TestRun extends GenericDBObject {
 
 	public void setExecuted(boolean executed) {
 		this.executed = executed;
+	}
+
+	public TestRunType getTestRunType() {
+		return testRunType;
+	}
+
+	public void setTestRunType(TestRunType testRunType) {
+		this.testRunType = testRunType;
 	}
 }

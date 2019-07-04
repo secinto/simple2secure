@@ -1,57 +1,46 @@
 [
 	{
-		"description": "Simple tool for running some tests",
-		"version": "0.0.1",
-		"precondition": {
-			"description": "Remove some file if exists",
-			"command": {
-				"executable": "DELETE_RESULT",
-				"parameter": {
-					"description": "File name",
-					"prefix": "",
-					"value": "./result/result.json"
+		"test":{
+			"name": "test1",
+			"test_definition":{
+				"description": "Simple tool for running some tests",
+				"version": "0.0.1",
+				"precondition": {
+					"description": "Remove some file if exists",
+					"command": {
+						"executable": "DELETE_RESULT",
+						"parameter": {
+							"description": "File name",
+							"prefix": "",
+							"value": "./result/result.json"
+						}
+					}
+				},
+				"step": {
+					"description": "Execute nmap",
+					"command": {
+						"executable": "nmap",
+						"parameter": {
+							"description": "Some simple nmap execution",
+							"prefix": "",
+							"value": "www.secinto.com"
+						}
+					}
+				},
+				"postcondition": {
+					"description": "Save result to the file",
+					"command": {
+						"executable": "SAVE_RESULT",
+						"parameter": {
+							"description": "File Name",
+							"prefix": "",
+							"value": "result/result.json"
+						}
+					}
 				}
-			},
-			"rule": {
-				"name": "File Rule",
-				"description": "Rule will execute some action according to the provided result",
-				"condition": "no-condition",
-				"actions": "no-action"
+			
 			}
-		},
-		"step": {
-			"description": "Execute nmap",
-			"command": {
-				"executable": "nmap",
-				"parameter": {
-					"description": "Some simple nmap execution",
-					"prefix": "",
-					"value": "www.secinto.com"
-				}
-			},
-			"rule": {
-				"name": "Nmap Rule",
-				"description": "Rule will execute some action according to the provided result",
-				"condition": "no-condition",
-				"actions": "no-action"
-			}
-		},
-		"postcondition": {
-			"description": "Save result to the file",
-			"command": {
-				"executable": "SAVE_RESULT",
-				"parameter": {
-					"description": "File Name",
-					"prefix": "",
-					"value": "result/result.json"
-				}
-			},
-			"rule": {
-				"name": "File Save Rule",
-				"description": "Rule will execute some action according to the provided result",
-				"condition": "no-condition",
-				"actions": "no-action"
-			}
+		
 		}
 	}
 ]

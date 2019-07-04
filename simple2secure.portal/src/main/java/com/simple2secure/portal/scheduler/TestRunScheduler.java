@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
@@ -49,8 +50,8 @@ public class TestRunScheduler {
 
 			for (Test test : tests) {
 				long currentTimestamp = System.currentTimeMillis();
-				// TODO: Calculate the difference between last execution time and current timestamp
-				TestRun testRun = new TestRun(test.getId(), test.getPodId(), false);
+				// Calculate the difference between last execution time and current timestamp
+				TestRun testRun = new TestRun(test.getId(), test.getPodId(), false, TestRunType.AUTOMATIC_PORTAL);
 
 				long millisScheduled = portalUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
 				long nextExecutionTime = test.getLastExecution() + millisScheduled;

@@ -181,13 +181,14 @@ public class LicenseController {
 					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
 					String accessToken = tokenAuthenticationService.addPodAuthentication(podId, group, license);
 					if (!Strings.isNullOrEmpty(accessToken)) {
-
+						long currentTimestamp = System.currentTimeMillis();
 						if (Strings.isNullOrEmpty(license.getPodId())) {
 							license.setPodId(podId);
 						}
 						license.setAccessToken(accessToken);
 						license.setActivated(true);
 						license.setHostname(licensePod.getHostname());
+						license.setLastOnlineTimestamp(currentTimestamp);
 
 						if (podExists) {
 							licenseRepository.update(license);

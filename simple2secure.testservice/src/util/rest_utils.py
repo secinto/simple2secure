@@ -1,7 +1,6 @@
 import requests
 from src.util import file_utils
 from flask import json
-from datetime import datetime
 
 
 def get_auth_token(app):

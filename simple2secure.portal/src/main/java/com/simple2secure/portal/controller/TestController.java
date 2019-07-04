@@ -18,6 +18,7 @@ import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -55,7 +56,7 @@ public class TestController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody Test test, @RequestHeader("Accept-Language") String locale) {
 		if (test != null) {
-			TestRun testRun = new TestRun(test.getId(), test.getPodId(), false);
+			TestRun testRun = new TestRun(test.getId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
 			// TODO: Add notification that test has been scheduled
 			testRunRepository.save(testRun);
 			return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);

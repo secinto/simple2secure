@@ -1,4 +1,4 @@
-from flask import Flask, Response, session, json
+from flask import Flask, Response, session, json, request, render_template
 from src.config.celery_config import make_celery
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -6,10 +6,11 @@ from flask_cors import CORS
 from src.util import rest_utils
 from src.util import file_utils
 from src.util import json_utils
-from src.models.CompanyLicensePod import CompanyLicensePod
 from apscheduler.schedulers.background import BackgroundScheduler
+from src.models.CompanyLicensePod import CompanyLicensePod
 from datetime import datetime
 from scanner import scanner
+from marshmallow import fields
 import socket
 import os
 import threading
@@ -68,9 +69,23 @@ class TestResult(db.Model):
 class PodInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     generated_id = db.Column(db.Text)
+    hash_value_service = db.Column(db.Text)
 
-    def __init__(self, generated_id):
+    def __init__(self, generated_id, hash_value_service):
         self.generated_id = generated_id
+        self.hash_value_service = hash_value_service
+
+
+class Test(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text)
+    test_content = db.Column(db.Text)
+    hash_value = db.Column(db.Text)
+
+    def __init__(self, name, test_content, hash_value):
+        self.name = name
+        self.test_content = test_content
+        self.hash_value = hash_value
 
 
 class TestResultSchema(ma.ModelSchema):
@@ -81,6 +96,12 @@ class TestResultSchema(ma.ModelSchema):
 class PodInfoSchema(ma.ModelSchema):
     class Meta:
         model = PodInfo
+
+
+class TestSchema(ma.ModelSchema):
+
+    class Meta:
+        model = Test
 
 
 db.create_all()
@@ -99,7 +120,7 @@ def init():
     # If there is not pod_info object in database, generate new pod_id and save object to db
     if pod_info is None:
         app.config['POD_ID'] = secrets.token_urlsafe(20)
-        pod_info = PodInfo(app.config['POD_ID'])
+        pod_info = PodInfo(app.config['POD_ID'], "")
         db.session.add(pod_info)
         db.session.commit()
     # if there is a podInfo object in database, set saved pod_id into the app.config[POD_ID] variable
@@ -134,7 +155,7 @@ def check_configuration():
 
     for test in test_array:
 
-        schedule_test.delay(test)
+        schedule_test.delay(test, test.id)
         # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
 
 
@@ -154,7 +175,7 @@ def get_test_results_from_db():
 
 
 @celery.task(name='celery.schedule_test')
-def schedule_test(test):
+def schedule_test(test, test_id):
     results = {}
 
     tool_precondition = json_utils.get_json_test_object_new(test, "precondition", "command")
@@ -176,7 +197,7 @@ def schedule_test(test):
     postcondition_scan.start()
 
     timestamp = datetime.now().timestamp() * 1000
-    test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test['id'],
+    test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_id,
                              socket.gethostname(), timestamp, False)
 
     db.session.add(test_result)
@@ -190,14 +211,51 @@ def send_test_results(test_result, auth_token):
 
 @app.route("/services")
 def parse_tests():
-    tests_string = json_utils.read_json_testfile()
+    tests_string = file_utils.read_json_testfile()
     resp = Response(tests_string, status=200, mimetype='application/json')
     return resp
 
 
+@app.route("/results")
+def show_test_results():
+    test_results = TestResult.query.all()
+    return render_template('testresults.html', len=len(test_results), test_results=test_results)
+
+
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return '<html><body><h1>Hello World</h1></body></html>'
+
+
+@app.route("/services/run")
+def run_service():
+    response_text = ""
+
+    response = file_utils.read_json_testfile()
+    # response_json_object = json.loads(response)
+    file_utils.update_insert_tests_to_db(response)
+
+    if json_utils.is_blank(request.query_string) is True:
+        tests = Test.query.all()
+
+        for test in tests:
+            current_test = json.loads(test.test_content)
+            schedule_test.delay(current_test["test_definition"], test.id)
+
+        response_text = "All available tests from services.json have been scheduled"
+
+    else:
+        test_name_response = request.args.get("test")
+        db_test = Test.query.filter_by(name=test_name_response).first()
+
+        if db_test is None:
+            response_text = "Test with provided test name cannot be found"
+        else:
+            current_test = json.loads(db_test.test_content)
+            schedule_test.delay(current_test["test_definition"], db_test.id)
+            response_text = "Test " + test_name_response + " has been scheduled"
+
+    return response_text
 
 
 def start_runner():

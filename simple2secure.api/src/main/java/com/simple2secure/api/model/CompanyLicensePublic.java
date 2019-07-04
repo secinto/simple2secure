@@ -32,6 +32,10 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String hostname;
 
+	protected PodStatus status;
+
+	protected long lastOnlineTimestamp;
+
 	public CompanyLicensePublic() {
 	}
 
@@ -112,5 +116,21 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	public PodStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PodStatus status) {
+		this.status = status;
+	}
+
+	public long getLastOnlineTimestamp() {
+		return lastOnlineTimestamp;
+	}
+
+	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
+		this.lastOnlineTimestamp = lastOnlineTimestamp;
 	}
 }
