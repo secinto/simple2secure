@@ -16,12 +16,18 @@
         <!-- Position Column -->
         <ng-container matColumnDef="testId">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.id}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="hostname">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+        </ng-container>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->

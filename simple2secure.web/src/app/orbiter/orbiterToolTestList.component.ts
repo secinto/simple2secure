@@ -19,7 +19,7 @@ export class OrbiterToolTestListComponent {
 	podId: string;
 	pod: PodDTO;
 	context: ContextDTO;
-	displayedColumns = ['testId', 'hostname', 'version', 'action'];
+	displayedColumns = ['testId', 'hostname', 'status', 'version', 'action'];
 	loading = false;
 	url: string;
 	dataSource = new MatTableDataSource();

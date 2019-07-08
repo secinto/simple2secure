@@ -12,6 +12,7 @@ public class Test extends GenericDBObject {
 	private static final long serialVersionUID = -914338716345452064L;
 
 	private String podId;
+	private String name;
 	private String contextId;
 	private String hostname;
 	private String description;
@@ -27,6 +28,14 @@ public class Test extends GenericDBObject {
 
 	public Test() {
 
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getPodId() {

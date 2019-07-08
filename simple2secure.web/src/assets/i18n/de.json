@@ -348,6 +348,7 @@
   "table.executable": "Ausführbar",
   "table.prefix": "Prefix",
   "table.value": "Wert",
+  "table.status": "Status",
   "test.parameter": "Parameter",
   "table.hostname": "Hostname",
   "button.addTest": "Test hinzufügen",

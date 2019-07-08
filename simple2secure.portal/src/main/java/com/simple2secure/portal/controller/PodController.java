@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.PodDTO;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.commons.config.LoadedConfigItems;
@@ -114,11 +115,23 @@ public class PodController {
 
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/scheduledTests/{podId}", method = RequestMethod.GET, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('POD')")
 	public ResponseEntity<List<Test>> getScheduledTests(@PathVariable("podId") String podId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
-		return testUtils.getScheduledTestsByPodId(podId, locale);
+		CompanyLicensePrivate podLicense = licenseRepository.findByPodId(podId);
+
+		if (podLicense != null) {
+			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
+			licenseRepository.update(podLicense);
+			return testUtils.getScheduledTestsByPodId(podId, locale);
+		}
+
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 }

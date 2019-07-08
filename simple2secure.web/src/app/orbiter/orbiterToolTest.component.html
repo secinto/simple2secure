@@ -13,6 +13,13 @@
         </ng-container>
 
         <!-- Name Column -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
         <ng-container matColumnDef="group">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
             </mat-header-cell>

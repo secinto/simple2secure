@@ -100,17 +100,28 @@ public class TestController {
 		if (!Strings.isNullOrEmpty(locale) && test != null) {
 			if (!Strings.isNullOrEmpty(test.getPodId())) {
 				if (Strings.isNullOrEmpty(test.getId())) {
-					status = new TestStatus("Added", "Test has been added successfully");
-					testRepository.save(test);
-				} else {
-					status = new TestStatus("Updated", "Test has been updated successfully");
-					testRepository.update(test);
-				}
+					Test currentTest = testRepository.getTestByName(test.getName());
+					boolean isSaveable = testUtils.checkIfTestIsSaveable(currentTest);
 
+					if (isSaveable) {
+						status = new TestStatus("Saved", "Test has been saved successfully");
+						testRepository.save(test);
+					} else {
+						status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale));
+					}
+
+				} else {
+					boolean isUpdateable = testUtils.checkIfTestIsUpdateable(test);
+					if (isUpdateable) {
+						status = new TestStatus("Updated", "Test has been updated successfully");
+						testRepository.update(test);
+					} else {
+						status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale));
+					}
+				}
 				return new ResponseEntity<TestStatus>(status, HttpStatus.OK);
 			}
 		}
-
 		status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test", locale));
 
 		return new ResponseEntity<TestStatus>(status, HttpStatus.NOT_FOUND);

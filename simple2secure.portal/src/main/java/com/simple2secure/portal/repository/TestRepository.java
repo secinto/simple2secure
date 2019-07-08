@@ -13,4 +13,6 @@ public abstract class TestRepository extends MongoRepository<Test> {
 
 	public abstract List<Test> getScheduledTest();
 
+	public abstract Test getTestByName(String name);
+
 }

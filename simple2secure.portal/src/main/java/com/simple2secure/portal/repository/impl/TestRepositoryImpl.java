@@ -43,4 +43,11 @@ public class TestRepositoryImpl extends TestRepository {
 		return tests;
 	}
 
+	@Override
+	public Test getTestByName(String name) {
+		Query query = new Query(Criteria.where("name").is(name));
+		Test test = mongoTemplate.findOne(query, Test.class);
+		return test;
+	}
+
 }

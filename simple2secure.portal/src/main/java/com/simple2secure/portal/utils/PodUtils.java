@@ -82,7 +82,8 @@ public class PodUtils {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getPodId())) {
-							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname());
+							String status = getPodStatus(license);
+							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), status);
 							myPods.add(pod);
 						}
 					}
@@ -110,7 +111,8 @@ public class PodUtils {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getPodId())) {
-							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname());
+							String podStatus = getPodStatus(license);
+							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), podStatus);
 							List<Test> tests = testRepository.getByPodId(pod.getPodId());
 
 							PodDTO podDto = new PodDTO(pod, tests);
@@ -129,6 +131,26 @@ public class PodUtils {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
 			licenseRepository.deleteByPodId(podId);
 			log.debug("Deleted dependencies for probe id {}", podId);
+		}
+	}
+
+	/**
+	 * This method checks the current status (online, offline, unknown) of the pod according to the lastOnlineTimestamp
+	 *
+	 * @param podLicense
+	 * @return
+	 */
+	private String getPodStatus(CompanyLicensePrivate podLicense) {
+		// make it multilingual
+		if (podLicense.getLastOnlineTimestamp() == 0) {
+			return "Unknown";
+		} else {
+			long timeDiff = System.currentTimeMillis() - podLicense.getLastOnlineTimestamp();
+			if (timeDiff > 60000) {
+				return "Offline";
+			} else {
+				return "Online";
+			}
 		}
 	}
 

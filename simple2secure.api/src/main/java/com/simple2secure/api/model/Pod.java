@@ -6,18 +6,20 @@ public class Pod {
 	private CompanyGroup group;
 	private boolean activated;
 	private String hostname;
+	private String status;
 
 	public Pod() {
 
 	}
 
-	public Pod(String podId, CompanyGroup group, boolean activated, String hostname) {
+	public Pod(String podId, CompanyGroup group, boolean activated, String hostname, String status) {
 		super();
 
 		this.podId = podId;
 		this.group = group;
 		this.activated = activated;
 		this.hostname = hostname;
+		this.status = status;
 	}
 
 	public String getPodId() {
@@ -50,5 +52,13 @@ public class Pod {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

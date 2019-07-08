@@ -233,4 +233,27 @@ public class TestUtils {
 				HttpStatus.NOT_FOUND);
 	}
 
+	public boolean checkIfTestIsSaveable(Test dbTest) {
+		if (dbTest == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean checkIfTestIsUpdateable(Test currentTest) {
+		Test dbTest = testRepository.getTestByName(currentTest.getName());
+
+		if (dbTest == null) {
+			return true;
+		} else {
+			if (currentTest.getName().equals(dbTest.getName())) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+	}
+
 }

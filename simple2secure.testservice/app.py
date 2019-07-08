@@ -10,7 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from src.models.CompanyLicensePod import CompanyLicensePod
 from datetime import datetime
 from scanner import scanner
-from marshmallow import fields
+import webbrowser
 import socket
 import os
 import threading
@@ -30,15 +30,17 @@ CORS(app)
 
 # Setting some static variables
 app.secret_key = "ChangeIt2019!"
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+app.config['CELERY_BROKER_URL'] = 'redis://redis:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pod.sqlite3'
 app.config['POD_ID'] = ''
+app.config['GROUP_ID'] = ''
 app.config['LICENSE_ID'] = ''
 app.config['PORTAL_URL'] = 'https://localhost:8443/api/'
 app.config['AUTH_TOKEN'] = ''
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 celery = make_celery(app)
+
 # DB, marshmallow and Celery initialization
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -111,11 +113,6 @@ db.session.commit()
 @app.before_first_request
 def init():
     session.clear()
-    print("-----------------------------")
-    print("-------Initialization--------")
-    print("-----------------------------")
-    print(" * Extracting the pod license")
-
     pod_info = PodInfo.query.first()
     # If there is not pod_info object in database, generate new pod_id and save object to db
     if pod_info is None:
@@ -127,26 +124,31 @@ def init():
     else:
         app.config['POD_ID'] = pod_info.generated_id
 
-    license_from_file = file_utils.get_license_file()
-    app.licenseFile = file_utils.parse_license_file(license_from_file, app)
-    app.config['LICENSE_ID'] = app.licenseFile.licenseId
-    print(" * Pod License Id : " + app.licenseFile.licenseId)
-    print(" * Pod Group Id : " + app.licenseFile.groupId)
-    print(" * Pod Id : " + app.licenseFile.podId)
-    print(" ****************************")
-    app.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app)
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=check_configuration, trigger="interval",
-                      seconds=15)
-    scheduler.add_job(func=get_test_results_from_db, trigger="interval",
-                      seconds=20)
-    scheduler.start()
-    print(" * Activating the license")
-    print(" * Auth Token : " + app.config['AUTH_TOKEN'])
-    print(" ****************************")
-    print("-----------------------------")
-    print("-----Initialization END------")
-    print("-----------------------------")
+    try:
+        auth_token_obj = rest_utils.get_auth_token_object(app)
+
+        if auth_token_obj.status_code == 200:
+            app.config['AUTH_TOKEN'] = auth_token_obj.text
+            license_from_file = file_utils.get_license_file()
+            app.licenseFile = file_utils.parse_license_file(license_from_file, app)
+            app.config['LICENSE_ID'] = app.licenseFile.licenseId
+
+            print(rest_utils.print_success_message_auth(app))
+
+            scheduler = BackgroundScheduler()
+            scheduler.add_job(func=check_configuration, trigger="interval",
+                              seconds=15)
+            scheduler.add_job(func=get_test_results_from_db, trigger="interval",
+                              seconds=20)
+            scheduler.start()
+
+        else:
+            print(rest_utils.print_error_message())
+            shutdown_server()
+
+    except requests.exceptions.ConnectionError:
+            print(rest_utils.print_error_message())
+            shutdown_server()
 
 
 def check_configuration():
@@ -154,7 +156,7 @@ def check_configuration():
     test_array = rest_utils.portal_get(app.config['PORTAL_URL'] + "pod/scheduledTests/" + app.config['POD_ID'], app)
 
     for test in test_array:
-
+        print(test)
         schedule_test.delay(test, test.id)
         # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
 
@@ -223,8 +225,8 @@ def show_test_results():
 
 
 @app.route("/")
-def hello():
-    return '<html><body><h1>Hello World</h1></body></html>'
+def index():
+    return '<html><body><h1>HI</h1></body></html>'
 
 
 @app.route("/services/run")
@@ -274,6 +276,13 @@ def start_runner():
     thread.start()
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+
 if __name__ == '__main__':
-    start_runner()
-    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)
+    webbrowser.open('https://localhost:5000/services')
+    app.run(debug=True, ssl_context='adhoc', host='0.0.0.0', threaded=True, use_reloader=True)

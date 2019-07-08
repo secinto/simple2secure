@@ -4,6 +4,7 @@ import {Timeunit} from './timeunit';
 
 export class Test extends Base {
 	podId = '';
+	name = '';
 	description = '';
 	version = '';
 	precondition = new TestStep();
