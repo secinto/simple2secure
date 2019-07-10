@@ -86,14 +86,16 @@ class PodInfo(db.Model):
 
 
 class Test(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Text, primary_key=True)
+    podId = db.Column(db.Text)
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
     hash_value = db.Column(db.Text)
     lastChangedTimestamp = db.Column(db.BigInteger)
 
-    def __init__(self, name, test_content, hash_value, last_changed_timestamp):
+    def __init__(self, name, test_content, hash_value, last_changed_timestamp, pod_id):
         self.name = name
+        self.podId = pod_id
         self.test_content = test_content
         self.hash_value = hash_value
         self.lastChangedTimestamp = last_changed_timestamp
@@ -162,12 +164,17 @@ def init():
 
 def check_configuration():
 
-    test_array = rest_utils.portal_get(app.config['PORTAL_URL'] + "pod/scheduledTests/" + app.config['POD_ID'], app)
+    request_test = rest_utils.portal_get(app.config['PORTAL_URL'] + "pod/scheduledTests/" + app.config['POD_ID'], app)
 
-    for test in test_array:
-        print(test)
-        schedule_test.delay(test, test.id)
-        # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
+    if request_test.status_code == 200:
+        test_array = json.loads(request_test.text)
+
+        for test in test_array:
+            schedule_test.delay(test, test.id)
+            # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
+
+    else:
+        print(request_test.status_code)
 
 
 def get_test_results_from_db():

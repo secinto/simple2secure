@@ -256,4 +256,12 @@ public class TestUtils {
 
 	}
 
+	public boolean checkIfPortalTestIsOlder(long portalTestTimestamp, long podTestTimestamp) {
+		if (portalTestTimestamp - podTestTimestamp < 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

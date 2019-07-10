@@ -103,6 +103,7 @@ def update_insert_tests_to_db(tests, app_obj):
 
     tests_json = json.loads(tests)
     current_milli_time = int(round(time.time() * 1000))
+    test_schema = app.TestSchema()
     for test in tests_json:
 
         test_hash = check_md5(json.dumps(test["test"]))
@@ -111,21 +112,37 @@ def update_insert_tests_to_db(tests, app_obj):
         db_test = app.Test.query.filter_by(name=current_test_name).first()
 
         if db_test is None:
-            current_test = app.Test(test["test"]["name"], json.dumps(test["test"]), test_hash, current_milli_time)
-            # sync_test_with_portal(test, app_obj)
-            app.db.session.add(current_test)
+            current_test = app.Test(test["test"]["name"], json.dumps(test["test"]), test_hash, current_milli_time,
+                                    app_obj.config['POD_ID'])
+            output = test_schema.dump(current_test).data
+            sync_test = sync_test_with_portal(output, app_obj)
+            test_obj = generate_test_object(sync_test)
+            app.db.session.add(test_obj)
             app.db.session.commit()
 
         else:
-            test_schema = app.TestSchema()
             output = test_schema.dump(db_test).data
-            # sync_test_with_portal(output, app_obj)
             if not db_test.hash_value == test_hash:
                 db_test.test_content = json.dumps(test["test"])
                 db_test.hash_value = test_hash
                 db_test.lastChangedTimestamp = current_milli_time
-                app.db.session.commit()
+
+            output = test_schema.dump(db_test).data
+            sync_test = sync_test_with_portal(output, app_obj)
+            test_obj = generate_test_object(sync_test)
+            db_test.test_content = test_obj.test_content
+            db_test.hash_value = test_obj.hash_value
+            app.db.session.commit()
 
 
 def sync_test_with_portal(test, app_obj):
-    rest_utils.portal_post(app_obj.config['PORTAL_URL'] + "test", test, app_obj)
+    response = rest_utils.portal_post_test(app_obj.config['PORTAL_URL'] + "test/saveTestPod", test, app_obj)
+    return response
+
+
+def generate_test_object(sync_test):
+    sync_test_json = json.loads(sync_test)
+    test = app.Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                    sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test.id = sync_test_json["id"]
+    return test

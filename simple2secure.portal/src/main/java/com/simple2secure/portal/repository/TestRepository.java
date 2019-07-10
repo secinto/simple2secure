@@ -15,4 +15,6 @@ public abstract class TestRepository extends MongoRepository<Test> {
 
 	public abstract Test getTestByName(String name);
 
+	public abstract Test getTestByNameAndPodId(String name, String podId);
+
 }

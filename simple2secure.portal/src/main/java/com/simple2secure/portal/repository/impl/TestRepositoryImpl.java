@@ -50,4 +50,11 @@ public class TestRepositoryImpl extends TestRepository {
 		return test;
 	}
 
+	@Override
+	public Test getTestByNameAndPodId(String name, String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId).and("name").is(name));
+		Test test = mongoTemplate.findOne(query, Test.class);
+		return test;
+	}
+
 }

@@ -93,7 +93,7 @@ public class TestController {
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'POD')")
 	public ResponseEntity<TestStatus> updateSaveTest(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		TestStatus status = new TestStatus();
@@ -125,6 +125,52 @@ public class TestController {
 		status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test", locale));
 
 		return new ResponseEntity<TestStatus>(status, HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/saveTestPod", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('POD')")
+	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(locale) && test != null) {
+			if (!Strings.isNullOrEmpty(test.getPodId())) {
+				Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+				Test returnTestValue = new Test();
+
+				if (currentPortalTest != null) {
+					boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
+							test.getLastChangedTimestamp());
+
+					returnTestValue = currentPortalTest;
+
+					if (isPortalTestOlder) {
+						currentPortalTest.setHash_value(test.getHash_value());
+						currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+						currentPortalTest.setTest_content(test.getTest_content());
+						currentPortalTest.setActive(true);
+						testRepository.update(currentPortalTest);
+					}
+				} else {
+					currentPortalTest = new Test();
+					currentPortalTest.setHash_value(test.getHash_value());
+					currentPortalTest.setName(test.getName());
+					currentPortalTest.setPodId(test.getPodId());
+					currentPortalTest.setHostname(test.getHostname());
+					currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+					currentPortalTest.setTest_content(test.getTest_content());
+					currentPortalTest.setActive(true);
+
+					testRepository.save(currentPortalTest);
+
+					returnTestValue = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+				}
+				return new ResponseEntity<Test>(returnTestValue, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 }

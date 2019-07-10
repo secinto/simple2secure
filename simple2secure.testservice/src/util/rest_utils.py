@@ -37,15 +37,25 @@ def portal_get(url, app):
     # print(" * Auth Token before posting function: " + app.config['AUTH_TOKEN'])
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                 app.config['AUTH_TOKEN']}
-    data_request = requests.get(url, verify=False, headers=headers).text
-    data_array = json.loads(data_request)
+    data_request = requests.get(url, verify=False, headers=headers)
 
-    return data_array
+    return data_request
 
 
 def portal_post_celery(url, data, auth_token):
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " + auth_token}
     requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+
+
+def portal_post_test(url, data, app):
+    print("Token before sending" + app.config['AUTH_TOKEN'])
+    if not app.config['AUTH_TOKEN']:
+        app.config['AUTH_TOKEN'] = get_auth_token(app)
+
+    print("TOKEN BEFORE AFTER SENDING" + app.config['AUTH_TOKEN'])
+    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
+                                                                                                app.config['AUTH_TOKEN']}
+    return requests.post(url, data=json.dumps(data), verify=False, headers=headers).text
 
 
 def send_notification(test_id, content, app):
