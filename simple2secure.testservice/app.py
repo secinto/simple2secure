@@ -28,11 +28,18 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 app = Flask(__name__)
 CORS(app)
 
+# This is the correct configuration for the docker
+# app.config['CELERY_BROKER_URL'] = 'redis://redis:6379'
+# app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379'
+
+# This is the correct configuration for the localhost
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
 # Setting some static variables
 app.secret_key = "ChangeIt2019!"
-app.config['CELERY_BROKER_URL'] = 'redis://redis:6379'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pod.sqlite3'
+
 app.config['POD_ID'] = ''
 app.config['GROUP_ID'] = ''
 app.config['LICENSE_ID'] = ''
@@ -83,11 +90,13 @@ class Test(db.Model):
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
     hash_value = db.Column(db.Text)
+    lastChangedTimestamp = db.Column(db.BigInteger)
 
-    def __init__(self, name, test_content, hash_value):
+    def __init__(self, name, test_content, hash_value, last_changed_timestamp):
         self.name = name
         self.test_content = test_content
         self.hash_value = hash_value
+        self.lastChangedTimestamp = last_changed_timestamp
 
 
 class TestResultSchema(ma.ModelSchema):
@@ -144,11 +153,11 @@ def init():
 
         else:
             print(rest_utils.print_error_message())
-            shutdown_server()
+            # shutdown_server()
 
     except requests.exceptions.ConnectionError:
             print(rest_utils.print_error_message())
-            shutdown_server()
+            # shutdown_server()
 
 
 def check_configuration():
@@ -231,11 +240,11 @@ def index():
 
 @app.route("/services/run")
 def run_service():
-    response_text = ""
+    response_text = ''
 
     response = file_utils.read_json_testfile()
     # response_json_object = json.loads(response)
-    file_utils.update_insert_tests_to_db(response)
+    file_utils.update_insert_tests_to_db(response, app)
 
     if json_utils.is_blank(request.query_string) is True:
         tests = Test.query.all()
@@ -285,4 +294,4 @@ def shutdown_server():
 
 if __name__ == '__main__':
     webbrowser.open('https://localhost:5000/services')
-    app.run(debug=True, ssl_context='adhoc', host='0.0.0.0', threaded=True, use_reloader=True)
+    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)

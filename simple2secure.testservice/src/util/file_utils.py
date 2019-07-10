@@ -1,10 +1,12 @@
 from src.models.CompanyLicensePod import CompanyLicensePod
+from src.util import rest_utils
 import zipfile
 import os
+import app
 import socket
 import hashlib
-import app
 import json
+import time
 
 ALLOWED_EXTENSIONS = set(['zip'])
 EXPIRATION_DATE = "expirationDate"
@@ -97,22 +99,33 @@ def compare_hash_values(current_hash_string):
     return False
 
 
-def update_insert_tests_to_db(tests):
+def update_insert_tests_to_db(tests, app_obj):
 
     tests_json = json.loads(tests)
+    current_milli_time = int(round(time.time() * 1000))
     for test in tests_json:
 
         test_hash = check_md5(json.dumps(test["test"]))
         current_test_name = test["test"]["name"]
-        db_test = app.Test.query.filter_by(name=current_test_name).first()
-        if db_test is None:
 
-            current_test = app.Test(test["test"]["name"], json.dumps(test["test"]), test_hash)
+        db_test = app.Test.query.filter_by(name=current_test_name).first()
+
+        if db_test is None:
+            current_test = app.Test(test["test"]["name"], json.dumps(test["test"]), test_hash, current_milli_time)
+            # sync_test_with_portal(test, app_obj)
             app.db.session.add(current_test)
             app.db.session.commit()
 
         else:
+            test_schema = app.TestSchema()
+            output = test_schema.dump(db_test).data
+            # sync_test_with_portal(output, app_obj)
             if not db_test.hash_value == test_hash:
                 db_test.test_content = json.dumps(test["test"])
                 db_test.hash_value = test_hash
+                db_test.lastChangedTimestamp = current_milli_time
                 app.db.session.commit()
+
+
+def sync_test_with_portal(test, app_obj):
+    rest_utils.portal_post(app_obj.config['PORTAL_URL'] + "test", test, app_obj)

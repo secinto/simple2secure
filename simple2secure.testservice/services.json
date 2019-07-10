@@ -1,8 +1,8 @@
 [
 	{
-		"test":{
+		"test": {
 			"name": "test1",
-			"test_definition":{
+			"test_definition": {
 				"description": "Simple tool for running some tests",
 				"version": "0.0.1",
 				"precondition": {
@@ -38,9 +38,7 @@
 						}
 					}
 				}
-			
 			}
-		
 		}
 	}
 ]

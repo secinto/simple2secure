@@ -13,18 +13,15 @@ public class Test extends GenericDBObject {
 
 	private String podId;
 	private String name;
-	private String contextId;
+	private String test_content;
 	private String hostname;
-	private String description;
-	private String version;
-	private TestStep precondition;
-	private TestStep step;
-	private TestStep postcondition;
 	private boolean active;
 	private boolean scheduled;
 	private long scheduledTime;
 	private TimeUnit scheduledTimeUnit;
 	private long lastScheduleTimestamp;
+	private long lastChangedTimestamp;
+	private String hash_value;
 
 	public Test() {
 
@@ -46,12 +43,12 @@ public class Test extends GenericDBObject {
 		this.podId = podId;
 	}
 
-	public String getContextId() {
-		return contextId;
+	public String getHostname() {
+		return hostname;
 	}
 
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 	public long getLastScheduleTimestamp() {
@@ -62,52 +59,28 @@ public class Test extends GenericDBObject {
 		this.lastScheduleTimestamp = lastScheduleTimestamp;
 	}
 
-	public String getHostname() {
-		return hostname;
+	public String getTest_content() {
+		return test_content;
 	}
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setTest_content(String test_content) {
+		this.test_content = test_content;
 	}
 
-	public String getDescription() {
-		return description;
+	public long getLastChangedTimestamp() {
+		return lastChangedTimestamp;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setLastChangedTimestamp(long lastChangedTimestamp) {
+		this.lastChangedTimestamp = lastChangedTimestamp;
 	}
 
-	public String getVersion() {
-		return version;
+	public String getHash_value() {
+		return hash_value;
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public TestStep getPrecondition() {
-		return precondition;
-	}
-
-	public void setPrecondition(TestStep precondition) {
-		this.precondition = precondition;
-	}
-
-	public TestStep getStep() {
-		return step;
-	}
-
-	public void setStep(TestStep step) {
-		this.step = step;
-	}
-
-	public TestStep getPostcondition() {
-		return postcondition;
-	}
-
-	public void setPostcondition(TestStep postcondition) {
-		this.postcondition = postcondition;
+	public void setHash_value(String hash_value) {
+		this.hash_value = hash_value;
 	}
 
 	public boolean isActive() {

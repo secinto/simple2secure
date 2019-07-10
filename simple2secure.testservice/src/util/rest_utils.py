@@ -71,24 +71,27 @@ def print_error_message():
            "--!!!Error occured - portal not reachable!!!--\n" \
            "--                                          --\n" \
            "--********POD HAS NOT BEEN ACTIVATED********--\n" \
-           "----------------------------------------------\n" \
+           "----------------------------------------------" \
            "----------------------------------------------"
 
 
 def print_success_message_auth(app):
-    return "-----------------------------\n" \
-           "-------Initialization--------\n" \
-           "-----------------------------\n" \
-           " * Extracting the pod license\n" \
-           " * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
-           " * Pod Group Id : " + app.config['GROUP_ID'] + "\n" \
-           " * Pod Id : " + app.config['POD_ID'] + "\n" \
-           " ****************************\n" \
-           " * Activating the license\n" \
-           " * Auth Token : " + app.config['AUTH_TOKEN'] + "\n" \
-           " ****************************\n" \
-           "-----------------------------\n" \
-           "-----Initialization END------\n" \
-           "-----------------------------\n"
+    return "----------------------------------------------\n" \
+           "----------------INITIALIZATION----------------\n" \
+           "----------------------------------------------\n" \
+           "--       Extracting the pod license         --\n" \
+           "----------------------------------------------\n" \
+           "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
+           "-- * Pod Group Id : " + app.config['GROUP_ID'] + "\n" \
+           "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
+           "----------------------------------------------\n" \
+           "----------------------------------------------\n" \
+           "--          ACTIVATING THE LICENSE          --\n" \
+           "----------------------------------------------\n" \
+           "-- * Auth Token : " + app.config['AUTH_TOKEN'] + "\n" \
+           "----------------------------------------------\n" \
+           "----------------------------------------------\n" \
+           "---------------INITIALIZATION END-------------\n" \
+           "----------------------------------------------\n"
 
 
