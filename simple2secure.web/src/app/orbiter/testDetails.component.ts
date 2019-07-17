@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef, MatExpansionPanel} from '@angular/materia
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
 import {Test, Timeunit} from '../_models';
+import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, DataService, HttpService} from '../_services/index';
 
 @Component({
@@ -12,7 +13,7 @@ import {AlertService, DataService, HttpService} from '../_services/index';
 
 export class TestDetailsComponent{
 	loading = false;
-	test: Test;
+	test: TestObjWeb;
 	type: string;
 	isNewTest = false;
 	url: string;
@@ -31,7 +32,7 @@ export class TestDetailsComponent{
 		if (
 			this.type == 'new'){
 			this.isNewTest = true;
-			this.test = new Test();
+			this.test = new TestObjWeb();
 			this.test.podId = data.podId;
 		}
 		else{

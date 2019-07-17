@@ -13,3 +13,5 @@ marshmallow-sqlalchemy
 sqlalchemy
 marshmallow
 redis
+wmi
+pypiwin32

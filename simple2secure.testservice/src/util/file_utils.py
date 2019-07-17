@@ -16,21 +16,21 @@ SIGNATURE = "signature"
 LICENSE_FOLDER = 'static/license'
 
 
-def read_json_testfile():
+def read_json_testfile(appObj):
     # Read test file and return it
     tests_file = open('services.json', 'r')
     content = tests_file.read()
     if not compare_hash_values(check_md5(content)):
         # TODO: Update the database with the tests or insert new ones
-        update_insert_tests_to_db(content)
+        update_insert_tests_to_db(content, appObj)
 
     return content
 
 
-def parse_license_file(license_file, app):
+def parse_license_file(license_file, appObj):
     lines = license_file.split("\n")
     group_id = ""
-    pod_id = app.config['POD_ID']
+    pod_id = appObj.config['POD_ID']
 
     for line in lines:
         if "#" not in line:
@@ -38,12 +38,12 @@ def parse_license_file(license_file, app):
             if row[0] == GROUP_ID:
                 group_id = row[1]
             elif row[0] == LICENSE_ID:
-                app.config['LICENSE_ID'] = row[1]
+                appObj.config['LICENSE_ID'] = row[1]
 
-    if group_id and app.config['LICENSE_ID']:
+    if group_id and appObj.config['LICENSE_ID']:
         # send post to the portal to activate license
-        license_obj = CompanyLicensePod(group_id.rstrip(), app.config['LICENSE_ID'].rstrip(), pod_id,
-                                        socket.gethostname(), read_json_testfile())
+        license_obj = CompanyLicensePod(group_id.rstrip(), appObj.config['LICENSE_ID'].rstrip(), pod_id,
+                                        socket.gethostname(), read_json_testfile(appObj))
         return license_obj
 
 
@@ -140,8 +140,20 @@ def sync_test_with_portal(test, app_obj):
     return response
 
 
+def sync_all_tests_with_portal(test, app_obj):
+    response = rest_utils.portal_post_test(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
+    return response
+
+
 def generate_test_object(sync_test):
     sync_test_json = json.loads(sync_test)
+    test = app.Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                    sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test.id = sync_test_json["id"]
+    return test
+
+
+def generate_test_object_from_json(sync_test_json):
     test = app.Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
                     sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     test.id = sync_test_json["id"]

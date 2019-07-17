@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import com.simple2secure.api.dto.PodDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Pod;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestContent;
+import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -65,6 +68,8 @@ public class PodUtils {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
+	private Gson gson = new Gson();
+
 	/**
 	 * This function returns all pods from the current context
 	 *
@@ -113,8 +118,7 @@ public class PodUtils {
 						if (!Strings.isNullOrEmpty(license.getPodId())) {
 							String podStatus = getPodStatus(license);
 							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), podStatus);
-							List<Test> tests = testRepository.getByPodId(pod.getPodId());
-
+							List<TestObjWeb> tests = convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
 							PodDTO podDto = new PodDTO(pod, tests);
 							myPods.add(podDto);
 						}
@@ -124,6 +128,35 @@ public class PodUtils {
 		}
 		log.debug("Retrieved {0} pods for context {1}", myPods.size(), context.getName());
 		return myPods;
+	}
+
+	/**
+	 * This function converts the test object which is saved in the mongo database to the correct test object which is being shown in the web.
+	 *
+	 * @param tests
+	 */
+	public List<TestObjWeb> convertToTestObjectForWeb(List<Test> tests) {
+		List<TestObjWeb> testsWeb = new ArrayList<>();
+
+		if (tests != null) {
+
+			for (Test test : tests) {
+				TestObjWeb testObjWeb = new TestObjWeb();
+				TestContent testContent = gson.fromJson(test.getTest_content(), TestContent.class);
+				testObjWeb.setTest_content(testContent);
+				testObjWeb.setName(test.getName());
+				testObjWeb.setActive(test.isActive());
+				testObjWeb.setHostname(test.getHostname());
+				testObjWeb.setPodId(test.getPodId());
+				testObjWeb.setTestId(test.getId());
+				testObjWeb.setScheduled(test.isScheduled());
+				testObjWeb.setScheduledTime(test.getScheduledTime());
+				testObjWeb.setScheduledTimeUnit(test.getScheduledTimeUnit());
+				testsWeb.add(testObjWeb);
+			}
+		}
+
+		return testsWeb;
 	}
 
 	public void deletePodDependencies(String podId) {

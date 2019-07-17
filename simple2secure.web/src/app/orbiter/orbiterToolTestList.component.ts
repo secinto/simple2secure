@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {PodDTO} from '../_models/DTO/podDTO';
 import {ContextDTO, Test} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
+import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
@@ -15,7 +16,7 @@ import {TestDetailsComponent} from './testDetails.component';
 
 export class OrbiterToolTestListComponent {
 
-	selectedTest: Test = new Test();
+	selectedTest: TestObjWeb = new TestObjWeb();
 	podId: string;
 	pod: PodDTO;
 	context: ContextDTO;
@@ -54,8 +55,9 @@ export class OrbiterToolTestListComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public onMenuTriggerClick(test: Test) {
+	public onMenuTriggerClick(test: TestObjWeb) {
 		this.selectedTest = test;
+
 	}
 
 	openDialogShowTest(type: string): void {

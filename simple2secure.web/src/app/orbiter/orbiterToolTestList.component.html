@@ -26,15 +26,15 @@
 
         <!-- Position Column -->
         <ng-container matColumnDef="status">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.active}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
         <ng-container matColumnDef="version">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.version' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.version}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.test_content.test_definition.version}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">

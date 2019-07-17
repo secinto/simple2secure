@@ -1,7 +1,7 @@
 import {Pod} from '../pod';
-import {Test} from '../test';
+import {TestObjWeb} from '../testObjWeb';
 
 export class PodDTO {
 	public pod: Pod;
-	public test: Test[];
+	public test: TestObjWeb[];
 }

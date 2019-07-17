@@ -23,14 +23,14 @@
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                   [(ngModel)]="test.description" name="description">
+                                   [(ngModel)]="test.test_content.test_definition.description" name="description">
                         </mat-form-field>
                     </div>
 
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.version' | translate }}"
-                                   [(ngModel)]="test.version" name="version" readonly>
+                                   [(ngModel)]="test.test_content.test_definition.version" name="version" readonly>
                         </mat-form-field>
                     </div>
 
@@ -78,14 +78,14 @@
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                   [(ngModel)]="test.precondition.description" name="precondition.description">
+                                   [(ngModel)]="test.test_content.test_definition.precondition.description" name="precondition.description">
                         </mat-form-field>
                     </div>
 
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
-                                   [(ngModel)]="test.precondition.command.executable" name="precondition.executable">
+                                   [(ngModel)]="test.test_content.test_definition.precondition.command.executable" name="precondition.executable">
                         </mat-form-field>
                     </div>
 
@@ -98,21 +98,21 @@
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                       [(ngModel)]="test.precondition.command.parameter.description" name="precondition.parameter.description">
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.description" name="precondition.parameter.description">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
-                                       [(ngModel)]="test.precondition.command.parameter.prefix" name="precondition.prefix">
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.prefix" name="precondition.prefix">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
-                                       [(ngModel)]="test.precondition.command.parameter.value" name="precondition.parameter.value">
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.value" name="precondition.parameter.value">
                             </mat-form-field>
                         </div>
 
@@ -130,14 +130,14 @@
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                   [(ngModel)]="test.step.description" name="step.description">
+                                   [(ngModel)]="test.test_content.test_definition.step.description" name="step.description">
                         </mat-form-field>
                     </div>
 
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
-                                   [(ngModel)]="test.step.command.executable" name="step.executable">
+                                   [(ngModel)]="test.test_content.test_definition.step.command.executable" name="step.executable">
                         </mat-form-field>
                     </div>
 
@@ -150,21 +150,21 @@
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                       [(ngModel)]="test.step.command.parameter.description" name="step.parameter.description">
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.description" name="step.parameter.description">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
-                                       [(ngModel)]="test.step.command.parameter.prefix" name="step.prefix">
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.prefix" name="step.prefix">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
-                                       [(ngModel)]="test.step.command.parameter.value" name="step.parameter.value">
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.value" name="step.parameter.value">
                             </mat-form-field>
                         </div>
                     </mat-expansion-panel>
@@ -180,14 +180,14 @@
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                   [(ngModel)]="test.postcondition.description" name="postcondition.description">
+                                   [(ngModel)]="test.test_content.test_definition.postcondition.description" name="postcondition.description">
                         </mat-form-field>
                     </div>
 
                     <div class="form-group">
                         <mat-form-field class="full_width_input">
                             <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
-                                   [(ngModel)]="test.postcondition.command.executable" name="postcondition.executable">
+                                   [(ngModel)]="test.test_content.test_definition.postcondition.command.executable" name="postcondition.executable">
                         </mat-form-field>
                     </div>
 
@@ -201,21 +201,21 @@
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
-                                       [(ngModel)]="test.postcondition.command.parameter.description" name="postcondition.parameter.description">
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.description" name="postcondition.parameter.description">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
-                                       [(ngModel)]="test.postcondition.command.parameter.prefix" name="postcondition.prefix">
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.prefix" name="postcondition.prefix">
                             </mat-form-field>
                         </div>
 
                         <div class="form-group">
                             <mat-form-field class="full_width_input">
                                 <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
-                                       [(ngModel)]="test.postcondition.command.parameter.value" name="postcondition.parameter.value">
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.value" name="postcondition.parameter.value">
                             </mat-form-field>
                         </div>
 

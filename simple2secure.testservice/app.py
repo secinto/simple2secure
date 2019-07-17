@@ -18,6 +18,7 @@ import urllib3
 import secrets
 import time
 import requests
+import wmi
 
 
 # Setting env variable for celery to work on windows
@@ -144,13 +145,12 @@ def init():
             app.licenseFile = file_utils.parse_license_file(license_from_file, app)
             app.config['LICENSE_ID'] = app.licenseFile.licenseId
 
-            print(rest_utils.print_success_message_auth(app))
-
             scheduler = BackgroundScheduler()
             scheduler.add_job(func=check_configuration, trigger="interval",
                               seconds=15)
             scheduler.add_job(func=get_test_results_from_db, trigger="interval",
                               seconds=20)
+            scheduler.add_job(func=sync_tests_with_the_portal, trigger="interval", seconds=30)
             scheduler.start()
 
         else:
@@ -160,6 +160,26 @@ def init():
     except requests.exceptions.ConnectionError:
             print(rest_utils.print_error_message())
             # shutdown_server()
+
+
+def sync_tests_with_the_portal():
+    test_schema = TestSchema()
+    tests = Test.query.all()
+
+    if tests is not None:
+        new_tests = []
+        for test in tests:
+            output = test_schema.dump(test).data
+            new_tests.append(output)
+
+        if new_tests is not None:
+            sync_test = file_utils.sync_all_tests_with_portal(new_tests, app)
+            test_array = json.loads(sync_test)
+
+            for test_new in test_array:
+                test_obj = file_utils.generate_test_object_from_json(test_new)
+                db.session.add(test_obj)
+                db.session.commit()
 
 
 def check_configuration():
@@ -229,7 +249,7 @@ def send_test_results(test_result, auth_token):
 
 @app.route("/services")
 def parse_tests():
-    tests_string = file_utils.read_json_testfile()
+    tests_string = file_utils.read_json_testfile(app)
     resp = Response(tests_string, status=200, mimetype='application/json')
     return resp
 
@@ -240,6 +260,25 @@ def show_test_results():
     return render_template('testresults.html', len=len(test_results), test_results=test_results)
 
 
+@app.route("/programs")
+def show_programs():
+    PATTERN = r"\newcommand*{{\Title}}{{{}}}"
+
+    w = wmi.WMI()
+
+    html = "test"
+    for p in w.Win32_Product():
+        print
+        PATTERN.format(p.Version)
+        print
+        PATTERN.format(p.Vendor)
+        print
+        PATTERN.format(p.Caption)
+        print("\hline")
+
+    return html
+
+
 @app.route("/")
 def index():
     return '<html><body><h1>HI</h1></body></html>'
@@ -247,9 +286,8 @@ def index():
 
 @app.route("/services/run")
 def run_service():
-    response_text = ''
 
-    response = file_utils.read_json_testfile()
+    response = file_utils.read_json_testfile(app)
     # response_json_object = json.loads(response)
     file_utils.update_insert_tests_to_db(response, app)
 

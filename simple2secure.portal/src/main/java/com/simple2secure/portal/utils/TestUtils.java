@@ -1,5 +1,8 @@
 package com.simple2secure.portal.utils;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +15,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
@@ -56,6 +61,11 @@ public class TestUtils {
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	TestUtils testUtils;
+
+	private Gson gson = new Gson();
 
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
@@ -195,7 +205,7 @@ public class TestUtils {
 	}
 
 	/**
-	 * This function returns all tests which are not executed.
+	 * This function returns all tests which are not executed and which are scheduled for the next run.
 	 *
 	 * @param hostname
 	 * @param locale
@@ -233,7 +243,10 @@ public class TestUtils {
 				HttpStatus.NOT_FOUND);
 	}
 
-	public boolean checkIfTestIsSaveable(Test dbTest) {
+	public boolean checkIfTestIsSaveable(Test test) {
+
+		Test dbTest = testRepository.getTestByName(test.getName());
+
 		if (dbTest == null) {
 			return true;
 		} else {
@@ -241,6 +254,13 @@ public class TestUtils {
 		}
 	}
 
+	/**
+	 * This function checks if test exists in the database according to the test name, if it is true - this test will be updated. If not, then
+	 * this test will be saved.
+	 *
+	 * @param currentTest
+	 * @return
+	 */
 	public boolean checkIfTestIsUpdateable(Test currentTest) {
 		Test dbTest = testRepository.getTestByName(currentTest.getName());
 
@@ -256,12 +276,109 @@ public class TestUtils {
 
 	}
 
+	/**
+	 * This function which test is older, test saved in the mongo db or test retrieved from the pod
+	 *
+	 * @param portalTestTimestamp
+	 * @param podTestTimestamp
+	 * @return
+	 */
 	public boolean checkIfPortalTestIsOlder(long portalTestTimestamp, long podTestTimestamp) {
 		if (portalTestTimestamp - podTestTimestamp < 0) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * This function converts the provided testObjWeb to the normal Test obj which will be saved or updated in the database.
+	 *
+	 * @param testObjWeb
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
+	public Test convertTestWebObjtoTestObject(TestObjWeb testObjWeb) throws NoSuchAlgorithmException {
+
+		Test test = new Test();
+
+		testObjWeb.getTest_content().setName(testObjWeb.getName());
+		String testContent = gson.toJson(testObjWeb.getTest_content());
+
+		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
+			// new test
+			test.setHostname(testObjWeb.getHostname());
+			test.setLastChangedTimestamp(System.currentTimeMillis());
+			test.setName(testObjWeb.getName());
+			test.setPodId(testObjWeb.getPodId());
+			test.setScheduled(testObjWeb.isScheduled());
+			test.setScheduledTime(testObjWeb.getScheduledTime());
+			test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
+			test.setTest_content(testContent);
+			test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+			test.setActive(true);
+
+		} else {
+			// test should exist in the database, update the existing one
+			test = testRepository.find(testObjWeb.getTestId());
+			if (test != null) {
+				test.setScheduled(testObjWeb.isScheduled());
+				test.setScheduledTime(testObjWeb.getScheduledTime());
+				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
+				test.setTest_content(testContent);
+				test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+				test.setLastChangedTimestamp(System.currentTimeMillis());
+			} else {
+				test = null;
+			}
+		}
+
+		return test;
+
+	}
+
+	/**
+	 * This function calculates the md5 hash of the provided string
+	 *
+	 * @param content
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
+	public byte[] calculateMd5Hash(String content) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		byte[] messageDigest = md.digest(content.getBytes());
+		return messageDigest;
+	}
+
+	/**
+	 * This function converts the byte array with the calculated hash to the hex value represented as string
+	 *
+	 * @param md5hash
+	 * @return
+	 */
+	public String getHexValueHash(byte[] md5hash) {
+		BigInteger no = new BigInteger(1, md5hash);
+		String hashtext = no.toString(16);
+		while (hashtext.length() < 32) {
+			hashtext = "0" + hashtext;
+		}
+		return hashtext;
+	}
+
+	/**
+	 * This function extracts only test names from the test object list
+	 *
+	 * @param tests
+	 * @return
+	 */
+	public List<String> getTestNamesFromTestList(List<Test> tests) {
+		ArrayList<String> test_names = new ArrayList<>();
+
+		for (Test test : tests) {
+			test_names.add(test.getName());
+		}
+
+		return test_names;
 	}
 
 }
