@@ -377,7 +377,7 @@ public class UserController {
 
 				// Add template for the email content and retrieve it from the database!
 				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
-						+ loadedConfigItems.getBaseURL() + "/api/users/resetPassword/" + user.getPasswordResetToken();
+						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
 
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
 					return new ResponseEntity<User>(user, HttpStatus.OK);

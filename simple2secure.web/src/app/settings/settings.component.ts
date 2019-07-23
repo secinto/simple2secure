@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material';
+import {TestMacro} from '../_models/TestMacro';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -100,6 +101,17 @@ export class SettingsComponent {
 		}
 	}
 
+
+	addNewTestMacro(){
+		if(this.settingsObj.testMacroList){
+			this.settingsObj.testMacroList.push(new TestMacro())
+		}
+		else{
+			this.settingsObj.testMacroList = [];
+			this.settingsObj.testMacroList.push(new TestMacro())
+		}
+	}
+
 	saveLicensePlan(licensePlan: LicensePlan) {
 		this.loading = true;
 		this.httpService.post(licensePlan, environment.apiEndpoint + 'settings/licensePlan').subscribe(
@@ -124,6 +136,44 @@ export class SettingsComponent {
 		this.httpService.delete(environment.apiEndpoint + 'settings/licensePlan/' + licensePlan.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.user.delete'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	deleteTestMacro(testMacro: TestMacro) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'settings/testmacro/' + testMacro.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.user.delete'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	saveTestMacro(testMacro: TestMacro) {
+		this.loading = true;
+		this.httpService.post(testMacro, environment.apiEndpoint + 'settings/testmacro').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.settings.update'));
 				this.loading = false;
 				this.loadSettings();
 			},

@@ -106,13 +106,13 @@ def update_insert_tests_to_db(tests, app_obj):
     test_schema = app.TestSchema()
     for test in tests_json:
 
-        test_hash = check_md5(json.dumps(test["test"]))
-        current_test_name = test["test"]["name"]
+        test_hash = check_md5(json.dumps(test))
+        current_test_name = test["name"]
 
         db_test = app.Test.query.filter_by(name=current_test_name).first()
 
         if db_test is None:
-            current_test = app.Test(test["test"]["name"], json.dumps(test["test"]), test_hash, current_milli_time,
+            current_test = app.Test(test["name"], json.dumps(test), test_hash, current_milli_time,
                                     app_obj.config['POD_ID'])
             output = test_schema.dump(current_test).data
             sync_test = sync_test_with_portal(output, app_obj)
@@ -123,7 +123,7 @@ def update_insert_tests_to_db(tests, app_obj):
         else:
             output = test_schema.dump(db_test).data
             if not db_test.hash_value == test_hash:
-                db_test.test_content = json.dumps(test["test"])
+                db_test.test_content = json.dumps(test)
                 db_test.hash_value = test_hash
                 db_test.lastChangedTimestamp = current_milli_time
 
@@ -158,3 +158,15 @@ def generate_test_object_from_json(sync_test_json):
                     sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     test.id = sync_test_json["id"]
     return test
+
+
+def update_services_file():
+    data = []
+    tests = app.Test.query.all()
+    if tests is not None:
+        for test in tests:
+            data.append(json.loads(test.test_content))
+
+    if data is not None:
+        with open('services.json', 'w') as outfile:
+            json.dump(data, outfile, indent=4)

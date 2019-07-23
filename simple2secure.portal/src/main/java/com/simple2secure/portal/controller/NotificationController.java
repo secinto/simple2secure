@@ -54,7 +54,8 @@ public class NotificationController {
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
-			List<Notification> notifications = repository.findByContextId(contextId);
+			// List<Notification> notifications = repository.findByContextId(contextId);
+			List<Notification> notifications = repository.findAll();
 			if (notifications != null) {
 				return new ResponseEntity<List<Notification>>(notifications, HttpStatus.OK);
 			}

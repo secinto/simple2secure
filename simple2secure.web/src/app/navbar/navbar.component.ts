@@ -9,7 +9,7 @@ import {Observable} from 'rxjs';
 import {Context, ContextDTO, UserRole} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
-import {AlertService, AuthenticationService, HttpService} from '../_services';
+import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
 
 declare var $: any;
 
@@ -37,6 +37,7 @@ export class NavbarComponent {
 	returnUrl: string;
 	numOfNotifications = 3;
 	private timer;
+	showNotifications: boolean;
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -47,10 +48,13 @@ export class NavbarComponent {
 	            private router: Router,
 	            private route: ActivatedRoute,
 	            private httpService: HttpService,
+	            private dataService: DataService,
 	            private alertService: AlertService,
 	            private authenticationService: AuthenticationService,
 	            private dialog: MatDialog)
 	{
+		this.showNotifications = false;
+		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 		this.timer = Observable.timer(5000, 5000);
 		this.timer.subscribe((t) => this.getNotifications());
@@ -62,6 +66,7 @@ export class NavbarComponent {
 				.subscribe(
 					data => {
 						this.notifications = data;
+						this.dataService.setNotifications(this.notifications);
 					},
 					error => {
 						console.log(error);
@@ -185,9 +190,18 @@ export class NavbarComponent {
 		}
 	}
 
-	openNotificationModal(event) {
+	openNotificationModal() {
 
-		const dialogPosition: DialogPosition = {
+		if(this.showNotifications == true){
+			this.showNotifications = false;
+		}
+		else{
+			this.showNotifications = true;
+		}
+
+		console.log(this.showNotifications);
+
+		/*const dialogPosition: DialogPosition = {
 			top: event.y + 'px',
 			right: event.x + 'px',
 			left: event.x + 'px',
@@ -201,7 +215,7 @@ export class NavbarComponent {
 			position: dialogPosition
 		};
 
-		const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);
+		const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);*/
 
 	}
 

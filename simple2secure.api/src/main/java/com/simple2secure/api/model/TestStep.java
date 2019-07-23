@@ -11,7 +11,6 @@ public class TestStep extends GenericDBObject {
 
 	private String description;
 	private Command command;
-	private Rule condition;
 
 	public TestStep() {
 
@@ -32,13 +31,4 @@ public class TestStep extends GenericDBObject {
 	public void setCommand(Command command) {
 		this.command = command;
 	}
-
-	public Rule getCondition() {
-		return condition;
-	}
-
-	public void setCondition(Rule condition) {
-		this.condition = condition;
-	}
-
 }

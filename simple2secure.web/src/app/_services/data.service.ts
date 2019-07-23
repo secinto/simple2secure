@@ -67,4 +67,12 @@ export class DataService {
 		return JSON.parse(localStorage.getItem('pod'));
 	}
 
+	setNotifications(notifications: Notification[]) {
+		localStorage.setItem('notifications', JSON.stringify(notifications));
+	}
+
+	getNotifications(){
+		return JSON.parse(localStorage.getItem('notifications'));
+	}
+
 }

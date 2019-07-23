@@ -355,5 +355,9 @@
   "message.test.create": "Test erfolgreich erstellt!",
   "message.test.update": "Test erfolgreich aktualisiert!",
   "message.test.delete": "Test erfolgreich gelöscht!",
-  "message.test.schedule": "Test wurde geplant!"
+  "message.test.schedule": "Test wurde geplant!",
+  "table.testmacro": "Testmakro",
+  "testmacro.add": "Neues Testmakro hinzufügen",
+  "testmacro.macro.placeholder": "Bitte geben Sie ein Testmakro ein",
+  "testmacro.executable.placeholder": "Bitte geben Sie die executable ein"
 }
