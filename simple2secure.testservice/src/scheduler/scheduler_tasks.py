@@ -5,9 +5,9 @@ from src.db.database_schema import TestResultSchema, TestSchema
 from src.util import rest_utils, file_utils
 
 
-def start_tasks(app_obj, celery_tasks):
+def start_scheduler_tasks(app_obj, celery_tasks):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=check_configuration, trigger="interval", seconds=15,
+    scheduler.add_job(func=get_scheduled_tests, trigger="interval", seconds=15,
                       kwargs={'app_obj': app_obj, 'celery_task': celery_tasks})
 
     scheduler.add_job(func=get_test_results_from_db, trigger="interval", seconds=20,
@@ -17,7 +17,7 @@ def start_tasks(app_obj, celery_tasks):
     scheduler.start()
 
 
-def check_configuration(app_obj, celery_task):
+def get_scheduled_tests(app_obj, celery_task):
     with app_obj.app_context():
         request_test = rest_utils.portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
                                              app_obj.config['POD_ID'], app_obj)
@@ -61,12 +61,24 @@ def sync_tests_with_the_portal(app_obj):
                 new_tests.append(output)
 
             if new_tests is not None:
-                sync_test = file_utils.sync_all_tests_with_portal(new_tests, app_obj)
-                test_array = json.loads(sync_test)
 
-                for test_new in test_array:
-                    test_obj = file_utils.generate_test_object_from_json(test_new)
-                    db.session.add(test_obj)
-                    db.session.commit()
+                if len(new_tests) > 0:
+                    sync_test = file_utils.sync_all_tests_with_portal(new_tests, app_obj)
 
-                file_utils.update_services_file()
+                    if sync_test.status_code == 200:
+                        test_array = json.loads(sync_test.text)
+
+                        if len(test_array) > 0 :
+                            for test_new in test_array:
+                                test_obj = file_utils.generate_test_object_from_json(test_new)
+                                db.session.add(test_obj)
+                                db.session.commit()
+
+                            file_utils.update_services_file()
+
+                    else:
+                        print(sync_test.text)
+
+
+
+

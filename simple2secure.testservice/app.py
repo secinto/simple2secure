@@ -3,11 +3,11 @@ from src import create_app
 from src.util import file_utils
 from src.util import json_utils
 from src.db.database import TestResult, Test
-from src.scheduler.scheduler_tasks import start_tasks
+from src.scheduler.scheduler_tasks import start_scheduler_tasks
 import src.celery.celery_tasks as celery_tasks
 
 app = create_app()
-start_tasks(app, celery_tasks)
+start_scheduler_tasks(app, celery_tasks)
 
 
 @app.route("/services")

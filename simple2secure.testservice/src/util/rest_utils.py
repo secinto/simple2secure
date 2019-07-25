@@ -63,6 +63,19 @@ def portal_post_test(url, data, app):
         return requests.post(url, data=json.dumps(data), verify=False, headers=headers).text
 
 
+def portal_post_test_response(url, data, app):
+    with app.app_context():
+        print("Token before sending" + app.config['AUTH_TOKEN'])
+        if not app.config['AUTH_TOKEN']:
+            app.config['AUTH_TOKEN'] = get_auth_token(app)
+
+        print("TOKEN BEFORE AFTER SENDING" + app.config['AUTH_TOKEN'])
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
+                                                                                                    app.config['AUTH_TOKEN']}
+        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+
+
+
 def send_notification(test_id, content, app):
     # url = app.config['PORTAL_URL'] + "notification"
     # timestamp = datetime.now().timestamp() * 1000

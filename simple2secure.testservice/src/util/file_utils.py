@@ -141,7 +141,7 @@ def sync_test_with_portal(test, app_obj):
 
 
 def sync_all_tests_with_portal(test, app_obj):
-    response = rest_utils.portal_post_test(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
+    response = rest_utils.portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
     return response
 
 

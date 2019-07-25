@@ -186,8 +186,7 @@ public class TestController {
 	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(locale) && tests != null) {
-
+		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
 			List<Test> portalTests = testRepository.getByPodId(tests.get(0).getPodId());
 			List<Test> newTests = new ArrayList<>();
 			if (portalTests != null) {
