@@ -1,8 +1,8 @@
-from src.models.CompanyLicensePod import CompanyLicensePod
+from src.db.database import db, PodInfo, Test, CompanyLicensePod
+from src.db.database_schema import TestSchema
 from src.util import rest_utils
 import zipfile
 import os
-import app
 import socket
 import hashlib
 import json
@@ -81,19 +81,19 @@ def check_md5(content):
 
 
 def compare_hash_values(current_hash_string):
-    pod_info = app.PodInfo.query.first()
+    pod_info = PodInfo.query.first()
 
     if pod_info is not None:
         if pod_info.hash_value_service is None:
             pod_info.hash_value_service = current_hash_string
-            app.db.session.commit()
+            db.session.commit()
             return False
         else:
             if pod_info.hash_value_service == current_hash_string:
                 return True
             else:
                 pod_info.hash_value_service = current_hash_string
-                app.db.session.commit()
+                db.session.commit()
                 return False
 
     return False
@@ -103,22 +103,22 @@ def update_insert_tests_to_db(tests, app_obj):
 
     tests_json = json.loads(tests)
     current_milli_time = int(round(time.time() * 1000))
-    test_schema = app.TestSchema()
+    test_schema = TestSchema()
     for test in tests_json:
 
         test_hash = check_md5(json.dumps(test))
         current_test_name = test["name"]
 
-        db_test = app.Test.query.filter_by(name=current_test_name).first()
+        db_test = Test.query.filter_by(name=current_test_name).first()
 
         if db_test is None:
-            current_test = app.Test(test["name"], json.dumps(test), test_hash, current_milli_time,
-                                    app_obj.config['POD_ID'])
+            current_test = Test(test["name"], json.dumps(test), test_hash,
+                                current_milli_time, app_obj.config['POD_ID'])
             output = test_schema.dump(current_test).data
             sync_test = sync_test_with_portal(output, app_obj)
             test_obj = generate_test_object(sync_test)
-            app.db.session.add(test_obj)
-            app.db.session.commit()
+            db.session.add(test_obj)
+            db.session.commit()
 
         else:
             output = test_schema.dump(db_test).data
@@ -132,7 +132,7 @@ def update_insert_tests_to_db(tests, app_obj):
             test_obj = generate_test_object(sync_test)
             db_test.test_content = test_obj.test_content
             db_test.hash_value = test_obj.hash_value
-            app.db.session.commit()
+            db.session.commit()
 
 
 def sync_test_with_portal(test, app_obj):
@@ -147,22 +147,22 @@ def sync_all_tests_with_portal(test, app_obj):
 
 def generate_test_object(sync_test):
     sync_test_json = json.loads(sync_test)
-    test = app.Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
-                    sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     test.id = sync_test_json["id"]
     return test
 
 
 def generate_test_object_from_json(sync_test_json):
-    test = app.Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
-                    sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     test.id = sync_test_json["id"]
     return test
 
 
 def update_services_file():
     data = []
-    tests = app.Test.query.all()
+    tests = Test.query.all()
     if tests is not None:
         for test in tests:
             data.append(json.loads(test.test_content))

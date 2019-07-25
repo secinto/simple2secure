@@ -80,6 +80,52 @@
         }
     },
     {
+        "name": "",
+        "test_definition": {
+            "description": "slapsapdlasp",
+            "version": "",
+            "precondition": {
+                "description": "sadsadsa",
+                "command": {
+                    "command": "",
+                    "executable": "hahaha",
+                    "parameter": {
+                        "description": "sadsada",
+                        "prefix": "sadas",
+                        "value": "sadgadsadsa"
+                    }
+                },
+                "condition": {}
+            },
+            "step": {
+                "description": "sadsadas",
+                "command": {
+                    "command": "",
+                    "executable": "sadsadsa",
+                    "parameter": {
+                        "description": "sadsadsa",
+                        "prefix": "dsadsadas",
+                        "value": "sadsadsadsa"
+                    }
+                },
+                "condition": {}
+            },
+            "postcondition": {
+                "description": "sadsadsa",
+                "command": {
+                    "command": "",
+                    "executable": "sadsadsadsa",
+                    "parameter": {
+                        "description": "sadsadsa",
+                        "prefix": "sadsadsadsa",
+                        "value": "sadsadsadsa"
+                    }
+                },
+                "condition": {}
+            }
+        }
+    },
+    {
         "name": "test 3",
         "test_definition": {
             "description": "testing test 3",
