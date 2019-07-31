@@ -73,7 +73,7 @@ public class PodController {
 	TestUtils testUtils;
 
 	/**
-	 * This function returns all devices according to the user id
+	 * This function returns all pods according to the contextId
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
@@ -102,10 +102,26 @@ public class PodController {
 
 	}
 
+	/**
+	 * This function retrieves the tests according to the podId, if no tests are found then it checks if there are tests according to the
+	 * hostname.
+	 *
+	 * @param podId
+	 * @param hostname
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@RequestMapping(value = "/config/{podId}/{hostname}", method = RequestMethod.GET)
-	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("podId") String podId, @PathVariable("hostname") String hostname) {
+	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("podId") String podId, @PathVariable("hostname") String hostname)
+			throws ItemNotFoundRepositoryException {
 
 		List<Test> test = testRepository.getByPodId(podId);
+		CompanyLicensePrivate podLicense = licenseRepository.findByPodId(podId);
+
+		if (podLicense != null) {
+			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
+			licenseRepository.update(podLicense);
+		}
 
 		if (test == null || test.isEmpty()) {
 			test = testRepository.getByHostname(hostname);
@@ -115,6 +131,14 @@ public class PodController {
 
 	}
 
+	/**
+	 * This function retrieves the scheduled tests from the list of the scheduled tests and returns them to the pod.
+	 *
+	 * @param podId
+	 * @param locale
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/scheduledTests/{podId}", method = RequestMethod.GET, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('POD')")

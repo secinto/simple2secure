@@ -26,10 +26,12 @@ import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
@@ -52,16 +54,26 @@ public class TestController {
 	TestRunRepository testRunRepository;
 
 	@Autowired
+	LicenseRepository licenseRepository;
+
+	@Autowired
+	NotificationUtils notificationUtils;
+
+	@Autowired
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTest", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/scheduleTest/{contextId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody Test test, @RequestHeader("Accept-Language") String locale) {
-		if (test != null) {
-			TestRun testRun = new TestRun(test.getId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
-			// TODO: Add notification that test has been scheduled
+	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+		if (test != null && !Strings.isNullOrEmpty(contextId)) {
+			TestRun testRun = new TestRun(test.getTestId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
+
 			testRunRepository.save(testRun);
+
+			notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal", contextId);
+
 			return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
 		}
 
@@ -91,7 +103,8 @@ public class TestController {
 
 	@RequestMapping(value = "/{podId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<Test>> getTestByPodId(@PathVariable("podId") String podId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<TestObjWeb>> getTestByPodId(@PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) {
 		return testUtils.getTestByPodId(podId, locale);
 	}
 
@@ -205,6 +218,25 @@ public class TestController {
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/{testId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Test> deleteTest(@PathVariable("testId") String testId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(testId)) {
+			Test test = testRepository.find(testId);
+			if (test != null) {
+				testRepository.delete(test);
+				return new ResponseEntity<Test>(test, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 }

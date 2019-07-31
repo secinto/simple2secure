@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {CompanyGroup} from '../_models';
+import {CompanyGroup, Notification} from '../_models';
 import {PodDTO} from '../_models/DTO/podDTO';
 
 @Injectable()

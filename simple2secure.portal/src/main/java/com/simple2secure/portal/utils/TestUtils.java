@@ -20,6 +20,7 @@ import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
@@ -75,6 +76,7 @@ public class TestUtils {
 	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
 		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
 			if (!Strings.isNullOrEmpty(testResult.getTestId())) {
+				testResult.setId(null);
 				testResultRepository.save(testResult);
 				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
 			}
@@ -192,12 +194,13 @@ public class TestUtils {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<Test>> getTestByPodId(String podId, String locale) {
+	public ResponseEntity<List<TestObjWeb>> getTestByPodId(String podId, String locale) {
 		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
-			List<Test> testList = testRepository.getByPodId(podId);
 
-			if (testList != null) {
-				return new ResponseEntity<List<Test>>(testList, HttpStatus.OK);
+			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodId(podId));
+
+			if (testsWeb != null) {
+				return new ResponseEntity<List<TestObjWeb>>(testsWeb, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
@@ -242,6 +245,13 @@ public class TestUtils {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
+	/**
+	 * This function checks if the test with the provided test name already exists in the database.
+	 * 
+	 * @param test
+	 * @return
+	 */
 
 	public boolean checkIfTestIsSaveable(Test test) {
 
@@ -303,6 +313,12 @@ public class TestUtils {
 		Test test = new Test();
 
 		testObjWeb.getTest_content().setName(testObjWeb.getName());
+
+		// TODO: change it!
+		if (Strings.isNullOrEmpty(testObjWeb.getTest_content().getTest_definition().getVersion())) {
+			testObjWeb.getTest_content().getTest_definition().setVersion("0.0.1");
+		}
+
 		String testContent = gson.toJson(testObjWeb.getTest_content());
 
 		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
@@ -379,6 +395,35 @@ public class TestUtils {
 		}
 
 		return test_names;
+	}
+
+	/**
+	 * This function converts the test object which is saved in the mongo database to the correct test object which is being shown in the web.
+	 *
+	 * @param tests
+	 */
+	public List<TestObjWeb> convertToTestObjectForWeb(List<Test> tests) {
+		List<TestObjWeb> testsWeb = new ArrayList<>();
+
+		if (tests != null) {
+
+			for (Test test : tests) {
+				TestObjWeb testObjWeb = new TestObjWeb();
+				TestContent testContent = gson.fromJson(test.getTest_content(), TestContent.class);
+				testObjWeb.setTest_content(testContent);
+				testObjWeb.setName(test.getName());
+				testObjWeb.setActive(test.isActive());
+				testObjWeb.setHostname(test.getHostname());
+				testObjWeb.setPodId(test.getPodId());
+				testObjWeb.setTestId(test.getId());
+				testObjWeb.setScheduled(test.isScheduled());
+				testObjWeb.setScheduledTime(test.getScheduledTime());
+				testObjWeb.setScheduledTimeUnit(test.getScheduledTimeUnit());
+				testsWeb.add(testObjWeb);
+			}
+		}
+
+		return testsWeb;
 	}
 
 }

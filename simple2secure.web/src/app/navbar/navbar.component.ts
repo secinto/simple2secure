@@ -1,12 +1,9 @@
 import {ViewChild, Component} from '@angular/core';
-
-
-
-import {DialogPosition, MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs';
-import {Context, ContextDTO, UserRole} from '../_models';
+import {ContextDTO, UserRole, Notification} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
@@ -31,11 +28,11 @@ export class NavbarComponent {
 	currentUser: any;
 	currentContext: ContextDTO;
 	notifications: Notification[];
+	numOfUnreadNotification: number;
 	loggedIn: boolean;
 	currentLang: string;
 	showSettings: boolean;
 	returnUrl: string;
-	numOfNotifications = 3;
 	private timer;
 	showNotifications: boolean;
 
@@ -56,7 +53,7 @@ export class NavbarComponent {
 		this.showNotifications = false;
 		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-		this.timer = Observable.timer(5000, 5000);
+		this.timer = Observable.timer(3000, 3000);
 		this.timer.subscribe((t) => this.getNotifications());
 	}
 
@@ -67,6 +64,7 @@ export class NavbarComponent {
 					data => {
 						this.notifications = data;
 						this.dataService.setNotifications(this.notifications);
+						this.countunreadNotifications(this.notifications);
 					},
 					error => {
 						console.log(error);
@@ -74,6 +72,15 @@ export class NavbarComponent {
 		}
 	}
 
+	public countunreadNotifications(notifications: Notification[]){
+		this.numOfUnreadNotification = 0;
+
+		for (var i = 0; i < notifications.length; i++) {
+			if (!notifications[i].read){
+				this.numOfUnreadNotification++;
+			}
+		}
+	}
 
 	ngDoCheck() {
 

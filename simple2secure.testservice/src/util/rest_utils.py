@@ -2,6 +2,7 @@ import requests
 from src.util import file_utils
 from flask import json
 from datetime import datetime
+from src.db.database import Notification
 
 
 def get_auth_token(app):
@@ -28,7 +29,6 @@ def portal_post(url, data, app):
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
 
-        print("TOKEN BEFORE AFTER SENDING" + app.config['AUTH_TOKEN'])
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config['AUTH_TOKEN']}
         requests.post(url, data=json.dumps(data), verify=False, headers=headers)
@@ -46,9 +46,10 @@ def portal_get(url, app):
         return data_request
 
 
-def portal_post_celery(url, data, auth_token):
-    headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " + auth_token}
-    requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+def portal_post_celery(url, data, auth_token, app):
+    with app.app_context():
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " + auth_token}
+        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
 
 
 def portal_post_test(url, data, app):
@@ -75,13 +76,17 @@ def portal_post_test_response(url, data, app):
         return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
 
 
+def send_notification(content, app, auth_token, pod_id):
+    url = app.config['PORTAL_URL'] + "notification/" + pod_id
+    notification = Notification(content)
 
-def send_notification(test_id, content, app):
-    # url = app.config['PORTAL_URL'] + "notification"
-    # timestamp = datetime.now().timestamp() * 1000
-    # notification = Notification(test_id, content, timestamp)
-    # portal_post(url, notification.__dict__, app)
-    print("send notification")
+    print("CURRENT POD ID : " + pod_id)
+
+    with app.app_context():
+        print("Token before sending" + auth_token)
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
+                   'Authorization': "Bearer " + auth_token}
+        requests.post(url, data=json.dumps(notification.__dict__), verify=False, headers=headers)
 
 
 def check_auth_token(app):

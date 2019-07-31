@@ -1,6 +1,6 @@
 from flask import Response, json, request, render_template
 from src import create_app
-from src.util import file_utils
+from src.util import file_utils, rest_utils
 from src.util import json_utils
 from src.db.database import TestResult, Test
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
@@ -45,7 +45,8 @@ def run_service():
 
             for test in tests:
                 current_test = json.loads(test.test_content)
-                celery_tasks.schedule_test.delay(current_test["test_definition"], test.id)
+                celery_tasks.schedule_test.delay(current_test["test_definition"], test.id, test.name, app.config['AUTH_TOKEN'], app.config['POD_ID'])
+                rest_utils.send_notification("Test " + test.name + " has been scheduled", app, app.config['AUTH_TOKEN'], app.config['POD_ID'])
 
         else:
             test_name_response = request.args.get("test")
@@ -74,7 +75,10 @@ def run_service():
                     current_test["test_definition"]["postcondition"]["command"]["parameter"][
                         "value"] = postcondition_param_value
 
-                celery_tasks.schedule_test.delay(current_test["test_definition"], db_test.id)
+                celery_tasks.schedule_test.delay(current_test["test_definition"], db_test.id, db_test.name,
+                                                 app.config['AUTH_TOKEN'], app.config['POD_ID'])
+                rest_utils.send_notification("Test " + db_test.name + " has been scheduled for the execution manually using the pod",
+                                             app, app.config['AUTH_TOKEN'], app.config['POD_ID'])
                 response_text = "Test " + test_name_response + " has been scheduled"
 
         return response_text

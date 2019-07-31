@@ -1,8 +1,8 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatExpansionPanel} from '@angular/material';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import {Test, Timeunit} from '../_models';
+import {Timeunit} from '../_models';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, DataService, HttpService} from '../_services/index';
 
@@ -58,6 +58,7 @@ export class TestDetailsComponent{
 				else {
 					this.alertService.success(this.translate.instant('message.test.update'));
 				}
+				this.close(true);
 			},
 			error => {
 				if (error.status == 0) {
@@ -68,6 +69,11 @@ export class TestDetailsComponent{
 				}
 				this.loading = false;
 			});
+	}
+
+
+	public close(value: boolean){
+		this.dialogRef.close(value);
 	}
 
 }

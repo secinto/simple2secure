@@ -50,7 +50,6 @@ export class OrbiterToolTestComponent {
 	}
 
 	public onMenuTriggerClick(pod: PodDTO) {
-		console.log(pod);
 		this.selectedPod = pod;
 	}
 

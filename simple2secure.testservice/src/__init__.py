@@ -49,12 +49,12 @@ def entrypoint(mode='app'):
         db.session.commit()
 
     if mode == 'app':
-        init(app)
+        authenticate(app)
 
     return app
 
 
-def init(app):
+def authenticate(app):
     with app.app_context():
         pod_info = PodInfo.query.first()
         # If there is not pod_info object in database, generate new pod_id and save object to db

@@ -25,10 +25,12 @@ def get_scheduled_tests(app_obj, celery_task):
             test_array = json.loads(request_test.text)
 
             for test in test_array:
-                print("testing")
-                celery_task.schedule_test.delay(test, test.id)
-                # rest_utils.send_notification(test["id"], "Test has been scheduled", app)
-
+                current_test = json.loads(test["test_content"])
+                celery_task.schedule_test.delay(current_test["test_definition"], test["id"],
+                                                test["name"], app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
+                rest_utils.send_notification("Test " + test["name"] + " has been scheduled for the execution in the pod",
+                                             app_obj,
+                                             app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
         else:
             print(request_test.status_code)
 
@@ -44,9 +46,6 @@ def get_test_results_from_db(app_obj, celery_task):
                 app_obj.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app_obj)
 
             celery_task.send_test_results.delay(output, app_obj.config['AUTH_TOKEN'], app_obj.config['PORTAL_URL'])
-            # rest_utils.send_notification(test_result.testId, "Test has been finished", app)
-            test_result.isSent = True
-            db.session.commit()
 
 
 def sync_tests_with_the_portal(app_obj):

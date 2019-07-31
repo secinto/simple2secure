@@ -45,7 +45,7 @@
             </li>
             <li *ngIf="loggedIn" (click)="openNotificationModal()">
                 <button mat-icon-button color="white"><i class="fa fa-bell fa-2x"
-                                                         aria-hidden="true" matBadge="{{this.notifications.length}}" matBadgeColor="warn" matBadgePosition="above after"></i></button>
+                                                         aria-hidden="true" matBadge="{{this.numOfUnreadNotification}}" matBadgeColor="warn" matBadgePosition="above after"></i></button>
             </li>
             <li *ngIf="loggedIn">
                 <button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x"

@@ -15,8 +15,6 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Pod;
-import com.simple2secure.api.model.Test;
-import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
@@ -68,6 +66,9 @@ public class PodUtils {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
+	@Autowired
+	TestUtils testUtils;
+
 	private Gson gson = new Gson();
 
 	/**
@@ -100,7 +101,7 @@ public class PodUtils {
 	}
 
 	/**
-	 * This function returns all pods from the current context
+	 * This function returns all pods from the current context with merged Test objects.
 	 *
 	 * @param context
 	 * @return
@@ -118,7 +119,7 @@ public class PodUtils {
 						if (!Strings.isNullOrEmpty(license.getPodId())) {
 							String podStatus = getPodStatus(license);
 							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), podStatus);
-							List<TestObjWeb> tests = convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
+							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
 							PodDTO podDto = new PodDTO(pod, tests);
 							myPods.add(podDto);
 						}
@@ -131,34 +132,10 @@ public class PodUtils {
 	}
 
 	/**
-	 * This function converts the test object which is saved in the mongo database to the correct test object which is being shown in the web.
+	 * This function deletes the pod dependencies according to the podId
 	 *
-	 * @param tests
+	 * @param podId
 	 */
-	public List<TestObjWeb> convertToTestObjectForWeb(List<Test> tests) {
-		List<TestObjWeb> testsWeb = new ArrayList<>();
-
-		if (tests != null) {
-
-			for (Test test : tests) {
-				TestObjWeb testObjWeb = new TestObjWeb();
-				TestContent testContent = gson.fromJson(test.getTest_content(), TestContent.class);
-				testObjWeb.setTest_content(testContent);
-				testObjWeb.setName(test.getName());
-				testObjWeb.setActive(test.isActive());
-				testObjWeb.setHostname(test.getHostname());
-				testObjWeb.setPodId(test.getPodId());
-				testObjWeb.setTestId(test.getId());
-				testObjWeb.setScheduled(test.isScheduled());
-				testObjWeb.setScheduledTime(test.getScheduledTime());
-				testObjWeb.setScheduledTimeUnit(test.getScheduledTimeUnit());
-				testsWeb.add(testObjWeb);
-			}
-		}
-
-		return testsWeb;
-	}
-
 	public void deletePodDependencies(String podId) {
 		if (!Strings.isNullOrEmpty(podId)) {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context

@@ -49,10 +49,8 @@ class Test(db.Model):
 
 
 class Notification:
-    def __init__(self, test_id, content, timestamp):
-        self.testId = test_id
+    def __init__(self, content):
         self.content = content
-        self.timestamp = timestamp
 
 
 class CompanyLicensePod:

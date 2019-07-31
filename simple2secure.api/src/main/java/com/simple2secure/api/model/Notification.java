@@ -11,6 +11,7 @@ public class Notification extends GenericDBObject {
 	private String content;
 	private String contextId;
 	private boolean read;
+	private long timestamp;
 
 	public Notification() {
 	}
@@ -20,6 +21,14 @@ public class Notification extends GenericDBObject {
 		this.content = content;
 		this.contextId = contextId;
 		this.read = read;
+	}
+
+	public Notification(String content, boolean read, String contextId, long timestamp) {
+		super();
+		this.content = content;
+		this.contextId = contextId;
+		this.read = read;
+		this.timestamp = timestamp;
 	}
 
 	public String getContent() {
@@ -36,5 +45,21 @@ public class Notification extends GenericDBObject {
 
 	public void setRead(boolean read) {
 		this.read = read;
+	}
+
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 }

@@ -57,7 +57,7 @@ export class UserOverviewComponent {
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
 	displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
-	displayedColumnsPods = ['pod', 'group', 'activated'];
+	displayedColumnsPods = ['pod', 'group', 'status', 'activated'];
 
 	dataSource = new MatTableDataSource();
 	dataSource2 = new MatTableDataSource();

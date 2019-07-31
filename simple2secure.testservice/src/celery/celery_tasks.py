@@ -2,6 +2,7 @@ from src.util import rest_utils
 from src.util import json_utils
 from scanner import scanner
 from src.db.database import db, TestResult
+from src.db.database_schema import TestResultSchema
 from flask import json
 from src import create_celery_app, entrypoint
 import threading
@@ -13,11 +14,17 @@ celery = create_celery_app(app)
 
 @celery.task(name='celery.send_test_results')
 def send_test_results(test_result, auth_token, portal_url):
-    rest_utils.portal_post_celery(portal_url + "test/saveTestResult", test_result, auth_token)
+    with app.app_context():
+        response = rest_utils.portal_post_celery(portal_url + "test/saveTestResult", test_result, auth_token, app)
+
+        if response.status_code == 200:
+            test_res = TestResult.query.filter_by(id=test_result["id"]).first()
+            test_res.isSent = True
+            db.session.commit()
 
 
 @celery.task(name='celery.schedule_test')
-def schedule_test(test, test_id):
+def schedule_test(test, test_id, test_name, auth_token, pod_id):
     with app.app_context():
         results = {}
 
@@ -42,6 +49,8 @@ def schedule_test(test, test_id):
         timestamp = rest_utils.get_current_timestamp()
         test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_id,
                                  socket.gethostname(), timestamp, False)
+
+        rest_utils.send_notification("Test " + test_name + " has been executed", app, auth_token, pod_id)
 
         db.session.add(test_result)
         db.session.commit()

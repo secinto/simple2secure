@@ -6,7 +6,7 @@
 
         <div class="notification new" *ngFor="let notification of notifications">
             <div class="notification-text">
-                <span *ngIf="!notification.read" class="highlight">{{notification.content}}</span>
+                <span (click)="isRead(notification)" *ngIf="!notification.read" class="highlight">{{notification.content}}</span>
                 <span *ngIf="notification.read">{{notification.content}}</span>
             </div>
         </div>

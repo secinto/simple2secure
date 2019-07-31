@@ -164,5 +164,45 @@
                 }
             }
         }
+    },
+    {
+        "name": "test4",
+        "test_definition": {
+            "description": "description",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "desc",
+                "command": {
+                    "executable": "sedc",
+                    "parameter": {
+                        "description": "desc",
+                        "prefix": "aaaa",
+                        "value": "21321321"
+                    }
+                }
+            },
+            "step": {
+                "description": "sadsadsadsa",
+                "command": {
+                    "executable": "21sadsadsad21321",
+                    "parameter": {
+                        "description": "sadsadsa21321312",
+                        "prefix": "sadsadasdsa",
+                        "value": "121321321321"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "ssadsadsadsa21321",
+                "command": {
+                    "executable": "sadsadasdas",
+                    "parameter": {
+                        "description": "sadsadsa",
+                        "prefix": "21321321",
+                        "value": "sadsadsadsa"
+                    }
+                }
+            }
+        }
     }
 ]
