@@ -49,6 +49,7 @@ const appRoutes: Routes = [
 					{path: 'network/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
 					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
 					{path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
+					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
 				]
 			},
 			{
@@ -57,7 +58,6 @@ const appRoutes: Routes = [
 				data: {title: 'menu.orbiter'},
 				children: [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
-					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 				]

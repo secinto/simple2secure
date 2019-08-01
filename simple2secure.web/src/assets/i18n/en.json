@@ -359,5 +359,7 @@
   "table.testmacro": "Test Macros",
   "testmacro.add": "Add new test macro",
   "testmacro.macro.placeholder": "Please enter test macro",
-  "testmacro.executable.placeholder": "Please enter executable"
+  "testmacro.executable.placeholder": "Please enter executable",
+  "test.scheduled": "Scheduled tests",
+  "test.scheduled.info": "Show the scheduled tests with status"
 }

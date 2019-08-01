@@ -23,6 +23,7 @@ import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
+import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -30,6 +31,7 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
+import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.TestUtils;
@@ -51,6 +53,9 @@ public class TestController {
 	TestRepository testRepository;
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	TestRunRepository testRunRepository;
 
 	@Autowired
@@ -63,18 +68,24 @@ public class TestController {
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTest/{contextId}", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/scheduleTest/{contextId}/{userId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
-		if (test != null && !Strings.isNullOrEmpty(contextId)) {
-			TestRun testRun = new TestRun(test.getTestId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
+			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
+		if (test != null && !Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
 
-			testRunRepository.save(testRun);
+			User user = userRepository.find(userId);
 
-			notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal", contextId);
+			if (user != null) {
+				TestRun testRun = new TestRun(test.getTestId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
 
-			return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+				testRunRepository.save(testRun);
+
+				notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
+						contextId);
+
+				return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+			}
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),

@@ -13,7 +13,7 @@ export class ReportOverviewComponent {
 		private router: Router)
 	{}
 
-	showReports(path: string) {
+	navigateTo(path: string) {
 		this.router.navigate([path], {relativeTo: this.route});
 	}
 }

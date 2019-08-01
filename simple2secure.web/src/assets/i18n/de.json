@@ -359,5 +359,7 @@
   "table.testmacro": "Testmakro",
   "testmacro.add": "Neues Testmakro hinzufügen",
   "testmacro.macro.placeholder": "Bitte geben Sie ein Testmakro ein",
-  "testmacro.executable.placeholder": "Bitte geben Sie die executable ein"
+  "testmacro.executable.placeholder": "Bitte geben Sie die executable ein",
+  "test.scheduled": "Geplante Tests",
+  "test.scheduled.info": "Zeigen Sie die geplanten Tests mit Status an"
 }

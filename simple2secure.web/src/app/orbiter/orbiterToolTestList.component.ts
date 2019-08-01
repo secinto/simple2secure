@@ -1,7 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO, Test} from '../_models/index';
+import {ContextDTO, Test, User} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, HttpService, DataService} from '../_services';
@@ -23,6 +23,7 @@ export class OrbiterToolTestListComponent {
 	pod: PodDTO;
 	tests: TestObjWeb[];
 	context: ContextDTO;
+	currentUser: any;
 	displayedColumns = ['testId', 'version', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -41,6 +42,7 @@ export class OrbiterToolTestListComponent {
 	) {}
 
 	ngOnInit() {
+		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isTestChanged = false;
 		this.context = JSON.parse(localStorage.getItem('context'));
 		this.pod = this.dataService.getPods();
@@ -117,7 +119,8 @@ export class OrbiterToolTestListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' + this.context.context.id;
+		this.url = environment.apiEndpoint + 'test/scheduleTest/' +
+			this.context.context.id + '/' + this.currentUser.userID;
 		this.httpService.post(this.selectedTest, this.url).subscribe(
 			data => {
 
