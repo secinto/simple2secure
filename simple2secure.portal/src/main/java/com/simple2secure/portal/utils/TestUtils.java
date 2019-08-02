@@ -248,7 +248,7 @@ public class TestUtils {
 
 	/**
 	 * This function checks if the test with the provided test name already exists in the database.
-	 * 
+	 *
 	 * @param test
 	 * @return
 	 */

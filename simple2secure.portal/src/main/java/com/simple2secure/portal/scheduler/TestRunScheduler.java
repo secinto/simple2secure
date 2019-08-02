@@ -8,12 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
+import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
+import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
@@ -31,6 +37,15 @@ public class TestRunScheduler {
 
 	@Autowired
 	TestRunRepository testRunRepository;
+
+	@Autowired
+	LicenseRepository licenseRepository;
+
+	@Autowired
+	GroupRepository groupRepository;
+
+	@Autowired
+	NotificationUtils notificationUtils;
 
 	private static final Logger log = LoggerFactory.getLogger(TestRunScheduler.class);
 
@@ -51,17 +66,32 @@ public class TestRunScheduler {
 			for (Test test : tests) {
 				long currentTimestamp = System.currentTimeMillis();
 				// Calculate the difference between last execution time and current timestamp
-				TestRun testRun = new TestRun(test.getId(), test.getPodId(), false, TestRunType.AUTOMATIC_PORTAL);
 
 				long millisScheduled = portalUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
 				long nextExecutionTime = test.getLastExecution() + millisScheduled;
 				long executionTimeDifference = nextExecutionTime - currentTimestamp;
 
 				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
-					test.setLastExecution(currentTimestamp);
-					testRunRepository.save(testRun);
-					testRepository.update(test);
-					// TODO: Add notification
+
+					CompanyLicensePrivate license = licenseRepository.findByPodId(test.getPodId());
+
+					if (license != null) {
+
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+
+						if (group != null) {
+							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(), false,
+									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+
+							test.setLastExecution(currentTimestamp);
+							testRunRepository.save(testRun);
+							testRepository.update(test);
+
+							notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled automatically using the portal",
+									group.getContextId());
+						}
+
+					}
 				}
 			}
 

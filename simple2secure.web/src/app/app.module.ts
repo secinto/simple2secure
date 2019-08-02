@@ -18,7 +18,7 @@ import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
 import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
 import {TestDetailsComponent} from './orbiter/testDetails.component';
-import {TestResultDetailsComponent} from './orbiter/testResultDetails.component';
+import {TestResultDetailsComponent} from './report/testResultDetails.component';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
@@ -83,7 +83,8 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
-import {TestResultComponent} from './orbiter/testResult.component';
+import {TestResultComponent} from './report/testResult.component';
+import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -206,7 +207,8 @@ export const httpInterceptorProviders = [
 		TestResultDetailsComponent,
 		TestDetailsComponent,
 		OrbiterToolTestComponent,
-		OrbiterToolTestListComponent
+		OrbiterToolTestListComponent,
+		OrbiterToolTestScheduledListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,

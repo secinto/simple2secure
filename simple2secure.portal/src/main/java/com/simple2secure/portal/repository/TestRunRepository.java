@@ -8,4 +8,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class TestRunRepository extends MongoRepository<TestRun> {
 
 	public abstract List<TestRun> getTestNotExecutedByPodId(String podId);
+
+	public abstract List<TestRun> getByContextId(String contextId);
 }

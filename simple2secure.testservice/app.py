@@ -1,6 +1,7 @@
 from flask import Response, json, request, render_template
 from src import create_app
-from src.util import file_utils, rest_utils
+from src.db.database_schema import TestSchema
+from src.util import file_utils
 from src.util import json_utils
 from src.db.database import TestResult, Test
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
@@ -34,6 +35,8 @@ def index():
 @app.route("/services/run")
 def run_service():
     with app.app_context():
+
+        test_schema = TestSchema()
         response = file_utils.read_json_testfile(app)
         # response_json_object = json.loads(response)
         file_utils.update_insert_tests_to_db(response, app)
@@ -41,12 +44,8 @@ def run_service():
         response_text = "All available tests from services.json have been scheduled"
 
         if json_utils.is_blank(request.query_string) is True:
-            tests = Test.query.all()
-
-            for test in tests:
-                current_test = json.loads(test.test_content)
-                celery_tasks.schedule_test.delay(current_test["test_definition"], test.id, test.name, app.config['AUTH_TOKEN'], app.config['POD_ID'])
-                rest_utils.send_notification("Test " + test.name + " has been scheduled", app, app.config['AUTH_TOKEN'], app.config['POD_ID'])
+            response_text = "Test ID not specified! Please write the url in the following form " \
+                            "{https://localhost:5000/services/run?test=test1}"
 
         else:
             test_name_response = request.args.get("test")
@@ -75,11 +74,15 @@ def run_service():
                     current_test["test_definition"]["postcondition"]["command"]["parameter"][
                         "value"] = postcondition_param_value
 
-                celery_tasks.schedule_test.delay(current_test["test_definition"], db_test.id, db_test.name,
-                                                 app.config['AUTH_TOKEN'], app.config['POD_ID'])
-                rest_utils.send_notification("Test " + db_test.name + " has been scheduled for the execution manually using the pod",
-                                             app, app.config['AUTH_TOKEN'], app.config['POD_ID'])
+            db_test.test_content = current_test
+            print(db_test.test_content)
+            output = test_schema.dump(db_test).data
+            resp = file_utils.schedule_test_on_the_portal(output, app, app.config['POD_ID'])
+
+            if resp.status_code == 200:
                 response_text = "Test " + test_name_response + " has been scheduled"
+            else:
+                response_text = "Problem occured while scheduling test!"
 
         return response_text
 

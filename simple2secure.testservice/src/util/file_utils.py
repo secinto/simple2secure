@@ -140,6 +140,12 @@ def sync_test_with_portal(test, app_obj):
     return response
 
 
+def schedule_test_on_the_portal(test, app_obj, pod_id):
+    response = rest_utils.portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/scheduleTestPod/" + pod_id,
+                                                    test, app_obj)
+    return response
+
+
 def sync_all_tests_with_portal(test, app_obj):
     response = rest_utils.portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
     return response

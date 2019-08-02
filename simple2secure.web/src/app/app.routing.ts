@@ -23,7 +23,8 @@ import {UserRole} from './_models';
 import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
 import {ReportComponent, ReportOverviewComponent} from './report';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
-import {TestResultComponent} from './orbiter/testResult.component';
+import {TestResultComponent} from './report/testResult.component';
+import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 
 const appRoutes: Routes = [
 	{
@@ -60,6 +61,7 @@ const appRoutes: Routes = [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
+					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
 				]
 			},
 			{

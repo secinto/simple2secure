@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {TestResult} from '../_models';
-import {DataService} from '../_services/index';
+import {DataService} from '../_services';
 
 @Component({
 	moduleId: module.id,

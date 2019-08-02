@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, TestResultDTO} from '../_models/index';
+import {ContextDTO, TestResultDTO} from '../_models';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';

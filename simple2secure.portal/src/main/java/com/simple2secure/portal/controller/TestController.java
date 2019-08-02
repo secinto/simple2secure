@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
@@ -27,6 +29,7 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
@@ -65,6 +68,9 @@ public class TestController {
 	NotificationUtils notificationUtils;
 
 	@Autowired
+	GroupRepository groupRepository;
+
+	@Autowired
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -77,19 +83,78 @@ public class TestController {
 			User user = userRepository.find(userId);
 
 			if (user != null) {
-				TestRun testRun = new TestRun(test.getTestId(), test.getPodId(), false, TestRunType.MANUAL_PORTAL);
 
-				testRunRepository.save(testRun);
+				Test currentTest = testRepository.find(test.getTestId());
 
-				notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
-						contextId);
+				if (currentTest != null) {
 
-				return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId, false, TestRunType.MANUAL_PORTAL,
+							currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+
+					testRunRepository.save(testRun);
+
+					notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
+							contextId);
+
+					return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+				}
 			}
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/scheduleTestPod/{podId}", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('POD')")
+	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (test != null && !Strings.isNullOrEmpty(podId)) {
+			CompanyLicensePrivate license = licenseRepository.findByPodId(podId);
+
+			if (license != null) {
+				CompanyGroup group = groupRepository.find(license.getGroupId());
+
+				if (group != null) {
+					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), false, TestRunType.MANUAL_POD,
+							test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+
+					testRunRepository.save(testRun);
+
+					notificationUtils.addNewNotificationPortal(
+							test.getName() + " has been scheduled for the execution manually using the pod " + license.getHostname(),
+							group.getContextId());
+
+					return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+
+				}
+
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_test", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/getScheduledTests/{contextId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<TestRun>> getScheduledTestsByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
+
+			List<TestRun> tests = testRunRepository.getByContextId(contextId);
+
+			if (tests != null) {
+				return new ResponseEntity<List<TestRun>>(tests, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
+				HttpStatus.NOT_FOUND);
+
 	}
 
 	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = "application/json")
@@ -119,11 +184,11 @@ public class TestController {
 		return testUtils.getTestByPodId(podId, locale);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'POD')")
-	public ResponseEntity<TestStatus> updateSaveTest(@RequestBody TestObjWeb test, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
-		TestStatus status = new TestStatus();
 		if (!Strings.isNullOrEmpty(locale) && test != null) {
 
 			Test convertedTest = testUtils.convertTestWebObjtoTestObject(test);
@@ -134,28 +199,29 @@ public class TestController {
 						boolean isSaveable = testUtils.checkIfTestIsSaveable(convertedTest);
 
 						if (isSaveable) {
-							status = new TestStatus("Saved", "Test has been saved successfully");
 							testRepository.save(convertedTest);
 						} else {
-							status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale));
+							return new ResponseEntity(
+									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
+									HttpStatus.NOT_FOUND);
 						}
 
 					} else {
 						boolean isUpdateable = testUtils.checkIfTestIsUpdateable(convertedTest);
 						if (isUpdateable) {
-							status = new TestStatus("Updated", "Test has been updated successfully");
 							testRepository.update(convertedTest);
 						} else {
-							status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale));
+							return new ResponseEntity(
+									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
+									HttpStatus.NOT_FOUND);
 						}
 					}
-					return new ResponseEntity<TestStatus>(status, HttpStatus.OK);
+					return new ResponseEntity<Test>(convertedTest, HttpStatus.OK);
 				}
 			}
 		}
-		status = new TestStatus("Error", messageByLocaleService.getMessage("problem_occured_while_saving_test", locale));
-
-		return new ResponseEntity<TestStatus>(status, HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

@@ -29,4 +29,11 @@ public class TestRunRepositoryImpl extends TestRunRepository {
 		return tests;
 	}
 
+	@Override
+	public List<TestRun> getByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);
+		return tests;
+	}
+
 }
