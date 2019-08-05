@@ -10,7 +10,7 @@ public class TestResult extends GenericDBObject {
 	private static final long serialVersionUID = -6306698374548193553L;
 
 	private String name;
-	private String testId;
+	private String testRunId;
 	private String hostname;
 	private String result;
 	private String timestamp;
@@ -19,9 +19,9 @@ public class TestResult extends GenericDBObject {
 
 	}
 
-	public TestResult(String name, String testId, String hostname, String result, String timestamp) {
+	public TestResult(String name, String testRunId, String hostname, String result, String timestamp) {
 		this.name = name;
-		this.testId = testId;
+		this.testRunId = testRunId;
 		this.hostname = hostname;
 		this.result = result;
 		this.timestamp = timestamp;
@@ -43,12 +43,12 @@ public class TestResult extends GenericDBObject {
 		this.result = result;
 	}
 
-	public String getTestId() {
-		return testId;
+	public String getTestRunId() {
+		return testRunId;
 	}
 
-	public void setTestId(String testId) {
-		this.testId = testId;
+	public void setTestRunId(String testRunId) {
+		this.testRunId = testRunId;
 	}
 
 	public String getTimestamp() {

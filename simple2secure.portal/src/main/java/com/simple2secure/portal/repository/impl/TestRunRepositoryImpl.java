@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.portal.repository.TestRunRepository;
 
 @Repository
@@ -23,15 +24,22 @@ public class TestRunRepositoryImpl extends TestRunRepository {
 	}
 
 	@Override
-	public List<TestRun> getTestNotExecutedByPodId(String podId) {
-		Query query = new Query(Criteria.where("executed").is(false).and("podId").is(podId));
+	public List<TestRun> getByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
 		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);
 		return tests;
 	}
 
 	@Override
-	public List<TestRun> getByContextId(String contextId) {
-		Query query = new Query(Criteria.where("contextId").is(contextId));
+	public List<TestRun> getPlannedTests(String podId) {
+		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(podId));
+		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);
+		return tests;
+	}
+
+	@Override
+	public List<TestRun> getTestRunByPodId(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId));
 		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);
 		return tests;
 	}

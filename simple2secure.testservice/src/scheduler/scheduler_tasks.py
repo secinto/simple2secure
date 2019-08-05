@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
-from src.db.database import db, TestResult, Test
+from src.db.database import db, TestResult, Test, TestStatus
 from src.db.database_schema import TestResultSchema, TestSchema
 from src.util import rest_utils, file_utils
 
@@ -22,15 +22,16 @@ def get_scheduled_tests(app_obj, celery_task):
         request_test = rest_utils.portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
                                              app_obj.config['POD_ID'], app_obj)
         if request_test.status_code == 200:
-            test_array = json.loads(request_test.text)
+            test_run_array = json.loads(request_test.text)
 
-            for test in test_array:
-                current_test = json.loads(test["test_content"])
-                celery_task.schedule_test.delay(current_test["test_definition"], test["id"],
-                                                test["name"], app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
-                rest_utils.send_notification("Test " + test["name"] + " has been scheduled for the execution in the pod",
+            for test_run in test_run_array:
+                current_test = json.loads(test_run["testContent"])
+                celery_task.schedule_test.delay(current_test["test_definition"], test_run["testId"],
+                                                test_run["testName"], app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'], test_run["id"])
+                rest_utils.send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                              app_obj,
                                              app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
+                rest_utils.update_test_status(app_obj, app_obj.config['AUTH_TOKEN'], test_run["id"], test_run["testId"], "SCHEDULED")
         else:
             print(request_test.status_code)
 

@@ -2,7 +2,7 @@ import requests
 from src.util import file_utils
 from flask import json
 from datetime import datetime
-from src.db.database import Notification
+from src.db.database import Notification, TestRunDTO
 
 
 def get_auth_token(app):
@@ -77,16 +77,25 @@ def portal_post_test_response(url, data, app):
 
 
 def send_notification(content, app, auth_token, pod_id):
-    url = app.config['PORTAL_URL'] + "notification/" + pod_id
+    url = app.config['PORTAL_URL'] + "notification/pod/" + pod_id
     notification = Notification(content)
-
-    print("CURRENT POD ID : " + pod_id)
 
     with app.app_context():
         print("Token before sending" + auth_token)
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + auth_token}
         requests.post(url, data=json.dumps(notification.__dict__), verify=False, headers=headers)
+
+
+def update_test_status(app, auth_token, test_run_id, test_id, test_status):
+    url = app.config['PORTAL_URL'] + "test/updateTestStatus"
+    test_run_dto = TestRunDTO(test_run_id, test_id, test_status)
+
+    with app.app_context():
+        print("Token before sending" + auth_token)
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
+                   'Authorization': "Bearer " + auth_token}
+        requests.post(url, data=json.dumps(test_run_dto.__dict__), verify=False, headers=headers)
 
 
 def check_auth_token(app):

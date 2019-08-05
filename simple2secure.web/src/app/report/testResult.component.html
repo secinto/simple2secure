@@ -9,7 +9,7 @@
         <!-- Position Column -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.testResult.hostname}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.testResult.name}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="license">

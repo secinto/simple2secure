@@ -75,7 +75,7 @@ public class TestUtils {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
 		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
-			if (!Strings.isNullOrEmpty(testResult.getTestId())) {
+			if (!Strings.isNullOrEmpty(testResult.getTestRunId())) {
 				testResult.setId(null);
 				testResultRepository.save(testResult);
 				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
@@ -106,10 +106,12 @@ public class TestUtils {
 					if (licensesByGroup != null) {
 						for (CompanyLicensePrivate license : licensesByGroup) {
 							if (!Strings.isNullOrEmpty(license.getPodId())) {
-								List<Test> testList = testRepository.getByPodId(license.getPodId());
-								if (testList != null) {
-									for (Test test : testList) {
-										List<TestResult> testResults = testResultRepository.getByTestId(test.getId());
+
+								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getPodId());
+
+								if (testRunList != null) {
+									for (TestRun testRun : testRunList) {
+										List<TestResult> testResults = testResultRepository.getByTestRunId(testRun.getId());
 
 										if (testResults != null) {
 											for (TestResult testResult : testResults) {
@@ -117,6 +119,7 @@ public class TestUtils {
 												results.add(testResultDTO);
 											}
 										}
+
 									}
 								}
 							}
@@ -216,30 +219,13 @@ public class TestUtils {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<Test>> getScheduledTestsByPodId(String podId, String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<TestRun>> getScheduledTestsByPodId(String podId, String locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
 
-			List<TestRun> testRunList = testRunRepository.getTestNotExecutedByPodId(podId);
+			List<TestRun> testRunList = testRunRepository.getPlannedTests(podId);
 
 			if (testRunList != null) {
-				List<Test> testList = new ArrayList();
-				for (TestRun testRun : testRunList) {
-					if (testRun != null) {
-						if (!Strings.isNullOrEmpty(testRun.getTestId())) {
-							Test test = testRepository.find(testRun.getTestId());
-
-							if (test != null) {
-								testList.add(test);
-							}
-
-							testRun.setExecuted(true);
-							testRunRepository.update(testRun);
-						}
-					}
-				}
-				if (testList != null) {
-					return new ResponseEntity<List<Test>>(testList, HttpStatus.OK);
-				}
+				return new ResponseEntity<List<TestRun>>(testRunList, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),

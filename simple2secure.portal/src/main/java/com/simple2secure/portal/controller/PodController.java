@@ -27,6 +27,7 @@ import com.simple2secure.api.dto.PodDTO;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -142,8 +143,8 @@ public class PodController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/scheduledTests/{podId}", method = RequestMethod.GET, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<List<Test>> getScheduledTests(@PathVariable("podId") String podId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate podLicense = licenseRepository.findByPodId(podId);
 
 		if (podLicense != null) {

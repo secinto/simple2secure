@@ -7,7 +7,6 @@ export class TestRun extends Base {
 	testName: string;
 	podId: string;
 	contextId: string;
-	executed: boolean;
 	testRunType: TestRunType;
 	testContent: string;
 	testStatus: TestStatus;

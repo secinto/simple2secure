@@ -80,7 +80,7 @@ public class TestRunScheduler {
 						CompanyGroup group = groupRepository.find(license.getGroupId());
 
 						if (group != null) {
-							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(), false,
+							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
 									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
 
 							test.setLastExecution(currentTimestamp);

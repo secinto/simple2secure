@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from enum import Enum
 
 db = SQLAlchemy()
 
@@ -8,15 +9,15 @@ class TestResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     result = db.Column(db.Text)
-    testId = db.Column(db.String(120))
+    testRunId = db.Column(db.String(120))
     hostname = db.Column(db.String(120))
     timestamp = db.Column(db.String(120))
     isSent = db.Column(db.Boolean)
 
-    def __init__(self, name, result, test_id, hostname, timestamp, is_sent):
+    def __init__(self, name, result, testRunId, hostname, timestamp, is_sent):
         self.name = name
         self.result = result
-        self.testId = test_id
+        self.testRunId = testRunId
         self.hostname = hostname
         self.timestamp = timestamp
         self.isSent = is_sent
@@ -60,3 +61,38 @@ class CompanyLicensePod:
         self.podId = pod_id
         self.hostname = hostname
         self.configuration = configuration
+
+
+class TestRun:
+    def __init__(self, testId, testName, podId, contextId, testRunType, testContent, testStatus, timestamp):
+        self.testId = testId
+        self.testName = testName
+        self.podId = podId
+        self.contextId = contextId
+        self.testRunType = testRunType
+        self.testContent = testContent
+        self.testStatus = testStatus
+        self.timestamp = timestamp
+
+
+class TestRunDTO:
+    def __init__(self, testRunId, testId, testStatus):
+        self.testRunId = testRunId
+        self.testId = testId
+        self.testStatus = testStatus
+
+
+class NotificationDTO:
+    def __init__(self, notification, testRunDTO):
+        self.notification = notification
+        self.testRunDTO = testRunDTO
+
+
+class TestStatus(Enum):
+    UNKNOWN = 1
+    SCHEDULED = 2
+    RUNNING = 3
+    PLANNED = 4
+    EXECUTED = 5
+
+

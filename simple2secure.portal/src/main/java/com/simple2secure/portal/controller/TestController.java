@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
+import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
@@ -88,7 +89,7 @@ public class TestController {
 
 				if (currentTest != null) {
 
-					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId, false, TestRunType.MANUAL_PORTAL,
+					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId, TestRunType.MANUAL_PORTAL,
 							currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
 
 					testRunRepository.save(testRun);
@@ -118,8 +119,9 @@ public class TestController {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 
 				if (group != null) {
-					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), false, TestRunType.MANUAL_POD,
-							test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+					String test_content = test.getTest_content().replace("\'", "\"");
+					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
+							TestStatus.PLANNED, System.currentTimeMillis());
 
 					testRunRepository.save(testRun);
 
@@ -314,6 +316,30 @@ public class TestController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
 				HttpStatus.NOT_FOUND);
 
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('POD')")
+	public ResponseEntity<TestRunDTO> updateTestStatus(@RequestBody TestRunDTO testRunDTO, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(locale) && testRunDTO != null) {
+
+			if (!Strings.isNullOrEmpty(testRunDTO.getTestRunId())) {
+				TestRun testRun = testRunRepository.find(testRunDTO.getTestRunId());
+
+				testRun.setTestStatus(testRunDTO.getTestStatus());
+
+				testRunRepository.update(testRun);
+			}
+
+			return new ResponseEntity<TestRunDTO>(testRunDTO, HttpStatus.OK);
+
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 }

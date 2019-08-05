@@ -12,7 +12,6 @@ public class TestRun extends GenericDBObject {
 	private String podId;
 	private String contextId;
 	private TestRunType testRunType;
-	private boolean executed;
 	private String testContent;
 	private TestStatus testStatus;
 	private long timestamp;
@@ -21,13 +20,12 @@ public class TestRun extends GenericDBObject {
 
 	}
 
-	public TestRun(String testId, String testName, String podId, String contextId, boolean executed, TestRunType testRunType,
-			String testContent, TestStatus testStatus, long timestamp) {
+	public TestRun(String testId, String testName, String podId, String contextId, TestRunType testRunType, String testContent,
+			TestStatus testStatus, long timestamp) {
 		this.testId = testId;
 		this.testName = testName;
 		this.podId = podId;
 		this.contextId = contextId;
-		this.executed = executed;
 		this.testRunType = testRunType;
 		this.testContent = testContent;
 		this.testStatus = testStatus;
@@ -64,14 +62,6 @@ public class TestRun extends GenericDBObject {
 
 	public void setContextId(String contextId) {
 		this.contextId = contextId;
-	}
-
-	public boolean isExecuted() {
-		return executed;
-	}
-
-	public void setExecuted(boolean executed) {
-		this.executed = executed;
 	}
 
 	public TestRunType getTestRunType() {

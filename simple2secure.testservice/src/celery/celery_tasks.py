@@ -1,8 +1,7 @@
 from src.util import rest_utils
 from src.util import json_utils
 from scanner import scanner
-from src.db.database import db, TestResult
-from src.db.database_schema import TestResultSchema
+from src.db.database import db, TestResult, TestStatus
 from flask import json
 from src import create_celery_app, entrypoint
 import threading
@@ -24,7 +23,7 @@ def send_test_results(test_result, auth_token, portal_url):
 
 
 @celery.task(name='celery.schedule_test')
-def schedule_test(test, test_id, test_name, auth_token, pod_id):
+def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
     with app.app_context():
         results = {}
 
@@ -47,10 +46,12 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id):
         postcondition_scan.start()
 
         timestamp = rest_utils.get_current_timestamp()
-        test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_id,
+        test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
                                  socket.gethostname(), timestamp, False)
 
-        rest_utils.send_notification("Test " + test_name + " has been executed", app, auth_token, pod_id)
+        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app, auth_token, pod_id)
+
+        rest_utils.update_test_status(app, auth_token, test_run_id, test_id, "EXECUTED")
 
         db.session.add(test_result)
         db.session.commit()

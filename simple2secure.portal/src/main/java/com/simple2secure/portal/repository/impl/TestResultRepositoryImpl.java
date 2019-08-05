@@ -42,4 +42,11 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
 		return testResults;
 	}
+
+	@Override
+	public List<TestResult> getByTestRunId(String testRunId) {
+		Query query = new Query(Criteria.where("testRunId").is(testRunId));
+		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
+		return testResults;
+	}
 }
