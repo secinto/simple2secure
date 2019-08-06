@@ -75,7 +75,7 @@ class TestRun:
         self.timestamp = timestamp
 
 
-class TestRunDTO:
+class TestStatusDTO:
     def __init__(self, testRunId, testId, testStatus):
         self.testRunId = testRunId
         self.testId = testId

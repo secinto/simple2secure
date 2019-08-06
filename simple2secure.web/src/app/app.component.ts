@@ -1,4 +1,5 @@
 
+import {stringify} from 'querystring';
 import {map, filter} from 'rxjs/operators';
 import {Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
@@ -27,30 +28,26 @@ export class AppComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.router
-			.events.pipe(
-			filter(event => event instanceof NavigationEnd),
-			map(() => {
-				let child = this.activatedRoute.firstChild;
-				while (child) {
-					if (child.firstChild) {
-						child = child.firstChild;
-					} else if (child.snapshot.data && child.snapshot.data['title']) {
-						return child.snapshot.data['title'];
-					} else {
-						return null;
-					}
-				}
-				return null;
-			}),).subscribe((title: any) => {
-			if (title) {
-				this.translatedTitle = this.translate.instant(title);
-				this.titleService.setTitle(this.translatedTitle);
-			}
-			else {
-				this.titleService.setTitle(title);
-			}
+		this.router.events
+			.filter((event) => event instanceof NavigationEnd)
+			.map(() => this.activatedRoute)
+			.map((route) => {
+				while (route.firstChild) route = route.firstChild;
+				return route;
+			})
+			.filter((route) => route.outlet === 'primary')
+			.mergeMap((route) => route.data)
+			.subscribe((event) => {
 
-		});
+				if (event['title']){
+					this.translate.get(event['title']).subscribe((translated: string) => {
+						this.titleService.setTitle(translated);
+					});
+				}
+				else{
+					this.titleService.setTitle(this.translatedTitle);
+				}
+
+			});
 	}
 }

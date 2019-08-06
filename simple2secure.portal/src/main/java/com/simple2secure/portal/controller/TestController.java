@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.dto.TestRunDTO;
+import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Test;
@@ -143,7 +144,7 @@ public class TestController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/getScheduledTests/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestRun>> getScheduledTestsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<TestRunDTO>> getScheduledTestsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
@@ -151,12 +152,20 @@ public class TestController {
 			List<TestRun> tests = testRunRepository.getByContextId(contextId);
 
 			if (tests != null) {
-				return new ResponseEntity<List<TestRun>>(tests, HttpStatus.OK);
+				List<TestRunDTO> testRunDTOList = new ArrayList<>();
+
+				for (TestRun test : tests) {
+					TestResult testResult = testResultRepository.getByTestRunId(test.getId());
+
+					TestRunDTO testRunDTO = new TestRunDTO(test, testResult);
+
+					testRunDTOList.add(testRunDTO);
+				}
+				return new ResponseEntity<List<TestRunDTO>>(testRunDTOList, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
 				HttpStatus.NOT_FOUND);
-
 	}
 
 	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = "application/json")
@@ -319,10 +328,29 @@ public class TestController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/testrun/{testRunId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<TestRun> deleteTestRun(@PathVariable("testRunId") String testRunId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(testRunId)) {
+			TestRun testRun = testRunRepository.find(testRunId);
+			if (testRun != null) {
+				testRunRepository.delete(testRun);
+				return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<TestRunDTO> updateTestStatus(@RequestBody TestRunDTO testRunDTO, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(locale) && testRunDTO != null) {
 
@@ -334,7 +362,7 @@ public class TestController {
 				testRunRepository.update(testRun);
 			}
 
-			return new ResponseEntity<TestRunDTO>(testRunDTO, HttpStatus.OK);
+			return new ResponseEntity<TestStatusDTO>(testRunDTO, HttpStatus.OK);
 
 		}
 

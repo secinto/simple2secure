@@ -1,11 +1,13 @@
 import {Component, ViewChild} from '@angular/core';
-import {environment} from '../../environments/environment';
-import {ContextDTO} from '../_models/index';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
-import {TestRun} from '../_models/testRun';
-import {AlertService, HttpService, DataService} from '../_services';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
+import {environment} from '../../environments/environment';
+import {TestRunDTO} from '../_models/DTO/testRunDTO';
+import {ContextDTO} from '../_models/index';
+import {TestStatus} from '../_models/testStatus';
+import {AlertService, DataService, HttpService} from '../_services';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
+import {TestResultDetailsComponent} from '../report/testResultDetails.component';
 
 @Component({
 	moduleId: module.id,
@@ -14,10 +16,11 @@ import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 
 export class OrbiterToolTestScheduledListComponent {
 
-	selectedTest: TestRun = new TestRun();
+	selectedTestRun: TestRunDTO = new TestRunDTO();
 	podId: string;
 	isTestChanged: boolean;
-	tests: TestRun[];
+	showTestResult = false;
+	tests: TestRunDTO[];
 	context: ContextDTO;
 	displayedColumns = ['name', 'type', 'status', 'action'];
 	loading = false;
@@ -50,9 +53,14 @@ export class OrbiterToolTestScheduledListComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public onMenuTriggerClick(test: TestRun) {
-		this.selectedTest = test;
-
+	public onMenuTriggerClick(test: TestRunDTO) {
+		this.showTestResult = false;
+		if (test.testRun.testStatus == TestStatus.EXECUTED){
+			if (test.testResult != null){
+				this.showTestResult = true;
+			}
+		}
+		this.selectedTestRun = test;
 	}
 
 	public loadScheduledTests(){
@@ -104,14 +112,14 @@ export class OrbiterToolTestScheduledListComponent {
 
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
-				this.deleteTest(this.selectedTest);
+				this.deleteTestRun(this.selectedTestRun);
 			}
 		});
 	}
 
-	public deleteTest(selectedTest: TestRun) {
+	public deleteTestRun(testRun: TestRunDTO) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'test/delete/' + selectedTest.testId).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'test/delete/testrun/' + testRun.testRun.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
@@ -127,5 +135,37 @@ export class OrbiterToolTestScheduledListComponent {
 				}
 				this.loading = false;
 			});
+	}
+
+	public getEnumValue(value: any){
+		if (value == 'MANUAL_POD'){
+			return 'MANUAL POD';
+		}
+		else if (value == 'MANUAL_PORTAL'){
+			return 'MANUAL PORTAL';
+		}
+		else{
+			return 'AUTOMATIC PORTAL';
+		}
+	}
+
+	public getTestStatusByTestResult(testRunDTO: TestRunDTO){
+		if(testRunDTO.testResult == null){
+			return 'UNKNOWN';
+		}
+		else{
+			return testRunDTO.testRun.testStatus;
+		}
+	}
+
+	openDialogShowTestResult(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			result: this.selectedTestRun.testResult
+		};
+
+		this.dialog.open(TestResultDetailsComponent, dialogConfig);
+
 	}
 }

@@ -2,7 +2,7 @@ import requests
 from src.util import file_utils
 from flask import json
 from datetime import datetime
-from src.db.database import Notification, TestRunDTO
+from src.db.database import Notification, TestStatusDTO
 
 
 def get_auth_token(app):
@@ -89,7 +89,7 @@ def send_notification(content, app, auth_token, pod_id):
 
 def update_test_status(app, auth_token, test_run_id, test_id, test_status):
     url = app.config['PORTAL_URL'] + "test/updateTestStatus"
-    test_run_dto = TestRunDTO(test_run_id, test_id, test_status)
+    test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
 
     with app.app_context():
         print("Token before sending" + auth_token)

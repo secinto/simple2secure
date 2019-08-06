@@ -111,15 +111,12 @@ public class TestUtils {
 
 								if (testRunList != null) {
 									for (TestRun testRun : testRunList) {
-										List<TestResult> testResults = testResultRepository.getByTestRunId(testRun.getId());
+										TestResult testResult = testResultRepository.getByTestRunId(testRun.getId());
 
-										if (testResults != null) {
-											for (TestResult testResult : testResults) {
-												TestResultDTO testResultDTO = new TestResultDTO(testResult, group);
-												results.add(testResultDTO);
-											}
+										if (testResult != null) {
+											TestResultDTO testResultDTO = new TestResultDTO(testResult, group);
+											results.add(testResultDTO);
 										}
-
 									}
 								}
 							}

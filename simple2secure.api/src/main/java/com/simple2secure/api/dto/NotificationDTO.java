@@ -6,12 +6,12 @@ public class NotificationDTO {
 
 	Notification notification;
 
-	TestRunDTO testRunDTO;
+	TestStatusDTO testRunDTO;
 
 	public NotificationDTO() {
 	}
 
-	public NotificationDTO(Notification notification, TestRunDTO testRunDTO) {
+	public NotificationDTO(Notification notification, TestStatusDTO testRunDTO) {
 		this.notification = notification;
 		this.testRunDTO = testRunDTO;
 	}
@@ -24,11 +24,11 @@ public class NotificationDTO {
 		this.notification = notification;
 	}
 
-	public TestRunDTO getTestRunDTO() {
+	public TestStatusDTO getTestRunDTO() {
 		return testRunDTO;
 	}
 
-	public void setTestRunDTO(TestRunDTO testRunDTO) {
+	public void setTestRunDTO(TestStatusDTO testRunDTO) {
 		this.testRunDTO = testRunDTO;
 	}
 

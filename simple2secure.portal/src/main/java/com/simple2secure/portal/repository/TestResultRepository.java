@@ -13,6 +13,6 @@ public abstract class TestResultRepository extends MongoRepository<TestResult> {
 
 	public abstract List<TestResult> getByTestId(String testId);
 
-	public abstract List<TestResult> getByTestRunId(String testRunId);
+	public abstract TestResult getByTestRunId(String testRunId);
 
 }
