@@ -30,7 +30,6 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
-import com.simple2secure.portal.repository.EmailListRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 
@@ -52,9 +51,6 @@ public class TestProbeAPIs extends TestAPIBase {
 
 	@Autowired
 	private GroupRepository groupRepository;
-
-	@Autowired
-	private EmailListRepository emailListRepository;
 
 	HttpHeaders headers = new HttpHeaders();
 
