@@ -7,9 +7,9 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class ToolRepository extends MongoRepository<Tool> {
 
-	public abstract List<Tool> getToolsByUserID(String user_id);
+	public abstract List<Tool> getToolsByContextId(String contextId);
 
-	public abstract void deleteByUserID(String user_id);
-	
-	public abstract Tool getToolByName(String tool_name);
+	public abstract Tool getToolByName(String toolName);
+
+	public abstract Tool getToolByNameAndContextId(String toolName, String contextId);
 }

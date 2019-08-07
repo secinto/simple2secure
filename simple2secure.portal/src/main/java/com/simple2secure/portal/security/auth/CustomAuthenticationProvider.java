@@ -17,8 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserRole;
+import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.service.UserService;
 
 @Service
 @Configurable
@@ -30,7 +31,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	String password;
 
 	@Autowired
-	UserService userService;
+	UserRepository userRepository;
 
 	public static String userID;
 
@@ -45,21 +46,17 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 		username = authentication.getPrincipal().toString();
 		password = authentication.getCredentials().toString();
-		String role = "";
-		User user = userService.findByUsername(username);
+
+		User user = userRepository.findByEmailOnlyActivated(username);
 
 		if (user == null) {
 			throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
 		}
 
-		if (user.getUserRole() != null) {
-			role = user.getUserRole().name();
-		}
-
 		if (passwordEncoder.matches(password, user.getPassword())) {
 
 			userID = user.getId();
-			return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(role));
+			return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(UserRole.LOGINUSER.name()));
 		} else {
 			throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
 		}

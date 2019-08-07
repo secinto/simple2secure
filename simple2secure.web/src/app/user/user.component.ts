@@ -1,9 +1,10 @@
 import {Component} from '@angular/core';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'user.component.html',
-  selector: 'userComponent'
+	moduleId: module.id,
+	templateUrl: 'user.component.html',
+	selector: 'userComponent'
 })
 
-export class UserComponent {}
+export class UserComponent {
+}

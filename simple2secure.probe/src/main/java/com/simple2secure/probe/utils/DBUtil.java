@@ -6,9 +6,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Report;
@@ -17,6 +18,7 @@ import com.simple2secure.probe.dao.BaseDao;
 import com.simple2secure.probe.dao.impl.ConfigDaoImpl;
 import com.simple2secure.probe.dao.impl.LicenseDaoImpl;
 import com.simple2secure.probe.dao.impl.NetworkReportDaoImpl;
+import com.simple2secure.probe.dao.impl.ProbePacketDaoImpl;
 import com.simple2secure.probe.dao.impl.ProcessorDaoImpl;
 import com.simple2secure.probe.dao.impl.QueryDaoImpl;
 import com.simple2secure.probe.dao.impl.ReportDaoImpl;
@@ -37,42 +39,50 @@ public class DBUtil {
 	private ReportDaoImpl reportDao;
 	private QueryDaoImpl queryDao;
 	private StepDaoImpl stepDao;
+	private ProbePacketDaoImpl probePacketDao;
 
 	public static DBUtil getInstance() throws IllegalArgumentException {
+		return getInstance(null);
+	}
+
+	public static DBUtil getInstance(String persistenceUnitName) {
 		if (instance == null) {
-			instance = new DBUtil();
+			instance = new DBUtil(persistenceUnitName);
 		}
 		return instance;
 	}
 
-	public DBUtil() {
-
+	private DBUtil(String persistenceUnitName) {
 		if (configDao == null) {
-			configDao = new ConfigDaoImpl();
+			configDao = new ConfigDaoImpl(persistenceUnitName);
 		}
 
 		if (licenseDao == null) {
-			licenseDao = new LicenseDaoImpl();
+			licenseDao = new LicenseDaoImpl(persistenceUnitName);
 		}
 
 		if (networkReportDao == null) {
-			networkReportDao = new NetworkReportDaoImpl();
+			networkReportDao = new NetworkReportDaoImpl(persistenceUnitName);
 		}
 
 		if (processorDao == null) {
-			processorDao = new ProcessorDaoImpl();
+			processorDao = new ProcessorDaoImpl(persistenceUnitName);
 		}
 
 		if (reportDao == null) {
-			reportDao = new ReportDaoImpl();
+			reportDao = new ReportDaoImpl(persistenceUnitName);
 		}
 
 		if (queryDao == null) {
-			queryDao = new QueryDaoImpl();
+			queryDao = new QueryDaoImpl(persistenceUnitName);
 		}
 
 		if (stepDao == null) {
-			stepDao = new StepDaoImpl();
+			stepDao = new StepDaoImpl(persistenceUnitName);
+		}
+
+		if (probePacketDao == null) {
+			probePacketDao = new ProbePacketDaoImpl(persistenceUnitName);
 		}
 
 		if (log.isDebugEnabled()) {
@@ -113,22 +123,10 @@ public class DBUtil {
 
 		BaseDao dao = getDao(t);
 		if (dao != null) {
-			queryObjects = dao.getAll();
+			queryObjects = dao.findByFieldName(fieldName, value);
 		}
 
 		return queryObjects;
-	}
-
-	@SuppressWarnings("unchecked")
-	public synchronized <T> T findByFieldNameObject(String fieldName, Object value, Object t) {
-
-		Object queryObject = new Object();
-
-		if (t instanceof Config || t == Report.class) {
-			queryObject = configDao.findBy(fieldName, value);
-		}
-
-		return (T) queryObject;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -156,7 +154,7 @@ public class DBUtil {
 			return configDao;
 		}
 
-		else if (t instanceof CompanyLicenseObj || t == CompanyLicenseObj.class) {
+		else if (t instanceof CompanyLicensePublic || t == CompanyLicensePublic.class) {
 			return licenseDao;
 		}
 
@@ -179,6 +177,11 @@ public class DBUtil {
 		else if (t instanceof Step || t == Step.class) {
 			return stepDao;
 		}
+
+		else if (t instanceof ProbePacket || t == ProbePacket.class) {
+			return probePacketDao;
+		}
+
 		return null;
 	}
 }

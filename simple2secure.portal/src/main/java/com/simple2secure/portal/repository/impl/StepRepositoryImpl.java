@@ -21,17 +21,16 @@ public class StepRepositoryImpl extends StepRepository {
 		super.collectionName = "step"; //$NON-NLS-1$
 		super.className = Step.class;
 	}
-	
+
 	@Override
 	public void deleteByGroupId(String groupId) {
 		List<Step> steps = getStepsByGroupId(groupId, true);
-		if(steps != null) {
-			for(Step step : steps) {
+		if (steps != null) {
+			for (Step step : steps) {
 				this.delete(step);
-			}			
-		}		
+			}
+		}
 	}
-	
 
 	@Override
 	public List<Step> getStepsByGroupId(String groupId, boolean select_all) {
@@ -39,21 +38,28 @@ public class StepRepositoryImpl extends StepRepository {
 
 		if (select_all) {
 			query = new Query(Criteria.where("groupId").is(groupId));
-			
+
 		} else {
 			query = new Query(Criteria.where("groupId").is(groupId).and("active").is(1));
-			
+
 		}
-		List<Step> steps = this.mongoTemplate.find(query, Step.class);
+		List<Step> steps = mongoTemplate.find(query, Step.class);
 		return steps;
 	}
 
 	@Override
 	public Step getByNameAndGroupId(String name, String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId).and("name").is(name));
-		
-		Step step = this.mongoTemplate.findOne(query, Step.class);
-		
+
+		Step step = mongoTemplate.findOne(query, Step.class);
+
 		return step;
-	}	
+	}
+
+	@Override
+	public List<Step> getAllGreaterThanNumber(int stepNumber, String groupId) {
+		Query query = new Query(Criteria.where("number").gt(stepNumber).and("groupId").is(groupId));
+		List<Step> steps = mongoTemplate.find(query, Step.class);
+		return steps;
+	}
 }

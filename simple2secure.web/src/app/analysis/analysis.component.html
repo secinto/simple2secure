@@ -1,2 +1,84 @@
-    <button (click)="add()">Add Point!</button>
-    <div [chart]="chart"></div>
+
+<div class="container">
+    <mat-tab-group>
+        <mat-tab label="{{ 'osquery.reports.charts' | translate }}">
+            <mat-card>
+                <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
+                            name="query" (selectionChange)="onQueryChange($event.value)" required>
+                    <mat-option *ngFor="let query of queries" [value]="query">
+                        {{query.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-card>
+            <mat-card>
+
+                <button mat-raised-button color="primary" id="addButton" type="button"
+                        (click)="openDialogAddQuery()"
+                        class="mat-green-button">
+                    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+                </button>
+
+                <div [chart]="chart"></div>
+            </mat-card>
+
+        </mat-tab>
+
+        <mat-tab label="{{ 'network.report.charts' | translate }}">
+
+
+            <mat-card>
+                <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedNetworkReport"
+                            name="networkReport" (selectionChange)="onQueryChangeNetworkRep($event.value)" required>
+                    <mat-option *ngFor="let networkReport of networkReports" [value]="networkReport">
+                        {{networkReport.processorName}} ({{networkReport.startTime}})
+                    </mat-option>
+                </mat-select>
+            </mat-card>
+
+            <mat-card>
+                <agm-map
+                        [latitude]="51"
+                        [longitude]="7"
+                        [zoom]="4"
+                        [disableDefaultUI]="true"
+                        [zoomControl]="false">
+
+                    <agm-marker
+                            *ngFor="let m of markers; let i = index"
+                            [latitude]="m.lat"
+                            [longitude]="m.lng"
+                            [label]="m.label"
+                            [markerDraggable]="m.draggable">
+
+                    </agm-marker>
+
+                    <agm-marker
+                            *ngFor="let m of markers; let i = index"
+                            [latitude]="m.latDest"
+                            [longitude]="m.lngDest"
+                            [label]="m.label"
+                            [iconUrl] ="'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'"
+                            [markerDraggable]="m.draggable">
+
+                    </agm-marker>
+
+                   <agm-polyline
+                            [visible]="true"
+                            [strokeWeight]="1"
+                            [strokeColor]="'#A7BD26'"
+                            [strokeOpacity]=0.8>
+
+                        <agm-polyline-point
+                                *ngFor="let m of markers; let i=index"
+                                [latitude]="m.lat"
+                                [longitude]="m.lng">
+                        </agm-polyline-point>
+
+                    </agm-polyline>
+
+                </agm-map>
+            </mat-card>
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

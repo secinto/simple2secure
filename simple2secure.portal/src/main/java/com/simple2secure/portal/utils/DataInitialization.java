@@ -1,5 +1,6 @@
 package com.simple2secure.portal.utils;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +20,12 @@ import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserRegistration;
+import com.simple2secure.api.model.UserRegistrationType;
+import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
@@ -27,6 +33,7 @@ import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
+import com.simple2secure.portal.repository.UserRepository;
 
 @Component
 public class DataInitialization {
@@ -56,12 +63,18 @@ public class DataInitialization {
 
 	@Autowired
 	protected StepRepository stepRepository;
-	
+
 	@Autowired
 	protected LicensePlanRepository licensePlanRepository;
 
 	@Autowired
+	protected UserRepository userRepository;
+
+	@Autowired
 	protected PortalUtils portalUtils;
+
+	@Autowired
+	protected UserUtils userUtils;
 
 	/**
 	 *
@@ -69,21 +82,21 @@ public class DataInitialization {
 	 * @param username
 	 *
 	 *          This function adds a default group for the users which are registered using the standard registration. This function does not
-	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group while adding.
+	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group before adding.
 	 */
-	public void addDefaultGroup(String userId, String adminGroupId) {
-		
-		List<CompanyGroup> groupList = groupRepository.findByOwnerId(userId);
+	public void addDefaultGroup(String userId, String contextId) {
+
+		List<CompanyGroup> groupList = groupRepository.findByContextId(contextId);
 
 		if (groupList == null || groupList.isEmpty()) {
 			ResponseEntity<CompanyGroup> response = restTemplate.getForEntity(loadedConfigItems.getGroupURL(), CompanyGroup.class);
 			CompanyGroup group = response.getBody();
-			group.setAdminGroupId(adminGroupId);
+			group.setContextId(contextId);
 			group.setRootGroup(true);
 			group.setStandardGroup(true);
 			ObjectId groupId = groupRepository.saveAndReturnId(group);
 			log.debug("Default group added for user with id {}", userId);
-			if(!Strings.isNullOrEmpty(groupId.toString())) {
+			if (!Strings.isNullOrEmpty(groupId.toString())) {
 				addDefaultGroupQueries(groupId.toString());
 				addDefaultGroupProcessors(groupId.toString());
 				addDefaultGroupSteps(groupId.toString());
@@ -159,15 +172,15 @@ public class DataInitialization {
 			}
 		}
 	}
-	
+
 	public void addDefaultLicensePlan() {
 		List<LicensePlan> licensePlansDB = licensePlanRepository.findAll();
-		
-		if(licensePlansDB == null || licensePlansDB.isEmpty()) {
+
+		if (licensePlansDB == null || licensePlansDB.isEmpty()) {
 			ResponseEntity<LicensePlan> response = restTemplate.getForEntity(loadedConfigItems.getLicensePlanURL(), LicensePlan.class);
 			LicensePlan licensePlan = response.getBody();
 			licensePlanRepository.save(licensePlan);
-		}		
+		}
 	}
 
 	/**
@@ -190,6 +203,24 @@ public class DataInitialization {
 				step.setGroupId(groupId);
 				step.setActive(1);
 				stepRepository.save(step);
+			}
+		}
+	}
+
+	/**
+	 * This function adds default users in case that those are not already added to the database
+	 *
+	 * @throws IOException
+	 */
+	public void addDefaultUsers() throws IOException {
+		UserRegistration userRegistration = new UserRegistration();
+		for (String email : StaticConfigItems.SECINTO_EMAIL_LIST) {
+			User user = userRepository.findByEmail(email);
+			if (user == null) {
+				userRegistration.setEmail(email);
+				userRegistration.setRegistrationType(UserRegistrationType.INITIALIZATION);
+				userRegistration.setUserRole(UserRole.SUPERADMIN);
+				userUtils.initializeSecintoUsers(userRegistration, "en");
 			}
 		}
 	}

@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *
+ * Copyright (C) 2019 by secinto GmbH (http://www.secinto.com)
+ *
+ *********************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.commons.config;
 
 import java.nio.charset.Charset;
@@ -19,7 +40,9 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String baseKubernetesURL = "https://35.232.109.156";
+	// private String baseKubernetesURL = "https://35.232.109.156";
+
+	private String baseKubernetesURL = "https://192.168.123.95:6443";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
@@ -44,11 +67,23 @@ public class LoadedConfigItems {
 	private String stepAPI = "/api/steps";
 	private String processorAPI = "/api/processors";
 	private String licenseAPI = "/api/license";
+	private String serviceAPI = "/api/service";
 
-	public LoadedConfigItems() {
+	private static LoadedConfigItems instance;
+
+	public static LoadedConfigItems getInstance() {
+		if (instance == null) {
+			instance = new LoadedConfigItems();
+			instance.init();
+		}
+		return instance;
 	}
 
-	public void init() {
+	public LoadedConfigItems() {
+
+	}
+
+	protected void init() {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
 		try {
@@ -197,8 +232,11 @@ public class LoadedConfigItems {
 		return getBaseURL() + licenseAPI;
 	}
 
+	public String getServiceAPI() {
+		return getBaseURL() + serviceAPI;
+	}
+
 	public String getLicensePlanURL() {
 		return getBaseURL() + licensePlanURL;
-	}	
-
+	}
 }

@@ -10,14 +10,13 @@ package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.assertj.core.util.Strings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,8 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -37,118 +37,136 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
+@RequestMapping("/api/steps")
 public class StepController {
 
 	@Autowired
 	private StepRepository repository;
-	
+
 	@Autowired
 	private LicenseRepository licenseRepository;
-	
+
 	@Autowired
 	private GroupRepository groupRepository;
-	
-    @Autowired
-    MessageByLocaleService messageByLocaleService;	
-    
-    @Autowired
-    PortalUtils portalUtils;
 
-	public static final Logger logger = LoggerFactory.getLogger(StepController.class);
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	PortalUtils portalUtils;
+
+	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/steps/{probeId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{probeId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
 	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-		
-		CompanyLicense license = licenseRepository.findByProbeId(probeId);
-		
-		if(license != null) {
-			CompanyGroup group = groupRepository.find(license.getGroupId());
-			
-			if(group != null) {
-				List<Step> steps = new ArrayList<>();
-				if(group.isRootGroup()) {
-					//This is root group get configuration from this group only
-					steps = repository.getStepsByGroupId(license.getGroupId(), select_all);
-					if(steps != null) {
-						return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
-					}
-					else {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)), HttpStatus.NOT_FOUND);
-					}
-				}
-				else {
-					//This is not root group get all processors from all parent groups, until we find the root group
-					List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
-					//Iterate through all found groups and add their queries to the queryConfig
-					for(CompanyGroup cg : foundGroups) {
-						List<Step> currentSteps = repository.getStepsByGroupId(cg.getId(), select_all);
-						if(currentSteps != null) {
-							steps.addAll(currentSteps);
+		log.debug("Retrieving steps for probe id {}", probeId);
+		if (!Strings.isNullOrEmpty(probeId)) {
+			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+
+			if (license != null) {
+				CompanyGroup group = groupRepository.find(license.getGroupId());
+
+				if (group != null) {
+					List<Step> steps = new ArrayList<>();
+					if (group.isRootGroup()) {
+						// This is root group get configuration from this group only
+						steps = repository.getStepsByGroupId(license.getGroupId(), select_all);
+
+					} else {
+						// This is not root group get all processors from all parent groups, until we find the root group
+						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
+						// Iterate through all found groups and add their queries to the queryConfig
+						for (CompanyGroup cg : foundGroups) {
+							List<Step> currentSteps = repository.getStepsByGroupId(cg.getId(), select_all);
+							if (currentSteps != null) {
+								steps.addAll(currentSteps);
+							}
 						}
 					}
-					
-					return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+					if (steps != null) {
+						return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+					}
 				}
 			}
-			else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)), HttpStatus.NOT_FOUND);
-			}
 		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)), HttpStatus.NOT_FOUND);
-		}		
+		log.error("Error while retrieving steps for probe id {}", probeId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)),
+				HttpStatus.NOT_FOUND);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/steps/group/{groupId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable("groupId") String groupId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
-		List<Step> steps = this.repository.getStepsByGroupId(groupId, select_all);
-		if(steps == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)), HttpStatus.NOT_FOUND);
+
+		if (!Strings.isNullOrEmpty(groupId)) {
+			List<Step> steps = repository.getStepsByGroupId(groupId, select_all);
+			if (steps != null) {
+				return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+			}
 		}
-		return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+		log.error("Error while retrieving steps for group id {}", groupId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/api/steps", method = RequestMethod.POST, consumes = "application/json")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		
-		//TODO - implement a method to check it the step with the provided id exists in the update case and check if probe or group id are empty!!!
-		if(Strings.isNullOrEmpty(step.getId())) {
-			
-			//Set the correct number
-			if(!Strings.isNullOrEmpty(step.getGroupId())) {
-				List<Step> steps = this.repository.getStepsByGroupId(step.getGroupId(), true);
-				step.setNumber(steps.size() + 1);
-			}						
-			this.repository.save(step);
+	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (step != null) {
+			if (Strings.isNullOrEmpty(step.getId())) {
+
+				// Set the correct number
+				if (!Strings.isNullOrEmpty(step.getGroupId())) {
+					List<Step> steps = repository.getStepsByGroupId(step.getGroupId(), true);
+					step.setNumber(steps.size() + 1);
+				}
+				repository.save(step);
+			} else {
+				repository.update(step);
+			}
+
+			return new ResponseEntity<Step>(step, HttpStatus.OK);
 		}
-		else {
-			
-			this.repository.update(step);
-		}
-				
-		return new ResponseEntity<Step>(step, HttpStatus.OK);
+		log.error("Error while updating step");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale)),
+				HttpStatus.NOT_FOUND);
 	}
-	
+
 	/**
 	 * This function returns all users from the user repository
+	 *
+	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(value = "/api/steps/{stepId}", method = RequestMethod.DELETE)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{stepId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @RequestHeader("Accept-Language") String locale) {
-		Step step = this.repository.find(stepId);
-		if (step == null) {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step",
-					ObjectUtils.toObjectArray(stepId), locale)), HttpStatus.NOT_FOUND);
-		} else {
-			this.repository.delete(step);
-			return new ResponseEntity<>(step, HttpStatus.OK);
+	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(stepId)) {
+			Step step = repository.find(stepId);
+			List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber(), step.getGroupId());
+			{
+				repository.delete(step);
+				if (steps != null) {
+					for (Step stepObj : steps) {
+						stepObj.setNumber(stepObj.getNumber() - 1);
+						repository.update(stepObj);
+					}
+				}
+				return new ResponseEntity<>(step, HttpStatus.OK);
+			}
 		}
-	}	
+		log.error("Error while deleting step with id {}", stepId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale)),
+				HttpStatus.NOT_FOUND);
+	}
 }

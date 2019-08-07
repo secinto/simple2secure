@@ -17,12 +17,16 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Token;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TokenRepository;
@@ -52,6 +56,12 @@ public class TokenAuthenticationService {
 	LicenseRepository licenseRepository;
 
 	@Autowired
+	CurrentContextRepository currentContextRepository;
+
+	@Autowired
+	ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
 	PortalUtils portalUtils;
 
 	static final String TOKEN_PREFIX = "Bearer";
@@ -61,7 +71,7 @@ public class TokenAuthenticationService {
 	static final String CLAIM_USERROLE = "userRole";
 	static final String CLAIM_PROBEID = "probeID";
 
-	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicense license) {
+	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicensePrivate license) {
 		if (!Strings.isNullOrEmpty(probeId) && group != null && license != null) {
 
 			List<Settings> settings = settingsRepository.findAll();
@@ -83,7 +93,7 @@ public class TokenAuthenticationService {
 			claims.put(CLAIM_PROBEID, probeId);
 			claims.put(CLAIM_USERROLE, UserRole.PROBE);
 			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
+					.signWith(SignatureAlgorithm.ES512, license.getTokenSecret()).compact();
 
 			return accessToken;
 		} else {
@@ -101,11 +111,6 @@ public class TokenAuthenticationService {
 
 			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
 			claims.put(CLAIM_USERID, user.getId());
-			if (collection != null && collection.size() == 1) {
-				claims.put(CLAIM_USERROLE, collection.iterator().next().getAuthority());
-			} else {
-				claims.put(CLAIM_USERROLE, "");
-			}
 
 			List<Settings> settings = settingsRepository.findAll();
 
@@ -119,7 +124,7 @@ public class TokenAuthenticationService {
 			}
 
 			String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
-					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.HS512, user.getPassword())
+					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.ES512, user.getPassword())
 					.compact();
 
 			if (token == null) {
@@ -146,7 +151,7 @@ public class TokenAuthenticationService {
 		String accessToken = resolveToken(request);
 		if (accessToken != null) {
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
-
+			UserRole userRole = UserRole.LOGINUSER;
 			if (token != null) {
 				User user = userRepository.find(token.getUserId());
 
@@ -155,9 +160,21 @@ public class TokenAuthenticationService {
 					boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
 
 					if (isAccessTokenValid) {
+
+						CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());
+
+						if (currentContext != null) {
+							ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository
+									.find(currentContext.getContextUserAuthenticationId());
+
+							if (contextUserAuthentication != null) {
+								userRole = contextUserAuthentication.getUserRole();
+							}
+
+						}
+
 						return user != null
-								? new UsernamePasswordAuthenticationToken(user, null,
-										CustomAuthenticationProvider.getAuthorities(user.getUserRole().name()))
+								? new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()))
 								: null;
 					} else {
 						return null;
@@ -172,7 +189,7 @@ public class TokenAuthenticationService {
 			else {
 				// Handle token for probeId
 				// Check if there is a token with this id in the licenseRepo - for probe
-				CompanyLicense license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
+				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 				if (license != null) {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());

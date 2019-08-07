@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
@@ -88,8 +89,7 @@ public class ProbeController {
 	}
 
 	/***
-	 * Creates the title bar and adds buttons and listeners to it. Only outsourced
-	 * for legibility
+	 * Creates the title bar and adds buttons and listeners to it. Only outsourced for legibility
 	 */
 	private void initTitleBar() {
 		// the following snippet creates a custom window bar
@@ -161,8 +161,7 @@ public class ProbeController {
 		hyperlink.setOnMouseClicked(ev -> {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop()
-							.browse(new URI(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURLWeb()));
+					Desktop.getDesktop().browse(new URI(LoadedConfigItems.getInstance().getBaseURLWeb()));
 				} catch (IOException e) {
 					log.error(e.getMessage());
 				} catch (URISyntaxException e) {

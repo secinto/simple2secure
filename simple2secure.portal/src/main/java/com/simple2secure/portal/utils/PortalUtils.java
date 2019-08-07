@@ -8,104 +8,49 @@
 
 package com.simple2secure.portal.utils;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.portal.repository.GroupRepository;
 
 @Component
 public class PortalUtils {
-
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+	private static Logger log = LoggerFactory.getLogger(PortalUtils.class);
 
 	@Autowired
 	JavaMailSender javaMailSender;
-	
+
 	@Autowired
 	GroupRepository groupRepository;
 
 	/**
-	 * Helper function to read string from the file
-	 *
-	 * @param rd
-	 * @return
-	 * @throws IOException
-	 */
-	public String readAll(Reader rd) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		int cp;
-		while ((cp = rd.read()) != -1) {
-			sb.append((char) cp);
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * This function generates an activation token for each user
+	 * This function generates a token(activation, invitation, paswordReset) for each user
 	 *
 	 * @return
 	 */
 	public synchronized String generateToken() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
-	}
-
-	public String alphaNumericString(int len) {
-		String ALPHA_UPPER_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		String ALPHA_LOWER_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
-		String NUMERIC_CHARACTERS = "0123456789";
-		String SPECIAL_CHARACTERS = ";!.-:";
-
-		Random rnd = new Random();
-
-		StringBuilder sb = new StringBuilder(len);
-		for (int i = 0; i < len; i++) {
-			if (i == 0) {
-				sb.append(ALPHA_UPPER_CHARACTERS.charAt(rnd.nextInt(ALPHA_UPPER_CHARACTERS.length())));
-			}
-			if (i == 1) {
-				sb.append(NUMERIC_CHARACTERS.charAt(rnd.nextInt(NUMERIC_CHARACTERS.length())));
-			}
-			if (i == 2) {
-				sb.append(SPECIAL_CHARACTERS.charAt(rnd.nextInt(SPECIAL_CHARACTERS.length())));
-			} else {
-				sb.append(ALPHA_LOWER_CHARACTERS.charAt(rnd.nextInt(ALPHA_LOWER_CHARACTERS.length())));
-			}
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * This function returns the expiration date for the default group which is created when new user is registered
-	 *
-	 * @return
-	 */
-	public String getDefaultLicenseExpirationDate() {
-		Date currentDate = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		Calendar c = Calendar.getInstance();
-		c.setTime(currentDate);
-		// TODO: implement in web so that superadmin can configure this value!
-		c.add(Calendar.DATE, 10);
-		Date currentDatePlusFive = c.getTime();
-		return sdf.format(currentDatePlusFive);
 	}
 
 	/**
@@ -121,10 +66,6 @@ public class PortalUtils {
 			if (processor_item.getName().trim().equals(processor.getName().trim())) {
 				return true;
 			}
-			if (processor_item.getProcessor_class().trim().equals(processor.getProcessor_class().trim())) {
-				return true;
-			}
-
 		}
 		return false;
 	}
@@ -146,105 +87,131 @@ public class PortalUtils {
 
 	}
 
-	public Date convertStringtoDate(String date) {
-		try {
-			return DATE_FORMAT.parse(date);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public boolean isLicenseExpired(String expDate) {
-		Date expirationDate = convertStringtoDate(expDate);
-		return System.currentTimeMillis() > expirationDate.getTime();
-	}
-
+	/**
+	 * Converts the given TimeUnits time to milliseconds.
+	 *
+	 * @param time
+	 *          The value of the time unit.
+	 * @param timeUnit
+	 *          The unit in which the time is measured.
+	 * @return The specified amount of time in milliseconds.
+	 */
 	public long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
 		if (timeUnit != null) {
-			if (timeUnit.equals(TimeUnit.SECONDS)) {
-				return TimeUnit.SECONDS.toMillis(time);
-			} else if (timeUnit.equals(TimeUnit.MINUTES)) {
-				return TimeUnit.MINUTES.toMillis(time);
-			} else if (timeUnit.equals(TimeUnit.HOURS)) {
-				return TimeUnit.HOURS.toMillis(time);
-			} else if (timeUnit.equals(TimeUnit.DAYS)) {
-				return TimeUnit.DAYS.toMillis(time);
-			} else {
-				return 0;
-			}
+			return timeUnit.toMillis(time);
 		} else {
 			return 0;
 		}
 	}
-	
-	/**
-	 * This function converts milis to date
-	 * @param milis
-	 * @return
-	 */
-	public static Calendar milisToDate(long milis) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(milis);
-		return calendar;
-	}
-	
+
 	/**
 	 * This function checks if this group has children groups
+	 *
 	 * @param group
 	 * @return
 	 */
 	public static boolean groupHasChildren(CompanyGroup group) {
-		if(group != null) {
-			if(group.getChildrenIds() != null) {
-				if(group.getChildrenIds().size() > 0) {
+		if (group != null) {
+			if (group.getChildrenIds() != null) {
+				if (group.getChildrenIds().size() > 0) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * This function finds the parent group of the current child
+	 *
 	 * @param group
 	 * @return
 	 */
 	public CompanyGroup findTheParentGroup(CompanyGroup group) {
-		
-		if(!Strings.isNullOrEmpty(group.getParentId())) {
+
+		if (!Strings.isNullOrEmpty(group.getParentId())) {
 			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
-			if(parentGroup != null) {
+			if (parentGroup != null) {
 				return parentGroup;
 			}
 		}
 		return null;
 	}
-	
-	
+
 	/**
 	 * This function searches recursively for all dependent groups until the root group is found
+	 *
 	 * @param group
 	 * @return
 	 */
-	public List<CompanyGroup> findAllParentGroups(CompanyGroup group){
+	public List<CompanyGroup> findAllParentGroups(CompanyGroup group) {
 		List<CompanyGroup> foundGroups = new ArrayList<>();
 		foundGroups.add(group);
 		boolean rootGroupFound = false;
-		while(!rootGroupFound) {
+		while (!rootGroupFound) {
 			CompanyGroup parentGroup = findTheParentGroup(group);
-			if(parentGroup != null) {
+			if (parentGroup != null) {
 				foundGroups.add(parentGroup);
-				if(parentGroup.isRootGroup()) {
+				if (parentGroup.isRootGroup()) {
 					rootGroupFound = true;
-				}
-				else {
+				} else {
 					group = parentGroup;
 				}
-			}
-			else {
+			} else {
 				rootGroupFound = true;
 			}
 		}
 		return foundGroups;
 	}
+
+	/**
+	 * This function checks if the invitation token is still valid
+	 *
+	 * @param expirationTime
+	 * @return
+	 */
+	public boolean checkIfTokenIsStillValid(long expirationTime) {
+		if (System.currentTimeMillis() <= expirationTime) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This function reads the files from the resources folder according to the folder name
+	 *
+	 * @param folder
+	 * @return
+	 */
+	private static File[] getResourceFolderFiles(String folder) {
+		URL url = Resources.getResource(folder);
+		String path = url.getPath();
+		log.debug("Folder on the following path {} found", path);
+		return new File(path).listFiles();
+	}
+
+	/**
+	 * This is a function which reads the files from the resources folder and converts to the byte array in order to prepare them for download
+	 *
+	 * @return
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public byte[] downloadFile() throws IOException, URISyntaxException {
+		File[] probe = getResourceFolderFiles("probe");
+		byte[] array = Files.readAllBytes(probe[0].toPath());
+		return array;
+	}
+
+	/**
+	 * This function converts an input stream object to string
+	 * 
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public String convertInputStreamToString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream, "UTF-8");
+	}
+
 }
