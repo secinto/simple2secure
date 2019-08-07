@@ -15,6 +15,7 @@ import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -41,7 +42,7 @@ import ch.maxant.rules.Rule;
 @Component
 public class UpdateEmailScheduler {
 
-	private String STORE = "imaps";
+	private String STORE = "imap";
 	private String FOLDER = "inbox";
 	private String SOCKET_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
 	private String SOCKET_FACTORY_PORT = "465";
@@ -67,7 +68,7 @@ public class UpdateEmailScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	// @Scheduled(fixedRate = 50000)
+	@Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		if (configs != null) {
@@ -195,13 +196,15 @@ public class UpdateEmailScheduler {
 	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
 		Properties props = new Properties();
 
+		props.setProperty("mail.imap.ssl.enable", "true");
+
 		// create a new session with the provided properties
 		Session session = Session.getDefaultInstance(props, null);
 
 		// connect to the store using the provided credentials
 		Store store = session.getStore(STORE);
 
-		store.connect("imap.gmail.com", 993, config.getEmail(), config.getPassword());
+		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
 		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
