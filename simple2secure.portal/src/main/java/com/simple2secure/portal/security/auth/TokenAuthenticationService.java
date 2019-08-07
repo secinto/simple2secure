@@ -17,12 +17,16 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicense;
+import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Token;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TokenRepository;
@@ -52,6 +56,12 @@ public class TokenAuthenticationService {
 	LicenseRepository licenseRepository;
 
 	@Autowired
+	CurrentContextRepository currentContextRepository;
+
+	@Autowired
+	ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
 	PortalUtils portalUtils;
 
 	static final String TOKEN_PREFIX = "Bearer";
@@ -61,7 +71,15 @@ public class TokenAuthenticationService {
 	static final String CLAIM_USERROLE = "userRole";
 	static final String CLAIM_PROBEID = "probeID";
 
-	public String addLicenseAuthentication(String probeId, CompanyGroup group, CompanyLicense license) {
+	/**
+	 * This function is used to create probe authentication token so that it is available to send data to the portal
+	 *
+	 * @param probeId
+	 * @param group
+	 * @param license
+	 * @return
+	 */
+	public String addProbeAuthentication(String probeId, CompanyGroup group, CompanyLicensePrivate license) {
 		if (!Strings.isNullOrEmpty(probeId) && group != null && license != null) {
 
 			List<Settings> settings = settingsRepository.findAll();
@@ -93,6 +111,46 @@ public class TokenAuthenticationService {
 
 	}
 
+	/**
+	 * This function is used to create pod authentication token so that it is available to send data to the portal
+	 *
+	 * @param podId
+	 * @param group
+	 * @param license
+	 * @return
+	 */
+	public String addPodAuthentication(String podId, CompanyGroup group, CompanyLicensePrivate license) {
+		if (!Strings.isNullOrEmpty(podId) && group != null && license != null) {
+
+			List<Settings> settings = settingsRepository.findAll();
+
+			long expirationTime = 0;
+
+			if (settings != null) {
+				if (settings.size() == 1) {
+					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
+							settings.get(0).getAccessTokenProbeValidityUnit());
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+
+			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
+			claims.put(CLAIM_PROBEID, podId);
+			claims.put(CLAIM_USERROLE, UserRole.POD);
+			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
+
+			return accessToken;
+		} else {
+			log.error("Pod id or group is null");
+			return null;
+		}
+
+	}
+
 	public void addAuthentication(HttpServletResponse res, String username, Collection<? extends GrantedAuthority> collection) {
 		User user = userRepository.findByEmailOnlyActivated(username);
 		if (user != null) {
@@ -101,11 +159,6 @@ public class TokenAuthenticationService {
 
 			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
 			claims.put(CLAIM_USERID, user.getId());
-			if (collection != null && collection.size() == 1) {
-				claims.put(CLAIM_USERROLE, collection.iterator().next().getAuthority());
-			} else {
-				claims.put(CLAIM_USERROLE, "");
-			}
 
 			List<Settings> settings = settingsRepository.findAll();
 
@@ -146,7 +199,7 @@ public class TokenAuthenticationService {
 		String accessToken = resolveToken(request);
 		if (accessToken != null) {
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
-
+			UserRole userRole = UserRole.LOGINUSER;
 			if (token != null) {
 				User user = userRepository.find(token.getUserId());
 
@@ -155,9 +208,21 @@ public class TokenAuthenticationService {
 					boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
 
 					if (isAccessTokenValid) {
+
+						CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());
+
+						if (currentContext != null) {
+							ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository
+									.find(currentContext.getContextUserAuthenticationId());
+
+							if (contextUserAuthentication != null) {
+								userRole = contextUserAuthentication.getUserRole();
+							}
+
+						}
+
 						return user != null
-								? new UsernamePasswordAuthenticationToken(user, null,
-										CustomAuthenticationProvider.getAuthorities(user.getUserRole().name()))
+								? new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()))
 								: null;
 					} else {
 						return null;
@@ -172,12 +237,17 @@ public class TokenAuthenticationService {
 			else {
 				// Handle token for probeId
 				// Check if there is a token with this id in the licenseRepo - for probe
-				CompanyLicense license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
+				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 				if (license != null) {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
 
 					if (isAccessTokenValid) {
+						if (!Strings.isNullOrEmpty(license.getPodId())) {
+							return license != null
+									? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.POD.name()))
+									: null;
+						}
 						return license != null
 								? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()))
 								: null;

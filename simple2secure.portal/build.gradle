@@ -1,20 +1,10 @@
-buildscript {
-	ext { springBootVersion = '2.0.6.RELEASE' }
-	repositories {
-		maven { url 'https://repo.spring.io/libs-snapshot' }
-		mavenCentral()
-	}
-	dependencies { classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}" }
+plugins {
+	id "org.sonarqube" version "2.6.2"
+	id "org.springframework.boot" version "2.1.0.RELEASE"
+	id 'application'
+	id "io.spring.dependency-management" version "1.0.6.RELEASE"
+	id 'war'
 }
-
-plugins {  id "org.sonarqube" version "2.6.2" }
-plugins {  id "org.springframework.boot" version "2.0.6.RELEASE" }
-
-apply plugin: 'application'
-apply plugin: 'eclipse-wtp'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'war'
-
 
 mainClassName = "com.secinto.portal.Simple2SecurePortal"
 
@@ -29,6 +19,8 @@ jar {
 	version =  '0.1.0-SNAPSHOT'
 }
 
+dependencies { providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' }
+
 compileJava {
 	options.warnings = false
 	options.deprecation = false
@@ -36,40 +28,11 @@ compileJava {
 	options.compilerArgs += ["-Xdoclint:none", "-Xlint:none", "-nowarn"]
 }
 
-war { baseName = 's2s' }
-
-dependencies {
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	compile 'com.google.guava:guava:21.0'
-	compile 'org.slf4j:slf4j-api:1.7.25'
-	compile 'ch.qos.logback:logback-classic:1.2.3'
-	compile group: 'commons-io', name: 'commons-io', version: '2.5'
-	compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
-	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
-	compile 'org.springframework.boot:spring-boot-starter-web'
-	compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	compile 'org.springframework.boot:spring-boot-starter-security'
-	compile 'org.springframework.boot:spring-boot-devtools'
-	compile 'org.springframework.boot:spring-boot-starter-mail'
-	compile group: 'ro.fortsoft.licensius', name: 'licensius', version: '0.1.1'
-	compile group: 'ch.qos.cal10n', name: 'cal10n-api', version: '0.8.1'
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
-	compile group: 'io.kubernetes', name: 'client-java', version: '2.0.0'
-	compile group: 'ch.maxant', name: 'rules', version: '2.2.1'
-	compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
-
-	testCompile(
-	'junit:junit:4.12',
-	'org.springframework.boot:spring-boot-starter-test',
-	'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1')
-	testImplementation(
-	'org.junit.jupiter:junit-jupiter-api:5.3.1'
-	)
-	testRuntimeOnly(
-	'org.junit.jupiter:junit-jupiter-engine:5.3.1',
-	'org.junit.vintage:junit-vintage-engine:5.3.1'
-	)
-
-	compile project(':simple2secure.api')
-	compile project(':simple2secure.commons')
+war { 
+	baseName = 's2s-portal' 
 }
+
+
+
+
+

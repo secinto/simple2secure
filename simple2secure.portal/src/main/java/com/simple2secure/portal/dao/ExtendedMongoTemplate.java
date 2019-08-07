@@ -82,10 +82,10 @@ public class ExtendedMongoTemplate extends MongoTemplate {
 
 	private String determineCollection(Class<?> entityClass) {
 		Method m = ReflectionUtils.findMethod(super.getClass(), /*
-		 * MessageCodeUtil.getMessageCodeMessage(
-		 * MessageCodeGeneral.mongo_collection_name_determiner)
-		 */"mongo_collection_name_determiner", // $NON-NLS-1$
-		 Class.class);
+																														 * MessageCodeUtil.getMessageCodeMessage(
+																														 * MessageCodeGeneral.mongo_collection_name_determiner)
+																														 */"mongo_collection_name_determiner", // $NON-NLS-1$
+				Class.class);
 		ReflectionUtils.makeAccessible(m);
 		return (String) ReflectionUtils.invokeMethod(m, this, entityClass);
 	}

@@ -15,11 +15,15 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "localhost";
-	private String basePort = "8443";
-	private String basePortWeb = "9000";
+	private String baseHost = "144.76.93.104";
+	private String basePort = "51001/s2s";
+	private String basePortWeb = "51003";
 
-	private String baseKubernetesURL = "https://35.232.109.156";
+	// private String baseKubernetesURL = "https://35.232.109.156";
+
+	private String baseKubernetesURL = "https://192.168.123.95:6443";
+
+	private String baseDockerContainer = "http://192.168.99.100:5000";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
@@ -44,11 +48,23 @@ public class LoadedConfigItems {
 	private String stepAPI = "/api/steps";
 	private String processorAPI = "/api/processors";
 	private String licenseAPI = "/api/license";
+	private String serviceAPI = "/api/service";
 
-	public LoadedConfigItems() {
+	private static LoadedConfigItems instance;
+
+	public static LoadedConfigItems getInstance() {
+		if (instance == null) {
+			instance = new LoadedConfigItems();
+			instance.init();
+		}
+		return instance;
 	}
 
-	public void init() {
+	public LoadedConfigItems() {
+
+	}
+
+	protected void init() {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
 		try {
@@ -71,6 +87,10 @@ public class LoadedConfigItems {
 
 	public void setBaseProtocol(String baseProtocol) {
 		this.baseProtocol = baseProtocol;
+	}
+
+	public String getBaseDockerContainer() {
+		return baseDockerContainer;
 	}
 
 	public String getBaseHost() {
@@ -197,8 +217,11 @@ public class LoadedConfigItems {
 		return getBaseURL() + licenseAPI;
 	}
 
+	public String getServiceAPI() {
+		return getBaseURL() + serviceAPI;
+	}
+
 	public String getLicensePlanURL() {
 		return getBaseURL() + licensePlanURL;
-	}	
-
+	}
 }

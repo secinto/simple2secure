@@ -2,27 +2,34 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class Command extends GenericDBObject{
-	
+public class Command extends GenericDBObject {
+
 	/**
-	 * 
+	 *
 	 */
-	private static final long serialVersionUID = -6467606054044990890L;
-	private String content;
-	
+	private static final long serialVersionUID = -2977516759831166624L;
+
+	private String executable;
+	private Parameter parameter;
+
 	public Command() {
-		
+
 	}
 
-	public Command(String content) {
-		this.content = content;
-	}
-	
-	public String getContent() {
-		return content;
+	public Parameter getParameter() {
+		return parameter;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setParameter(Parameter parameter) {
+		this.parameter = parameter;
 	}
+
+	public String getExecutable() {
+		return executable;
+	}
+
+	public void setExecutable(String executable) {
+		this.executable = executable;
+	}
+
 }

@@ -9,6 +9,7 @@
 package com.simple2secure.portal.controller;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,67 +23,83 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.simple2secure.api.model.Email;
+import com.google.common.base.Strings;
+import com.simple2secure.api.dto.EmailConfigurationDTO;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.EmailConfiguration;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.MailUtils;
 
 @RestController
+@RequestMapping("/api/email")
 public class EmailController {
-	
+
 	static final Logger log = LoggerFactory.getLogger(EmailController.class);
-		
+
 	@Autowired
 	private EmailConfigurationRepository emailConfigRepository;
-	
-	@Autowired 
+
+	@Autowired
 	EmailRepository emailRepository;
-	
-    @Autowired
-    MessageByLocaleService messageByLocaleService;	
+
+	@Autowired
+	ContextRepository contextRepository;
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
+
+	@Autowired
+	MailUtils mailUtils;
 
 	public static final Logger logger = LoggerFactory.getLogger(EmailController.class);
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/email", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config, @RequestHeader("Accept-Language") String locale){
-		if(config != null) {
-			emailConfigRepository.save(config);
-			return new ResponseEntity<EmailConfiguration>(config, HttpStatus.OK);
+	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		if (config != null) {
+			if (!mailUtils.checkIfEmailConfigExists(config.getEmail(), config.getContextId())) {
+				if (!Strings.isNullOrEmpty(config.getId())) {
+					emailConfigRepository.update(config);
+				} else {
+					emailConfigRepository.save(config);
+				}
+				return new ResponseEntity<EmailConfiguration>(config, HttpStatus.OK);
+			}
+
 		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)), HttpStatus.NOT_FOUND);		
-		}		
-	}
-	
-	@RequestMapping(value = "/api/email/{user_id}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<EmailConfiguration>> getEmailConfigByUserID(@PathVariable("user_id") String user_id, @RequestHeader("Accept-Language") String locale){
-		return new ResponseEntity<List<EmailConfiguration>>(emailConfigRepository.findByUserUUID(user_id), HttpStatus.OK);
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/api/email/inbox/{email_config_id}", method = RequestMethod.GET)
-	public ResponseEntity<List<Email>> getEmailMessagesByUserID(@PathVariable("email_config_id") String email_config_id, @RequestHeader("Accept-Language") String locale) {
-			
-		EmailConfiguration config = emailConfigRepository.findByConfigId(email_config_id);
-		
-		if(config != null) {				
-			//extractEmailsFromMessages(connect(config), config.getUserUUID(), email_config_id);
-			List<Email> emails = emailRepository.findByUserUUIDAndConfigID(config.getUserUUID(), email_config_id);
-			return new ResponseEntity<List<Email>>(emails, HttpStatus.OK);
-										
+	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(contextId)) {
+			Context context = contextRepository.find(contextId);
+			if (context != null) {
+				List<EmailConfigurationDTO> emailConfigurationList = mailUtils.getEmailConfigDTO(contextId);
+				if (emailConfigurationList != null) {
+					return new ResponseEntity<List<EmailConfigurationDTO>>(emailConfigurationList, HttpStatus.OK);
+				}
+			}
 		}
-		else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale)), HttpStatus.NOT_FOUND);
-		}
-	
+
+		log.error("Error occured while getting email config for user with id {}", contextId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale)),
+				HttpStatus.NOT_FOUND);
 	}
-	
+
 	/**
 	 * This function deletes configuration and user according to the user id
 	 *
@@ -91,15 +108,21 @@ public class EmailController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/api/email/{config_id}", method = RequestMethod.DELETE)
-	public ResponseEntity<EmailConfiguration> deleteConfig(@PathVariable("config_id") String configId, @RequestHeader("Accept-Language") String locale) {
-		EmailConfiguration config = this.emailConfigRepository.deleteByConfigId(configId);
-		if(config == null) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale)), HttpStatus.NOT_FOUND);
+	@RequestMapping(value = "/{emailConfigId}", method = RequestMethod.DELETE)
+	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable("emailConfigId") String emailConfigId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(emailConfigId)) {
+			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId);
+
+			if (emailConfig != null) {
+				mailUtils.deleteEmailConfiguration(emailConfig);
+				return new ResponseEntity<EmailConfiguration>(emailConfig, HttpStatus.OK);
+
+			}
 		}
-		else {
-			return new ResponseEntity<EmailConfiguration>(config, HttpStatus.OK);	
-		}
-				
-	}	
+		log.error("Error occured while deleting email configuration with id {}", emailConfigId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale)),
+				HttpStatus.NOT_FOUND);
+	}
 }

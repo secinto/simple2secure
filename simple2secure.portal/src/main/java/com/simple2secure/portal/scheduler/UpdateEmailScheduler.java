@@ -15,19 +15,19 @@ import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.ExtendedRule;
-import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.PortalRule;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 
 import ch.maxant.rules.AbstractAction;
 import ch.maxant.rules.CompileException;
@@ -62,16 +62,19 @@ public class UpdateEmailScheduler {
 	@Autowired
 	MailUtils mailUtils;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	@Scheduled(fixedRate = 50000)
+	// @Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		if (configs != null) {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
-					extractEmailsFromMessages(msg, cfg.getUserUUID(), cfg.getId());
+					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
 		}
@@ -85,22 +88,46 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String user_id, String config_id) throws Exception {
-		for (Message msg : messages) {
-			UIDFolder uf = (UIDFolder) msg.getFolder();
-			Long messageId = uf.getUID(msg);
+	public void extractEmailsFromMessages(Message[] messages, String configId) {
+		if (!Strings.isNullOrEmpty(configId)) {
+			EmailConfiguration emailConfig = emailConfigRepository.find(configId);
+			if (emailConfig != null) {
+				for (Message msg : messages) {
+					UIDFolder uf = (UIDFolder) msg.getFolder();
+					Long messageId;
+					try {
+						messageId = uf.getUID(msg);
+						if (emailRepository.findByConfigAndMessageId(configId, messageId.toString()) == null) {
+							// TO-DO - check if there is a rule for this inbox and check it accordingly
+							Email email = new Email();
+							Object content;
+							try {
+								content = msg.getContent();
+								if (content instanceof String) {
+									String body = (String) content;
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											body, msg.getReceivedDate().toString());
+								} else if (content instanceof MimeMultipart) {
+									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
+											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+								}
 
-			if (emailRepository.findByUserUUIDConfigIDAndMsgID(user_id, config_id, messageId.toString()) == null) {
-				// TO-DO - check if there is a rule for this inbox and check it accordingly
-				Email email = new Email(messageId.toString(), user_id, config_id, msg.getMessageNumber(), msg.getSubject(),
-						msg.getFrom()[0].toString(), mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()),
-						msg.getReceivedDate().toString());
+								// emailsRuleChecker(email, emailConfig);
 
-				emailsRuleChecker(email);
+								emailRepository.save(email);
+							} catch (Exception e) {
+								log.error("Problem occured {}", e.getMessage());
+							}
+						}
 
-				emailRepository.save(email);
+					} catch (MessagingException e1) {
+						log.error("Problem occured messageId not found");
+					}
+
+				}
 			}
 		}
+
 	}
 
 	/**
@@ -108,9 +135,9 @@ public class UpdateEmailScheduler {
 	 * repository
 	 */
 
-	private void emailsRuleChecker(Email email) {
+	private void emailsRuleChecker(Email email, EmailConfiguration emailConfig) {
 
-		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigID());
+		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
 		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
 
 		List<Rule> rules = new ArrayList<>();
@@ -129,9 +156,11 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(email.getUserUUID(), email.getConfigID(), "Subject",
-								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
-						notificationRepository.save(notification);
+						/*
+						 * Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
+						 * "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
+						 */
+						// notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
 						return null;
 					}
@@ -145,8 +174,7 @@ public class UpdateEmailScheduler {
 					Engine engine = new Engine(rules, true);
 					engine.executeAllActions(email, actions);
 				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error(e.getMessage());
 				}
 			}
 		} else {
@@ -165,14 +193,17 @@ public class UpdateEmailScheduler {
 	 */
 
 	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
+		Properties props = new Properties();
 
 		// create a new session with the provided properties
-		Session session = Session.getDefaultInstance(setEmailConfiguration(config), null);
+		Session session = Session.getDefaultInstance(props, null);
 
 		// connect to the store using the provided credentials
 		Store store = session.getStore(STORE);
 
-		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+		store.connect("imap.gmail.com", 993, config.getEmail(), config.getPassword());
+
+		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
 		log.info("Connected to the store: " + store);
 
@@ -198,11 +229,15 @@ public class UpdateEmailScheduler {
 	 */
 	private Properties setEmailConfiguration(EmailConfiguration config) {
 		Properties props = new Properties();
+
 		props.setProperty("mail.imap.host", config.getIncomingServer());
 		props.setProperty("mail.imap.port", config.getIncomingPort());
 		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
+		props.setProperty("mail.imap.socketFactory.port", config.getIncomingPort());
 		props.setProperty("mail.imap.auth", IMAP_AUTH);
+		props.setProperty("mail.mime.ignoreunknownencoding", "true");
+
+		props.put("mail.store.protocol", STORE);
 
 		return props;
 

@@ -5,51 +5,30 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Notification extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3081134740537811621L;
-	private String userId;
-	private String toolId;
-	private String name;
 	private String content;
-	private String timestamp;
+	private String contextId;
 	private boolean read;
+	private long timestamp;
 
 	public Notification() {
 	}
 
-	public Notification(String userId, String toolId, String name, String content, String timestamp, boolean read) {
+	public Notification(String content, boolean read, String contextId) {
 		super();
-		this.userId = userId;
-		this.toolId = toolId;
-		this.name = name;
 		this.content = content;
-		this.timestamp = timestamp;
+		this.contextId = contextId;
 		this.read = read;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getToolId() {
-		return toolId;
-	}
-
-	public void setToolId(String toolId) {
-		this.toolId = toolId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public Notification(String content, boolean read, String contextId, long timestamp) {
+		super();
+		this.content = content;
+		this.contextId = contextId;
+		this.read = read;
+		this.timestamp = timestamp;
 	}
 
 	public String getContent() {
@@ -68,11 +47,19 @@ public class Notification extends GenericDBObject {
 		this.read = read;
 	}
 
-	public String getTimestamp() {
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
+	}
+
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(String timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 }

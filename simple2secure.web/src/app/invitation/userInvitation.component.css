@@ -1,0 +1,9 @@
+.updatePasswordPageForm {
+    position: relative;
+    top: 50%;
+    text-align: center;
+}
+
+#context-message {
+    text-align: center;
+}

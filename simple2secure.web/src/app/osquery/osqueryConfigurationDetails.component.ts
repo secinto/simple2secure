@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -11,199 +11,200 @@ import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.comp
 import {UserGroupComponent} from '../user';
 
 @Component({
-    moduleId: module.id,
-    selector: 'osQueryConfigDetails',
-    templateUrl: 'osqueryConfigurationDetails.component.html'
+	moduleId: module.id,
+	selector: 'osQueryConfigDetails',
+	templateUrl: 'osqueryConfigurationDetails.component.html'
 })
 
 export class OsqueryConfigurationDetailsComponent {
-    displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active', 'action'];
-    dataSource = new MatTableDataSource();
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+	displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active', 'action'];
+	dataSource = new MatTableDataSource();
+	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator) paginator: MatPaginator;
 
-    currentUser: any;
-    queries: any[];
-    selectedItem: QueryRun;
-    loading = false;
-    type: number;
-    deleted = false;
-    added = false;
-    private sub: any;
-    groupId: string;
-    probeId: string;
-    groupEditable: boolean;
+	currentUser: any;
+	queries: any[];
+	selectedItem: QueryRun;
+	loading = false;
+	type: number;
+	deleted = false;
+	added = false;
+	private sub: any;
+	groupId: string;
+	probeId: string;
+	groupEditable: boolean;
 
 
-    constructor(
-        private alertService: AlertService,
-        private httpService: HttpService,
-        private router: Router,
-        private dialog: MatDialog,
-        private dataService: DataService,
-        private route: ActivatedRoute,
-        private translate: TranslateService
-    ) {}
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private router: Router,
+		private dialog: MatDialog,
+		private dataService: DataService,
+		private route: ActivatedRoute,
+		private translate: TranslateService
+	)
+	{}
 
-    ngOnInit() {
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+	ngOnInit() {
+		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-        this.sub = this.route.params.subscribe(params => {
-            this.groupId = params['id'];
-        });
+		this.sub = this.route.params.subscribe(params => {
+			this.groupId = params['id'];
+		});
 
-        this.groupEditable = this.dataService.isGroupEditable();
+		this.groupEditable = this.dataService.isGroupEditable();
 
-        if (!this.groupEditable){
-            this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
-        }
+		if (!this.groupEditable) {
+			this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
+		}
 
-        this.loadQueries();
-    }
+		this.loadQueries();
+	}
 
-    ngAfterViewInit() {
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
-      }
+	ngAfterViewInit() {
+		this.dataSource.sort = this.sort;
+		this.dataSource.paginator = this.paginator;
+	}
 
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
-    }
+	applyFilter(filterValue: string) {
+		filterValue = filterValue.trim();
+		filterValue = filterValue.toLowerCase();
+		this.dataSource.filter = filterValue;
+	}
 
-    loadQueries(){
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'config/query/group/' + this.groupId + '/true')
-            .subscribe(
-                data => {
-                    this.queries = data;
-                    this.dataSource.data = this.queries;
-                    if (data.length > 0){
-                        if (this.deleted == false && this.added == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = false;
-                            this.added = false;
-                        }
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
+	loadQueries() {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'config/query/group/' + this.groupId + '/true')
+			.subscribe(
+				data => {
+					this.queries = data;
+					this.dataSource.data = this.queries;
+					if (data.length > 0) {
+						if (this.deleted == false && this.added == false) {
+							this.alertService.success(this.translate.instant('message.data'));
+						}
+						else {
+							this.deleted = false;
+							this.added = false;
+						}
+					}
+					this.loading = false;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
 
-    onMenuTriggerClick(item: any){
-        this.selectedItem = item;
-    }
+	onMenuTriggerClick(item: any) {
+		this.selectedItem = item;
+	}
 
-    onEditClick(){
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.width = '450px';
-        dialogConfig.data = {
-            queryRun: this.selectedItem,
-            groupId: this.groupId
-        };
+	onEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			queryRun: this.selectedItem,
+			groupId: this.groupId
+		};
 
-        const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result == true){
-                this.alertService.success(this.translate.instant('message.osquery.update'));
-            }
-            else{
-                if (result instanceof HttpErrorResponse){
-                    if (result.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(result.error.errorMessage);
-                    }
-                }
-            }
-        });
-    }
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.osquery.update'));
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
 
-    onAddClick(){
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.width = '450px';
-        dialogConfig.data = {
-            queryRun: null,
-            groupId: this.groupId
-        };
+	onAddClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			queryRun: null,
+			groupId: this.groupId
+		};
 
-        const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result == true){
-                this.alertService.success(this.translate.instant('message.osquery.add'));
-                this.added = true;
-                this.loadQueries();
-            }
-            else{
-                if (result instanceof HttpErrorResponse){
-                    if (result.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(result.error.errorMessage);
-                    }
-                }
-            }
-        });
-    }
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.osquery.add'));
+				this.added = true;
+				this.loadQueries();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
 
-    onDeleteClick(){
-        this.openDialog(this.selectedItem);
-    }
+	onDeleteClick() {
+		this.openDialog(this.selectedItem);
+	}
 
-    public openDialog(item: any){
+	public openDialog(item: any) {
 
-        const dialogConfig = new MatDialogConfig();
+		const dialogConfig = new MatDialogConfig();
 
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
 
-        dialogConfig.data = {
-            id: 1,
-            title: this.translate.instant('message.areyousure'),
-            content: this.translate.instant('message.config.dialog')
-        };
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.config.dialog')
+		};
 
-        const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
-        dialogRef.afterClosed().subscribe(data => {
-            if (data === true){
-                this.deleteConfig(item);
-            }
-        });
-    }
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteConfig(item);
+			}
+		});
+	}
 
-    deleteConfig(queryConfig: any){
-        this.loading = true;
-        this.httpService.delete(environment.apiEndpoint + 'config/query/' + queryConfig.id).subscribe(
-            data => {
-                this.alertService.success(this.translate.instant('message.osquery.delete'));
-                this.deleted = true;
-                this.loadQueries();
-                this.loading = false;
-            },
-            error => {
-                if (error.status == 0){
-                    this.alertService.error(this.translate.instant('server.notresponding'));
-                }
-                else{
-                    this.alertService.error(error.error.errorMessage);
-                }
-                this.loading = false;
-            });
-    }
+	deleteConfig(queryConfig: any) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'config/query/' + queryConfig.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.osquery.delete'));
+				this.deleted = true;
+				this.loadQueries();
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
 }

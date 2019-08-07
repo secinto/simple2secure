@@ -1,85 +1,104 @@
 package com.simple2secure.portal.scheduler;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.simple2secure.api.model.Probe;
-
-import ch.maxant.rules.AbstractAction;
-import ch.maxant.rules.CompileException;
-import ch.maxant.rules.DuplicateNameException;
-import ch.maxant.rules.Engine;
-import ch.maxant.rules.ParseException;
-import ch.maxant.rules.Rule;
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestRunType;
+import com.simple2secure.api.model.TestStatus;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.TestRepository;
+import com.simple2secure.portal.repository.TestRunRepository;
+import com.simple2secure.portal.utils.NotificationUtils;
+import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.TestUtils;
 
 @Component
-public class TestRunScheduler{
-	
-    private static final Logger log = LoggerFactory.getLogger(TestRunScheduler.class);
+public class TestRunScheduler {
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");	
-    
-    //@Scheduled(fixedRate = 50000)
-    public void runTest() {
-    	
-    }   
-    
-    
-	//@Scheduled(fixedRate = 50000)
-    public void reportCurrentTime() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
-        Rule r1 = new Rule("YouthTarif", "input.activated == true", "notificationAction", 3, "com.simple2secure.api.model.Device", null);
-        Rule r2 = new Rule("SeniorTarif", "input.activated == false", "notificationAction", 3, "com.simple2secure.api.model.Device", null);
-        Rule r3 = new Rule("LoyaltyTarif", "#YouthTarif && input.name == 'dev1'", "notificationAction", 4, "com.simple2secure.api.model.Device", null);
-        
-        List<Rule> rules = Arrays.asList(r1, r2, r3);
-        
-        try {
-        	
-    		AbstractAction<Probe, Void> a1 = new AbstractAction<Probe, Void>("notificationAction") {
-    			@Override
-    			public Void execute(Probe input) {
-    				log.info("Sending email to user!");
-    				return null;
-    			}
-    		};
-    		
-    		AbstractAction<Probe, Void> a2 = new AbstractAction<Probe, Void>("secondAction") {
-    			@Override
-    			public Void execute(Probe input) {
-    				log.info("Sending email to user 2!");
-    				return null;
-    			}
-    		};  		
-			
-			Engine engine = new Engine(rules, true);
-			//Probe dev1 = new Probe("dev1", "userid", "clientId", "macAddress", "timskaodksaodsa", true);
-			//Probe dev2 = new Probe("dev2", "userid", "clientId", "macAddress", "timskaodksaodsa", false);
-			
-			/*try {
-				engine.executeAllActions(dev1, Arrays.asList(a1, a2));
-			} catch (NoMatchingRuleFoundException | NoActionFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
-		} catch (DuplicateNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CompileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	@Autowired
+	TestUtils testUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
+	TestRepository testRepository;
+
+	@Autowired
+	TestRunRepository testRunRepository;
+
+	@Autowired
+	LicenseRepository licenseRepository;
+
+	@Autowired
+	GroupRepository groupRepository;
+
+	@Autowired
+	NotificationUtils notificationUtils;
+
+	private static final Logger log = LoggerFactory.getLogger(TestRunScheduler.class);
+
+	/**
+	 * This function checks if there are some tests which need to be executed and adds those test to the TestRun table in the database
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 *
+	 */
+
+	@Scheduled(fixedRate = 50000)
+	public void checkTests() throws ItemNotFoundRepositoryException {
+
+		List<Test> tests = testRepository.getScheduledTest();
+
+		if (tests != null && !tests.isEmpty()) {
+
+			for (Test test : tests) {
+				long currentTimestamp = System.currentTimeMillis();
+				// Calculate the difference between last execution time and current timestamp
+
+				long millisScheduled = portalUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
+				long nextExecutionTime = test.getLastExecution() + millisScheduled;
+				long executionTimeDifference = nextExecutionTime - currentTimestamp;
+
+				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
+
+					CompanyLicensePrivate license = licenseRepository.findByPodId(test.getPodId());
+
+					if (license != null) {
+
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+
+						if (group != null) {
+							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
+									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+
+							test.setLastExecution(currentTimestamp);
+							testRunRepository.save(testRun);
+							testRepository.update(test);
+
+							notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled automatically using the portal",
+									group.getContextId());
+						}
+
+					}
+				}
+			}
+
+		} else {
+			log.error("There are no test cases which need to be scheduled");
 		}
-        
-    }
+
+	}
 
 }

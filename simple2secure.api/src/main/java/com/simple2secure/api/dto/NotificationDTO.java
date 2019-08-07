@@ -1,27 +1,35 @@
 package com.simple2secure.api.dto;
 
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.api.model.Tool;
 
-public class NotificationDTO extends Notification{
+public class NotificationDTO {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4016184022840808308L;
-	private Tool tool;
-	
-	public NotificationDTO(Tool tool, Notification notification) {
-		super(notification.getUserId(), notification.getToolId(), notification.getName(), notification.getContent(), notification.getTimestamp(), notification.isRead());
-		this.tool = tool;
+	Notification notification;
+
+	TestStatusDTO testRunDTO;
+
+	public NotificationDTO() {
 	}
 
-	public Tool getTool() {
-		return tool;
+	public NotificationDTO(Notification notification, TestStatusDTO testRunDTO) {
+		this.notification = notification;
+		this.testRunDTO = testRunDTO;
 	}
 
-	public void setTool(Tool tool) {
-		this.tool = tool;
+	public Notification getNotification() {
+		return notification;
 	}
-	
+
+	public void setNotification(Notification notification) {
+		this.notification = notification;
+	}
+
+	public TestStatusDTO getTestRunDTO() {
+		return testRunDTO;
+	}
+
+	public void setTestRunDTO(TestStatusDTO testRunDTO) {
+		this.testRunDTO = testRunDTO;
+	}
+
 }

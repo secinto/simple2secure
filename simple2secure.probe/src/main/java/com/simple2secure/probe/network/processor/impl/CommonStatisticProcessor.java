@@ -1,13 +1,18 @@
 package com.simple2secure.probe.network.processor.impl;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
@@ -24,16 +29,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.PacketInfo;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.PacketContainer;
 import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.utils.DBUtil;
 
 /***
- * The CommonStatisticsProcessor reads all the basic data from the packet and
- * writes it to the Database. This data includes: Timestamp, Source- and
- * Destination Mac Address, Source- and Destination IP Address, Type (IPv4,
- * Ipv6...) and Protocol (TCP, UDP...) both in the same slot, and length
+ * The CommonStatisticsProcessor reads all the basic data from the packet and writes it to the Database. This data includes: Timestamp,
+ * Source- and Destination Mac Address, Source- and Destination IP Address, Type (IPv4, Ipv6...) and Protocol (TCP, UDP...) both in the same
+ * slot, and length
  *
  * @author jhoffmann
  *
@@ -48,7 +54,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	private int packetCounter;
 
-	private Map<String, String> reportContent;
+	private String content;
 
 	private String srcMac, destMac, srcIp, destIp, protocol;
 
@@ -66,31 +72,37 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	Map<String, Integer> protocols;
 
+	List<PacketInfo> ipPairs;
+
+	String ipPairsContent;
+
 	private int maxLength;
 
 	public CommonStatisticProcessor(String name, Map<String, String> options) {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
+		report.setProcessorName(name);
 		report.setProbeId(ProbeConfiguration.probeId);
+		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
 
-		reportContent = new HashMap<>();
+		// reportContent = new TreeMap<>();
 		packetCounter = 0;
-		sourceIp = new HashMap<>();
-		destinationIp = new HashMap<>();
-		sourceMac = new HashMap<>();
-		destinationMac = new HashMap<>();
-		protocols = new HashMap<>();
+		sourceIp = new TreeMap<>();
+		destinationIp = new TreeMap<>();
+		sourceMac = new TreeMap<>();
+		destinationMac = new TreeMap<>();
+		protocols = new TreeMap<>();
 		maxLength = 0;
+		ipPairs = new ArrayList<>();
 	}
 
 	@Override
 	public PacketContainer processPacket() {
 		/*
-		 * Obtain the features for this packet. Depending on the feature type and the
-		 * actual packet (TCP, UDP, or higher layer packet instances) different features
-		 * will be returned.
+		 * Obtain the features for this packet. Depending on the feature type and the actual packet (TCP, UDP, or higher layer packet instances)
+		 * different features will be returned.
 		 */
 
 		Packet packet = this.packet.getPacket();
@@ -163,8 +175,8 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		long intervalTime = packet.getProcessor().getAnalysisInterval();
 		TimeUnit intervalUnit = packet.getProcessor().getAnalysisIntervalUnit();
 		/*
-		 * TODO: Verify that this never happens or create a better handler for the case
-		 * that null is returned. Also use shared constants for that.
+		 * TODO: Verify that this never happens or create a better handler for the case that null is returned. Also use shared constants for
+		 * that.
 		 */
 		if (intervalUnit == null) {
 			intervalUnit = TimeUnit.HOURS;
@@ -177,23 +189,25 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				// initialize new report
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
-					report.setContent(reportContent);
+					report.setStringContent(content);
+					report.setIpPairs(ipPairs);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
 				analysisStartTime = new Date();
 				report = new NetworkReport();
 				report.setProbeId(ProbeConfiguration.probeId);
+				report.setGroupId(ProbeConfiguration.groupId);
 				report.setStartTime(analysisStartTime.toString());
 				report.setProcessorName(packet.getProcessor().getName());
 
-				reportContent = new HashMap<>();
-				sourceIp = new HashMap<>();
-				destinationIp = new HashMap<>();
+				// reportContent = new TreeMap<>();
+				sourceIp = new TreeMap<>();
+				destinationIp = new TreeMap<>();
 				packetCounter = 0;
-				sourceMac = new HashMap<>();
-				destinationMac = new HashMap<>();
-				protocols = new HashMap<>();
+				sourceMac = new TreeMap<>();
+				destinationMac = new TreeMap<>();
+				protocols = new TreeMap<>();
 				maxLength = 0;
 			} else {
 				packetCounter++;
@@ -210,6 +224,9 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 * This function counts the network traffic data provided by each packet.
 	 */
 	private void countNetworkTraffic() {
+
+		ipPairs.add(new PacketInfo(destIp, srcIp, "", "", 0, ""));
+
 		// Count sourceIPs
 		Integer countSrcIp = sourceIp.get(srcIp);
 
@@ -258,37 +275,85 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	}
 
 	/*
-	 * This function analyzes the collected values and writes the maximum values to
-	 * the content map
+	 * This function analyzes the collected values and writes the maximum values to the content map
 	 */
 	private void writeNetworkTrafficResults() {
-		Map.Entry<String, Integer> mostUsedSourceIP = getMostUsedEntry(sourceIp);
-		Map.Entry<String, Integer> mostUsedDestinationIP = getMostUsedEntry(destinationIp);
-		Map.Entry<String, Integer> mostUsedSourceMac = getMostUsedEntry(sourceMac);
-		Map.Entry<String, Integer> mostUsedDestinationMac = getMostUsedEntry(destinationMac);
-		Map.Entry<String, Integer> mostUsedProtocol = getMostUsedEntry(protocols);
+		sourceIp = sortByValue(sourceIp);
+		destinationIp = sortByValue(destinationIp);
+		destinationMac = sortByValue(destinationMac);
+		sourceMac = sortByValue(sourceMac);
+		protocols = sortByValue(protocols);
 
-		String contentSrcIp = "Most used source IP: " + mostUsedSourceIP.getKey() + " - used: " + mostUsedSourceIP.getValue() + " times";
-		String contentDstIp = "Most used destination IP: " + mostUsedDestinationIP.getKey() + " - used: " + mostUsedDestinationIP.getValue()
-				+ " times";
-		String contentSrcMac = "Most used source MAC: " + mostUsedSourceMac.getKey() + " - used: " + mostUsedSourceMac.getValue()
-				+ " times";
-		String contentDstMac = "Most used destination MAC: " + mostUsedDestinationMac.getKey() + " - used: "
-				+ mostUsedDestinationMac.getValue() + " times";
-		String contentProtocol = "Most used protocol; " + mostUsedProtocol.getKey() + " - used: " + mostUsedProtocol.getValue() + " times";
-		String contentMaxPacketLength = "Maximum packet length was: " + maxLength;
+		String srcIP = "{";
+		for (Map.Entry<String, Integer> entry : sourceIp.entrySet()) {
+			srcIP = srcIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		}
+		srcIP = srcIP.substring(0, srcIP.length() - 2);
+		srcIP = srcIP + "}";
 
-		reportContent.put("contentSrcIp", contentSrcIp);
-		reportContent.put("contentDstIp", contentDstIp);
-		reportContent.put("contentSrcMac", contentSrcMac);
-		reportContent.put("contentDstMac", contentDstMac);
-		reportContent.put("contentProtocol", contentProtocol);
-		reportContent.put("contentMaxPacketLength", contentMaxPacketLength);
+		String destIP = "{";
+		for (Map.Entry<String, Integer> entry : destinationIp.entrySet()) {
+			destIP = destIP + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		}
+		destIP = destIP.substring(0, destIP.length() - 2);
+		destIP = destIP + "}";
+
+		String destMAC = "{";
+		for (Map.Entry<String, Integer> entry : destinationMac.entrySet()) {
+			destMAC = destMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		}
+		destMAC = destMAC.substring(0, destMAC.length() - 2);
+		destMAC = destMAC + "}";
+
+		String srcMAC = "{";
+		for (Map.Entry<String, Integer> entry : sourceMac.entrySet()) {
+			srcMAC = srcMAC + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		}
+		srcMAC = srcMAC.substring(0, srcMAC.length() - 2);
+		srcMAC = srcMAC + "}";
+
+		String protocol = "{";
+		for (Map.Entry<String, Integer> entry : protocols.entrySet()) {
+			protocol = protocol + "'" + entry.getKey().replace("/", "") + "' : '" + entry.getValue() + "' , ";
+		}
+		protocol = protocol.substring(0, protocol.length() - 2);
+		protocol = protocol + "}";
+		// String contentSrcIp = "Most used source IP: " + mostUsedSourceIP.getKey() + " - used: " + mostUsedSourceIP.getValue() + " times";
+		// String contentDstIp = "Most used destination IP: " + mostUsedDestinationIP.getKey() + " - used: " + mostUsedDestinationIP.getValue()
+		// + " times";
+		// String contentSrcMac = "Most used source MAC: " + mostUsedSourceMac.getKey() + " - used: " + mostUsedSourceMac.getValue() + " times";
+		// String contentDstMac = "Most used destination MAC: " + mostUsedDestinationMac.getKey() + " - used: " +
+		// mostUsedDestinationMac.getValue()
+		// + " times";
+		// String contentProtocol = "Most used protocol; " + mostUsedProtocol.getKey() + " - used: " + mostUsedProtocol.getValue() + " times";
+		// String contentMaxPacketLength = "Maximum packet length was: " + maxLength;
+		Map<String, String> entry = new LinkedHashMap<String, String>();
+
+		entry.put("Source IP", srcIP);
+		entry.put("Destination IP", destIP);
+		entry.put("Source MAC", srcMAC);
+		entry.put("Destination MAC", destMAC);
+		entry.put("Protocols", protocol);
+
+		content = JSONUtils.toString(entry);
+		content = content.replace("\"{", "{");
+		content = content.replace("}\"", "}");
+		content = content.replace("'", "\"");
+		log.debug(content);
+
+		ipPairsContent = JSONUtils.toString(ipPairs);
+		ipPairsContent = ipPairsContent.replace("\"{", "{");
+		ipPairsContent = ipPairsContent.replace("}\"", "}");
+		ipPairsContent = ipPairsContent.replace("'", "\"");
+		// entry.put("Source MAC", contentSrcMac);
+		// entry.put("Destination MAC", contentDstMac);
+		// entry.put("Protocol", contentProtocol);
+		// entry.put("contentMaxPacketLength", contentMaxPacketLength);
 	}
 
 	/**
 	 * This function returns the entry with the maximum value
-	 * 
+	 *
 	 * @param map
 	 * @return
 	 */
@@ -307,5 +372,25 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		});
 		sortedEntries.addAll(map.entrySet());
 		return sortedEntries;
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+		List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
+		list.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+		Map<K, V> result = new LinkedHashMap<>();
+		for (Entry<K, V> entry : list) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+
+		return result;
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValueReverse(Map<K, V> map) {
+		map.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> {
+					throw new AssertionError();
+				}, LinkedHashMap::new));
+		return map;
 	}
 }

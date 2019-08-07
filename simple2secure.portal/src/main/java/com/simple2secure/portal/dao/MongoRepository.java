@@ -24,7 +24,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
  *          the concrete database object which is managed by the repository. Has to be derived from BasicDBObject
  */
 @Repository
-public abstract class MongoRepository<T extends GenericDBObject> {
+public class MongoRepository<T extends GenericDBObject> {
 
 	static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
@@ -45,23 +45,19 @@ public abstract class MongoRepository<T extends GenericDBObject> {
 	 *          the item to insert
 	 */
 	public void save(T item) {
-		//ObjectId objId = new ObjectId();	
 		DBObject dbObj = this.mongoTemplate.convert(item);
-		//dbObj.put(GenericDBObject.ID, objId);
 		this.mongoTemplate.save(dbObj, this.collectionName);
-
-		//return objId;
 	}
-	
+
 	/**
 	 * Inserts a new item into the repository and the database and returns objectId
 	 *
 	 * @param item
 	 *          the item to insert
-	 * @return 
+	 * @return
 	 */
 	public ObjectId saveAndReturnId(T item) {
-		ObjectId objId = new ObjectId();	
+		ObjectId objId = new ObjectId();
 		DBObject dbObj = this.mongoTemplate.convert(item);
 		dbObj.put(GenericDBObject.ID, objId);
 		this.mongoTemplate.save(dbObj, this.collectionName);

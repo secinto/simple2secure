@@ -7,8 +7,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -16,13 +14,13 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.CompanyLicenseObj;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
-import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.license.LicenseController;
+import com.simple2secure.probe.license.StartConditions;
+import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.LocaleHolder;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 import ch.qos.logback.classic.Level;
 import javafx.application.Application;
@@ -57,6 +55,8 @@ public class ProbeGUI extends Application {
 
 	public static ResourceBundle rb;
 
+	private LicenseController licenseCon = new LicenseController();
+
 	public static void main(String[] args) {
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
@@ -86,76 +86,22 @@ public class ProbeGUI extends Application {
 
 		createTrayIcon(primaryStage);
 
-		/*
-		 * Initialize the configuration. It must be checked if this is the best place to do it. But it will be done anyhow further down if the
-		 * license is not loaded. Thus we should provide it here immediately. The only thing is that it also would verify if the API is
-		 * available.
-		 */
-		ProbeConfiguration.getInstance();
+		ProbeConfiguration.isGuiRunning = true;
 
-		// if (TimingUtils.netIsAvailable(ProbeConfiguration.getInstance().getLoadedConfigItems().getBaseURL())) {
-		// ProbeConfiguration.setAPIAvailablitity(true);
-		// log.info("SERVER REACHABLE!");
-		// }
-		CompanyLicenseObj license = checkIfLicenseExists();
+		StartConditions startConditions = licenseCon.checkProbeStartConditions();
 
-		if (license != null) {
-
-			Date expirationDate = ProbeUtils.convertStringtoDate(license.getExpirationDate());
-			if (!isLicenseExpired(expirationDate)) {
-				ProbeConfiguration.authKey = license.getAuthToken();
-				ProbeConfiguration.probeId = license.getProbeId();
-				ProbeConfiguration.licenseId = license.getLicenseId();
-				if (license.isActivated()) {
-					ProbeConfiguration.isLicenseValid = true;
-				} else {
-
-				}
-
-				if (ProbeConfiguration.isLicenseValid) {
-					initRootPane();
-				} else {
-					initLicenseImportPane("Your license has expired! Please import the new one!");
-				}
-
-			} else {
-				initLicenseImportPane("Your license has expired! Please import the new one!");
-			}
-
+		switch (startConditions) {
+		case LICENSE_NOT_AVAILABLE:
+			initLicenseImportPane("There is no license stored, please import a license.");
+			break;
+		case LICENSE_EXPIRED:
+		case LICENSE_NOT_ACTIVATED:
+		case LICENSE_VALID:
+			initRootPane();
+			break;
+		default:
+			initRootPane();
 		}
-
-		else {
-			initLicenseImportPane("");
-		}
-	}
-
-	/**
-	 * This function checks if the license exists and according to that sets the different view on the start
-	 *
-	 * @return
-	 */
-	public CompanyLicenseObj checkIfLicenseExists() {
-		CompanyLicenseObj license = getLicenseFromDb();
-		if (license != null) {
-			if (license.isActivated()) {
-				return license;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static CompanyLicenseObj getLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
-
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {
@@ -304,9 +250,5 @@ public class ProbeGUI extends Application {
 				}
 			}
 		});
-	}
-
-	private boolean isLicenseExpired(Date expirationDate) {
-		return System.currentTimeMillis() > expirationDate.getTime();
 	}
 }

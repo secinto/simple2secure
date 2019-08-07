@@ -1,3 +1,42 @@
+mail:
+  username: secure.s2s.secinto@gmail.com
+  password: latinica1
+  imap:
+    host: imap.ionos.de
+    auth: true
+    starttls.enable: true
+    socketFactory:
+      port: 993
+      class: javax.net.ssl.SSLSocketFactory
+  smtp:
+    auth: true
+    starttls.enable: true
+    host: smtp.gmail.com
+    ssl.trust: smtp.gmail.com
+    port: 587   
+    socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
+
+license:
+  filepath: temp/license/
+  privateKey: keys/private.key
+  publicKey: keys/public.key
+  
+kubernetes:
+  token: eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJzMnMtbmFtZXNwYWNlIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InNlY2ludG8tYWRtaW4tdG9rZW4tZ3E1cDUiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoic2VjaW50by1hZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImE1OWE2MGExLWZlYzItMTFlOC05NGRlLTUwNDY1ZDhkYTBkMSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpzMnMtbmFtZXNwYWNlOnNlY2ludG8tYWRtaW4ifQ.UMdUz3ODhq3GvvBN2Rp3f7BzNHuZMdFzb-W7lhdghabs80o4XeCvweemr95xfxLCA96PJz80-u29bbsCndpZF7OphOO3yPT8HMnbYPmibsuZM7SlXXxI5KJj4w7EC8ZlAfZt9BYTZsGKMJuImOaIWRzrptp5jSBF3aeNaQSF9OP_vkc3hMxlCM4e8zTnh9cKK9I7fDBLEwMQEUsdCbgVU5aoLVYLd5Y3wQ1oGzJaLa1TUoeRK17WXAL_mMzwnMfqsSv0fRgy30boj8OaM7uBzkcM42RQKHhkFvTzsuvQ3Fmpm9H5SdRWz8HtX0rwQ5rSI9Ba3HweSi6sTXEHqO3o3Q  
+  namespace: s2s-namespace
+    
+spring:
+  profiles:
+    active: prod,default
+  main:
+    banner-mode: "off"
+  data:
+    mongodb:
+      host: s2s-mongodb
+      port: 27017
+      database: s2s
+
 server:
   port: 8443
   ssl:
@@ -9,38 +48,14 @@ server:
     trust-store: classpath:keys/cacerts
     trust-store-password: testtest
   certificate:
-    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195
-
-mail:
-  username: activation@secinto.com
-  password: S2S.secinto.18.AT
-  imap:
-    host: imap.ionos.de
-    auth: true
-    socketFactory:
-      port: 993
-      class: javax.net.ssl.SSLSocketFactory
-  smtp:
-    auth: true
-    host: smtp.ionos.de
-    port: 587
-    
+    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784      
+---      
 spring:
-  profiles:
-    active: prod
-  main:
-    banner-mode: "off"
+  profiles: deployment
   data:
     mongodb:
-      host: localhost
+      host: s2s-mongodb
       port: 27017
-    
-  
----
-spring:
-  profiles: prod,default
-  data:
-    mongodb:
       database: s2s
 ---
 spring:
