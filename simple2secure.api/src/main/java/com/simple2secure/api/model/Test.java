@@ -1,126 +1,91 @@
 package com.simple2secure.api.model;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+
+import javax.persistence.OneToMany;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class Test extends GenericDBObject {
 
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = -914338716345452064L;
-
-	private String podId;
+	private static final long serialVersionUID = -4242956528915218942L;
 	private String name;
-	private String test_content;
-	private String hostname;
-	private boolean active;
+	@OneToMany
+	private List<Command> commands;
 	private boolean scheduled;
-	private long scheduledTime;
-	private TimeUnit scheduledTimeUnit;
-	private long lastScheduleTimestamp;
-	private long lastChangedTimestamp;
-	private String hash_value;
+	private boolean finished;
+	@OneToMany
+	private List<TestResult> result;
+	private boolean customTest;
+	private boolean createInstance;
 
 	public Test() {
+	}
 
+	public Test(String name, List<Command> commands, boolean scheduled, boolean finished, List<TestResult> result, boolean customTest) {
+		this.name = name;
+		this.scheduled = scheduled;
+		this.finished = finished;
+		this.result = result;
+		this.commands = commands;
+		this.customTest = customTest;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getPodId() {
-		return podId;
-	}
-
-	public void setPodId(String podId) {
-		this.podId = podId;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	public long getLastScheduleTimestamp() {
-		return lastScheduleTimestamp;
-	}
-
-	public void setLastScheduleTimestamp(long lastScheduleTimestamp) {
-		this.lastScheduleTimestamp = lastScheduleTimestamp;
-	}
-
-	public String getTest_content() {
-		return test_content;
-	}
-
-	public void setTest_content(String test_content) {
-		this.test_content = test_content;
-	}
-
-	public long getLastChangedTimestamp() {
-		return lastChangedTimestamp;
-	}
-
-	public void setLastChangedTimestamp(long lastChangedTimestamp) {
-		this.lastChangedTimestamp = lastChangedTimestamp;
-	}
-
-	public String getHash_value() {
-		return hash_value;
-	}
-
-	public void setHash_value(String hash_value) {
-		this.hash_value = hash_value;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
 	public boolean isScheduled() {
-		return scheduled;
+		return this.scheduled;
 	}
 
-	public void setScheduled(boolean scheduled) {
+	public void setIsScheduled(boolean scheduled) {
 		this.scheduled = scheduled;
 	}
-
-	public long getScheduledTime() {
-		return scheduledTime;
+	
+	public boolean isFinished() {
+		return this.finished;
+	}
+	
+	public void setIsFinished(boolean finished) {
+		this.finished = finished;
+	}
+	public void setTestResult(List<TestResult> result) {
+		this.result = result;
 	}
 
-	public void setScheduledTime(long scheduledTime) {
-		this.scheduledTime = scheduledTime;
+	public List<TestResult> getTestResult() {
+		return this.result;
 	}
 
-	public TimeUnit getScheduledTimeUnit() {
-		return scheduledTimeUnit;
+	public List<Command> getCommands() {
+		return commands;
 	}
 
-	public void setScheduledTimeUnit(TimeUnit scheduledTimeUnit) {
-		this.scheduledTimeUnit = scheduledTimeUnit;
+	public void setCommands(List<Command> commands) {
+		this.commands = commands;
 	}
 
-	public long getLastExecution() {
-		return lastScheduleTimestamp;
+	public boolean isCustomTest() {
+		return customTest;
 	}
 
-	public void setLastExecution(long lastExecution) {
-		lastScheduleTimestamp = lastExecution;
+	public void setIsCustomTest(boolean customTest) {
+		this.customTest = customTest;
 	}
-
+	
+	public void SetCreateInstance(boolean createInstance) {
+		this.createInstance = createInstance;
+	}
+	
+	public boolean getCreateInstance() {
+		return this.createInstance;
+	}
 }

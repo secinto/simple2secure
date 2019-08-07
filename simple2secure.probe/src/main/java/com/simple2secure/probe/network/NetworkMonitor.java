@@ -12,8 +12,8 @@ import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.core.Pcaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.util.Strings;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.commons.collections.ProcessingQueue;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -37,7 +37,7 @@ public class NetworkMonitor {
 
 	private ProcessingQueue<PacketContainer> processingQueue;
 	private PcapHandle receiverHandle;
-	// private PcapHandle senderHandle;
+	private PcapHandle senderHandle;
 
 	public static NetworkMonitor startMonitor() {
 		if (instance == null) {
@@ -61,20 +61,20 @@ public class NetworkMonitor {
 			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
 		}
 
-		Config configuration = ProbeConfiguration.getInstance().getConfig();
+		Config configuration = ProbeConfiguration.getInstance().getCurrentConfigObj();
 
-		boolean show = configuration.isShowInterfaces();
+		boolean show = configuration.isShow_interfaces();
 
 		String previousAddress = "";
 
-		// boolean use_iface = configuration.isUse_configured_iface();
-		// if (use_iface) {
-		// int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
-		// int iface = config;
-		// if (iface < interfaces.size()) {
-		// singleInterface = interfaces.get(iface);
-		// }
-		// }
+		boolean use_iface = configuration.isUse_configured_iface();
+		if (use_iface) {
+			int config = ProbeConfiguration.getInstance().getCurrentConfigObj().getInterface_number();
+			int iface = config;
+			if (iface < interfaces.size()) {
+				singleInterface = interfaces.get(iface);
+			}
+		}
 
 		if (singleInterface == null) {
 
@@ -114,7 +114,7 @@ public class NetworkMonitor {
 			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
 			 * be developed
 			 */
-			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
+			if (Strings.isNotNullAndNotEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
 				try {
 					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
 				} catch (Exception e) {
@@ -130,15 +130,27 @@ public class NetworkMonitor {
 			new Thread(receiver).start();
 
 		} catch (Exception e) {
-			if (packetProcessor != null) {
-				packetProcessor.stop();
-			}
 			if (receiver != null) {
 				receiver.stop();
+			}
+			if (packetProcessor != null) {
+				packetProcessor.stop();
 			}
 			throw new NetworkException(LocaleHolder.getMessage("pcap_interface_open_error"));
 		}
 
+	}
+
+	public void stop() {
+		if (receiver != null) {
+			receiver.stop();
+		}
+		if (packetProcessor != null) {
+			packetProcessor.stop();
+		}
+		if (instance != null) {
+			instance = null;
+		}
 	}
 
 	public PacketReceiver getReceiver() {

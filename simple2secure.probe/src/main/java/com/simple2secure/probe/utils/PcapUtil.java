@@ -1,31 +1,19 @@
 package com.simple2secure.probe.utils;
 
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.pcap4j.core.PcapAddress;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
-import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
-import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
-import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.EthernetPacket.EthernetHeader;
-import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.IpV4Packet.IpV4Header;
 import org.pcap4j.packet.IpV6Packet.IpV6Header;
 import org.pcap4j.packet.Packet;
@@ -42,96 +30,16 @@ public class PcapUtil {
 	private static Logger log = LoggerFactory.getLogger(PcapUtil.class);
 
 	public static Map<String, Boolean> findOutgoingInterfaces(List<String> addresses) {
-		Map<String, Boolean> mapping = new HashMap<>();
+		Map<String, Boolean> mapping = new HashMap<String, Boolean>();
 		for (String ipAddress : addresses) {
 			mapping.put(ipAddress, checkAddress(ipAddress));
 		}
 		return mapping;
 	}
 
-	/**
-	 * This method converts a packet converted to a hex stream, back to a packet.
-	 *
-	 * @param... a string object which contains a network packet converted to a hex stream string. @param... offset @return... a network
-	 * packet converted from a hex stream string
-	 */
-	public static Packet convertHexStreamToPacket(String hexStreamAsString, int offset) throws IllegalRawDataException {
-		byte[] decodedString = Base64.getDecoder().decode(hexStreamAsString);
-		return EthernetPacket.newPacket(decodedString, offset, decodedString.length);
-	}
-
-	/**
-	 * This method converts a network packet to a hex stream string
-	 *
-	 * @param... raw data of a packet as byte array @return... returns the converted network packet as hex stream string
-	 */
-	public static String convertPackRawDataToHexStreamString(byte[] rawData) {
-		byte[] encodedRawData = Base64.getEncoder().encode(rawData);
-		return new String(encodedRawData);
-	}
-
-	/**
-	 * This method creates automatically a PcapHandle with the outgoing network interface
-	 *
-	 * @return... PcapHandle
-	 */
-	public static PcapHandle getPcapHandle() {
-		final int SNAP_LEN = 65536;
-		final int READ_TIMEOUT = 10;
-		PcapHandle handle = null;
-		String ip = null;
-		try {
-			ip = PcapUtil.getIpAddrOfNetworkInterface();
-			PcapNetworkInterface nI = PcapUtil.getNetworkInterfaceByInetAddr(ip);
-			handle = nI.openLive(SNAP_LEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
-		} catch (UnknownHostException | SocketException | PcapNativeException e) {
-			log.error("Could not retreive the ip address of the network interface.");
-		}
-		return handle;
-	}
-
-	/**
-	 * This function returns the network interface with the provided ip address.
-	 *
-	 * @param... ipAdress of the network interface you want to get @return... PcapNetworkInterface object with the network interface of the
-	 * provided ip
-	 */
-	public static PcapNetworkInterface getNetworkInterfaceByInetAddr(String ipAddress) {
-		try {
-			for (PcapNetworkInterface nI : Pcaps.findAllDevs()) {
-				List<PcapAddress> ipAdressList = nI.getAddresses();
-				for (PcapAddress add : ipAdressList) {
-					if (add.getAddress().toString().equals("/" + ipAddress)) {
-						return Pcaps.getDevByAddress(add.getAddress());
-					}
-				}
-			}
-		} catch (PcapNativeException e) {
-			log.error("Could not find network interface with the provided ip.");
-		}
-		return null;
-	}
-
-	/**
-	 * 8.8.8.8 the address does not have to be reachable
-	 * https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
-	 *
-	 * @return IP-address of the outgoing network interface as string
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 */
-	public static String getIpAddrOfNetworkInterface() throws UnknownHostException, SocketException {
-		// seems like this method is taking advantage of a sideffect of the "socket.connect" method
-		String ipAddr;
-		try (final DatagramSocket socket = new DatagramSocket()) {
-			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-			ipAddr = socket.getLocalAddress().getHostAddress();
-		}
-		return ipAddr;
-	}
-
 	public static boolean checkAddress(String ipAddress) {
-		try (Socket socket = new java.net.Socket()) {
+		Socket soc = new java.net.Socket();
+		try {
 			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 
 			while (nets.hasMoreElements()) {
@@ -142,9 +50,9 @@ public class PcapUtil {
 					InetAddress inet = InetAddress.getByName(ipAddress);
 
 					if (address.getAddress() instanceof Inet4Address && address.getAddress().equals(inet)) {
-						socket.bind(new InetSocketAddress(address.getAddress(), 0));
-						socket.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
-						socket.close();
+						soc.bind(new InetSocketAddress(address.getAddress(), 0));
+						soc.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
+						soc.close();
 						return true;
 					}
 				}
@@ -155,8 +63,9 @@ public class PcapUtil {
 		return false;
 	}
 
-	public static String getMacAddress(InetAddress ipAddress) {
+	public static String getMacAddress() {
 		try {
+			InetAddress ipAddress = InetAddress.getLocalHost();
 			NetworkInterface networkInterface = NetworkInterface.getByInetAddress(ipAddress);
 			byte[] macAddressBytes = networkInterface.getHardwareAddress();
 			StringBuilder macAddressBuilder = new StringBuilder();
@@ -245,7 +154,6 @@ public class PcapUtil {
 
 	/**
 	 * Does exclude the traffic to the local portal
-	 *
 	 * @return
 	 */
 	public static String getBPFFilterLocal() {

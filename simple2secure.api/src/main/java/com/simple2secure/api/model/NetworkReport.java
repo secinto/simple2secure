@@ -1,10 +1,12 @@
 package com.simple2secure.api.model;
 
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -14,38 +16,28 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class NetworkReport extends GenericDBObject {
 
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = -5984944130903360444L;
-	private String groupId;
+
 	private String probeId;
-
-	@Lob
-	private String stringContent;
-
 	@ElementCollection
-	private List<PacketInfo> ipPairs;
+	@MapKeyColumn(name = "key")
+	@Column(name = "value")
+	private Map<String, String> content;
 	private String startTime;
 	private String processorName;
 	private boolean sent;
 
 	public NetworkReport() {
-		// content = new TreeMap<String, String>();
+		content = new TreeMap<String, String>();
 	}
 
-	public NetworkReport(String probeId, String content, String startTime, boolean sent) {
+	public NetworkReport(String probeId, Map<String, String> content, String startTime, boolean sent) {
 		this.probeId = probeId;
-		// this.content = content;
+		this.content = content;
 		this.startTime = startTime;
 		this.sent = sent;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 
 	public String getProbeId() {
@@ -56,12 +48,16 @@ public class NetworkReport extends GenericDBObject {
 		this.probeId = probeId;
 	}
 
-	public String getStringContent() {
-		return stringContent;
+	public void addContent(String key, String value) {
+		content.put(key, value);
 	}
 
-	public void setStringContent(String stringContent) {
-		this.stringContent = stringContent;
+	public Map<String, String> getContent() {
+		return content;
+	}
+
+	public void setContent(Map<String, String> content) {
+		this.content = content;
 	}
 
 	public String getStartTime() {
@@ -86,13 +82,5 @@ public class NetworkReport extends GenericDBObject {
 
 	public void setProcessorName(String processorName) {
 		this.processorName = processorName;
-	}
-
-	public List<PacketInfo> getIpPairs() {
-		return ipPairs;
-	}
-
-	public void setIpPairs(List<PacketInfo> ipPairs) {
-		this.ipPairs = ipPairs;
 	}
 }

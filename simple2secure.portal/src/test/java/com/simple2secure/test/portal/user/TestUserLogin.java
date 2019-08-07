@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.UserRepository;
@@ -59,10 +60,16 @@ public class TestUserLogin {
 	@BeforeAll
 	public void init() {
 		user = new User();
+
+		user.setFirstName("test");
+		user.setLastName("test");
+		user.setUsername("test");
 		user.setEmail("testiing@test.com");
 		user.setPassword(passwordEncoder.encode("test"));
+		user.setUsername("test");
 		user.setActivated(true);
 		user.setActivationToken("12345");
+		user.setUserRole(UserRole.ADMIN);
 		userRepository.save(user);
 
 		loadedConfigItems.setBasePort(String.valueOf(randomServerPort));
@@ -125,6 +132,13 @@ public class TestUserLogin {
 			token = null;
 		}
 		assertNull(token);
+	}
+
+	@Test
+	public void testRegisterUserSuccessfull() {
+		JSONObject request = new JSONObject();
+		request.put("username", "testiing@test.com");
+		request.put("password", "testss");
 	}
 
 	@AfterAll

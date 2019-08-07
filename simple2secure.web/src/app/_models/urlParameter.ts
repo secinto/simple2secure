@@ -1,4 +1,4 @@
 export enum UrlParameter {
-	NEW = 'NEW',
-	EDIT = 'EDIT'
+    NEW = 'NEW',
+    EDIT = 'EDIT'
 }

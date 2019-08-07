@@ -1,21 +1,16 @@
 <mat-tab-group #tabGroup>
 
-    <mat-tab label="{{ 'menu.general' | translate }}">
+	<mat-tab label="{{ 'menu.general' | translate }}">
         <h3>{{ 'group.details' | translate }} {{group.name}}</h3>
         <form #groupForm="ngForm">
-            <mat-form-field class="full_width_input">
-                <input matInput type="text" placeholder="{{ 'group.name.placeholder' | translate }}"
-                       [(ngModel)]="group.name" name="name" autocomplete="name" [disabled]="!groupEditable" required>
-            </mat-form-field>
+                <mat-form-field class="full_width_input">
+                    <input matInput type="text" placeholder="{{ 'group.name.placeholder' | translate }}" [(ngModel)]="group.name" name="name" autocomplete="name" [disabled]="!groupEditable" required>
+                </mat-form-field>
 
-            <button type="button" (click)="saveGroup()" [disabled]="!groupForm.dirty || !groupEditable"
-                    mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}
-            </button>
-            <button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{
-                'button.cancel' | translate }}
-            </button>
+            <button type="button" (click)="saveGroup()" [disabled]="!groupForm.dirty || !groupEditable" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}</button>
+            <button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
         </form>
-    </mat-tab>
+	</mat-tab>
 
     <mat-tab label="{{ 'table.query' | translate }}">
         <osQueryConfigDetails></osQueryConfigDetails>

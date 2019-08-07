@@ -11,10 +11,9 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class Report extends GenericDBObject {
 
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = -7217360147886001090L;
-	private String groupId;
 	private String probeId;
 	private String query;
 
@@ -41,14 +40,6 @@ public class Report extends GenericDBObject {
 		this.queryResult = queryResult;
 		this.queryTimestamp = queryTimestamp;
 		this.isSent = isSent;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 
 	public boolean isSent() {

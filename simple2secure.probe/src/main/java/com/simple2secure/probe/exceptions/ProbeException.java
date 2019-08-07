@@ -31,6 +31,7 @@ package com.simple2secure.probe.exceptions;
 
 import com.simple2secure.commons.exceptions.BaseException;
 import com.simple2secure.commons.messages.Message;
+import com.simple2secure.commons.messages.MessageCode;
 
 public class ProbeException extends BaseException {
 

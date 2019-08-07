@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -10,199 +10,198 @@ import {NetworkProcessorConfigurationEditComponent} from './networkProcessorConf
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
-	moduleId: module.id,
-	selector: 'networkConfigurationProcessor',
-	templateUrl: 'networkConfigurationProcessorDetails.component.html'
+    moduleId: module.id,
+    selector: 'networkConfigurationProcessor',
+    templateUrl: 'networkConfigurationProcessorDetails.component.html'
 })
 
 export class NetworkConfigurationProcessorDetailsComponent {
 
-	currentUser: any;
-	processors: Processor[];
-	private sub: any;
-	loading = false;
-	type: number;
-	groupId: string;
-	deleted = false;
-	added = false;
-	selectedItem: Processor;
-	displayedColumns = ['name', 'class', 'interval', 'packet', 'action'];
-	dataSource = new MatTableDataSource();
-	@ViewChild(MatSort) sort: MatSort;
-	@ViewChild(MatPaginator) paginator: MatPaginator;
-	groupEditable: boolean;
+    currentUser: any;
+    processors: Processor[];
+    private sub: any;
+    loading = false;
+    type: number;
+    groupId: string;
+    deleted = false;
+    added = false;
+    selectedItem: Processor;
+    displayedColumns = ['name', 'class', 'interval', 'packet', 'action'];
+    dataSource = new MatTableDataSource();
+    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    groupEditable: boolean;
 
-	constructor(
-		private alertService: AlertService,
-		private httpService: HttpService,
-		private router: Router,
-		private dialog: MatDialog,
-		private route: ActivatedRoute,
-		private dataService: DataService,
-		private translate: TranslateService
-	)
-	{}
+    constructor(
+        private alertService: AlertService,
+        private httpService: HttpService,
+        private router: Router,
+        private dialog: MatDialog,
+        private route: ActivatedRoute,
+        private dataService: DataService,
+        private translate: TranslateService
+    ) {}
 
-	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    ngOnInit() {
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-		this.sub = this.route.params.subscribe(params => {
-			this.groupId = params['id'];
-		});
+        this.sub = this.route.params.subscribe(params => {
+            this.groupId = params['id'];
+        });
 
-		this.groupEditable = this.dataService.isGroupEditable();
+        this.groupEditable = this.dataService.isGroupEditable();
 
-		if (!this.groupEditable) {
-			this.displayedColumns = ['name', 'class', 'interval', 'packet'];
-		}
+        if (!this.groupEditable){
+            this.displayedColumns = ['name', 'class', 'interval', 'packet'];
+        }
 
-		this.loadProcessors();
-	}
+        this.loadProcessors();
+    }
 
-	loadProcessors() {
-		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
-			.subscribe(
-				data => {
-					this.processors = data;
-					this.dataSource.data = this.processors;
-					if (data.length > 0) {
-						if (this.deleted == false && this.added == false) {
-							this.alertService.success(this.translate.instant('message.data'));
-						}
-						else {
-							this.deleted = false;
-							this.added = false;
-						}
-					}
-					this.loading = false;
+    loadProcessors(){
+        this.loading = true;
+        this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+            .subscribe(
+                data => {
+                    this.processors = data;
+                    this.dataSource.data = this.processors;
+                    if (data.length > 0) {
+                        if (this.deleted == false && this.added == false){
+                            this.alertService.success(this.translate.instant('message.data'));
+                        }
+                        else{
+                            this.deleted = false;
+                            this.added = false;
+                        }
+                    }
+                    this.loading = false;
 
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-	}
+                },
+                error => {
+                    if (error.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
+    }
 
-	ngAfterViewInit() {
-		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
-	}
+    ngAfterViewInit() {
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+      }
 
-	applyFilter(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource.filter = filterValue;
-	}
+    applyFilter(filterValue: string) {
+        filterValue = filterValue.trim(); // Remove whitespace
+        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+        this.dataSource.filter = filterValue;
+    }
 
-	onMenuTriggerClick(item: any) {
-		this.selectedItem = item;
-	}
+    onMenuTriggerClick(item: any){
+        this.selectedItem = item;
+    }
 
-	onEditClick() {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
-		dialogConfig.data = {
-			processor: this.selectedItem,
-			groupId: this.groupId
-		};
+    onEditClick() {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            processor: this.selectedItem,
+            groupId: this.groupId
+        };
 
-		const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
+        const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
 
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.processor.update'));
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
-	}
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.processor.update'));
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
 
-	onAddClick() {
+    onAddClick() {
 
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
-		dialogConfig.data = {
-			processor: null,
-			groupId: this.groupId
-		};
-		const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '450px';
+        dialogConfig.data = {
+            processor: null,
+            groupId: this.groupId
+        };
+        const dialogRef = this.dialog.open(NetworkProcessorConfigurationEditComponent, dialogConfig);
 
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.processor.add'));
-				this.added = true;
-				this.loadProcessors();
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
-	}
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == true){
+                this.alertService.success(this.translate.instant('message.processor.add'));
+                this.added = true;
+                this.loadProcessors();
+            }
+            else{
+                if (result instanceof HttpErrorResponse){
+                    if (result.status == 0){
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else{
+                        this.alertService.error(result.error.errorMessage);
+                    }
+                }
+            }
+        });
+    }
 
-	onDeleteClick() {
-		this.openDialog(this.selectedItem);
-	}
+    onDeleteClick(){
+        this.openDialog(this.selectedItem);
+    }
 
-	public openDialog(item: any) {
+    public openDialog(item: any){
 
-		const dialogConfig = new MatDialogConfig();
+        const dialogConfig = new MatDialogConfig();
 
-		dialogConfig.disableClose = true;
-		dialogConfig.autoFocus = true;
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
 
-		dialogConfig.data = {
-			id: 1,
-			title: this.translate.instant('message.areyousure'),
-			content: this.translate.instant('message.processor.dialog')
-		};
+        dialogConfig.data = {
+            id: 1,
+            title: this.translate.instant('message.areyousure'),
+            content: this.translate.instant('message.processor.dialog')
+        };
 
-		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+        const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
-		dialogRef.afterClosed().subscribe(data => {
-			if (data === true) {
-				this.deleteProcessor(item);
-			}
-		});
-	}
+        dialogRef.afterClosed().subscribe(data => {
+            if (data === true){
+                this.deleteProcessor(item);
+            }
+        });
+    }
 
-	deleteProcessor(processor: any) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'processors/' + processor.id).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.processor.delete'));
-				this.deleted = true;
-				this.loadProcessors();
-				this.loading = false;
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
-	}
+    deleteProcessor(processor: any){
+        this.loading = true;
+        this.httpService.delete(environment.apiEndpoint + 'processors/' + processor.id).subscribe(
+            data => {
+                this.alertService.success(this.translate.instant('message.processor.delete'));
+                this.deleted = true;
+                this.loadProcessors();
+                this.loading = false;
+            },
+            error => {
+                if (error.status == 0){
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else{
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            });
+    }
 }

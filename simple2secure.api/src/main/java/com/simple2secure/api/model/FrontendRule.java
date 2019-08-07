@@ -1,36 +1,36 @@
 package com.simple2secure.api.model;
 
-import com.simple2secure.api.dbo.GenericDBObject;
-
-public class FrontendRule extends GenericDBObject {
-
-	/**
-	 *
-	 */
-
-	private static final long serialVersionUID = 3173461203987223971L;
+public class FrontendRule {
+	
+	private String id;
 	private String toolId;
-	private String contextId;
-	private String clazz;
+	private String userId;
 	private String name;
 	private String description;
 	private int priority;
-	private long timestamp;
-	private boolean active = true;
-
+	private String createdOn;
+	private boolean active;
+	
 	public FrontendRule() {
 	}
 
-	public FrontendRule(String toolId, String contextId, String clazz, String name, String description, int priority, long timestamp,
-			boolean active) {
+	public FrontendRule(String id, String toolId, String userId, String name, String description, int priority, String createdOn, boolean active) {
+		this.id = id;
 		this.toolId = toolId;
-		this.contextId = contextId;
-		this.clazz = clazz;
+		this.userId = userId;
 		this.name = name;
 		this.description = description;
 		this.priority = priority;
-		this.timestamp = timestamp;
+		this.createdOn = createdOn;
 		this.active = active;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getToolId() {
@@ -41,20 +41,20 @@ public class FrontendRule extends GenericDBObject {
 		this.toolId = toolId;
 	}
 
-	public String getContextId() {
-		return contextId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
-	public long getTimestamp() {
-		return timestamp;
+	public String getCreatedOn() {
+		return createdOn;
 	}
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+	public void setCreatedOn(String createdOn) {
+		this.createdOn = createdOn;
 	}
 
 	public boolean isActive() {
@@ -87,13 +87,5 @@ public class FrontendRule extends GenericDBObject {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
-	}
-
-	public String getClazz() {
-		return clazz;
-	}
-
-	public void setClazz(String clazz) {
-		this.clazz = clazz;
 	}
 }

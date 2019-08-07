@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
+import { Component} from '@angular/core';
 
 @Component({
-	moduleId: module.id,
-	templateUrl: 'rule.component.html'
+    moduleId: module.id,
+    templateUrl: 'rule.component.html'
 })
 
 export class RuleComponent {

@@ -1,7 +1,5 @@
-import {Base} from './base';
-import {Parameter} from './parameter';
+import {Generic} from './generic';
 
-export class Command extends Base {
-	parameter = new Parameter();
-	executable = '';
+export class Command extends Generic {
+  content: string;
 }

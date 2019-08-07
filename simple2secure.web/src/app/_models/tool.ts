@@ -1,7 +1,7 @@
 import {Base} from './base';
-import {TestCase} from './testCase';
+import {Test} from './test';
 
-export class Tool extends Base {
-	generatedName = String;
-	tests: TestCase[];
+export class Tool extends Base{
+    generatedName = String;
+    tests: Test[];
 }

@@ -1,101 +1,73 @@
 /* Three image containers (use 25% for four, and 50% for two, etc) */
-.example-container {
-
+.example-container{
+	
 }
 
 .column {
-    padding: 5px;
-    width: 18em;
-    height: 18em;
-    padding: 2.8em;
-    border-radius: 50%;
-    margin-right: 100px;
-    display: inline-block;
+  padding: 5px;
+  width: 18em;
+  height: 18em;
+  padding: 2.8em;
+  border-radius: 50%;
+  margin-right: 100px;
+  display: inline-block;
 }
 
 /* Clear floats after image containers */
 .row::after {
-    content: "";
-    clear: both;
-    /*display: table;*/
+  content: "";
+  clear: both;
+  /*display: table;*/
 }
 
 /* row */
 
 .row {
-    /*position: block;*/
-    align: center;
-    text-align: center;
+	/*position: block;*/
+	align: center;
+	text-align: center;
 }
 
 /* Text under the icons*/
 .row p {
-    text-transform: uppercase;
-    font-weight: bold;
+	text-transform: uppercase;
+	font-weight: bold;
 }
-
 /* Image in the row */
 .row img {
-    width: 45%;
+	width:45%;
 }
 
 .subitems {
-    display: none;
+	display:none;
 }
 
-.column .subitems {
-    width: 4em;
-    height: 4em;
+.column .subitems{
+	width: 4em;
+	height: 4em;
 }
 
-.column .subitems button {
+.column .subitems button{
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     margin: -2em;
     color: #A7BD26;
     text-transform: uppercase;
     font-weight: bold;
 }
 
-.column .subitems button i {
+.column .subitems button i{
     color: grey;
 }
-
-.column img {
-    display: block;
-    width: 100%;
+.column img 
+{ 
+	display: block; width: 100%; 
 }
-
-.deg0 {
-    transform: translate(8em);
-}
-
-/* 12em = half the width of the wrapper */
-.deg22 {
-    transform: rotate(22deg) translate(8em) rotate(-22deg);
-}
-
-.deg45 {
-    transform: rotate(45deg) translate(8em) rotate(-45deg);
-}
-
-.deg135 {
-    transform: rotate(135deg) translate(8em) rotate(-135deg);
-}
-
-.deg180 {
-    transform: translate(-8em);
-}
-
-.deg225 {
-    transform: rotate(225deg) translate(8em) rotate(-225deg);
-}
-
-.deg315 {
-    transform: rotate(315deg) translate(8em) rotate(-315deg);
-}
-
-.deg337 {
-    transform: rotate(337deg) translate(8em) rotate(-337deg);
-}
+.deg0 { transform: translate(8em); } /* 12em = half the width of the wrapper */
+.deg22 { transform: rotate(22deg) translate(8em) rotate(-22deg); }
+.deg45 { transform: rotate(45deg) translate(8em) rotate(-45deg); }
+.deg135 { transform: rotate(135deg) translate(8em) rotate(-135deg); }
+.deg180 { transform: translate(-8em); }
+.deg225 { transform: rotate(225deg) translate(8em) rotate(-225deg); }
+.deg315 { transform: rotate(315deg) translate(8em) rotate(-315deg); }
+.deg337 { transform: rotate(337deg) translate(8em) rotate(-337deg); }

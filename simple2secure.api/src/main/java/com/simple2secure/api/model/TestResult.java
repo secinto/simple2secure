@@ -5,50 +5,36 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class TestResult extends GenericDBObject {
 
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = -6306698374548193553L;
-
+	private static final long serialVersionUID = 8378078482721033979L;
 	private String name;
-	private String testRunId;
-	private String hostname;
-	private String result;
+	private String content;
 	private String timestamp;
 
 	public TestResult() {
-
 	}
 
-	public TestResult(String name, String testRunId, String hostname, String result, String timestamp) {
+	public TestResult(String name, String content, String timestamp) {
 		this.name = name;
-		this.testRunId = testRunId;
-		this.hostname = hostname;
-		this.result = result;
+		this.content = content;
 		this.timestamp = timestamp;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getResult() {
-		return result;
+	public String getContent() {
+		return this.content;
 	}
 
-	public void setResult(String result) {
-		this.result = result;
-	}
-
-	public String getTestRunId() {
-		return testRunId;
-	}
-
-	public void setTestRunId(String testRunId) {
-		this.testRunId = testRunId;
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public String getTimestamp() {
@@ -57,13 +43,5 @@ public class TestResult extends GenericDBObject {
 
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
 	}
 }

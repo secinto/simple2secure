@@ -1,3 +1,3 @@
 export class Generic {
-	id: string;
+  id: string;
 }

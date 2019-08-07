@@ -15,14 +15,15 @@ public class ProcessingQueue<T> {
 	}
 
 	/**
-	 * Pushes a {@link PacketContainer} as last element onto the queue. This is a FIFO type of queue.
+	 * Pushes a {@link PacketContainer} as last element onto the queue. This is a
+	 * FIFO type of queue.
 	 *
 	 * @param packet
 	 */
 	public void push(T packet) {
 		synchronized (processingQueue) {
 			processingQueue.add(packet);
-			processingQueue.notifyAll();
+			processingQueue.notify();
 		}
 	}
 
@@ -38,7 +39,6 @@ public class ProcessingQueue<T> {
 					processingQueue.wait();
 				} catch (InterruptedException e) {
 					log.error("Processing queue interrupted. Reason {}", e);
-					Thread.currentThread().interrupt();
 				}
 			}
 			return processingQueue.poll();

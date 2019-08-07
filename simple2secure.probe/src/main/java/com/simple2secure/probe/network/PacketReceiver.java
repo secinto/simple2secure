@@ -42,6 +42,7 @@ public class PacketReceiver implements PacketListener, Runnable {
 	public void run() {
 		try {
 			running = true;
+
 			handle.loop(-1, this);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -57,9 +58,7 @@ public class PacketReceiver implements PacketListener, Runnable {
 
 	public void stop() {
 		try {
-			if (running) {
-				handle.breakLoop();
-			}
+			handle.breakLoop();
 		} catch (NotOpenException e) {
 			log.debug("PacketReceiver.close called although loop wasn't running!", e);
 		}

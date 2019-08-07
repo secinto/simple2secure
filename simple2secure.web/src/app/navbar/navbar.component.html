@@ -1,61 +1,48 @@
 <nav class="navbar">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
-            <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: <b>{{currentContext.context.name}}</b>
-            </p>
-        </div>
-        <ul class="nav navbar-nav centered-nav">
+	<div class="container-fluid">
+	    <div class="navbar-header">
+	      <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
+	    </div>
+	    <ul class="nav navbar-nav centered-nav">
 
-            <li *ngIf="loggedIn" id="report-menu" (click)="onNavItemClick('/report', 'report-menu')">
-                <img src="assets/icons/communication.png">
-            </li>
-
-            <li *ngIf="loggedIn" id="analysis-menu" (click)="onNavItemClick('/analysis', 'analysis-menu')">
-                <img src="assets/icons/analysis.png">
-            </li>
-
-            <li *ngIf="loggedIn" id="email-menu" (click)="onNavItemClick('/email', 'email-menu')">
-                <img src="assets/icons/email.png">
-            </li>
-
-            <li *ngIf="loggedIn" id="orbiter-menu" (click)="onNavItemClick('/orbiter', 'orbiter-menu')">
-                <img src="assets/icons/orbiter.png">
-            </li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <mat-form-field id="nav-right-custom-language-switcher">
-                    <mat-select id="nav-right-custom-language-switcher-select" [(ngModel)]="currentLang"
-                                (selectionChange)="setLocale($event.value)">
-                        <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages"
-                                    [value]="language.value">
-                            {{language.localeVal}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </li>
-            <li *ngIf="loggedIn">
-                <button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-2x"
-                                                                            aria-hidden="true"></i></button>
-            </li>
-            <li *ngIf="loggedIn && showSettings">
-                <button mat-icon-button routerLink="/settings" color="white"><i class="fa fa-cog fa-2x"
-                                                                                aria-hidden="true"></i></button>
-            </li>
-            <li *ngIf="loggedIn" (click)="openNotificationModal()">
-                <button mat-icon-button color="white"><i class="fa fa-bell fa-2x"
-                                                         aria-hidden="true" matBadge="{{this.numOfUnreadNotification}}" matBadgeColor="warn" matBadgePosition="above after"></i></button>
-            </li>
-            <li *ngIf="loggedIn">
-                <button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x"
-                                                                             aria-hidden="true"></i></button>
-            </li>
-        </ul>
-
-        <div *ngIf="showNotifications">
-            <notificationList></notificationList>
-        </div>
-
+		        <li *ngIf="loggedIn" id="report-menu" (click)="onNavItemClick('/report', 'report-menu')">
+		        	<img src="assets/icons/communication.png">			     	
+		        </li>   
+		        
+		        <li *ngIf="loggedIn" id="analysis-menu" (click)="onNavItemClick('/analysis', 'analysis-menu')">
+					<img src="assets/icons/analysis.png">			   	
+		        </li> 
+		        
+		        <li *ngIf="loggedIn" id="email-menu" (click)="onNavItemClick('/email', 'email-menu')">
+		        	<img src="assets/icons/email.png">		
+		        </li>                 
+		        
+		        <li *ngIf="loggedIn" id="orbiter-menu" (click)="onNavItemClick('/orbiter', 'orbiter-menu')">
+					<img src="assets/icons/orbiter.png">			     	
+		        </li>                                          
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+		      <li>
+	    	  	<mat-form-field id="nav-right-custom-language-switcher">  	      
+				  <mat-select id="nav-right-custom-language-switcher-select" [(ngModel)]="currentLang" (selectionChange)="setLocale($event.value)">
+				    <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages" [value]="language.value">
+				      {{language.localeVal}}
+				    </mat-option>
+				  </mat-select>
+				</mat-form-field>
+	    	  </li>    
+		      <li *ngIf="loggedIn">
+		      	<button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-2x" aria-hidden="true"></i></button>
+		      </li>    
+		      <li *ngIf="loggedIn && showSettings">
+		      	<button mat-icon-button routerLink="/settings" color="white"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></button>
+		      </li>  
+		      <li *ngIf="loggedIn">
+		      	<button mat-icon-button routerLink="/notification" color="white"><i class="fa fa-bell fa-2x" aria-hidden="true"></i></button>
+		      </li>        
+		      <li *ngIf="loggedIn">
+		      	<button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x" aria-hidden="true"></i></button>
+		      </li>
+	    </ul>    
     </div>
 </nav>

@@ -2,6 +2,8 @@ package com.simple2secure.probe.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
@@ -11,15 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
-import com.simple2secure.commons.json.JSONUtils;
 
 /***
- * Different Utility methods for parsing JSON Strings. Uses the ever-obsolete
- * w3c library, might want to replace it with something newer.
+ * Different Utility methods for parsing JSON Strings. Uses the ever-obsolete w3c library, might want to replace it with something newer.
  *
  * @author jhoffmann
  *
@@ -55,8 +57,7 @@ public class JsonUtils {
 	}
 
 	/**
-	 * Reads the JSON config file provided as file name String and converts the
-	 * content
+	 * Reads the JSON config file provided as file name String and converts the content
 	 *
 	 * @param filename
 	 * @return
@@ -88,9 +89,10 @@ public class JsonUtils {
 		return null;
 
 	}
-
+	
 	public static Config readConfigFromString(String config) {
-		Config configObj = JSONUtils.fromString(config, Config.class);
+		Gson gson = new Gson();
+		Config configObj = gson.fromJson(config, Config.class);
 		return configObj;
 	}
 
@@ -101,8 +103,16 @@ public class JsonUtils {
 	 * @return
 	 */
 	public static List<QueryRun> readRunQueriesFromFile(File file) {
+		Gson gson = new Gson();
 
-		QueryRun[] queryRunArr = JSONUtils.fromFile(file, QueryRun[].class);
+		FileReader fr = null;
+		try {
+			fr = new FileReader(file);
+		} catch (FileNotFoundException e) {
+			log.error("Provided file not found: " + file.getAbsolutePath());
+		}
+		JsonReader reader = new JsonReader(fr);
+		QueryRun[] queryRunArr = gson.fromJson(reader, QueryRun[].class);
 		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
 		return queryRunList;
 
@@ -115,7 +125,16 @@ public class JsonUtils {
 	 * @return
 	 */
 	public static List<Processor> readProcessorsFromFile(File file) {
-		Processor[] processorArr = JSONUtils.fromFile(file, Processor[].class);
+		Gson gson = new Gson();
+
+		FileReader fr = null;
+		try {
+			fr = new FileReader(file);
+		} catch (FileNotFoundException e) {
+			log.error("Provided file not found: " + file.getAbsolutePath());
+		}
+		JsonReader reader = new JsonReader(fr);
+		Processor[] processorArr = gson.fromJson(reader, Processor[].class);
 		List<Processor> processors = Arrays.asList(processorArr);
 		return processors;
 
@@ -128,7 +147,16 @@ public class JsonUtils {
 	 * @return
 	 */
 	public static List<Step> readStepsFromFile(File file) {
-		Step[] stepArr = JSONUtils.fromFile(file, Step[].class);
+		Gson gson = new Gson();
+
+		FileReader fr = null;
+		try {
+			fr = new FileReader(file);
+		} catch (FileNotFoundException e) {
+			log.error("Provided file not found: " + file.getAbsolutePath());
+		}
+		JsonReader reader = new JsonReader(fr);
+		Step[] stepArr = gson.fromJson(reader, Step[].class);
 		List<Step> steps = Arrays.asList(stepArr);
 		return steps;
 	}

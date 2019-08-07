@@ -1,93 +1,70 @@
 <button *ngIf="groupEditable" mat-raised-button color="primary" id="addButton" type="button" (click)="onAddClick()"
-        class="pull-right mat-green-button">
-    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+	class="pull-right mat-green-button">
+	<i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
 </button>
 
 <div class="example-container mat-elevation-z8 table table-striped">
-    <div class="header-filter-table">
-        <mat-form-field class="header-filter-field">
-            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-        </mat-form-field>
-    </div>
-    <mat-table #table [dataSource]="dataSource" matSort>
+  <div class="header-filter-table">
+    <mat-form-field class="header-filter-field">
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
-        </ng-container>
+    <!-- Position Column -->
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="query">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.sql' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.sqlQuery}}</mat-cell>
-        </ng-container>
+    <!-- Name Column -->
+    <ng-container matColumnDef="query">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.sql' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.sqlQuery}} </mat-cell>
+    </ng-container>
 
-        <ng-container matColumnDef="runAlways">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'osquery.runalways' |
-                translate }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                <button *ngIf="element.always === true" mat-raised-button color="primary" class="mat-green-button"> {{
-                    'button.true' | translate }}
-                </button>
-                <button *ngIf="element.always === false" mat-raised-button color="warn" class="mat-red-button"> {{
-                    'button.false' | translate }}
-                </button>
-            </mat-cell>
-        </ng-container>
+    <ng-container matColumnDef="runAlways">
+      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'osquery.runalways' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+        <button *ngIf="element.always === true" mat-raised-button color="primary" class="mat-green-button"> {{ 'button.true' | translate }}</button>
+        <button *ngIf="element.always === false" mat-raised-button color="warn" class="mat-red-button"> {{ 'button.false' | translate }}</button>
+      </mat-cell>
+    </ng-container>
 
-        <ng-container matColumnDef="interval">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.analysisInterval' | translate }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.analysisInterval}} {{element.analysisIntervalUnit}}
-            </mat-cell>
-        </ng-container>
+    <ng-container matColumnDef="interval">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.analysisInterval' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.analysisInterval}}  {{element.analysisIntervalUnit}} </mat-cell>
+    </ng-container>
 
-        <ng-container matColumnDef="active">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.state' | translate
-                }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                <button *ngIf="element.active === 1" mat-raised-button color="primary" class="mat-green-button"> {{
-                    'button.active' | translate }}
-                </button>
-                <button *ngIf="element.active === 0" mat-raised-button color="warn" class="mat-red-button"> {{
-                    'button.inactive' | translate }}
-                </button>
-            </mat-cell>
-        </ng-container>
+    <ng-container matColumnDef="active">
+      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.state' | translate }} </mat-header-cell>     
+      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
+      	<button *ngIf="element.active === 1" mat-raised-button color="primary" class="mat-green-button"> {{ 'button.active' | translate }}</button> 
+      	<button *ngIf="element.active === 0" mat-raised-button color="warn" class="mat-red-button"> {{ 'button.inactive' | translate }}</button>
+      </mat-cell>
+    </ng-container>
+    
+    <ng-container *ngIf="groupEditable" matColumnDef="action">
+      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+        <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuOsQuery" (click)="onMenuTriggerClick(element)">
+          <i class="fas fa-bars"></i>
+        </button>
+      </mat-cell>
+    </ng-container>
 
-        <ng-container *ngIf="groupEditable" matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate
-                }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuOsQuery"
-                        (click)="onMenuTriggerClick(element)">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-    </mat-table>
-    <mat-paginator #paginator
-                   [pageSize]="10"
-                   [pageSizeOptions]="[5, 10, 20]"
-                   [showFirstLastButtons]="true">
-    </mat-paginator>
-    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>  
+  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>
 
 <mat-menu #menuOsQuery="matMenu">
-    <button *ngIf="groupEditable" mat-menu-item (click)="onEditClick()">
-        <mat-icon>edit</mat-icon>
-        {{ 'button.edit' | translate }}
-    </button>
-    <button *ngIf="groupEditable" mat-menu-item (click)="onDeleteClick()">
-        <mat-icon>delete</mat-icon>
-        {{ 'button.delete' | translate }}
-    </button>
+  <button *ngIf="groupEditable" mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
+  <button *ngIf="groupEditable" mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
 </mat-menu>

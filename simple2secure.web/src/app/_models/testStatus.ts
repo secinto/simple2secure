@@ -1,7 +1,0 @@
-export enum TestStatus {
-	UNKNOWN = 'UNKNOWN',
-	SCHEDULED = 'SCHEDULED',
-	RUNNING = 'RUNNING',
-	PLANNED = 'PLANNED',
-	EXECUTED = 'EXECUTED'
-}

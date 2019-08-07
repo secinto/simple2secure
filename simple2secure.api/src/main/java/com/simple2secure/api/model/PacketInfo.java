@@ -1,8 +1,5 @@
 package com.simple2secure.api.model;
 
-import javax.persistence.Embeddable;
-
-@Embeddable
 public class PacketInfo {
 
 	private String destination_ip;
@@ -16,7 +13,8 @@ public class PacketInfo {
 
 	}
 
-	public PacketInfo(String destination_ip, String source_ip, String destination_mac, String source_mac, int length, String protocol) {
+	public PacketInfo(String destination_ip, String source_ip, String destination_mac, String source_mac,
+			int length, String protocol) {
 		super();
 		this.destination_ip = destination_ip;
 		this.source_ip = source_ip;

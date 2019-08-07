@@ -1,27 +1,21 @@
-import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {DataService} from '../_services/index';
+import {Component} from '@angular/core';
+import {NetworkReport} from '../_models/index';
+import {DataService, AlertService} from '../_services/index';
 
 @Component({
-	moduleId: module.id,
-	templateUrl: 'networkReportDetails.component.html'
+  moduleId: module.id,
+  templateUrl: 'networkReportDetails.component.html'
 })
 
 export class NetworkReportDetailsComponent {
-	report: any;
-	loading = false;
-	result: string;
+  report: NetworkReport;
+  loading = false;
+  objectKeys = Object.keys;
 
-	constructor(
-		private dataService: DataService,
-		private dialogRef: MatDialogRef<NetworkReportDetailsComponent>,
-		@Inject(MAT_DIALOG_DATA) data)
-	{
-		this.report = data.report;
-	}
+  constructor(
+    private dataService: DataService) {}
 
-	getStringResult() {
-		this.result = JSON.parse(this.report.stringContent);
-		return this.result;
-	}
+  ngOnInit() {
+    this.report = this.dataService.get();
+  }
 }

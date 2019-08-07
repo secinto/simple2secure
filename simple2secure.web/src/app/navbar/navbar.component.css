@@ -1,84 +1,74 @@
-.navbar {
-    background-color: white;
-    color: #A7BD26;
-    border-bottom: 5px solid #A7BD26;
-    min-height: 78px;
+.navbar{
+	background-color: white;
+	color: #A7BD26;
+	border-bottom: 5px solid #A7BD26;
+	min-height: 78px;
 }
 
-.navbar .navbar-nav {
-    display: inline-block;
+ .navbar .navbar-nav {
+     display: inline-block;
+ }
+ 
+.centered-nav{
+     position: absolute;
+     left: 44%;
+     transform: translatex(-44%);	
+} 
+
+.navbar-nav li{
+	text-align: center;
+	display:inline-block;
 }
 
-.centered-nav {
-    position: absolute;
-    left: 44%;
-    transform: translatex(-44%);
+.nav img{
+	width: 130px;
+	max-width: 50%;
 }
 
-.navbar-nav li {
-    text-align: center;
-    display: inline-block;
+.navbar-brand{
+	display: inline-block;
+	padding: 15px 0px 0px 5px;
 }
 
-.nav img {
-    width: 130px;
-    max-width: 50%;
+.navbar-right{
+	float:right;
+	display: inline-block;
+	max-width: 20%;
+	margin-right: 0px;
+	padding: 15px 0px 0px 0px;
 }
 
-.navbar-brand {
-    display: inline-block;
-    padding: 15px 0px 0px 5px;
+.navbar-right li{
+	height: auto;
+	width: auto;
 }
 
-.navbar-right {
-    float: right;
-    display: inline-block;
-    max-width: 20%;
-    margin-right: 0px;
-    padding: 15px 0px 0px 0px;
+.navbar-right a{
+	color: white;	
 }
 
-.navbar-right li {
-    height: auto;
-    width: auto;
-}
-
-.navbar-right a {
-    color: white;
-}
-
-#nav-right-custom-language-switcher {
-    max-width: 50px;
-    font-weight: bold;
-}
-
-#current-context-id {
-    margin-left: -10px;
-    overflow: hidden;
-    width: 100%;
-    white-space: nowrap;
-    font-size: 11px;
-    text-align: center;
-    cursor: pointer;
+#nav-right-custom-language-switcher{
+	max-width: 50px;
+	font-weight: bold;
 }
 
 /* ############### onHover effects ###############
 		 Navigation item on hover effect */
 .navbar-nav li:hover {
-    -webkit-transform: scale(1.1); /* Safari and Chrome */
-    -moz-transform: scale(1.1); /* Firefox */
-    -ms-transform: scale(1.1); /* IE 9 */
-    -o-transform: scale(1.1); /* Opera */
-    transform: scale(1.1);
-    cursor: pointer;
+    -webkit-transform:scale(1.1); /* Safari and Chrome */
+    -moz-transform:scale(1.1); /* Firefox */
+    -ms-transform:scale(1.1); /* IE 9 */
+    -o-transform:scale(1.1); /* Opera */
+     transform:scale(1.1);
+     cursor: pointer;
 }
 
-.navbar-right li:hover {
-    -webkit-transform: scale(1.1); /* Safari and Chrome */
-    -moz-transform: scale(1.1); /* Firefox */
-    -ms-transform: scale(1.1); /* IE 9 */
-    -o-transform: scale(1.1); /* Opera */
-    transform: scale(1.1);
+.navbar-right li:hover{
+    -webkit-transform:scale(1.1); /* Safari and Chrome */
+    -moz-transform:scale(1.1); /* Firefox */
+    -ms-transform:scale(1.1); /* IE 9 */
+    -o-transform:scale(1.1); /* Opera */
+     transform:scale(1.1);	
 }
 
 

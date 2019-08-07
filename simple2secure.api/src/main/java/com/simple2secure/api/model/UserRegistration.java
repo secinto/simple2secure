@@ -6,26 +6,24 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 public class UserRegistration {
-
+	
 	private String email;
-
+	
 	private String password;
-
+	
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
 	private List<String> groupIds;
-
+	
 	private String addedByUserId;
-
-	private String currentContextId;
-
+	
 	private UserRegistrationType registrationType;
-
+	
 	public UserRegistration() {
-
+		
 	}
-
+	
 	public UserRegistration(String email, UserRole userRole, List<String> groupIds) {
 		this.email = email;
 		this.userRole = userRole;
@@ -58,14 +56,6 @@ public class UserRegistration {
 
 	public String getAddedByUserId() {
 		return addedByUserId;
-	}
-
-	public String getCurrentContextId() {
-		return currentContextId;
-	}
-
-	public void setCurrentContextId(String currentContextId) {
-		this.currentContextId = currentContextId;
 	}
 
 	public void setAddedByUserId(String addedByUserId) {

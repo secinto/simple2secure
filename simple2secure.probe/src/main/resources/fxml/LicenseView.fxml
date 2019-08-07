@@ -14,7 +14,7 @@
 <?import javafx.scene.control.Button?>
 <?scenebuilder-stylesheet ../gui/css/simple2secure.css?>
 
-<Pane prefHeight="300.0" prefWidth="400.0" stylesheets="@../gui/css/simple2secure.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.simple2secure.probe.gui.controller.LicenseGUIController">
+<Pane prefHeight="300.0" prefWidth="400.0" stylesheets="@../gui/css/simple2secure.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.simple2secure.probe.gui.controller.LicenseController">
    <children>
       <ImageView fitHeight="105.0" fitWidth="400.0" pickOnBounds="true">
          <image>
@@ -25,7 +25,7 @@
          <children>
 			<VBox alignment="CENTER" prefHeight="64.0" prefWidth="201.0" spacing="10">
 				<children>
-					<Button fx:id="importButton" mnemonicParsing="false" onAction="#handleLicenseGUIImport" text="Import your license" >
+					<Button fx:id="importButton" mnemonicParsing="false" onAction="#handleLicenseImport" text="Import your license" >
 					    <styleClass>
 					        <String fx:value="primary"/>
 					        <String fx:value="middle"/>

@@ -1,41 +1,56 @@
-<h3 mat-dialog-title>{{ 'menu.emails' | translate }}</h3>
-<div mat-dialog-content>
-    <div class="example-container mat-elevation-z8 table table-striped">
-        <div class="header-filter-table">
-            <mat-form-field class="header-filter-field">
-                <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-            </mat-form-field>
-        </div>
-        <mat-table #table [dataSource]="dataSource" matSort>
+<button mat-raised-button color="primary" id="addButton" type="button" [routerLink]="['rule/overview']"
+	class="pull-right mat-green-button">
+	<i class="glyphicon glyphicon-edit"></i> {{ 'button.rules' | translate }}
+</button>
+<div class="example-container mat-elevation-z8 table table-striped">
+  <div class="header-filter-table">
+    <mat-form-field class="header-filter-field">
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource" matSort>
 
-            <!-- Position Column -->
-            <ng-container matColumnDef="from">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.from' | translate }}</mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.from}}</mat-cell>
-            </ng-container>
+    <!-- Position Column -->
+    <ng-container matColumnDef="from">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.from' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.from}} </mat-cell>
+    </ng-container>
 
-            <!-- Name Column -->
-            <ng-container matColumnDef="subject">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.subject' | translate }}</mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.subject}}</mat-cell>
-            </ng-container>
+    <!-- Name Column -->
+    <ng-container matColumnDef="subject">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.subject' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.subject}} </mat-cell>
+    </ng-container>    
+    
+    <!-- Name Column -->
+    <ng-container matColumnDef="time">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.receivedDate' | translate }} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.receivedDate}} </mat-cell>
+    </ng-container> 
+    
+    <!-- Expanded Content Column - The detail row is made up of this one column -->
+    <ng-container matColumnDef="expandedDetail">
+      <mat-cell *matCellDef="let detail"> 
+        {{detail.element.text}}
+      </mat-cell>
+    </ng-container>    
+    
 
-            <!-- Name Column -->
-            <ng-container matColumnDef="time">
-                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.receivedDate' | translate }}
-                </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.receivedDate}}</mat-cell>
-            </ng-container>
-
-
-            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
-        <mat-paginator #paginator
-                       [pageSize]="10"
-                       [pageSizeOptions]="[5, 10, 20]"
-                       [showFirstLastButtons]="true">
-        </mat-paginator>
-        <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
-    </div>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"
+            matRipple 
+            class="element-row" 
+            [class.expanded]="expandedElement == row"
+            (click)="expandedElement = row"></mat-row>
+    <!--  <mat-row *matRowDef="let row; columns: ['expandedDetail']; when: isExpansionDetailRow"
+            [@detailExpand]="row.element == expandedElement ? 'expanded' : 'collapsed'"
+            style="overflow: hidden"> 
+    </mat-row>-->
+  </mat-table>
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>  
+  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>

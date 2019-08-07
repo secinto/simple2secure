@@ -30,10 +30,6 @@
 
 package com.simple2secure.commons.network;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
@@ -791,28 +787,9 @@ public class NetUtils {
 				return false;
 			}
 		} catch (IllegalArgumentException e) {
-			// log.error(MessageCodeUtil.getMessageCodeMessage(MessageCodeGeneral.address_not_correct, e.getLocalizedMessage()));
+			//log.error(MessageCodeUtil.getMessageCodeMessage(MessageCodeGeneral.address_not_correct, e.getLocalizedMessage()));
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 *
-	 * @param string_url
-	 * @return
-	 */
-	public static boolean netIsAvailable(String string_url) {
-		try {
-			final URL url = new URL(string_url);
-			final URLConnection conn = url.openConnection();
-			conn.connect();
-			return true;
-		} catch (MalformedURLException e) {
-			log.error(e.getMessage());
-			return false;
-		} catch (IOException e) {
-			return false;
-		}
 	}
 }

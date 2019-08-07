@@ -1,46 +1,37 @@
 <div class="example-container">
-    <div class="row">
+	<div class="row">
         <div class="column" id="analysis">
             <a href='#' class='center'><img src='assets/icons/analysis.png'></a>
             <p>{{ 'dashboard.analysis' | translate }}</p>
             <div class="subitems">
-                <button class='deg0' routerLink="/analysis" mat-button><i class="fas fa-chart-pie"></i> {{
-                    'menu.analysis' | translate }}
-                </button>
+                <button class='deg0' routerLink="/analysis" mat-button><i class="fas fa-chart-pie"></i> {{ 'menu.analysis' | translate }}</button>
             </div>
         </div>
         <div class="column" id="report">
-            <a href='#' class='center'><img src='assets/icons/communication.png'></a>
-            <p>{{ 'menu.reports' | translate }}</p>
-            <div class="subitems">
-                <button class='deg337' routerLink="/report/network" mat-button><i class="fas fa-newspaper"></i> {{
-                    'menu.networkanalysisReports' | translate }}
-                </button>
-                <button class='deg0' routerLink="/report/osquery" mat-button><i class="fas fa-newspaper"></i> {{
-                    'menu.queryReport' | translate }}
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="column" id="email">
-            <a href='#' class='center'><img src='assets/icons/email.png'></a>
-            <p>{{ 'dashboard.email' | translate }}</p>
-            <div class="subitems">
-                <button class='deg0' routerLink="/email" mat-button><i class="fas fa-align-center"></i> {{
-                    'menu.overview' | translate }}
-                </button>
-            </div>
-        </div>
-        <div class="column" id="orbiter">
+			 <a href='#' class='center'><img src='assets/icons/communication.png'></a>
+			<p>{{ 'menu.reports' | translate }}</p>
+			<div class="subitems">
+				<button class='deg337' routerLink="/report/network" mat-button><i class="fas fa-newspaper"></i> {{ 'menu.networkanalysisReports' | translate }}</button>
+				<button class='deg0' routerLink="/report/osquery" mat-button><i class="fas fa-newspaper"></i> {{ 'menu.queryReport' | translate }}</button>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="column" id="email">
+			 <a href='#' class='center'><img src='assets/icons/email.png'></a>
+			<p>{{ 'dashboard.email' | translate }}</p>
+			<div class="subitems">
+				<button class='deg0' routerLink="/email" mat-button><i class="fas fa-align-center"></i> {{ 'menu.overview' | translate }}</button>
+			</div>
+		</div>
+		<div class="column" id="orbiter">
 
-            <a href='#' class='center'><img src='assets/icons/orbiter.png'></a>
-            <p>{{ 'dashboard.orbiter' | translate }}</p>
-            <div class="subitems">
-                <button class='deg337' routerLink="/orbiter" mat-button><i class="fas fa-wrench"></i> {{ 'menu.tools' |
-                    translate }}
-                </button>
-            </div>
-        </div>
-    </div>
+			 <a href='#' class='center'><img src='assets/icons/orbiter.png'></a>
+			<p>{{ 'dashboard.orbiter' | translate }}</p>
+			<div class="subitems">
+				<button class='deg337' routerLink="/orbiter/tools" mat-button><i class="fas fa-wrench"></i> {{ 'menu.tools' | translate }}</button>
+				<button class='deg0' routerLink="/orbiter/tools/test" mat-button><i class="fas fa-clipboard-list"></i> {{ 'menu.tests' | translate }}</button>
+			</div>
+		</div>
+	</div>
 </div>

@@ -1,0 +1,9 @@
+<h3 >{{ 'button.testresults' | translate }} {{test.name}}</h3>
+
+
+<fieldset *ngFor="let item of test.testResult">
+	<p><b>Timestamp: </b> {{item.timestamp}}</p>
+	<fieldset>
+		<div [innerHTML] = "'<b>Result:</b><br>' + item.content | nl2br "></div>
+	</fieldset>
+</fieldset>

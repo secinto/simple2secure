@@ -11,45 +11,34 @@ package com.simple2secure.api.dto;
 import java.util.List;
 
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Pod;
-import com.simple2secure.api.model.Probe;
-import com.simple2secure.api.model.UserInfo;
+import com.simple2secure.api.model.User;
 
-public class UserDTO {
+public class UserDTO{
 
-	private List<UserRoleDTO> myUsersList;
+	private List<User> myUsersList;
 	private List<CompanyGroup> myGroups;
-	private List<Probe> myProbes;
-	private List<Pod> myPods;
-	private List<Context> myContexts;
-	private List<String> assignedGroups;
-	private UserInfo myProfile;
+	private User myProfile;
 
-	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Pod> myPods,
-			List<Context> myContexts, List<String> assignedGroups) {
-		myProfile = user;
-		myUsersList = myUsers;
+
+	public UserDTO(User user, List<User> myUsers, List<CompanyGroup> myGroups) {
+		this.myProfile = user;
+		this.myUsersList = myUsers;
 		this.myGroups = myGroups;
-		this.myProbes = myProbes;
-		this.myPods = myPods;
-		this.myContexts = myContexts;
-		this.assignedGroups = assignedGroups;
 	}
 
-	public List<UserRoleDTO> getMyUsersList() {
+	public List<User> getMyUsersList() {
 		return myUsersList;
 	}
 
-	public void setMyUsersList(List<UserRoleDTO> myUsersList) {
+	public void setMyUsersList(List<User> myUsersList) {
 		this.myUsersList = myUsersList;
 	}
 
-	public UserInfo getMyProfile() {
+	public User getMyProfile() {
 		return myProfile;
 	}
 
-	public void setMyProfile(UserInfo myProfile) {
+	public void setMyProfile(User myProfile) {
 		this.myProfile = myProfile;
 	}
 
@@ -59,37 +48,5 @@ public class UserDTO {
 
 	public void setMyGroups(List<CompanyGroup> myGroups) {
 		this.myGroups = myGroups;
-	}
-
-	public List<Probe> getMyProbes() {
-		return myProbes;
-	}
-
-	public void setMyProbes(List<Probe> myProbes) {
-		this.myProbes = myProbes;
-	}
-
-	public List<Context> getMyContexts() {
-		return myContexts;
-	}
-
-	public void setMyContexts(List<Context> myContexts) {
-		this.myContexts = myContexts;
-	}
-
-	public List<String> getAssignedGroups() {
-		return assignedGroups;
-	}
-
-	public void setAssignedGroups(List<String> assignedGroups) {
-		this.assignedGroups = assignedGroups;
-	}
-
-	public List<Pod> getMyPods() {
-		return myPods;
-	}
-
-	public void setMyPods(List<Pod> myPods) {
-		this.myPods = myPods;
 	}
 }

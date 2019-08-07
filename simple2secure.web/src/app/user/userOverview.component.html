@@ -1,481 +1,219 @@
-<div class="container">
+ <div class="container">
     <mat-tab-group #tabGroup (selectedIndexChange)="_setDataSource($event)">
         <mat-tab label="{{ 'table.myprofile' | translate }}">
-            <!--<h3>{{ 'user.details' | translate }} {{myProfile.email}}</h3>-->
-            <form #userForm="ngForm" (ngSubmit)="updateUserInfo()">
-
-                <table class="full_width_input" cellspacing="0">
-                    <tr>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text"
-                                       placeholder="{{ 'register.firstName.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.firstName" name="firstName"
-                                       autocomplete='given-name'>
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text"
-                                       placeholder="{{ 'register.lastName.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.lastName" name="lastName"
-                                       autocomplete='family-name'>
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                </table>
-
-                <table class="full_width_input" cellspacing="2px">
-                    <tr>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text"
-                                       placeholder="{{ 'register.address.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.address" name="address">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text" placeholder="{{ 'register.city.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.city" name="city">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="number" placeholder="{{ 'register.zip.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.zip" name="zip">
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                </table>
-
-                <table class="full_width_input" cellspacing="2px">
-                    <tr>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text"
-                                       placeholder="{{ 'register.mobile.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.mobile" name="mobile">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="full_width_input">
-                                <input matInput type="text" placeholder="{{ 'register.phone.placeholder' | translate }}"
-                                       [(ngModel)]="myProfile.myProfile.phone" name="phone">
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                </table>
-
-                <mat-form-field class="full_width_input">
-                    <input matInput type="text" placeholder="{{ 'register.company.placeholder' | translate }}"
-                           [(ngModel)]="myProfile.myProfile.company" name="company">
-                </mat-form-field>
-
-                <mat-form-field class="full_width_input">
-                    <input matInput type="text" placeholder="{{ 'userRole.placeholder' | translate }}"
-                           [(ngModel)]="context.userRole" disabled name="userRole" required>
-                </mat-form-field>
-
-                <mat-form-field class="full_width_input">
-                    <input matInput type="email" placeholder="{{ 'login.email.placeholder' | translate }}"
-                           [(ngModel)]="myProfile.myProfile.email" disabled name="email" autocomplete="email" required>
-                </mat-form-field>
-
-                <button type="submit" mat-raised-button color="warn" class="full_width_input mat-green-button">{{
-                    'button.save' | translate }}
-                </button>
-            </form>
+			<h3>{{ 'user.details' | translate }} {{myProfile.username}}</h3>
+			<form #userForm="ngForm" (ngSubmit)="updateUserInfo()">
+			
+				  <table class="full_width_input" cellspacing="0"><tr>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.firstName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.firstName" name="firstName" autocomplete='given-name'>
+				    </mat-form-field></td>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.lastName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.lastName" name="lastName" autocomplete='family-name'>
+				    </mat-form-field></td>
+				  </tr></table>
+				  
+			  	 <table class="full_width_input" cellspacing="2px"><tr>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.address.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.address" name="address">
+				    </mat-form-field></td>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.city.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.city" name="city">
+				    </mat-form-field></td>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="number" placeholder="{{ 'register.zip.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.zip" name="zip">
+				    </mat-form-field></td>	    
+				  </tr></table>
+				  
+			  	 <table class="full_width_input" cellspacing="2px"><tr>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.firstName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.mobile" name="mobile">
+				    </mat-form-field></td>
+				    <td><mat-form-field class="full_width_input">
+				      <input matInput type="text" placeholder="{{ 'register.lastName.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.phone" name="phone">
+				    </mat-form-field></td>    
+				  </tr></table>
+				  
+			  	  <mat-form-field class="full_width_input">
+				    <input matInput type="text" placeholder="{{ 'register.company.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.company" name="company">
+				  </mat-form-field>
+				  
+  				  <mat-form-field class="full_width_input">
+				    <input matInput type="text" placeholder="{{ 'userRole.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.userRole" disabled name="userRole" required>
+				  </mat-form-field>  
+				  
+				  <mat-form-field class="full_width_input">
+				    <input matInput type="email" placeholder="{{ 'login.email.placeholder' | translate }}" [(ngModel)]="myProfile.myProfile.email" disabled name="email" autocomplete="email" required>
+				  </mat-form-field>    
+			
+				<button type="submit" mat-raised-button color="warn" class="full_width_input mat-green-button">{{ 'button.save' | translate }}</button>
+			</form>
 
         </mat-tab>
-
+    
         <mat-tab *ngIf="showMyUsers" label="{{ 'table.myusers' | translate }}">
-            <button *ngIf="showGroupTable" mat-raised-button color="primary" id="addButton" type="button"
-                    (click)="openDialogAddUser()"
-                    class="pull-right mat-green-button">
-                <i class="glyphicon glyphicon-plus"></i> {{ 'button.addUser' | translate }}
-            </button>
+			<button *ngIf="showGroupTable" mat-raised-button color="primary" id="addButton" type="button" (click)="openDialogAddUser()"
+				class="pull-right mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i> {{ 'button.addUser' | translate }}
+			</button>
+			
+			<div *ngIf="showUserTable" class="example-container mat-elevation-z8 table table-striped">
+			  <div class="header-filter-table">
+			    <mat-form-field class="header-filter-field">
+			      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+			    </mat-form-field>
+			  </div>
+			  <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
 
-            <div *ngIf="showUserTable" class="example-container mat-elevation-z8 table table-striped">
-                <div class="header-filter-table">
-                    <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-                    </mat-form-field>
-                </div>
-                <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
+				  <!--<ng-container matColumnDef="group">
+					  <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }} </mat-header-cell>
+					  <mat-cell *matCellDef="let element"> {{element.groupName}} </mat-cell>
+				  </ng-container>-->
 
-                    <ng-container matColumnDef="userRole">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'userRole.placeholder' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.userRole}}</mat-cell>
-                    </ng-container>
+				  <ng-container matColumnDef="userRole">
+					  <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'userRole.placeholder' | translate }} </mat-header-cell>
+					  <mat-cell *matCellDef="let element"> {{element.userRole}} </mat-cell>
+				  </ng-container>
+			
+			    <ng-container matColumnDef="email">
+			      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'login.email' | translate }} </mat-header-cell>
+			      <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+			    </ng-container>
+			    
+			    <ng-container matColumnDef="action">
+			      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>     
+			      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
+			      	<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu" (click)="onMenuTriggerClick(element)">
+			          <i class="fas fa-bars"></i>
+			        </button> 
+			      </mat-cell>
+			    </ng-container>
+			
+			    <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
+			    <mat-row *matRowDef="let row; columns: displayedColumnsUsers;"></mat-row>
+			  </mat-table>
+			  <mat-paginator #paginator
+			                 [pageSize]="10"
+			                 [pageSizeOptions]="[5, 10, 20]"
+			                 [showFirstLastButtons]="true">
+			  </mat-paginator>  
+			  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+			</div>
 
-                    <ng-container matColumnDef="email">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'login.email' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.user.email}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="action">
-                        <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
-                            translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
-                                    (click)="onMenuTriggerClick(element)">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                        </mat-cell>
-                    </ng-container>
-
-                    <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: displayedColumnsUsers;"></mat-row>
-                </mat-table>
-                <mat-paginator #paginator
-                               [pageSize]="10"
-                               [pageSizeOptions]="[5, 10, 20]"
-                               [showFirstLastButtons]="true">
-                </mat-paginator>
-                <mat-progress-spinner *ngIf="loading" style="margin:0 auto;"
-                                      mode="indeterminate"></mat-progress-spinner>
-            </div>
-
-            <div *ngIf="!showUserTable" class="row jumbotron-row-error">
-                <div class="jumbotron jumbotron-top-error">
-                    <span *ngIf="showGroupTable" class="rotate-icon fas fa-arrow-up fa-7x"></span>
-                    <h2>{{ 'user.notfound' | translate }}</h2>
-                    <h4 *ngIf="showGroupTable">{{ 'user.notfound.info' | translate }}</h4>
+			<div *ngIf="!showUserTable" class="row jumbotron-row-error">
+				<div class="jumbotron jumbotron-top-error">
+					<span *ngIf="showGroupTable" class="rotate-icon fas fa-arrow-up fa-7x"></span>
+					<h2>{{ 'user.notfound' | translate }}</h2>
+					<h4 *ngIf="showGroupTable">{{ 'user.notfound.info' | translate }}</h4>
                     <h4 *ngIf="!showGroupTable">{{ 'user.notfound.infoNoGroup' | translate }}</h4>
-                </div>
-            </div>
-
-            <mat-menu #menu="matMenu">
-                <div *ngIf="canDeleteAndEditUser">
-                    <button mat-menu-item (click)="openDialogEditUser()">
-                        <mat-icon>edit</mat-icon>
-                        {{ 'button.edit' | translate }}
-                    </button>
-                    <button mat-menu-item (click)="onDeleteClick()">
-                        <mat-icon>delete</mat-icon>
-                        {{ 'button.delete' | translate }}
-                    </button>
-                </div>
-                <div *ngIf="!canDeleteAndEditUser">
-                    <p mat-menu-item>
-                        <mat-icon>warning</mat-icon>
-                        {{'actions.notavailable' | translate}}
-                    </p>
-                </div>
-            </mat-menu>
+				</div>
+			</div>
+			
+			<mat-menu #menu="matMenu">
+			  <button mat-menu-item (click)="openDialogEditUser()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
+			  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+			</mat-menu>
         </mat-tab>
-
-        //CONTEXT TAB
-        <mat-tab *ngIf="addnewContext" label="{{ 'table.mycontexts' | translate }}">
-            <button *ngIf="addnewContext" mat-raised-button color="primary" id="addButton" type="button"
-                    (click)="openDialogNewContext()"
-                    class="pull-right mat-green-button">
-                <i class="glyphicon glyphicon-plus"></i> {{ 'button.addContext' | translate }}
-            </button>
-
-            <div *ngIf="showContextTable" class="example-container mat-elevation-z8 table table-striped">
-                <div class="header-filter-table">
-                    <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-                    </mat-form-field>
-                </div>
-                <mat-table #sortCntx="matSort" #table [dataSource]="dataSource4" matSort>
-
-                    <ng-container matColumnDef="name">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="licenseDownloads">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.licenseDownloads' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.currentNumberOfLicenseDownloads}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="action">
-                        <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
-                            translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
-                                    (click)="onMenuTriggerClick(element)">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                        </mat-cell>
-                    </ng-container>
-
-                    <mat-header-row *matHeaderRowDef="displayedColumnsContext"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: displayedColumnsContext;"></mat-row>
-                </mat-table>
-                <mat-paginator #paginator3
-                               [pageSize]="10"
-                               [pageSizeOptions]="[5, 10, 20]"
-                               [showFirstLastButtons]="true">
-                </mat-paginator>
-                <mat-progress-spinner *ngIf="loading" style="margin:0 auto;"
-                                      mode="indeterminate"></mat-progress-spinner>
-            </div>
-
-            <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="openDialogEditContext()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'button.edit' | translate }}
-                </button>
-                <button mat-menu-item (click)="onContextDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-                <button mat-menu-item (click)="loadRulesByContextId()">
-                    <mat-icon>view_list</mat-icon>
-                    {{ 'button.showRules' | translate }}
-                </button>
-            </mat-menu>
-        </mat-tab>
-
-        //GROUPS TAB
+        
+        
         <mat-tab label="{{ 'table.mygroups' | translate }}">
-            <button *ngIf="addNewGroup" mat-raised-button color="primary" id="addButton" type="button"
-                    (click)="openDialogRootGroup()"
-                    class="pull-right mat-green-button">
-                <i class="glyphicon glyphicon-plus"></i> {{ 'button.addGroup' | translate }}
-            </button>
+		  	<button *ngIf="addNewGroup" mat-raised-button color="primary" id="addButton" type="button" (click)="openDialogRootGroup()"
+				class="pull-right mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i> {{ 'button.addGroup' | translate }}
+			</button>
 
             <div *ngIf="showGroupTable" class="example-container mat-elevation-z8 table table-striped">
-                <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)">
-                    <ng-template #treeNodeTemplate let-node let-index="index" draggable="false"
-                                 ng-reflect-tree-drag-enabled="false">
-                        <table class="myGroupNodesTable">
-                            <tr>
-                                <td>
-                                    <span class="node-s2s-item">{{ node.data.name }}</span>
-                                </td>
-                                <td align="right">
-                                    <button class="mat-green-button node-s2s-button float-right" mat-button
-                                            [matMenuTriggerFor]="menuGrp" (click)="onMenuTriggerClick(node.data)">
-                                        <i class="fas fa-bars"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </table>
+                <tree-root [nodes]="myProfile.myGroups" [options]="options" (moveNode)="onMoveGroupNode($event)" >
+                    <ng-template #treeNodeTemplate let-node let-index="index">
+                        <span class="node-s2s-item">{{ node.data.name }}</span>
+                        <button class="mat-green-button node-s2s-button float-right" mat-button [matMenuTriggerFor]="menuGrp" (click)="onMenuTriggerClick(node.data)">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </ng-template>
                 </tree-root>
                 <mat-menu #menuGrp="matMenu">
                     <div *ngIf="showEditAndDelete">
-                        <button mat-menu-item (click)="onDownloadClick()">
-                            <mat-icon>book</mat-icon>
-                            {{ 'button.downloadLicense' | translate }}
-                        </button>
-                        <button mat-menu-item (click)="openDialogSubGroup()">
-                            <mat-icon>add</mat-icon>
-                            {{ 'button.addSubGroup' | translate }}
-                        </button>
-                        <button mat-menu-item (click)="onGroupEditClick()">
-                            <mat-icon>edit</mat-icon>
-                            {{ 'button.edit' | translate }}
-                        </button>
-                        <button mat-menu-item (click)="onApplyConfigClick()">
-                            <mat-icon>file_copy</mat-icon>
-                            {{ 'button.default.config' | translate }}
-                        </button>
-                        <button *ngIf="isGroupDeletable" mat-menu-item (click)="onDeleteGroupClick()">
-                            <mat-icon>delete</mat-icon>
-                            {{ 'button.delete' | translate }}
-                        </button>
+                        <button mat-menu-item (click)="onDownloadClick()"><mat-icon>book</mat-icon> {{ 'button.downloadLicense' | translate }}</button>
+                        <button mat-menu-item (click)="openDialogSubGroup()"><mat-icon>add</mat-icon> {{ 'button.addSubGroup' | translate }}</button>
+                        <button mat-menu-item (click)="onGroupEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
+						<button mat-menu-item (click)="onApplyConfigClick()"><mat-icon>file_copy</mat-icon> {{ 'button.default.config' | translate }}</button>
+                        <button *ngIf="isGroupDeletable" mat-menu-item (click)="onDeleteGroupClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
                     </div>
                     <div *ngIf="!showEditAndDelete">
-                        <button mat-menu-item (click)="onDownloadClick()">
-                            <mat-icon>book</mat-icon>
-                            {{ 'button.downloadLicense' | translate }}
-                        </button>
-                        <button mat-menu-item (click)="onGroupEditClick()">
-                            <mat-icon>visibility</mat-icon>
-                            {{ 'button.show' | translate }}
-                        </button>
+                        <button mat-menu-item (click)="onDownloadClick()"><mat-icon>book</mat-icon> {{ 'button.downloadLicense' | translate }}</button>
+                        <button mat-menu-item (click)="onGroupEditClick()"><mat-icon>visibility</mat-icon> {{ 'button.show' | translate }}</button>
                     </div>
 
                 </mat-menu>
             </div>
         </mat-tab>
-
+        
         <mat-tab label="{{ 'table.myprobes' | translate }}">
 
 
-            <button class="pull-right mat-green-button" [disabled]="loading" mat-raised-button color="primary"
-                    id="addButton" type="button" (click)="download()">
-                <i class="glyphicon glyphicon-download"></i> {{ 'button.downloadProbe' | translate }}
-                <img *ngIf="loading"
-                     src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="/>
-            </button>
+			<button class="pull-right mat-green-button" [disabled]="loading" mat-raised-button color="primary" id="addButton" type="button" (click)="download()">
+				<i class="glyphicon glyphicon-download"></i> {{ 'button.downloadProbe' | translate }}
+				<img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+			</button>
 
-            <div *ngIf="showProbeTable" class="example-container mat-elevation-z8 table table-striped">
-                <div class="header-filter-table">
-                    <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
-                    </mat-form-field>
-                </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="dataSource2" matSort>
+			<div *ngIf="showProbeTable" class="example-container mat-elevation-z8 table table-striped">
+			  <div class="header-filter-table">
+			    <mat-form-field class="header-filter-field">
+			      <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
+			    </mat-form-field>
+			  </div>
+			  <mat-table #sortDev="matSort" #table [dataSource]="dataSource2" matSort>
+			
+			    <ng-container matColumnDef="probe">
+			      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }} </mat-header-cell>
+			      <mat-cell *matCellDef="let element"> {{element.probeId}} </mat-cell>
+			    </ng-container>
+			    
+   			    <ng-container matColumnDef="group">
+			      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }} </mat-header-cell>
+			      <mat-cell *matCellDef="let element"> {{element.groupName}} </mat-cell>
+			    </ng-container>
+			    
+			    <ng-container matColumnDef="activated">
+			      <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.activated' | translate }} </mat-header-cell>
+			      <mat-cell center *matCellDef="let element"> <i *ngIf="element.activated" style="color: #A7BD26"
+                            class="fas fa-check-circle fa-2x"></i> <i *ngIf="!element.activated" style="color: #AA3939"
+                            class="fas fa-times-circle fa-2x"></i></mat-cell>
+			    </ng-container>
+			    
+			    <ng-container matColumnDef="action">
+			      <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }} </mat-header-cell>     
+			      <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()"> 
+			      	<button class="mat-green-button" mat-button >
+			          <i class="fas fa-bars"></i>
+			        </button> 
+			      </mat-cell>
+			    </ng-container>
+			
+			    <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
+			    <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
+			  </mat-table>
+			  <mat-paginator #paginator2
+			                 [pageSize]="10"
+			                 [pageSizeOptions]="[5, 10, 20]"
+			                 [showFirstLastButtons]="true">
+			  </mat-paginator>  
+			  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+			</div>
 
-                    <ng-container matColumnDef="probe">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="group">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="activated">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.activated' | translate }}
-                        </mat-header-cell>
-                        <mat-cell center *matCellDef="let element"><i *ngIf="element.activated" style="color: #A7BD26"
-                                                                      class="fas fa-check-circle fa-2x"></i> <i
-                                *ngIf="!element.activated" style="color: #AA3939"
-                                class="fas fa-times-circle fa-2x"></i></mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="action">
-                        <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
-                            translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuProbe"
-                                    (click)="onMenuTriggerClick(element)">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                        </mat-cell>
-                    </ng-container>
-
-                    <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
-                </mat-table>
-                <mat-paginator #paginator2
-                               [pageSize]="10"
-                               [pageSizeOptions]="[5, 10, 20]"
-                               [showFirstLastButtons]="true">
-                </mat-paginator>
-                <mat-progress-spinner *ngIf="loading" style="margin:0 auto;"
-                                      mode="indeterminate"></mat-progress-spinner>
-            </div>
-
-            <div *ngIf="!showProbeTable" class="row jumbotron-row-error">
-                <div class="jumbotron jumbotron-top-error">
-                    <span class="rotate-icon fas fa-arrow-up fa-7x"></span>
-                    <h2>{{ 'probe.notfound' | translate }}</h2>
-                    <h4>{{ 'probe.notfound.info' | translate }}</h4>
-                </div>
-            </div>
-
-            <mat-menu #menuProbe="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
-                </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-            </mat-menu>
+			<div *ngIf="!showProbeTable" class="row jumbotron-row-error">
+				<div class="jumbotron jumbotron-top-error">
+					<span class="rotate-icon fas fa-arrow-up fa-7x"></span>
+					<h2>{{ 'probe.notfound' | translate }}</h2>
+					<h4>{{ 'probe.notfound.info' | translate }}</h4>
+				</div>
+			</div>
+			
+			 <mat-menu #menu="matMenu">
+			  <button mat-menu-item (click)="onEditClick()"><mat-icon>edit</mat-icon> {{ 'button.edit' | translate }}</button>
+			  <button mat-menu-item (click)="onDeleteClick()"><mat-icon>delete</mat-icon> {{ 'button.delete' | translate }}</button>
+			</mat-menu>         
         </mat-tab>
-
-        <mat-tab label="{{ 'table.mypods' | translate }}">
-
-            <div *ngIf="showPodTable" class="example-container mat-elevation-z8 table table-striped">
-                <div class="header-filter-table">
-                    <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilterPod($event.target.value)" placeholder="Filter">
-                    </mat-form-field>
-                </div>
-                <mat-table #sortPod="matSort" #table [dataSource]="dataSource5" matSort>
-
-                    <ng-container matColumnDef="pod">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="group">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="activated">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.activated' | translate }}
-                        </mat-header-cell>
-                        <mat-cell center *matCellDef="let element"><i *ngIf="element.activated" style="color: #A7BD26"
-                                                                      class="fas fa-check-circle fa-2x"></i> <i
-                                *ngIf="!element.activated" style="color: #AA3939"
-                                class="fas fa-times-circle fa-2x"></i></mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
-                    </ng-container>
-
-                    <ng-container matColumnDef="action">
-                        <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
-                            translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                            <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuPod"
-                                    (click)="onMenuTriggerClick(element)">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                        </mat-cell>
-                    </ng-container>
-
-                    <mat-header-row *matHeaderRowDef="displayedColumnsPods"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: displayedColumnsPods;"></mat-row>
-                </mat-table>
-                <mat-paginator #paginator4
-                               [pageSize]="10"
-                               [pageSizeOptions]="[5, 10, 20]"
-                               [showFirstLastButtons]="true">
-                </mat-paginator>
-                <mat-progress-spinner *ngIf="loading" style="margin:0 auto;"
-                                      mode="indeterminate"></mat-progress-spinner>
-            </div>
-
-            <div *ngIf="!showPodTable" class="row jumbotron-row-error">
-                <div class="jumbotron jumbotron-top-error">
-                    <h2>{{ 'pod.notfound' | translate }}</h2>
-                    <h4>{{ 'pod.notfound.info' | translate }}</h4>
-                </div>
-            </div>
-
-            <mat-menu #menuProbe="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
-                </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-            </mat-menu>
-
-            <mat-menu #menuPod="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
-                </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-            </mat-menu>
-        </mat-tab>
-
     </mat-tab-group>
 </div> 
 

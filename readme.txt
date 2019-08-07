@@ -35,7 +35,7 @@
   
   e.g.
   
-  -Djavax.net.ssl.trustStore=D:/development/simple2secure/simple2secure.portal/src/main/resources/keys/cacerts -Djavax.net.ssl.trustStorePassword=testtest
+  -Djavax.net.ssl.trustStore=file:D:/development/simple2secure/simple2secure.portal/src/main/resources/keys/cacerts -Djavax.net.ssl.trustStorePassword=testtest
   
   Additionally it will be necessary for chrome to enable the following flag. Insert this in the address bar and set it to 
   enabled. 

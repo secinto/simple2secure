@@ -1,12 +1,14 @@
-<h3 mat-dialog-title>{{ 'networkreport.details' | translate }} {{report.processorName}}</h3>
-
-<div mat-dialog-content>
-    <p><b>{{ 'table.time' | translate }}: </b> {{report.startTime}}</p>
-    <ngx-json-view [data]="getStringResult()"></ngx-json-view>
-</div>
-
-<div mat-dialog-actions>
-    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="report"
-            cdkFocusInitial>{{ 'button.cancel' | translate }}
-    </button>
-</div>
+<fieldset>
+<legend>{{ 'networkreport.details' | translate }} {{report.processorName}}</legend>
+     <fieldset>
+        <fieldset>
+            <p><b>{{ 'table.time' | translate }}: </b> {{report.startTime}}</p>
+        </fieldset>
+        <fieldset>
+            <legend>{{ 'networkreport.results' | translate }}:</legend>
+            <div *ngFor="let key of objectKeys(report.content)">
+                <p>{{report.content[key]}}</p>
+            </div>
+        </fieldset>
+    </fieldset>
+</fieldset>

@@ -1,86 +1,67 @@
 import {Component, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO} from '../_models/index';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
+import {QueryRun, Tool, Test, TestResult, Command} from '../_models/index';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
-import {TranslateService} from '@ngx-translate/core';
 
 @Component({
-	moduleId: module.id,
-	templateUrl: 'orbiterToolTest.component.html'
+  moduleId: module.id,
+  templateUrl: 'orbiterToolTest.component.html'
 })
 
 export class OrbiterToolTestComponent {
 
-	selectedPod: PodDTO;
-	pods: PodDTO[];
-	context: ContextDTO;
-	displayedColumns = ['pod', 'group', 'status', 'action'];
-	loading = false;
-	dataSource = new MatTableDataSource();
-	@ViewChild(MatSort) sort: MatSort;
-	@ViewChild(MatPaginator) paginator: MatPaginator;
+    tool: Tool;
+    customTests: Test[];
+    displayedColumns = ['name', 'commands', 'testResults', 'action'];
+    dataSource = new MatTableDataSource();
+    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
 
-	constructor(
-		private alertService: AlertService,
-		private httpService: HttpService,
-		private dataService: DataService,
-		private dialog: MatDialog,
-		private translate: TranslateService,
-		private router: Router,
-		private route: ActivatedRoute
-	) {}
+  constructor(
+    private alertService: AlertService,
+    private httpService: HttpService,
+    private dataService: DataService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.tool = new Tool();
+    this.customTests = new Array();
+  }
 
-	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadPods();
-	}
+  testExecuted = false;
+  loading = false;
 
-	ngAfterViewInit() {
-		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
-	}
+  ngOnInit() {
+    this.tool = DataService.getTool();
+    this.getCustomTests();
+  }
 
-	applyFilter(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource.filter = filterValue;
-	}
+  ngAfterViewInit() {
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
 
-	public onMenuTriggerClick(pod: PodDTO) {
-		this.selectedPod = pod;
-	}
+  applyFilter(filterValue: string) {
+      filterValue = filterValue.trim(); // Remove whitespace
+      filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+      this.dataSource.filter = filterValue;
+  }
 
-	loadPods() {
-		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'pod/' + this.context.context.id)
-			.subscribe(
-				data => {
-					this.pods = data;
-					this.dataSource.data = this.pods;
-					if (data.length > 0) {
-						this.alertService.success(this.translate.instant('message.data'));
-					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
-					this.loading = false;
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-	}
+  showTestResults(item: Tool){
+      this.dataService.set(item);
+      this.router.navigate(['result'], { relativeTo: this.route});
+  }
 
-	public showPodTests() {
-		this.dataService.setPods(this.selectedPod);
-		this.router.navigate([this.selectedPod.pod.podId], {relativeTo: this.route});
-	}
+  getCustomTests(){
+      this.customTests = [];
+      for (let i = 0; i < this.tool.tests.length; i++){
+       if (this.tool.tests[i].customTest == true){
+           this.customTests.push(this.tool.tests[i]);
+       }
+
+       this.dataSource.data = this.customTests;
+      }
+   }
 }

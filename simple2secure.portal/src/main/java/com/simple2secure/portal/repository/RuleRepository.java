@@ -7,10 +7,7 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class RuleRepository extends MongoRepository<PortalRule> {
 	public abstract List<PortalRule> findByToolId(String toolId);
-
-	public abstract List<PortalRule> findByContextId(String contextId);
-
-	public abstract List<PortalRule> findByToolAndContextId(String toolId, String contextId);
-
-	public abstract void deleteByContextId(String contextId);
+	public abstract List<PortalRule> findByUserID(String userId);
+	public abstract List<PortalRule> findByToolAndUserId(String toolId, String userId);
+	public abstract void deleteByUserId(String userId);
 }

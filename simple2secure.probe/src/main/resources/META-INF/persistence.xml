@@ -7,6 +7,7 @@
 		<description>Simple2Secure Probe</description>
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>com.simple2secure.api.model.AccountCredential</class>
+		<class>com.simple2secure.api.model.API</class>
 		<class>com.simple2secure.api.model.Config</class>
 		<class>com.simple2secure.api.model.DBConfig</class>
 		<class>com.simple2secure.api.model.Device</class>
@@ -17,25 +18,20 @@
 		<class>com.simple2secure.api.model.Report</class>
 		<class>com.simple2secure.api.model.Service</class>
 		<class>com.simple2secure.api.model.Step</class>
-		<class>com.simple2secure.api.model.CompanyLicensePublic</class>
+		<class>com.simple2secure.api.model.Task</class>
+		<class>com.simple2secure.api.model.CompanyLicenseObj</class>
 		<class>com.simple2secure.api.model.NetworkReport</class>
-		<class>com.simple2secure.api.model.ProbePacket</class>
 		<properties>
-			<property name="hibernate.dialect"
-				value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
-			<property name="hibernate.archive.autodetection"
-				value="class" />
-			<property name="hibernate.connection.driver_class"
-				value="org.h2.Driver" />
-			<property name="hibernate.connection.url"
-				value="jdbc:h2:file:~/s2sDb/s2sProbeDB" />
+			<property name="hibernate.archive.autodetection" value="class" />
+			<property name="hibernate.connection.driver_class" value="org.h2.Driver" />
+			<property name="hibernate.connection.url" value="jdbc:h2:file:~/s2sDb/s2sProbeDB" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
-			<property name="javax.persistence.jdbc.password"
-				value="admin" />
+			<property name="javax.persistence.jdbc.password" value="admin" />
 		</properties>
 	</persistence-unit>
 </persistence> 

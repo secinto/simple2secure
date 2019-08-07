@@ -1,20 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
-	selector: 'app-footer',
-	template: `
+  selector: 'app-footer',
+  template: `
         <footer><span>© {{year}} secinto GmbH All Rights Reserved</span></footer>
-	`,
-	styleUrls: ['footer.component.css'],
+  `,
+  styleUrls: ['footer.component.css'],
 })
 export class FooterComponent implements OnInit {
 
-	year: number;
+  year: number;
+  constructor() { }
 
-	constructor() { }
-
-	ngOnInit() {
-		this.year = new Date().getFullYear();
-	}
+  ngOnInit() {
+      this.year = new Date().getFullYear();
+  }
 
 }

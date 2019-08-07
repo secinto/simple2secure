@@ -1,43 +1,46 @@
-<h3 mat-dialog-title>{{ 'button.addRule' | translate }}</h3>
-<div mat-dialog-content>
-    <form #ruleForm="ngForm">
+<!--  
+<form #userForm="ngForm" (ngSubmit)="saveRule()">
 
-        <table class="full_width_input" cellspacing="0">
-            <tr>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="text" placeholder="{{ 'table.name' | translate }}" [(ngModel)]="rule.name"
-                               name="name" autocomplete='given-name' required>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="number" placeholder="{{ 'table.priority' | translate }}"
-                               [(ngModel)]="rule.priority" name="priority" autocomplete='given-name' required>
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
+	  <table class="full_width_input" cellspacing="0"><tr>
+	    <td><mat-form-field class="full_width_input">
+	      <input matInput type="text" placeholder="{{ 'table.name' | translate }}" [(ngModel)]="rule.name" name="name" autocomplete='given-name' required>
+	    </mat-form-field></td>
+	    <td><mat-form-field class="full_width_input">
+	      <input matInput type="number" placeholder="{{ 'table.priority' | translate }}" [(ngModel)]="rule.priority" name="priority" autocomplete='given-name' required>
+	    </mat-form-field></td>
+	  </tr></table>
+	  
+	  <table class="full_width_input" cellspacing="0"><tr>
+	    <td><mat-form-field class="full_width_input">
+	      <input matInput type="text" placeholder="{{ 'table.description' | translate }}" [(ngModel)]="rule.description" name="description" autocomplete='family-name'required>
+	    </mat-form-field></td>
+	  </tr></table>
+	  
+	  <div class="ngx-dnd-container" fxLayout="row wrap">
+		  <div fxFlex="45" class="ngx-dnd-item">Item 1</div>
+		  <div fxFlex="45" class="ngx-dnd-item">Item 2</div>
+		  <div fxFlex="20" class="ngx-dnd-item">Item 3</div>
+		  <div fxFlex="20" class="ngx-dnd-item">Item 4</div>
+		  <div fxFlex="20" class="ngx-dnd-item">Item 5</div>
+		</div>
+	  
+	  <div class="ngx-dnd-container" ngxDroppable="operators" fxLayout="row wrap">
+	  	  <p>Operators</p>
+		  <div fxFlex="20" class="ngx-dnd-item" ngxDraggable *ngFor="let operator of operators">{{operator}}</div>
+	  </div>
+	  
+	  <div class="ngx-dnd-container" ngxDroppable="toolItems">
+	  	  <p>Tool Items</p>
+		  <div class="ngx-dnd-item" ngxDraggable *ngFor="let item of toolItems">{{item}}</div>
+	  </div>
+		
+		<div class="ngx-dnd-container" ngxDroppable="example">
+		   <p>Drop items here:</p>
+		</div>
+		
 
-        <table class="full_width_input" cellspacing="0">
-            <tr>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="text" placeholder="{{ 'table.description' | translate }}"
-                               [(ngModel)]="rule.description" name="description" autocomplete='family-name' required>
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
 
-    </form>
-</div>
+	<button type="submit" mat-raised-button color="warn" class="full_width_input">{{ 'button.save' | translate }}</button>
+</form>
 
-<div mat-dialog-actions>
-    <button mat-button [disabled]="!ruleForm.dirty" mat-raised-button class="mat-green-button" color="primary"
-            (click)="saveRule()">{{ 'button.save' | translate }}
-    </button>
-    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rule"
-            cdkFocusInitial>{{ 'button.cancel' | translate }}
-    </button>
-</div>
+-->

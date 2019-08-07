@@ -6,11 +6,11 @@ import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class ReportRepository extends MongoRepository<Report> {
+	public abstract List<Report> getAllReportsByUserID(String userId);
+	
 	public abstract List<Report> getReportsByProbeId(String probeId);
-
-	public abstract List<Report> getReportsByName(String name);
-
-	public abstract List<Report> getReportsByGroupId(String groupId);
-
+	
+	public abstract void deleteByUserId(String userId);
+	
 	public abstract void deleteByProbeId(String probeId);
 }

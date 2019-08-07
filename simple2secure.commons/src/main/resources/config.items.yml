@@ -1,3 +1,5 @@
+baseURL: https://localhost:8443
+baseURLWeb: http://localhost:9000
 baseKubernetesURL: https://35.232.109.156
 reportURL: /config/reports.json
 stepsURL: /config/steps.json
@@ -19,4 +21,3 @@ packetAPI: /api/packet
 stepAPI: /api/steps
 processorAPI: /api/processors
 licenseAPI: /api/license
-serviceAPI: /api/service

@@ -1,16 +1,11 @@
 import {Base} from './base';
-import {TestStep} from './testStep';
-import {Timeunit} from './timeunit';
+import {TestResult} from './testResult';
+import {Command} from './command';
 
-export class Test extends Base {
-	podId = '';
-	name = '';
-	description = '';
-	version = '';
-	precondition = new TestStep();
-	step = new TestStep();
-	postcondition= new TestStep();
-	scheduled: boolean;
-	scheduledTime: number;
-	scheduledTimeUnit: Timeunit;
+export class Test extends Base{
+    name: string;
+    commands: Command[];
+    testResult: TestResult[];
+    customTest: boolean;
+    createInstance: boolean;
 }

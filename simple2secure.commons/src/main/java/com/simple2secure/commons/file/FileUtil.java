@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,53 +25,21 @@ public class FileUtil {
 
 	static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
-	private static String workingDirectory = System.getProperty("user.dir");
-	private static String absoluteWorkingPath = new File(workingDirectory).getAbsolutePath();
+	private static File workingDirectory = new File("./");
+	private static String absoluteWorkingPath = FileUtil.workingDirectory.getAbsolutePath();
 
 	static {
 		setWorkingDirectory(".");
 	}
 
-	/**
-	 * Sets the working directory which is used for internal processes to the specified directory. If nothing is specified or the specified
-	 * directory doesn't exist, <code>System.getProperty("user.dir")</code> is used as working directory.
-	 *
-	 * @param workingDirectory
-	 *          The working directory which should be used.
-	 */
 	public static void setWorkingDirectory(String workingDirectory) {
 		File dir = new File(workingDirectory);
 
 		if (dir.exists()) {
 			absoluteWorkingPath = dir.getAbsolutePath();
 			absoluteWorkingPath = absoluteWorkingPath.replace("\\.", "\\");
-			FileUtil.workingDirectory = dir.getAbsolutePath();
-		} else {
-			workingDirectory = System.getProperty("user.dir");
-			absoluteWorkingPath = workingDirectory;
+			FileUtil.workingDirectory = dir;
 		}
-	}
-
-	/**
-	 * Corrects the format of paths to fit the system default. For instance double backslash or slash are corrected where not necessary. Also
-	 * if it is specified that the path denotes a directory an ending file delimiter is added if not present.
-	 *
-	 * @param path
-	 *          The path which should be corrected
-	 * @param isDirectory
-	 *          Specifies if the path denotes a directory or a file.
-	 * @return The corrected path.
-	 */
-	public static String correctPathFormat(String path, boolean isDirectory) {
-		if (isDirectory && (!path.endsWith("\\") || !path.endsWith("/"))) {
-			path = path + File.separator;
-		}
-
-		path = path.replace("\\", FileSystems.getDefault().getSeparator());
-		path = path.replace("\\", FileSystems.getDefault().getSeparator());
-		path = path.replace("/", FileSystems.getDefault().getSeparator());
-		path = path.replace("/", FileSystems.getDefault().getSeparator());
-		return path;
 	}
 
 	/**
@@ -200,24 +167,6 @@ public class FileUtil {
 	}
 
 	/**
-	 * Copies the specified file to the provided folder name. Returns the final absolute path of the copied file.
-	 *
-	 * @param file
-	 *          The file which should be copied.
-	 * @param localFilePath
-	 *          The local file path to which the file should be copied.
-	 * @return The absolute file path of the copied file.
-	 */
-	public static String copyFileToFolder(File file, String localFilePath) {
-		if (FileUtil.copyToFolder(file, localFilePath)) {
-			return FileUtil.correctPathFormat(localFilePath + file.getName(), false);
-		} else {
-			return FileUtil.correctPathFormat(file.getAbsolutePath(), false);
-		}
-
-	}
-
-	/**
 	 * Returns the contents of the specified file as {@link String} using UTf-8 encoding.
 	 *
 	 * @param file
@@ -294,7 +243,7 @@ public class FileUtil {
 	public static List<File> getFilesFromDirectory(String directory, boolean scanRecursive, List<String> fileTypes, List<String> excludeFiles,
 			List<String> excludePatterns) throws IOException {
 		File root = new File(directory);
-		List<File> fileList = new ArrayList<>();
+		List<File> fileList = new ArrayList<File>();
 
 		if (root.isDirectory() && includedByPattern(root.getAbsolutePath(), excludePatterns)) {
 			File[] files = root.listFiles();
@@ -327,7 +276,7 @@ public class FileUtil {
 	 * @throws IOException
 	 */
 	public static List<String> readInfoFromFile(String file) throws IOException {
-		List<String> fileList = new ArrayList<>();
+		List<String> fileList = new ArrayList<String>();
 
 		if (!FileUtil.fileOrFolderExists(file)) {
 			log.info("The specified file {} doesn't exist.", file);
@@ -364,7 +313,7 @@ public class FileUtil {
 	 * @throws IOException
 	 */
 	public static List<String> readInfoFromFile(List<String> files) throws IOException {
-		List<String> fileList = new ArrayList<>();
+		List<String> fileList = new ArrayList<String>();
 
 		for (String file : files) {
 
