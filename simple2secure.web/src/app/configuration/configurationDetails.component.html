@@ -1,201 +1,46 @@
 <form id="cfgForm" #configForm="ngForm">
-<div class="container">  
-    <mat-tab-group>
-        <mat-tab label="{{ 'menu.general' | translate }}">
-			
-			<div class="form-group">
-				<mat-form-field class="full_width_input">
-			    	<input type="number" matInput placeholder="{{ 'table.version' | translate }}" [(ngModel)]="config.version" name="version" readonly>
-			  	</mat-form-field>
-			</div>
-			
-			<div class="form-group">
-				<mat-form-field class="full_width_input">
-			    	<input type="text" matInput placeholder="{{ 'config.configSupplier' | translate }}" [(ngModel)]="config.config_supplier" name="config_supplier">
-			    	<mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  	</mat-form-field>
-			</div>
-			
-			<div class="form-group">
-				<mat-form-field class="full_width_input">
-			    	<input type="text" matInput placeholder="{{ 'config.taskSupplier' | translate }}" [(ngModel)]="config.task_supplier" name="task_supplier">
-			    	<mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  	</mat-form-field>
-			</div>
-			
-			<div class="form-group">
-				<mat-form-field class="full_width_input">
-			    	<input type="text" matInput placeholder="{{ 'config.stylesheet' | translate }}" [(ngModel)]="config.stylesheet" name="stylesheet">
-			    	<mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  	</mat-form-field>
-			</div>
+    <div>
 
-			<div class="form-group">
-				<label for="use_configured_iface">{{ 'config.useConfiguredIface' | translate }}</label><br>
-				<mat-button-toggle-group name="use_configured_iface" [(ngModel)]="config.use_configured_iface">
-				  <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
-				  <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
-				</mat-button-toggle-group>
-			</div>
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="number" matInput placeholder="{{ 'config.interfaceNumber' | translate }}" [(ngModel)]="config.interface_number" name="interface_number">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>  
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="number" matInput placeholder="{{ 'table.version' | translate }}"
+                       [(ngModel)]="config.version" name="version" readonly>
+            </mat-form-field>
+        </div>
 
-			<div class="form-group">
-				<label for="show_interfaces">{{ 'config.showInterfaces' | translate }}</label><br>
-				<mat-button-toggle-group name="show_interfaces" [(ngModel)]="config.show_interfaces">
-				  <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
-				  <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
-				</mat-button-toggle-group>
-			</div>
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.externalAddress' | translate }}" [(ngModel)]="config.external_address" name="external_address">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div> 
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="number" matInput placeholder="{{ 'config.connectionTimeout' | translate }}" [(ngModel)]="config.connection_timeout" name="connection_timeout">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>
+        <div class="form-group">
+            <label for="showInterfaces">{{ 'config.showInterfaces' | translate }}</label><br>
+            <mat-button-toggle-group id="showInterfaces" name="showInterfaces" [(ngModel)]="config.showInterfaces">
+                <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
+                <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
 
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.processingFactory' | translate }}" [(ngModel)]="config.processing_factory" name="processing_factory">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.communicationFactory' | translate }}" [(ngModel)]="config.communication_factory" name="communication_factory">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'config.externalAddress' | translate }}"
+                       [(ngModel)]="config.externalAddress" name="externalAddress">
+                <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
+            </mat-form-field>
+        </div>
 
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="number" matInput placeholder="{{ 'config.wtIntervall' | translate }}" [(ngModel)]="config.wt_intervall" name="wt_intervall">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>							
-			
-        </mat-tab>
-        <mat-tab label="{{ 'menu.database' | translate }}" *ngIf="config.db_config" ngModelGroup="db_config">
-        
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.dbconfigLocation' | translate }}" [(ngModel)]="config.db_config.location" name="location">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>
-			
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.dbURI' | translate }}" [(ngModel)]="config.db_config.dbURI" name="dbURI">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.writeUser' | translate }}" [(ngModel)]="config.db_config.write_user" name="write_user">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>			
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.writePassword' | translate }}" [(ngModel)]="config.db_config.write_password" name="write_password">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>		
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.readUser' | translate }}" [(ngModel)]="config.db_config.read_user" name="read_user">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.readPassword' | translate }}" [(ngModel)]="config.db_config.read_password" name="read_password">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-			<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="number" matInput placeholder="{{ 'config.timeslot' | translate }}" [(ngModel)]="config.db_config.time_slot_size" name="time_slot_size">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>							
-				
-        </mat-tab>
-        <mat-tab label="{{ 'menu.osquery' | translate }}" *ngIf="config.queries" ngModelGroup="queries">
-        
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.strings' | translate }}" [(ngModel)]="config.queries.querystrings" name="querystrings">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.osqueryconfig' | translate }}" [(ngModel)]="config.queries.queryconfig" name="queryconfig">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
-			
-        	<div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.osquerypath' | translate }}" [(ngModel)]="config.queries.osquerypath" name="osquerypath">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>						
-			
-        </mat-tab>
-        <mat-tab label="{{ 'menu.apis' | translate }}">
-        
-            <div class="form-group">
-			  <mat-form-field class="full_width_input">
-			    <input type="text" matInput placeholder="{{ 'config.baseurl' | translate }}" [(ngModel)]="config.base_url" name="config.base_url">
-			    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-			  </mat-form-field>
-			</div>	
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'config.processingFactory' | translate }}"
+                       [(ngModel)]="config.processingFactory" name="processingFactory">
+                <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
+            </mat-form-field>
+        </div>
 
-            <button id="addAPI" mat-raised-button color="primary" (click)="addNewAPI()" class="pull-right mat-green-button"><i class="glyphicon glyphicon-plus"></i> {{ 'button.addAPI' | translate }}</button>
-			<div *ngFor="let api of config.apis; let in=index" ngModelGroup="api">
-				<legend>{{api.name}}</legend>
-				
-				<div class="form-group">
-				  <mat-form-field class="full_width_input">
-				    <input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="config.apis[in].name" name="name{{in}}">
-				    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-				  </mat-form-field>
-				</div>
-				
-				<div class="form-group">
-				  <mat-form-field class="full_width_input">
-				    <input type="text" matInput placeholder="{{ 'config.url' | translate }}" [(ngModel)]="config.apis[in].url" name="url{{in}}">
-				    <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
-				  </mat-form-field>
-				</div>
-												
-			</div>
-        </mat-tab>		
-    </mat-tab-group>
-</div>
-<button type="button" (click)="saveConfig()" [disabled]="!configForm.dirty" mat-raised-button class="mat-green-button" color="primary">{{ 'button.save' | translate }}</button>
-<button type="button" (click)="cancel()" mat-raised-button class="mat-red-button" color="warn">{{ 'button.cancel' | translate }}</button>
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'config.bpfFilter' | translate }}"
+                       [(ngModel)]="config.bpfFilter" name="bpfFilter">
+                <mat-icon matSuffix class="mat-icon-green">mode_edit</mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+    <button type="button" (click)="saveConfig()" [disabled]="!configForm.dirty" mat-raised-button
+            class="mat-green-button" color="primary">{{ 'button.save' | translate }}
+    </button>
 </form>

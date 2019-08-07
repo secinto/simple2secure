@@ -18,11 +18,9 @@ public class Processor extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = 6776396393360976891L;
 	private boolean isGroovy;
-	private String probeId;
 	private String groupId;
 	private String name;
 	private String processor_class;
-	private boolean isGroupProcessor;
 
 	@Lob
 	@Column(columnDefinition = "CLOB")
@@ -38,21 +36,12 @@ public class Processor extends GenericDBObject {
 		isGroovy = false;
 	}
 
-	public Processor(String probeId, String name, String processor_class, String groovyProcessor) {
+	public Processor(String name, String processor_class, String groovyProcessor) {
 		super();
 		isGroovy = true;
-		this.probeId = probeId;
 		this.name = name;
 		this.processor_class = processor_class;
 		this.groovyProcessor = groovyProcessor;
-	}
-
-	public String getProbeId() {
-		return probeId;
-	}
-
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
 	}
 
 	public String getGroupId() {
@@ -109,13 +98,5 @@ public class Processor extends GenericDBObject {
 
 	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
 		this.analysisIntervalUnit = analysisIntervalUnit;
-	}
-
-	public boolean isGroupProcessor() {
-		return isGroupProcessor;
-	}
-
-	public void setGroupProcessor(boolean isGroupProcessor) {
-		this.isGroupProcessor = isGroupProcessor;
 	}
 }

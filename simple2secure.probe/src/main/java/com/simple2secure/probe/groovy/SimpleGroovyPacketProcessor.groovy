@@ -17,14 +17,12 @@ class SimpleGroovyPacketProcessor extends PacketProcessor {
 	@Override
 	public PacketContainer processPacket() {
 		String test = this.packet.getId();
-		println("Obtained data from Java");
-		println("Obtained packet with test id " + test);
-		log.debug("Print debug message from groovy script " + name);
+		log.debug("Processing packet in groovy with id {}", test);
 		return this.packet;
 	}
 
 	@Override
 	public void performAnalysis() {
-		log.debug("Groovy script perform analysis {}", this.packet.getTimestamp());
+		log.debug("Groovy script perform start analysis {} for packet with timestamp {}", this.packet.getTimestamp());
 	}
 }

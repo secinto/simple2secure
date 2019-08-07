@@ -15,7 +15,6 @@ public class QueryRun extends GenericDBObject {
 	 * 
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String probeId;
 	private String groupId;
 	private String name;
 	private boolean always;
@@ -24,16 +23,14 @@ public class QueryRun extends GenericDBObject {
 
 	private String sqlQuery;
 	private int active;
-	private boolean isGroupQueryRun;
 
 	public QueryRun() {
 
 	}
 
-	public QueryRun(String probeId, String groupId, String name, boolean always, long analysisInterval, TimeUnit analysisIntervalUnit,
+	public QueryRun(String groupId, String name, boolean always, long analysisInterval, TimeUnit analysisIntervalUnit,
 			String sqlQuery, int active) {
 		super();
-		this.probeId = probeId;
 		this.groupId = groupId;
 		this.name = name;
 		this.always = always;
@@ -83,14 +80,6 @@ public class QueryRun extends GenericDBObject {
 		this.sqlQuery = sqlQuery;
 	}
 
-	public String getProbeId() {
-		return probeId;
-	}
-
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
-	}
-
 	public String getGroupId() {
 		return groupId;
 	}
@@ -105,13 +94,5 @@ public class QueryRun extends GenericDBObject {
 
 	public void setActive(int active) {
 		this.active = active;
-	}
-
-	public boolean isGroupQueryRun() {
-		return isGroupQueryRun;
-	}
-
-	public void setGroupQueryRun(boolean isGroupQueryRun) {
-		this.isGroupQueryRun = isGroupQueryRun;
 	}
 }

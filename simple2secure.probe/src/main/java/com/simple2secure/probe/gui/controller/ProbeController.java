@@ -10,11 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.config.ConfigItems;
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
-import com.simple2secure.probe.gui.ProbeGUIAppender;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.gui.model.WindowButtons;
+import com.simple2secure.probe.logging.GUIAppender;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -88,8 +89,7 @@ public class ProbeController {
 	}
 
 	/***
-	 * Creates the title bar and adds buttons and listeners to it. Only outsourced
-	 * for legibility
+	 * Creates the title bar and adds buttons and listeners to it. Only outsourced for legibility
 	 */
 	private void initTitleBar() {
 		// the following snippet creates a custom window bar
@@ -107,7 +107,7 @@ public class ProbeController {
 		} /**/
 
 		// label to display the application title
-		Label l = new Label(ConfigItems.PROBE_TITLE);
+		Label l = new Label(StaticConfigItems.PROBE_TITLE);
 
 		// the HBox is required to right-align the buttons.
 		HBox h = new HBox();
@@ -153,7 +153,7 @@ public class ProbeController {
 		// TextArea textArea = new TextArea();
 		OutputStream os = new ListViewOutputStream(list, items);
 
-		ProbeGUIAppender.setStaticOutputStream(os);
+		GUIAppender.setStaticOutputStream(os);
 
 		Hyperlink hyperlink = new Hyperlink("More info...");
 		TextFlow flow = new TextFlow(new Text(""), hyperlink);
@@ -161,7 +161,7 @@ public class ProbeController {
 		hyperlink.setOnMouseClicked(ev -> {
 			if (Desktop.isDesktopSupported()) {
 				try {
-					Desktop.getDesktop().browse(new URI(ConfigItems.BASE_URL_WEB));
+					Desktop.getDesktop().browse(new URI(LoadedConfigItems.getInstance().getBaseURLWeb()));
 				} catch (IOException e) {
 					log.error(e.getMessage());
 				} catch (URISyntaxException e) {

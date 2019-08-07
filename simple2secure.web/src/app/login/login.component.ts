@@ -1,93 +1,148 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
 
 import {AlertService, AuthenticationService, HttpService} from '../_services/index';
-import {TranslateCompiler, TranslateService} from '@ngx-translate/core';
+import {TranslateService} from '@ngx-translate/core';
 import {JwtHelper} from 'angular2-jwt';
+import {environment} from '../../environments/environment';
+import {ContextDTO} from '../_models';
+import {MatDialog, MatDialogConfig} from '@angular/material';
+import {SelectContextDialog} from '../dialog/select-context';
 
 @Component({
-    moduleId: module.id,
+	moduleId: module.id,
+	selector: 'loginComponent',
 	styleUrls: ['login.component.css'],
-    templateUrl: 'login.component.html'
+	templateUrl: 'login.component.html'
 })
 
 export class LoginComponent implements OnInit {
-    model: any = {};
-    loading = false;
-    returnUrl: string;
-    hide: boolean;
-    jwtHelper: JwtHelper = new JwtHelper();
+	model: any = {};
+	loading = false;
+	returnUrl: string;
+	hide: boolean;
+	currentUser: any;
+	jwtHelper: JwtHelper = new JwtHelper();
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private translate: TranslateService,
-        private authenticationService: AuthenticationService,
-        private httpService: HttpService,
-        private alertService: AlertService) { }
+	constructor(
+		private route: ActivatedRoute,
+		private router: Router,
+		private translate: TranslateService,
+		private authenticationService: AuthenticationService,
+		private httpService: HttpService,
+		private dialog: MatDialog,
+		private alertService: AlertService)
+	{ }
 
-    ngOnInit() {
+	ngOnInit() {
 
-        this.hide = true;
+		this.hide = true;
 
-        // reset login status
-        this.authenticationService.logout();
+		// reset login status
+		this.authenticationService.logout();
 
-        // get return url from route parameters or default to '/'
-        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    }
+		// get return url from route parameters or default to '/'
+		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+	}
 
-    login() {
-        this.loading = true;
-        this.httpService.postLogin(this.model.username, this.model.password)
-            .subscribe(
-                response => {
-                    const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
-                    const user_uuid = decodedToken.userID;
-                    const user_role = decodedToken.userRole;
-                    localStorage.setItem('token', response.headers.get('Authorization'));
-                    localStorage.setItem('currentUser', JSON.stringify({ firstName: this.model.username, token: response.headers.get('Authorization'), userID: user_uuid, userRole: user_role }));
-                    this.router.navigate([this.returnUrl]);
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                        this.loading = false;
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
+	login() {
+		this.loading = true;
+		this.httpService.postLogin(this.model.username, this.model.password)
+			.subscribe(
+				response => {
+					const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
+					const userId = decodedToken.userID;
+					localStorage.setItem('token', response.headers.get('Authorization'));
+					localStorage.setItem('currentUser', JSON.stringify({
+						firstName: this.model.username,
+						token: response.headers.get('Authorization'), userID: userId
+					}));
+					// after successful login choose the context
+					this.getContexts(userId);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+						this.loading = false;
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
 
-                });
-    }
+				});
+	}
 
-    showPassword(){
-        if (this.hide){
-            this.hide = false;
-        }
-        else{
-            this.hide = true;
-        }
-    }
+	private getContexts(userId: string) {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'context/' + userId)
+			.subscribe(
+				data => {
+					this.openSelectContextModal(data);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
 
-    success(message: string) {
-        this.alertService.success(message);
-    }
+	openSelectContextModal(contexts: ContextDTO[]) {
+		// If size of the contexts is greater than 0 open dialog
+		if (contexts.length > 1) {
+			const dialogConfig = new MatDialogConfig();
 
-    error(message: string) {
-        this.alertService.error(message);
-    }
+			dialogConfig.disableClose = true;
+			dialogConfig.autoFocus = true;
+			dialogConfig.width = '450px';
 
-    info(message: string) {
-        this.alertService.info(message);
-    }
+			dialogConfig.data = {
+				id: 1,
+				title: this.translate.instant('login.successful'),
+				content: this.translate.instant('message.contextDialog'),
+				selectMessage: this.translate.instant('message.contextDialog.select'),
+				contextList: contexts
+			};
 
-    warn(message: string) {
-        this.alertService.warn(message);
-    }
+			const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);
 
-    clear() {
-        this.alertService.clear();
-    }
+			dialogRef.afterClosed().subscribe(result => {
+				if (result == true) {
+					this.router.navigate([this.returnUrl]);
+				}
+				else {
+					this.authenticationService.logout();
+				}
+			});
+		}
+		// If size of the contexts is equal to 1, set currentContext automatically
+		else if (contexts.length == 1) {
+			console.log('Updating context automatically, selected context ' + JSON.stringify(contexts[0]));
+			localStorage.setItem('context', JSON.stringify(contexts[0]));
+			this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+			this.httpService.updateContext(contexts[0].context, this.currentUser.userID);
+		}
+
+		// In this case some error occured and user needs to be redirect again to login page, call logout function
+		else {
+			this.alertService.error(this.translate.instant('server.notresponding'));
+			this.authenticationService.logout();
+		}
+	}
+
+	showPassword() {
+		if (this.hide) {
+			this.hide = false;
+		}
+		else {
+			this.hide = true;
+		}
+	}
+
+
 }

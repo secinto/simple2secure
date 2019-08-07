@@ -1,206 +1,208 @@
-import { Component, ViewChild} from '@angular/core';
-import { AlertService, HttpService, DataService} from '../_services';
+import {Component, ViewChild} from '@angular/core';
+import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {Step} from '../_models/index';
+import {HttpErrorResponse} from '@angular/common/http';
+import {NetworkStepConfigurationEditComponent} from './networkStepConfigurationEdit.component';
 
 @Component({
-    moduleId: module.id,
-    templateUrl: 'networkConfigurationStepDetails.component.html'
+	moduleId: module.id,
+	selector: 'networkConfigurationStep',
+	templateUrl: 'networkConfigurationStepDetails.component.html'
 })
 
 export class NetworkConfigurationStepDetailsComponent {
 
-    currentUser: any;
-    steps: Step[];
-    loading = false;
-    type: number;
-    groupId: string;
-    probeId: string;
-    deleted: boolean;
-    displayedColumns = ['name', 'number', 'state', 'action'];
-    dataSource = new MatTableDataSource();
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+	currentUser: any;
+	private sub: any;
+	steps: Step[];
+	selectedItem: Step;
+	loading = false;
+	type: number;
+	groupId: string;
+	deleted = false;
+	added = false;
+	displayedColumns = ['name', 'number', 'state', 'action'];
+	dataSource = new MatTableDataSource();
+	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator) paginator: MatPaginator;
+	groupEditable: boolean;
 
-    constructor(
-        private alertService: AlertService,
-        private httpService: HttpService,
-        private dataService: DataService,
-        private router: Router,
-        private dialog: MatDialog,
-        private route: ActivatedRoute,
-        private translate: TranslateService
-    ) {}
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private router: Router,
+		private dialog: MatDialog,
+		private route: ActivatedRoute,
+		private translate: TranslateService
+	)
+	{}
 
-    ngOnInit() {
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        this.route.queryParams.subscribe(params => {
-            this.type = params['type'];
+	ngOnInit() {
+		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-            if (this.type == 3){
-                this.groupId = params['groupId'];
-            }
-            else{
-                this.probeId = params['probeId'];
-            }
-        });
+		this.sub = this.route.params.subscribe(params => {
+			this.groupId = params['id'];
+		});
 
-        this.loadSteps();
-    }
+		this.groupEditable = this.dataService.isGroupEditable();
 
-    ngAfterViewInit() {
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
-      }
+		if (!this.groupEditable) {
+			this.displayedColumns = ['name', 'number', 'state'];
+		}
 
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
-    }
+		this.loadSteps();
+	}
 
-    loadSteps(){
-        if (this.type == 3){
-            this.loadGroupSteps();
-        }
-        else{
-            this.loadDeviceSteps();
-        }
-    }
+	ngAfterViewInit() {
+		this.dataSource.sort = this.sort;
+		this.dataSource.paginator = this.paginator;
+	}
 
-    loadDeviceSteps(){
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'steps/' + this.probeId + '/true')
-            .subscribe(
-                data => {
-                    this.steps = data;
-                    this.dataSource.data = this.steps;
-                    if (data.length > 0){
-                        if (this.deleted == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = false;
-                        }
-                    }
-                    else{
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
+	applyFilter(filterValue: string) {
+		filterValue = filterValue.trim();
+		filterValue = filterValue.toLowerCase();
+		this.dataSource.filter = filterValue;
+	}
 
-    loadGroupSteps(){
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'steps/group/' + this.groupId + '/true')
-            .subscribe(
-                data => {
-                    this.steps = data;
-                    this.dataSource.data = this.steps;
-                    if (data.length > 0){
-                        if (this.deleted == false){
-                            this.alertService.success(this.translate.instant('message.data'));
-                        }
-                        else{
-                            this.deleted = false;
-                        }
-                    }
-                    else{
-                        this.alertService.error(this.translate.instant('message.data.notProvided'));
-                    }
-                    this.loading = false;
+	loadSteps() {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'steps/group/' + this.groupId + '/true')
+			.subscribe(
+				data => {
+					this.steps = data;
+					this.dataSource.data = this.steps;
+					if (data.length > 0) {
+						if (this.deleted == false && this.added == false) {
+							this.alertService.success(this.translate.instant('message.data'));
+						}
+						else {
+							this.deleted = false;
+							this.added = false;
+						}
+					}
+					this.loading = false;
 
-                },
-                error => {
-                    if (error.status == 0){
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else{
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
 
-    onMenuTriggerClick(item: any){
-        this.dataService.set(item);
-    }
+	onMenuTriggerClick(item: any) {
+		this.selectedItem = item;
+	}
 
-    onEditClick(){
-        if (this.type == 3){
-            this.router.navigate(['edit'], { relativeTo: this.route, queryParams: { type: this.type, groupId: this.groupId, action: 'edit' } });
-        }
-        else{
-            this.router.navigate(['edit'], { relativeTo: this.route, queryParams: { type: this.type, probeId: this.probeId, action: 'edit' } });
-        }
-    }
+	onEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			step: this.selectedItem,
+			groupId: this.groupId
+		};
 
-    onDeleteClick(){
-        this.openDialog(this.dataService.get());
-    }
+		const dialogRef = this.dialog.open(NetworkStepConfigurationEditComponent, dialogConfig);
 
-    public openDialog(item: any){
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.step.update'));
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
 
-        const dialogConfig = new MatDialogConfig();
+	public onAddClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			step: null,
+			groupId: this.groupId
+		};
 
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
+		const dialogRef = this.dialog.open(NetworkStepConfigurationEditComponent, dialogConfig);
 
-        dialogConfig.data = {
-            id: 1,
-            title: this.translate.instant('message.areyousure'),
-            content: this.translate.instant('message.step.dialog')
-        };
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.step.add'));
+				this.added = true;
+				this.loadSteps();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
 
-        const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+	onDeleteClick() {
+		this.openDialog(this.selectedItem);
+	}
 
-        dialogRef.afterClosed().subscribe(data => {
-            if (data === true){
-                this.deleteStep(item);
-            }
-        });
-    }
+	public openDialog(item: any) {
 
-    deleteStep(step: any){
-        this.loading = true;
-        this.httpService.delete(environment.apiEndpoint + 'steps/' + step.id).subscribe(
-            data => {
-                this.alertService.success(this.translate.instant('message.step.delete'));
-                this.deleted = true;
-                this.loadSteps();
-                this.loading = false;
-            },
-            error => {
-                if (error.status == 0){
-                    this.alertService.error(this.translate.instant('server.notresponding'));
-                }
-                else{
-                    this.alertService.error(error.error.errorMessage);
-                }
-                this.loading = false;
-            });
-    }
+		const dialogConfig = new MatDialogConfig();
 
-    public addStep(){
-        if (this.type == 3){
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, groupId: this.groupId, action: 'new' } });
-        }
-        else{
-            this.router.navigate(['new'], { relativeTo: this.route, queryParams: { type: this.type, probeId: this.probeId, action: 'new' } });
-        }
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
 
-    }
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.step.dialog')
+		};
+
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteStep(item);
+			}
+		});
+	}
+
+	deleteStep(step: any) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'steps/' + step.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.step.delete'));
+				this.deleted = true;
+				this.loadSteps();
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
 }

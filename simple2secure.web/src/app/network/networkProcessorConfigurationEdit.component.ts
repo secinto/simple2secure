@@ -1,97 +1,72 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 
-import {Processor, Timeunit} from '../_models/index';
+import {Processor, Timeunit, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
-import {Location, Time} from '@angular/common';
+import {Location} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'networkProcessorConfigurationEdit.component.html'
+	moduleId: module.id,
+	templateUrl: 'networkProcessorConfigurationEdit.component.html'
 })
 
 export class NetworkProcessorConfigurationEditComponent {
 
-  processor: Processor;
-  id: string;
-  private sub: any;
-  splittedurl: any[];
-  type: number;
-  action: string;
-  groupId: string;
-  probeId: string;
+	processor: Processor;
+	action: string;
+	groupId: string;
+	timeUnits = Timeunit;
 
-  timeUnits = Timeunit;
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private translate: TranslateService,
+		private router: Router,
+		private route: ActivatedRoute,
+		private location: Location,
+		private dialogRef: MatDialogRef<NetworkProcessorConfigurationEditComponent>,
+		@Inject(MAT_DIALOG_DATA) data
+	)
+	{
+		if (data.processor == null) {
+			this.action = UrlParameter.NEW;
+			this.processor = new Processor();
+			this.groupId = data.groupId;
+		}
+		else {
+			this.action = UrlParameter.EDIT;
+			this.processor = data.processor;
+			this.groupId = data.groupId;
+		}
+	}
 
-  constructor(
-    private alertService: AlertService,
-    private httpService: HttpService,
-    private dataService: DataService,
-    private translate: TranslateService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private location: Location
-  ) {
-    this.processor = new Processor();
-  }
+	extractTimeUnits(): Array<string> {
+		const keys = Object.keys(this.timeUnits);
+		return keys.slice();
+	}
 
-    extractTimeUnits(): Array<string> {
-        const keys = Object.keys(this.timeUnits);
-        return keys.slice();
-    }
+	saveProcessor() {
 
-  ngOnInit() {
+		if (this.action == UrlParameter.NEW) {
+			this.processor.groupId = this.groupId;
+		}
 
-    this.route.queryParams.subscribe(params => {
-      this.type = params['type'];
-      this.action = params['action'];
+		console.log('HEREEEEEEEEEEE');
+		this.httpService.post(this.processor, environment.apiEndpoint + 'processors').subscribe(
+			data => {
+				this.dialogRef.close(true);
+			},
+			error => {
+				this.dialogRef.close(error);
+			});
+	}
 
-
-      if (this.type == 3){
-          this.groupId = params['groupId'];
-      }
-      else{
-          this.probeId = params['probeId'];
-      }
-
-    });
-
-    if (this.action === 'edit') {
-      this.processor = this.dataService.get();
-    }
-  }
-
-  saveProcessor() {
-
-      if (this.action == 'new') {
-
-          if (this.type == 3){
-              this.processor.groupId = this.groupId;
-          }
-          else{
-              this.processor.probeId = this.probeId;
-          }
-      }
-
-    this.httpService.post(this.processor, environment.apiEndpoint + 'processors').subscribe(
-      data => {
-        this.processor = data;
-        this.location.back();
-      },
-      error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
-      });
-  }
-
-  cancel(){
-      this.location.back();
-  }
+	cancel() {
+		this.location.back();
+	}
 }

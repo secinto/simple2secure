@@ -1,0 +1,50 @@
+<dialog></dialog>
+<div class="example-container mat-elevation-z8 table table-striped">
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="probe">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.probe' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+        </ng-container>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="processorName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.processor' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.processorName}}</mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="startTime">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.startTime}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate
+                }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button mat-button class="mat-green-button" color="primary"
+                        (click)="$event.stopPropagation(); onDeleteClick(element)">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
+                 (click)="openDialogShowReportDetails(row)"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+

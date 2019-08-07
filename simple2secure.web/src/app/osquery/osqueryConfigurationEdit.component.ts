@@ -1,96 +1,70 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {Location} from '@angular/common';
-import {QueryRun, Timeunit} from '../_models/index';
+import {QueryRun, Timeunit, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'osqueryConfigurationEdit.component.html'
+	moduleId: module.id,
+	templateUrl: 'osqueryConfigurationEdit.component.html'
 })
 
 export class OsqueryConfigurationEditComponent {
 
-  queryRun: QueryRun;
-  id: string;
-  private sub: any;
-  splittedurl: any[];
-  type: number;
-  action: string;
-  probeId: string;
-  groupId: string;
+	queryRun: QueryRun;
+	id: string;
+	type: number;
+	action: string;
+	probeId: string;
+	groupId: string;
 
-  timeUnits = Timeunit;
+	timeUnits = Timeunit;
 
-  constructor(
-    private alertService: AlertService,
-    private httpService: HttpService,
-    private dataService: DataService,
-    private router: Router,
-    private translate: TranslateService,
-    private route: ActivatedRoute,
-    private location: Location
-  ) {
-    this.queryRun = new QueryRun();
-  }
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private router: Router,
+		private translate: TranslateService,
+		private route: ActivatedRoute,
+		private location: Location,
+		private dialogRef: MatDialogRef<OsqueryConfigurationEditComponent>,
+		@Inject(MAT_DIALOG_DATA) data
+	)
+	{
+		if (data.queryRun == null) {
+			this.action = UrlParameter.NEW;
+			this.queryRun = new QueryRun();
+			this.groupId = data.groupId;
+		}
+		else {
+			this.action = UrlParameter.EDIT;
+			this.queryRun = data.queryRun;
+			this.groupId = data.groupId;
+		}
+	}
 
-  ngOnInit() {
+	extractTimeUnits(): Array<string> {
+		const keys = Object.keys(this.timeUnits);
+		return keys.slice();
+	}
 
-    this.route.queryParams.subscribe(params => {
-      this.type = params['type'];
-      this.action = params['action'];
+	saveQueryRun() {
 
-      if (this.type == 1){
-          this.groupId = params['groupId'];
-      }
-      else{
-          this.probeId = params['probeId'];
-      }
+		if (this.action == UrlParameter.NEW) {
+			this.queryRun.groupId = this.groupId;
+		}
 
-    });
-
-    if (this.action === 'edit') {
-      this.queryRun = this.dataService.get();
-    }
-  }
-
-  extractTimeUnits(): Array<string> {
-      const keys = Object.keys(this.timeUnits);
-      return keys.slice();
-  }
-
-  saveQueryRun() {
-
-    if (this.action == 'new') {
-      if (this.type == 1) {
-        if (!this.queryRun.groupId) {
-          this.queryRun.groupId = this.groupId;
-        }
-      }
-      else{
-          this.queryRun.probeId = this.probeId;
-        }
-      }
-
-    this.httpService.post(this.queryRun, environment.apiEndpoint + 'config/query').subscribe(
-      data => {
-        this.queryRun = data;
-        this.location.back();
-      },
-      error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
-      });
-  }
-
-  cancel(){
-      this.location.back();
-  }
+		this.httpService.post(this.queryRun, environment.apiEndpoint + 'config/query').subscribe(
+			data => {
+				this.dialogRef.close(true);
+			},
+			error => {
+				this.dialogRef.close(error);
+			});
+	}
 }

@@ -21,7 +21,6 @@ public class ViewNavigator {
 	 * Convenience constants for fxml layouts managed by the navigator.
 	 */
 	public static final String MAIN = "/fxml/ProbeRoot.fxml";
-	public static final String LOGIN_VIEW = "/fxml/LoginView.fxml";
 	public static final String LICENSE_VIEW = "/fxml/LicenseView.fxml";
 
 	private static Map<String, FXMLLoader> loaderCache = new HashMap<>();

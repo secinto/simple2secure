@@ -1,42 +1,57 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
- */
-
 package com.simple2secure.portal.controller;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import com.simple2secure.api.config.ConfigItems;
+import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
+import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.ServiceLibraryRepository;
+import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
+@RequestMapping("/api/service")
 public class ServiceController {
 
-	RestTemplate restTemplate = new RestTemplate();
+	@Autowired
+	ServiceLibraryRepository serviceLibraryRepository;
 
-	/**
-	 * This API returns JSON, with all services listed in it.
-	 *
-	 * @return
-	 */
-	@RequestMapping(value = "/api", method = RequestMethod.GET)
-	public ResponseEntity<List<Service>> getAvailableServices(@RequestHeader("Accept-Language") String locale) {
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
 
-		ResponseEntity<Service[]> response = this.restTemplate.getForEntity(ConfigItems.services_url, Service[].class);
-		List<Service> servicesList = Arrays.asList(response.getBody());
-		return new ResponseEntity<List<Service>>(servicesList, HttpStatus.OK);
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
+		return new ResponseEntity<Service>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/{versionId}", method = RequestMethod.GET)
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable("version") String version,
+			@RequestHeader("Accept-Language") String locale) {
+		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);
+
+		try {
+			library.setLibraryData(Files.readAllBytes(new File(library.getFilename()).toPath()));
+		} catch (IOException ioe) {
+			library = null;
+		}
+
+		if (library != null) {
+			return new ResponseEntity<ServiceLibraryDTO>(library, HttpStatus.OK);
+		} else {
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale)), HttpStatus.NOT_FOUND);
+
+		}
+	}
+
 }

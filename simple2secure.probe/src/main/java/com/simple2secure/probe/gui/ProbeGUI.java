@@ -7,8 +7,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -16,14 +14,13 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.config.ConfigItems;
-import com.simple2secure.api.model.CompanyLicenseObj;
-import com.simple2secure.commons.general.TimingUtils;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
-import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.license.LicenseController;
+import com.simple2secure.probe.license.StartConditions;
+import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.LocaleHolder;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 import ch.qos.logback.classic.Level;
 import javafx.application.Application;
@@ -58,6 +55,8 @@ public class ProbeGUI extends Application {
 
 	public static ResourceBundle rb;
 
+	private LicenseController licenseCon = new LicenseController();
+
 	public static void main(String[] args) {
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
@@ -76,7 +75,7 @@ public class ProbeGUI extends Application {
 
 		ProbeGUI.primaryStage = primaryStage;
 
-		primaryStage.setTitle(ConfigItems.PROBE_TITLE);
+		primaryStage.setTitle(StaticConfigItems.PROBE_TITLE);
 		primaryStage.getIcons().add(new Image(ProbeGUI.class.getResourceAsStream("/gui/images/logo.png")));
 
 		// Remove window decoration
@@ -87,82 +86,27 @@ public class ProbeGUI extends Application {
 
 		createTrayIcon(primaryStage);
 
-		if (TimingUtils.netIsAvailable(ConfigItems.BASE_URL)) {
-			ProbeConfiguration.setAPIAvailablitity(true);
-			log.info("SERVER REACHABLE!");
+		ProbeConfiguration.isGuiRunning = true;
+
+		StartConditions startConditions = licenseCon.checkProbeStartConditions();
+
+		switch (startConditions) {
+		case LICENSE_NOT_AVAILABLE:
+			initLicenseImportPane("There is no license stored, please import a license.");
+			break;
+		case LICENSE_EXPIRED:
+		case LICENSE_NOT_ACTIVATED:
+		case LICENSE_VALID:
+			initRootPane();
+			break;
+		default:
+			initRootPane();
 		}
-		CompanyLicenseObj license = checkIfLicenseExists();
-
-		if (license != null) {
-
-			Date expirationDate = ProbeUtils.convertStringtoDate(license.getExpirationDate());
-			if (!isLicenseExpired(expirationDate)) {
-				ProbeConfiguration.authKey = license.getAuthToken();
-				ProbeConfiguration.probeId = license.getProbeId();
-				ProbeConfiguration.licenseId = license.getLicenseId();
-
-				if (!ProbeConfiguration.isAPIAvailable()) {
-					ProbeConfiguration.isLicenseValid = true;
-				}
-
-				ProbeConfiguration.getInstance();
-
-				if (ProbeConfiguration.isLicenseValid) {
-					initRootPane();
-				} else {
-					initLicenseImportPane("Your license has expired! Please import the new one!");
-				}
-
-			} else {
-				initLicenseImportPane("Your license has expired! Please import the new one!");
-			}
-
-		}
-
-		else {
-			initLicenseImportPane("");
-		}
-	}
-
-	/**
-	 * This function checks if the license exists and according to that sets the
-	 * different view on the start
-	 * 
-	 * @return
-	 */
-	public CompanyLicenseObj checkIfLicenseExists() {
-		// LicenseDaoImpl licenseDao = new LicenseDaoImpl();
-		CompanyLicenseObj license = getLicenseFromDb();
-		if (license != null) {
-			if (license.isActivated()) {
-				// String licenseExists = APIUtils.sendPostWithResponse(ConfigItems.license_api,
-				// license.id);
-
-				return license;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static CompanyLicenseObj getLicenseFromDb() {
-		List<CompanyLicenseObj> licenses = DBUtil.getInstance().findAll(new CompanyLicenseObj());
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
-
 	}
 
 	public static void initLicenseImportPane(String errorText) throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(ProbeGUI.class.getResource(ViewNavigator.LICENSE_VIEW));
-		// final FXMLLoader fxmlLoader = new
-		// FXMLLoader(getClass().getResource(ViewNavigator.LICENSE_VIEW));
 		loader.getNamespace().put("labelText", errorText);
 		Parent root = loader.load();
 		Scene scene = new Scene(root);
@@ -172,8 +116,7 @@ public class ProbeGUI extends Application {
 	}
 
 	/**
-	 * This function initializes the Root Pane, it is called after the user is
-	 * successfully logged in
+	 * This function initializes the Root Pane, it is called after the user is successfully logged in
 	 */
 
 	public static void initRootPane() {
@@ -192,8 +135,7 @@ public class ProbeGUI extends Application {
 			ViewNavigator.setMainController(loader.getController());
 
 			Scene scene = new Scene(rootPane);
-			rootPane.setBorder(
-					new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+			rootPane.setBorder(new Border(new BorderStroke(Color.AQUAMARINE, BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -308,9 +250,5 @@ public class ProbeGUI extends Application {
 				}
 			}
 		});
-	}
-
-	private boolean isLicenseExpired(Date expirationDate) {
-		return System.currentTimeMillis() > expirationDate.getTime();
 	}
 }

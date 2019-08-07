@@ -21,29 +21,10 @@ public class ProcessorRepositoryImpl extends ProcessorRepository {
 		super.collectionName = "processor"; //$NON-NLS-1$
 		super.className = Processor.class;
 	}
-
-	@Override
-	public List<Processor> getProcessorsByProbeId(String probeId) {
-		Query query = new Query(Criteria.where("probeId").is(probeId));
-		List<Processor> processors = this.mongoTemplate.find(query, Processor.class);
-		return processors;
-	}
-
-	@Override
-	public void deleteByProbeId(String probeId) {
-		List<Processor> processors = getProcessorsByProbeId(probeId);
-
-		if(processors != null) {
-			for (Processor processor : processors) {
-				this.delete(processor);
-			}				
-		}
-
-	}
 	
 	@Override
 	public void deleteByGroupId(String groupId) {
-		List<Processor> processors = getProcessorsByGroupId(groupId, false);
+		List<Processor> processors = getProcessorsByGroupId(groupId);
 		
 		if(processors != null) {
 			for(Processor processor : processors) {
@@ -53,14 +34,9 @@ public class ProcessorRepositoryImpl extends ProcessorRepository {
 	}	
 
 	@Override
-	public List<Processor> getProcessorsByGroupId(String groupId, boolean isGroupProcessor) {
-		Query query = new Query();
-		if(isGroupProcessor) {
-			query = new Query(Criteria.where("groupId").is(groupId).and("isGroupProcessor").is(isGroupProcessor));
-		}
-		else {
-			query = new Query(Criteria.where("groupId").is(groupId));
-		}
+	public List<Processor> getProcessorsByGroupId(String groupId) {
+		
+		Query query = new Query(Criteria.where("groupId").is(groupId));
 		
 		List<Processor> processors = this.mongoTemplate.find(query, Processor.class);
 		return processors;

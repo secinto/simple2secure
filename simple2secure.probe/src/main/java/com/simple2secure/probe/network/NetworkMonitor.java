@@ -2,6 +2,7 @@ package com.simple2secure.probe.network;
 
 import java.util.List;
 
+import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.PcapAddress;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapIpV4Address;
@@ -12,9 +13,10 @@ import org.pcap4j.core.Pcaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.config.ConfigItems;
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Config;
 import com.simple2secure.commons.collections.ProcessingQueue;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.network.NetUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.exceptions.NetworkException;
@@ -35,6 +37,7 @@ public class NetworkMonitor {
 
 	private ProcessingQueue<PacketContainer> processingQueue;
 	private PcapHandle receiverHandle;
+	// private PcapHandle senderHandle;
 
 	public static NetworkMonitor startMonitor() {
 		if (instance == null) {
@@ -58,20 +61,20 @@ public class NetworkMonitor {
 			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
 		}
 
-		Config configuration = ProbeConfiguration.getInstance().getCurrentConfigObj();
+		Config configuration = ProbeConfiguration.getInstance().getConfig();
 
-		boolean show = configuration.isShow_interfaces();
+		boolean show = configuration.isShowInterfaces();
 
 		String previousAddress = "";
 
-		boolean use_iface = configuration.isUse_configured_iface();
-		if (use_iface) {
-			int config = ProbeConfiguration.getInstance().getCurrentConfigObj().getInterface_number();
-			int iface = config;
-			if (iface < interfaces.size()) {
-				singleInterface = interfaces.get(iface);
-			}
-		}
+		// boolean use_iface = configuration.isUse_configured_iface();
+		// if (use_iface) {
+		// int config = ProbeConfiguration.getInstance().getConfig().getInterface_number();
+		// int iface = config;
+		// if (iface < interfaces.size()) {
+		// singleInterface = interfaces.get(iface);
+		// }
+		// }
 
 		if (singleInterface == null) {
 
@@ -81,8 +84,8 @@ public class NetworkMonitor {
 					log.info(i + ":" + currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
 				}
 				/*
-				 * Iterate through the addresses of the interfaces and check if someone fits.
-				 * TODO: We should store the interfaces which have relevant addresses.
+				 * Iterate through the addresses of the interfaces and check if someone fits. TODO: We should store the interfaces which have
+				 * relevant addresses.
 				 */
 				List<PcapAddress> addresses = interfaces.get(i).getAddresses();
 				for (PcapAddress address : addresses) {
@@ -105,8 +108,19 @@ public class NetworkMonitor {
 		}
 
 		try {
-			receiverHandle = singleInterface.openLive(ConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, ConfigItems.READ_TIMEOUT);
+			receiverHandle = singleInterface.openLive(StaticConfigItems.SNAPLEN, PromiscuousMode.PROMISCUOUS, StaticConfigItems.READ_TIMEOUT);
 
+			/*
+			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
+			 * be developed
+			 */
+			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
+				try {
+					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
+				} catch (Exception e) {
+					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
+				}
+			}
 			processingQueue = new ProcessingQueue<PacketContainer>();
 
 			receiver = new PacketReceiver(receiverHandle, processingQueue);
@@ -116,27 +130,15 @@ public class NetworkMonitor {
 			new Thread(receiver).start();
 
 		} catch (Exception e) {
-			if (receiver != null) {
-				receiver.stop();
-			}
 			if (packetProcessor != null) {
 				packetProcessor.stop();
+			}
+			if (receiver != null) {
+				receiver.stop();
 			}
 			throw new NetworkException(LocaleHolder.getMessage("pcap_interface_open_error"));
 		}
 
-	}
-
-	public void stop() {
-		if (receiver != null) {
-			receiver.stop();
-		}
-		if (packetProcessor != null) {
-			packetProcessor.stop();
-		}
-		if(instance != null) {
-			instance = null;
-		}
 	}
 
 	public PacketReceiver getReceiver() {

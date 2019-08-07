@@ -1,93 +1,105 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CompanyGroup} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
-import {Router, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
-import {DatePipe} from '@angular/common';
+import {MatDialog} from '@angular/material';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'userGroup.component.html',
-  selector: 'UserGroupComponent',
-  providers: [DatePipe]
+	moduleId: module.id,
+	templateUrl: 'userGroup.component.html',
+	selector: 'UserGroupComponent',
 })
 
-export class UserGroupComponent {
-  public group: CompanyGroup;
-  loading = false;
-  id: string;
-  private sub: any;
-  url: string;
-  currentUser: any;
-  selectedDate: string;
-  tempDate: Date;
+export class UserGroupComponent implements OnInit {
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private httpService: HttpService,
-    private dataService: DataService,
-    private location: Location,
-    private alertService: AlertService,
-    private translate: TranslateService,
-    private datePipe: DatePipe) {
-        this.group = new CompanyGroup();
-  }
+	group = new CompanyGroup();
+	loading = false;
+	id: string;
+	private sub: any;
+	url: string;
+	currentUser: any;
+	groupEditable: boolean;
 
-  ngOnInit() {
-    this.sub = this.route.params.subscribe(params => {
-      this.id = params['id'];
-    });
+	constructor(
+		private router: Router,
+		private route: ActivatedRoute,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private location: Location,
+		private dialog: MatDialog,
+		private alertService: AlertService,
+		private translate: TranslateService)
+	{
+	}
 
-    this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+	ngOnInit() {
+		this.sub = this.route.params.subscribe(params => {
+			this.id = params['id'];
+		});
 
-    if (this.id === 'newGroup') {
+		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-    }
-    else {
-      this.loadGroup();
-      this.tempDate = new Date(this.group.licenseExpirationDate + ' ');
-      this.selectedDate = this.datePipe.transform(this.tempDate, 'yyyy-MM-dd', 'Europe/Vienna');
-    }
-  }
+		this.groupEditable = this.dataService.isGroupEditable();
+		this.loadGroup();
+	}
 
-  private loadGroup() {
-      this.group = this.dataService.get();
-  }
+	public loadGroup() {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'group/' + this.id)
+			.subscribe(
+				data => {
+					this.group = data;
+					if (this.group) {
+						this.alertService.success(this.translate.instant('message.data'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.data.notProvided'));
+					}
+					this.loading = false;
 
-  saveGroup() {
-    this.loading = true;
-    this.url = environment.apiEndpoint + 'users/group';
-    if (this.id === 'newGroup') {
-        this.group.addedByUserId = this.currentUser['userID'];
-    }
-    this.group.licenseExpirationDate = this.datePipe.transform(this.selectedDate, 'MM/dd/yyyy', 'Europe/Vienna');
-    this.httpService.post(this.group, this.url).subscribe(
-      data => {
-        this.group = data;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
 
-        if (this.id === 'new') {
-          this.alertService.success(this.translate.instant('message.user.create'));
-        }
-        else {
-          this.alertService.success(this.translate.instant('message.user.update'));
-        }
-        this.cancel();
-      },
-      error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
-          this.loading = false;
-      });
-  }
+	saveGroup() {
+		this.loading = true;
 
-  cancel(){
-      this.location.back();
-  }
+		this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + 'null';
+		this.httpService.post(this.group, this.url).subscribe(
+			data => {
+				this.group = data;
+
+				if (this.id === 'new') {
+					this.alertService.success(this.translate.instant('message.user.create'));
+				}
+				else {
+					this.alertService.success(this.translate.instant('message.user.update'));
+				}
+				this.cancel();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	cancel() {
+		this.location.back();
+	}
 }

@@ -1,11 +1,20 @@
-.registerPageForm{
-	/*padding: 10px 10px 10px 10px;*/
-	position: relative;
-	top: 50%;
-	/*transform: translateY(25%);
-	/*border:4px solid grey;*/
+.mat-card-custom {
+    margin: 4px;
 }
 
-#registerH2{
-	text-align: center;
+#saveButton {
+    margin-top: 5px;
+}
+
+.mat-card-license-plan {
+    margin-top: 50px;
+}
+
+.mat-card-title-left {
+    display: inline;
+}
+
+.mat-card-title-right {
+    display: inline;
+    float: right;
 }

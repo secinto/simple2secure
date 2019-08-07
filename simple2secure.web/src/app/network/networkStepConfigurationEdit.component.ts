@@ -1,124 +1,87 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 
-import {Step, Processor} from '../_models/index';
+import {Step, Processor, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {Location} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
-  moduleId: module.id,
-  templateUrl: 'networkStepConfigurationEdit.component.html'
+	moduleId: module.id,
+	templateUrl: 'networkStepConfigurationEdit.component.html'
 })
 
 export class NetworkStepConfigurationEditComponent {
 
-  step: Step;
-  id: string;
-  type: number;
-  action: string;
-  groupId: string;
-  probeId: string;
-  processors: Processor[];
+	step: Step;
+	id: string;
+	type: number;
+	action: string;
+	groupId: string;
+	processors: Processor[];
+	private sub: any;
 
 
-  constructor(
-    private alertService: AlertService,
-    private httpService: HttpService,
-    private dataService: DataService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private translate: TranslateService,
-    private location: Location
-  ) {
-    this.step = new Step();
-  }
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private router: Router,
+		private route: ActivatedRoute,
+		private translate: TranslateService,
+		private location: Location,
+		private dialogRef: MatDialogRef<NetworkStepConfigurationEditComponent>,
+		@Inject(MAT_DIALOG_DATA) data
+	)
+	{
+		if (data.step == null) {
+			this.action = UrlParameter.NEW;
+			this.step = new Step();
+			this.groupId = data.groupId;
+		}
+		else {
+			this.action = UrlParameter.EDIT;
+			this.step = data.step;
+			this.groupId = data.groupId;
+		}
+		this.getProcessorsByGroupId();
 
-  ngOnInit() {
+	}
 
-    this.route.queryParams.subscribe(params => {
-      this.type = params['type'];
+	saveStep() {
 
-      if (this.type == 3){
-          this.groupId = params['groupId'];
-          this.getProcessorsByGroupId();
-      }
-      else{
-          this.probeId = params['probeId'];
-          this.getProcessorsByProbeId();
-      }
+		if (this.action == UrlParameter.NEW) {
+			this.step.groupId = this.groupId;
+		}
+		this.httpService.post(this.step, environment.apiEndpoint + 'steps').subscribe(
+			data => {
+				this.dialogRef.close(true);
+			},
+			error => {
+				this.dialogRef.close(error);
+			});
+	}
 
-      this.action = params['action'];
-    });
+	getProcessorsByGroupId() {
+		this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+			.subscribe(
+				data => {
+					this.processors = data;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+	}
 
-    if (this.action === 'edit') {
-      this.step = this.dataService.get();
-    }
-  }
-
-  saveStep() {
-
-    if (this.action == 'new') {
-
-        if (this.type == 3){
-            this.step.groupId = this.groupId;
-        }
-        else{
-            this.step.probeId = this.probeId;
-        }
-    }
-
-    this.httpService.post(this.step, environment.apiEndpoint + 'steps').subscribe(
-      data => {
-        this.step = data;
-        this.location.back();
-      },
-      error => {
-          if (error.status == 0){
-              this.alertService.error(this.translate.instant('server.notresponding'));
-          }
-          else{
-              this.alertService.error(error.error.errorMessage);
-          }
-      });
-  }
-
-  getProcessorsByGroupId(){
-      this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
-          .subscribe(
-              data => {
-                  this.processors = data;
-
-              },
-              error => {
-                  if (error.status == 0){
-                      this.alertService.error(this.translate.instant('server.notresponding'));
-                  }
-                  else{
-                      this.alertService.error(error.error.errorMessage);
-                  }
-              });
-  }
-
-  getProcessorsByProbeId(){
-      this.httpService.get(environment.apiEndpoint + 'processors/' + this.probeId)
-          .subscribe(
-              data => {
-                  this.processors = data;
-              },
-              error => {
-                  if (error.status == 0){
-                      this.alertService.error(this.translate.instant('server.notresponding'));
-                  }
-                  else{
-                      this.alertService.error(error.error.errorMessage);
-                  }
-              });
-  }
-
-  cancel(){
-      this.location.back();
-  }
+	cancel() {
+		this.location.back();
+	}
 }

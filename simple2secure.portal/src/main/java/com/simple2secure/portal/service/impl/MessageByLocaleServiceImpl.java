@@ -10,27 +10,27 @@ import org.springframework.stereotype.Service;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Service
-public class MessageByLocaleServiceImpl implements MessageByLocaleService{
+public class MessageByLocaleServiceImpl implements MessageByLocaleService {
 
-    @Autowired
-    private MessageSource messageSource;
-	
+	@Autowired
+	private MessageSource messageSource;
+
 	@Override
 	public String getMessage(String id) {
 		Locale locale = LocaleContextHolder.getLocale();
-		return messageSource.getMessage(id,null,locale);
+		return messageSource.getMessage(id, null, locale);
 	}
 
 	@Override
 	public String getMessage(String id, String lang) {
 		Locale locale = new Locale(lang);
-		return messageSource.getMessage(id,null,locale);
+		return messageSource.getMessage(id, null, locale);
 	}
-	
+
 	@Override
-	public String getMessage(String id,Object[] parameters, String lang) {
+	public String getMessage(String id, Object[] parameters, String lang) {
 		Locale locale = new Locale(lang);
-		return messageSource.getMessage(id,parameters,locale);
+		return messageSource.getMessage(id, parameters, locale);
 	}
 
 }

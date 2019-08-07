@@ -8,199 +8,82 @@
 
 package com.simple2secure.portal.utils;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Resources;
+import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.User;
+import com.simple2secure.portal.repository.GroupRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+@Component
 public class PortalUtils {
-	
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+	private static Logger log = LoggerFactory.getLogger(PortalUtils.class);
+
+	@Autowired
+	JavaMailSender javaMailSender;
+
+	@Autowired
+	GroupRepository groupRepository;
+
+	static final String CLAIM_POD = "podID";
+	static final String CLAIMS_SUBJECT = "data";
 
 	/**
-	 * Helper function to read string from the file
-	 * 
-	 * @param rd
-	 * @return
-	 * @throws IOException
-	 */
-	public static String readAll(Reader rd) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		int cp;
-		while ((cp = rd.read()) != -1) {
-			sb.append((char) cp);
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * Sends an email with the activation token or in case of the password reset to the user
-	 * 
-	 * @param user
-	 * @throws IOException 
-	 */
-	public static boolean sendEmail(User user, String emailContent, String subject) throws IOException {
-		if (user != null && !Strings.isNullOrEmpty(user.getEmail())) {
-			String to = user.getEmail();
-
-			Properties properties = new Properties();
-			
-			
-			properties.load(PortalUtils.class.getClassLoader().getResourceAsStream("mail.properties"));
-			
-			final String username = properties.getProperty("username");
-			final String password = properties.getProperty("password");
-
-			Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
-				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(username, password);
-				}
-			});
-
-			try {
-				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(username));
-				message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-				message.setSubject(subject);
-				message.setText(emailContent);
-
-				Transport.send(message);
-				return true;
-			} catch (MessagingException mex) {
-				mex.printStackTrace();
-				return false;
-			}
-		} else {
-			return false;
-		}
-
-	}
-
-	/**
-	 * This function generates an activation token for each user
-	 * 
+	 * This function generates a token(activation, invitation, paswordReset) for each user
+	 *
 	 * @return
 	 */
-	public static synchronized String generateToken() {
+	public synchronized String generateToken() {
 		UUID uuid = UUID.randomUUID();
 		return uuid.toString();
 	}
-	
-	public static String alphaNumericString(int len) {
-	    String ALPHA_UPPER_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	    String ALPHA_LOWER_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
-	    String NUMERIC_CHARACTERS = "0123456789";
-	    String SPECIAL_CHARACTERS = ";!.-:";
-	    
-	    Random rnd = new Random();
 
-	    StringBuilder sb = new StringBuilder(len);
-	    for (int i = 0; i < len; i++) {
-	    	if(i == 0) {
-	    		sb.append(ALPHA_UPPER_CHARACTERS.charAt(rnd.nextInt(ALPHA_UPPER_CHARACTERS.length())));
-	    	}
-	    	if(i == 1) {
-	    		sb.append(NUMERIC_CHARACTERS.charAt(rnd.nextInt(NUMERIC_CHARACTERS.length())));
-	    	}
-	    	if(i == 2) {
-	    		sb.append(SPECIAL_CHARACTERS.charAt(rnd.nextInt(SPECIAL_CHARACTERS.length())));
-	    	}
-	    	else {
-	    		sb.append(ALPHA_LOWER_CHARACTERS.charAt(rnd.nextInt(ALPHA_LOWER_CHARACTERS.length())));
-	    	}	        
-	    }
-	    return sb.toString();
-	}
-	
 	/**
-	 * This function converts the email body from the MimeMultiPart to the string.
-	 * @param mimeMultipart
-	 * @return
-	 * @throws Exception
-	 */
-	public static String getTextFromMimeMultipart(MimeMultipart mimeMultipart) throws Exception {
-	    String result = "";
-	    int partCount = mimeMultipart.getCount();
-	    for (int i = 0; i < partCount; i++) {
-	        BodyPart bodyPart = mimeMultipart.getBodyPart(i);
-	        if (bodyPart.isMimeType("text/plain")) {
-	            result = result + "\n" + bodyPart.getContent();
-	            break; // without break same text appears twice in my tests
-	        } else if (bodyPart.isMimeType("text/html")) {
-	            String html = (String) bodyPart.getContent();
-	            // result = result + "\n" + org.jsoup.Jsoup.parse(html).text();
-	            result = html;
-	        } else if (bodyPart.getContent() instanceof MimeMultipart) {
-	            result = result + getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent());
-	        }
-	    }
-	    return result;
-	}
-	
-	/** 
-	 * This function returns the expiration date for the default group which is 
-	 * created when new user is registered
-	 * @return
-	 */
-	public static String getDefaultLicenseExpirationDate() {
-		Date currentDate = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		Calendar c = Calendar.getInstance();
-		c.setTime(currentDate);
-		//TODO: implement in web so that superadmin can configure this value!
-		c.add(Calendar.DATE, 10);
-		Date currentDatePlusFive = c.getTime();
-		return sdf.format(currentDatePlusFive);	
-	}
-	
-	/**
-	 * This function checks if processor with the provided name or class already exist in the database. 
-	 * New processor will be only added if it does not exist.
+	 * This function checks if processor with the provided name or class already exist in the database. New processor will be only added if it
+	 * does not exist.
+	 *
 	 * @param processors
 	 * @param processor
 	 * @return
 	 */
-	public static boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
-		for(Processor processor_item : processors) {
-			if(processor_item.getName().trim().equals(processor.getName().trim())) {
+	public boolean checkIfListAlreadyContainsProcessor(List<Processor> processors, Processor processor) {
+		for (Processor processor_item : processors) {
+			if (processor_item.getName().trim().equals(processor.getName().trim())) {
 				return true;
 			}
-			if(processor_item.getProcessor_class().trim().equals(processor.getProcessor_class().trim())) {
-				return true;
-			}
-			
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check before each request if access token has expired
+	 *
 	 * @param expirationDate
 	 * @return
 	 */
-	public static boolean isAccessTokenExpired(Date expirationDate) {
+	public boolean isAccessTokenExpired(Date expirationDate) {
 		Date currentDate = new Date(System.currentTimeMillis());
 
 		if (expirationDate.before(currentDate)) {
@@ -208,42 +91,151 @@ public class PortalUtils {
 		} else {
 			return false;
 		}
-		
+
 	}
-	
-	public static Date convertStringtoDate(String date) {
-		try {
-			return DATE_FORMAT.parse(date);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static boolean isLicenseExpired(String expDate) {
-		Date expirationDate = convertStringtoDate(expDate);
-		return System.currentTimeMillis() > expirationDate.getTime();
-	}
-	
-	public static long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
-		if(timeUnit != null) {
-			if(timeUnit.equals(TimeUnit.SECONDS)) {
-				return TimeUnit.SECONDS.toMillis(time);
-			}
-			else if(timeUnit.equals(TimeUnit.MINUTES)) {
-				return TimeUnit.MINUTES.toMillis(time);
-			}
-			else if(timeUnit.equals(TimeUnit.HOURS)) {
-				return TimeUnit.HOURS.toMillis(time);
-			}
-			else if(timeUnit.equals(TimeUnit.DAYS)) {
-				return TimeUnit.DAYS.toMillis(time);
-			}
-			else {
-				return 0;
-			}
-		}
-		else {
+
+	/**
+	 * Converts the given TimeUnits time to milliseconds.
+	 *
+	 * @param time
+	 *          The value of the time unit.
+	 * @param timeUnit
+	 *          The unit in which the time is measured.
+	 * @return The specified amount of time in milliseconds.
+	 */
+	public long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
+		if (timeUnit != null) {
+			return timeUnit.toMillis(time);
+		} else {
 			return 0;
 		}
 	}
+
+	/**
+	 * This function checks if this group has children groups
+	 *
+	 * @param group
+	 * @return
+	 */
+	public static boolean groupHasChildren(CompanyGroup group) {
+		if (group != null) {
+			if (group.getChildrenIds() != null) {
+				if (group.getChildrenIds().size() > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function finds the parent group of the current child
+	 *
+	 * @param group
+	 * @return
+	 */
+	public CompanyGroup findTheParentGroup(CompanyGroup group) {
+
+		if (!Strings.isNullOrEmpty(group.getParentId())) {
+			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
+			if (parentGroup != null) {
+				return parentGroup;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * This function searches recursively for all dependent groups until the root group is found
+	 *
+	 * @param group
+	 * @return
+	 */
+	public List<CompanyGroup> findAllParentGroups(CompanyGroup group) {
+		List<CompanyGroup> foundGroups = new ArrayList<>();
+		foundGroups.add(group);
+		boolean rootGroupFound = false;
+		while (!rootGroupFound) {
+			CompanyGroup parentGroup = findTheParentGroup(group);
+			if (parentGroup != null) {
+				foundGroups.add(parentGroup);
+				if (parentGroup.isRootGroup()) {
+					rootGroupFound = true;
+				} else {
+					group = parentGroup;
+				}
+			} else {
+				rootGroupFound = true;
+			}
+		}
+		return foundGroups;
+	}
+
+	/**
+	 * This function checks if the invitation token is still valid
+	 *
+	 * @param expirationTime
+	 * @return
+	 */
+	public boolean checkIfTokenIsStillValid(long expirationTime) {
+		if (System.currentTimeMillis() <= expirationTime) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This function reads the files from the resources folder according to the folder name
+	 *
+	 * @param folder
+	 * @return
+	 */
+	private static File[] getResourceFolderFiles(String folder) {
+		URL url = Resources.getResource(folder);
+		String path = url.getPath();
+		log.debug("Folder on the following path {} found", path);
+		return new File(path).listFiles();
+	}
+
+	/**
+	 * This is a function which reads the files from the resources folder and converts to the byte array in order to prepare them for download
+	 *
+	 * @return
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public byte[] downloadFile() throws IOException, URISyntaxException {
+		File[] probe = getResourceFolderFiles("probe");
+		byte[] array = Files.readAllBytes(probe[0].toPath());
+		return array;
+	}
+
+	/**
+	 * This function converts an input stream object to string
+	 *
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public String convertInputStreamToString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream, "UTF-8");
+	}
+
+	/**
+	 * This function generates pod token which is used for communication between pod and portal. With this token we will be able to send
+	 * request to the pod service from the portal.
+	 * 
+	 * @return
+	 */
+	public String generatePodToken(String podId, String tokenSecret) {
+
+		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
+		claims.put(CLAIM_POD, podId);
+
+		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
+				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
+
+		return podToken;
+	}
+
 }

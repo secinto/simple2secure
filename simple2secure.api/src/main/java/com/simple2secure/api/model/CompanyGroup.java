@@ -1,46 +1,37 @@
 package com.simple2secure.api.model;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-@Entity
-@Table(name = "CompanyGroup")
-public class CompanyGroup extends GenericDBObject{
+public class CompanyGroup extends GenericDBObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8637103644388176110L;
-	
+
+	private String parentId;
 	private String name;
-	private String addedByUserId;
-	private String owner;
-	
-	private String licenseExpirationDate;
-	
-	@OneToMany(cascade = {CascadeType.ALL})
-	List<CompanyGroup> children;
-	
-	private int maxNumberOfLicenseDownloads;
-	
-	private int currentNumberOfLicenseDownloads;
-	
-	public CompanyGroup() {}
-	
-	public CompanyGroup(String name, String owner, String addedByUserId, String licenseExpirationDate, List<CompanyGroup> children) {
-		this.name = name;
-		this.owner = owner;
-		this.addedByUserId = addedByUserId;
-		this.children = children;
-		this.licenseExpirationDate = licenseExpirationDate;
+	private String contextId;
+
+	List<String> childrenIds = new ArrayList<>();
+
+	List<CompanyGroup> children = new ArrayList<>();
+
+	private boolean rootGroup;
+
+	private boolean standardGroup = false;
+
+	public CompanyGroup() {
 	}
-	
+
+	public CompanyGroup(String name, List<String> childrenIds) {
+		this.name = name;
+		this.childrenIds = childrenIds;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -49,51 +40,67 @@ public class CompanyGroup extends GenericDBObject{
 		this.name = name;
 	}
 
-	public String getAddedByUserId() {
-		return addedByUserId;
+	public List<String> getChildrenIds() {
+		return childrenIds;
 	}
 
-	public void setAddedByUserId(String addedByUserId) {
-		this.addedByUserId = addedByUserId;
+	public void addChildrenId(String companyGroupId) {
+		childrenIds.add(companyGroupId);
+	}
+
+	public void addChildren(CompanyGroup child) {
+		children.add(child);
+	}
+
+	public void removeChildrenId(String companyGroupId) {
+		childrenIds.remove(companyGroupId);
+	}
+
+	public void removeChild(CompanyGroup child) {
+		children.remove(child);
+	}
+
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
+	}
+
+	public boolean isRootGroup() {
+		return rootGroup;
+	}
+
+	public void setRootGroup(boolean rootGroup) {
+		this.rootGroup = rootGroup;
+	}
+
+	public void setChildrenIds(List<String> children) {
+		childrenIds = children;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 	public List<CompanyGroup> getChildren() {
 		return children;
 	}
 
-	public void setGroupId(List<CompanyGroup> children) {
+	public void setChildren(List<CompanyGroup> children) {
 		this.children = children;
 	}
 
-	public String getLicenseExpirationDate() {
-		return licenseExpirationDate;
+	public boolean isStandardGroup() {
+		return standardGroup;
 	}
 
-	public void setLicenseExpirationDate(String licenseExpirationDate) {
-		this.licenseExpirationDate = licenseExpirationDate;
-	}
-
-	public int getMaxNumberOfLicenseDownloads() {
-		return maxNumberOfLicenseDownloads;
-	}
-
-	public void setMaxNumberOfLicenseDownloads(int maxNumberOfLicenseDownloads) {
-		this.maxNumberOfLicenseDownloads = maxNumberOfLicenseDownloads;
-	}
-
-	public int getCurrentNumberOfLicenseDownloads() {
-		return currentNumberOfLicenseDownloads;
-	}
-
-	public void setCurrentNumberOfLicenseDownloads(int currentNumberOfLicenseDownloads) {
-		this.currentNumberOfLicenseDownloads = currentNumberOfLicenseDownloads;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
+	public void setStandardGroup(boolean standardGroup) {
+		this.standardGroup = standardGroup;
 	}
 }

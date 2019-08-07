@@ -1,20 +1,20 @@
 .mat-table {
-  overflow: auto;
-  max-height: 500px;
+    overflow: auto;
+    max-height: 500px;
 }
 
 .element-row {
-  position: relative;
+    position: relative;
 }
 
 .element-row:not(.expanded) {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .element-row:not(.expanded):hover {
-  background: #f5f5f5;
+    background: #f5f5f5;
 }
 
 .element-row.expanded {
-  border-bottom-color: transparent;
+    border-bottom-color: transparent;
 }

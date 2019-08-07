@@ -8,17 +8,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.Step;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ProbeUtils {
+import com.simple2secure.api.model.Processor;
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.rest.RESTUtils;
+import com.simple2secure.probe.config.ProbeConfiguration;
+
+public final class ProbeUtils {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
 
+	private static Logger log = LoggerFactory.getLogger(ProbeUtils.class);
+
+	public static Processor getProcessorFromListByName(String name, Map<String, Processor> list) {
+		for (Processor item : list.values()) {
+			if (item.getName().equals(name)) {
+				return item;
+			}
+		}
+		return null;
+	}
+
 	/**
-	 * This function returns the file file from the file list according to the
-	 * filename
-	 * 
+	 * This function returns the file file from the file list according to the filename
+	 *
 	 * @param files
 	 * @param fileName
 	 * @return
@@ -40,21 +55,17 @@ public class ProbeUtils {
 		}
 	}
 
-	public static Processor getProcessorFromListByName(String name, Map<String, Processor> list) {
-		for (Processor item : list.values()) {
-			if (item.getName().equals(name)) {
-				return item;
-			}
+	/**
+	 * This function checks if the server is reachable
+	 */
+	public static void isServerReachable() {
+		if (RESTUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL())) {
+			ProbeConfiguration.setAPIAvailablitity(true);
+			log.info("SERVER REACHABLE!");
+		} else {
+			ProbeConfiguration.setAPIAvailablitity(false);
+			log.error("SERVER NOT REACHABLE!");
 		}
-		return null;
 	}
 
-	public static Step getStepFromListByName(String name, List<Step> list) {
-		for (Step item : list) {
-			if (item.getName().equals(name)) {
-				return item;
-			}
-		}
-		return null;
-	}
 }
