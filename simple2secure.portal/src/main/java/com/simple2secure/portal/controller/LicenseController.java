@@ -144,7 +144,7 @@ public class LicenseController {
 			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)
 					&& !Strings.isNullOrEmpty(hostname) && !Strings.isNullOrEmpty(configuration)) {
 				CompanyGroup group = groupRepository.find(groupId);
-				CompanyLicensePrivate license = licenseRepository.findByLicenseAndHostname(licenseId, hostname);
+				CompanyLicensePrivate license = licenseRepository.findByLicenseIdAndPodId(licenseId, podId);
 
 				if (license == null) {
 					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
@@ -310,7 +310,8 @@ public class LicenseController {
 					String licenseFile = LicenseUtil.createLicenseFile(companyLicense.getGroupId(), companyLicense.getLicenseId(),
 							companyLicense.getExpirationDate());
 
-					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStreamFromFile(licenseFile, licenseFilePath + "public.key");
+					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStreamFromFile(licenseFile,
+							licenseFilePath + "public.key");
 
 					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
 					contextRepository.update(context);
