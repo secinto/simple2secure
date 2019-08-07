@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
-import {CompanyGroup} from '../_models';
+import {CompanyGroup, Notification} from '../_models';
+import {PodDTO} from '../_models/DTO/podDTO';
 
 @Injectable()
 export class DataService {
@@ -57,4 +58,21 @@ export class DataService {
 	isGroupEditable() {
 		return JSON.parse(localStorage.getItem('isGroupEditable'));
 	}
+
+	setPods(data: PodDTO) {
+		localStorage.setItem('pod', JSON.stringify(data));
+	}
+
+	getPods() {
+		return JSON.parse(localStorage.getItem('pod'));
+	}
+
+	setNotifications(notifications: Notification[]) {
+		localStorage.setItem('notifications', JSON.stringify(notifications));
+	}
+
+	getNotifications(){
+		return JSON.parse(localStorage.getItem('notifications'));
+	}
+
 }

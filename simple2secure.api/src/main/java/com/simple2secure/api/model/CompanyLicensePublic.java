@@ -19,6 +19,8 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String probeId;
 
+	protected String podId;
+
 	protected String licenseId;
 
 	@Lob
@@ -27,6 +29,12 @@ public class CompanyLicensePublic extends GenericDBObject {
 	protected String expirationDate;
 
 	protected boolean activated;
+
+	protected String hostname;
+
+	protected PodStatus status;
+
+	protected long lastOnlineTimestamp;
 
 	public CompanyLicensePublic() {
 	}
@@ -62,6 +70,14 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.probeId = probeId;
 	}
 
+	public String getPodId() {
+		return podId;
+	}
+
+	public void setPodId(String podId) {
+		this.podId = podId;
+	}
+
 	public String getLicenseId() {
 		return licenseId;
 	}
@@ -94,4 +110,27 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.expirationDate = expirationDate;
 	}
 
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	public PodStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PodStatus status) {
+		this.status = status;
+	}
+
+	public long getLastOnlineTimestamp() {
+		return lastOnlineTimestamp;
+	}
+
+	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
+		this.lastOnlineTimestamp = lastOnlineTimestamp;
+	}
 }

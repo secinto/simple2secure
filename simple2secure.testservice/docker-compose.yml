@@ -1,0 +1,25 @@
+version: "3" 
+services:  
+    flask:
+        build: .
+        command: "python3 app.py"
+        ports:
+            - 5001:5000
+        links:
+            - redis
+            - celery
+        volumes:
+            - .:/usr/src/app
+
+    celery:
+        build: .
+        command: "celery -A app.celery worker --loglevel=info"
+        links:
+            - redis
+        volumes:
+            - .:/usr/src/app
+
+    redis:
+        image: redis
+        ports:
+            - 6379:6379

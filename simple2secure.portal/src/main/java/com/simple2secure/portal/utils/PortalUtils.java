@@ -33,6 +33,10 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.portal.repository.GroupRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
 @Component
 public class PortalUtils {
 	private static Logger log = LoggerFactory.getLogger(PortalUtils.class);
@@ -42,6 +46,9 @@ public class PortalUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
+
+	static final String CLAIM_POD = "podID";
+	static final String CLAIMS_SUBJECT = "data";
 
 	/**
 	 * This function generates a token(activation, invitation, paswordReset) for each user
@@ -205,13 +212,30 @@ public class PortalUtils {
 
 	/**
 	 * This function converts an input stream object to string
-	 * 
+	 *
 	 * @param inputStream
 	 * @return
 	 * @throws IOException
 	 */
 	public String convertInputStreamToString(InputStream inputStream) throws IOException {
 		return IOUtils.toString(inputStream, "UTF-8");
+	}
+
+	/**
+	 * This function generates pod token which is used for communication between pod and portal. With this token we will be able to send
+	 * request to the pod service from the portal.
+	 * 
+	 * @return
+	 */
+	public String generatePodToken(String podId, String tokenSecret) {
+
+		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
+		claims.put(CLAIM_POD, podId);
+
+		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
+				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
+
+		return podToken;
 	}
 
 }

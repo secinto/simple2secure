@@ -41,7 +41,6 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.ToolRepository;
 import com.simple2secure.portal.repository.UserInfoRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.repository.UserRepository;
@@ -73,9 +72,6 @@ public class UserUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
-
-	@Autowired
-	ToolRepository toolRepository;
 
 	@Autowired
 	EmailConfigurationRepository emailConfigRepository;

@@ -16,6 +16,9 @@ import {AuthGuard} from './_guards/index';
 import {AlertService, AuthenticationService, DataService, HttpService} from './_services/index';
 import {HomeComponent} from './home/index';
 import {LoginComponent} from './login/index';
+import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
+import {TestDetailsComponent} from './orbiter/testDetails.component';
+import {TestResultDetailsComponent} from './report/testResultDetails.component';
 import {ResetComponent} from './resetPassword/index';
 import {UpdatePasswordComponent} from './updatePassword/index';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
@@ -29,7 +32,7 @@ import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
 	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
 	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule
+	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule, MatBadgeModule
 } from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -62,8 +65,7 @@ import {NotificationComponent, NotificationOverviewComponent} from './notificati
 import {AnalysisComponent, AddQueryDialog} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
 import {
-	OrbiterComponent, OrbiterToolsComponent, OrbiterToolTestRunComponent, OrbiterToolTestComponent,
-	OrbiterToolTestResultComponent, OrbiterToolTemplateComponent, OrbiterTestTemplateComponent
+	OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent
 } from './orbiter/index';
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
@@ -73,13 +75,16 @@ import {RoleGuard} from './_guards/role.guard';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
+import {NotificationDialog} from './dialog/notification-dialog';
 import * as highstock from 'highcharts/modules/stock.src';
 import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
-import { AgmDirectionModule } from 'agm-direction'
+import { AgmDirectionModule } from 'agm-direction';
+import {TestResultComponent} from './report/testResult.component';
+import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -109,6 +114,7 @@ export const httpInterceptorProviders = [
 		MatSelectModule,
 		MatMenuModule,
 		MatIconModule,
+		MatBadgeModule,
 		MatSidenavModule,
 		MatButtonToggleModule,
 		MatTableModule,
@@ -120,6 +126,7 @@ export const httpInterceptorProviders = [
 		MatDatepickerModule,
 		MatNativeDateModule,
 		MatCardModule,
+		MatExpansionModule,
 		HttpClientModule,
 		ChartModule,
 		TreeTableModule,
@@ -177,14 +184,11 @@ export const httpInterceptorProviders = [
 		FooterComponent,
 		EqualValidator,
 		OrbiterComponent,
-		OrbiterToolsComponent,
-		OrbiterToolTestRunComponent,
-		OrbiterToolTestComponent,
-		OrbiterToolTestResultComponent,
-		OrbiterToolTemplateComponent,
-		OrbiterTestTemplateComponent,
+		OrbiterOverviewComponent,
+		TestResultComponent,
 		ConfirmationDialog,
 		SelectContextDialog,
+		NotificationDialog,
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
@@ -199,11 +203,17 @@ export const httpInterceptorProviders = [
 		AnalysisComponent,
 		AddQueryDialog,
 		ReportComponent,
-		ReportOverviewComponent
+		ReportOverviewComponent,
+		TestResultDetailsComponent,
+		TestDetailsComponent,
+		OrbiterToolTestComponent,
+		OrbiterToolTestListComponent,
+		OrbiterToolTestScheduledListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
 		SelectContextDialog,
+		NotificationDialog,
 		UserGroupDialogComponent,
 		NetworkProcessorConfigurationEditComponent,
 		NetworkStepConfigurationEditComponent,
@@ -211,9 +221,6 @@ export const httpInterceptorProviders = [
 		UserGroupApplyConfigComponent,
 		UserProbeChangeGroupComponent,
 		UserContextAddDialogComponent,
-		OrbiterTestTemplateComponent,
-		OrbiterToolTestResultComponent,
-		OrbiterToolTestRunComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,
 		RuleOverviewComponent,
@@ -221,7 +228,9 @@ export const httpInterceptorProviders = [
 		OsQueryReportDetailsComponent,
 		NetworkReportDetailsComponent,
 		UserDetailsComponent,
-		AddQueryDialog
+		AddQueryDialog,
+		TestResultDetailsComponent,
+		TestDetailsComponent
 	],
 	providers: [
 		AuthGuard,

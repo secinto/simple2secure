@@ -15,14 +15,12 @@ import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.ExtendedRule;
-import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.PortalRule;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
@@ -69,7 +67,7 @@ public class UpdateEmailScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	@Scheduled(fixedRate = 50000)
+	// @Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		if (configs != null) {
@@ -158,9 +156,11 @@ public class UpdateEmailScheduler {
 					public Void execute(Email input) {
 
 						// adding to the notification repository!
-						Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
-								"NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
-						notificationRepository.save(notification);
+						/*
+						 * Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
+						 * "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
+						 */
+						// notificationRepository.save(notification);
 						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
 						return null;
 					}
@@ -174,8 +174,7 @@ public class UpdateEmailScheduler {
 					Engine engine = new Engine(rules, true);
 					engine.executeAllActions(email, actions);
 				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.error(e.getMessage());
 				}
 			}
 		} else {
@@ -194,14 +193,17 @@ public class UpdateEmailScheduler {
 	 */
 
 	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
+		Properties props = new Properties();
 
 		// create a new session with the provided properties
-		Session session = Session.getDefaultInstance(setEmailConfiguration(config), null);
+		Session session = Session.getDefaultInstance(props, null);
 
 		// connect to the store using the provided credentials
 		Store store = session.getStore(STORE);
 
-		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+		store.connect("imap.gmail.com", 993, config.getEmail(), config.getPassword());
+
+		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
 		log.info("Connected to the store: " + store);
 
@@ -227,12 +229,15 @@ public class UpdateEmailScheduler {
 	 */
 	private Properties setEmailConfiguration(EmailConfiguration config) {
 		Properties props = new Properties();
+
 		props.setProperty("mail.imap.host", config.getIncomingServer());
 		props.setProperty("mail.imap.port", config.getIncomingPort());
 		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", SOCKET_FACTORY_PORT);
+		props.setProperty("mail.imap.socketFactory.port", config.getIncomingPort());
 		props.setProperty("mail.imap.auth", IMAP_AUTH);
 		props.setProperty("mail.mime.ignoreunknownencoding", "true");
+
+		props.put("mail.store.protocol", STORE);
 
 		return props;
 

@@ -1,9 +1,7 @@
 import {Generic} from './generic';
 
 export class Notification extends Generic {
-	userId: string;
-	toolId: string;
-	name: string;
 	content: string;
+	contextId: string;
 	read: boolean;
 }

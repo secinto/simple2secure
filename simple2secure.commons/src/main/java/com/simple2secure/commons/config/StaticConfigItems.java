@@ -62,4 +62,9 @@ public class StaticConfigItems {
 	public static final String STANDARD_GROUP_NAME = "Standard";
 	public static final String DEFAULT_LICENSE_PLAN = "Default";
 
+	public static final String PROFILE_DEPLOYMENT = "deployment";
+	public static final String PROFILE_PRODUCTION = "prod";
+	public static final String PROFILE_DEFAULT = "default";
+	public static final String PROFILE_TEST = "test";
+
 }

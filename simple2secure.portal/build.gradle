@@ -28,4 +28,11 @@ compileJava {
 	options.compilerArgs += ["-Xdoclint:none", "-Xlint:none", "-nowarn"]
 }
 
-war { baseName = 's2s' }
+war { 
+	baseName = 's2s-portal' 
+}
+
+
+
+
+

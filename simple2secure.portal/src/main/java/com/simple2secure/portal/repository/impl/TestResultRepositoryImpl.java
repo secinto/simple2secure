@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.TestCaseResult;
+import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.repository.TestResultRepository;
 
 @Repository
@@ -18,15 +18,35 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "testCaseResult"; //$NON-NLS-1$
-		super.className = TestCaseResult.class;
+		super.collectionName = "testResult"; //$NON-NLS-1$
+		super.className = TestResult.class;
 	}
 
 	@Override
-	public List<TestCaseResult> findByToolId(String toolId) {
-		Query query = new Query(Criteria.where("toolId").is(toolId));
-		List<TestCaseResult> testResultList = mongoTemplate.find(query, TestCaseResult.class);
-		return testResultList;
+	public List<TestResult> getByGroupId(String groupId) {
+		Query query = new Query(Criteria.where("groupId").is(groupId));
+		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
+		return testResults;
 	}
 
+	@Override
+	public List<TestResult> getByLicenseId(String licenseId) {
+		Query query = new Query(Criteria.where("licenseId").is(licenseId));
+		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
+		return testResults;
+	}
+
+	@Override
+	public List<TestResult> getByTestId(String testId) {
+		Query query = new Query(Criteria.where("testId").is(testId));
+		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
+		return testResults;
+	}
+
+	@Override
+	public TestResult getByTestRunId(String testRunId) {
+		Query query = new Query(Criteria.where("testRunId").is(testRunId));
+		TestResult testResult = mongoTemplate.findOne(query, TestResult.class);
+		return testResult;
+	}
 }

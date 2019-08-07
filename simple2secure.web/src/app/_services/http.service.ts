@@ -7,6 +7,7 @@ import {Context, User, UserRegistration} from '../_models';
 import {catchError} from 'rxjs/operators';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthenticationService} from './authentication.service';
+import { Location } from '@angular/common';
 
 @Injectable()
 export class HttpService {
@@ -17,7 +18,8 @@ export class HttpService {
 	            protected httpClient: HttpClient,
 	            private translate: TranslateService,
 	            private router: Router,
-	            private authenticationService: AuthenticationService)
+	            private authenticationService: AuthenticationService,
+	            private location: Location)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 	}
@@ -31,7 +33,10 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token')).set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+			.set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<any>(url, {headers});
 	}
 
@@ -41,7 +46,10 @@ export class HttpService {
 		if (!this.currentLang) {
 			this.currentLang = this.translate.defaultLang;
 		}
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token')).set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+			.set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(url, item, {headers});
 	}
 
@@ -52,7 +60,10 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token')).set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+			.set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.delete<any>(url, {headers});
 	}
 
@@ -63,17 +74,26 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token')).set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+			.set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe();
 	}
 
 	public postLogin(username: string, password: string): Observable<HttpResponse<any>> {
+		const headers = new HttpHeaders()
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'login',
-			JSON.stringify({username: username, password: password}), {observe: 'response'});
+			JSON.stringify({username: username, password: password}), {observe: 'response', headers});
 	}
 
 	public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
-		return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, {observe: 'response'});
+		const headers = new HttpHeaders()
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
+		return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, {observe: 'response', headers});
 	}
 
 	public postReset(email: String): Observable<HttpResponse<any>> {
@@ -83,7 +103,9 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/sendResetPasswordEmail', email,
 			{observe: 'response', headers});
 	}
@@ -94,7 +116,9 @@ export class HttpService {
 		if (!this.currentLang) {
 			this.currentLang = this.translate.defaultLang;
 		}
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/updatePassword/' + token, password,
 			{observe: 'response', headers});
 	}
@@ -105,7 +129,9 @@ export class HttpService {
 		if (!this.currentLang) {
 			this.currentLang = this.translate.defaultLang;
 		}
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/activate/updatePassword/' +
 			authenticationToken, password, {observe: 'response', headers});
@@ -125,6 +151,7 @@ export class HttpService {
 	}*/
 
 	public updateContext(context: Context, userId: string) {
+
 		this.post(context, environment.apiEndpoint + 'context/' + userId).subscribe(
 			() => {
 				// Navigate to the home route
@@ -142,7 +169,9 @@ export class HttpService {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang);
+		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
+			.set('Access-Control-Allow-Origin', '*')
+			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<any>(url, {headers});
 	}
 

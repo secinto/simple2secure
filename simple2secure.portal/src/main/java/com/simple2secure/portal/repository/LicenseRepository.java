@@ -12,16 +12,26 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract CompanyLicensePrivate findByProbeId(String probeId);
 
+	public abstract CompanyLicensePrivate findByPodId(String podId);
+
 	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
 
 	public abstract CompanyLicensePrivate findByLicenseIdAndProbeId(String licenseId, String probeId);
+
+	public abstract CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId);
+
+	public abstract CompanyLicensePrivate findByLicenseAndHostname(String licenseId, String hostname);
 
 	public abstract CompanyLicensePrivate findByAccessToken(String accessToken);
 
 	public abstract CompanyLicensePrivate findByGroupAndUserId(String groupId, String userId);
 
+	public abstract CompanyLicensePrivate findByHostname(String hostname);
+
 	public abstract void deleteByGroupId(String groupId);
 
 	public abstract void deleteByProbeId(String probeId);
+
+	public abstract void deleteByPodId(String podId);
 
 }

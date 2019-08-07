@@ -30,6 +30,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +53,7 @@ public class RESTUtils {
 	public static String sendPost(String url, Object obj, String authKey) {
 		try {
 
-			HttpURLConnection connection = getConnection(url, "POST", authKey);
+			HttpsURLConnection connection = getConnection(url, "POST", authKey);
 
 			OutputStream os = connection.getOutputStream();
 			os.write(JSONUtils.toString(obj).getBytes());
@@ -72,6 +76,7 @@ public class RESTUtils {
 
 	public static String sendGet(String url, String authKey) {
 		try {
+
 			HttpURLConnection connection = getConnection(url, "GET", authKey);
 			return getResponse(connection);
 		} catch (MalformedURLException e) {
@@ -100,9 +105,19 @@ public class RESTUtils {
 		return outputBuilder.toString();
 	}
 
-	private static HttpURLConnection getConnection(String url, String method, String authKey) throws IOException {
+	private static HttpsURLConnection getConnection(String url, String method, String authKey) throws IOException {
 		URL remote = new URL(url);
-		HttpURLConnection conn = (HttpURLConnection) remote.openConnection();
+
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+
+			@Override
+			public boolean verify(final String hostname, final SSLSession session) {
+				return true;
+			}
+		});
+
+		HttpsURLConnection conn = (HttpsURLConnection) remote.openConnection();
+
 		conn.setDoOutput(true);
 		conn.setRequestMethod(method);
 		conn.setRequestProperty("Content-Type", "application/json");
@@ -112,6 +127,34 @@ public class RESTUtils {
 		}
 
 		return conn;
+	}
+
+	/**
+	 *
+	 * @param string_url
+	 * @return
+	 */
+	public static boolean netIsAvailable(String string_url) {
+		try {
+			final URL url = new URL(string_url);
+
+			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+
+				@Override
+				public boolean verify(final String hostname, final SSLSession session) {
+					return true;
+				}
+			});
+
+			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+			conn.connect();
+			return true;
+		} catch (MalformedURLException e) {
+			log.error(e.getMessage());
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 }

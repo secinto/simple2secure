@@ -75,8 +75,10 @@ public class ProbeUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
-						Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
-						myProbes.add(probe);
+						if (!Strings.isNullOrEmpty(license.getProbeId())) {
+							Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
+							myProbes.add(probe);
+						}
 					}
 				}
 			}

@@ -12,16 +12,20 @@ import java.util.List;
 
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
+import com.simple2secure.api.model.TestMacro;
 
 public class SettingsDTO {
-	
+
 	private Settings settings;
-	
+
 	private List<LicensePlan> licensePlan;
-		
-	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan) {
+
+	private List<TestMacro> testMacroList;
+
+	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList) {
 		this.settings = settings;
 		this.licensePlan = licensePlan;
+		this.testMacroList = testMacroList;
 	}
 
 	public Settings getSettings() {
@@ -38,5 +42,13 @@ public class SettingsDTO {
 
 	public void setLicensePlan(List<LicensePlan> licensePlan) {
 		this.licensePlan = licensePlan;
-	}	
+	}
+
+	public List<TestMacro> getTestMacroList() {
+		return testMacroList;
+	}
+
+	public void setTestMacroList(List<TestMacro> testMacroList) {
+		this.testMacroList = testMacroList;
+	}
 }

@@ -3,6 +3,7 @@ import {HomeComponent} from './home/index';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
 import {LoginLayoutComponent} from './_layouts/loginLayout/index';
 import {LoginComponent} from './login/index';
+import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
 import {ResetComponent} from './resetPassword/index';
 import {AnalysisComponent} from './analysis/index';
 import {RegisterComponent} from './register/index';
@@ -10,10 +11,7 @@ import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user
 import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './network/index';
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
-import {
-	OrbiterComponent, OrbiterToolsComponent,
-	OrbiterToolTestComponent, OrbiterToolTemplateComponent
-} from './orbiter/index';
+import {OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent} from './orbiter/index';
 import {EmailOverviewComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
 import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
@@ -25,6 +23,8 @@ import {UserRole} from './_models';
 import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
 import {ReportComponent, ReportOverviewComponent} from './report';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
+import {TestResultComponent} from './report/testResult.component';
+import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 
 const appRoutes: Routes = [
 	{
@@ -50,6 +50,7 @@ const appRoutes: Routes = [
 					{path: 'network/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
 					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
 					{path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
+					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
 				]
 			},
 			{
@@ -57,9 +58,10 @@ const appRoutes: Routes = [
 				component: OrbiterComponent,
 				data: {title: 'menu.orbiter'},
 				children: [
-					{path: '', component: OrbiterToolsComponent, data: {title: 'menu.orbiterTools'}},
+					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
-					{path: 'template', component: OrbiterToolTemplateComponent, data: {title: 'menu.templates'}},
+					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
+					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
 				]
 			},
 			{

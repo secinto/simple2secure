@@ -1,14 +1,12 @@
 import {ViewChild, Component} from '@angular/core';
-
-
-
 import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {Context, ContextDTO, UserRole} from '../_models';
+import {Observable} from 'rxjs';
+import {ContextDTO, UserRole, Notification} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
-import {AlertService, AuthenticationService, HttpService} from '../_services';
+import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
 
 declare var $: any;
 
@@ -29,11 +27,14 @@ export class NavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: any;
 	currentContext: ContextDTO;
+	notifications: Notification[];
+	numOfUnreadNotification: number;
 	loggedIn: boolean;
 	currentLang: string;
 	showSettings: boolean;
 	returnUrl: string;
-
+	private timer;
+	showNotifications: boolean;
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -44,11 +45,41 @@ export class NavbarComponent {
 	            private router: Router,
 	            private route: ActivatedRoute,
 	            private httpService: HttpService,
+	            private dataService: DataService,
 	            private alertService: AlertService,
 	            private authenticationService: AuthenticationService,
 	            private dialog: MatDialog)
 	{
+		this.showNotifications = false;
+		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+		this.timer = Observable.timer(3000, 3000);
+		this.timer.subscribe((t) => this.getNotifications());
+	}
+
+	public getNotifications() {
+		if (this.loggedIn){
+			this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
+				.subscribe(
+					data => {
+						this.notifications = data;
+						this.dataService.setNotifications(this.notifications);
+						this.countunreadNotifications(this.notifications);
+					},
+					error => {
+						console.log(error);
+					});
+		}
+	}
+
+	public countunreadNotifications(notifications: Notification[]){
+		this.numOfUnreadNotification = 0;
+
+		for (var i = 0; i < notifications.length; i++) {
+			if (!notifications[i].read){
+				this.numOfUnreadNotification++;
+			}
+		}
 	}
 
 	ngDoCheck() {
@@ -164,6 +195,35 @@ export class NavbarComponent {
 			this.alertService.error(this.translate.instant('server.notresponding'));
 			this.authenticationService.logout();
 		}
+	}
+
+	openNotificationModal() {
+
+		if(this.showNotifications == true){
+			this.showNotifications = false;
+		}
+		else{
+			this.showNotifications = true;
+		}
+
+		console.log(this.showNotifications);
+
+		/*const dialogPosition: DialogPosition = {
+			top: event.y + 'px',
+			right: event.x + 'px',
+			left: event.x + 'px',
+			bottom: event.y + 'px'
+		};
+
+		const dialogConfig = new MatDialogConfig();
+
+		dialogConfig.data = {
+			id: 1,
+			position: dialogPosition
+		};
+
+		const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);*/
+
 	}
 
 

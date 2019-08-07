@@ -13,4 +13,6 @@ public abstract class NotificationRepository extends MongoRepository<Notificatio
 	public abstract List<Notification> findByContextAndToolId(String contextId, String toolId);
 
 	public abstract void deleteByContextId(String contextId);
+
+	public abstract List<Notification> findAllSortDescending(String contextId);
 }

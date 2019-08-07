@@ -28,6 +28,7 @@ import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.Pod;
 import com.simple2secure.api.model.Probe;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInfo;
@@ -54,6 +55,7 @@ import com.simple2secure.portal.utils.ContextUtils;
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.PodUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.ProbeUtils;
 import com.simple2secure.portal.utils.UserUtils;
@@ -119,6 +121,9 @@ public class UserController {
 	ProbeUtils probeUtils;
 
 	@Autowired
+	PodUtils podUtils;
+
+	@Autowired
 	ContextUtils contextUtils;
 
 	@Autowired
@@ -159,6 +164,7 @@ public class UserController {
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
 				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
+				List<Pod> myPods = podUtils.getAllPodsFromCurrentContext(context);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
 				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
 
@@ -168,7 +174,7 @@ public class UserController {
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myPods, myContexts, assignedGroups);
 				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
 			}
 		}
@@ -371,7 +377,7 @@ public class UserController {
 
 				// Add template for the email content and retrieve it from the database!
 				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
-						+ loadedConfigItems.getBaseURL() + "/api/users/resetPassword/" + user.getPasswordResetToken();
+						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
 
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
 					return new ResponseEntity<User>(user, HttpStatus.OK);

@@ -7,16 +7,23 @@
     <mat-table #table [dataSource]="dataSource" matSort>
 
         <!-- Position Column -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.test.name}}</mat-cell>
+        <ng-container matColumnDef="pod">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.pod' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="testResults">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.numoftestsresults' | translate }}
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.results.length}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="group">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -41,21 +48,9 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="repeatTest()">
-        <mat-icon>repeat</mat-icon>
-        {{ 'button.runTestAgain' | translate }}
-    </button>
-    <button mat-menu-item (click)="showTestDetails()">
-        <mat-icon>details</mat-icon>
-        {{ 'test.details' | translate }}
-    </button>
-    <button mat-menu-item (click)="showTestResults()">
-        <mat-icon>receipt</mat-icon>
-        {{ 'button.showtestsresults' | translate }}
-    </button>
-    <button mat-menu-item (click)="openDialogDeleteTest()">
-        <mat-icon>delete</mat-icon>
-        {{ 'button.delete' | translate }}
+    <button mat-menu-item (click)="showPodTests()">
+        <mat-icon>code</mat-icon>
+        {{ 'button.showtests' | translate }}
     </button>
 </mat-menu>
 

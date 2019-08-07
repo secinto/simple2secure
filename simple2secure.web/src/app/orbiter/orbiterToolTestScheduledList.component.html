@@ -1,0 +1,67 @@
+<div class="example-container mat-elevation-z8 table table-striped">
+
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.testName}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.executionType' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{getEnumValue(element.testRun.testRunType)}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{getTestStatusByTestResult(element)}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+                        (click)="onMenuTriggerClick(element)">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<mat-menu #menu="matMenu">
+
+    <button *ngIf="showTestResult" mat-menu-item (click)="openDialogShowTestResult()">
+        <mat-icon>description</mat-icon>
+        {{ 'button.showtestsresults' | translate }}
+    </button>
+
+    <button *ngIf="!showTestResult" disabled mat-menu-item (click)="openDialogShowTestResult()">
+        <mat-icon>description</mat-icon>
+        {{ 'button.showtestsresults' | translate }}
+    </button>
+
+    <button mat-menu-item (click)="openDeleteDialog()">
+        <mat-icon>delete</mat-icon>
+        {{ 'button.delete' | translate }}
+    </button>
+</mat-menu>
+
+
+

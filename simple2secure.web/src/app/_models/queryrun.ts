@@ -8,4 +8,5 @@ export class QueryRun extends Generic {
 	analysisInterval: number;
 	analysisIntervalUnit: Timeunit;
 	sqlQuery: string;
+	active: number;
 }

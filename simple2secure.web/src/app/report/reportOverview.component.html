@@ -6,7 +6,7 @@
         <p>{{ 'network.checkReports' | translate }}</p>
         <button mat-raised-button id="osconfigbtn1"
                 class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button"
-                (click)="showReports('network')"> {{ 'button.more' | translate }}
+                (click)="navigateTo('network')"> {{ 'button.more' | translate }}
         </button>
     </div>
 
@@ -16,7 +16,17 @@
         <p>{{ 'network.checkReports' | translate }}</p>
         <button mat-raised-button id="osconfigbtn2"
                 class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button"
-                (click)="showReports('osquery')"> {{ 'button.more' | translate }}
+                (click)="navigateTo('osquery')"> {{ 'button.more' | translate }}
+        </button>
+    </div>
+
+    <div class="jumbotron-bottom jumbotron text-center col-md-5 osconfigjumb" id="osconfigjumb1">
+        <h1>{{ 'button.testresults' | translate }}</h1>
+        <i class="fas fa-newspaper fa-4x container-jumbotron-icon"></i>
+        <p>{{ 'testResult.pod' | translate }}</p>
+        <button mat-raised-button id="osconfigbtn2"
+                class="clickable btn-lg btn-success pull-down osconfigbtn mat-green-button"
+                (click)="navigateTo('testResult')"> {{ 'button.more' | translate }}
         </button>
     </div>
 </div>

@@ -1,0 +1,237 @@
+<h3 *ngIf="!isNewTest" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+<h3 *ngIf="isNewTest" mat-dialog-title>{{ 'button.addTest' | translate }}</h3>
+
+<div mat-dialog-content>
+    <form id="cfgForm" #configForm="ngForm">
+        <div>
+            <mat-accordion>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'menu.general' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+                                   [(ngModel)]="test.name" name="name">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.description" name="description">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.version' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.version" name="version" readonly>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scheduled">{{ 'osquery.runalways' | translate }}</label><br>
+                        <mat-button-toggle-group id="scheduled" name="scheduled" [(ngModel)]="test.scheduled" required="">
+                            <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
+                            <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+
+                    <table *ngIf="test.scheduled" cellspacing="0">
+                        <tr>
+                            <td>
+                                <mat-form-field class="full_width_input">
+                                    <input type="number" matInput
+                                           placeholder="{{ 'table.unitValue' | translate }}"
+                                           [(ngModel)]="test.scheduledTime"
+                                           name="scheduledTime">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="full_width_input">
+                                    <mat-select [(ngModel)]="test.scheduledTimeUnit"
+                                                placeholder="{{ 'table.unit' | translate }}"
+                                                name="scheduledTimeUnit">
+                                        <mat-option *ngFor="let ttimeUnit of extractTimeUnits()"
+                                                    [value]="ttimeUnit">{{ttimeUnit}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                    </table>
+
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'test.precondition' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.precondition.description" name="precondition.description">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.precondition.command.executable" name="precondition.executable">
+                        </mat-form-field>
+                    </div>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.description" name="precondition.parameter.description">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.prefix" name="precondition.prefix">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.precondition.command.parameter.value" name="precondition.parameter.value">
+                            </mat-form-field>
+                        </div>
+
+                    </mat-expansion-panel>
+
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'test.step' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.step.description" name="step.description">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.step.command.executable" name="step.executable">
+                        </mat-form-field>
+                    </div>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.description" name="step.parameter.description">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.prefix" name="step.prefix">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.step.command.parameter.value" name="step.parameter.value">
+                            </mat-form-field>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'test.postcondition' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.postcondition.description" name="postcondition.description">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-group">
+                        <mat-form-field class="full_width_input">
+                            <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                                   [(ngModel)]="test.test_content.test_definition.postcondition.command.executable" name="postcondition.executable">
+                        </mat-form-field>
+                    </div>
+
+                    <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.description" name="postcondition.parameter.description">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.prefix" name="postcondition.prefix">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                       [(ngModel)]="test.test_content.test_definition.postcondition.command.parameter.value" name="postcondition.parameter.value">
+                            </mat-form-field>
+                        </div>
+
+                    </mat-expansion-panel>
+
+                </mat-expansion-panel>
+            </mat-accordion>
+
+        </div>
+    </form>
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveTest()">{{ 'button.save' | translate }}
+    </button>
+</div>

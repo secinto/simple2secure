@@ -26,7 +26,7 @@ export class AnalysisComponent implements OnInit{
 	context: ContextDTO;
 	currentUser: any;
 	selectedQuery: any;
-	private chart: StockChart;
+	chart: StockChart;
 	chartOptions: any;
 	seriesOption: any;
 	loading = false;
@@ -59,7 +59,10 @@ export class AnalysisComponent implements OnInit{
 					this.networkReports = data;
 					if (this.networkReports){
 						this.selectedNetworkReport = this.networkReports[0];
-						this.addLabels(this.selectedNetworkReport);
+						if(this.selectedNetworkReport){
+							this.addLabels(this.selectedNetworkReport);
+						}
+
 					}
 
 				});

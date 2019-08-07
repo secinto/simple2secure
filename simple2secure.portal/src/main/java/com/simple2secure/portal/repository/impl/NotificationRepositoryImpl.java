@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -50,5 +51,13 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 			}
 		}
 
+	}
+
+	@Override
+	public List<Notification> findAllSortDescending(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		query = query.with(new Sort(Sort.Direction.DESC, "_id"));
+
+		return mongoTemplate.find(query, Notification.class);
 	}
 }
