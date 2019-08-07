@@ -172,7 +172,7 @@ public class TokenAuthenticationService {
 			}
 
 			String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
-					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.ES512, user.getPassword())
+					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.HS512, user.getPassword())
 					.compact();
 
 			if (token == null) {
