@@ -14,7 +14,6 @@ import {UpdatePasswordComponent} from './updatePassword';
 import {OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent} from './orbiter/index';
 import {EmailOverviewComponent} from './email/index';
 import {SettingsComponent} from './settings/index';
-import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
 import {RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {UserGroupComponent} from './user/userGroup.component';
@@ -89,15 +88,7 @@ const appRoutes: Routes = [
 				component: SettingsComponent,
 				canActivate: [AuthGuard, RoleGuard],
 				data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN},
-			},
-			{
-				path: 'notification',
-				component: NotificationComponent,
-				data: {title: 'menu.notifications'},
-				children: [
-					{path: '', component: NotificationOverviewComponent},
-				]
-			},
+			}
 		]
 	},
 	{

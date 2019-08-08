@@ -26,7 +26,7 @@ export class NotificationComponent {
 	isRead(notification: Notification){
 
 		if (!notification.read){
-			console.log('Notification ID ' + notification.id);
+			// console.log('Notification ID ' + notification.id);
 			this.url = environment.apiEndpoint + 'notification/read';
 			this.httpService.post(notification, this.url).subscribe(
 				data => {
