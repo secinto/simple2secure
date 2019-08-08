@@ -36,5 +36,4 @@ simple2secure.testservice/celery-queue/Dockerfile
 simple2secure.testservice/celery-queue/requirements.txt
 *.pyc
 simple2secure.testservice/src/pod.sqlite3
-simple2secure.web/package-lock.json
 bin/simple2secure.web/node_modules/
