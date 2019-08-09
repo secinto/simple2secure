@@ -9,7 +9,7 @@ COPY package.json package-lock.json ./
 
 RUN apk add --no-cache git python
 
-RUN npm ci && npm rebuild node-sass --force && mkdir /ng-app && mv ./node_modules ./ng-app 
+RUN npm ci && mkdir /ng-app && mv ./node_modules ./ng-app 
 
 WORKDIR /ng-app
 
