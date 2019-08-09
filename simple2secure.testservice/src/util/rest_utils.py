@@ -25,7 +25,7 @@ def get_auth_token_object(app):
 
 def portal_post(url, data, app):
     with app.app_context():
-        print("Token before sending" + app.config['AUTH_TOKEN'])
+        app.logger.info('Token before sending post request from (portal_post): %s', app.config['AUTH_TOKEN'])
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
 
@@ -38,7 +38,8 @@ def portal_get(url, app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
-        # print(" * Auth Token before posting function: " + app.config['AUTH_TOKEN'])
+
+        app.logger.info('Token before sending get request from (portal_get): %s', app.config['AUTH_TOKEN'])
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config['AUTH_TOKEN']}
         data_request = requests.get(url, verify=False, headers=headers)
@@ -54,11 +55,10 @@ def portal_post_celery(url, data, auth_token, app):
 
 def portal_post_test(url, data, app):
     with app.app_context():
-        print("Token before sending" + app.config['AUTH_TOKEN'])
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
 
-        print("TOKEN BEFORE AFTER SENDING" + app.config['AUTH_TOKEN'])
+        app.logger.info('Token before sending post request from (portal_post_test): %s', app.config['AUTH_TOKEN'])
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config['AUTH_TOKEN']}
         return requests.post(url, data=json.dumps(data), verify=False, headers=headers).text
@@ -66,11 +66,10 @@ def portal_post_test(url, data, app):
 
 def portal_post_test_response(url, data, app):
     with app.app_context():
-        print("Token before sending" + app.config['AUTH_TOKEN'])
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
 
-        print("TOKEN BEFORE AFTER SENDING" + app.config['AUTH_TOKEN'])
+        app.logger.info('Token before sending post request from (portal_post_test_response): %s', app.config['AUTH_TOKEN'])
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config['AUTH_TOKEN']}
         return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
@@ -81,7 +80,8 @@ def send_notification(content, app, auth_token, pod_id):
     notification = Notification(content)
 
     with app.app_context():
-        print("Token before sending" + auth_token)
+        app.logger.info('Token before sending post request from (send_notification): %s',
+                        auth_token)
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + auth_token}
         requests.post(url, data=json.dumps(notification.__dict__), verify=False, headers=headers)
@@ -92,7 +92,8 @@ def update_test_status(app, auth_token, test_run_id, test_id, test_status):
     test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
 
     with app.app_context():
-        print("Token before sending" + auth_token)
+        app.logger.info('Token before sending post request from (update_test_status): %s',
+                        auth_token)
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + auth_token}
         requests.post(url, data=json.dumps(test_run_dto.__dict__), verify=False, headers=headers)
@@ -123,7 +124,7 @@ def print_error_message():
 
 
 def print_success_message_auth(app):
-    return "----------------------------------------------\n" \
+    message = "----------------------------------------------\n" \
            "----------------INITIALIZATION----------------\n" \
            "----------------------------------------------\n" \
            "--       Extracting the pod license         --\n" \
@@ -140,5 +141,7 @@ def print_success_message_auth(app):
            "----------------------------------------------\n" \
            "---------------INITIALIZATION END-------------\n" \
            "----------------------------------------------\n"
+
+    app.logger.info('Pod Informaticn: %s', message)
 
 

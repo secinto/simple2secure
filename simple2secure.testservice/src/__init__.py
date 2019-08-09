@@ -8,6 +8,7 @@ import src.config.config as config_module
 import secrets
 import requests
 import os
+import logging
 
 
 def create_app():
@@ -49,6 +50,7 @@ def entrypoint(mode='app'):
         db.session.commit()
 
     if mode == 'app':
+        logging.basicConfig(filename='logs/app.log', level=logging.INFO)
         authenticate(app)
 
     return app
@@ -63,9 +65,11 @@ def authenticate(app):
             pod_info = PodInfo(app.config['POD_ID'], "")
             db.session.add(pod_info)
             db.session.commit()
+            app.logger.info('Generating new pod id: %s', app.config['POD_ID'])
         # if there is a podInfo object in database, set saved pod_id into the app.config[POD_ID] variable
         else:
             app.config['POD_ID'] = pod_info.generated_id
+            app.logger.info('Using existing pod id from the database: %s', app.config['POD_ID'])
 
         try:
             auth_token_obj = rest_utils.get_auth_token_object(app)
@@ -75,13 +79,14 @@ def authenticate(app):
                 license_from_file = file_utils.get_license_file()
                 license_file = file_utils.parse_license_file(license_from_file, app)
                 app.config['LICENSE_ID'] = license_file.licenseId
+                rest_utils.print_success_message_auth(app)
 
             else:
-                print(rest_utils.print_error_message())
                 # shutdown_server()
+                app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
 
         except requests.exceptions.ConnectionError:
-                print(rest_utils.print_error_message())
+                app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
                 # shutdown_server()
 
 

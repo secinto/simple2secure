@@ -40,7 +40,7 @@ def get_json_test_object_new(data, key, attribute):
 def parse_query_test(query_string, item_type):
     # Split query params by "%"
     mylist = query_string.split("%")
-    print(enumerate(mylist))
+    # print(enumerate(mylist))
     for index, item in enumerate(mylist):
         # Split sub params by "="
         mysublist = item.split("=")
