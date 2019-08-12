@@ -21,16 +21,23 @@ http://localhost:5000/services/run?test=test1&step=stp1%command=cmdstp1%executab
 
 http://localhost:5000/services/run?test=test1&step=stp1%parameter=cmdstp1param%value=www.orf.at
 
-
-
-
-
-
-
-
-
-
 ############# NEW TUTORIAL #########################
+
+### Installing simple2secure.portal ###
+1) Download and install MongoDB Community Edition
+2) Start mongodb by running "mongod" command from the shell
+3) Download and install gradle from from https://gradle.org/releases/
+3) Navigate to the simple2secure root folder and run "gradle eclipse"
+4) Open project in eclipse and you can run it directly from the eclipse IDE
+
+
+### Installing simple2secure.web
+1) Download and install nodejs from https://nodejs.org/en/download/
+2) Run "npm install" from the simple2secure.web directory
+3) install Angular CLI by executing "npm install -g @angular/cli" from the command line
+4) After everything is installed successfully you can start the web by executing "start.bat" batch file from the simple2secure.web directory 
+
+
 
 Please make sure that Python, Pip and Redis are installed on your PC
 
@@ -52,4 +59,23 @@ python app.py
 
 ## Start celery worker from the console (Open console and type)
 celery -A src.celery.celery_tasks.celery worker --loglevel=info
+
+
+Activating and running the pod from our server
+
+1) Visit our portal at https://144.76.93.104:51003 and register if you do not have an account
+
+2) Activate an account and download license from the "My Groups" tab under the following link https://144.76.93.104:51003/#/user
+
+3) Copy this license file in the /static/license/ folder
+
+4) Check in config.py file if the parameter PORTAL_URL is set to the "https://144.76.96.104:51001/s2s/api"
+
+5) After that install all required libraries by executing pip install -r requirements.txt from the root folder of our testservice project
+
+6) When all libraries are installed you can start the project by running python app.py
+
+
+
+
 
