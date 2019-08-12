@@ -7,6 +7,7 @@ import {ContextDTO, UserRole, Notification} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
+import {FormControl} from '@angular/forms';
 
 declare var $: any;
 
@@ -35,6 +36,7 @@ export class NavbarComponent {
 	returnUrl: string;
 	private timer;
 	showNotifications: boolean;
+	searchBarControl: FormControl = new FormControl('');
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -205,6 +207,24 @@ export class NavbarComponent {
 		else{
 			this.showNotifications = true;
 		}
+	}
+
+	getSearchResults(searchString: any) {
+		this.httpService.get(environment.apiEndpoint + 'search/' + searchString)
+			.subscribe(
+				data => {
+					console.log("HREEEEEEEEEEEEEEEEEEE");
+					console.log(data);
+				},
+				error => {
+					console.log(JSON.stringify(error.error));
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
 	}
 
 

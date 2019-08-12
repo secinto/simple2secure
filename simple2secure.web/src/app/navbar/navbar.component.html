@@ -25,6 +25,12 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li>
+                <div id="search-bar">
+                    <mat-search-bar (onEnter)="getSearchResults(searchBarControl.value)" [formControl]="searchBarControl"></mat-search-bar>
+                </div>
+
+            </li>
+            <li>
                 <mat-form-field id="nav-right-custom-language-switcher">
                     <mat-select id="nav-right-custom-language-switcher-select" [(ngModel)]="currentLang"
                                 (selectionChange)="setLocale($event.value)">

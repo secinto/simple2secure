@@ -86,6 +86,7 @@ import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 import {HelperService} from './_services/helper.service';
+import { NgMatSearchBarModule } from 'ng-mat-search-bar';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -149,6 +150,7 @@ export const httpInterceptorProviders = [
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		}),
 		AgmDirectionModule,
+		NgMatSearchBarModule
 
 	],
 	declarations: [
