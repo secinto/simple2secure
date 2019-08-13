@@ -1,15 +1,16 @@
 package com.simple2secure.service.tasks;
 
-import java.util.TimerTask;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProbeUpdater extends TimerTask {
+import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.interfaces.ServiceTask;
+
+public class ProbeUpdater extends ServiceTask {
 	private Logger log = LoggerFactory.getLogger(ProbeUpdater.class);
 
-	public ProbeUpdater() {
-
+	public ProbeUpdater(ControllerEngine controllerEngine) {
+		super(controllerEngine);
 	}
 
 	@Override

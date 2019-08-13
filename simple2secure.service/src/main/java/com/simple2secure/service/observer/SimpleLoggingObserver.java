@@ -15,7 +15,7 @@ public class SimpleLoggingObserver implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		log.debug("Process output {}", arg);
+		log.debug("Observable output: {}", arg);
 
 		if (firstObservable == null) {
 			firstObservable = (String) arg;

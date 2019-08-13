@@ -1,11 +1,17 @@
 package com.simple2secure.service.tasks;
 
-import java.util.TimerTask;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PortalWatchdog extends TimerTask {
+import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.interfaces.ServiceTask;
+
+public class PortalWatchdog extends ServiceTask {
+
+	public PortalWatchdog(ControllerEngine probeControllerEngine) {
+		super(probeControllerEngine);
+	}
+
 	private Logger log = LoggerFactory.getLogger(PortalWatchdog.class);
 
 	@Override

@@ -1,34 +1,50 @@
 package com.simple2secure.service.tasks;
 
-import java.io.FileNotFoundException;
-import java.util.TimerTask;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
-import com.simple2secure.service.observer.SimpleLoggingObserver;
+import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.interfaces.ServiceTask;
 
-public class ProbeMonitor extends TimerTask {
+public class ProbeMonitor extends ServiceTask {
 
 	private Logger log = LoggerFactory.getLogger(ProbeMonitor.class);
 
-	private ProcessContainer container;
-	private SimpleLoggingObserver observer;
+	private ProcessContainer probeProcess;
 
-	public ProbeMonitor() throws FileNotFoundException {
-		// ProcessUtils.invokeJavaProcess(null, false, "-cp", "../../release/simple2secure.probe-0.1.0.jar",
-		// "com.simple2secure.probe.cli.ProbeCLI", "-l", "../../release/license.zip");
-		//
-		// observer = new TestLoggingObserver();
-		// container.getObservable().addObserver(observer);
-		// container.startObserving();
+	public ProbeMonitor(ControllerEngine probeControllerEngine) {
+		super(probeControllerEngine);
+		this.probeProcess = probeControllerEngine.getControlledProcess();
 	}
 
 	@Override
 	public void run() {
-		log.debug("Executing {}", ProbeUpdater.class);
+		boolean restart = false;
+		log.debug("Executing {}", ProbeMonitor.class);
+		log.debug("Probe process is alive {}", this.probeProcess.getProcess().isAlive());
 
+		if (this.probeProcess == null) {
+			restart = true;
+		} else {
+			if (this.probeProcess.getProcess() == null) {
+				restart = true;
+			} else if (!this.probeProcess.getProcess().isAlive()) {
+				restart = true;
+			}
+		}
+
+		if (restart) {
+			log.info("Controlled probe process is not alive anymore, trying to restart it!");
+
+			if (!this.getProbeControllerEngine().isStopped()) {
+				log.debug("Triggering restart for controlled probe process!");
+				this.getProbeControllerEngine().triggerRestart();
+			} else {
+				log.debug("Triggering start for controlled probe process!");
+				this.getProbeControllerEngine().triggerStart();
+			}
+		}
 	}
 
 }

@@ -15,18 +15,20 @@ public class ProbeControllerService implements Daemon {
 	private static ProbeControllerEngine engine = new ProbeControllerEngine();
 
 	/**
-	 * Static methods called by prunsrv to start/stop the Windows service. Pass the argument "start" to start the service, and pass "stop" to
-	 * stop the service.
+	 * Static methods called by prunsrv to start/stop the Windows service. Pass the
+	 * argument "start" to start the service, and pass "stop" to stop the service.
 	 *
-	 * @param args
-	 *          Arguments from prunsrv command line
+	 * @param args Arguments from prunsrv command line
 	 **/
 	public static void windowsService(String args[]) {
 		log.info("Received windowsService call");
 		String cmd = "start";
+		log.debug("Arguments available {}", args.length);
 		if (args.length > 0) {
 			cmd = args[0];
+			log.debug("First argument used {}", args[0]);
 		}
+
 		log.debug("windowsService parameters", Arrays.toString(args));
 		log.debug("Starting service");
 		if ("start".equals(cmd)) {
@@ -93,7 +95,7 @@ public class ProbeControllerService implements Daemon {
 			engine = new ProbeControllerEngine();
 		}
 
-		log.info("Starting {}", engine.getName());
+		log.info("Starting ProbeControllerEngine");
 		if (engine.start()) {
 			log.info("{} started successfully!", engine.getName());
 		} else {
