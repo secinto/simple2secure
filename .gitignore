@@ -37,3 +37,4 @@ simple2secure.testservice/celery-queue/requirements.txt
 *.pyc
 simple2secure.testservice/src/pod.sqlite3
 bin/simple2secure.web/node_modules/
+bin/
