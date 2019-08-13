@@ -1,6 +1,7 @@
 package com.simple2secure.commons.rules;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Richard Heinz
@@ -13,6 +14,7 @@ public interface GeneralRulesEngine
 			throws IOException, InstantiationException, IllegalAccessException;
 	
 	public void addRule(Object rule);
+
 	
 	public void removeRule(String ruleName);
 	

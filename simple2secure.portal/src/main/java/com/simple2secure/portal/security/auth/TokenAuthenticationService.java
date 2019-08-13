@@ -101,7 +101,7 @@ public class TokenAuthenticationService {
 			claims.put(CLAIM_PROBEID, probeId);
 			claims.put(CLAIM_USERROLE, UserRole.PROBE);
 			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-					.signWith(SignatureAlgorithm.ES512, license.getTokenSecret()).compact();
+					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
 
 			return accessToken;
 		} else {
@@ -172,7 +172,7 @@ public class TokenAuthenticationService {
 			}
 
 			String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
-					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.ES512, user.getPassword())
+					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.HS512, user.getPassword())
 					.compact();
 
 			if (token == null) {

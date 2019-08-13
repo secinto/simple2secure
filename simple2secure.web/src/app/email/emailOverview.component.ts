@@ -1,13 +1,12 @@
 import {HttpErrorResponse} from '@angular/common/http';
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {ContextDTO, EmailConfiguration, EmailConfigurationDTO, FrontendRule} from '../_models/index';
+import {ContextDTO, EmailConfiguration, EmailConfigurationDTO} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {RuleAddComponent, RuleOverviewComponent} from '../rule';
 import {EmailAccountAddComponent} from './emailAccountAdd.component';
 import {EmailInboxComponent} from './emailInbox.component';
 
@@ -26,8 +25,6 @@ export class EmailOverviewComponent {
 	context: ContextDTO;
 	isConfigUpdated = false;
 	isConfigAdded = false;
-	isRuleAdded = false;
-	rule = new FrontendRule();
 
 	displayedColumns = ['email', 'id', 'incomingPort', 'action'];
 	dataSource = new MatTableDataSource();
@@ -46,6 +43,7 @@ export class EmailOverviewComponent {
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
+		console.log(this.context.context.id);
 		this.loadAllConfigurations();
 	}
 
@@ -69,7 +67,7 @@ export class EmailOverviewComponent {
 					this.config = data;
 					this.dataSource.data = this.config;
 
-					if (!this.deleted && !this.isConfigUpdated && !this.isConfigAdded && !this.isRuleAdded) {
+					if (!this.deleted && !this.isConfigUpdated && !this.isConfigAdded) {
 						if (data.length > 0) {
 							this.alertService.success(this.translate.instant('message.emailConfig'));
 						}
@@ -80,7 +78,6 @@ export class EmailOverviewComponent {
 					}
 					this.deleted = false;
 					this.isConfigUpdated = false;
-					this.isRuleAdded = false;
 					this.isConfigAdded = false;
 					this.loading = false;
 				},
@@ -117,6 +114,7 @@ export class EmailOverviewComponent {
 		dialogConfig.data = {
 			config: new EmailConfiguration(),
 		};
+
 		const dialogRef = this.dialog.open(EmailAccountAddComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
@@ -141,7 +139,6 @@ export class EmailOverviewComponent {
 	openDialogEditConfig(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
-
 		dialogConfig.data = {
 			config: this.selectedConfig.configuration,
 		};
@@ -205,46 +202,13 @@ export class EmailOverviewComponent {
 			});
 	}
 
-	openDialogAddRule(): void {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
-		this.rule.toolId = this.selectedConfig.configuration.id;
-		this.rule.contextId = this.context.context.id;
-		this.rule.clazz = "com.simple2secure.api.model.Email";
-
-		dialogConfig.data = {
-			rule: this.rule
-		};
-
-		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.rule.add'));
-				this.isRuleAdded = true;
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
+	private openDialogShowRules()
+	{
+		console.log("inside openDialogShowRules: not implemented yet");
 	}
 
-	openDialogShowRules(): void {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
-
-		dialogConfig.data = {
-			rules: this.selectedConfig.rules
-		};
-
-		this.dialog.open(RuleOverviewComponent, dialogConfig);
-
+	private openDialogAddRule()
+	{
+		console.log("inside openDialogAddRule: not implemented yet");
 	}
 }

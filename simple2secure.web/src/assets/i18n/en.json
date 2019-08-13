@@ -362,5 +362,8 @@
   "testmacro.executable.placeholder": "Please enter executable",
   "test.scheduled": "Scheduled tests",
   "test.scheduled.info": "Show the scheduled tests with status",
-  "test.executionType": "Type"
+  "test.executionType": "Type",
+  "menu.addRule": "Add rule",
+  "rule.name": "Rule name",
+  "table.groovycode": "Groovy rule class"
 }

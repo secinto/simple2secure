@@ -21,13 +21,13 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.ExtendedRule;
-import com.simple2secure.api.model.PortalRule;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.rules.EmailRulesEngine;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
 import ch.maxant.rules.AbstractAction;
@@ -53,6 +53,9 @@ public class UpdateEmailScheduler {
 
 	@Autowired
 	NotificationRepository notificationRepository;
+	
+	@Autowired
+	NotificationUtils notificationUtils;
 
 	@Autowired
 	RuleRepository ruleRepository;
@@ -65,6 +68,9 @@ public class UpdateEmailScheduler {
 
 	@Autowired
 	PortalUtils portalUtils;
+	
+	@Autowired 
+	EmailRulesEngine emailRulesEngine;
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
@@ -75,6 +81,7 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
+					
 					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
@@ -112,9 +119,12 @@ public class UpdateEmailScheduler {
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
 											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
 								}
-
+								
+								emailRulesEngine.checkMail(email, emailConfig.getContextId());
+								
+								
 								// emailsRuleChecker(email, emailConfig);
-
+								
 								emailRepository.save(email);
 							} catch (Exception e) {
 								log.error("Problem occured {}", e.getMessage());
@@ -124,64 +134,9 @@ public class UpdateEmailScheduler {
 					} catch (MessagingException e1) {
 						log.error("Problem occured messageId not found");
 					}
-
 				}
 			}
 		}
-
-	}
-
-	/**
-	 * This function checks the rules for the email and in case that some rules applies it will be automatically added to the notification
-	 * repository
-	 */
-
-	private void emailsRuleChecker(Email email, EmailConfiguration emailConfig) {
-
-		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
-		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
-
-		List<Rule> rules = new ArrayList<>();
-		if (portalRules != null) {
-			for (PortalRule pRule : portalRules) {
-				ExtendedRule extRule = pRule.getRule();
-				Rule r1 = new Rule(extRule.getName(), extRule.getExpression(), extRule.getOutcome(), extRule.getPriority(), extRule.getNamespace());
-				rules.add(r1);
-			}
-
-			if (rules == null || rules.isEmpty()) {
-				log.error("No rules provided!");
-			} else {
-				AbstractAction<Email, Void> a1 = new AbstractAction<Email, Void>("notificationAction") {
-					@Override
-					public Void execute(Email input) {
-
-						// adding to the notification repository!
-						/*
-						 * Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
-						 * "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
-						 */
-						// notificationRepository.save(notification);
-						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
-						return null;
-					}
-				};
-
-				List<AbstractAction<Email, Void>> actions = new ArrayList<>();
-				actions.add(a1);
-
-				try {
-
-					Engine engine = new Engine(rules, true);
-					engine.executeAllActions(email, actions);
-				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
-					log.error(e.getMessage());
-				}
-			}
-		} else {
-			log.error("No rules provided!");
-		}
-
 	}
 
 	/**
@@ -222,28 +177,6 @@ public class UpdateEmailScheduler {
 		log.info("Messages length: " + messages.length);
 
 		return messages;
-	}
-
-	/**
-	 * This function creates a new properties object from the EmailConfiguration object and returns it.
-	 *
-	 * @param config
-	 * @return
-	 */
-	private Properties setEmailConfiguration(EmailConfiguration config) {
-		Properties props = new Properties();
-
-		props.setProperty("mail.imap.host", config.getIncomingServer());
-		props.setProperty("mail.imap.port", config.getIncomingPort());
-		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", config.getIncomingPort());
-		props.setProperty("mail.imap.auth", IMAP_AUTH);
-		props.setProperty("mail.mime.ignoreunknownencoding", "true");
-
-		props.put("mail.store.protocol", STORE);
-
-		return props;
-
 	}
 
 }

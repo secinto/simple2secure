@@ -1,6 +1,9 @@
-<div mat-dialog-content>
+<button mat-raised-button color="primary" id="addButton" type="button" (click)="onOpenDialogAddRule()"
+        class="pull-right mat-green-button">
+    <i class="glyphicon glyphicon-plus"></i> {{ 'menu.addRule' | translate }}
+</button>
 
-    <div class="example-container mat-elevation-z8 table table-striped">
+<div class="example-container mat-elevation-z8 table table-striped">
         <div class="header-filter-table">
             <mat-form-field class="header-filter-field">
                 <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
@@ -20,11 +23,11 @@
                 <mat-cell *matCellDef="let element"> {{element.description}}</mat-cell>
             </ng-container>
 
-            <!-- Name Column -->
+            <!-- Name Column
             <ng-container matColumnDef="priority">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.priority' | translate }}</mat-header-cell>
                 <mat-cell *matCellDef="let element"> {{element.priority}}</mat-cell>
-            </ng-container>
+            </ng-container> -->
 
             <ng-container matColumnDef="action">
                 <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate
@@ -60,11 +63,4 @@
             {{ 'button.delete' | translate }}
         </button>
     </mat-menu>
-</div>
-
-<div mat-dialog-actions>
-    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rules"
-            cdkFocusInitial>{{ 'button.close' | translate }}
-    </button>
-</div>
 

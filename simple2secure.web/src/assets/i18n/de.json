@@ -362,5 +362,8 @@
   "testmacro.executable.placeholder": "Bitte geben Sie die executable ein",
   "test.scheduled": "Geplante Tests",
   "test.scheduled.info": "Zeigen Sie die geplanten Tests mit Status an",
-  "test.executionType": "Type"
+  "test.executionType": "Type",
+  "menu.addRule": "Regel hinzufügen",
+  "rule.name": "Rule Name",
+  "table.groovycode": "Groovy Regel Klasse"
 }

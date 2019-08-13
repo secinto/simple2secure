@@ -57,7 +57,13 @@ import {
 	OsQueryReportDetailsComponent, ReportOverviewComponent
 } from './report/index';
 
-import {EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
+import {
+	EmailOverviewComponent,
+	EmailInboxComponent,
+	EmailAccountAddComponent,
+	EmailRuleOverviewComponent,
+	EmailComponent
+} from './email/index';
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {SettingsComponent} from './settings/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
@@ -85,6 +91,7 @@ import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -148,6 +155,7 @@ export const httpInterceptorProviders = [
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		}),
 		AgmDirectionModule,
+		AceEditorModule
 
 	],
 	declarations: [
@@ -192,6 +200,8 @@ export const httpInterceptorProviders = [
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
+		EmailRuleOverviewComponent,
+		EmailComponent,
 		SettingsComponent,
 		ActivationComponent,
 		ActivatedComponent,
@@ -223,7 +233,6 @@ export const httpInterceptorProviders = [
 		UserContextAddDialogComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,
-		RuleOverviewComponent,
 		RuleAddComponent,
 		OsQueryReportDetailsComponent,
 		NetworkReportDetailsComponent,

@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.FrontendRule;
-import com.simple2secure.api.model.PortalRule;
+import com.simple2secure.api.model.Rule;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.RuleRepository;
@@ -46,64 +45,61 @@ public class RuleController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<FrontendRule> addOrUpdateRule(@RequestBody FrontendRule rule, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<Rule> addOrUpdateRule(@RequestBody Rule rule, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (rule != null) {
-
-			PortalRule portalRule = ruleUtils.convertFrontendRuleToPortalRule(rule);
-
-			if (portalRule != null) {
-				if (!Strings.isNullOrEmpty(rule.getId())) {
-					portalRule.setId(rule.getId());
-					ruleRepository.update(portalRule);
-				} else {
-					ruleRepository.save(portalRule);
-				}
+			
+			if(!Strings.isNullOrEmpty(rule.getId())) {
+				ruleRepository.update(rule);
+			}
+			else {
+				ruleRepository.save(rule);
 			}
 
-			return new ResponseEntity<FrontendRule>(rule, HttpStatus.OK);
+			return new ResponseEntity<Rule>(rule, HttpStatus.OK);
+		
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{toolId}/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<FrontendRule>> getEmailMessagesByUserID(@PathVariable("toolId") String toolId,
-			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<Rule>> getRulesByContextId(@PathVariable("contextId") String contextId,
+			@RequestHeader("Accept-Language") String locale) {
 
-		if (!Strings.isNullOrEmpty(toolId) && !Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId)) {
 
-			List<FrontendRule> frontRules = ruleUtils.getFrontendRulesByToolId(toolId);
+			List<Rule> rules = ruleUtils.getRulesByContextId(contextId);
 
-			if (frontRules != null) {
-				return new ResponseEntity<List<FrontendRule>>(frontRules, HttpStatus.OK);
+			if (rules != null) {
+				return new ResponseEntity<List<Rule>>(rules, HttpStatus.OK);
 			}
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
 				HttpStatus.NOT_FOUND);
 	}
-
+	//"/delete/{ruleId}"
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<FrontendRule>> getRulesByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		if (!Strings.isNullOrEmpty(contextId)) {
-
-			List<FrontendRule> frontRules = ruleUtils.getFrontendRulesByContextId(contextId);
-
-			if (frontRules != null) {
-				return new ResponseEntity<List<FrontendRule>>(frontRules, HttpStatus.OK);
+	public ResponseEntity<Rule> deleteRule(@PathVariable("ruleId") String ruleId,
+			@RequestHeader("Accept-Language") String locale){
+		
+		if(!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale)) {
+			Rule rule = ruleRepository.find(ruleId);			
+			if(rule != null) {
+				ruleRepository.delete(rule);
+				return new ResponseEntity<Rule>(rule, HttpStatus.OK);
 			}
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
+		
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale)),
 				HttpStatus.NOT_FOUND);
+		
 	}
 
 }

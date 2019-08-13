@@ -1,11 +1,13 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {FrontendRule} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
+import {Rule} from '../_models/rule';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
+import {ContextDTO} from '../_models';
+
 
 @Component({
 	moduleId: module.id,
@@ -15,9 +17,10 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class RuleAddComponent {
 
-	rule: FrontendRule;
+	rule: Rule;
 	loading = false;
 	isNewRuleAdded = false;
+	context: ContextDTO;
 
 
 	constructor(
@@ -32,16 +35,24 @@ export class RuleAddComponent {
 		private dialogRef: MatDialogRef<RuleAddComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
+		this.context = JSON.parse(localStorage.getItem('context'));
 		this.rule = data.rule;
+		console.log(this.context.context.id);
+		/*
 		if (data.rule.id) {
 			this.isNewRuleAdded = false;
 		}
 		else {
 			this.isNewRuleAdded = true;
-		}
+		}*/
 	}
 
 	saveRule() {
+
+		if (!this.rule.contextID) {
+			this.rule.contextID = this.context.context.id;
+		}
+
 		this.httpService.post(this.rule, environment.apiEndpoint + 'rule').subscribe(
 			data => {
 				this.dialogRef.close(true);

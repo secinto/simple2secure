@@ -1,14 +1,21 @@
 package com.simple2secure.api.model;
 
-public class Rule {
+import com.simple2secure.api.dbo.GenericDBObject;
+
+public class Rule extends GenericDBObject{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1812440159847822313L;
 
 	private String name;
 
 	private String description;
 
-	private String condition;
+	private String contextID;
 
-	private String actions;
+	private String groovyCode;
 
 	public Rule() {
 
@@ -30,20 +37,20 @@ public class Rule {
 		this.description = description;
 	}
 
-	public String getCondition() {
-		return condition;
+	public String getCondextID() {
+		return contextID;
 	}
 
-	public void setCondition(String condition) {
-		this.condition = condition;
+	public void setContextID(String contextID) {
+		this.contextID = contextID;
 	}
 
-	public String getActions() {
-		return actions;
+	public String getGroovyCode() {
+		return groovyCode;
 	}
 
-	public void setActions(String actions) {
-		this.actions = actions;
+	public void setGroovyCode(String groovyCode) {
+		this.groovyCode = groovyCode;
 	}
 
 }

@@ -12,7 +12,6 @@ export * from './testCaseResult';
 export * from './command';
 export * from './testCase';
 export * from './notification';
-export * from './frontendRule';
 export * from './companygroup';
 export * from './probe';
 export * from './networkReport';
@@ -37,5 +36,5 @@ export  * from './testResultObj';
 export * from './DTO/testResultDTO';
 export * from './rule';
 export * from './test';
-export * from './testStep'
+export * from './testStep';
 

@@ -1,19 +1,14 @@
 <h3 mat-dialog-title>{{ 'button.addRule' | translate }}</h3>
 <div mat-dialog-content>
-    <form #ruleForm="ngForm">
+    <form #ruleForm="ngForm" >
 
         <table class="full_width_input" cellspacing="0">
             <tr>
                 <td>
                     <mat-form-field class="full_width_input">
-                        <input matInput type="text" placeholder="{{ 'table.name' | translate }}" [(ngModel)]="rule.name"
+                        <input matInput type="text" placeholder="{{ 'table.name' | translate }}"
+                               [(ngModel)]="rule.name"
                                name="name" autocomplete='given-name' required>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="number" placeholder="{{ 'table.priority' | translate }}"
-                               [(ngModel)]="rule.priority" name="priority" autocomplete='given-name' required>
                     </mat-form-field>
                 </td>
             </tr>
@@ -29,9 +24,20 @@
                 </td>
             </tr>
         </table>
-
     </form>
 </div>
+
+
+<div ace-editor
+     [(text)]="rule.groovyCode"
+     [mode]="'groovy'"
+[theme]="'eclipse'"
+[options]="options"
+[readOnly]="false"
+[autoUpdateContent]="true"
+style="min-height: 200px; width:100%; overflow: auto;">
+</div>
+
 
 <div mat-dialog-actions>
     <button mat-button [disabled]="!ruleForm.dirty" mat-raised-button class="mat-green-button" color="primary"
@@ -41,3 +47,5 @@
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
 </div>
+
+

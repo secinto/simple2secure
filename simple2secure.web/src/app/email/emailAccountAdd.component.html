@@ -1,5 +1,4 @@
 <h3 mat-dialog-title>{{ 'menu.emailConfig' | translate }}</h3>
-
 <div mat-dialog-content>
     <form #emailConfigForm="ngForm" (ngSubmit)="saveConfig()">
 
@@ -8,7 +7,8 @@
                 <td>
                     <mat-form-field class="full_width_input">
                         <input matInput type="text" placeholder="{{ 'login.email' | translate }}"
-                               [(ngModel)]="config.email" name="email" autocomplete='given-name' required>
+                               [(ngModel)]="config.email"
+                               name="email" autocomplete='given-name' required>
                     </mat-form-field>
                 </td>
                 <td>

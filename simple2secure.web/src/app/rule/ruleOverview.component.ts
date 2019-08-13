@@ -1,11 +1,15 @@
 import {Component, Inject, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {FrontendRule} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
+import {Rule} from '../_models/rule';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
+import {EmailAccountAddComponent} from '../email';
+import {HttpErrorResponse} from '@angular/common/http';
+import { RuleAddComponent } from '.';
+import {ContextDTO} from '../_models';
 
 @Component({
 	moduleId: module.id,
@@ -15,14 +19,15 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class RuleOverviewComponent {
 
-	rules: FrontendRule[];
+	rules: Rule[];
 	loading = false;
-	selectedRule: FrontendRule;
+	selectedRule: Rule;
 	toolId: string;
 	currentUser: any;
 	deleted = false;
+	context: ContextDTO;
 
-	displayedColumns = ['name', 'description', 'priority', 'action'];
+	displayedColumns = ['name', 'description', 'action'];// 'priority', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -34,18 +39,15 @@ export class RuleOverviewComponent {
 		private alertService: AlertService,
 		private dataService: DataService,
 		private dialog: MatDialog,
-		private translate: TranslateService,
-		private dialogRef: MatDialogRef<RuleOverviewComponent>,
-		@Inject(MAT_DIALOG_DATA) data)
+		private translate: TranslateService)
 	{
-		this.rules = data.rules;
-		this.dataSource.data = this.rules;
+
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.toolId = this.route.snapshot.paramMap.get('id');
-		//this.loadRules();
+
+		this.context = JSON.parse(localStorage.getItem('context'));
+		this.loadRules();
 	}
 
 	ngAfterViewInit() {
@@ -59,16 +61,18 @@ export class RuleOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
+
+
 	private loadRules() {
+		console.log(this.context.context.id);
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'rule/' + this.toolId + '/' + this.currentUser.userID)
+		this.httpService.get(environment.apiEndpoint + 'rule/' + this.context.context.id)
 			.subscribe(
 				data => {
 					this.rules = data;
 					this.dataSource.data = this.rules;
 					this.loading = false;
 					this.alertService.success(this.translate.instant('message.rule'));
-
 				},
 				error => {
 					if (error.status == 0) {
@@ -81,8 +85,12 @@ export class RuleOverviewComponent {
 				});
 	}
 
-	public onMenuTriggerClick(rule: FrontendRule) {
+	public onMenuTriggerClick(rule: Rule) {
 		this.selectedRule = rule;
+	}
+
+	public onOpenDialogAddRule(){
+		this.openDialogAddRule();
 	}
 
 	public onEditClick() {
@@ -90,15 +98,71 @@ export class RuleOverviewComponent {
 	}
 
 	public onDeleteClick() {
-		this.openDialog(this.selectedRule);
+		this.onDeleteDialog(this.selectedRule);
 	}
 
-	public editRule(rule: FrontendRule) {
+	public editRule(rule: Rule) {
 		this.dataService.set(rule);
 		this.router.navigate(['../edit'], {relativeTo: this.route, queryParams: {action: 'edit'}});
 	}
 
-	public openDialog(config: FrontendRule) {
+	private openDialogAddRule(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '500px';
+
+		dialogConfig.data = {
+			rule: new Rule(),
+		};
+		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.rule.dialog'));
+				this.loadRules();
+			}
+			else {
+                 if (result instanceof HttpErrorResponse) {
+                    if (result.status == 0) {
+                    	this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                    	this.alertService.error(result.error.errorMessage);
+                    }
+                 }
+			}
+		});
+	}
+
+
+	private onEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '500px';
+
+		dialogConfig.data = {
+			rule: this.selectedRule,
+		};
+		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.rule.dialog'));
+				this.loadRules();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
+
+
+	private onDeleteDialog(config: Rule) {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -119,9 +183,9 @@ export class RuleOverviewComponent {
 		});
 	}
 
-	public deleteRule(rule: FrontendRule) {
+	private deleteRule(rule: Rule) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'email/' + rule.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'rule/' + rule.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.rule.delete'));
 				this.deleted = true;

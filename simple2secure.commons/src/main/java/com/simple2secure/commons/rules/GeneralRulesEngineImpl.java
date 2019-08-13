@@ -1,6 +1,7 @@
 package com.simple2secure.commons.rules;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rules;
@@ -9,6 +10,7 @@ import org.jeasy.rules.core.DefaultRulesEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.Rule;
 
 import groovy.lang.GroovyClassLoader;
 
@@ -62,7 +64,7 @@ public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 		rules_.register(rule);
 		log.debug("Registered new rule {}", rule.getClass().getName());
 	}
-
+	
 	
 	/**
 	 * Method to delete rule by name
