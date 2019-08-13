@@ -364,5 +364,8 @@
   "test.scheduled.info": "Show the scheduled tests with status",
   "test.executionType": "Type",
   "notifications.empty": "Notifications not provided",
-  "menu.searchResults": "Search Results"
+  "menu.searchResults": "Search Results",
+  "menu.notifications": "Notifications",
+  "menu.networkreports": "Network reports",
+  "title.hits": "hits"
 }

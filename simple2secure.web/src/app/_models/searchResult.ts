@@ -1,4 +1,4 @@
 export class SearchResult{
-	result: string;
+	object: any[] = [];
 	clazz: string;
 }

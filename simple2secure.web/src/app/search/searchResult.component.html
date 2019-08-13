@@ -1,3 +1,34 @@
-<div class="container">
+<div *ngIf="loading" class="container">
     <ng4-loading-spinner> </ng4-loading-spinner>
+</div>
+
+<div *ngIf="!loading" class="container">
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.notifications' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[0])}} {{ 'title.hits' | translate }}</mat-panel-description>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.queryReport' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[1])}} {{ 'title.hits' | translate }}</mat-panel-description>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.networkreports' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[2])}} {{ 'title.hits' | translate }}</mat-panel-description>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'button.testresults' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[3])}} {{ 'title.hits' | translate }}</mat-panel-description>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
 </div>

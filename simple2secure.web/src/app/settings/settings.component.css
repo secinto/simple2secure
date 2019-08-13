@@ -1,20 +1,3 @@
-.mat-card-custom {
-    margin: 4px;
-}
-
 #saveButton {
     margin-top: 5px;
-}
-
-.mat-card-license-plan {
-    margin-top: 50px;
-}
-
-.mat-card-title-left {
-    display: inline;
-}
-
-.mat-card-title-right {
-    display: inline;
-    float: right;
 }
