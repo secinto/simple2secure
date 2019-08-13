@@ -1,25 +1,28 @@
 package com.simple2secure.api.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SearchResult {
 
-	private String result;
+	private List<?> object = new ArrayList<>();
 	private String clazz;
 
 	public SearchResult() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SearchResult(String result, String clazz) {
-		this.result = result;
+	public SearchResult(List<?> object, String clazz) {
+		this.object = object;
 		this.clazz = clazz;
 	}
 
-	public String getResult() {
-		return result;
+	public List<?> getObject() {
+		return object;
 	}
 
-	public void setResult(String result) {
-		this.result = result;
+	public void setObject(List<?> object) {
+		this.object = object;
 	}
 
 	public String getClazz() {

@@ -24,6 +24,8 @@ import {ReportComponent, ReportOverviewComponent} from './report';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
+import {SearchComponent} from './search/search.component';
+import {SearchResultComponent} from './search/searchResult.component';
 
 const appRoutes: Routes = [
 	{
@@ -88,6 +90,14 @@ const appRoutes: Routes = [
 				component: SettingsComponent,
 				canActivate: [AuthGuard, RoleGuard],
 				data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN},
+			},
+			{
+				path: 'search',
+				component: SearchComponent,
+				data: {title: 'menu.searchResults'},
+				children: [
+					{path: ':searchquery', component: SearchResultComponent, data: {title: 'menu.searchResults'}},
+				]
 			}
 		]
 	},

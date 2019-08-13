@@ -6,12 +6,20 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 
 import com.mongodb.DBObject;
 import com.simple2secure.api.dbo.GenericDBObject;
+import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.Notification;
+import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 
 /**
@@ -152,6 +160,39 @@ public class MongoRepository<T extends GenericDBObject> {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Finds an item in the database by the search text
+	 *
+	 * @param searchQuery
+	 * @return
+	 */
+	public List<T> getBySearchQuery(String searchQuery) {
+		TextQuery textQuery = TextQuery.queryText(new TextCriteria().matchingAny(searchQuery)).sortByScore();
+		List<T> result = mongoTemplate.find(textQuery, this.className, this.collectionName);
+		return result;
+	}
+
+	/**
+	 * This function is used to define text Indexes for the full text search. It can be also implemented using annotation, but in our case we
+	 * do not have the spring packages in the api project, so the annotations are not available there. This function is called only one time
+	 * on the application start.
+	 */
+	public void defineTextIndexes() {
+
+		TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onField("content").build();
+		mongoTemplate.indexOps(Notification.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("queryResult").onField("query").build();
+		mongoTemplate.indexOps(Report.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("stringContent").build();
+		mongoTemplate.indexOps(NetworkReport.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("result").onField("hostname").onField("name").build();
+		mongoTemplate.indexOps(TestResult.class).ensureIndex(textIndex);
+
 	}
 
 }

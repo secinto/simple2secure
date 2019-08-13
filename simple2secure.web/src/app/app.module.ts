@@ -87,6 +87,9 @@ import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
 import {HelperService} from './_services/helper.service';
 import { NgMatSearchBarModule } from 'ng-mat-search-bar';
+import {SearchComponent} from './search/search.component';
+import {SearchResultComponent} from './search/searchResult.component';
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -150,7 +153,8 @@ export const httpInterceptorProviders = [
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		}),
 		AgmDirectionModule,
-		NgMatSearchBarModule
+		NgMatSearchBarModule,
+		Ng4LoadingSpinnerModule.forRoot()
 
 	],
 	declarations: [
@@ -210,7 +214,9 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
-		OrbiterToolTestScheduledListComponent
+		OrbiterToolTestScheduledListComponent,
+		SearchComponent,
+		SearchResultComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,

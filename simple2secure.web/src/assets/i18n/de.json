@@ -363,5 +363,6 @@
   "test.scheduled": "Geplante Tests",
   "test.scheduled.info": "Zeigen Sie die geplanten Tests mit Status an",
   "test.executionType": "Type",
-  "notifications.empty": "Benachrichtigungen nicht bereitgestellt"
+  "notifications.empty": "Benachrichtigungen nicht bereitgestellt",
+  "menu.searchResults": "Suchergebnisse"
 }

@@ -77,7 +77,7 @@ export class NavbarComponent {
 	public countunreadNotifications(notifications: Notification[]){
 		this.numOfUnreadNotification = 0;
 
-		for (var i = 0; i < notifications.length; i++) {
+		for (let i = 0; i < notifications.length; i++) {
 			if (!notifications[i].read){
 				this.numOfUnreadNotification++;
 			}
@@ -201,7 +201,7 @@ export class NavbarComponent {
 
 	openNotificationModal() {
 
-		if(this.showNotifications == true){
+		if (this.showNotifications == true){
 			this.showNotifications = false;
 		}
 		else{
@@ -209,22 +209,10 @@ export class NavbarComponent {
 		}
 	}
 
-	getSearchResults(searchString: any) {
-		this.httpService.get(environment.apiEndpoint + 'search/' + searchString)
-			.subscribe(
-				data => {
-					console.log("HREEEEEEEEEEEEEEEEEEE");
-					console.log(data);
-				},
-				error => {
-					console.log(JSON.stringify(error.error));
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
+	navigateToTheSearchPage(searchString: any) {
+		if (searchString.trim()){
+			this.router.navigate(['search', searchString]);
+		}
 	}
 
 

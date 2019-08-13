@@ -36,6 +36,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.dao.MongoRepository;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 
 @EnableScheduling
@@ -62,6 +63,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	@Autowired
 	private Environment env;
 
+	@Autowired
+	private MongoRepository mongoRepository;
+
 	@Bean
 	public JavaMailSender getJavaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -76,9 +80,6 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		props.put("mail.smtp.auth", mailSMTPAuth);
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.debug", "true");
-		// props.put("mail.smtp.socketFactory.port", mailSMTPPort);
-		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		// props.put("mail.smtp.socketFactory.fallback", "false");
 
 		return mailSender;
 	}
@@ -130,6 +131,11 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	@PostConstruct
 	public void currentActiveProfile() {
+
+		// Define the indexes for the full text search
+
+		mongoRepository.defineTextIndexes();
+
 		String[] activeProfiles = env.getActiveProfiles();
 
 		for (String profile : activeProfiles) {
