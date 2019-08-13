@@ -19,21 +19,19 @@ public class ProbePacketQueueHandler extends TimerTask {
 	private ProbePacket probePacket;
 
 	public ProbePacketQueueHandler(ProbePacket probePacket, ProcessingQueue<Packet> processingQueue) {
-		this.probePacket = probePacket;
-		this.processingQueue = processingQueue;
+		try {
+			this.probePacket = probePacket;
+			packetToQueue = PcapUtil.convertHexStreamToPacket(probePacket.getPacketAsHexStream(), 0);
+			this.processingQueue = processingQueue;
+
+		} catch (IllegalRawDataException e) {
+			log.error("Could not convert hex stream to packet.", e);
+		}
 	}
 
-	/**
-	 * This Class converts the network packet within the ProbePacket and push the network packet to the provided queue.
-	 */
 	@Override
 	public void run() {
-		try {
-			packetToQueue = PcapUtil.convertHexStreamToPacket(probePacket.getPacketAsHexStream(), 0);
-			processingQueue.push(packetToQueue);
-		} catch (IllegalRawDataException e) {
-			log.error("Could not create network packet from hex stream.", e);
-		}
+		processingQueue.push(packetToQueue);
 	}
 
 	public Packet getPacketToQueue() {
@@ -59,4 +57,41 @@ public class ProbePacketQueueHandler extends TimerTask {
 	public void setProbePacket(ProbePacket probePacket) {
 		this.probePacket = probePacket;
 	}
+
+	// private static Logger log = LoggerFactory.getLogger(ProbePacketQueueHandler.class);
+	// private ProcessingQueue<ProbePacket> probePacketQueue;
+	// private Timer timer = new Timer(true);
+	// private boolean isRunning = false;
+	//
+	// public ProbePacketQueueHandler() {
+	// }
+	//
+	// @Override
+	// public void run() {
+	// isRunning = true;
+	// while (isRunning) {
+	// if (ProbePacketRequestHandler.dbHasChanged) {
+	// probePacketQueue = new ProcessingQueue<>();
+	// for (ProbePacket probeP : PacketUtil.getAllProbePacketsFromDB()) {
+	// probePacketQueue.push(probeP);
+	// }
+	// ProbePacketRequestHandler.dbHasChanged = false;
+	// }
+	//
+	// if (probePacketQueue != null && probePacketQueue.hasElement()) {
+	// ProbePacket probePFromQ = probePacketQueue.pop();
+	//
+	// Packet packet;
+	// try {
+	// packet = PcapUtil.convertHexStreamToPacket(probePFromQ.getPacketAsHexStream(), 0);
+	// TimerTask packetHandlerTask = new PacketHandler(packet);
+	// timer.scheduleAtFixedRate(packetHandlerTask, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(30));
+	// // timer.schedule(packetHandlerTask, TimeUnit.SECONDS.toMillis(1));
+	// } catch (IllegalRawDataException e) {
+	// log.error("Could not convert hex stream to a packet.", e);
+	// isRunning = false;
+	// }
+	// }
+	// }
+	// }
 }

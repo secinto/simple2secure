@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.commons.rest.RESTUtils;
+import com.simple2secure.commons.network.NetUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public final class ProbeUtils {
@@ -59,7 +59,7 @@ public final class ProbeUtils {
 	 * This function checks if the server is reachable
 	 */
 	public static void isServerReachable() {
-		if (RESTUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL())) {
+		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL())) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		} else {
