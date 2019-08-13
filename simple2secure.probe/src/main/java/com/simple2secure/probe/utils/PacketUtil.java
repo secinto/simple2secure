@@ -1,6 +1,7 @@
 package com.simple2secure.probe.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,19 +39,21 @@ public class PacketUtil {
 
 	/**
 	 * This method checks if the provided ProbePacket which already exists in the DB has been changed.
-	 *
-	 * @param... the ProbePacket to check if it has changed @return... true if the packet contains one not matching value
+	 * 
+	 * @param taskMap
 	 */
-	public static List<ProbePacket> packetChanged(Map<String, ProbePacketQueueHandler> taskMap) {
+	public static List<ProbePacket> getChangedPackets(Map<String, ProbePacketQueueHandler> taskMap) {
 		List<ProbePacket> changedPacketList = null;
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 
 		for (ProbePacket probePacket : probePacketList) {
 			ProbePacketQueueHandler task = taskMap.get(probePacket.getId());
-			if (!(task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
+			if (!(task.getProbePacket().getGroupId().equals(probePacket.getGroupId())
+					&& task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
 					&& task.getProbePacket().getAnalysisInterval() == probePacket.getAnalysisInterval()
 					&& task.getProbePacket().getAnalysisIntervalUnit().equals(probePacket.getAnalysisIntervalUnit())
 					&& task.getProbePacket().getPacketAsHexStream().equals(probePacket.getPacketAsHexStream()))) {
+				changedPacketList = new ArrayList<>();
 				changedPacketList.add(probePacket);
 			}
 		}
