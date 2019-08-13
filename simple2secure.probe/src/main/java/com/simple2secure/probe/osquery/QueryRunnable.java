@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Report;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 
@@ -60,10 +59,11 @@ public class QueryRunnable implements Runnable {
 		String result = "";
 		Process p;
 
-		File queryExec = new File(StaticConfigItems.OSQUERY_PATH + File.separator + "osqueryi.exe");
+		File queryExec = new File(ProbeConfiguration.getInstance().getConfig().getQueries().getOsquerypath() + File.separator + "osqueryi.exe");
 		String myCommand = queryExec.getAbsolutePath();
 		String myArgs0 = "--json";
-		String myArgs1 = "--config-path=" + StaticConfigItems.OSQUERY_PATH + File.separator + "osquery.conf";
+		String myArgs1 = "--config-path=" + ProbeConfiguration.getInstance().getConfig().getQueries().getOsquerypath() + File.separator
+				+ "osquery.conf";
 		String myArgs2 = query;
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
