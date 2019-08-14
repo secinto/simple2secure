@@ -1,3 +1,25 @@
+/**
+*********************************************************************
+*   simple2secure is a cyber risk and information security platform.
+*   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+*********************************************************************
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as
+*   published by the Free Software Foundation, either version 3 of the
+*   License, or (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*
+ *********************************************************************
+*/
+
 package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
@@ -98,7 +120,7 @@ public class TestController {
 					notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
 							contextId);
 
-					return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+					return new ResponseEntity<>(testRun, HttpStatus.OK);
 				}
 			}
 		}
@@ -130,7 +152,7 @@ public class TestController {
 							test.getName() + " has been scheduled for the execution manually using the pod " + license.getHostname(),
 							group.getContextId());
 
-					return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+					return new ResponseEntity<>(testRun, HttpStatus.OK);
 
 				}
 
@@ -161,7 +183,7 @@ public class TestController {
 
 					testRunDTOList.add(testRunDTO);
 				}
-				return new ResponseEntity<List<TestRunDTO>>(testRunDTOList, HttpStatus.OK);
+				return new ResponseEntity<>(testRunDTOList, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
@@ -227,7 +249,7 @@ public class TestController {
 									HttpStatus.NOT_FOUND);
 						}
 					}
-					return new ResponseEntity<Test>(convertedTest, HttpStatus.OK);
+					return new ResponseEntity<>(convertedTest, HttpStatus.OK);
 				}
 			}
 		}
@@ -273,7 +295,7 @@ public class TestController {
 
 					returnTestValue = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
 				}
-				return new ResponseEntity<Test>(returnTestValue, HttpStatus.OK);
+				return new ResponseEntity<>(returnTestValue, HttpStatus.OK);
 			}
 		}
 
@@ -299,7 +321,7 @@ public class TestController {
 					}
 				}
 
-				return new ResponseEntity<List<Test>>(newTests, HttpStatus.OK);
+				return new ResponseEntity<>(newTests, HttpStatus.OK);
 			}
 
 		}
@@ -318,7 +340,7 @@ public class TestController {
 			Test test = testRepository.find(testId);
 			if (test != null) {
 				testRepository.delete(test);
-				return new ResponseEntity<Test>(test, HttpStatus.OK);
+				return new ResponseEntity<>(test, HttpStatus.OK);
 			}
 		}
 
@@ -337,7 +359,7 @@ public class TestController {
 			TestRun testRun = testRunRepository.find(testRunId);
 			if (testRun != null) {
 				testRunRepository.delete(testRun);
-				return new ResponseEntity<TestRun>(testRun, HttpStatus.OK);
+				return new ResponseEntity<>(testRun, HttpStatus.OK);
 			}
 		}
 
@@ -362,7 +384,7 @@ public class TestController {
 				testRunRepository.update(testRun);
 			}
 
-			return new ResponseEntity<TestStatusDTO>(testRunDTO, HttpStatus.OK);
+			return new ResponseEntity<>(testRunDTO, HttpStatus.OK);
 
 		}
 

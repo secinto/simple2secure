@@ -481,3 +481,7 @@ tree-viewport{
 .mat-expansion-panel{
     margin-top: 50px !important;
 }
+
+.mat-expansion-panel-header-description{
+    flex-basis: 0 !important;
+}

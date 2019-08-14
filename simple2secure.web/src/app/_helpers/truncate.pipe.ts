@@ -20,14 +20,17 @@
  *********************************************************************
  */
 
-import {Component} from '@angular/core';
+import {Pipe, PipeTransform } from '@angular/core';
 
-@Component({
-	moduleId: module.id,
-	templateUrl: 'loginlayout.component.html',
-	styleUrls: ['loginlayout.component.css']
+@Pipe({
+    name: 'truncate'
 })
 
-export class LoginLayoutComponent {
-
+export class TruncatePipe implements PipeTransform {
+    transform(value: string, limit = 50, completeWords = false, ellipsis = '...') {
+        if (completeWords) {
+            limit = value.substr(0, limit).lastIndexOf(' ');
+        }
+        return `${value.substr(0, limit)}${ellipsis}`;
+    }
 }

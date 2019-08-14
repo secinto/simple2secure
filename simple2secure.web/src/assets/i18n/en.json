@@ -367,5 +367,6 @@
   "menu.searchResults": "Search Results",
   "menu.notifications": "Notifications",
   "menu.networkreports": "Network reports",
-  "title.hits": "hits"
+  "title.hits": "hits",
+  "title.notification": "Notification"
 }

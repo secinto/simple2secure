@@ -8,6 +8,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +63,15 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 		Query query = new Query(Criteria.where("processorName").is(name));
 		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
 		return reports;
+	}
+
+	@Override
+	public List<NetworkReport> getSearchQueryByGroupId(String searchQuery, String groupId) {
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+		Query query = TextQuery.queryText(criteria).sortByScore();
+		query.addCriteria(Criteria.where("groupId").is(groupId));
+		List<NetworkReport> result = mongoTemplate.find(query, className, collectionName);
+		return result;
 	}
 
 }

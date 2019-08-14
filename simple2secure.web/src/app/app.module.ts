@@ -1,3 +1,25 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
+
 import {DatePipe} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
@@ -90,6 +112,8 @@ import { NgMatSearchBarModule } from 'ng-mat-search-bar';
 import {SearchComponent} from './search/search.component';
 import {SearchResultComponent} from './search/searchResult.component';
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+import {TruncatePipe} from './_helpers/truncate.pipe';
+import {NotificationDetailsComponent} from './notification/notificationDetails.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -216,7 +240,9 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestListComponent,
 		OrbiterToolTestScheduledListComponent,
 		SearchComponent,
-		SearchResultComponent
+		SearchResultComponent,
+		TruncatePipe,
+		NotificationDetailsComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -238,7 +264,8 @@ export const httpInterceptorProviders = [
 		UserDetailsComponent,
 		AddQueryDialog,
 		TestResultDetailsComponent,
-		TestDetailsComponent
+		TestDetailsComponent,
+		NotificationDetailsComponent
 	],
 	providers: [
 		AuthGuard,
