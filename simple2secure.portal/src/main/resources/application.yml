@@ -29,7 +29,7 @@ spring:
     banner-mode: "off"
   data:
     mongodb:
-      host: s2s-mongodb
+      host: localhost
       port: 27017
       database: s2s
 
@@ -44,13 +44,12 @@ server:
     trust-store: classpath:keys/cacerts
     trust-store-password: testtest
   certificate:
-    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784      
+    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784, 82608546408201705581087460839067218768, 70317815677293606821836133181142060207       
 ---      
 spring:
   profiles: deployment
   data:
     mongodb:
-      host: s2s-mongodb
       port: 27017
       database: s2s
 ---
@@ -58,6 +57,5 @@ spring:
   profiles: test
   data:
     mongodb:
-      host: localhost
       port: 27017
       database: s2s_test
