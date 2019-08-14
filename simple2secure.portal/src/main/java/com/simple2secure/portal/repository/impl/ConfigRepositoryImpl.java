@@ -32,18 +32,18 @@ public class ConfigRepositoryImpl extends ConfigRepository {
 	@Override
 	public void deleteByProbeId(String probeId) {
 		Config config = findByProbeId(probeId);
-		if(config != null) {
+		if (config != null) {
 			this.delete(config);
-		}		
+		}
 	}
 
 	@Override
 	public Config findByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId).and("isGroupConfiguration").is(true));
 		Config config = this.mongoTemplate.findOne(query, Config.class);
-		return config;		
+		return config;
 	}
-	
+
 	@Override
 	public List<Config> findAllByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
@@ -54,10 +54,10 @@ public class ConfigRepositoryImpl extends ConfigRepository {
 	@Override
 	public void deleteByGroupId(String groupId) {
 		List<Config> configs = findAllByGroupId(groupId);
-		if(configs != null) {
-			for(Config config : configs) {
+		if (configs != null) {
+			for (Config config : configs) {
 				this.delete(config);
 			}
-		}		
+		}
 	}
 }

@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
@@ -100,7 +113,7 @@ public class ConfigController {
 		if (config != null) {
 			config.setVersion(config.getVersion() + 1);
 			configRepository.update(config);
-			return new ResponseEntity<Config>(config, HttpStatus.OK);
+			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 		log.error("Error while inserting/updating the general configuration");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
@@ -123,7 +136,7 @@ public class ConfigController {
 					HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<Config>(configs.get(0), HttpStatus.OK);
+		return new ResponseEntity<>(configs.get(0), HttpStatus.OK);
 	}
 
 	/**
@@ -141,12 +154,12 @@ public class ConfigController {
 			if (!Strings.isNullOrEmpty(query.getId())) {
 
 				queryRepository.update(query);
-				return new ResponseEntity<QueryRun>(query, HttpStatus.OK);
+				return new ResponseEntity<>(query, HttpStatus.OK);
 			}
 
 			else {
 				queryRepository.save(query);
-				return new ResponseEntity<QueryRun>(query, HttpStatus.OK);
+				return new ResponseEntity<>(query, HttpStatus.OK);
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
@@ -198,7 +211,7 @@ public class ConfigController {
 						// Take only the query runs of this group, because this is root group!
 						queryConfig = queryRepository.findByGroupId(license.getGroupId(), select_all);
 						if (queryConfig != null) {
-							return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+							return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 						}
 
 					} else {
@@ -215,7 +228,7 @@ public class ConfigController {
 							}
 						}
 
-						return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+						return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 					}
 				}
 			}
@@ -238,7 +251,7 @@ public class ConfigController {
 			List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId, select_all);
 
 			if (queryConfig != null) {
-				return new ResponseEntity<List<QueryRun>>(queryConfig, HttpStatus.OK);
+				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
@@ -271,7 +284,7 @@ public class ConfigController {
 							queryRunList.addAll(queryConfig);
 						}
 					}
-					return new ResponseEntity<List<QueryRun>>(queryRunList, HttpStatus.OK);
+					return new ResponseEntity<>(queryRunList, HttpStatus.OK);
 				}
 
 			}
@@ -292,7 +305,7 @@ public class ConfigController {
 		if (!Strings.isNullOrEmpty(id)) {
 			QueryRun queryConfig = queryRepository.find(id);
 			if (queryConfig != null) {
-				return new ResponseEntity<QueryRun>(queryConfig, HttpStatus.OK);
+				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 			}
 		}
 		log.error("Query configuration not found for the query ID {}", id);
@@ -321,7 +334,7 @@ public class ConfigController {
 						// Copy all configurations from the source group to dest group
 						groupUtils.copyGroupConfiguration(sourceGroup.getId(), destGroup.getId());
 
-						return new ResponseEntity<CompanyGroup>(sourceGroup, HttpStatus.OK);
+						return new ResponseEntity<>(sourceGroup, HttpStatus.OK);
 					}
 				}
 			}

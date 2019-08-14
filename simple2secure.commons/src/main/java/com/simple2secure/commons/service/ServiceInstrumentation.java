@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.commons.service;
 
 import java.io.BufferedOutputStream;
@@ -12,15 +33,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.license.License;
 
 public class ServiceInstrumentation {
-	private static Logger log = LoggerFactory.getLogger(ServiceInstrumentation.class);
-
 	public static final String AUTHENTICATED_TAG = "AUTHENTICATED";
 	private InputStream serviceOutput;
 
@@ -35,73 +51,13 @@ public class ServiceInstrumentation {
 
 	private String token;
 
-	private boolean useSignatureAuthentication = true;
+	private boolean useSignatureAuthentication = false;
 	private boolean useAuthentication = true;
-
-	private boolean useFallbackNoSecurity = false;
 
 	public ServiceInstrumentation(InputStream output, OutputStream input) {
 		serviceOutput = output;
 		serviceInput = input;
 		serviceCommandWriter = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream(serviceInput)));
-	}
-
-	/**
-	 * Returns whether signature authentication is used or not.
-	 *
-	 * @return Boolean value of the current state
-	 */
-	public boolean isUseSignatureAuthentication() {
-		return useSignatureAuthentication;
-	}
-
-	/**
-	 * Specifies if signature authentication should be used for command authentication. As default it is used.
-	 *
-	 * @param useSignatureAuthentication
-	 *          Boolean value to set signature authentication state
-	 */
-	public void setUseSignatureAuthentication(boolean useSignatureAuthentication) {
-		this.useSignatureAuthentication = useSignatureAuthentication;
-	}
-
-	/**
-	 * Returns the current state of using command authentication.
-	 *
-	 * @return Boolean value off the state.
-	 */
-	public boolean isUseAuthentication() {
-		return useAuthentication;
-	}
-
-	/**
-	 * Sets the value if authentication should be used for each command. Default this also implies to use signature authentication, which is
-	 * set implicitly if <code>true</code> is provided as input.
-	 *
-	 * @param useAuthentication
-	 *          True or False whether authentication should be used or not.
-	 */
-	public void setUseAuthentication(boolean useAuthentication) {
-		this.useAuthentication = useAuthentication;
-	}
-
-	/**
-	 * Returns if NO security is used as fallback.
-	 *
-	 * @return Boolean if NO security is used.
-	 */
-	public boolean isUseFallbackNoSecurity() {
-		return useFallbackNoSecurity;
-	}
-
-	/**
-	 * Sets the value for using NO security as fallback to the provided value. As default the value is set to false.
-	 *
-	 * @param useFallbackNoSecurity
-	 *          True if NO security should be used as fallback.
-	 */
-	public void setUseFallbackNoSecurity(boolean useFallbackNoSecurity) {
-		this.useFallbackNoSecurity = useFallbackNoSecurity;
 	}
 
 	/**
@@ -208,36 +164,29 @@ public class ServiceInstrumentation {
 	 * @throws IOException
 	 *           Thrown if writing to the output stream fails.
 	 * @throws NoSuchAlgorithmException
+	 *           Thrown if the specified algorithm does not exist
 	 * @throws SignatureException
+	 *           Thrown if the signature could not be created.
 	 * @throws InvalidKeyException
+	 *           Thrown if an incorrect key has been used.
 	 */
 	public synchronized void sendCommand(ServiceCommand command)
 			throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 		/*
 		 * TODO: Add some authentication mechanism which allows to verify the sender authenticity of the sender at the service.
 		 */
-		boolean authenticationStatus = true;
 		String commandToSend = command.getCommand() + " " + String.join(" ", command.getArguments());
 		if (useAuthentication) {
 			if (useSignatureAuthentication && privateKey != null) {
-				try {
-					byte[] signedCommand = CryptoUtils.sign(commandToSend, privateKey);
-					commandToSend = new String(signedCommand, "UTF-8");
-				} catch (Exception e) {
-					log.error("Couldn't sign command. Reason {}", e);
-					if (useFallbackNoSecurity) {
-						log.info("Proceeding with fallback NO security");
-						authenticationStatus = false;
-					}
-				}
+				byte[] signedCommand = CryptoUtils.sign(commandToSend, privateKey);
+				commandToSend = new String(signedCommand, "UTF-8");
 			} else {
 				commandToSend = commandToSend + " " + token;
 			}
 			commandToSend = AUTHENTICATED_TAG + " " + commandToSend;
 		}
-		if (authenticationStatus) {
-			serviceCommandWriter.write(commandToSend);
-		}
+
+		serviceCommandWriter.write(commandToSend);
 
 	}
 }

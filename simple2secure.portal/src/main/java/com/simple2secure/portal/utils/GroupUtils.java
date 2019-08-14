@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
@@ -308,7 +329,7 @@ public class GroupUtils {
 				if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
 					// SUPERADMIN can move everything
 					if (moveGroup(fromGroup, toGroup)) {
-						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+						return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 					}
 				}
 				// SUPERUSER
@@ -320,14 +341,14 @@ public class GroupUtils {
 						// in this case the moved group will be root group
 						if (toGroup == null) {
 							if (moveGroup(fromGroup, toGroup)) {
-								return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+								return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 							}
 						} else {
 							// check if toGroup is assigned to this user
 							groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(toGroup.getId(), user.getId());
 							if (groupAccessRight != null) {
 								if (moveGroup(fromGroup, toGroup)) {
-									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 								}
 							}
 						}
@@ -343,14 +364,14 @@ public class GroupUtils {
 							// In case that toGroup is null, fromGroup will be new root group
 							if (toGroup == null) {
 								if (moveGroup(fromGroup, toGroup)) {
-									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 								}
 							} else {
 								if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
 									// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
 									if (fromGroup.getContextId().equals(toGroup.getContextId())) {
 										if (moveGroup(fromGroup, toGroup)) {
-											return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+											return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 										}
 									}
 								}

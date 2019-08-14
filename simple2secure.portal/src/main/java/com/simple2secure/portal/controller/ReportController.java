@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
@@ -80,7 +93,7 @@ public class ReportController {
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
 		if (report != null) {
 			reportsRepository.save(report);
-			return new ResponseEntity<Report>(report, HttpStatus.OK);
+			return new ResponseEntity<>(report, HttpStatus.OK);
 		}
 		log.error("Error occured while saving report");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
@@ -99,11 +112,11 @@ public class ReportController {
 
 				if (groups != null) {
 					log.debug("Loading OSQuery reports for contextId {0}", contextId);
-					List<Report> reportsList = new ArrayList<Report>();
+					List<Report> reportsList = new ArrayList<>();
 					for (CompanyGroup group : groups) {
 						reportsList.addAll(reportsRepository.getReportsByGroupId(group.getId()));
 					}
-					return new ResponseEntity<List<Report>>(reportsList, HttpStatus.OK);
+					return new ResponseEntity<>(reportsList, HttpStatus.OK);
 				}
 			}
 		}
@@ -119,7 +132,7 @@ public class ReportController {
 		if (!Strings.isNullOrEmpty(id)) {
 			Report report = reportsRepository.find(id);
 			if (report != null) {
-				return new ResponseEntity<Report>(report, HttpStatus.OK);
+				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving report with id {}", id);
@@ -133,7 +146,7 @@ public class ReportController {
 		if (!Strings.isNullOrEmpty(name)) {
 			List<GraphReport> reports = reportUtils.prepareReportsForGraph(name);
 			if (reports != null) {
-				return new ResponseEntity<List<GraphReport>>(reports, HttpStatus.OK);
+				return new ResponseEntity<>(reports, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
@@ -149,7 +162,7 @@ public class ReportController {
 			Report report = reportsRepository.find(id);
 			if (report != null) {
 				reportsRepository.delete(report);
-				return new ResponseEntity<Report>(report, HttpStatus.OK);
+				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while deleting report with id {}", id);
@@ -163,7 +176,7 @@ public class ReportController {
 			@RequestHeader("Accept-Language") String locale) {
 		if (networkReport != null) {
 			networkReportRepository.save(networkReport);
-			return new ResponseEntity<NetworkReport>(networkReport, HttpStatus.OK);
+			return new ResponseEntity<>(networkReport, HttpStatus.OK);
 		}
 		log.error("Error occured while saving network report");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
@@ -182,11 +195,11 @@ public class ReportController {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 				if (groups != null) {
 					log.debug("Loading network reports for contextId {0}", contextId);
-					List<NetworkReport> reportsList = new ArrayList<NetworkReport>();
+					List<NetworkReport> reportsList = new ArrayList<>();
 					for (CompanyGroup group : groups) {
 						reportsList.addAll(networkReportRepository.getReportsByGroupId(group.getId()));
 					}
-					return new ResponseEntity<List<NetworkReport>>(reportsList, HttpStatus.OK);
+					return new ResponseEntity<>(reportsList, HttpStatus.OK);
 				}
 			}
 		}
@@ -206,7 +219,7 @@ public class ReportController {
 			NetworkReport report = networkReportRepository.find(id);
 			if (report != null) {
 				networkReportRepository.delete(report);
-				return new ResponseEntity<NetworkReport>(report, HttpStatus.OK);
+				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while deleting network report with id {}", id);
@@ -221,7 +234,7 @@ public class ReportController {
 		if (!Strings.isNullOrEmpty(name)) {
 			List<NetworkReport> reports = networkReportRepository.getReportsByName(name);
 			if (reports != null) {
-				return new ResponseEntity<List<NetworkReport>>(reports, HttpStatus.OK);
+				return new ResponseEntity<>(reports, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
@@ -234,7 +247,7 @@ public class ReportController {
 	public ResponseEntity<List<NetworkReportDTO>> getNetworkReportsForGeoLocation(@RequestHeader("Accept-Language") String locale) {
 		List<NetworkReportDTO> reports = reportUtils.prepareNetworkReports();
 		if (reports != null) {
-			return new ResponseEntity<List<NetworkReportDTO>>(reports, HttpStatus.OK);
+			return new ResponseEntity<>(reports, HttpStatus.OK);
 		}
 		log.error("Error occured while retrieving reports for geolocation");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);

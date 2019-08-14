@@ -1,4 +1,5 @@
 package com.simple2secure.portal.repository.impl;
+
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -20,20 +21,20 @@ public class QueryRepositoryImpl extends QueryRepository {
 		super.collectionName = "queryrun"; //$NON-NLS-1$
 		super.className = QueryRun.class;
 	}
-	
+
 	@Override
 	public List<QueryRun> findByGroupId(String groupId, boolean selectAll) {
 		Query query = new Query();
-		
+
 		if (selectAll) {
 			query = new Query(Criteria.where("groupId").is(groupId));
-			
+
 		} else {
-			query = new Query(Criteria.where("groupId").is(groupId).and("active").is(1));			
+			query = new Query(Criteria.where("groupId").is(groupId).and("active").is(1));
 		}
-		
-		return this.mongoTemplate.find(query, QueryRun.class, this.collectionName); 
-	}	
+
+		return this.mongoTemplate.find(query, QueryRun.class, this.collectionName);
+	}
 
 	@Override
 	public QueryRun findByName(String name) {
@@ -45,11 +46,11 @@ public class QueryRepositoryImpl extends QueryRepository {
 	@Override
 	public void deleteByGroupId(String groupId) {
 		List<QueryRun> queries = findByGroupId(groupId, true);
-		
-		if(queries != null) {
-			for(QueryRun query : queries) {
+
+		if (queries != null) {
+			for (QueryRun query : queries) {
 				this.delete(query);
 			}
-		}		
+		}
 	}
 }

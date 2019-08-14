@@ -1,21 +1,21 @@
 /**
  *********************************************************************
- *
- * Copyright (C) 2019 by secinto GmbH (http://www.secinto.com)
- *
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
  *********************************************************************
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * You may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *********************************************************************
  */
@@ -53,6 +53,12 @@ public class ServiceUtils {
 	public static String DEFAULT_JVM_OPTIONS = "";
 
 	private static String JVM_LIBRARY_REL = "bin\\server\\jvm.dll";
+
+	private static boolean isWindows = true;
+
+	static {
+		isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+	}
 
 	/**
 	 * Checks if the used JVM is 64 bit or not.
@@ -114,7 +120,7 @@ public class ServiceUtils {
 	 * @return
 	 */
 	public static Map<String, String> createServiceEnvironment(boolean useOwnPrunSrv, String installPath, String serviceName) {
-		Map<String, String> env = new TreeMap<String, String>();
+		Map<String, String> env = new TreeMap<>();
 
 		env.put("SERVICE_NAME", serviceName);
 
@@ -260,7 +266,7 @@ public class ServiceUtils {
 			String serviceDescription, String library, String startup, String startClass, String startMethod, String startMode, String startImage,
 			String stopClass, String stopMethod, String stopMode, String stopTimeout, String stopImage, String logPath, String logLevel,
 			String stdout, String stderr, String jvmPath, String jvmms, String jvmmx, String jvmss, String jvmOptions) {
-		Map<String, String> env = new TreeMap<String, String>();
+		Map<String, String> env = new TreeMap<>();
 
 		if (!installPath.endsWith("\\")) {
 			installPath = installPath + "\\";
@@ -317,10 +323,13 @@ public class ServiceUtils {
 		env.put("PR_STARTCLASS", startClass);
 		env.put("PR_STARTMETHOD", startMethod);
 
+		env.put("PR_STARTPARAMS", "start");
+
 		env.put("PR_STOPMODE", stopMode);
 		env.put("PR_STOPCLASS", stopClass);
 		env.put("PR_STOPMETHOD", stopMethod);
 		env.put("PR_STOPTIMEOUT", stopTimeout);
+		env.put("PR_STOPPARAMS", "stop");
 
 		if (!Strings.isNullOrEmpty(startImage)) {
 			env.put("PR_STARTIMAGE", installPath + startImage);
@@ -370,10 +379,15 @@ public class ServiceUtils {
 	public static ProcessContainer installService(boolean useOwnPrunSrv, String installPath, String serviceName, String serviceDescription,
 			String library, String startClass, String startMethod, String stopClass, String stopMethod) {
 		StringBuilder serviceString = new StringBuilder();
-		serviceString.append("%PR_INSTALL% //IS//%SERVICE_NAME%");
-		Map<String, String> environment = createInstallEnvironment(useOwnPrunSrv, installPath, serviceName, serviceDescription, library,
-				startClass, startMethod, stopClass, stopMethod);
-		return ProcessUtils.manageServiceWindows(serviceString.toString(), true, environment);
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //IS//%SERVICE_NAME%");
+			Map<String, String> environment = createInstallEnvironment(useOwnPrunSrv, installPath, serviceName, serviceDescription, library,
+					startClass, startMethod, stopClass, stopMethod);
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), true, environment);
+		} else {
+			return null;
+		}
+
 	}
 
 	/**
@@ -385,10 +399,14 @@ public class ServiceUtils {
 	 */
 	public static ProcessContainer startService(String serviceName) {
 		StringBuilder serviceString = new StringBuilder();
-		serviceString.append("%PR_INSTALL% //ES//%SERVICE_NAME%");
-		Map<String, String> environment = createServiceEnvironment(serviceName);
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //ES//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -400,10 +418,14 @@ public class ServiceUtils {
 	 */
 	public static ProcessContainer stopService(String serviceName) {
 		StringBuilder serviceString = new StringBuilder();
-		serviceString.append("%PR_INSTALL% //SS//%SERVICE_NAME%");
-		Map<String, String> environment = createServiceEnvironment(serviceName);
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //SS//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -415,10 +437,14 @@ public class ServiceUtils {
 	 */
 	public static ProcessContainer deleteService(String serviceName) {
 		StringBuilder serviceString = new StringBuilder();
-		serviceString.append("%PR_INSTALL% //DS//%SERVICE_NAME%");
-		Map<String, String> environment = createServiceEnvironment(serviceName);
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //DS//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(serviceName);
 
-		return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -429,7 +455,7 @@ public class ServiceUtils {
 	 * @return The converted variables as Map.
 	 */
 	public static Map<String, String> convertParameters(Map<String, String> params) {
-		Map<String, String> convertedParams = new TreeMap<String, String>();
+		Map<String, String> convertedParams = new TreeMap<>();
 		for (String key : params.keySet()) {
 			String value = params.get(key);
 			switch (key) {
