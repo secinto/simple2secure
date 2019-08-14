@@ -109,11 +109,7 @@ public class ProbePacketRequestHandler implements Runnable {
 					taskMap.put(packet.getId(), new ProbePacketQueueHandler(packet, processingQueue));
 					DBUtil.hasDBChanged = false;
 				}
-<<<<<<< HEAD
-				List<ProbePacket> changedPacketsList = PacketUtil.packetChanged(taskMap);
-=======
 				List<ProbePacket> changedPacketsList = PacketUtil.getChangedPackets(taskMap);
->>>>>>> develop_probe_service
 				if (changedPacketsList != null) {
 					stopTasks();
 					for (ProbePacket probePacket : changedPacketsList) {

@@ -50,6 +50,7 @@ spring:
   profiles: deployment
   data:
     mongodb:
+      host: localhost
       port: 27017
       database: s2s
 ---
@@ -57,5 +58,6 @@ spring:
   profiles: test
   data:
     mongodb:
+      host: localhost
       port: 27017
       database: s2s_test

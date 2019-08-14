@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /**
  *********************************************************************
  *   simple2secure is a cyber risk and information security platform.
@@ -21,7 +19,6 @@
  *
  *********************************************************************
  */
->>>>>>> develop_probe_service
 package com.simple2secure.probe.network.packet;
 
 import org.pcap4j.core.NotOpenException;

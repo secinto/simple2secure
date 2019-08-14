@@ -62,7 +62,8 @@ public class PacketUtil {
 	 *
 	 * @param taskMap
 	 */
-	public static List<ProbePacket> packetChanged(Map<String, ProbePacketQueueHandler> taskMap) {
+	@SuppressWarnings("null")
+	public static List<ProbePacket> getChangedPackets(Map<String, ProbePacketQueueHandler> taskMap) {
 		List<ProbePacket> changedPacketList = null;
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 

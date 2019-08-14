@@ -36,15 +36,9 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "144.76.93.104";
+	private String baseHost = "simple2secure.info";
 	private String basePort = "51001/s2s";
 	private String basePortWeb = "51003";
-
-	// private String baseKubernetesURL = "https://35.232.109.156";
-
-	private String baseKubernetesURL = "https://192.168.123.95:6443";
-
-	private String baseDockerContainer = "http://192.168.99.100:5000";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
@@ -110,10 +104,6 @@ public class LoadedConfigItems {
 		this.baseProtocol = baseProtocol;
 	}
 
-	public String getBaseDockerContainer() {
-		return baseDockerContainer;
-	}
-
 	public String getBaseHost() {
 		return baseHost;
 	}
@@ -144,14 +134,6 @@ public class LoadedConfigItems {
 
 	public String getBaseURLWeb() {
 		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
-	}
-
-	public String getBaseKubernetesURL() {
-		return baseKubernetesURL;
-	}
-
-	public void setBaseKubernetesURL(String baseKubernetesURL) {
-		this.baseKubernetesURL = baseKubernetesURL;
 	}
 
 	public String getReportURL() {
