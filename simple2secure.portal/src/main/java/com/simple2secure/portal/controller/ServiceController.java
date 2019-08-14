@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.controller;
 
 import java.io.File;
@@ -31,7 +52,7 @@ public class ServiceController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
-		return new ResponseEntity<Service>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
+		return new ResponseEntity<>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -47,7 +68,7 @@ public class ServiceController {
 		}
 
 		if (library != null) {
-			return new ResponseEntity<ServiceLibraryDTO>(library, HttpStatus.OK);
+			return new ResponseEntity<>(library, HttpStatus.OK);
 		} else {
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale)), HttpStatus.NOT_FOUND);
 

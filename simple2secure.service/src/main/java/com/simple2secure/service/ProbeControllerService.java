@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.service;
 
 import java.util.Arrays;
@@ -7,6 +28,8 @@ import org.apache.commons.daemon.DaemonContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.service.engine.ProbeControllerEngine;
+
 public class ProbeControllerService implements Daemon {
 
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerService.class);
@@ -15,10 +38,11 @@ public class ProbeControllerService implements Daemon {
 	private static ProbeControllerEngine engine = new ProbeControllerEngine();
 
 	/**
-	 * Static methods called by prunsrv to start/stop the Windows service. Pass the
-	 * argument "start" to start the service, and pass "stop" to stop the service.
+	 * Static methods called by prunsrv to start/stop the Windows service. Pass the argument "start" to start the service, and pass "stop" to
+	 * stop the service.
 	 *
-	 * @param args Arguments from prunsrv command line
+	 * @param args
+	 *          Arguments from prunsrv command line
 	 **/
 	public static void windowsService(String args[]) {
 		log.info("Received windowsService call");

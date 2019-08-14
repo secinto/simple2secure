@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.controller;
 
 import java.io.IOException;
@@ -136,7 +157,7 @@ public class UserController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
 		List<User> userList = userRepository.findAll();
-		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
+		return new ResponseEntity<>(userList, HttpStatus.OK);
 	}
 
 	/**
@@ -175,7 +196,7 @@ public class UserController {
 				}
 
 				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myPods, myContexts, assignedGroups);
-				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
@@ -249,7 +270,7 @@ public class UserController {
 
 			if (user != null) {
 				userInfoRepository.update(userInfo);
-				return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
+				return new ResponseEntity<>(userInfo, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
@@ -380,7 +401,7 @@ public class UserController {
 						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
 
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
-					return new ResponseEntity<User>(user, HttpStatus.OK);
+					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
 					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
 							HttpStatus.NOT_FOUND);
@@ -456,7 +477,7 @@ public class UserController {
 							}
 							contextUserAuthRepository.save(contextUserAuth);
 							userInvitationRepository.delete(userInvitation);
-							return new ResponseEntity<UserInvitation>(userInvitation, HttpStatus.OK);
+							return new ResponseEntity<>(userInvitation, HttpStatus.OK);
 
 						} else {
 							userInvitationRepository.delete(userInvitation);
@@ -565,7 +586,7 @@ public class UserController {
 								HttpStatus.NOT_FOUND);
 					} else {
 						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
-						return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
+						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
 					}
 				}
 			}

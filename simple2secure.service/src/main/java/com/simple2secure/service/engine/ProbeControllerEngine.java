@@ -1,4 +1,25 @@
-package com.simple2secure.service;
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
+package com.simple2secure.service.engine;
 
 import java.io.FileNotFoundException;
 import java.util.concurrent.Executors;
@@ -12,12 +33,12 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
 import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.model.TriggerableEngineStates;
 import com.simple2secure.service.observer.SimpleLoggingObserver;
 import com.simple2secure.service.tasks.PortalWatchdog;
 import com.simple2secure.service.tasks.ProbeMonitor;
 import com.simple2secure.service.tasks.ProbeUpdater;
 import com.simple2secure.service.tasks.TriggerEngineState;
-import com.simple2secure.service.tasks.TriggerableEngineStates;
 
 public class ProbeControllerEngine implements ControllerEngine {
 	private static Logger log = LoggerFactory.getLogger(ProbeControllerEngine.class);
@@ -87,8 +108,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 				log.debug("Creating ProbeUpdater scheduled task");
 				probeUpdater = scheduler.scheduleAtFixedRate(new ProbeUpdater(this), 100, 10000, TimeUnit.MILLISECONDS);
 				log.debug("Creating PortalWatchdog scheduled task");
-				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(this), 200, 10000,
-						TimeUnit.MILLISECONDS);
+				portalWatchdog = scheduler.scheduleAtFixedRate(new PortalWatchdog(this), 200, 10000, TimeUnit.MILLISECONDS);
 				stopped = false;
 				return true;
 			} catch (Exception e) {
@@ -100,8 +120,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 
 	@Override
 	public boolean stop() {
-		log.debug("Trying to stop probe process via process handle. Process handle available: {}",
-				probeProcess == null);
+		log.debug("Trying to stop probe process via process handle. Process handle available: {}", probeProcess == null);
 		if (probeProcess != null) {
 			try {
 				log.debug("Calling destroy on probe process handle");

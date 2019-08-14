@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.controller;
 
 import java.util.List;
@@ -45,7 +66,7 @@ public class NotificationController {
 			@RequestHeader("Accept-Language") String locale) {
 		if (notification != null && !Strings.isNullOrEmpty(podId)) {
 			if (notificationUtils.addNewNotificationPod(notification.getContent(), podId)) {
-				return new ResponseEntity<Notification>(notification, HttpStatus.OK);
+				return new ResponseEntity<>(notification, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while saving notification");
@@ -62,7 +83,7 @@ public class NotificationController {
 		if (!Strings.isNullOrEmpty(contextId)) {
 			List<Notification> notifications = repository.findAllSortDescending(contextId);
 			if (notifications != null) {
-				return new ResponseEntity<List<Notification>>(notifications, HttpStatus.OK);
+				return new ResponseEntity<>(notifications, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving notifications for context id {}", contextId);
@@ -79,7 +100,7 @@ public class NotificationController {
 		if (notification != null) {
 			notification.setRead(true);
 			repository.update(notification);
-			return new ResponseEntity<Notification>(notification, HttpStatus.OK);
+			return new ResponseEntity<>(notification, HttpStatus.OK);
 		}
 
 		log.error("Problem occured while updating read parameter");
