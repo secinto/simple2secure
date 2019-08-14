@@ -30,7 +30,7 @@
 	</appender>
 
 	<logger name="com.simple2secure.portal" level="debug" />
-	<logger name="org.mongodb.driver" level="debug" />
+	<logger name="org.mongodb.driver" level="info" />
 
 	<root level="error">
 		<appender-ref ref="STDOUT" />
