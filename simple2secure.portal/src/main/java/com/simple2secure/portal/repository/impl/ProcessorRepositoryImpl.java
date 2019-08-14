@@ -21,23 +21,23 @@ public class ProcessorRepositoryImpl extends ProcessorRepository {
 		super.collectionName = "processor"; //$NON-NLS-1$
 		super.className = Processor.class;
 	}
-	
+
 	@Override
 	public void deleteByGroupId(String groupId) {
 		List<Processor> processors = getProcessorsByGroupId(groupId);
-		
-		if(processors != null) {
-			for(Processor processor : processors) {
+
+		if (processors != null) {
+			for (Processor processor : processors) {
 				this.delete(processor);
-			}			
+			}
 		}
-	}	
+	}
 
 	@Override
 	public List<Processor> getProcessorsByGroupId(String groupId) {
-		
+
 		Query query = new Query(Criteria.where("groupId").is(groupId));
-		
+
 		List<Processor> processors = this.mongoTemplate.find(query, Processor.class);
 		return processors;
 	}

@@ -37,6 +37,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -60,9 +61,9 @@ import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
+@ActiveProfiles("test")
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
-@ActiveProfiles("test")
 public class TestAPIBase {
 
 	private static Logger log = LoggerFactory.getLogger(TestAPIBase.class);
@@ -93,6 +94,9 @@ public class TestAPIBase {
 
 	@LocalServerPort
 	protected int randomServerPort;
+
+	@Autowired
+	private ApplicationContext appContext;
 
 	private User adminUser;
 

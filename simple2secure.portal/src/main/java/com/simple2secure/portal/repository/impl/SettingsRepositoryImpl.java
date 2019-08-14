@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.portal.repository.SettingsRepository;
 

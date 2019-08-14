@@ -1,10 +1,12 @@
 package com.simple2secure.portal.repository.impl;
 
 import javax.annotation.PostConstruct;
+
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.simple2secure.api.model.Token;
 import com.simple2secure.portal.repository.TokenRepository;
 
@@ -23,12 +25,12 @@ public class TokenRepositoryImpl extends TokenRepository {
 		Query query = new Query(Criteria.where("userId").is(userId));
 		return this.mongoTemplate.findOne(query, Token.class);
 	}
-	
+
 	@Override
 	public Token findByProbeId(String probeId) {
 		Query query = new Query(Criteria.where("probeId").is(probeId));
 		return this.mongoTemplate.findOne(query, Token.class);
-	}	
+	}
 
 	@Override
 	public Token findByAccessToken(String accessToken) {
@@ -45,10 +47,9 @@ public class TokenRepositoryImpl extends TokenRepository {
 	@Override
 	public void deleteByUserId(String userId) {
 		Token token = findByUserId(userId);
-		if(token != null) {
+		if (token != null) {
 			delete(token);
 		}
-		
-		
-	}	
+
+	}
 }
