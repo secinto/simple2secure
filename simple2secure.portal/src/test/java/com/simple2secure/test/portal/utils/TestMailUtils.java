@@ -57,7 +57,7 @@ public class TestMailUtils {
 	 */
 	@Test
 	public void testSendEmailPositive() throws IOException {
-		User user = new User("jenkins@secinto.com", "test", true, null, true, true);
+		User user = new User("s2s.test@secinto.com", "test", true, null, true, true);
 		boolean result = mailUtils.sendEmail(user, "Sending Test Email from the test class", "Sending Test Email from the test class");
 		assertTrue(result);
 	}
@@ -99,7 +99,7 @@ public class TestMailUtils {
 
 	@Test
 	public void testSendHtmlEmailPositive() throws MessagingException {
-		User user = new User("emir.sahinovic@secinto.com", "test", true, null, false, false);
+		User user = new User("s2s.test@secinto.com", "test", true, null, false, false);
 		String email = "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">\r\n" + "  <tr>\r\n" + "      <td>\r\n"
 				+ "          <table cellspacing=\"0\" cellpadding=\"0\">\r\n" + "              <tr>\r\n"
 				+ "                  <td style=\"border-radius: 2px;\" bgcolor=\"#ED2939\">\r\n"

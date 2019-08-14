@@ -39,10 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-/**
- * @author <a href="stefan.kraxberger@secinto.com">Stefan Kraxberger</a>
- *
- */
 public class FileUtil {
 
 	static Logger log = LoggerFactory.getLogger(FileUtil.class);

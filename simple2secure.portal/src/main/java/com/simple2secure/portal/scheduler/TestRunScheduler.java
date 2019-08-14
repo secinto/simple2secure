@@ -111,15 +111,11 @@ public class TestRunScheduler {
 							notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled automatically using the portal",
 									group.getContextId());
 						}
-
 					}
 				}
 			}
-
 		} else {
-			log.error("There are no test cases which need to be scheduled");
+			log.info("There are no test cases which need to be scheduled");
 		}
-
 	}
-
 }

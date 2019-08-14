@@ -36,14 +36,13 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "simple2secure.info";
+	private String baseHost = "localhost";
 	private String basePort = "51001/s2s";
 	private String basePortWeb = "51003";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
 	private String configURL = "/config/config.json";
-	private String endpointsURL = "/config/endpoints.json";
 	private String processorsURL = "/config/processors.json";
 	private String queryURL = "/config/queries.json";
 	private String toolsURL = "/config/tools.json";
@@ -53,7 +52,6 @@ public class LoadedConfigItems {
 	private String licensePlanURL = "/config/licensePlan.json";
 
 	private String usersAPI = "/api/users";
-	private String endpointsAPI = "/api/endpoints";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
 	private String queryAPI = "/api/config/query";
@@ -148,10 +146,6 @@ public class LoadedConfigItems {
 		return getBaseURL() + configURL;
 	}
 
-	public String getEndpointsURL() {
-		return getBaseURL() + endpointsURL;
-	}
-
 	public String getProcessorsURL() {
 		return getBaseURL() + processorsURL;
 	}
@@ -178,10 +172,6 @@ public class LoadedConfigItems {
 
 	public String getUsersAPI() {
 		return getBaseURL() + usersAPI;
-	}
-
-	public String getEndpointsAPI() {
-		return getBaseURL() + endpointsAPI;
 	}
 
 	public String getLoginAPI() {

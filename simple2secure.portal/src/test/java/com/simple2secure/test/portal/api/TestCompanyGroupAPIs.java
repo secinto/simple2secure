@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	HttpHeaders headers = new HttpHeaders();
 
+	@Disabled
 	@Test
 	public void testCreateRootGroupPositive() {
 
@@ -91,6 +93,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertTrue(response.getBody().isRootGroup());
 	}
 
+	@Disabled
 	@Test
 	public void testCreateSubGroupPositive() {
 
@@ -116,6 +119,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertFalse(response.getBody().isRootGroup());
 	}
 
+	@Disabled
 	@Test
 	public void moveRootGroupWithAdminUserPositive() {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
@@ -169,6 +173,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertEquals(404, response.getStatusCodeValue());
 	}
 
+	@Disabled
 	@Test
 	public void moveSubGroupWithAdminIfDestGroupIsNull() throws ItemNotFoundRepositoryException {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
@@ -214,6 +219,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertNull(childGroup.getParentId());
 	}
 
+	@Disabled
 	@Test
 	public void moveRootGroupWithSuperUserPositive() {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
