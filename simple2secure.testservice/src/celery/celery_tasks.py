@@ -55,5 +55,13 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
 
         db.session.add(test_result)
         db.session.commit()
+        
+@celery.task(name='celery.schedule_test_for_sequence')
+def schedule_test_for_sequence(parameter, command):
+    with app.app_context():
+        results = {}
+        scan = scanner(json_utils.construct_command(json_utils.get_tool(
+            command), parameter), results, "sequence_result")
+        return results["sequence_result"]
 
 
