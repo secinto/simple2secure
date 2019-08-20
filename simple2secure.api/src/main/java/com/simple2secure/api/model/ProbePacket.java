@@ -44,7 +44,7 @@ public class ProbePacket extends GenericDBObject {
 	private TimeUnit analysisIntervalUnit;
 	private String packetAsHexStream;
 
-	private ProbePacket() {
+	protected ProbePacket() {
 	}
 
 	public ProbePacket(String groupId, String name, boolean always, int requestCount, long analysisInterval, TimeUnit analysisIntervalUnit,

@@ -40,7 +40,6 @@ public abstract class GenericDBObject implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	// @Column(name = "id", updatable = false, nullable = false)
 	public String id;
 
 	public void setId(String id) {

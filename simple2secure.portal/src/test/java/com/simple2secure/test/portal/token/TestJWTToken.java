@@ -23,6 +23,7 @@ package com.simple2secure.test.portal.token;
 
 import java.util.Date;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+@Disabled
 public class TestJWTToken {
 
 	private static Logger log = LoggerFactory.getLogger(TestJWTToken.class);

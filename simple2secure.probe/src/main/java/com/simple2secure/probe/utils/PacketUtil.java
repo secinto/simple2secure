@@ -22,6 +22,7 @@
 package com.simple2secure.probe.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +63,12 @@ public class PacketUtil {
 	 *
 	 * @param taskMap
 	 */
-	@SuppressWarnings("null")
 	public static List<ProbePacket> getChangedPackets(Map<String, ProbePacketQueueHandler> taskMap) {
-		List<ProbePacket> changedPacketList = null;
+		List<ProbePacket> changedPacketList = new ArrayList<>();
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 
 		for (ProbePacket probePacket : probePacketList) {
-			ProbePacketQueueHandler task = taskMap.get(probePacket.getId());
+			ProbePacketQueueHandler task = taskMap.get(probePacket.getName());
 			if (!(task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
 					&& task.getProbePacket().getAnalysisInterval() == probePacket.getAnalysisInterval()
 					&& task.getProbePacket().getAnalysisIntervalUnit().equals(probePacket.getAnalysisIntervalUnit())
