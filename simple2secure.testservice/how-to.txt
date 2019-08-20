@@ -1,9 +1,9 @@
 Building docker image simple2secure-testservice
-
-1) Navigate to the root folder "simple2secure.testservice"
-2) Open cmd and type "docker build -t flask-service-s2s:latest ."
+1) Download and install docker 
+2) Navigate to the root folder "simple2secure.testservice"
+3) Open shell and type "docker build -t flask-service-s2s:latest ."
 4) Delete the running container (if already exists ) using "docker rm containerId -f" ----> "docker container ls" will list all containers
-3) Run the app in docker using "docker run --name=s2s-test-service -d -p 5000:5000 flask-service-s2s"
+5) Run the app in docker using "docker run --name=s2s-test-service -d -p 5000:5000 flask-service-s2s"
 
 
 To save image to the custom location run:
@@ -14,6 +14,7 @@ To load saved image
 
 docker load -i flask-service-s2s.tar
 
+Some simple examples which can be used
 
 http://localhost:5000/services/run?test=test1&step=stp1%command=cmdstp1%executable=nmap
 
@@ -63,13 +64,13 @@ celery -A src.celery.celery_tasks.celery worker --loglevel=info
 
 Activating and running the pod from our server
 
-1) Visit our portal at https://144.76.93.104:51003 and register if you do not have an account
+1) Visit our portal at https://simple2secure.info:51003 and register if you do not have an account
 
-2) Activate an account and download license from the "My Groups" tab under the following link https://144.76.93.104:51003/#/user
+2) Activate an account and download license from the "My Groups" tab under the following link https://simple2secure.info:51003/#/user
 
 3) Copy this license file in the /static/license/ folder
 
-4) Check in config.py file if the parameter PORTAL_URL is set to the "https://144.76.96.104:51001/s2s/api"
+4) Check in config.py file if the parameter PORTAL_URL is set to the "https://simple2secure.info:51001/s2s/api"
 
 5) After that install all required libraries by executing pip install -r requirements.txt from the root folder of our testservice project
 
