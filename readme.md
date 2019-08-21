@@ -11,6 +11,10 @@ Prerequisites:
 
 or you can use our BETA portal https://simple2secure.info:51003/#/ (currently not available).
 
+If you have a virus scanner running on your machine it is required that you either postpone it or you make an exception for the portal (Java task).
+This is necessary in order to guarantee correct execution of the simple2secure.portal since it tries to send emails if required which can fail 
+depending on the virus scanner used. 
+
 ## simple2secure.portal
 1) Download and install MongoDB Community Edition
 2) Start mongodb by running "mongod" command from the shell
