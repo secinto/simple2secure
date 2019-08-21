@@ -60,6 +60,7 @@ project(':simple2secure.service') {
 		compile project(':simple2secure.commons')
 
 		compile group: 'commons-daemon', name: 'commons-daemon', version: '1.1.0'
+		compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 	}
 }
 

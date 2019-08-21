@@ -182,7 +182,7 @@ public class ProbeCLI {
 
 		} catch (ParseException e) {
 			String header = "Start monitoring your system using Probe\n\n";
-			String footer = "\nPlease report issues at http://simple2secure.com/issues";
+			String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ProbeCLI", header, options, footer, true);
 		}
