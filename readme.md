@@ -45,19 +45,25 @@ Download and install redis as windows service from:
 https://github.com/downloads/rgl/redis/redis-2.4.6-setup-64-bit.exe
 
 #### LINUX
-1) sudo apt-get update
-2) sudo apt-get upgrade
-3) sudo apt-get install redis-server
-4) sudo systemctl enable redis-server.service
-
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install redis-server
+sudo systemctl enable redis-server.service
+```
 ### Install all dependencies from requirements.txt
+```
 pip install -r requirements.txt
-
-## #Start python application
+```
+### Start python application
+```
 python app.py
+```
 
 ### Start celery worker from the console (Open console and type)
+```
 celery -A src.celery.celery_tasks.celery worker --loglevel=info
+```
 
 ## General info on the portal and the pod
 
