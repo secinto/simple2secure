@@ -13,7 +13,9 @@ It has several features such as:
 
 The probe can be executed using either a generated java library and providing the following start commands
 
+```
 java -jar ./build/libs/simple2secure.probe-1.0.0-RC.jar -l ./release/license.zip
+```
 
 or using Gradle
 
