@@ -18,13 +18,13 @@ or you can use our BETA portal https://simple2secure.info:51003/#/ (currently no
 3) Navigate to the simple2secure root folder and run "gradle eclipse"
 4) Open project in eclipse and you can run it directly from the eclipse IDE
 
-# simple2secure.web
+## simple2secure.web
 1) Download and install NodeJS (verified with 10.16.3 LTS) from https://nodejs.org/en/download/
 2) Run "npm install" from the simple2secure.web directory
 3) install Angular CLI by executing "npm install -g @angular/cli" from the command line
 4) After everything is installed successfully you can start the web by executing "start.bat" batch file from the simple2secure.web directory 
 
-# simple2secure.testservice (Pod)
+## simple2secure.testservice (Pod)
 
 For development it is easiest to use the Pod directly and not within a Docker container, since it is easier to modify things. 
 Therefore, some tools are required to be installed. The Pod uses Celery (Distributed Task Queue) for managing its different tasks
@@ -32,28 +32,28 @@ which itself requires a third part Message Queue provider such as RabbitMQ, Redi
 and depending on whether you are developing on Windows or Linux it must be installed for this system. Find below the installation 
 instructions for the different OS.
 
-## Installation of Redis 
+### Installation of Redis 
 
-### WINDOWS
+#### WINDOWS
 Download and install redis as windows service from:
 https://github.com/downloads/rgl/redis/redis-2.4.6-setup-64-bit.exe
 
-### LINUX
+#### LINUX
 1) sudo apt-get update
 2) sudo apt-get upgrade
 3) sudo apt-get install redis-server
 4) sudo systemctl enable redis-server.service
 
-## Install all dependencies from requirements.txt
+### Install all dependencies from requirements.txt
 pip install -r requirements.txt
 
-## Start python application
+## #Start python application
 python app.py
 
-## Start celery worker from the console (Open console and type)
+### Start celery worker from the console (Open console and type)
 celery -A src.celery.celery_tasks.celery worker --loglevel=info
 
-# General info on the portal and the pod
+## General info on the portal and the pod
 
 Here it is described how to activate and run the Pod using our server but it would be the same (except that you need to use localhost:9000 
 instead of simple2secure.info:51003).
