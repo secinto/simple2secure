@@ -1,34 +1,38 @@
 # simple2secure installation instructions
-You can use our official BETA portal on https://simple2secure.info:51003/#/ 
-
-or 
-
-you can make your own local build and host the portal, testservice, web and so on locally.
+You can make your own local build and host the portal, testservice, web and so on locally.
 
 Prerequisites:
 
-- Java 8, Gradle
+- Java 8, Gradle (min. 4.6)
 - Tested with Eclipse IDE (with Spring Suite, JavaFX Plugin)
 - MongoDB 
-- Python, Pip, NodeJS, Redis
+- Python (3.7), Pip, NodeJS (Latest LTS), Redis
 - In order that the tests can be run it is required that any Virus scanner is muted, since they usually block sending Emails directly
 
+or you can use our BETA portal https://simple2secure.info:51003/#/ (currently not available).
 
-### Installing simple2secure.portal ###
+## simple2secure.portal
 1) Download and install MongoDB Community Edition
 2) Start mongodb by running "mongod" command from the shell
 3) Download and install gradle from from https://gradle.org/releases/
 3) Navigate to the simple2secure root folder and run "gradle eclipse"
 4) Open project in eclipse and you can run it directly from the eclipse IDE
 
-
-### Installing simple2secure.web
+# simple2secure.web
 1) Download and install NodeJS (verified with 10.16.3 LTS) from https://nodejs.org/en/download/
 2) Run "npm install" from the simple2secure.web directory
 3) install Angular CLI by executing "npm install -g @angular/cli" from the command line
 4) After everything is installed successfully you can start the web by executing "start.bat" batch file from the simple2secure.web directory 
 
-Please make sure that Python, Pip and Redis are installed on your PC
+# simple2secure.testservice (Pod)
+
+For development it is easiest to use the Pod directly and not within a Docker container, since it is easier to modify things. 
+Therefore, some tools are required to be installed. The Pod uses Celery (Distributed Task Queue) for managing its different tasks
+which itself requires a third part Message Queue provider such as RabbitMQ, Redis or others. We have based your solution on Redis 
+and depending on whether you are developing on Windows or Linux it must be installed for this system. Find below the installation 
+instructions for the different OS.
+
+## Installation of Redis 
 
 ### WINDOWS
 Download and install redis as windows service from:
@@ -49,6 +53,10 @@ python app.py
 ## Start celery worker from the console (Open console and type)
 celery -A src.celery.celery_tasks.celery worker --loglevel=info
 
+# General info on the portal and the pod
+
+Here it is described how to activate and run the Pod using our server but it would be the same (except that you need to use localhost:9000 
+instead of simple2secure.info:51003).
 
 Activating and running the pod from our server (currently in maintenance mode - will be announced as soon as it has been updated to current release version)
 
