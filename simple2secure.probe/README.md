@@ -20,5 +20,6 @@ or using Gradle
 ```
 gradle run --args="-l ./release/license.zip"
 ```
-or can be run directly in Eclipse. It is also possible to install probe directly as windows service and run it directly from there. 
+or it can also be directly started from Eclipse using either the ProbeCLI or ProbeGUI class. 
+It is also possible to install probe directly as windows service and run it directly from there. 
 Therefore see the description in simple2secure.service on how to set up the service.
