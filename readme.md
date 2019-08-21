@@ -30,7 +30,7 @@ depending on the virus scanner used.
 3) install Angular CLI by executing "npm install -g @angular/cli" from the command line
 4) After everything is installed successfully you can start the web by executing "start.bat" batch file from the simple2secure.web directory 
 
-## simple2secure.testservice (Pod)
+## simple2secure.pod 
 
 For development it is easiest to use the Pod directly and not within a Docker container, since it is easier to modify things. 
 Therefore, some tools are required to be installed. The Pod uses Celery (Distributed Task Queue) for managing its different tasks
