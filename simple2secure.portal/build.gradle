@@ -6,7 +6,7 @@ plugins {
 	id 'war'
 }
 
-mainClassName = "com.secinto.portal.Simple2SecurePortal"
+mainClassName = "com.simple2secure.portal.Simple2SecurePortal"
 
 
 sonarqube {
@@ -16,7 +16,7 @@ sonarqube {
 
 jar {
 	baseName = 'simple2secure-portal'
-	version =  '0.1.0-SNAPSHOT'
+	version =  '1.0.0-RC'
 }
 
 dependencies {
