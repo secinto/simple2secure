@@ -1,8 +1,8 @@
 mail:
-  username: s2s.test@secinto.at
-  password: S2S.Test.Latinica.1
+  username: someone@email.com
+  password: somepass
   imap:
-    host: imap.ionos.de
+    host: 
     auth: true
     starttls.enable: true
     socketFactory:
@@ -11,8 +11,8 @@ mail:
   smtp:
     auth: true
     starttls.enable: true
-    host: smtp.ionos.de
-    ssl.trust: smtp.ionos.de
+    host: 
+    ssl.trust: 
     port: 587   
     socketFactory:
       class: javax.net.ssl.SSLSocketFactory

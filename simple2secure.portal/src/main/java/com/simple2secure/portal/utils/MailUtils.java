@@ -25,11 +25,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -57,8 +60,19 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 @Component
 public class MailUtils {
 
+	private static Logger log = LoggerFactory.getLogger(MailUtils.class);
+
 	@Value("${mail.username}")
 	private String mailUser;
+
+	@Value("${mail.password}")
+	private String mailPassword;
+
+	@Value("${mail.imap.host}")
+	private String mailIMAPHost;
+
+	@Value("${mail.smtp.host}")
+	private String mailSMTPHost;
 
 	@Autowired
 	EmailConfigurationRepository emailConfigRepository;
@@ -84,6 +98,18 @@ public class MailUtils {
 	@Autowired
 	RuleUtils ruleUtils;
 
+	private boolean initialized = false;
+
+	@PostConstruct
+	public void initialize() {
+		if (!Strings.isNullOrEmpty(mailUser) && !Strings.isNullOrEmpty(mailPassword) && !Strings.isNullOrEmpty(mailIMAPHost)
+				&& !Strings.isNullOrEmpty(mailSMTPHost)) {
+			initialized = true;
+		} else {
+			log.error("Mail configuration not provided. Can't send any emails from portal");
+		}
+	}
+
 	/**
 	 * Sends an email with the activation token or in case of the password reset to the user
 	 *
@@ -91,6 +117,11 @@ public class MailUtils {
 	 * @throws IOException
 	 */
 	public boolean sendEmail(User user, String emailContent, String subject) throws IOException {
+		if (!initialized) {
+			log.warn("Not sending any email since MailUtils are not initialized correctly");
+			return true;
+		}
+
 		if (user != null && !Strings.isNullOrEmpty(user.getEmail())) {
 			String to = user.getEmail();
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -114,6 +145,11 @@ public class MailUtils {
 	 * @throws MessagingException
 	 */
 	public boolean sendHTMLEmail(User user, String emailContent, String subject) throws MessagingException {
+		if (!initialized) {
+			log.warn("Not sending any email since MailUtils are not initialized correctly");
+			return true;
+		}
+
 		if (user != null && !Strings.isNullOrEmpty(emailContent) && !Strings.isNullOrEmpty(subject)) {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			message.setSubject(subject);
