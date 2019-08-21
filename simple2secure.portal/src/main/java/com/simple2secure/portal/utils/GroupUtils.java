@@ -45,7 +45,6 @@ import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -64,9 +63,6 @@ public class GroupUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	StepRepository stepRepository;
@@ -180,9 +176,6 @@ public class GroupUtils {
 
 			// Remove GroupAccessRights
 			groupAccessRightRepository.deleteByGroupId(groupId);
-
-			// Delete the group configurations
-			configRepository.deleteByGroupId(groupId);
 
 			deleteGroupFromChildren(groupId);
 		}

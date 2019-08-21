@@ -34,12 +34,9 @@ import org.pcap4j.core.Pcaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.commons.collections.ProcessingQueue;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.network.NetUtils;
-import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.exceptions.NetworkException;
 import com.simple2secure.probe.exceptions.ProbeException;
 import com.simple2secure.probe.utils.LocaleHolder;
@@ -82,11 +79,7 @@ public class NetworkMonitor {
 			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
 		}
 
-		Config configuration = ProbeConfiguration.getInstance().getConfig();
-
-		boolean show = configuration.isShow_interfaces();
-
-		getSingleInterface(show);
+		getSingleInterface(false);
 
 		if (singleInterface == null) {
 			throw new NetworkException(LocaleHolder.getMessage("no_usable_address"));
@@ -99,13 +92,8 @@ public class NetworkMonitor {
 			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
 			 * be developed
 			 */
-			if (!Strings.isNullOrEmpty(ProbeConfiguration.getInstance().getConfig().getBpfFilter())) {
-				try {
-					receiverHandle.setFilter(ProbeConfiguration.getInstance().getConfig().getBpfFilter(), BpfCompileMode.OPTIMIZE);
-				} catch (Exception e) {
-					log.error("Couldn't apply filter {} for reason {}", ProbeConfiguration.getInstance().getConfig().getBpfFilter(), e.getCause());
-				}
-			}
+			receiverHandle.setFilter("not (host 127.0.0.1 and port (8080 or 8443 or 9000))", BpfCompileMode.OPTIMIZE);
+
 			processingQueue = new ProcessingQueue<>();
 
 			receiver = new PacketReceiver(receiverHandle, processingQueue);

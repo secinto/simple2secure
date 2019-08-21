@@ -37,7 +37,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
@@ -49,7 +48,6 @@ import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
@@ -77,9 +75,6 @@ public class DataInitialization {
 
 	@Autowired
 	protected GroupRepository groupRepository;
-
-	@Autowired
-	protected ConfigRepository configRepository;
 
 	@Autowired
 	protected QueryRepository queryRepository;
@@ -134,24 +129,6 @@ public class DataInitialization {
 					addDefaultGroupProcessors(groupId.toString());
 					addDefaultGroupSteps(groupId.toString());
 				}
-			}
-		}
-	}
-
-	/**
-	 * This function adds default configuration for each group which is created
-	 *
-	 * @param probeId
-	 * @throws IOException
-	 */
-	public void addDefaultConfiguration() throws IOException {
-		List<Config> configDB = configRepository.findAll();
-		if (configDB == null || configDB.isEmpty()) {
-			File file = new File(getClass().getResource("/server/config.json").getFile());
-			String content = new String(Files.readAllBytes(file.toPath()));
-			Config config = gson.fromJson(content, Config.class);
-			if (config != null) {
-				configRepository.save(config);
 			}
 		}
 	}

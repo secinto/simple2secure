@@ -31,8 +31,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -72,45 +70,6 @@ public class JsonUtils {
 				reader.close();
 			}
 		}
-	}
-
-	/**
-	 * Reads the JSON config file provided as file name String and converts the content
-	 *
-	 * @param filename
-	 * @return
-	 */
-	public static Config readConfigFromFilename(String filename) {
-		File configFile = new File(filename);
-		if (configFile != null && configFile.exists() && configFile.isFile()) {
-			return readConfigFromFile(configFile);
-		} else {
-			log.error("Couldn't create File object from filename {}", filename);
-			return null;
-		}
-	}
-
-	/**
-	 * This file reads local configuration from the file
-	 *
-	 * @param file
-	 * @return
-	 */
-	public static Config readConfigFromFile(File file) {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			Config config = mapper.readValue(file, Config.class);
-			return config;
-		} catch (Exception e) {
-			log.error("Couldn't parse JSON to config object. Reason {}", e.getMessage());
-		}
-		return null;
-
-	}
-
-	public static Config readConfigFromString(String config) {
-		Config configObj = JSONUtils.fromString(config, Config.class);
-		return configObj;
 	}
 
 	/**

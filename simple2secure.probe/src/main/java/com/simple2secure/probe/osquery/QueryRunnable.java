@@ -80,11 +80,10 @@ public class QueryRunnable implements Runnable {
 		String result = "";
 		Process p;
 
-		File queryExec = new File(ProbeConfiguration.getInstance().getConfig().getQueries().getOsquerypath() + File.separator + "osqueryi.exe");
+		File queryExec = new File("src/main/resources/osquery/os_win7" + File.separator + "osqueryi.exe");
 		String myCommand = queryExec.getAbsolutePath();
 		String myArgs0 = "--json";
-		String myArgs1 = "--config-path=" + ProbeConfiguration.getInstance().getConfig().getQueries().getOsquerypath() + File.separator
-				+ "osquery.conf";
+		String myArgs1 = "--config-path=./src/main/resources/osquery/os_win7" + File.separator + "osquery.conf";
 		String myArgs2 = query;
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);

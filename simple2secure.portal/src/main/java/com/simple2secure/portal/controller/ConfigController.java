@@ -42,12 +42,10 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -62,9 +60,6 @@ import com.simple2secure.portal.utils.PortalUtils;
 @RestController
 @RequestMapping("/api/config")
 public class ConfigController {
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -99,45 +94,6 @@ public class ConfigController {
 	RestTemplate restTemplate = new RestTemplate();
 
 	static final Logger log = LoggerFactory.getLogger(ConfigController.class);
-
-	/**
-	 * This function updates configuration and automatically after each update the version will be incremented
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN')")
-	public ResponseEntity<Config> saveConfig(@RequestBody Config config, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (config != null) {
-			config.setVersion(config.getVersion() + 1);
-			configRepository.update(config);
-			return new ResponseEntity<>(config, HttpStatus.OK);
-		}
-		log.error("Error while inserting/updating the general configuration");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
-	 * this function returns config by config id
-	 *
-	 * @param id
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
-	public ResponseEntity<Config> getConfig(@RequestHeader("Accept-Language") String locale) {
-		List<Config> configs = configRepository.findAll();
-		if (configs == null || configs.size() != 1) {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
-					HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<>(configs.get(0), HttpStatus.OK);
-	}
 
 	/**
 	 * This function updates or saves new Query config into the database

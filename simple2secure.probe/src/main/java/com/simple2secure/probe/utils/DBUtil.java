@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.api.model.Processor;
@@ -36,7 +35,6 @@ import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.probe.dao.BaseDao;
-import com.simple2secure.probe.dao.impl.ConfigDaoImpl;
 import com.simple2secure.probe.dao.impl.LicenseDaoImpl;
 import com.simple2secure.probe.dao.impl.NetworkReportDaoImpl;
 import com.simple2secure.probe.dao.impl.ProbePacketDaoImpl;
@@ -53,7 +51,6 @@ public class DBUtil {
 
 	private static DBUtil instance;
 
-	private ConfigDaoImpl configDao;
 	private LicenseDaoImpl licenseDao;
 	private NetworkReportDaoImpl networkReportDao;
 	private ProcessorDaoImpl processorDao;
@@ -75,9 +72,6 @@ public class DBUtil {
 	}
 
 	private DBUtil(String persistenceUnitName) {
-		if (configDao == null) {
-			configDao = new ConfigDaoImpl(persistenceUnitName);
-		}
 
 		if (licenseDao == null) {
 			licenseDao = new LicenseDaoImpl(persistenceUnitName);
@@ -172,11 +166,8 @@ public class DBUtil {
 
 	@SuppressWarnings("rawtypes")
 	private BaseDao getDao(Object t) {
-		if (t instanceof Config || t == Config.class) {
-			return configDao;
-		}
 
-		else if (t instanceof CompanyLicensePublic || t == CompanyLicensePublic.class) {
+		if (t instanceof CompanyLicensePublic || t == CompanyLicensePublic.class) {
 			return licenseDao;
 		}
 

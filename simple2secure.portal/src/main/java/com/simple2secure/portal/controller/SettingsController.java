@@ -43,7 +43,6 @@ import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TestMacroRepository;
@@ -60,9 +59,6 @@ public class SettingsController {
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	TestMacroRepository testMacroRepository;

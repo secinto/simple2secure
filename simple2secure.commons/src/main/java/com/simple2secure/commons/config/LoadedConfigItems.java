@@ -37,8 +37,8 @@ public class LoadedConfigItems {
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
 	private String baseHost = "localhost";
-	private String basePort = "51001/s2s";
-	private String basePortWeb = "51003";
+	private String basePort = "8443";
+	private String basePortWeb = "9000";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";

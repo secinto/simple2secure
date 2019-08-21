@@ -66,6 +66,9 @@ public class Simple2SecureTrustManager implements X509TrustManager {
 		} catch (CertificateException excep) {
 			for (X509Certificate cert : chain) {
 				log.debug("Client Certificate Chain {}", cert.getSubjectX500Principal().toString());
+				log.debug("Client Certificate Serial Number {}", cert.getSerialNumber().toString());
+				log.debug("Client Certificate Issuer DN {}", cert.getIssuerX500Principal());
+				log.debug("Client Certificate Subject DN {}", cert.getSubjectX500Principal());
 				if (stringContainsItemFromList(cert.getSerialNumber().toString(), acceptedSerialNumbers)) {
 					if (!trustedIssuers.contains(cert)) {
 						trustedIssuers.add(cert);

@@ -37,7 +37,6 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
@@ -62,9 +61,6 @@ public class ContextUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	StepRepository stepRepository;
