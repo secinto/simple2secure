@@ -13,7 +13,6 @@ import {ContextDTO} from '../_models';
 
 @Component({
 	moduleId: module.id,
-	styleUrls: ['rule.component.css'],
 	templateUrl: 'ruleOverview.component.html',
 	selector: 'ruleOverview'
 })
@@ -64,7 +63,6 @@ export class RuleOverviewComponent {
 
 
 	private loadRules() {
-		console.log(this.context.context.id);
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'rule/' + this.context.context.id)
 			.subscribe(
@@ -100,12 +98,12 @@ export class RuleOverviewComponent {
 	public onDeleteClick() {
 		this.onDeleteDialog(this.selectedRule);
 	}
-
+/*
 	public editRule(rule: Rule) {
 		this.dataService.set(rule);
 		this.router.navigate(['../edit'], {relativeTo: this.route, queryParams: {action: 'edit'}});
 	}
-
+*/
 	private openDialogAddRule(){
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
@@ -134,12 +132,12 @@ export class RuleOverviewComponent {
 	}
 
 
-	private onEditClick() {
+	private editRule(rule: Rule) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
 		dialogConfig.data = {
-			rule: this.selectedRule,
+			rule: rule,
 		};
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 

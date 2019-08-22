@@ -18,3 +18,18 @@
 .element-row.expanded {
     border-bottom-color: transparent;
 }
+
+.ace_editor, .ace_editor * {
+    min-height: 300px;
+    font-family:Courier,monospace !important;
+    width: 100%;
+    overflow: auto;
+}
+
+.ace_text-input {
+    font-family: monospace !important;
+}
+
+
+
+

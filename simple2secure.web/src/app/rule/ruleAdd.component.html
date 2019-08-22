@@ -1,51 +1,63 @@
 <h3 mat-dialog-title>{{ 'button.addRule' | translate }}</h3>
-<div mat-dialog-content>
-    <form #ruleForm="ngForm" >
 
-        <table class="full_width_input" cellspacing="0">
-            <tr>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="text" placeholder="{{ 'table.name' | translate }}"
-                               [(ngModel)]="rule.name"
-                               name="name" autocomplete='given-name' required>
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
+<mat-button-toggle-group [value]="toggle" (change)="toggleView($event)">
+    <mat-button-toggle [value]= "template" aria-label="Text align left">
+        template
+    </mat-button-toggle>
+    <mat-button-toggle [value]="expert" aria-label="Text align center">
+        expert
+    </mat-button-toggle>
+</mat-button-toggle-group>
 
-        <table class="full_width_input" cellspacing="0">
-            <tr>
-                <td>
-                    <mat-form-field class="full_width_input">
-                        <input matInput type="text" placeholder="{{ 'table.description' | translate }}"
-                               [(ngModel)]="rule.description" name="description" autocomplete='family-name' required>
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
-    </form>
+<table class="full_width_input" cellspacing="0">
+    <tr>
+        <td>
+            <mat-form-field class="full_width_input">
+                <input matInput type="text" placeholder="{{ 'table.name' | translate }}"
+                       [(ngModel)]="rule.name"
+                       name="name" autocomplete='given-name' required>
+            </mat-form-field>
+        </td>
+    </tr>
+</table>
+<table class="full_width_input" cellspacing="0">
+    <tr>
+        <td>
+            <mat-form-field class="full_width_input">
+                <input matInput type="text" placeholder="{{ 'table.description' | translate }}"
+                       [(ngModel)]="rule.description" name="description" autocomplete='family-name' required>
+            </mat-form-field>
+        </td>
+    </tr>
+</table>
+
+<div *ngIf="toggle == 'template'">
+
+    templatemode: not implemented yet...
+
+
 </div>
 
+<div *ngIf="toggle == 'expert'">
 
-<div ace-editor
-     [(text)]="rule.groovyCode"
-     [mode]="'groovy'"
-[theme]="'eclipse'"
-[options]="options"
-[readOnly]="false"
-[autoUpdateContent]="true"
-style="min-height: 200px; width:100%; overflow: auto;">
+    <div #ace_editor  ace-editor
+         [(text)]="rule.groovyCode"
+         [mode]="'groovy'"
+         [theme]="'eclipse'"
+         [readOnly]="false"
+         [autoUpdateContent]="true">
+    </div>
 </div>
-
 
 <div mat-dialog-actions>
-    <button mat-button [disabled]="!ruleForm.dirty" mat-raised-button class="mat-green-button" color="primary"
-            (click)="saveRule()">{{ 'button.save' | translate }}
-    </button>
-    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rule"
-            cdkFocusInitial>{{ 'button.cancel' | translate }}
-    </button>
+    <form #ruleForm="ngForm" >
+        <button mat-button [disabled]="!ruleForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+                (click)="saveRule()">{{ 'button.save' | translate }}
+        </button>
+        <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rule"
+                cdkFocusInitial>{{ 'button.cancel' | translate }}
+        </button>
+    </form>
 </div>
 
 

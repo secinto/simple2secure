@@ -43,8 +43,8 @@ export class EmailOverviewComponent {
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
-		console.log(this.context.context.id);
 		this.loadAllConfigurations();
+
 	}
 
 	ngAfterViewInit() {

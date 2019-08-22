@@ -365,5 +365,6 @@
   "test.executionType": "Type",
   "menu.addRule": "Add rule",
   "rule.name": "Rule name",
-  "table.groovycode": "Groovy rule class"
+  "table.groovycode": "Groovy rule class",
+  "table.params": "params"
 }

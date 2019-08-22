@@ -30,9 +30,28 @@ import {BootstrapModalModule} from 'ngx-modialog/plugins/bootstrap';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
-	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
-	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule, MatBadgeModule
+    MatButtonModule,
+    MatCheckboxModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatMenuModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatButtonToggleModule,
+    MatTableModule,
+    MatTabsModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    MatNativeDateModule,
+    MatDatepickerModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatBadgeModule,
+    MatRadioModule
 } from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -98,66 +117,67 @@ export const httpInterceptorProviders = [
 ];
 
 @NgModule({
-	imports: [
-		BrowserModule,
-		BrowserAnimationsModule,
-		Angular2FontawesomeModule,
-		FormsModule,
-		ReactiveFormsModule,
-		DataTableModule,
-		routing,
-		FileUploadModule,
-		TabsModule,
-		ModalModule.forRoot(),
-		BootstrapModalModule,
-		NgbModule.forRoot(),
-		Nl2BrPipeModule,
-		NgxJsonViewerModule,
-		MatButtonModule,
-		MatCheckboxModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatOptionModule,
-		MatSelectModule,
-		MatMenuModule,
-		MatIconModule,
-		MatBadgeModule,
-		MatSidenavModule,
-		MatButtonToggleModule,
-		MatTableModule,
-		MatTabsModule,
-		MatPaginatorModule,
-		MatSortModule,
-		MatProgressSpinnerModule,
-		MatDialogModule,
-		MatDatepickerModule,
-		MatNativeDateModule,
-		MatCardModule,
-		MatExpansionModule,
-		HttpClientModule,
-		ChartModule,
-		TreeTableModule,
-		NgxSpinnerModule,
-		Ng2GoogleChartsModule,
-		TreeviewModule.forRoot(),
-		TreeModule.forRoot(),
-		NgxJsonViewModule,
-		TranslateModule.forRoot({
-			loader: {
-				provide: TranslateLoader,
-				useFactory: HttpLoaderFactory,
-				deps: [HttpClient]
-			}
-		}),
-		AgmCoreModule.forRoot({
-			// please get your own API key here:
-			// https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
-			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
-		}),
-		AgmDirectionModule,
-		AceEditorModule
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        Angular2FontawesomeModule,
+        FormsModule,
+        ReactiveFormsModule,
+        DataTableModule,
+        routing,
+        FileUploadModule,
+        TabsModule,
+        ModalModule.forRoot(),
+        BootstrapModalModule,
+        NgbModule.forRoot(),
+        Nl2BrPipeModule,
+        NgxJsonViewerModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatIconModule,
+        MatBadgeModule,
+        MatSidenavModule,
+        MatButtonToggleModule,
+        MatTableModule,
+        MatTabsModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatProgressSpinnerModule,
+        MatDialogModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatCardModule,
+        MatExpansionModule,
+        HttpClientModule,
+        ChartModule,
+        TreeTableModule,
+        NgxSpinnerModule,
+        Ng2GoogleChartsModule,
+        TreeviewModule.forRoot(),
+        TreeModule.forRoot(),
+        NgxJsonViewModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        AgmCoreModule.forRoot({
+            // please get your own API key here:
+            // https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
+            apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
+        }),
+        AgmDirectionModule,
+        AceEditorModule,
+        MatRadioModule
 
-	],
+    ],
 	declarations: [
 		AppComponent,
 		AlertComponent,
