@@ -1,0 +1,1 @@
+java -jar ./libs/simple2secure.service.jar -a delete

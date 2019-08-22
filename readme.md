@@ -12,17 +12,19 @@ Prerequisites:
 or you can use our BETA portal https://simple2secure.info:51003/#/ (currently not available).
 
 ### General remark:
-
 If you have a virus scanner running on your machine it is required that you either postpone it or you make an exception for the portal (Java task).
 This is necessary in order to guarantee correct execution of the simple2secure.portal since it tries to send emails if required which can fail 
 depending on the virus scanner used. 
 
 ## simple2secure.portal
 1) Download and install MongoDB Community Edition
-2) Start mongodb by running "mongod" command from the shell
-3) Download and install gradle from from https://gradle.org/releases/
-3) Navigate to the simple2secure root folder and run "gradle eclipse"
-4) Open project in eclipse and you can run it directly from the eclipse IDE
+2) Download and install gradle from from https://gradle.org/releases/
+3) Set environment varibale for gradle
+		3.1) set GRADLE_HOME={path_of_the_extracted_directory}
+		3.2) set PATH=%GRADLE_HOME%\bin;%PATH%
+
+4) Navigate to the simple2secure root folder and run "gradle eclipse"
+5) Open project in eclipse and you can run it directly from the eclipse IDE
 
 ## simple2secure.web
 1) Download and install NodeJS (verified with 10.16.3 LTS) from https://nodejs.org/en/download/
@@ -30,8 +32,10 @@ depending on the virus scanner used.
 3) install Angular CLI by executing "npm install -g @angular/cli" from the command line
 4) After everything is installed successfully you can start the web by executing "start.bat" batch file from the simple2secure.web directory 
 
-## simple2secure.pod 
+## simple2secure.probe
+1) Download and install Npcap from https://nmap.org/npcap/ (preferred) or WinPcap from http://www.win10pcap.org/download/ 
 
+## simple2secure.pod 
 For development it is easiest to use the Pod directly and not within a Docker container, since it is easier to modify things. 
 Therefore, some tools are required to be installed. The Pod uses Celery (Distributed Task Queue) for managing its different tasks
 which itself requires a third part Message Queue provider such as RabbitMQ, Redis or others. We have based your solution on Redis 
