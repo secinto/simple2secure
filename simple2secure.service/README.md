@@ -11,7 +11,7 @@ from the portal and restarts the probe thereafter.
 Currently no specific convenience method is provided to install the service but it can be done using the TestServiceInstallation test
 class. It requires a probe and service library in the release/libs folder. The libraries must be named simple2secure.service.jar 
 and simple2secure.probe.jar. 
- 
+
 The service can be executed using either a generated java library and providing the following start commands. The release
 
 ```
@@ -24,4 +24,7 @@ or using Gradle
 gradle run --args="-a install"
 ```
  
- The probe and the service are configured to use the release folder for storing all relevant data, the DB and the log files.
+The probe and the service are configured to use the release folder for storing all relevant data, the DB and the log files.
+
+In the release folder there are 4 Batch files for installService, startService, stopService and deleteService which can be 
+used as shortcut.

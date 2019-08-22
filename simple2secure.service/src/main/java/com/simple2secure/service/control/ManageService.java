@@ -69,14 +69,14 @@ public class ManageService {
 					stopServiceClassName, stopMethod);
 		} else if (action.equalsIgnoreCase("start")) {
 			log.info("Starting service {}", serviceName);
-			ServiceUtils.startService(serviceName);
+			ServiceUtils.startService(true, libraryPath, serviceName);
 		} else if (action.equalsIgnoreCase("stop")) {
 			log.info("Stopping service {}", serviceName);
-			ServiceUtils.stopService(serviceName);
+			ServiceUtils.stopService(true, libraryPath, serviceName);
 		} else if (action.equalsIgnoreCase("delete")) {
 			log.info("Stopping and removing service {}", serviceName);
-			ServiceUtils.stopService(serviceName);
-			ServiceUtils.deleteService(serviceName);
+			ServiceUtils.stopService(true, libraryPath, serviceName);
+			ServiceUtils.deleteService(true, libraryPath, serviceName);
 		} else {
 			log.info("Provided action is not recognized {}", action);
 		}

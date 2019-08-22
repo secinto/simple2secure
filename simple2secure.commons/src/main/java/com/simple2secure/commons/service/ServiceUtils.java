@@ -410,6 +410,25 @@ public class ServiceUtils {
 	}
 
 	/**
+	 * Starts the provided service from the Windows services.
+	 *
+	 * @param serviceName
+	 *          The service name to started.
+	 * @return
+	 */
+	public static ProcessContainer startService(boolean useOwnPrunSrv, String installPath, String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //ES//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(useOwnPrunSrv, installPath, serviceName);
+
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Stops the provided service from the Windows services.
 	 *
 	 * @param serviceName
@@ -429,6 +448,25 @@ public class ServiceUtils {
 	}
 
 	/**
+	 * Stops the provided service from the Windows services.
+	 *
+	 * @param serviceName
+	 *          The service name to be stopped
+	 * @return
+	 */
+	public static ProcessContainer stopService(boolean useOwnPrunSrv, String installPath, String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //SS//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(useOwnPrunSrv, installPath, serviceName);
+
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Deletes the provided service from the Windows services.
 	 *
 	 * @param serviceName
@@ -440,6 +478,25 @@ public class ServiceUtils {
 		if (isWindows) {
 			serviceString.append("%PR_INSTALL% //DS//%SERVICE_NAME%");
 			Map<String, String> environment = createServiceEnvironment(serviceName);
+
+			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Deletes the provided service from the Windows services.
+	 *
+	 * @param serviceName
+	 *          The service to be deleted.
+	 * @return
+	 */
+	public static ProcessContainer deleteService(boolean useOwnPrunSrv, String installPath, String serviceName) {
+		StringBuilder serviceString = new StringBuilder();
+		if (isWindows) {
+			serviceString.append("%PR_INSTALL% //DS//%SERVICE_NAME%");
+			Map<String, String> environment = createServiceEnvironment(useOwnPrunSrv, installPath, serviceName);
 
 			return ProcessUtils.manageServiceWindows(serviceString.toString(), false, environment);
 		} else {
