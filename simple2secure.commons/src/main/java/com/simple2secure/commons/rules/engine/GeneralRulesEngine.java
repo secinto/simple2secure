@@ -20,46 +20,29 @@
  *********************************************************************
 */
 
-package com.simple2secure.portal.rules;
+package com.simple2secure.commons.rules.engine;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+/**
+ * @author Richard Heinz
+ *
+ */
 
-import com.simple2secure.api.model.Email;
-import com.simple2secure.api.model.Rule;
-import com.simple2secure.api.model.TemplateRule;
-import com.simple2secure.portal.utils.RuleUtils;
+public interface GeneralRulesEngine 
+{
+	public void addRuleFromSource(String source) 
+			throws IOException, InstantiationException, IllegalAccessException;
+	
+	public void addRule(Object rule);
 
-@Service
-public class EmailRulesEngine extends PortalRulesEngine {
 	
-	@Autowired
-	private RuleUtils ruleUtils;
+	public void removeRule(String ruleName);
 	
-	private static Logger log = LoggerFactory.getLogger(EmailRulesEngine.class);
+	public void addFact(Object fact);
 	
-	public void checkMail(Email email, String contextId)
-	{   
-		addFact(email);
-		List<Rule> rules = ruleUtils.getRulesByContextId(contextId);
-		
-		rules.forEach(rule -> {
-			try {
-				addRuleFromSourceWithBean(rule.getGroovyCode());
-			} catch (Exception e) {
-				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());
-				// e.printStackTrace();
-			}
-		});
-		
-		checkFacts();
-		
-		removeFact(email.getClass().getName());
-		rules_.clear();
-	}
+	public void removeFact(String classname);
+	
+	public void checkFacts();
 }

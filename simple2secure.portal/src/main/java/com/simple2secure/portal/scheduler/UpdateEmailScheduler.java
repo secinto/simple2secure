@@ -121,10 +121,7 @@ public class UpdateEmailScheduler {
 								}
 								
 								emailRulesEngine.checkMail(email, emailConfig.getContextId());
-								
-								
-								// emailsRuleChecker(email, emailConfig);
-								
+
 								emailRepository.save(email);
 							} catch (Exception e) {
 								log.error("Problem occured {}", e.getMessage());
