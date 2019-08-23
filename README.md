@@ -9,7 +9,8 @@ Prerequisites:
 - Python (3.7), Pip, NodeJS (Latest LTS), Redis
 - In order that the tests can be run it is required that any Virus scanner is muted, since they usually block sending Emails directly
 
-or you can use our BETA portal https://simple2secure.info:51003/#/ (currently not available).
+or you can use our BETA portal https://simple2secure.info:51003/#/ currently only tested (and working) with Google Chrome.
+In order to be able to get the site served you need to make an exception because currently only a self-signed certificate is used.
 
 ### General remark:
 If you have a virus scanner running on your machine it is required that you either postpone it or you make an exception for the portal (Java task).
