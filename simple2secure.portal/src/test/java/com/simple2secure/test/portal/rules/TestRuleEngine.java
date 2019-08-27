@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jeasy.rules.api.Condition;
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rule;
 import org.jeasy.rules.core.RuleBuilder;
 import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailAttribute;
 import com.simple2secure.api.model.EmailAttributeEnum;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.rules.annotations.Condition;
 import com.simple2secure.commons.rules.annotations.ConditionParam;
 import com.simple2secure.commons.rules.annotations.ConditionParamArray;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngine;
@@ -216,6 +218,7 @@ public class TestRuleEngine {
 	    {
 			f.setAccessible(true);
 	    	System.out.println(f);
+	    
 
 		    
 		    if(f.getAnnotation(ConditionParamArray.class) instanceof ConditionParamArray)
@@ -259,26 +262,74 @@ public class TestRuleEngine {
 	@Test
 	public void testLoadingClassesFromPackage()
 	{
-		TemplateActionSendNotification temp = new TemplateActionSendNotification("asdf");
-		ClassLoader loader = temp.getClass().getClassLoader();
+		System.out.println("======================================================");
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 	    ClassPath path;
+	    
+	    JSONArray conditionsInfoArray = new JSONArray();
+	    
 		try {
+			
+			
 			path = ClassPath.from(loader);
-			for (ClassPath.ClassInfo info : path.getTopLevelClassesRecursive("com.simple2secure.test.portal.rules")) {
-		        try {
-					Class clazz = Class.forName(info.getName(), true, loader);
+			for (ClassPath.ClassInfo info : path.getTopLevelClassesRecursive("com.simple2secure.portal.rules")) {
+				Class clazz = Class.forName(info.getName(), true, loader);
+				Condition condition = (Condition) clazz.getAnnotation(Condition.class);
+				JSONObject conditionsInfo = new JSONObject();
+
+			    if(condition != null)
+			    {
+			    	conditionsInfo.put("condition name", condition.name());
+			    	conditionsInfo.put("condition_description_de", condition.description_de());
+			    	conditionsInfo.put("condition_description_en", condition.description_en());
 					System.out.println(clazz.getName());
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		        //dowhatever
+			    	System.out.println(condition.name());
+			    	
+			    	Field fs[] = clazz.getDeclaredFields();
+			    	int paramArrayCount = 0;
+			    	int paramCount = 0;
+					for (Field f : fs) 
+				    {
+						JSONObject conditionInfoParam = new JSONObject();
+				    
+						f.setAccessible(true);
+
+					    if(f.getAnnotation(ConditionParamArray.class) != null)
+					    {
+					    	ConditionParamArray annotationParamArray = (ConditionParamArray) f.getAnnotation(ConditionParamArray.class);
+					    	
+					    	System.out.println(annotationParamArray.name());
+					    	conditionInfoParam.put("param_name", annotationParamArray.name());
+					    	conditionInfoParam.put("description_de", annotationParamArray.description_de());
+					    	conditionInfoParam.put("description_en", annotationParamArray.description_en());
+					    	conditionInfoParam.put("type", annotationParamArray.type());
+					    	conditionsInfo.put("param_array_" + (paramArrayCount++) , conditionInfoParam);
+					    }
+					    
+					    if(f.getAnnotation(ConditionParam.class) != null)
+					    {
+					    	ConditionParam annotationParam = (ConditionParam) f.getAnnotation(ConditionParam.class);
+					    	
+					    	System.out.println(annotationParam.name());
+					    	conditionInfoParam.put("param_name", annotationParam.name());
+					    	conditionInfoParam.put("description_de", annotationParam.description_de());
+					    	conditionInfoParam.put("description_en", annotationParam.description_en());
+					    	conditionInfoParam.put("type", annotationParam.type());
+					    	conditionsInfo.put("param_" + (paramCount++) , conditionInfoParam);
+					    }
+					    
+				    }
+					conditionsInfoArray.put(conditionsInfo);
+			    }
+			    
 		    }
-		} catch (IOException e1) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		System.out.println(conditionsInfoArray.toString());
 	}
+	
 }
 
 
