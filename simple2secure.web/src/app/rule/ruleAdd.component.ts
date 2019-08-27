@@ -27,6 +27,7 @@ export class RuleAddComponent {
 	toggle = 'template';
 	expert = 'expert';
 	template = 'template';
+	jsonString: String;
 
     @ViewChild('ace_editor') editor: ElementRef;
 
@@ -54,6 +55,8 @@ export class RuleAddComponent {
 		else {
 			this.isNewRuleAdded = true;
 		}*/
+
+		this.getTemplates();
 	}
 
     ngAfterViewInit() {
@@ -101,6 +104,26 @@ export class RuleAddComponent {
 			"}");
 */
     }
+
+    getTemplates()
+	{
+		this.httpService.get(environment.apiEndpoint + 'rule/rule_templates')
+			.subscribe(
+				data => {
+					// TODO: handle the response
+					console.log(this.jsonString);
+					this.alertService.success(this.translate.instant("Sever connection for loading templates worked")); // TODO: change hardcodedtext
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+	}
 
 	saveRule() {
 

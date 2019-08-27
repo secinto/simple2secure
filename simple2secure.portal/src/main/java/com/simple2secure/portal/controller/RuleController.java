@@ -82,6 +82,18 @@ public class RuleController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+	
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/rule_templates", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<String[]> getRulesTemplates(
+	String rule_templates,@RequestHeader("Accept-Language") String locale) { 
+		String[] jsonString = {"test: jsonString"};
+
+		return new ResponseEntity<String[]>(jsonString, HttpStatus.OK);
+	}
+	
 	//"/delete/{ruleId}"
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{ruleId}", method = RequestMethod.DELETE)

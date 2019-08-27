@@ -48,10 +48,10 @@
          [autoUpdateContent]="true">
     </div>
 </div>
-
+<!-- [disabled]="!ruleForm.dirty" -->
 <div mat-dialog-actions>
     <form #ruleForm="ngForm" >
-        <button mat-button [disabled]="!ruleForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+        <button mat-button mat-raised-button class="mat-green-button" color="primary"
                 (click)="saveRule()">{{ 'button.save' | translate }}
         </button>
         <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rule"
