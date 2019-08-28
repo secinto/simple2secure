@@ -52,7 +52,7 @@ public class TemplateCondition {
 		this.params = params;
 	}
 
-	public Collection<ConditionParamArray<?>> getParamArray() {
+	public Collection<ConditionParamArray<?>> getParamArrays() {
 		return paramArrays;
 	}
 

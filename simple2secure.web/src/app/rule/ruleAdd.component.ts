@@ -11,6 +11,7 @@ import 'brace';
 import 'ace-builds/src-noconflict/mode-groovy';
 import {AceEditorComponent} from 'ng2-ace-editor';
 import {MatButtonToggleChange} from '@angular/material/typings/button-toggle';
+import {TemplateCondition} from '../_models/templateCondition';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class RuleAddComponent {
 	expert = 'expert';
 	template = 'template';
 	jsonString: String;
+	conditions: TemplateCondition[];
 
     @ViewChild('ace_editor') editor: ElementRef;
 
@@ -110,9 +112,35 @@ export class RuleAddComponent {
 		this.httpService.get(environment.apiEndpoint + 'rule/rule_templates')
 			.subscribe(
 				data => {
-					// TODO: handle the response
-					console.log("inside data");
-					console.log(data);
+					this.conditions = data;
+
+					if(this.conditions == null)
+					    return;
+
+					this.conditions.forEach(function (condition){
+						console.log("Condition:");
+						console.log(condition.name);
+						console.log(condition.description_de);
+						console.log(condition.description_en);
+
+						condition.params.forEach(function (param) {
+							console.log("---> param:");
+							console.log(param.name);
+							console.log(param.description_de);
+							console.log(param.description_en);
+							console.log(param.type);
+							console.log(param.value);
+						});
+
+						condition.paramArrays.forEach(function (paramArray) {
+							console.log("---> paramArray:");
+							console.log(paramArray.name);
+							console.log(paramArray.description_de);
+							console.log(paramArray.description_en);
+							console.log(paramArray.type);
+							console.log(paramArray.values);
+						});
+					});
 					this.alertService.success(this.translate.instant("Sever connection for loading templates worked")); // TODO: change hardcodedtext
 				},
 				error => {
