@@ -8,6 +8,8 @@
 
 package com.simple2secure.portal.controller;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import com.simple2secure.api.model.Rule;
+import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.rules.TemplateRuleBuilder;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.RuleUtils;
 
@@ -87,11 +92,20 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/rule_templates", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<String[]> getRulesTemplates(
+	public ResponseEntity<Collection<TemplateCondition>> getRulesTemplates(
 	String rule_templates,@RequestHeader("Accept-Language") String locale) { 
-		String[] jsonString = {"test: jsonString"};
+		Collection<TemplateCondition> conditions;
+		try {
+			conditions = TemplateRuleBuilder.loadTemplatesConditions("com.simple2secure.portal.rules");
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"),
+					HttpStatus.FAILED_DEPENDENCY);
+		}
 
-		return new ResponseEntity<String[]>(jsonString, HttpStatus.OK);
+		//String[] strings = {new Gson().toJson(conditions)};
+		return new ResponseEntity<Collection<TemplateCondition>>(conditions, HttpStatus.OK);
+		//return new ResponseEntity<String[]>(strings, HttpStatus.OK);
 	}
 	
 	//"/delete/{ruleId}"

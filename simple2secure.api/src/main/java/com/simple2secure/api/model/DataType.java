@@ -20,22 +20,8 @@
  *********************************************************************
 */
 
-package com.simple2secure.commons.rules.annotations;
+package com.simple2secure.api.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import com.simple2secure.commons.rules.enums.DataType;
-
-import java.lang.annotation.RetentionPolicy;
-
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ConditionParam {
-	
-	String name();
-	String description_de();
-	String description_en();
-	DataType type();
+public enum DataType {
+	_int, _double, _String;
 }

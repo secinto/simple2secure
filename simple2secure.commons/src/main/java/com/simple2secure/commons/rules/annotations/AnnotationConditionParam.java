@@ -26,15 +26,16 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.simple2secure.commons.rules.enums.DataType;
+import com.simple2secure.api.model.DataType;
 
 import java.lang.annotation.RetentionPolicy;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ConditionParamArray {
+public @interface AnnotationConditionParam {
+	
 	String name();
-	String description_en();
 	String description_de();
+	String description_en();
 	DataType type();
 }

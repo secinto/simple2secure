@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Condition 
+public @interface AnnotationCondition 
 {
 	String name();
 	String description_de();

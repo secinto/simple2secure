@@ -1,6 +1,7 @@
 package com.simple2secure.test.portal.rules;
 
 
+import java.awt.List;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,10 +26,14 @@ import com.google.gson.Gson;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailAttribute;
 import com.simple2secure.api.model.EmailAttributeEnum;
+import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
-import com.simple2secure.commons.rules.annotations.Condition;
-import com.simple2secure.commons.rules.annotations.ConditionParam;
-import com.simple2secure.commons.rules.annotations.ConditionParamArray;
+import com.simple2secure.api.model.ConditionParam;
+import com.simple2secure.api.model.ConditionParamArray;
+import com.simple2secure.api.model.DataType;
+import com.simple2secure.commons.rules.annotations.AnnotationCondition;
+import com.simple2secure.commons.rules.annotations.AnnotationConditionParam;
+import com.simple2secure.commons.rules.annotations.AnnotationConditionParamArray;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngine;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
 import com.simple2secure.portal.Simple2SecurePortal;
@@ -221,9 +226,9 @@ public class TestRuleEngine {
 	    
 
 		    
-		    if(f.getAnnotation(ConditionParamArray.class) instanceof ConditionParamArray)
+		    if(f.getAnnotation(AnnotationConditionParamArray.class) instanceof AnnotationConditionParamArray)
 		    {
-		    	ConditionParamArray paramArray = (ConditionParamArray) f.getAnnotation(ConditionParamArray.class);
+		    	AnnotationConditionParamArray paramArray = (AnnotationConditionParamArray) f.getAnnotation(AnnotationConditionParamArray.class);
 		    	
 		    	System.out.println(paramArray.description_de());
 		    	
@@ -236,9 +241,9 @@ public class TestRuleEngine {
 				}
 		    }
 		    
-		    if(f.getAnnotation(ConditionParam.class) instanceof ConditionParam)
+		    if(f.getAnnotation(AnnotationConditionParam.class) instanceof AnnotationConditionParam)
 		    {
-		    	ConditionParam param = (ConditionParam) f.getAnnotation(ConditionParam.class);
+		    	AnnotationConditionParam param = (AnnotationConditionParam) f.getAnnotation(AnnotationConditionParam.class);
 		    	
 		    	System.out.println(param.description_de());
 		    	System.out.println(param.name());
@@ -266,17 +271,117 @@ public class TestRuleEngine {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 	    ClassPath path;
 	    
-	    JSONArray conditionsInfoArray = new JSONArray();
+	    //JSONArray conditionsInfoArray = new JSONArray();
 	    
 		try {
 			
+			Collection<TemplateCondition> conditions = new ArrayList<TemplateCondition>();
 			
 			path = ClassPath.from(loader);
 			for (ClassPath.ClassInfo info : path.getTopLevelClassesRecursive("com.simple2secure.portal.rules")) {
 				Class clazz = Class.forName(info.getName(), true, loader);
-				Condition condition = (Condition) clazz.getAnnotation(Condition.class);
-				JSONObject conditionsInfo = new JSONObject();
+				AnnotationCondition annotationCondition = (AnnotationCondition) clazz.getAnnotation(AnnotationCondition.class);
+				//JSONObject conditionsInfo = new JSONObject();
 
+				 if(annotationCondition != null)
+				    {	
+					    Collection<ConditionParam<?>> conditionParams = new ArrayList<ConditionParam<?>>();
+					    Collection<ConditionParamArray<?>> conditionParamArrays = new ArrayList<ConditionParamArray<?>>();
+					    
+				    	Field fs[] = clazz.getDeclaredFields();
+
+						for (Field f : fs) 
+					    {
+							f.setAccessible(true);
+
+							AnnotationConditionParamArray annotationParamArray = (AnnotationConditionParamArray) f.getAnnotation(AnnotationConditionParamArray.class);
+						    if(annotationParamArray != null)
+						    {			
+						    	ConditionParamArray<?> paramArray = null;
+						    	switch(annotationParamArray.type())
+						    	{
+						    	case _int:
+						    		paramArray = new ConditionParamArray<Integer>();
+						    		paramArray.setType(DataType._int);
+						    		break;
+						    		
+						    	case _double:
+						    		paramArray = new ConditionParamArray<Double>();
+						    		paramArray.setType(DataType._double);
+						    		break;
+						    		
+						    	case _String:
+						    		paramArray = new ConditionParamArray<Double>();
+						    		paramArray.setType(DataType._String);
+						    		break;
+						    		
+						    	default:
+						    		break;
+						    	}
+						    	
+						    	if(paramArray != null)
+						    	{
+						    		paramArray.setName(annotationParamArray.name());
+							    	paramArray.setDescription_de(annotationParamArray.description_de());
+							    	paramArray.setDescription_en(annotationParamArray.description_en());
+							    	paramArray.setValues(null);
+							    	conditionParamArrays.add(paramArray);
+						    	}
+						    	
+						    	continue;
+						    }
+						    
+						    AnnotationConditionParam annotationParam = (AnnotationConditionParam) f.getAnnotation(AnnotationConditionParam.class);
+						    if(annotationParam != null)
+						    {
+								
+						    	ConditionParam<?> param = null;
+						    	switch(annotationParam.type())
+						    	{
+						    	case _int:
+						    		param = new ConditionParam<Integer>();
+						    		param.setType(DataType._int);
+						    		break;
+						    		
+						    	case _double:
+						    		param = new ConditionParam<Double>();
+						    		param.setType(DataType._double);
+						    		break;
+						    		
+						    	case _String:
+						    		param = new ConditionParam<Double>();
+						    		param.setType(DataType._String);
+						    		break;
+						    		
+						    	default:
+						    		break;
+						    	}
+						    	
+						    	if(param != null)
+						    	{
+						    		param.setName(annotationParam.name());
+							    	param.setDescription_de(annotationParam.description_de());
+							    	param.setDescription_en(annotationParam.description_en());
+							    	param.setValue(null);
+							    	conditionParams.add(param);	
+						    	}
+						    	
+						    	continue;
+						   }
+						    
+					    }
+						
+						TemplateCondition conditionObj = new TemplateCondition(
+					    		annotationCondition.name(), 
+					    		annotationCondition.description_en(), 
+					    		annotationCondition.description_de(),
+					    		conditionParams, conditionParamArrays);
+						
+						conditions.add(conditionObj);
+						
+				    }
+				
+				/*
 			    if(condition != null)
 			    {
 			    	conditionsInfo.put("condition name", condition.name());
@@ -321,13 +426,18 @@ public class TestRuleEngine {
 				    }
 					conditionsInfoArray.put(conditionsInfo);
 			    }
-			    
+			    */
+				 
+				 
 		    }
+			String condtionInfoString = new Gson().toJson(conditions);
+		    System.out.println(condtionInfoString);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(conditionsInfoArray.toString());
+		//System.out.println(conditionsInfoArray.toString());
+		
 	}
 	
 }

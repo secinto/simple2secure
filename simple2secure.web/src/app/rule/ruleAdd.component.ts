@@ -111,7 +111,8 @@ export class RuleAddComponent {
 			.subscribe(
 				data => {
 					// TODO: handle the response
-					console.log(this.jsonString);
+					console.log("inside data");
+					console.log(data);
 					this.alertService.success(this.translate.instant("Sever connection for loading templates worked")); // TODO: change hardcodedtext
 				},
 				error => {
