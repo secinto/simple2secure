@@ -20,17 +20,18 @@
  *********************************************************************
 */
 
+
 package com.simple2secure.api.model;
 
 import java.util.Collection;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class TemplateCondition extends GenericDBObject{
+public class TemplateAction extends GenericDBObject{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1291327703141018318L;
+	private static final long serialVersionUID = 3641649125428321240L;
 	
 	private String name;
 	private String description_en;
@@ -38,7 +39,7 @@ public class TemplateCondition extends GenericDBObject{
 	private Collection<RuleParam<?>> params;
 	private Collection<RuleParamArray<?>> paramArrays;
 	
-	public TemplateCondition(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
+	public TemplateAction(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
 			Collection<RuleParamArray<?>> paramArrays) {
 		super();
 		this.name = name;

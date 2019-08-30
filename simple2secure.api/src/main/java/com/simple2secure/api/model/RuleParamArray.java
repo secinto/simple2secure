@@ -22,69 +22,57 @@
 
 package com.simple2secure.api.model;
 
-import java.util.Collection;
+import java.util.List;
 
-import com.simple2secure.api.dbo.GenericDBObject;
-
-public class TemplateCondition extends GenericDBObject{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1291327703141018318L;
-	
+public class RuleParamArray<T> {
 	private String name;
 	private String description_en;
 	private String description_de;
-	private Collection<RuleParam<?>> params;
-	private Collection<RuleParamArray<?>> paramArrays;
+	private List<T> values;
+	private DataType type;
 	
-	public TemplateCondition(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
-			Collection<RuleParamArray<?>> paramArrays) {
+	public RuleParamArray() {
+		super();
+	}
+	
+	public RuleParamArray(String name, String description_en, String description_de, List<T> values,
+			DataType type) {
 		super();
 		this.name = name;
 		this.description_en = description_en;
 		this.description_de = description_de;
-		this.params = params;
-		this.paramArrays = paramArrays;
+		this.values = values;
+		this.type = type;
 	}
-
+	
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
 	public String getDescription_en() {
 		return description_en;
 	}
-
 	public void setDescription_en(String description_en) {
 		this.description_en = description_en;
 	}
-
 	public String getDescription_de() {
 		return description_de;
 	}
-
 	public void setDescription_de(String description_de) {
 		this.description_de = description_de;
 	}
-
-	public Collection<RuleParam<?>> getParams() {
-		return params;
+	public List<T> getValues() {
+		return values;
 	}
-
-	public void setParams(Collection<RuleParam<?>> params) {
-		this.params = params;
+	public void setValues(List<T> paramArray) {
+		this.values = paramArray;
 	}
-
-	public Collection<RuleParamArray<?>> getParamArrays() {
-		return paramArrays;
+	public DataType getType() {
+		return type;
 	}
-
-	public void setParamArray(Collection<RuleParamArray<?>> paramArray) {
-		this.paramArrays = paramArray;
+	public void setType(DataType type) {
+		this.type = type;
 	}
 }

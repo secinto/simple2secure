@@ -22,69 +22,54 @@
 
 package com.simple2secure.api.model;
 
-import java.util.Collection;
-
-import com.simple2secure.api.dbo.GenericDBObject;
-
-public class TemplateCondition extends GenericDBObject{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1291327703141018318L;
-	
+public class RuleParam<T> {	
 	private String name;
 	private String description_en;
 	private String description_de;
-	private Collection<RuleParam<?>> params;
-	private Collection<RuleParamArray<?>> paramArrays;
+	private T value;
+	private DataType type;
 	
-	public TemplateCondition(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
-			Collection<RuleParamArray<?>> paramArrays) {
+	public RuleParam() {
+		super();
+	}	
+
+	public RuleParam(String name, String description_en, String description_de, T value, DataType type) {
 		super();
 		this.name = name;
 		this.description_en = description_en;
 		this.description_de = description_de;
-		this.params = params;
-		this.paramArrays = paramArrays;
+		this.value = value;
+		this.type = type;
 	}
-
+	
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
 	public String getDescription_en() {
 		return description_en;
 	}
-
 	public void setDescription_en(String description_en) {
 		this.description_en = description_en;
 	}
-
 	public String getDescription_de() {
 		return description_de;
 	}
-
 	public void setDescription_de(String description_de) {
 		this.description_de = description_de;
 	}
-
-	public Collection<RuleParam<?>> getParams() {
-		return params;
+	public T getValue() {
+		return value;
 	}
-
-	public void setParams(Collection<RuleParam<?>> params) {
-		this.params = params;
+	public void setValue(T value) {
+		this.value = value;
 	}
-
-	public Collection<RuleParamArray<?>> getParamArrays() {
-		return paramArrays;
+	public DataType getType() {
+		return type;
 	}
-
-	public void setParamArray(Collection<RuleParamArray<?>> paramArray) {
-		this.paramArrays = paramArray;
+	public void setType(DataType type) {
+		this.type = type;
 	}
 }

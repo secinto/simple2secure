@@ -22,30 +22,37 @@
 
 package com.simple2secure.api.model;
 
-import java.util.Collection;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class TemplateCondition extends GenericDBObject{
+public class TemplateRule extends GenericDBObject {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1291327703141018318L;
-	
+	private static final long serialVersionUID = -5156938336427387331L;
+
 	private String name;
-	private String description_en;
-	private String description_de;
-	private Collection<RuleParam<?>> params;
-	private Collection<RuleParamArray<?>> paramArrays;
+
+	private String description;
+
+	private String contextID;
+
+	private TemplateCondition templateCondition;
 	
-	public TemplateCondition(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
-			Collection<RuleParamArray<?>> paramArrays) {
+	private TemplateAction templateAction;
+	
+	public TemplateRule() {
+
+	}
+
+	public TemplateRule(String name, String description, String contextID, TemplateCondition templateCondition,
+			TemplateAction templateAction) {
 		super();
 		this.name = name;
-		this.description_en = description_en;
-		this.description_de = description_de;
-		this.params = params;
-		this.paramArrays = paramArrays;
+		this.description = description;
+		this.contextID = contextID;
+		this.templateCondition = templateCondition;
+		this.templateAction = templateAction;
 	}
 
 	public String getName() {
@@ -56,35 +63,35 @@ public class TemplateCondition extends GenericDBObject{
 		this.name = name;
 	}
 
-	public String getDescription_en() {
-		return description_en;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDescription_en(String description_en) {
-		this.description_en = description_en;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public String getDescription_de() {
-		return description_de;
+	public String getContextID() {
+		return contextID;
 	}
 
-	public void setDescription_de(String description_de) {
-		this.description_de = description_de;
+	public void setContextID(String contextID) {
+		this.contextID = contextID;
 	}
 
-	public Collection<RuleParam<?>> getParams() {
-		return params;
+	public TemplateCondition getTemplateCondition() {
+		return templateCondition;
 	}
 
-	public void setParams(Collection<RuleParam<?>> params) {
-		this.params = params;
+	public void setTemplateCondition(TemplateCondition templateCondition) {
+		this.templateCondition = templateCondition;
 	}
 
-	public Collection<RuleParamArray<?>> getParamArrays() {
-		return paramArrays;
+	public TemplateAction getTemplateAction() {
+		return templateAction;
 	}
 
-	public void setParamArray(Collection<RuleParamArray<?>> paramArray) {
-		this.paramArrays = paramArray;
-	}
+	public void setTemplateAction(TemplateAction templateAction) {
+		this.templateAction = templateAction;
+	}	
 }
