@@ -77,7 +77,7 @@ public class RuleController {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 
-			List<GroovyRule> groovyRules = ruleUtils.getRulesByContextId(contextId);
+			List<GroovyRule> groovyRules = ruleUtils.getGroovyRulesByContextId(contextId);
 
 			if (groovyRules != null) {
 				return new ResponseEntity<List<GroovyRule>>(groovyRules, HttpStatus.OK);

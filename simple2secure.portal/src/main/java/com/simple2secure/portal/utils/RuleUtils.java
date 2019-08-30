@@ -8,16 +8,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.GroovyRule;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
+import com.simple2secure.portal.repository.TemplateRuleRepository;
 
 @Configuration
 @Component
-public class RuleUtils {
+public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils{
 
 	@Autowired
-	RuleRepository ruleRepository;
+	GroovyRuleRepository groovyRuleRepository;
 	
-	public List<GroovyRule> getRulesByContextId(String contextId){
-		return ruleRepository.findByContextId(contextId);
+	@Autowired
+	TemplateRuleRepository templateRuleRepository;
+	
+	public List<GroovyRule> getGroovyRulesByContextId(String contextId){
+		
+		return groovyRuleRepository.findByContextId(contextId);
+	}
+	
+	public List<TemplateRule> getTemplateRulesByContextId(String contextId)
+	{
+		return  templateRuleRepository.findByContextId(contextId);
 	}
 }

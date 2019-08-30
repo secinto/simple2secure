@@ -23,9 +23,13 @@
 package com.simple2secure.commons.rules.engine;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.jeasy.rules.api.Action;
+import org.jeasy.rules.api.Condition;
 
 import com.google.common.reflect.ClassPath;
 import com.simple2secure.api.model.DataType;
@@ -125,6 +129,22 @@ public class RuleUtils {
 	    }
 	}
 	
+	private static Collection<Class<?>> getAnnotatedClass(String path, Class annotation) throws IOException, ClassNotFoundException
+	{
+		Collection<Class<?>> clazzes = new ArrayList<Class<?>>();
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassPath classPath = ClassPath.from(loader);
+		
+		for (ClassPath.ClassInfo info : classPath.getTopLevelClassesRecursive(path))
+		{
+			Class clazz = Class.forName(info.getName(), true, loader);
+
+			if(clazz.getAnnotation(annotation) != null)
+				clazzes.add(clazz);		 
+	    }
+		return clazzes;
+	}
+	
 	public static Collection<TemplateCondition> loadTemplateConditions(String path) throws IOException, ClassNotFoundException
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -188,4 +208,32 @@ public class RuleUtils {
 	    }
 		return actions;	
 	}
+
+	public static Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException
+	{
+		Class<?> conditionClass = null;
+		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationCondition.class);
+		
+		for(Class<?> clazz: clazzes)
+		{
+			if(clazz.getAnnotation(AnnotationCondition.class).name().equalsIgnoreCase(conditionData.getName()))
+			{
+				conditionClass = clazz;
+				break;
+			}
+		}
+		
+		Field fs[] = conditionClass.getDeclaredFields();
+		
+		
+		return null;
+	}
+
+	public static Action buildActionFromTemplateAction(TemplateAction actionData)
+	{
+		
+		
+		return null;
+	}
+	
 }
