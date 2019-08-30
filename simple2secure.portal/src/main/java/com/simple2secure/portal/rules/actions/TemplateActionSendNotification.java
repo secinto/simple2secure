@@ -1,14 +1,23 @@
-package com.simple2secure.portal.rules;
+package com.simple2secure.portal.rules.actions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
+import com.simple2secure.commons.rules.annotations.AnnotationAction;
+import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.utils.NotificationUtils;
 
-
-public class TemplateActionSendNotification extends TemplateEmailAction{
+@AnnotationAction(name = "send notification",
+description_de = "Sendet eine Notification an das Portal.",
+description_en = "Sends a notification to the portal.")
+public class TemplateActionSendNotification extends AbtractEmailAction{
 	
+	@AnnotationRuleParam(name = "text",
+			description_de = "Text der als Notification angezeigt wird.",
+			description_en = "Text which shown as notification",
+			type = DataType._String)
 	String notification;
 	
 	@Autowired	

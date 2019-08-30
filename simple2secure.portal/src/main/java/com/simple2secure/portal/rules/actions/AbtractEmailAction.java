@@ -20,20 +20,19 @@
  *********************************************************************
 */
 
-package com.simple2secure.portal.rules;
+package com.simple2secure.portal.rules.actions;
 
-import org.jeasy.rules.api.Condition;
+import org.jeasy.rules.api.Action;
 import org.jeasy.rules.api.Facts;
 
-import com.simple2secure.api.dbo.GenericDBObject;
 import com.simple2secure.api.model.Email;
 
-public abstract class TemplateEmailCondition implements Condition {
+public abstract class AbtractEmailAction implements Action{
 
 	@Override
-	public boolean evaluate(Facts facts) {
-		return condition(facts.get("com.simple2secure.api.model.Email"));
+	public void execute(Facts facts) throws Exception {
+		action(facts.get("com.simple2secure.api.model.Email"));
 	}
 	
-	protected abstract boolean condition(Email email);
+	protected abstract void action(Email email) throws Exception;
 }

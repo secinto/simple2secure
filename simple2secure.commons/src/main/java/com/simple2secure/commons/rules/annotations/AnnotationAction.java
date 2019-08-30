@@ -24,17 +24,14 @@ package com.simple2secure.commons.rules.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.simple2secure.api.model.DataType;
-
-import java.lang.annotation.RetentionPolicy;
-
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationConditionParamArray {
+public @interface AnnotationAction 
+{
 	String name();
-	String description_en();
 	String description_de();
-	DataType type();
+	String description_en();
 }

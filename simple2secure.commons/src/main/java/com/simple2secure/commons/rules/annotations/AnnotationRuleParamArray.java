@@ -32,10 +32,9 @@ import java.lang.annotation.RetentionPolicy;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationConditionParam {
-	
+public @interface AnnotationRuleParamArray {
 	String name();
-	String description_de();
 	String description_en();
+	String description_de();
 	DataType type();
 }
