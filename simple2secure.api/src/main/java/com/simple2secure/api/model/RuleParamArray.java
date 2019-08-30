@@ -22,20 +22,22 @@
 
 package com.simple2secure.api.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class RuleParamArray<T> {
 	private String name;
 	private String description_en;
 	private String description_de;
-	private List<T> values;
+	private Collection<T> values;
 	private DataType type;
 	
 	public RuleParamArray() {
 		super();
 	}
 	
-	public RuleParamArray(String name, String description_en, String description_de, List<T> values,
+	public RuleParamArray(String name, String description_en, String description_de, Collection<T> values,
 			DataType type) {
 		super();
 		this.name = name;
@@ -63,7 +65,7 @@ public class RuleParamArray<T> {
 	public void setDescription_de(String description_de) {
 		this.description_de = description_de;
 	}
-	public List<T> getValues() {
+	public Collection<T> getValues() {
 		return values;
 	}
 	public void setValues(List<T> paramArray) {

@@ -11,15 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.EmailAttribute;
 import com.simple2secure.api.model.GroovyRule;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
 
 @Repository
 @Transactional
-public class RuleRepositoryImpl extends RuleRepository {
+public class GroovyRuleRepositoryImpl extends GroovyRuleRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "rule";
+		super.collectionName = "groovyRule";
 		super.className = GroovyRule.class;
 	}
 

@@ -24,7 +24,7 @@ import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
 import com.simple2secure.portal.rules.EmailRulesEngine;
 import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
@@ -58,7 +58,7 @@ public class UpdateEmailScheduler {
 	NotificationUtils notificationUtils;
 
 	@Autowired
-	RuleRepository ruleRepository;
+	GroovyRuleRepository groovyRuleRepository;
 
 	@Autowired
 	EmailRepository emailRepository;

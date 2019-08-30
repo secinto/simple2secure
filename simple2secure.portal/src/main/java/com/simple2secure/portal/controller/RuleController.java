@@ -29,7 +29,7 @@ import com.simple2secure.api.model.GroovyRule;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
 import com.simple2secure.portal.rules.TemplateRuleBuilder;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.RuleUtils;
@@ -39,7 +39,7 @@ import com.simple2secure.portal.utils.RuleUtils;
 public class RuleController {
 
 	@Autowired
-	RuleRepository ruleRepository;
+	GroovyRuleRepository groovyRuleRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -56,10 +56,10 @@ public class RuleController {
 		if (groovyRule != null) {
 			
 			if(!Strings.isNullOrEmpty(groovyRule.getId())) {
-				ruleRepository.update(groovyRule);
+				groovyRuleRepository.update(groovyRule);
 			}
 			else {
-				ruleRepository.save(groovyRule);
+				groovyRuleRepository.save(groovyRule);
 			}
 
 			return new ResponseEntity<GroovyRule>(groovyRule, HttpStatus.OK);
@@ -116,9 +116,9 @@ public class RuleController {
 			@RequestHeader("Accept-Language") String locale){
 		
 		if(!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale)) {
-			GroovyRule groovyRule = ruleRepository.find(ruleId);			
+			GroovyRule groovyRule = groovyRuleRepository.find(ruleId);			
 			if(groovyRule != null) {
-				ruleRepository.delete(groovyRule);
+				groovyRuleRepository.delete(groovyRule);
 				return new ResponseEntity<GroovyRule>(groovyRule, HttpStatus.OK);
 			}
 		}
