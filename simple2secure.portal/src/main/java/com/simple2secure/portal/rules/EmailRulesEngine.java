@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.simple2secure.api.model.Email;
-import com.simple2secure.api.model.Rule;
+import com.simple2secure.api.model.GroovyRule;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.portal.utils.RuleUtils;
 
@@ -46,9 +46,9 @@ public class EmailRulesEngine extends PortalRulesEngine {
 	public void checkMail(Email email, String contextId)
 	{   
 		addFact(email);
-		List<Rule> rules = ruleUtils.getRulesByContextId(contextId);
+		List<GroovyRule> groovyRules = ruleUtils.getRulesByContextId(contextId);
 		
-		rules.forEach(rule -> {
+		groovyRules.forEach(rule -> {
 			try {
 				addRuleFromSourceWithBean(rule.getGroovyCode());
 			} catch (Exception e) {

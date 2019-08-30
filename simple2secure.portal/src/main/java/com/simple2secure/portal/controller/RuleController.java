@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import com.simple2secure.api.model.Rule;
+import com.simple2secure.api.model.GroovyRule;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -50,19 +50,19 @@ public class RuleController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Rule> addOrUpdateRule(@RequestBody Rule rule, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<GroovyRule> addOrUpdateRule(@RequestBody GroovyRule groovyRule, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (rule != null) {
+		if (groovyRule != null) {
 			
-			if(!Strings.isNullOrEmpty(rule.getId())) {
-				ruleRepository.update(rule);
+			if(!Strings.isNullOrEmpty(groovyRule.getId())) {
+				ruleRepository.update(groovyRule);
 			}
 			else {
-				ruleRepository.save(rule);
+				ruleRepository.save(groovyRule);
 			}
 
-			return new ResponseEntity<Rule>(rule, HttpStatus.OK);
+			return new ResponseEntity<GroovyRule>(groovyRule, HttpStatus.OK);
 		
 		}
 
@@ -72,15 +72,15 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Rule>> getRulesByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<GroovyRule>> getRulesByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 
-			List<Rule> rules = ruleUtils.getRulesByContextId(contextId);
+			List<GroovyRule> groovyRules = ruleUtils.getRulesByContextId(contextId);
 
-			if (rules != null) {
-				return new ResponseEntity<List<Rule>>(rules, HttpStatus.OK);
+			if (groovyRules != null) {
+				return new ResponseEntity<List<GroovyRule>>(groovyRules, HttpStatus.OK);
 			}
 		}
 
@@ -112,14 +112,14 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Rule> deleteRule(@PathVariable("ruleId") String ruleId,
+	public ResponseEntity<GroovyRule> deleteRule(@PathVariable("ruleId") String ruleId,
 			@RequestHeader("Accept-Language") String locale){
 		
 		if(!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale)) {
-			Rule rule = ruleRepository.find(ruleId);			
-			if(rule != null) {
-				ruleRepository.delete(rule);
-				return new ResponseEntity<Rule>(rule, HttpStatus.OK);
+			GroovyRule groovyRule = ruleRepository.find(ruleId);			
+			if(groovyRule != null) {
+				ruleRepository.delete(groovyRule);
+				return new ResponseEntity<GroovyRule>(groovyRule, HttpStatus.OK);
 			}
 		}
 		
