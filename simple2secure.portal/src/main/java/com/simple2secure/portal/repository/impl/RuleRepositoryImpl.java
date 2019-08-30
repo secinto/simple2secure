@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.EmailAttribute;
-import com.simple2secure.api.model.Rule;
+import com.simple2secure.api.model.GroovyRule;
 import com.simple2secure.portal.repository.RuleRepository;
 
 @Repository
@@ -20,12 +20,12 @@ public class RuleRepositoryImpl extends RuleRepository {
 	@PostConstruct
 	public void init() {
 		super.collectionName = "rule";
-		super.className = Rule.class;
+		super.className = GroovyRule.class;
 	}
 
 	@Override
-	public List<Rule> findByContextId(String contextId) {
+	public List<GroovyRule> findByContextId(String contextId) {
 		Query query = new Query(Criteria.where("contextID").is(contextId));
-		return mongoTemplate.find(query, Rule.class);
+		return mongoTemplate.find(query, GroovyRule.class);
 	}
 }
