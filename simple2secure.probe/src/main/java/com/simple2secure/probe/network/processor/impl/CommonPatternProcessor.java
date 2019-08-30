@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.network.processor.impl;
 
 import java.util.Arrays;
@@ -24,10 +45,8 @@ public class CommonPatternProcessor extends PacketProcessor {
 	Logger log = LoggerFactory.getLogger(PacketProcessor.class);
 
 	/**
-	 * From my own observations, these are the 'phases' (sent packets) during Nmap
-	 * -o: Six TCP Syn Packets Two ICMP echo Packets One TCP Packet which would
-	 * usually be used for congestion controll Six TCP Packets with (Almost)
-	 * identical Options
+	 * From my own observations, these are the 'phases' (sent packets) during Nmap -o: Six TCP Syn Packets Two ICMP echo Packets One TCP
+	 * Packet which would usually be used for congestion controll Six TCP Packets with (Almost) identical Options
 	 *
 	 * more accurate definition can be seen in the actual code.
 	 */
@@ -46,13 +65,13 @@ public class CommonPatternProcessor extends PacketProcessor {
 
 	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-
 	public CommonPatternProcessor(String name, Map<String, String> options) {
 		super(name, options);
 	}
 
 	/**
 	 * This function converts a hex String into the byte array
+	 * 
 	 * @param s
 	 * @return
 	 */
@@ -67,7 +86,7 @@ public class CommonPatternProcessor extends PacketProcessor {
 
 	/***
 	 * calculates the flag from the raw Data
-	 * 
+	 *
 	 * @param header
 	 * @return
 	 */
@@ -82,9 +101,8 @@ public class CommonPatternProcessor extends PacketProcessor {
 		// Vertex v = null;
 		/*
 		 * TO-DO
-		 * 
-		 * if (packet.getVertex() != null) { v = packet.getVertex(); } else { v =
-		 * util.addVertex(identifier); //packet.setVertex(v); }
+		 *
+		 * if (packet.getVertex() != null) { v = packet.getVertex(); } else { v = util.addVertex(identifier); //packet.setVertex(v); }
 		 */
 
 		Packet packet = this.packet.getPacket();
@@ -251,8 +269,7 @@ public class CommonPatternProcessor extends PacketProcessor {
 					// util.setVertexProp(v, TYPE, PacketTags.OS_ICMP_TWO);
 				}
 
-			} else if (packet.get(IcmpV6CommonPacket.class) != null
-					&& packet.get(IcmpV6EchoRequestPacket.class) != null) {
+			} else if (packet.get(IcmpV6CommonPacket.class) != null && packet.get(IcmpV6EchoRequestPacket.class) != null) {
 				IcmpV6CommonPacket iPacket1 = packet.get(IcmpV6CommonPacket.class);
 				byte code = iPacket1.getHeader().getCode().value();
 				short seq = packet.get(IcmpV6EchoRequestPacket.class).getHeader().getSequenceNumber();
@@ -286,6 +303,7 @@ public class CommonPatternProcessor extends PacketProcessor {
 		return this.packet;
 	}
 
+	@Override
 	public void performAnalysis() {
 
 	}

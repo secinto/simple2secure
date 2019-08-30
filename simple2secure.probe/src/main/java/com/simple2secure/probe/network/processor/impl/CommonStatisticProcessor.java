@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.network.processor.impl;
 
 import java.text.ParseException;
@@ -29,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.network.PacketContainer;
@@ -72,17 +92,12 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	Map<String, Integer> protocols;
 
-	List<PacketInfo> ipPairs;
-
-	String ipPairsContent;
-
 	private int maxLength;
 
 	public CommonStatisticProcessor(String name, Map<String, String> options) {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
-		report.setProcessorName(name);
 		report.setProbeId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
@@ -95,7 +110,6 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		destinationMac = new TreeMap<>();
 		protocols = new TreeMap<>();
 		maxLength = 0;
-		ipPairs = new ArrayList<>();
 	}
 
 	@Override
@@ -190,7 +204,6 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
 					report.setStringContent(content);
-					report.setIpPairs(ipPairs);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
@@ -224,9 +237,6 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	 * This function counts the network traffic data provided by each packet.
 	 */
 	private void countNetworkTraffic() {
-
-		ipPairs.add(new PacketInfo(destIp, srcIp, "", "", 0, ""));
-
 		// Count sourceIPs
 		if (!Strings.isNullOrEmpty(srcIp)) {
 			Integer countSrcIp = sourceIp.get(srcIp);
@@ -294,7 +304,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		sourceMac = sortByValue(sourceMac);
 		protocols = sortByValue(protocols);
 
-		Map<String, String> resultEntry = new LinkedHashMap<String, String>();
+		Map<String, String> resultEntry = new LinkedHashMap<>();
 
 		if (!sourceIp.isEmpty()) {
 			String srcIP = "{";
@@ -352,11 +362,6 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		content = content.replace("}\"", "}");
 		content = content.replace("'", "\"");
 		log.debug(content);
-
-		ipPairsContent = JSONUtils.toString(ipPairs);
-		ipPairsContent = ipPairsContent.replace("\"{", "{");
-		ipPairsContent = ipPairsContent.replace("}\"", "}");
-		ipPairsContent = ipPairsContent.replace("'", "\"");
 		// entry.put("Source MAC", contentSrcMac);
 		// entry.put("Destination MAC", contentDstMac);
 		// entry.put("Protocol", contentProtocol);
@@ -375,7 +380,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 	}
 
 	private static <K, V extends Comparable<? super V>> SortedSet<Map.Entry<K, V>> entriesSortedByValues(Map<K, V> map) {
-		SortedSet<Map.Entry<K, V>> sortedEntries = new TreeSet<Map.Entry<K, V>>(new Comparator<Map.Entry<K, V>>() {
+		SortedSet<Map.Entry<K, V>> sortedEntries = new TreeSet<>(new Comparator<Map.Entry<K, V>>() {
 			@Override
 			public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
 				int res = e1.getValue().compareTo(e2.getValue());

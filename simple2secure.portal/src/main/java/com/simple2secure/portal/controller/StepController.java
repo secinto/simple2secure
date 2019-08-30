@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
@@ -87,7 +100,7 @@ public class StepController {
 						}
 					}
 					if (steps != null) {
-						return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+						return new ResponseEntity<>(steps, HttpStatus.OK);
 					}
 				}
 			}
@@ -106,7 +119,7 @@ public class StepController {
 		if (!Strings.isNullOrEmpty(groupId)) {
 			List<Step> steps = repository.getStepsByGroupId(groupId, select_all);
 			if (steps != null) {
-				return new ResponseEntity<List<Step>>(steps, HttpStatus.OK);
+				return new ResponseEntity<>(steps, HttpStatus.OK);
 			}
 		}
 		log.error("Error while retrieving steps for group id {}", groupId);
@@ -133,7 +146,7 @@ public class StepController {
 				repository.update(step);
 			}
 
-			return new ResponseEntity<Step>(step, HttpStatus.OK);
+			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 		log.error("Error while updating step");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale)),

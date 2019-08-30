@@ -1,7 +1,7 @@
 ### STAGE 1: Build ###
 
 # We label our stage as ‘builder’
-FROM node:alpine AS builder
+FROM node:lts-alpine AS builder
 
 COPY package.json package-lock.json ./
 
@@ -9,7 +9,7 @@ COPY package.json package-lock.json ./
 
 RUN apk add --no-cache git python
 
-RUN npm ci && mkdir /ng-app && mv ./node_modules ./ng-app
+RUN npm ci && mkdir /ng-app && mv ./node_modules ./ng-app 
 
 WORKDIR /ng-app
 

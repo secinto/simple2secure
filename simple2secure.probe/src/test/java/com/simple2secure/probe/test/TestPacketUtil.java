@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.test;
 
 import java.io.UnsupportedEncodingException;
@@ -28,7 +49,7 @@ public class TestPacketUtil {
 		ProbePacket arpPacket;
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
 		arpPacket.setId("5");
-		DBUtil.getInstance("s2s-test").merge(arpPacket);
+		DBUtil.getInstance().merge(arpPacket);
 
 		Assertions.assertTrue(PacketUtil.isPacketInDB(arpPacket));
 	}
@@ -38,7 +59,7 @@ public class TestPacketUtil {
 		ProbePacket arpPacket;
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
 		arpPacket.setId("1");
-		DBUtil.getInstance("s2s-test").merge(arpPacket);
+		DBUtil.getInstance().merge(arpPacket);
 
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet1", false, 15, 5);
 		arpPacket.setId("1");
@@ -58,21 +79,21 @@ public class TestPacketUtil {
 		ProbePacket pingPacket;
 		ProbePacket icmpCommonPacket;
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
-		arpPacket.setId("2");
+		// arpPacket.setId("2");
 		pingPacket = ProbePacketCrafter.craftProbePacket("ping", "2", "ping-packet", false, 50, 1);
-		pingPacket.setId("3");
+		// pingPacket.setId("3");
 		icmpCommonPacket = ProbePacketCrafter.craftProbePacket("icmpCommon", "2", "common-packet", false, 1, 1);
-		icmpCommonPacket.setId("4");
-		DBUtil.getInstance("s2s-test").merge(arpPacket);
-		DBUtil.getInstance("s2s-test").merge(pingPacket);
-		DBUtil.getInstance("s2s-test").merge(icmpCommonPacket);
+		// icmpCommonPacket.setId("4");
+		DBUtil.getInstance().merge(arpPacket);
+		DBUtil.getInstance().merge(pingPacket);
+		DBUtil.getInstance().merge(icmpCommonPacket);
 
-		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet1", false, 15, 5);
-		arpPacket.setId("2");
+		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 15, 5);
+		// arpPacket.setId("2");
 		Map<String, ProbePacketQueueHandler> taskMap = new HashMap<>();
-		taskMap.put(arpPacket.getId(), new ProbePacketQueueHandler(arpPacket, new ProcessingQueue<>()));
-		taskMap.put(pingPacket.getId(), new ProbePacketQueueHandler(pingPacket, new ProcessingQueue<>()));
-		taskMap.put(icmpCommonPacket.getId(), new ProbePacketQueueHandler(icmpCommonPacket, new ProcessingQueue<>()));
+		taskMap.put(arpPacket.getName(), new ProbePacketQueueHandler(arpPacket, new ProcessingQueue<>()));
+		taskMap.put(pingPacket.getName(), new ProbePacketQueueHandler(pingPacket, new ProcessingQueue<>()));
+		taskMap.put(icmpCommonPacket.getName(), new ProbePacketQueueHandler(icmpCommonPacket, new ProcessingQueue<>()));
 
 		List<ProbePacket> changedPackets = PacketUtil.getChangedPackets(taskMap);
 

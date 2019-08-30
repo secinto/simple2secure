@@ -205,25 +205,6 @@ export class NavbarComponent {
 		else{
 			this.showNotifications = true;
 		}
-
-		console.log(this.showNotifications);
-
-		/*const dialogPosition: DialogPosition = {
-			top: event.y + 'px',
-			right: event.x + 'px',
-			left: event.x + 'px',
-			bottom: event.y + 'px'
-		};
-
-		const dialogConfig = new MatDialogConfig();
-
-		dialogConfig.data = {
-			id: 1,
-			position: dialogPosition
-		};
-
-		const dialogRef = this.dialog.open(SelectContextDialog, dialogConfig);*/
-
 	}
 
 

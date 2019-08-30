@@ -61,7 +61,7 @@ import {EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} f
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {SettingsComponent} from './settings/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
-import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
+import {NotificationComponent} from './notification/index';
 import {AnalysisComponent, AddQueryDialog} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
 import {
@@ -85,6 +85,7 @@ import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
+import {HelperService} from './_services/helper.service';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -196,7 +197,6 @@ export const httpInterceptorProviders = [
 		ActivationComponent,
 		ActivatedComponent,
 		NotificationComponent,
-		NotificationOverviewComponent,
 		RuleComponent,
 		RuleOverviewComponent,
 		RuleAddComponent,
@@ -239,6 +239,7 @@ export const httpInterceptorProviders = [
 		AuthenticationService,
 		HttpService,
 		DataService,
+		HelperService,
 		httpInterceptorProviders,
 		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
 		DatePipe

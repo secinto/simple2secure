@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.util.List;
@@ -112,7 +125,7 @@ public class GroupController {
 
 							parentGroup.addChildrenId(groupId.toString());
 							groupRepository.update(parentGroup);
-							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+							return new ResponseEntity<>(group, HttpStatus.OK);
 						}
 					} else {
 						// NEW PARENT GROUP!
@@ -131,7 +144,7 @@ public class GroupController {
 								groupAccessRightRepository.save(groupAccessRight);
 							}
 
-							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+							return new ResponseEntity<>(group, HttpStatus.OK);
 						}
 					}
 				} else {
@@ -144,7 +157,7 @@ public class GroupController {
 				// UPDATING EXISTING GROUP
 
 				groupRepository.update(group);
-				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+				return new ResponseEntity<>(group, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while saving/updating group");
@@ -162,7 +175,7 @@ public class GroupController {
 		if (!Strings.isNullOrEmpty(groupId)) {
 			CompanyGroup group = groupRepository.find(groupId);
 			if (group != null) {
-				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+				return new ResponseEntity<>(group, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving group with id {}", groupId);
@@ -185,7 +198,7 @@ public class GroupController {
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
-					return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+					return new ResponseEntity<>(groups, HttpStatus.OK);
 				}
 			}
 		}
@@ -213,7 +226,7 @@ public class GroupController {
 					// TODO: check according to the user role which groups will be visible to the user
 					List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 					if (groups != null) {
-						return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+						return new ResponseEntity<>(groups, HttpStatus.OK);
 					}
 				}
 			}

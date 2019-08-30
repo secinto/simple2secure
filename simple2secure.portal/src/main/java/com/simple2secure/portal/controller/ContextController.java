@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.io.IOException;
@@ -100,7 +113,7 @@ public class ContextController {
 			// Update context
 			if (!Strings.isNullOrEmpty(context.getId())) {
 				contextRepository.update(context);
-				return new ResponseEntity<Context>(context, HttpStatus.OK);
+				return new ResponseEntity<>(context, HttpStatus.OK);
 			} else {
 				// Add new context
 				if (!contextUtils.checkIfContextAlreadyExists(context, userId)) {
@@ -123,7 +136,7 @@ public class ContextController {
 								try {
 									dataInitialization.addDefaultGroup(userId, savedContextId.toString());
 									contextUtils.mapSuperAdminsTotheContext(savedContextId.toString());
-									return new ResponseEntity<Context>(context, HttpStatus.OK);
+									return new ResponseEntity<>(context, HttpStatus.OK);
 								} catch (IOException e) {
 									log.error(e.getMessage());
 									return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
@@ -168,7 +181,7 @@ public class ContextController {
 						contextList.add(contextDTO);
 					}
 				}
-				return new ResponseEntity<List<ContextDTO>>(contextList, HttpStatus.OK);
+				return new ResponseEntity<>(contextList, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving contexts for user ID {}" + userId);
@@ -197,7 +210,7 @@ public class ContextController {
 				if (contextUtils.checkIfUserCanDeleteContext(user, context)) {
 					// call delete context dependencies
 					contextUtils.deleteContextDependencies(context);
-					return new ResponseEntity<Context>(context, HttpStatus.OK);
+					return new ResponseEntity<>(context, HttpStatus.OK);
 				} else {
 					// User not allowed to delete
 					log.error("{} not allowed to delete this default context {}", user.getEmail(), context.getName());
@@ -239,7 +252,7 @@ public class ContextController {
 					currentContextRepository.save(currentContext);
 				}
 
-				return new ResponseEntity<CurrentContext>(currentContext, HttpStatus.OK);
+				return new ResponseEntity<>(currentContext, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while updating/creating context {}" + context.getName());

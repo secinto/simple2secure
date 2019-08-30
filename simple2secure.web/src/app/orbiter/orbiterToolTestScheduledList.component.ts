@@ -8,6 +8,7 @@ import {TestStatus} from '../_models/testStatus';
 import {AlertService, DataService, HttpService} from '../_services';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestResultDetailsComponent} from '../report/testResultDetails.component';
+import {HelperService} from '../_services/helper.service';
 
 @Component({
 	moduleId: module.id,
@@ -35,7 +36,9 @@ export class OrbiterToolTestScheduledListComponent {
 		private dataService: DataService,
 		private dialog: MatDialog,
 		private translate: TranslateService,
-	) {}
+		private utils: HelperService
+	) {
+	}
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
@@ -65,7 +68,6 @@ export class OrbiterToolTestScheduledListComponent {
 
 	public loadScheduledTests(){
 		this.loading = true;
-		console.log(this.context);
 		this.httpService.get(environment.apiEndpoint + 'test/getScheduledTests/' + this.context.context.id)
 			.subscribe(
 				data => {
@@ -79,8 +81,6 @@ export class OrbiterToolTestScheduledListComponent {
 							this.alertService.error(this.translate.instant('message.data.notProvided'));
 						}
 					}
-
-
 				},
 				error => {
 					if (error.status == 0) {
@@ -137,27 +137,6 @@ export class OrbiterToolTestScheduledListComponent {
 			});
 	}
 
-	public getEnumValue(value: any){
-		if (value == 'MANUAL_POD'){
-			return 'MANUAL POD';
-		}
-		else if (value == 'MANUAL_PORTAL'){
-			return 'MANUAL PORTAL';
-		}
-		else{
-			return 'AUTOMATIC PORTAL';
-		}
-	}
-
-	public getTestStatusByTestResult(testRunDTO: TestRunDTO){
-		if(testRunDTO.testResult == null){
-			return 'UNKNOWN';
-		}
-		else{
-			return testRunDTO.testRun.testStatus;
-		}
-	}
-
 	openDialogShowTestResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
@@ -166,6 +145,10 @@ export class OrbiterToolTestScheduledListComponent {
 		};
 
 		this.dialog.open(TestResultDetailsComponent, dialogConfig);
+
+	}
+
+	getTestStatusByTestResult(element: any) {
 
 	}
 }

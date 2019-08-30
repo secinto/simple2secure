@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.scheduler;
 
 import java.util.ArrayList;
@@ -24,7 +45,7 @@ public class QueryScheduler extends TimerTask {
 	private Map<String, QueryRunnable> currentlyRunning;
 
 	public QueryScheduler() {
-		currentlyRunning = new HashMap<String, QueryRunnable>();
+		currentlyRunning = new HashMap<>();
 		int processors = Runtime.getRuntime().availableProcessors();
 
 		if (processors > 4) {
@@ -39,11 +60,10 @@ public class QueryScheduler extends TimerTask {
 	public void run() {
 		try {
 			/*
-			 * Check if one of the currently running ones is not contained in the
-			 * currentQueries anymore. All not available ones are canceled.
+			 * Check if one of the currently running ones is not contained in the currentQueries anymore. All not available ones are canceled.
 			 */
 			if (currentlyRunning != null && currentlyRunning.size() > 0) {
-				List<QueryRunnable> runningQueries = new ArrayList<QueryRunnable>(currentlyRunning.values());
+				List<QueryRunnable> runningQueries = new ArrayList<>(currentlyRunning.values());
 				for (QueryRunnable queryRunnable : runningQueries) {
 					if (!ProbeConfiguration.getInstance().getCurrentQueries().containsKey(queryRunnable.getQuery().getName())) {
 						queryRunnable.getScheduledFuture().cancel(false);
@@ -53,9 +73,8 @@ public class QueryScheduler extends TimerTask {
 			}
 			for (QueryRun query : ProbeConfiguration.getInstance().getCurrentQueries().values()) {
 				/*
-				 * Check if the query is already in the currently running ones. Only for queries
-				 * which are executed always. If not create a scheduled future and add it to the
-				 * currently running ones.
+				 * Check if the query is already in the currently running ones. Only for queries which are executed always. If not create a
+				 * scheduled future and add it to the currently running ones.
 				 */
 				if (!currentlyRunning.containsKey(query.getName())) {
 					QueryRunnable queryRunnable = new QueryRunnable(query);
@@ -75,12 +94,10 @@ public class QueryScheduler extends TimerTask {
 					if (currentQueryRunnable != null) {
 						QueryRun currentQuery = currentQueryRunnable.getQuery();
 						/*
-						 * Check if something has changed for the current query. If yes cancel it and
-						 * create a new scheduled future.
+						 * Check if something has changed for the current query. If yes cancel it and create a new scheduled future.
 						 */
-						if (currentQuery != null && currentQuery.isAlways()
-								&& (currentQuery.getAnalysisInterval() != query.getAnalysisInterval()
-										|| currentQuery.getAnalysisIntervalUnit() != query.getAnalysisIntervalUnit())) {
+						if (currentQuery != null && currentQuery.isAlways() && (currentQuery.getAnalysisInterval() != query.getAnalysisInterval()
+								|| currentQuery.getAnalysisIntervalUnit() != query.getAnalysisIntervalUnit())) {
 							currentQueryRunnable.getScheduledFuture().cancel(false);
 						}
 					}

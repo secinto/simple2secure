@@ -1,21 +1,21 @@
 /**
  *********************************************************************
- *
- * Copyright (C) 2019 by secinto GmbH (http://www.secinto.com)
- *
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
  *********************************************************************
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * You may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *********************************************************************
  */
@@ -36,20 +36,13 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "144.76.93.104";
-	private String basePort = "51001/s2s";
-	private String basePortWeb = "51003";
-
-	// private String baseKubernetesURL = "https://35.232.109.156";
-
-	private String baseKubernetesURL = "https://192.168.123.95:6443";
-
-	private String baseDockerContainer = "http://192.168.99.100:5000";
+	private String baseHost = "localhost";
+	private String basePort = "8443";
+	private String basePortWeb = "9000";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
 	private String configURL = "/config/config.json";
-	private String endpointsURL = "/config/endpoints.json";
 	private String processorsURL = "/config/processors.json";
 	private String queryURL = "/config/queries.json";
 	private String toolsURL = "/config/tools.json";
@@ -59,7 +52,6 @@ public class LoadedConfigItems {
 	private String licensePlanURL = "/config/licensePlan.json";
 
 	private String usersAPI = "/api/users";
-	private String endpointsAPI = "/api/endpoints";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
 	private String queryAPI = "/api/config/query";
@@ -110,10 +102,6 @@ public class LoadedConfigItems {
 		this.baseProtocol = baseProtocol;
 	}
 
-	public String getBaseDockerContainer() {
-		return baseDockerContainer;
-	}
-
 	public String getBaseHost() {
 		return baseHost;
 	}
@@ -146,14 +134,6 @@ public class LoadedConfigItems {
 		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
 	}
 
-	public String getBaseKubernetesURL() {
-		return baseKubernetesURL;
-	}
-
-	public void setBaseKubernetesURL(String baseKubernetesURL) {
-		this.baseKubernetesURL = baseKubernetesURL;
-	}
-
 	public String getReportURL() {
 		return getBaseURL() + reportURL;
 	}
@@ -164,10 +144,6 @@ public class LoadedConfigItems {
 
 	public String getConfigURL() {
 		return getBaseURL() + configURL;
-	}
-
-	public String getEndpointsURL() {
-		return getBaseURL() + endpointsURL;
 	}
 
 	public String getProcessorsURL() {
@@ -196,10 +172,6 @@ public class LoadedConfigItems {
 
 	public String getUsersAPI() {
 		return getBaseURL() + usersAPI;
-	}
-
-	public String getEndpointsAPI() {
-		return getBaseURL() + endpointsAPI;
 	}
 
 	public String getLoginAPI() {

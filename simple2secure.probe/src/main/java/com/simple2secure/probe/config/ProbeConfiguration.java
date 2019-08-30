@@ -1,11 +1,29 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.config;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -14,13 +32,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
+import org.h2.mvstore.cache.CacheLongKeyLIRS.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -33,7 +49,6 @@ import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.network.PacketProcessorFSM;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
-import com.simple2secure.probe.utils.LocaleHolder;
 
 public class ProbeConfiguration {
 
@@ -43,7 +58,7 @@ public class ProbeConfiguration {
 
 	private static boolean apiAvailable = false;
 	public static boolean runInTesting = true;
-	public static boolean isInstrumented = true;
+	public static boolean isInstrumented = false;
 
 	public static String authKey = "";
 	public static String groupId = "";
@@ -54,8 +69,6 @@ public class ProbeConfiguration {
 	public static boolean isLicenseValid = false;
 	public static boolean isCheckingLicense = false;
 	public static boolean isGuiRunning = false;
-
-	private Config currentConfig;
 
 	private Map<String, Step> currentSteps;
 
@@ -115,19 +128,6 @@ public class ProbeConfiguration {
 		support.removePropertyChangeListener(pcl);
 	}
 
-	/**
-	 * Returns the current configuration of the Probe which is kept update using the API from the Portal.
-	 *
-	 * @return The current configuration of the probe.
-	 */
-	public Config getConfig() {
-		if (currentConfig != null) {
-			return currentConfig;
-		} else {
-			return loadConfig();
-		}
-	}
-
 	/***
 	 * This method tries to acquire the newest Configuration file with all means necessary
 	 *
@@ -138,15 +138,12 @@ public class ProbeConfiguration {
 	 * @param standardConfig
 	 *          the path to the offline Configuration file. <code>StaticConfigValues.XML_LOCATION</code> can be used.
 	 */
-	public Config loadConfig() {
-		updateConfigLocal();
+	public void loadConfig() {
 		updateProcessorsLocal();
 		updateStepsLocal();
 		updateQueriesLocal();
 
 		checkAndUpdateConfigFromAPI();
-
-		return currentConfig;
 	}
 
 	/**
@@ -165,7 +162,6 @@ public class ProbeConfiguration {
 
 			if (isLicenseValid) {
 
-				updateConfigFromAPI();
 				updateProcessorsFromAPI();
 				updateStepsFromAPI();
 				updateQueriesFromAPI();
@@ -196,49 +192,6 @@ public class ProbeConfiguration {
 			if (support != null) {
 				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
 			}
-		}
-	}
-
-	/**
-	 * Obtains the {@link Config} from the Portal and updates the locally stored and used accordingly.
-	 */
-	private void updateConfigFromAPI() {
-		Config apiConfig = getConfigFromAPI();
-
-		if (apiConfig != null && apiConfig.getVersion() >= currentConfig.getVersion()) {
-			apiConfig.setId(currentConfig.getId());
-			DBUtil.getInstance().merge(apiConfig);
-			/*
-			 * Obtain it from the database to have all merged fields correctly updated.
-			 *
-			 * TODO: Although there will probably be no changes. Verify if this is necessary
-			 */
-			currentConfig = getConfigFromDatabase();
-			log.info("Using configuration from the server!");
-		}
-	}
-
-	/**
-	 * Updates the current {@link Config} from local information, either the database if available or from the default file configuration
-	 * otherwise.
-	 */
-	private void updateConfigLocal() {
-		Config dbConfig = getConfigFromDatabase();
-		/*
-		 * Obtain initial configuration from file and store it to the DB if none is available yet.
-		 */
-		if (dbConfig == null) {
-			log.debug("DB config not available, reading config from file. Should only happen once.");
-			Config fileConfig = getConfigFromFile();
-			DBUtil.getInstance().merge(fileConfig);
-			/*
-			 * Obtain the config stored in the DB to also obtain the ID.
-			 *
-			 * TODO: Currently the case that it is still not stored is not handled.
-			 */
-			currentConfig = getConfigFromDatabase();
-		} else {
-			currentConfig = dbConfig;
 		}
 	}
 
@@ -459,41 +412,6 @@ public class ProbeConfiguration {
 			return configs.get(0);
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the {@link Config} from the local default file configuration.
-	 *
-	 * @return The obtained {@link Config} object.
-	 */
-	public Config getConfigFromFile() {
-		Config fileConfig = null;
-		try {
-			InputStream ispotentialConfig = ProbeConfiguration.class.getResourceAsStream(StaticConfigItems.CONFIG_JSON_LOCATION);
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(ispotentialConfig, writer, "UTF-8");
-			String potentialConfigString = writer.toString();
-			File potentialConfig = new File(potentialConfigString);
-
-			if (!Strings.isNullOrEmpty(potentialConfigString)) {
-				fileConfig = JsonUtils.readConfigFromString(potentialConfigString);
-				if (fileConfig == null) {
-					log.error("Couldn't obtain configuration object from the file content of configuration file {}",
-							potentialConfig.getAbsoluteFile());
-					throw new IllegalArgumentException(LocaleHolder.getMessage("load_config_failed").getMessage());
-				}
-			} else {
-				log.error("Couldn't obtain the standard configuration file!");
-				System.out.println(LocaleHolder.getMessage("load_config_failed").getMessage());
-				throw new IllegalArgumentException(LocaleHolder.getMessage("load_config_failed").getMessage());
-			}
-
-		} catch (IOException e) {
-			log.error("Could't open config file {} and load the configuration", StaticConfigItems.CONFIG_JSON_LOCATION);
-			System.out.println(LocaleHolder.getMessage("load_config_failed").getMessage());
-			throw new IllegalArgumentException(LocaleHolder.getMessage("load_config_failed").getMessage());
-		}
-		return fileConfig;
 	}
 
 	/**

@@ -1,15 +1,12 @@
-baseKubernetesURL: https://35.232.109.156
 reportURL: /config/reports.json
 stepsURL: /config/steps.json
 configURL: /config/config.json
-endpointsURL: /config/endpoints.json
 processorsURL: /config/processors.json
 queryURL: /config/queries.json
 toolsURL: /config/tools.json
 groupURL: /config/group.json
 settingsURL: /config/settings.json
 usersAPI: /api/users
-endpointsAPI: /api/endpoints
 loginAPI: /api/login
 reportsAPI: /api/reports
 queryAPI: /api/config/query

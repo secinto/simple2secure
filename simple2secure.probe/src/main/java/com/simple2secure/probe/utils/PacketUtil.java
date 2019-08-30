@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.utils;
 
 import java.io.UnsupportedEncodingException;
@@ -12,8 +33,6 @@ import com.simple2secure.probe.network.packet.ProbePacketCrafter;
 import com.simple2secure.probe.network.packet.ProbePacketQueueHandler;
 
 public class PacketUtil {
-
-	public static boolean hasProbePacketTableChanged = false;
 
 	/**
 	 * This method checks the DB for the provided ProbePacket.
@@ -40,34 +59,20 @@ public class PacketUtil {
 	}
 
 	/**
-	 * This method removes all entries from the ProbePacketTable in the DB.
-	 */
-	public static void removeAllEntriesFromProbePacketTable() {
-		List<ProbePacket> probePacketList = DBUtil.getInstance().findAll(ProbePacket.class);
-		if (probePacketList.size() != 0) {
-			for (ProbePacket probePacket : probePacketList) {
-				DBUtil.getInstance().delete(probePacket);
-			}
-		}
-	}
-
-	/**
 	 * This method checks if the provided ProbePacket which already exists in the DB has been changed.
 	 *
-	 * @param... the ProbePacket to check if it has changed @return... true if the packet contains one not matching value
+	 * @param taskMap
 	 */
 	public static List<ProbePacket> getChangedPackets(Map<String, ProbePacketQueueHandler> taskMap) {
-		List<ProbePacket> changedPacketList = null;
+		List<ProbePacket> changedPacketList = new ArrayList<>();
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 
 		for (ProbePacket probePacket : probePacketList) {
-			ProbePacketQueueHandler task = taskMap.get(probePacket.getId());
-			if (!(task.getProbePacket().getGroupId().equals(probePacket.getGroupId())
-					&& task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
+			ProbePacketQueueHandler task = taskMap.get(probePacket.getName());
+			if (!(task.getProbePacket().getRequestCount() == probePacket.getRequestCount()
 					&& task.getProbePacket().getAnalysisInterval() == probePacket.getAnalysisInterval()
 					&& task.getProbePacket().getAnalysisIntervalUnit().equals(probePacket.getAnalysisIntervalUnit())
 					&& task.getProbePacket().getPacketAsHexStream().equals(probePacket.getPacketAsHexStream()))) {
-				changedPacketList = new ArrayList<>();
 				changedPacketList.add(probePacket);
 			}
 		}
@@ -93,6 +98,7 @@ public class PacketUtil {
 		return resultPacket;
 	}
 
+	// only for test
 	public static void craftProbePacketsForTest() throws IllegalRawDataException {
 
 		try {

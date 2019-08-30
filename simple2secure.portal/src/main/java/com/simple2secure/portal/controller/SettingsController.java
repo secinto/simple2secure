@@ -1,11 +1,24 @@
-/*
- * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
- * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
- * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
- * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
- * or its derivatives. This copyright notice must appear in all copies of this software.
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
  */
-
 package com.simple2secure.portal.controller;
 
 import java.util.List;
@@ -30,7 +43,6 @@ import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TestMacroRepository;
@@ -49,9 +61,6 @@ public class SettingsController {
 	LicensePlanRepository licensePlanRepository;
 
 	@Autowired
-	ConfigRepository configRepository;
-
-	@Autowired
 	TestMacroRepository testMacroRepository;
 
 	@Autowired
@@ -66,7 +75,7 @@ public class SettingsController {
 		List<TestMacro> testMacros = testMacroRepository.findAll();
 		if (settings != null) {
 			if (settings.size() == 1) {
-				return new ResponseEntity<SettingsDTO>(new SettingsDTO(settings.get(0), licensePlans, testMacros), HttpStatus.OK);
+				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros), HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving settings");
@@ -82,7 +91,7 @@ public class SettingsController {
 			throws ItemNotFoundRepositoryException {
 		if (settings != null) {
 			settingsRepository.update(settings);
-			return new ResponseEntity<Settings>(settings, HttpStatus.OK);
+			return new ResponseEntity<>(settings, HttpStatus.OK);
 		}
 		log.error("Problem occured while updating settings");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
@@ -100,7 +109,7 @@ public class SettingsController {
 			} else {
 				licensePlanRepository.update(licensePlan);
 			}
-			return new ResponseEntity<LicensePlan>(licensePlan, HttpStatus.OK);
+			return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving license plan");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
@@ -117,7 +126,7 @@ public class SettingsController {
 			LicensePlan licensePlan = licensePlanRepository.find(licensePlanId);
 			if (licensePlan != null) {
 				licensePlanRepository.delete(licensePlan);
-				return new ResponseEntity<LicensePlan>(licensePlan, HttpStatus.OK);
+				return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while deleting license plan with id {}", licensePlanId);
@@ -136,7 +145,7 @@ public class SettingsController {
 			TestMacro testMacro = testMacroRepository.find(testMacroId);
 			if (testMacro != null) {
 				testMacroRepository.delete(testMacro);
-				return new ResponseEntity<TestMacro>(testMacro, HttpStatus.OK);
+				return new ResponseEntity<>(testMacro, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while deleting test macro with id {}", testMacroId);
@@ -156,7 +165,7 @@ public class SettingsController {
 			} else {
 				testMacroRepository.update(testMacro);
 			}
-			return new ResponseEntity<TestMacro>(testMacro, HttpStatus.OK);
+			return new ResponseEntity<>(testMacro, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving test macro");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),

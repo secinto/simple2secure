@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.utils;
 
 import java.math.BigInteger;
@@ -78,7 +99,7 @@ public class TestUtils {
 			if (!Strings.isNullOrEmpty(testResult.getTestRunId())) {
 				testResult.setId(null);
 				testResultRepository.save(testResult);
-				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
+				return new ResponseEntity<>(testResult, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
@@ -97,7 +118,7 @@ public class TestUtils {
 	public ResponseEntity<List<TestResultDTO>> getTestResultByContextId(String contextId, String locale) {
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
 			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-			List<TestResultDTO> results = new ArrayList<TestResultDTO>();
+			List<TestResultDTO> results = new ArrayList<>();
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
 
@@ -124,7 +145,7 @@ public class TestUtils {
 					}
 				}
 				if (results != null) {
-					return new ResponseEntity<List<TestResultDTO>>(results, HttpStatus.OK);
+					return new ResponseEntity<>(results, HttpStatus.OK);
 				}
 			}
 		}
@@ -154,7 +175,7 @@ public class TestUtils {
 			}
 
 			if (testResults != null) {
-				return new ResponseEntity<List<TestResultDTO>>(testResults, HttpStatus.OK);
+				return new ResponseEntity<>(testResults, HttpStatus.OK);
 			}
 		}
 
@@ -176,7 +197,7 @@ public class TestUtils {
 			TestResult testResult = testResultRepository.find(testResultId);
 			if (testResult != null) {
 				testResultRepository.delete(testResult);
-				return new ResponseEntity<TestResult>(testResult, HttpStatus.OK);
+				return new ResponseEntity<>(testResult, HttpStatus.OK);
 			}
 			log.error("Problem occured while deleting test result");
 		}
@@ -200,7 +221,7 @@ public class TestUtils {
 			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodId(podId));
 
 			if (testsWeb != null) {
-				return new ResponseEntity<List<TestObjWeb>>(testsWeb, HttpStatus.OK);
+				return new ResponseEntity<>(testsWeb, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
@@ -222,7 +243,7 @@ public class TestUtils {
 			List<TestRun> testRunList = testRunRepository.getPlannedTests(podId);
 
 			if (testRunList != null) {
-				return new ResponseEntity<List<TestRun>>(testRunList, HttpStatus.OK);
+				return new ResponseEntity<>(testRunList, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),

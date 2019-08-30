@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.utils;
 
 import java.io.File;
@@ -16,7 +37,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
@@ -28,7 +48,6 @@ import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
@@ -56,9 +75,6 @@ public class DataInitialization {
 
 	@Autowired
 	protected GroupRepository groupRepository;
-
-	@Autowired
-	protected ConfigRepository configRepository;
 
 	@Autowired
 	protected QueryRepository queryRepository;
@@ -113,24 +129,6 @@ public class DataInitialization {
 					addDefaultGroupProcessors(groupId.toString());
 					addDefaultGroupSteps(groupId.toString());
 				}
-			}
-		}
-	}
-
-	/**
-	 * This function adds default configuration for each group which is created
-	 *
-	 * @param probeId
-	 * @throws IOException
-	 */
-	public void addDefaultConfiguration() throws IOException {
-		List<Config> configDB = configRepository.findAll();
-		if (configDB == null || configDB.isEmpty()) {
-			File file = new File(getClass().getResource("/server/config.json").getFile());
-			String content = new String(Files.readAllBytes(file.toPath()));
-			Config config = gson.fromJson(content, Config.class);
-			if (config != null) {
-				configRepository.save(config);
 			}
 		}
 	}

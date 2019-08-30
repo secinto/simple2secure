@@ -15,13 +15,13 @@
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.executionType' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{getEnumValue(element.testRun.testRunType)}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getEnumValue(element.testRun.testRunType)}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{getTestStatusByTestResult(element)}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getTestStatusByTestResult(element)}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">

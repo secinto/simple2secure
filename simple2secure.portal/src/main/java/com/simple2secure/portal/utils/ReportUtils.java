@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
@@ -8,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +74,12 @@ public class ReportUtils {
 				if (report != null) {
 					if (report.getQueryResult() != null) {
 						try {
-							JSONArray jsonArrayQueryResult = new JSONArray(report.getQueryResult());
-							if (jsonArrayQueryResult != null) {
 
-								// Fri Jan 18 08:24:33 CET 2019
-								DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
-								Date date = format.parse(report.getQueryTimestamp());
+							// Fri Jan 18 08:24:33 CET 2019
+							DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
+							Date date = format.parse(report.getQueryTimestamp());
 
-								graphReports.add(new GraphReport(report.getId(), report.getQuery(), jsonArrayQueryResult.length(), date.getTime()));
-							}
+							graphReports.add(new GraphReport(report.getId(), report.getQuery(), report.getQueryResult().length(), date.getTime()));
 
 						} catch (Exception e) {
 							log.error("Error occured while trying to parse string to jsonArray: {}", e);

@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.service;
 
 import java.util.Arrays;
@@ -6,6 +27,8 @@ import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.simple2secure.service.engine.ProbeControllerEngine;
 
 public class ProbeControllerService implements Daemon {
 
@@ -24,9 +47,12 @@ public class ProbeControllerService implements Daemon {
 	public static void windowsService(String args[]) {
 		log.info("Received windowsService call");
 		String cmd = "start";
+		log.debug("Arguments available {}", args.length);
 		if (args.length > 0) {
 			cmd = args[0];
+			log.debug("First argument used {}", args[0]);
 		}
+
 		log.debug("windowsService parameters", Arrays.toString(args));
 		log.debug("Starting service");
 		if ("start".equals(cmd)) {
@@ -93,7 +119,7 @@ public class ProbeControllerService implements Daemon {
 			engine = new ProbeControllerEngine();
 		}
 
-		log.info("Starting {}", engine.getName());
+		log.info("Starting ProbeControllerEngine");
 		if (engine.start()) {
 			log.info("{} started successfully!", engine.getName());
 		} else {

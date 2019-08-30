@@ -6,7 +6,7 @@ plugins {
 	id 'war'
 }
 
-mainClassName = "com.secinto.portal.Simple2SecurePortal"
+mainClassName = "com.simple2secure.portal.Simple2SecurePortal"
 
 
 sonarqube {
@@ -16,10 +16,13 @@ sonarqube {
 
 jar {
 	baseName = 'simple2secure-portal'
-	version =  '0.1.0-SNAPSHOT'
+	version =  '1.0.0-RC'
 }
 
-dependencies { providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' }
+dependencies {
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testCompile group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '2.2.0'
+}
 
 compileJava {
 	options.warnings = false
@@ -28,8 +31,8 @@ compileJava {
 	options.compilerArgs += ["-Xdoclint:none", "-Xlint:none", "-nowarn"]
 }
 
-war { 
-	baseName = 's2s-portal' 
+war {
+	baseName = 's2s-portal'
 }
 
 

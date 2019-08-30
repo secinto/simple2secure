@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
@@ -216,7 +237,7 @@ public class UserUtils {
 							}
 
 							log.debug("User {} added successfully", user.getEmail());
-							return new ResponseEntity<User>(user, HttpStatus.OK);
+							return new ResponseEntity<>(user, HttpStatus.OK);
 						} else {
 							userRepository.deleteByUserID(userID.toString());
 							contextUserAuthRepository.deleteById(contextUserId.toString());
@@ -280,7 +301,7 @@ public class UserUtils {
 
 					// Map all SUPERADMINs to this context
 					contextUtils.mapSuperAdminsTotheContext(contextId.toString());
-					return new ResponseEntity<User>(user, HttpStatus.OK);
+					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
 
 					userRepository.deleteByUserID(userID.toString());
@@ -342,7 +363,7 @@ public class UserUtils {
 					// Map all SUPERADMINs to this context
 					contextUtils.mapSuperAdminsTotheContext(contextId.toString());
 
-					return new ResponseEntity<User>(user, HttpStatus.OK);
+					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
 
 					userRepository.deleteByUserID(userID.toString());
@@ -418,7 +439,7 @@ public class UserUtils {
 								groupUtils.updateGroupAccessRightsforTheSuperuser(userRegistration.getGroupIds(), user, context);
 							}
 						}
-						return new ResponseEntity<User>(user, HttpStatus.OK);
+						return new ResponseEntity<>(user, HttpStatus.OK);
 					}
 				}
 			}
@@ -475,7 +496,7 @@ public class UserUtils {
 						if (mailUtils.sendEmail(user, mailUtils.generateInvitationEmail(userInvitation, context, addedByUser, locale),
 								StaticConfigItems.email_subject_inv)) {
 							userInvitationRepository.save(userInvitation);
-							return new ResponseEntity<User>(user, HttpStatus.OK);
+							return new ResponseEntity<>(user, HttpStatus.OK);
 						}
 
 					}
@@ -496,7 +517,7 @@ public class UserUtils {
 	 * @return
 	 */
 	public List<UserRoleDTO> getAllUsersFromCurrentContext(Context context, String userId) {
-		List<UserRoleDTO> myUsersWithRole = new ArrayList<UserRoleDTO>();
+		List<UserRoleDTO> myUsersWithRole = new ArrayList<>();
 		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(context.getId());
 
 		if (contextUserAuthList != null) {

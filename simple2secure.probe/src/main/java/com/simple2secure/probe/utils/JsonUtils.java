@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.utils;
 
 import java.io.BufferedReader;
@@ -10,16 +31,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.json.JSONUtils;
 
 /***
- * Different Utility methods for parsing JSON Strings. Uses the ever-obsolete
- * w3c library, might want to replace it with something newer.
+ * Different Utility methods for parsing JSON Strings. Uses the ever-obsolete w3c library, might want to replace it with something newer.
  *
  * @author jhoffmann
  *
@@ -52,46 +70,6 @@ public class JsonUtils {
 				reader.close();
 			}
 		}
-	}
-
-	/**
-	 * Reads the JSON config file provided as file name String and converts the
-	 * content
-	 *
-	 * @param filename
-	 * @return
-	 */
-	public static Config readConfigFromFilename(String filename) {
-		File configFile = new File(filename);
-		if (configFile != null && configFile.exists() && configFile.isFile()) {
-			return readConfigFromFile(configFile);
-		} else {
-			log.error("Couldn't create File object from filename {}", filename);
-			return null;
-		}
-	}
-
-	/**
-	 * This file reads local configuration from the file
-	 *
-	 * @param file
-	 * @return
-	 */
-	public static Config readConfigFromFile(File file) {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			Config config = mapper.readValue(file, Config.class);
-			return config;
-		} catch (Exception e) {
-			log.error("Couldn't parse JSON to config object. Reason {}", e.getMessage());
-		}
-		return null;
-
-	}
-
-	public static Config readConfigFromString(String config) {
-		Config configObj = JSONUtils.fromString(config, Config.class);
-		return configObj;
 	}
 
 	/**

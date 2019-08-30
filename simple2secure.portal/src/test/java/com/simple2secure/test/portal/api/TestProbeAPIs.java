@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.test.portal.api;
 
 import static org.junit.Assert.assertEquals;
@@ -10,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -34,6 +56,7 @@ import com.simple2secure.portal.repository.EmailListRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 
+@Disabled
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
@@ -150,7 +173,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		// API call to change the probe group
 		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Status code must be 200
@@ -185,7 +208,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		// API call to change the probe group
 		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Unauthorized status code must be returned
@@ -207,7 +230,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		// API call to change the probe group
 		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 
@@ -228,7 +251,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		// API call to change the probe group
 		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 
@@ -256,7 +279,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		// API call to change the probe group
 		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Access forbidden status code must be returned

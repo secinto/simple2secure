@@ -1,3 +1,24 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
 package com.simple2secure.probe.network.packet;
 
 import java.util.TimerTask;
@@ -19,21 +40,19 @@ public class ProbePacketQueueHandler extends TimerTask {
 	private ProbePacket probePacket;
 
 	public ProbePacketQueueHandler(ProbePacket probePacket, ProcessingQueue<Packet> processingQueue) {
-		this.probePacket = probePacket;
-		this.processingQueue = processingQueue;
+		try {
+			this.probePacket = probePacket;
+			packetToQueue = PcapUtil.convertHexStreamToPacket(probePacket.getPacketAsHexStream(), 0);
+			this.processingQueue = processingQueue;
+
+		} catch (IllegalRawDataException e) {
+			log.error("Could not convert hex stream to packet.", e);
+		}
 	}
 
-	/**
-	 * This Class converts the network packet within the ProbePacket and push the network packet to the provided queue.
-	 */
 	@Override
 	public void run() {
-		try {
-			packetToQueue = PcapUtil.convertHexStreamToPacket(probePacket.getPacketAsHexStream(), 0);
-			processingQueue.push(packetToQueue);
-		} catch (IllegalRawDataException e) {
-			log.error("Could not create network packet from hex stream.", e);
-		}
+		processingQueue.push(packetToQueue);
 	}
 
 	public Packet getPacketToQueue() {
@@ -59,4 +78,41 @@ public class ProbePacketQueueHandler extends TimerTask {
 	public void setProbePacket(ProbePacket probePacket) {
 		this.probePacket = probePacket;
 	}
+
+	// private static Logger log = LoggerFactory.getLogger(ProbePacketQueueHandler.class);
+	// private ProcessingQueue<ProbePacket> probePacketQueue;
+	// private Timer timer = new Timer(true);
+	// private boolean isRunning = false;
+	//
+	// public ProbePacketQueueHandler() {
+	// }
+	//
+	// @Override
+	// public void run() {
+	// isRunning = true;
+	// while (isRunning) {
+	// if (ProbePacketRequestHandler.dbHasChanged) {
+	// probePacketQueue = new ProcessingQueue<>();
+	// for (ProbePacket probeP : PacketUtil.getAllProbePacketsFromDB()) {
+	// probePacketQueue.push(probeP);
+	// }
+	// ProbePacketRequestHandler.dbHasChanged = false;
+	// }
+	//
+	// if (probePacketQueue != null && probePacketQueue.hasElement()) {
+	// ProbePacket probePFromQ = probePacketQueue.pop();
+	//
+	// Packet packet;
+	// try {
+	// packet = PcapUtil.convertHexStreamToPacket(probePFromQ.getPacketAsHexStream(), 0);
+	// TimerTask packetHandlerTask = new PacketHandler(packet);
+	// timer.scheduleAtFixedRate(packetHandlerTask, TimeUnit.SECONDS.toMillis(5), TimeUnit.SECONDS.toMillis(30));
+	// // timer.schedule(packetHandlerTask, TimeUnit.SECONDS.toMillis(1));
+	// } catch (IllegalRawDataException e) {
+	// log.error("Could not convert hex stream to a packet.", e);
+	// isRunning = false;
+	// }
+	// }
+	// }
+	// }
 }
