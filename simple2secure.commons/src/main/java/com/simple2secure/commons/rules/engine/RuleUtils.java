@@ -23,13 +23,14 @@
 package com.simple2secure.commons.rules.engine;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.jeasy.rules.api.Action;
 import org.jeasy.rules.api.Condition;
+import org.jeasy.rules.api.Rule;
+import org.jeasy.rules.core.RuleBuilder;
 
 import com.google.common.reflect.ClassPath;
 import com.simple2secure.api.model.DataType;
@@ -37,10 +38,12 @@ import com.simple2secure.api.model.RuleParam;
 import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
+import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
+
 
 public class RuleUtils {
 	
@@ -209,9 +212,10 @@ public class RuleUtils {
 		return actions;	
 	}
 
-	public static Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException
+	public static Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
 	{
 		Class<?> conditionClass = null;
+		Condition condition = null;
 		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationCondition.class);
 		
 		for(Class<?> clazz: clazzes)
@@ -223,17 +227,114 @@ public class RuleUtils {
 			}
 		}
 		
+		
+		condition = (Condition) conditionClass.newInstance();
+		
 		Field fs[] = conditionClass.getDeclaredFields();
 		
+		for(Field f : fs)
+		{
+			f.setAccessible(true);
+			AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
+			
+			if(param != null)
+			{
+				for(RuleParam<?> paramData : conditionData.getParams())
+				{
+					if(paramData.getName().equals(param.name()))
+					{
+						f.set(condition, paramData.getValue());
+						break;
+					}
+				}
+				continue;
+			}
+			
+			AnnotationRuleParamArray paramArray = f.getAnnotation(AnnotationRuleParamArray.class);
+			
+			if(paramArray != null)
+			{
+				for(RuleParamArray<?> paramData : conditionData.getParamArrays())
+				{
+					if(paramData.getName().equals(paramArray.name()))
+					{
+						f.set(condition, paramData.getValues());
+						break;
+					}
+				}
+				continue;
+			}			
+		}		
 		
-		return null;
+		return condition;
 	}
 
-	public static Action buildActionFromTemplateAction(TemplateAction actionData)
+	public static Action buildActionFromTemplateAction(TemplateAction actionData, String path) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException
 	{
+		Class<?> actionClass = null;
+		Action action = null;
+		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationAction.class);
+		
+		for(Class<?> clazz: clazzes)
+		{
+			if(clazz.getAnnotation(AnnotationAction.class).name().equalsIgnoreCase(actionData.getName()))
+			{
+				actionClass = clazz;
+				break;
+			}
+		}
 		
 		
-		return null;
+		action = (Action) actionClass.newInstance();
+		
+		Field fs[] = actionClass.getDeclaredFields();
+		
+		for(Field f : fs)
+		{
+			f.setAccessible(true);
+			AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
+			
+			if(param != null)
+			{
+				for(RuleParam<?> paramData : actionData.getParams())
+				{
+					if(paramData.getName().equals(param.name()))
+					{
+						f.set(action, paramData.getValue());
+						break;
+					}
+				}
+				continue;
+			}
+			
+			AnnotationRuleParamArray paramArray = f.getAnnotation(AnnotationRuleParamArray.class);
+			
+			if(paramArray != null)
+			{
+				for(RuleParamArray<?> paramData : actionData.getParamArrays())
+				{
+					if(paramData.getName().equals(paramArray.name()))
+					{
+						f.set(action, paramData.getValues());
+						break;
+					}
+				}
+				continue;
+			}			
+		}		
+		
+		return action;
+	}
+	
+	public static Rule buildRuleFromTemplateRule(TemplateRule ruleData, 
+			String pathConditonsTempates, String pathActionTemplates) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException
+	{
+		return new RuleBuilder().
+				name(ruleData.getName()).
+				description(ruleData.getDescription()).
+				when(buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), pathConditonsTempates)).
+				then(buildActionFromTemplateAction(ruleData.getTemplateAction(), pathActionTemplates)).
+				build();
 	}
 	
 }
