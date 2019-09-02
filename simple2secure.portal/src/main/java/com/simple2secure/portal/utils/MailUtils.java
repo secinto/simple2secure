@@ -28,7 +28,7 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Configuration
@@ -46,9 +46,6 @@ public class MailUtils {
 
 	@Autowired
 	ContextRepository contextRepository;
-
-	@Autowired
-	RuleRepository ruleRepository;
 
 	@Autowired
 	JavaMailSender javaMailSender;

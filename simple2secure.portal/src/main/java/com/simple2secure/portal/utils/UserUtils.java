@@ -39,7 +39,7 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.GroovyRuleRepository;
 import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.repository.UserInfoRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
@@ -86,7 +86,7 @@ public class UserUtils {
 	LicenseRepository licenseRepository;
 
 	@Autowired
-	RuleRepository ruleRepository;
+	GroovyRuleRepository groovyRuleRepository;
 
 	@Autowired
 	EmailRepository emailRepository;
