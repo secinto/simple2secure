@@ -11,5 +11,4 @@ import com.simple2secure.portal.dao.MongoRepository;
 @Component
 public abstract class RuleActionsRepository extends MongoRepository<TemplateAction>{
 
-	public abstract List<TemplateAction> findTemplateActions();
 }

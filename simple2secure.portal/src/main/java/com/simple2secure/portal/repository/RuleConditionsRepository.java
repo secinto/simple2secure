@@ -9,6 +9,5 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 @Component
 public abstract class RuleConditionsRepository extends MongoRepository<TemplateCondition>{
-	
-	public abstract List<TemplateCondition> findTemplateConditions();
+
 }

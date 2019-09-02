@@ -26,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.simple2secure.api.model.GroovyRule;
+import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroovyRuleRepository;
+import com.simple2secure.portal.repository.RuleActionsRepository;
+import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.rules.TemplateRuleBuilder;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.RuleUtils;
@@ -43,6 +46,12 @@ public class RuleController {
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
+	
+	@Autowired
+	RuleConditionsRepository ruleConditionsRepository;
+	
+	@Autowired
+	RuleActionsRepository ruleActionsRepository; 
 
 	@Autowired
 	RuleUtils ruleUtils;
@@ -92,21 +101,49 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/rule_templates", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateCondition>> getRulesTemplates(
+	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(
 	String rule_templates,@RequestHeader("Accept-Language") String locale) { 
 		Collection<TemplateCondition> conditions;
 		try {
-			conditions = TemplateRuleBuilder.loadTemplatesConditions("com.simple2secure.portal.rules");
+			conditions = ruleConditionsRepository.findAll();
+			if(conditions == null)
+			{
+				conditions = RuleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
+				conditions.forEach(ruleConditionsRepository::save);
+			}
+			    
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"),
 					HttpStatus.FAILED_DEPENDENCY);
 		}
 
-		//String[] strings = {new Gson().toJson(conditions)};
 		return new ResponseEntity<Collection<TemplateCondition>>(conditions, HttpStatus.OK);
-		//return new ResponseEntity<String[]>(strings, HttpStatus.OK);
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/rule_templateAction", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(
+	String rule_templates,@RequestHeader("Accept-Language") String locale) { 
+		Collection<TemplateAction> actions;
+		try {
+			actions = ruleActionsRepository.findAll();
+			if(actions == null)
+			{
+				actions = RuleUtils.loadTemplateActions("com.simple2secure.portal.rules.actions");
+				actions.forEach(ruleActionsRepository::save);
+			}
+			    
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"),
+					HttpStatus.FAILED_DEPENDENCY);
+		}
+
+		return new ResponseEntity<Collection<TemplateAction>>(actions, HttpStatus.OK);
+	}
+	
 	
 	//"/delete/{ruleId}"
 	@SuppressWarnings({ "unchecked", "rawtypes" })

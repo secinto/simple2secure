@@ -21,11 +21,4 @@ public class RuleActionsRepositoryImpl extends RuleActionsRepository{
 		super.collectionName = "templateAction";
 		super.className = TemplateAction.class;
 	}
-	
-	
-	@Override
-	public List<TemplateAction> findTemplateActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

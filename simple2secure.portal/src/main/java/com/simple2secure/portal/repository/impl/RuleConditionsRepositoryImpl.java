@@ -21,11 +21,4 @@ public class RuleConditionsRepositoryImpl extends RuleConditionsRepository{
 		super.collectionName = "templateCondition";
 		super.className = TemplateCondition.class;
 	}
-
-	@Override
-	public List<TemplateCondition> findTemplateConditions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
