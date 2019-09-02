@@ -46,16 +46,29 @@ public class EmailRulesEngine extends PortalRulesEngine {
 	public void checkMail(Email email, String contextId)
 	{   
 		addFact(email);
-		List<GroovyRule> groovyRules = ruleUtils.getRulesByContextId(contextId);
+		List<GroovyRule> groovyRules = ruleUtils.getGroovyRulesByContextId(contextId);
 		
 		groovyRules.forEach(rule -> {
 			try {
 				addRuleFromSourceWithBean(rule.getGroovyCode());
 			} catch (Exception e) {
 				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());
-				// e.printStackTrace();
 			}
 		});
+		
+		List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
+		templateRules.forEach(rule -> {
+			try {
+				ruleUtils.buildRuleFromTemplateRuleWithBean(
+						rule,
+						"com.simple2secure.portal.rules.conditions" ,
+						"com.simple2secure.portal.rules.actions");
+			}catch(Exception e)
+			{
+				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());
+			}
+		});
+		
 		
 		checkFacts();
 		
