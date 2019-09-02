@@ -37,11 +37,16 @@ public class TemplateActionSendEmail extends AbtractEmailAction{
 		this.text = text;
 		this.emailAddress = emailAddress;
 	}
+	
+	public TemplateActionSendEmail() {
+	}
 
 	@Override
 	protected void action(Email email) throws IOException {
 		User user = new User(emailAddress, "test", true, null, true, true); 
-		boolean result = mailUtils.sendEmail(user, text, text);
+
+		mailUtils.sendEmail(user, text, text);
+	
 	}
 }
 

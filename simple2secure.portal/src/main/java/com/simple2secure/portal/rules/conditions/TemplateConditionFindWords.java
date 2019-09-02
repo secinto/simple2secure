@@ -1,5 +1,7 @@
 package com.simple2secure.portal.rules.conditions;
 
+import java.util.Collection;
+
 import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
@@ -15,7 +17,7 @@ public class TemplateConditionFindWords extends AbtractEmailCondition {
 			description_de = "Woerter die gefunden werden müssen zum Auslösen der Regel",
 			description_en = "Words which must be found to trigger the rule",
 			type = DataType._String)
-	private String[] words;
+	private Collection<String> words;
 	
 	@AnnotationRuleParam(name = "limited word",
 			description_de = "Weiteres wort welches nur maximal x mal vorkommen darf",
@@ -29,12 +31,14 @@ public class TemplateConditionFindWords extends AbtractEmailCondition {
 			type = DataType._int)
 	private int max_word_count;
 	
-	
+	/*
 	public TemplateConditionFindWords(String[] words) {
 		this.words = words;
 		word = "abc";
 		max_word_count = 1;
 	}
+	*/
+	
 
 	@Override
 	protected boolean condition(Email email) {
