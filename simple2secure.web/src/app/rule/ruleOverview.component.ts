@@ -1,7 +1,7 @@
 import {Component, Inject, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services/index';
-import {Rule} from '../_models/rule';
+import {GroovyRule} from '../_models/groovyRule';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -18,15 +18,15 @@ import {ContextDTO} from '../_models';
 })
 export class RuleOverviewComponent {
 
-	rules: Rule[];
+	rules: GroovyRule[];
 	loading = false;
-	selectedRule: Rule;
+	selectedRule: GroovyRule;
 	toolId: string;
 	currentUser: any;
 	deleted = false;
 	context: ContextDTO;
 
-	displayedColumns = ['name', 'description', 'action'];// 'priority', 'action'];
+	displayedColumns = ['name', 'description', 'action']
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -64,7 +64,7 @@ export class RuleOverviewComponent {
 
 	private loadRules() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'rule/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'rule/groovyrule/' + this.context.context.id)
 			.subscribe(
 				data => {
 					this.rules = data;
@@ -83,7 +83,7 @@ export class RuleOverviewComponent {
 				});
 	}
 
-	public onMenuTriggerClick(rule: Rule) {
+	public onMenuTriggerClick(rule: GroovyRule) {
 		this.selectedRule = rule;
 	}
 
@@ -109,7 +109,7 @@ export class RuleOverviewComponent {
 		dialogConfig.width = '500px';
 
 		dialogConfig.data = {
-			rule: new Rule(),
+			rule: new GroovyRule(),
 		};
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
@@ -132,7 +132,7 @@ export class RuleOverviewComponent {
 	}
 
 
-	private editRule(rule: Rule) {
+	private editRule(rule: GroovyRule) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
@@ -160,7 +160,7 @@ export class RuleOverviewComponent {
 	}
 
 
-	private onDeleteDialog(config: Rule) {
+	private onDeleteDialog(config: GroovyRule) {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -181,9 +181,9 @@ export class RuleOverviewComponent {
 		});
 	}
 
-	private deleteRule(rule: Rule) {
+	private deleteRule(rule: GroovyRule) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'rule/' + rule.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'rule/groovyrule/' + rule.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.rule.delete'));
 				this.deleted = true;

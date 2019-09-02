@@ -1,9 +1,9 @@
 import {DataType} from './dataType';
 
-export class ConditionParam<T> {
+export class RuleParamArray<T> {
     name: string;
     description_en: string;
     description_de: string;
-    value: T;
+    values: T[];
     type: DataType;
 }

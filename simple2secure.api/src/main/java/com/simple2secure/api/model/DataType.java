@@ -23,5 +23,5 @@
 package com.simple2secure.api.model;
 
 public enum DataType {
-	_int, _double, _String;
+	_INT, _DOUBLE, _STRING;
 }

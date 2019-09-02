@@ -2,7 +2,7 @@ import {RuleParam} from './ruleParam';
 import {RuleParamArray} from './ruleParamArray';
 import {Base} from './base';
 
-export class TemplateCondition extends Base{
+export class TemplateAction extends Base {
     name: string;
     description_en: string;
     description_de: string;
