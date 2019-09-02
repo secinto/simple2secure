@@ -17,7 +17,7 @@ public class TemplateActionSendNotification extends AbtractEmailAction{
 	@AnnotationRuleParam(name = "text",
 			description_de = "Text der als Notification angezeigt wird.",
 			description_en = "Text which shown as notification",
-			type = DataType._String)
+			type = DataType._STRING)
 	String notification;
 	
 	@Autowired	

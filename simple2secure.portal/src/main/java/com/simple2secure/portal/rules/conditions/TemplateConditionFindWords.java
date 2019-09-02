@@ -16,19 +16,19 @@ public class TemplateConditionFindWords extends AbtractEmailCondition {
 	@AnnotationRuleParamArray(name = "words to find",
 			description_de = "Woerter die gefunden werden müssen zum Auslösen der Regel",
 			description_en = "Words which must be found to trigger the rule",
-			type = DataType._String)
+			type = DataType._STRING)
 	private Collection<String> words;
 	
 	@AnnotationRuleParam(name = "limited word",
 			description_de = "Weiteres wort welches nur maximal x mal vorkommen darf",
 			description_en = "one more word which is allowed max x times",
-			type = DataType._String)
+			type = DataType._STRING)
 	private String word;
 	
 	@AnnotationRuleParam(name = "max word count",
 			description_de = "Anzahl wie oft das vorgegeben Wort vorkommen darf",
 			description_en = "Number how often the given word is allowed",
-			type = DataType._int)
+			type = DataType._INT)
 	private int max_word_count;
 	
 	/*

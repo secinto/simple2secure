@@ -14,7 +14,7 @@ public class TemplateConditionSpecificDomains extends AbtractEmailCondition
 	@AnnotationRuleParamArray(name = "domains",
 			description_de = "Definierte Domains um die Regel auszulösen",
 			description_en = "Defined domains to trigger the rule",
-			type = DataType._String)
+			type = DataType._STRING)
 	String[] specificDomains;
 	
 	

@@ -23,13 +23,13 @@ public class TemplateActionSendEmail extends AbtractEmailAction{
 	@AnnotationRuleParam(name = "text",
 			description_de = "Text der an gegene Adresse gesendet werden soll.",
 			description_en = "Text which will be send to given address",
-			type = DataType._String)
+			type = DataType._STRING)
 	String text;
 	
 	@AnnotationRuleParam(name = "emailaddress",
 			description_de = "Adresse an welche die Email versand werden soll.",
 			description_en = "Address to which the email should be send",
-			type = DataType._String)
+			type = DataType._STRING)
 	String emailAddress;
 	
 	
