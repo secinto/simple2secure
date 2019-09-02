@@ -47,7 +47,7 @@ import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
 public class RuleUtils {
 	
-	private static void saveParamsFromClass(Class clazz, Collection<RuleParam<?>> params, Collection<RuleParamArray<?>> paramArrays)
+	private void saveParamsFromClass(Class clazz, Collection<RuleParam<?>> params, Collection<RuleParamArray<?>> paramArrays)
 	{
 		Field fs[] = clazz.getDeclaredFields();
 
@@ -61,19 +61,19 @@ public class RuleUtils {
 		    	RuleParamArray<?> paramArray = null;
 		    	switch(annotationParamArray.type())
 		    	{
-		    	case _int:
+		    	case _INT:
 		    		paramArray = new RuleParamArray<Integer>();
-		    		paramArray.setType(DataType._int);
+		    		paramArray.setType(DataType._INT);
 		    		break;
 		    		
-		    	case _double:
+		    	case _DOUBLE:
 		    		paramArray = new RuleParamArray<Double>();
-		    		paramArray.setType(DataType._double);
+		    		paramArray.setType(DataType._DOUBLE);
 		    		break;
 		    		
-		    	case _String:
+		    	case _STRING:
 		    		paramArray = new RuleParamArray<Double>();
-		    		paramArray.setType(DataType._String);
+		    		paramArray.setType(DataType._STRING);
 		    		break;
 		    		
 		    	default:
@@ -99,19 +99,19 @@ public class RuleUtils {
 		    	RuleParam<?> param = null;
 		    	switch(annotationParam.type())
 		    	{
-		    	case _int:
+		    	case _INT:
 		    		param = new RuleParam<Integer>();
-		    		param.setType(DataType._int);
+		    		param.setType(DataType._INT);
 		    		break;
 		    		
-		    	case _double:
+		    	case _DOUBLE:
 		    		param = new RuleParam<Double>();
-		    		param.setType(DataType._double);
+		    		param.setType(DataType._DOUBLE);
 		    		break;
 		    		
-		    	case _String:
+		    	case _STRING:
 		    		param = new RuleParam<Double>();
-		    		param.setType(DataType._String);
+		    		param.setType(DataType._STRING);
 		    		break;
 		    		
 		    	default:
@@ -132,7 +132,7 @@ public class RuleUtils {
 	    }
 	}
 	
-	private static Collection<Class<?>> getAnnotatedClass(String path, Class annotation) throws IOException, ClassNotFoundException
+	private Collection<Class<?>> getAnnotatedClass(String path, Class annotation) throws IOException, ClassNotFoundException
 	{
 		Collection<Class<?>> clazzes = new ArrayList<Class<?>>();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -148,7 +148,7 @@ public class RuleUtils {
 		return clazzes;
 	}
 	
-	public static Collection<TemplateCondition> loadTemplateConditions(String path) throws IOException, ClassNotFoundException
+	public Collection<TemplateCondition> loadTemplateConditions(String path) throws IOException, ClassNotFoundException
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Collection<TemplateCondition> conditions = new ArrayList<TemplateCondition>();
@@ -180,7 +180,7 @@ public class RuleUtils {
 		return conditions;	
 	}
 	
-	public static Collection<TemplateAction> loadTemplateActions(String path) throws IOException, ClassNotFoundException
+	public Collection<TemplateAction> loadTemplateActions(String path) throws IOException, ClassNotFoundException
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Collection<TemplateAction> actions = new ArrayList<TemplateAction>();
@@ -212,7 +212,7 @@ public class RuleUtils {
 		return actions;	
 	}
 
-	public static Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
+	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
 	{
 		Class<?> conditionClass = null;
 		Condition condition = null;
@@ -269,7 +269,7 @@ public class RuleUtils {
 		return condition;
 	}
 
-	public static Action buildActionFromTemplateAction(TemplateAction actionData, String path) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException
+	public Action buildActionFromTemplateAction(TemplateAction actionData, String path) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException
 	{
 		Class<?> actionClass = null;
 		Action action = null;
@@ -326,7 +326,7 @@ public class RuleUtils {
 		return action;
 	}
 	
-	public static Rule buildRuleFromTemplateRule(TemplateRule ruleData, 
+	public Rule buildRuleFromTemplateRule(TemplateRule ruleData, 
 			String pathConditonsTempates, String pathActionTemplates) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException
 	{
 		return new RuleBuilder().
