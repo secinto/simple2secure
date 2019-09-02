@@ -33,8 +33,70 @@
 
 <div *ngIf="toggle == 'template'">
 
-    templatemode: not implemented yet...
+    Condition Templates
 
+    <div class="example-container mat-elevation-z8">
+        <table mat-table [dataSource]="conditionsDataSource">
+
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="selected">
+                <th mat-header-cell *matHeaderCellDef> Select </th>
+
+                <td mat-cell *matCellDef="let row">
+                    <mat-radio-button>                                                                                   <!-- TODO: loading specific param boxes for the choosen condition -->
+                    </mat-radio-button>
+                </td>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{ 'table.name' | translate }} </th>
+                <td mat-cell *matCellDef="let condition"> {{condition.name}} </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> {{ 'table.description' | translate }} </th>
+                <td mat-cell *matCellDef="let condition"> {{condition.description_en}} </td>                             <!-- TODO: support multiple language -->
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="conditionsDisplayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: conditionsDisplayedColumns;"></tr>
+        </table>
+    </div>
+
+    Action Templates
+
+    <div class="example-container mat-elevation-z8">
+        <table mat-table [dataSource]="actionsDataSource">
+
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="selected">
+                <th mat-header-cell *matHeaderCellDef> Select </th>
+
+                <td mat-cell *matCellDef="let row">
+                    <mat-radio-button>                                                                                   <!-- TODO: loading specific param boxes for the choosen action -->
+                    </mat-radio-button>
+                </td>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{ 'table.name' | translate }} </th>
+                <td mat-cell *matCellDef="let action"> {{action.name}} </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> {{ 'table.description' | translate }} </th>
+                <td mat-cell *matCellDef="let action"> {{action.description_en}} </td>                                   <!-- TODO: support multiple language -->
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="actionsDisplayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: actionsDisplayedColumns;"></tr>
+        </table>
+    </div>
 
 </div>
 
@@ -59,5 +121,7 @@
         </button>
     </form>
 </div>
+
+
 
 

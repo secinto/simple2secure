@@ -1,7 +1,15 @@
-import {Component, ElementRef, Inject, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {
+	Component, ComponentFactory,
+	ComponentFactoryResolver,
+	ComponentRef,
+	ElementRef,
+	Inject,
+	ViewChild,
+	ViewContainerRef
+} from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services/index';
-import {Rule} from '../_models/rule';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {GroovyRule} from '../_models/groovyRule';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
@@ -12,6 +20,8 @@ import 'ace-builds/src-noconflict/mode-groovy';
 import {AceEditorComponent} from 'ng2-ace-editor';
 import {MatButtonToggleChange} from '@angular/material/typings/button-toggle';
 import {TemplateCondition} from '../_models/templateCondition';
+import {container} from '@angular/core/src/render3';
+import {TemplateAction} from '../_models/templateAction';
 
 
 @Component({
@@ -21,7 +31,7 @@ import {TemplateCondition} from '../_models/templateCondition';
 	selector: 'addRule'
 })
 export class RuleAddComponent {
-	rule: Rule;
+	rule: GroovyRule;
 	loading = false;
 	isNewRuleAdded = false;
 	context: ContextDTO;
@@ -30,9 +40,13 @@ export class RuleAddComponent {
 	template = 'template';
 	jsonString: String;
 	conditions: TemplateCondition[];
+	actions: TemplateAction[];
+	conditionsDisplayedColumns = ['selected', 'name', 'description'];
+	actionsDisplayedColumns = ['selected', 'name', 'description'];
+	conditionsDataSource = new MatTableDataSource();
+	actionsDataSource = new MatTableDataSource();
 
     @ViewChild('ace_editor') editor: ElementRef;
-
 
 	constructor(
 		private route: ActivatedRoute,
@@ -49,6 +63,9 @@ export class RuleAddComponent {
 		this.context = JSON.parse(localStorage.getItem('context'));
 		this.rule = data.rule;
 		this.toggle = this.template;
+
+
+
 
 		/*
 		if (data.rule.id) {
@@ -107,15 +124,67 @@ export class RuleAddComponent {
 */
     }
 
-    getTemplates()
+
+
+
+
+	private getTemplates()
 	{
-		this.httpService.get(environment.apiEndpoint + 'rule/rule_templates')
+		this.httpService.get(environment.apiEndpoint + 'rule/template_actions/')
+			.subscribe(
+				data => {
+					this.actions = data;
+
+					if(this.actions == null)
+					    return;
+
+					this.actionsDataSource.data = this.actions;
+
+					this.actions.forEach(function (action){
+						console.log("Action:");
+						console.log(action.name);
+						console.log(action.description_de);
+						console.log(action.description_en);
+
+						action.params.forEach(function (param) {
+							console.log("---> param:");
+							console.log(param.name);
+							console.log(param.description_de);
+							console.log(param.description_en);
+							console.log(param.type);
+							console.log(param.value);
+						});
+
+						action.paramArrays.forEach(function (paramArray) {
+							console.log("---> paramArray:");
+							console.log(paramArray.name);
+							console.log(paramArray.description_de);
+							console.log(paramArray.description_en);
+							console.log(paramArray.type);
+							console.log(paramArray.values);
+						});
+					});
+					this.alertService.success(this.translate.instant("Sever connection for loading action templates worked")); // TODO: change hardcodedtext
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+
+		this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
 			.subscribe(
 				data => {
 					this.conditions = data;
 
 					if(this.conditions == null)
-					    return;
+						return;
+
+					this.conditionsDataSource.data = this.conditions;
 
 					this.conditions.forEach(function (condition){
 						console.log("Condition:");
@@ -141,7 +210,7 @@ export class RuleAddComponent {
 							console.log(paramArray.values);
 						});
 					});
-					this.alertService.success(this.translate.instant("Sever connection for loading templates worked")); // TODO: change hardcodedtext
+					this.alertService.success(this.translate.instant("Sever connection for loading condition templates worked")); // TODO: change hardcodedtext
 				},
 				error => {
 
@@ -154,13 +223,11 @@ export class RuleAddComponent {
 				});
 	}
 
-	saveRule() {
-
+	private saveRule() {
 		if (!this.rule.contextID) {
 			this.rule.contextID = this.context.context.id;
 		}
-
-		this.httpService.post(this.rule, environment.apiEndpoint + 'rule').subscribe(
+		this.httpService.post(this.rule, environment.apiEndpoint + 'rule/templateRule/').subscribe(
 			data => {
 				this.dialogRef.close(true);
 			},
