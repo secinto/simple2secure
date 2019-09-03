@@ -139,7 +139,7 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		String[] activeProfiles = env.getActiveProfiles();
 
 		for (String profile : activeProfiles) {
-			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION) || profile.equals(StaticConfigItems.PROFILE_TEST)) {
 				LoadedConfigItems loadedConfigItems = LoadedConfigItems.getInstance();
 				loadedConfigItems.setBasePort("8443");
 				loadedConfigItems.setBaseProtocol("https");

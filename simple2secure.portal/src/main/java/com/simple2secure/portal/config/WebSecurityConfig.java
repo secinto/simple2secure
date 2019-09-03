@@ -71,15 +71,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll()
 				.antMatchers("/api/service/").permitAll().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
 				.antMatchers("/api/user/activate/").anonymous().and().authorizeRequests().antMatchers("/api/test").anonymous().and()
-				.authorizeRequests().antMatchers("/api/user/sendResetPasswordEmail").anonymous().and().authorizeRequests()
-				.antMatchers("/api/user/resetPassword/**").anonymous().and().authorizeRequests().antMatchers("/api/user/updatePassword/**")
-				.anonymous().and().authorizeRequests().antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/download/**").anonymous().and().authorizeRequests().antMatchers("/api/device/**").anonymous().and()
-				.authorizeRequests().antMatchers("/api/license/activateProbe").anonymous().and().authorizeRequests()
-				.antMatchers("/api/license/activatePod/**").anonymous().and().authorizeRequests().antMatchers("/api/pod/config/**").anonymous()
-				.and().authorizeRequests().and()
-				// We filter the api/login requests
-				.addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests().antMatchers("/api/user/updatePassword/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and()
+				.authorizeRequests().antMatchers("/api/device/**").anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe")
+				.anonymous().and().authorizeRequests().antMatchers("/api/license/activatePod/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/pod/config/**").anonymous().and().authorizeRequests()
+				// filter the login requests
+				.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 				// And filter other requests to check the presence of JWTth in header
 				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 

@@ -136,7 +136,7 @@ public class UserController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
 		List<User> userList = userRepository.findAll();
-		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
+		return new ResponseEntity<>(userList, HttpStatus.OK);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class UserController {
 				}
 
 				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myPods, myContexts, assignedGroups);
-				return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
@@ -249,7 +249,7 @@ public class UserController {
 
 			if (user != null) {
 				userInfoRepository.update(userInfo);
-				return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
+				return new ResponseEntity<>(userInfo, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
@@ -380,7 +380,7 @@ public class UserController {
 						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
 
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
-					return new ResponseEntity<User>(user, HttpStatus.OK);
+					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
 					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
 							HttpStatus.NOT_FOUND);
@@ -402,9 +402,9 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(value = "/resetPassword/{token}", method = RequestMethod.POST)
-	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token, @RequestHeader("Accept-Language") String locale)
-			throws URISyntaxException {
+	@RequestMapping(value = "/resetPassword/{token}", method = RequestMethod.GET)
+	@PreAuthorize("permitAll")
+	public ResponseEntity<User> showChangePasswordPage(@PathVariable("token") String token) throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);
@@ -456,7 +456,7 @@ public class UserController {
 							}
 							contextUserAuthRepository.save(contextUserAuth);
 							userInvitationRepository.delete(userInvitation);
-							return new ResponseEntity<UserInvitation>(userInvitation, HttpStatus.OK);
+							return new ResponseEntity<>(userInvitation, HttpStatus.OK);
 
 						} else {
 							userInvitationRepository.delete(userInvitation);
@@ -565,7 +565,7 @@ public class UserController {
 								HttpStatus.NOT_FOUND);
 					} else {
 						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
-						return new ResponseEntity<ContextUserAuthentication>(contextUserAuthentication, HttpStatus.OK);
+						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
 					}
 				}
 			}
