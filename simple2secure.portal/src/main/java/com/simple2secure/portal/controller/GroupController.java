@@ -112,7 +112,7 @@ public class GroupController {
 
 							parentGroup.addChildrenId(groupId.toString());
 							groupRepository.update(parentGroup);
-							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+							return new ResponseEntity<>(group, HttpStatus.OK);
 						}
 					} else {
 						// NEW PARENT GROUP!
@@ -131,7 +131,7 @@ public class GroupController {
 								groupAccessRightRepository.save(groupAccessRight);
 							}
 
-							return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+							return new ResponseEntity<>(group, HttpStatus.OK);
 						}
 					}
 				} else {
@@ -144,7 +144,7 @@ public class GroupController {
 				// UPDATING EXISTING GROUP
 
 				groupRepository.update(group);
-				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+				return new ResponseEntity<>(group, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while saving/updating group");
@@ -162,7 +162,7 @@ public class GroupController {
 		if (!Strings.isNullOrEmpty(groupId)) {
 			CompanyGroup group = groupRepository.find(groupId);
 			if (group != null) {
-				return new ResponseEntity<CompanyGroup>(group, HttpStatus.OK);
+				return new ResponseEntity<>(group, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving group with id {}", groupId);
@@ -185,7 +185,7 @@ public class GroupController {
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
-					return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+					return new ResponseEntity<>(groups, HttpStatus.OK);
 				}
 			}
 		}
@@ -213,7 +213,7 @@ public class GroupController {
 					// TODO: check according to the user role which groups will be visible to the user
 					List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 					if (groups != null) {
-						return new ResponseEntity<List<CompanyGroup>>(groups, HttpStatus.OK);
+						return new ResponseEntity<>(groups, HttpStatus.OK);
 					}
 				}
 			}
@@ -270,7 +270,7 @@ public class GroupController {
 		} else {
 			log.error("Problem occured while moving group with id {}", sourceGroupId);
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.NO_CONTENT);
 		}
 	}
 }

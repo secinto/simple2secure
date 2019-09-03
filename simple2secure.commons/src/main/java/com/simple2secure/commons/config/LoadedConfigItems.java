@@ -54,7 +54,7 @@ public class LoadedConfigItems {
 	private String settingsURL = "/config/settings.json";
 	private String licensePlanURL = "/config/licensePlan.json";
 
-	private String usersAPI = "/api/users";
+	private String usersAPI = "/api/user";
 	private String endpointsAPI = "/api/endpoints";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
@@ -66,6 +66,8 @@ public class LoadedConfigItems {
 	private String processorAPI = "/api/processors";
 	private String licenseAPI = "/api/license";
 	private String serviceAPI = "/api/service";
+	private String groupAPI = "/api/group";
+	private String probeAPI = "/api/probe";
 
 	private static LoadedConfigItems instance;
 
@@ -228,6 +230,14 @@ public class LoadedConfigItems {
 
 	public String getServiceAPI() {
 		return getBaseURL() + serviceAPI;
+	}
+
+	public String getGroupAPI() {
+		return getBaseURL() + groupAPI;
+	}
+
+	public String getProbeAPI() {
+		return getBaseURL() + probeAPI;
 	}
 
 	public String getLicensePlanURL() {

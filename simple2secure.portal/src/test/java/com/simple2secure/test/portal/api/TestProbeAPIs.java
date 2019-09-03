@@ -27,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.PodStatus;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
@@ -63,10 +64,11 @@ public class TestProbeAPIs extends TestAPIBase {
 		// Create license object which should be deleted
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
 		license.setProbeId("789");
+		license.setStatus(PodStatus.ONLINE);
 		licenseRepository.save(license);
 
 		// API call to delete the created license
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -88,7 +90,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -103,31 +105,13 @@ public class TestProbeAPIs extends TestAPIBase {
 		String probeId = "102";
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + probeId;
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Not found status code must be returned
 		assertEquals(404, response.getStatusCodeValue());
-	}
-
-	@Test
-	public void testDeleteProbeUserAuthenticatedButUnprivileged() {
-		// Create license object which should be deleted
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
-		licenseRepository.save(license);
-
-		// API call to delete the created license
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
-		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
-				new HttpEntity<String>(createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
-
-		// Access forbiden status code must be returned
-		assertNotNull(response);
-		assertEquals(403, response.getStatusCodeValue());
-		log.debug("Response {0}", response.toString());
 	}
 
 	@Test
@@ -148,9 +132,9 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Status code must be 200
@@ -183,9 +167,9 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Unauthorized status code must be returned
@@ -205,9 +189,9 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 
@@ -226,42 +210,13 @@ public class TestProbeAPIs extends TestAPIBase {
 		groupRepository.save(group);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + probeId;
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
+				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 
 		// Not found status code must be returned
 		assertEquals(404, response.getStatusCodeValue());
 	}
-
-	@Test
-	public void testChangeProbeGroupUserAuthenticatedButUnprivileged() {
-		// Create companyGroup object for the current group
-		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<String>());
-		ObjectId oldGroupId = groupRepository.saveAndReturnId(group);
-
-		// Create companyGroup object for the group which will be the new group
-		group.setName("New Group");
-		ObjectId newGroupId = groupRepository.saveAndReturnId(group);
-		group = groupRepository.find(newGroupId.toString());
-
-		// Create license object
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
-		license.setGroupId(oldGroupId.toString());
-		licenseRepository.save(license);
-
-		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
-		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<CompanyGroup>(group, createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
-
-		assertNotNull(response);
-		// Access forbidden status code must be returned
-		assertEquals(403, response.getStatusCodeValue());
-
-	}
-
 }

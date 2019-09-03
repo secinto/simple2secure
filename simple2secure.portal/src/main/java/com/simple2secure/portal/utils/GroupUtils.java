@@ -308,7 +308,7 @@ public class GroupUtils {
 				if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
 					// SUPERADMIN can move everything
 					if (moveGroup(fromGroup, toGroup)) {
-						return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+						return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 					}
 				}
 				// SUPERUSER
@@ -320,14 +320,14 @@ public class GroupUtils {
 						// in this case the moved group will be root group
 						if (toGroup == null) {
 							if (moveGroup(fromGroup, toGroup)) {
-								return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+								return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 							}
 						} else {
 							// check if toGroup is assigned to this user
 							groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(toGroup.getId(), user.getId());
 							if (groupAccessRight != null) {
 								if (moveGroup(fromGroup, toGroup)) {
-									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 								}
 							}
 						}
@@ -343,14 +343,14 @@ public class GroupUtils {
 							// In case that toGroup is null, fromGroup will be new root group
 							if (toGroup == null) {
 								if (moveGroup(fromGroup, toGroup)) {
-									return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 								}
 							} else {
 								if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
 									// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
 									if (fromGroup.getContextId().equals(toGroup.getContextId())) {
 										if (moveGroup(fromGroup, toGroup)) {
-											return new ResponseEntity<CompanyGroup>(fromGroup, HttpStatus.OK);
+											return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 										}
 									}
 								}
@@ -362,7 +362,7 @@ public class GroupUtils {
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-				HttpStatus.NOT_FOUND);
+				HttpStatus.NO_CONTENT);
 	}
 
 	/**

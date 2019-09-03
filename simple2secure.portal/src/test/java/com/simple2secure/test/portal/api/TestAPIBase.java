@@ -29,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
@@ -36,6 +37,7 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.UserRepository;
 
@@ -60,6 +62,9 @@ public class TestAPIBase {
 
 	@Autowired
 	private ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
+	private CurrentContextRepository currentContextRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -156,7 +161,10 @@ public class TestAPIBase {
 		user = userRepository.findByEmail(user.getEmail());
 
 		ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(user.getId(), contextId, userRole, true);
-		contextUserAuthRepository.save(contextUserAuth);
+		ObjectId contextUserAuthId = contextUserAuthRepository.saveAndReturnId(contextUserAuth);
+
+		CurrentContext currentContext = new CurrentContext(user.getId(), contextUserAuthId.toString());
+		currentContextRepository.save(currentContext);
 
 		return user;
 	}
@@ -190,7 +198,7 @@ public class TestAPIBase {
 		}
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
@@ -211,6 +219,8 @@ public class TestAPIBase {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Accept-Language", "en");
+		headers.set("user-agent",
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
 		if (userRole.equals(UserRole.ADMIN)) {
 			headers.set("Authorization", getAccessTokenAdmin());
 		} else if (userRole.equals(UserRole.SUPERUSER)) {
