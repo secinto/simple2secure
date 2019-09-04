@@ -9,7 +9,9 @@
 package com.simple2secure.portal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -33,6 +35,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.yaml.snakeyaml.Yaml;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -137,6 +140,10 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		mongoRepository.defineTextIndexes();
 
 		String[] activeProfiles = env.getActiveProfiles();
+
+		Yaml yaml = new Yaml();
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("/config_dev.item.yml");
+		Map<String, Object> obj = yaml.load(inputStream);
 
 		for (String profile : activeProfiles) {
 			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION) || profile.equals(StaticConfigItems.PROFILE_TEST)) {

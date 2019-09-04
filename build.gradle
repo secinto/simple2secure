@@ -108,3 +108,41 @@ project(':simple2secure.portal') {
 				'org.springframework.boot:spring-boot-starter-test')
 	}
 }
+
+ConfigurableFileTree ft_commons = fileTree(dir: 'simple2secure.commons/src/main/resources', includes: ['test.yml'])
+ConfigurableFileTree ft_portal = fileTree(dir: 'simple2secure.portal/src/main/resources', includes: ['test.yml'])
+
+task gitTask {
+	description 'Pushes the source code to the git repository'
+	doLast {
+		println "Pushing to the repository"
+	}	
+}
+
+task deleteTask(type: Delete){
+	description 'Deletes the unnecessary configuration yaml files'
+	doLast {
+		println "Deleting the files"
+	
+		ft_commons.visit { FileVisitDetails fvd ->
+            delete fvd.file
+        }
+		
+		ft_portal.visit { FileVisitDetails fvd ->
+            delete fvd.file
+        }
+	}
+}
+
+task overwriteTask(){
+	description 'Overwrites the actual configuration according to the used profile'
+	doLast {
+		println "First copying"
+	}	
+}
+
+deleteTask.dependsOn overwriteTask
+gitTask.dependsOn deleteTask
+gitTask.shouldRunAfter deleteTask
+
+

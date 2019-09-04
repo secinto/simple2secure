@@ -93,7 +93,10 @@ public class LoadedConfigItems {
 			LoadedConfigItems user = mapper.readValue(Resources.toString(Resources.getResource("config.items.yml"), Charset.forName("UTF-8")),
 					LoadedConfigItems.class);
 
-			log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
+			if (user != null) {
+				log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
+				instance = user;
+			}
 
 		} catch (Exception e) {
 			log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(), e.getStackTrace());
