@@ -1,122 +1,289 @@
 <h3 mat-dialog-title>{{ 'button.addRule' | translate }}</h3>
 
-<mat-button-toggle-group [value]="toggle" (change)="toggleView($event)">
-    <mat-button-toggle [value]= "template" aria-label="Text align left">
-        template
-    </mat-button-toggle>
-    <mat-button-toggle [value]="expert" aria-label="Text align center">
-        expert
-    </mat-button-toggle>
-</mat-button-toggle-group>
-
-<table class="full_width_input" cellspacing="0">
-    <tr>
-        <td>
-            <mat-form-field class="full_width_input">
-                <input matInput type="text" placeholder="{{ 'table.name' | translate }}"
-                       [(ngModel)]="rule.name"
-                       name="name" autocomplete='given-name' required>
-            </mat-form-field>
-        </td>
-    </tr>
-</table>
-<table class="full_width_input" cellspacing="0">
-    <tr>
-        <td>
-            <mat-form-field class="full_width_input">
-                <input matInput type="text" placeholder="{{ 'table.description' | translate }}"
-                       [(ngModel)]="rule.description" name="description" autocomplete='family-name' required>
-            </mat-form-field>
-        </td>
-    </tr>
-</table>
-
-<div *ngIf="toggle == 'template'">
-
-    Condition Templates
-
-    <div class="example-container mat-elevation-z8">
-        <table mat-table [dataSource]="conditionsDataSource">
-
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="selected">
-                <th mat-header-cell *matHeaderCellDef> Select </th>
-
-                <td mat-cell *matCellDef="let row">
-                    <mat-radio-button>                                                                                   <!-- TODO: loading specific param boxes for the choosen condition -->
-                    </mat-radio-button>
-                </td>
-            </ng-container>
-
-            <!-- Name -->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'table.name' | translate }} </th>
-                <td mat-cell *matCellDef="let condition"> {{condition.name}} </td>
-            </ng-container>
-
-            <!-- Description Column -->
-            <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef> {{ 'table.description' | translate }} </th>
-                <td mat-cell *matCellDef="let condition"> {{condition.description_en}} </td>                             <!-- TODO: support multiple language -->
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="conditionsDisplayedColumns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: conditionsDisplayedColumns;"></tr>
-        </table>
-    </div>
-
-    Action Templates
-
-    <div class="example-container mat-elevation-z8">
-        <table mat-table [dataSource]="actionsDataSource">
-
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="selected">
-                <th mat-header-cell *matHeaderCellDef> Select </th>
-
-                <td mat-cell *matCellDef="let row">
-                    <mat-radio-button>                                                                                   <!-- TODO: loading specific param boxes for the choosen action -->
-                    </mat-radio-button>
-                </td>
-            </ng-container>
-
-            <!-- Name -->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'table.name' | translate }} </th>
-                <td mat-cell *matCellDef="let action"> {{action.name}} </td>
-            </ng-container>
-
-            <!-- Description Column -->
-            <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef> {{ 'table.description' | translate }} </th>
-                <td mat-cell *matCellDef="let action"> {{action.description_en}} </td>                                   <!-- TODO: support multiple language -->
-            </ng-container>
+<mat-dialog-content>
+    <!-- =========================================================================================================== -->
+    <!-- Input for name and description -->
+    <table class="full_width_input" cellspacing="0">
+        <tr>
+            <td>
+                <mat-form-field class="full_width_input">
+                    <input matInput type="text" placeholder="{{ 'table.name' | translate }}"
+                           [(ngModel)]="ruleName"
+                           name="name" autocomplete='given-name' required>
+                </mat-form-field>
+            </td>
+        </tr>
+    </table>
+    <table class="full_width_input" cellspacing="0">
+        <tr>
+            <td>
+                <mat-form-field class="full_width_input">
+                    <input matInput type="text" placeholder="{{ 'table.description' | translate }}"
+                           [(ngModel)]="ruleDescription" name="description" autocomplete='family-name' required>
+                </mat-form-field>
+            </td>
+        </tr>
+    </table>
 
 
-            <tr mat-header-row *matHeaderRowDef="actionsDisplayedColumns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: actionsDisplayedColumns;"></tr>
-        </table>
-    </div>
+    <!-- =========================================================================================================== -->
+    <!-- Tabs for expert and template mode -->
+    <mat-tab-group #tabGroup mat-align-tabs="center" >
 
-</div>
+        <!-- ------------------------------------------------------------------------------------------------------- -->
+        <!-- Template -->
+        <mat-tab label="{{ 'menu.RuleTemplate' | translate }}">
 
-<div *ngIf="toggle == 'expert'">
+            <!-- Condition input -->
+            <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ 'rule.condition' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description >
+                        {{selectedCondition ? selectedCondition.name : ""}}                    <!-- TODO {{ 'rule.chooseCondition' | translate }} -->
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
 
-    <div #ace_editor  ace-editor
-         [(text)]="rule.groovyCode"
-         [mode]="'groovy'"
-         [theme]="'eclipse'"
-         [readOnly]="false"
-         [autoUpdateContent]="true">
-    </div>
-</div>
-<!-- [disabled]="!ruleForm.dirty" -->
+                <!-- Condition select -->
+                <mat-select [(ngModel)] = "selectedCondition"
+                            (selectionChange)="showConditionParams($event.value)"
+                            placeholder="{{ 'rule.chooseCondition' | translate }}">
+                    <mat-option *ngFor="let condition of allTemplateConditions" [value] = "condition">{{condition.name}}</mat-option>
+                </mat-select>
+
+                <!-- views params for input -->
+                <div *ngIf="currentConditionParams">
+                    <div *ngFor="let param of currentConditionParams">
+                        <tr>
+                            <td>
+                                <div [ngSwitch]="param.type">
+                                    <div *ngSwitchCase="'_INT'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="number" matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchCase="'_DOUBLE'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="number" matInput placeholder="{{param.name}}"
+                                                   ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchCase="'_STRING'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="text" matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchDefault>
+                                        <mat-form-field class="example-full-width">
+                                            <input matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <p>{{param.description_en}}</p>
+                            </td>
+                        </tr>
+                    </div>
+                </div>
+
+                <!-- view param arrays -->
+                <div *ngIf="currentConditionParamArrays">
+                    <div *ngFor = "let conditionParamArray of currentConditionParamArrays, let arrayIndex = index">
+                        <div *ngIf = "conditionParamArray.values">
+                            <div *ngFor = "let value of conditionParamArray.values, let valueIndex = index">
+                                <tr>
+                                    <td>
+                                        <div [ngSwitch]="conditionParamArray.type">
+                                            <div *ngSwitchCase="'_INT'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="number" matInput placeholder="{{conditionParamArray.name}}"
+                                                           [(ngModel)]="conditionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchCase="'_DOUBLE'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="number" matInput placeholder="{{conditionParamArray.name}}"
+                                                           [(ngModel)]="conditionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchCase="'_STRING'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="text" matInput placeholder="{{conditionParamArray.name}}"
+                                                           [(ngModel)]="conditionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchDefault>
+                                                <mat-form-field class="example-full-width">
+                                                    <input matInput placeholder="{{conditionParamArray.name}}"
+                                                           [(ngModel)]="conditionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>{{conditionParamArray.description_en}}</p>
+                                    </td>
+                                </tr>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button mat-raised-button color="primary" type="button" (click)="addValueConditionParamArray(arrayIndex)"
+                                    class="mat-green-button">
+                                <i class="glyphicon glyphicon-plus"></i> {{ 'menu.addValue' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </mat-expansion-panel>
+
+            <!--Action input -->
+            <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ 'rule.action' | translate }}                                                                     <!-- TODO -->
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{selectedAction ? selectedAction.name : ""}}                                                                                     <!-- TODO -->
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <!-- Action select -->
+                <mat-select [(ngModel)] = "selectedAction"
+                            (selectionChange)="showActionParams($event.value)"
+                            placeholder="{{ 'rule.chooseAction' | translate }}">
+                    <mat-option *ngFor="let action of allTemplateActions" [value] = "action">{{action.name}}</mat-option>
+                </mat-select>
+
+                <!-- views params for input -->
+                <div *ngIf="currentActionParams">
+                    <div *ngFor="let param of currentActionParams">
+                        <tr>
+                            <td>
+                                <div [ngSwitch]="param.type">
+                                    <div *ngSwitchCase="'_INT'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="number" matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchCase="'_DOUBLE'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="number" matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchCase="'_STRING'">
+                                        <mat-form-field class="example-full-width">
+                                            <input type="text" matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+                                    <div *ngSwitchDefault>
+                                        <mat-form-field class="example-full-width">
+                                            <input matInput placeholder="{{param.name}}"
+                                                   [(ngModel)]="param.value">
+                                        </mat-form-field>
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td>
+                                <p>{{param.description_en}}</p>
+                            </td>
+                        </tr>
+                    </div>
+                </div>
+
+                <!-- view param arrays -->
+                <div *ngIf="currentActionParamArrays">
+                    <div *ngFor = "let actionParamArray of currentActionParamArrays, let arrayIndex = index">
+                        <div *ngIf = "actionParamArray.values">
+                            <div *ngFor = "let value of actionParamArray.values, let valueIndex = index">
+                                <tr>
+                                    <td>
+                                        <div [ngSwitch]="actionParamArray.type">
+                                            <div *ngSwitchCase="'_INT'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="number" matInput placeholder="{{actionParamArray.name}}"
+                                                           [(ngModel)]="actionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchCase="'_DOUBLE'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="number" matInput placeholder="{{actionParamArray.name}}"
+                                                           [(ngModel)]="actionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchCase="'_STRING'">
+                                                <mat-form-field class="example-full-width">
+                                                    <input type="text" matInput placeholder="{{actionParamArray.name}}"
+                                                           [(ngModel)]="actionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchDefault>
+                                                <mat-form-field class="example-full-width">
+                                                    <input matInput placeholder="{{actionParamArray.name}}"
+                                                           [(ngModel)]="actionParamArray.values[valueIndex]">
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>{{actionParamArray.description_en}}</p>
+                                    </td>
+                                </tr>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button mat-raised-button color="primary" type="button" (click)="addValueActionParamArray(arrayIndex)"
+                                    class="mat-green-button">
+                                <i class="glyphicon glyphicon-plus"></i> {{ 'menu.addValue' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </mat-expansion-panel>
+
+        </mat-tab>
+
+
+        <!-- ------------------------------------------------------------------------------------------------------- -->
+        <!-- Expert -->
+        <mat-tab label="{{ 'menu.RuleExpert' | translate }}">
+            <!-- editor for expert mode -->
+            <div #ace_editor  ace-editor
+                 [(text)]="ruleExpert.groovyCode"
+                 [mode]="'groovy'"
+                 [theme]="'eclipse'"
+                 [readOnly]="false"
+                 [autoUpdateContent]="true">
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</mat-dialog-content>
+
+
+<!-- =============================================================================================================== -->
+<!-- save/cancel buttons  -->
 <div mat-dialog-actions>
     <form #ruleForm="ngForm" >
-        <button mat-button mat-raised-button class="mat-green-button" color="primary"
+                                                                                                                             <!-- TODO: [disabled]="!ruleForm.dirty" -->
+        <button mat-button mat-raised-button  class="mat-green-button" color="primary"
                 (click)="saveRule()">{{ 'button.save' | translate }}
         </button>
-        <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="rule"
+        <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]
                 cdkFocusInitial>{{ 'button.cancel' | translate }}
         </button>
     </form>

@@ -8,20 +8,31 @@ import {
 	ViewContainerRef
 } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services/index';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {
+    MatTableDataSource,
+    MatSort,
+    MatPaginator,
+    MatDialog,
+    MatDialogConfig,
+    MatDialogRef,
+    MAT_DIALOG_DATA,
+    MatTabChangeEvent, MatTabGroup
+} from '@angular/material';
 import {GroovyRule} from '../_models/groovyRule';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO} from '../_models';
+import {ContextDTO, TemplateRule} from '../_models';
 import 'brace';
 import 'ace-builds/src-noconflict/mode-groovy';
 import {AceEditorComponent} from 'ng2-ace-editor';
-import {MatButtonToggleChange} from '@angular/material/typings/button-toggle';
 import {TemplateCondition} from '../_models/templateCondition';
 import {container} from '@angular/core/src/render3';
 import {TemplateAction} from '../_models/templateAction';
+import {RuleParam} from '../_models/ruleParam';
+import {RuleParamArray} from '../_models/ruleParamArray';
+import {DataType} from '../_models/dataType';
 
 
 @Component({
@@ -31,22 +42,24 @@ import {TemplateAction} from '../_models/templateAction';
 	selector: 'addRule'
 })
 export class RuleAddComponent {
-	rule: GroovyRule;
+    ruleName: string;
+    ruleDescription: string;
+	ruleExpert: GroovyRule;
+	ruleTemplate: TemplateRule;
 	loading = false;
-	isNewRuleAdded = false;
 	context: ContextDTO;
-	toggle = 'template';
-	expert = 'expert';
 	template = 'template';
-	jsonString: String;
-	conditions: TemplateCondition[];
-	actions: TemplateAction[];
-	conditionsDisplayedColumns = ['selected', 'name', 'description'];
-	actionsDisplayedColumns = ['selected', 'name', 'description'];
-	conditionsDataSource = new MatTableDataSource();
-	actionsDataSource = new MatTableDataSource();
+	allTemplateConditions: TemplateCondition[];
+	allTemplateActions: TemplateAction[];
+	currentConditionParams:  RuleParam<any>[];
+	currentConditionParamArrays: RuleParamArray<any>[];
+	currentActionParams:  RuleParam<any>[];
+	currentActionParamArrays: RuleParamArray<any>[];
+	selectedCondition: TemplateCondition;
+	selectedAction: TemplateAction;
 
     @ViewChild('ace_editor') editor: ElementRef;
+    @ViewChild('tabGroup') tabGroup: MatTabGroup;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -61,11 +74,8 @@ export class RuleAddComponent {
 		@Inject(MAT_DIALOG_DATA) data)
 	{
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.rule = data.rule;
-		this.toggle = this.template;
-
-
-
+		this.ruleExpert = data.rule;
+		this.ruleTemplate = new TemplateRule();
 
 		/*
 		if (data.rule.id) {
@@ -125,45 +135,52 @@ export class RuleAddComponent {
     }
 
 
+	showConditionParams(value: TemplateCondition){
+	    this.selectedCondition = value;
+		this.currentConditionParams = value.params;
+		this.currentConditionParamArrays = value.paramArrays;
 
+		this.currentConditionParamArrays.forEach(paramArray => {
+            paramArray.values = new Array()
+            paramArray.values.push("");
+        });
+	}
 
+	showActionParams(value: TemplateAction){
+	    this.selectedAction = value;
+		this.currentActionParams = value.params;
+		this.currentActionParamArrays = value.paramArrays;
+
+        this.currentActionParamArrays.forEach(paramArray => {
+            paramArray.values = new Array()
+            paramArray.values.push("");
+        });
+	}
+
+	addValueConditionParamArray(arrayIndex: number){
+	    if (this.currentConditionParamArrays[arrayIndex].values[this.currentConditionParamArrays[arrayIndex].values.length - 1] != "")
+        {
+            this.currentConditionParamArrays[arrayIndex].values.push("");
+        }
+	}
+
+    addValueActionParamArray(arrayIndex: number){
+        if (this.currentActionParamArrays[arrayIndex].values[this.currentActionParamArrays[arrayIndex].values.length - 1] != "")
+        {
+            this.currentConditionParamArrays[arrayIndex].values.push("");
+        }
+    }
 
 	private getTemplates()
 	{
 		this.httpService.get(environment.apiEndpoint + 'rule/template_actions/')
 			.subscribe(
 				data => {
-					this.actions = data;
+					this.allTemplateActions = data;
 
-					if(this.actions == null)
+					if(this.allTemplateActions == null)
 					    return;
 
-					this.actionsDataSource.data = this.actions;
-
-					this.actions.forEach(function (action){
-						console.log("Action:");
-						console.log(action.name);
-						console.log(action.description_de);
-						console.log(action.description_en);
-
-						action.params.forEach(function (param) {
-							console.log("---> param:");
-							console.log(param.name);
-							console.log(param.description_de);
-							console.log(param.description_en);
-							console.log(param.type);
-							console.log(param.value);
-						});
-
-						action.paramArrays.forEach(function (paramArray) {
-							console.log("---> paramArray:");
-							console.log(paramArray.name);
-							console.log(paramArray.description_de);
-							console.log(paramArray.description_en);
-							console.log(paramArray.type);
-							console.log(paramArray.values);
-						});
-					});
 					this.alertService.success(this.translate.instant("Sever connection for loading action templates worked")); // TODO: change hardcodedtext
 				},
 				error => {
@@ -179,37 +196,11 @@ export class RuleAddComponent {
 		this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
 			.subscribe(
 				data => {
-					this.conditions = data;
+					this.allTemplateConditions = data;
 
-					if(this.conditions == null)
+					if(this.allTemplateConditions == null)
 						return;
 
-					this.conditionsDataSource.data = this.conditions;
-
-					this.conditions.forEach(function (condition){
-						console.log("Condition:");
-						console.log(condition.name);
-						console.log(condition.description_de);
-						console.log(condition.description_en);
-
-						condition.params.forEach(function (param) {
-							console.log("---> param:");
-							console.log(param.name);
-							console.log(param.description_de);
-							console.log(param.description_en);
-							console.log(param.type);
-							console.log(param.value);
-						});
-
-						condition.paramArrays.forEach(function (paramArray) {
-							console.log("---> paramArray:");
-							console.log(paramArray.name);
-							console.log(paramArray.description_de);
-							console.log(paramArray.description_en);
-							console.log(paramArray.type);
-							console.log(paramArray.values);
-						});
-					});
 					this.alertService.success(this.translate.instant("Sever connection for loading condition templates worked")); // TODO: change hardcodedtext
 				},
 				error => {
@@ -223,7 +214,99 @@ export class RuleAddComponent {
 				});
 	}
 
+
 	private saveRule() {
+
+        console.log("Name: " + this.ruleName);
+        console.log("Description: " + this.ruleDescription);
+
+
+        switch (this.tabGroup.selectedIndex) {
+            case 0: { // template mode
+                console.log("template mode");
+
+                if(!this.ruleTemplate.name){
+                    this.ruleTemplate.name = this.ruleName;
+                }
+
+
+                if(!this.ruleTemplate.description){
+                    this.ruleTemplate.description = this.ruleDescription;
+                }
+
+                if (!this.ruleTemplate.contextID) {
+                    this.ruleTemplate.contextID = this.context.context.id;
+                }
+
+                if(!this.ruleTemplate.templateCondition){
+                    console.log(this.selectedCondition);
+                    this.selectedCondition.paramArrays = this.currentConditionParamArrays;
+                    this.selectedCondition.params = this.currentConditionParams;
+                    this.ruleTemplate.templateCondition = this.selectedCondition;
+
+                }
+
+                if(!this.ruleTemplate.templateAction){
+                    this.selectedAction.paramArrays = this.currentActionParamArrays;
+                    this.selectedAction.params = this.currentActionParams;
+                    this.ruleTemplate.templateAction = this.selectedAction;
+                }
+
+
+                console.log(this.ruleTemplate);
+
+                this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule/').subscribe(
+                    data => {
+                        console.log("here2");
+                        this.dialogRef.close(true);
+                    },
+                    error => {
+                        console.log("here1");
+                        this.dialogRef.close(error);
+                    });
+
+                break;
+            }
+            case 1: { // expert mode
+                console.log("expert mode");
+
+                if(!this.ruleExpert.name){
+                    this.ruleExpert.name = this.ruleName;
+                }
+
+                if(!this.ruleExpert.description){
+                    this.ruleExpert.description = this.ruleDescription;
+                }
+
+                if (!this.ruleExpert.contextID) {
+                    this.ruleExpert.contextID = this.context.context.id;
+                }
+
+                console.log(this.ruleExpert);
+
+                this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/groovyrule/').subscribe(
+                    data => {
+                        this.dialogRef.close(true);
+                    },
+                    error => {
+                        this.dialogRef.close(error);
+                    });
+
+
+
+                break;
+            }
+            default: {
+                //statements;
+                break;
+            }
+        }
+
+
+        //console.log("Name: " + this.ruleTemplate);
+
+
+		/*
 		if (!this.rule.contextID) {
 			this.rule.contextID = this.context.context.id;
 		}
@@ -235,11 +318,7 @@ export class RuleAddComponent {
 				this.dialogRef.close(error);
 			});
 		this.loading = false;
+		*
+		 */
 	}
-
-	toggleView(change: MatButtonToggleChange){
-		this.toggle = change.value;
-	}
-
-
 }

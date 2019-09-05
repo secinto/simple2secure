@@ -366,5 +366,13 @@
   "menu.addRule": "Add rule",
   "rule.name": "Rule name",
   "table.groovycode": "Groovy rule class",
-  "table.params": "params"
+  "table.params": "params",
+  "menu.addValue": "add value",
+  "menu.RuleTemplate" : "Template",
+  "menu.RuleExpert" : "Expert",
+  "rule.condition" : "Condition",
+  "rule.action" : "Action",
+  "rule.chooseCondition" : "Choose condition",
+  "rule.chooseAction" : "Choose action"
+
 }
