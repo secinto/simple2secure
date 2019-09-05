@@ -47,6 +47,10 @@ public class TemplateCondition extends GenericDBObject{
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}
+	
+	public TemplateCondition() {
+		
+	}
 
 	public String getName() {
 		return name;

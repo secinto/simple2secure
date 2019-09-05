@@ -25,6 +25,7 @@ package com.simple2secure.portal.rules;
 import java.io.IOException;
 import java.util.List;
 
+import org.jeasy.rules.api.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +60,11 @@ public class EmailRulesEngine extends PortalRulesEngine {
 		List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
 		templateRules.forEach(rule -> {
 			try {
-				ruleUtils.buildRuleFromTemplateRuleWithBean(
-						rule,
+				addRule( 
+						ruleUtils.buildRuleFromTemplateRuleWithBean(rule,
 						"com.simple2secure.portal.rules.conditions" ,
-						"com.simple2secure.portal.rules.actions");
+						"com.simple2secure.portal.rules.actions")
+						);
 			}catch(Exception e)
 			{
 				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());

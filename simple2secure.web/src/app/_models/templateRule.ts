@@ -4,9 +4,8 @@ import {TemplateAction} from './templateAction';
 
 export class TemplateRule extends Base{
     name: string;
-    description_en: string;
-    description_de: string;
+    description: string;
     contextID: string;
-    templateConditions: TemplateCondition[];
-    templateActions: TemplateAction[];
+    templateCondition: TemplateCondition;
+    templateAction: TemplateAction;
 }

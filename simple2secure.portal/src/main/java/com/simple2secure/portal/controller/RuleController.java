@@ -82,7 +82,7 @@ public class RuleController {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/templateRule/", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {

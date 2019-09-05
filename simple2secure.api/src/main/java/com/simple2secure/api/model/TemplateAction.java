@@ -48,6 +48,9 @@ public class TemplateAction extends GenericDBObject{
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}
+	
+	public TemplateAction() {
+	}
 
 	public String getName() {
 		return name;
