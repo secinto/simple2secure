@@ -40,6 +40,7 @@ export class RuleAddComponent {
 	allTemplateActions: TemplateAction[];
 	selectedCondition: TemplateCondition;
 	selectedAction: TemplateAction;
+	dataType = DataType;
 
     @ViewChild('ace_editor') editor: ElementRef;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -275,7 +276,7 @@ export class RuleAddComponent {
                     }
                 }
 
-                console.log("here");
+
 
                 this.ruleTemplate.name = this.ruleName;
                 this.ruleTemplate.description = this.ruleDescription;
@@ -294,7 +295,6 @@ export class RuleAddComponent {
                     error => {
                         this.dialogRef.close(error);
                     });
-
                 break;
             }
 
