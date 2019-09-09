@@ -114,6 +114,11 @@ export class RuleAddComponent {
     }
 
 
+    // helping method to iterate over array of primitive in ngFor (ngModel); otherwise it will lose focus
+    trackByFn(index, item) {
+        return index;
+    }
+
 	showConditionParams(value: TemplateCondition){
 	    this.selectedCondition = value;
 	    this.selectedCondition.paramArrays.forEach(paramArray => {
@@ -187,6 +192,8 @@ export class RuleAddComponent {
 					}
 				});
 	}
+
+
 
 	private isStringEmptyOrUndefined(_string: string)
     {

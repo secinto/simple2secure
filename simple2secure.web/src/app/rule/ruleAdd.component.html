@@ -94,7 +94,7 @@
                 <div *ngIf="this.selectedCondition">
                     <div *ngFor = "let paramArray of this.selectedCondition.paramArrays, let arrayIndex = index">
                         <div *ngIf = "paramArray.values">
-                            <div *ngFor = "let value of paramArray.values, let valueIndex = index">
+                            <div *ngFor = "let value of paramArray.values, let valueIndex = index, trackBy: trackByFn">
                                 <tr>
                                     <td>
                                         <div [ngSwitch]="paramArray.type">
@@ -203,7 +203,7 @@
                 <div *ngIf="selectedAction">
                     <div *ngFor = "let paramArray of selectedAction.paramArrays, let arrayIndex = index">
                         <div *ngIf = "paramArray.values">
-                            <div *ngFor = "let value of paramArray.values, let valueIndex = index">
+                            <div *ngFor = "let value of paramArray.values, let valueIndex = index, trackBy: trackByFn">
                                 <tr>
                                     <td>
                                         <div [ngSwitch]="paramArray.type">
