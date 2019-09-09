@@ -373,6 +373,13 @@
   "rule.condition" : "Bedingung",
   "rule.action" : "Aktion",
   "rule.chooseCondition" : "Wähle eine Bedingung",
-  "rule.chooseAction" : "Wähle eine Aktion"
-
+  "rule.chooseAction" : "Wähle eine Aktion",
+  "rule.loadTemplateConditionsSucces" : "Templatebedingungen erfolgreich geladen.",
+  "rule.loadTemplateActionsSucces" : "Templateaktionen erfolgreich geladen.",
+  "rule.errorValueEmptyOrInvalide" : "Folgender Parameter ist ungültig: ",
+  "rule.noCodeGiven" : "Es wurde kein Sourcecode eingegeben.",
+  "rule.noConditionChosen" : "Es wurde keine Bedingung ausgewählt.",
+  "rule.noActionChosen" : "Es wurde keine Action ausgewählt.",
+  "rule.missingParamInCondition" : "Es fehlt ein Parameter in der Bedingung: ",
+  "rule.missingParamInAction" : "Es fehlt ein Parameter in der Action: "
 }

@@ -1,22 +1,14 @@
 import {
-	Component, ComponentFactory,
-	ComponentFactoryResolver,
-	ComponentRef,
+	Component,
 	ElementRef,
 	Inject,
 	ViewChild,
-	ViewContainerRef
 } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {
-    MatTableDataSource,
-    MatSort,
-    MatPaginator,
-    MatDialog,
-    MatDialogConfig,
     MatDialogRef,
     MAT_DIALOG_DATA,
-    MatTabChangeEvent, MatTabGroup
+    MatTabGroup, MatDialog, MatSnackBar,
 } from '@angular/material';
 import {GroovyRule} from '../_models/groovyRule';
 import {Router, ActivatedRoute} from '@angular/router';
@@ -28,10 +20,7 @@ import 'brace';
 import 'ace-builds/src-noconflict/mode-groovy';
 import {AceEditorComponent} from 'ng2-ace-editor';
 import {TemplateCondition} from '../_models/templateCondition';
-import {container} from '@angular/core/src/render3';
 import {TemplateAction} from '../_models/templateAction';
-import {RuleParam} from '../_models/ruleParam';
-import {RuleParamArray} from '../_models/ruleParamArray';
 import {DataType} from '../_models/dataType';
 
 
@@ -46,15 +35,9 @@ export class RuleAddComponent {
     ruleDescription: string;
 	ruleExpert: GroovyRule;
 	ruleTemplate: TemplateRule;
-	loading = false;
 	context: ContextDTO;
-	template = 'template';
 	allTemplateConditions: TemplateCondition[];
 	allTemplateActions: TemplateAction[];
-	currentConditionParams:  RuleParam<any>[];
-	currentConditionParamArrays: RuleParamArray<any>[];
-	currentActionParams:  RuleParam<any>[];
-	currentActionParamArrays: RuleParamArray<any>[];
 	selectedCondition: TemplateCondition;
 	selectedAction: TemplateAction;
 
@@ -71,26 +54,22 @@ export class RuleAddComponent {
 		private translate: TranslateService,
 		private location: Location,
 		private dialogRef: MatDialogRef<RuleAddComponent>,
+        private snackBar: MatSnackBar,
+
 		@Inject(MAT_DIALOG_DATA) data)
 	{
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.ruleExpert = data.rule;
+		//this.ruleExpert = data.rule;																					// TODO:
+		this.ruleExpert = new GroovyRule();
 		this.ruleTemplate = new TemplateRule();
 
-		/*
-		if (data.rule.id) {
-			this.isNewRuleAdded = false;
-		}
-		else {
-			this.isNewRuleAdded = true;
-		}*/
+        this.getTemplates();
 
-		this.getTemplates();
 	}
 
     ngAfterViewInit() {
 
-		// set start code:
+		// set start code:                                                                                              // TODO:
 		/*
         this.editor.getEditor().setText("" +
 			"import org.jeasy.rules.annotation.Action;\n" +
@@ -137,38 +116,33 @@ export class RuleAddComponent {
 
 	showConditionParams(value: TemplateCondition){
 	    this.selectedCondition = value;
-		this.currentConditionParams = value.params;
-		this.currentConditionParamArrays = value.paramArrays;
-
-		this.currentConditionParamArrays.forEach(paramArray => {
-            paramArray.values = new Array()
-            paramArray.values.push("");
+	    this.selectedCondition.paramArrays.forEach(paramArray => {
+	       paramArray.values = new Array();
+	       paramArray.values.push("");
         });
 	}
 
 	showActionParams(value: TemplateAction){
 	    this.selectedAction = value;
-		this.currentActionParams = value.params;
-		this.currentActionParamArrays = value.paramArrays;
-
-        this.currentActionParamArrays.forEach(paramArray => {
-            paramArray.values = new Array()
-            paramArray.values.push("");
-        });
+	    this.selectedAction.paramArrays.forEach(paramArray => {
+	    	paramArray.values = new Array();
+	    	paramArray.values.push("");
+		});
 	}
 
 	addValueConditionParamArray(arrayIndex: number){
-	    if (this.currentConditionParamArrays[arrayIndex].values[this.currentConditionParamArrays[arrayIndex].values.length - 1] != "")
+
+        if (this.selectedCondition.paramArrays[arrayIndex].values[this.selectedCondition.paramArrays[arrayIndex].values.length - 1] != "")
         {
-            this.currentConditionParamArrays[arrayIndex].values.push("");
+            this.selectedCondition.paramArrays[arrayIndex].values.push("");
         }
 	}
 
     addValueActionParamArray(arrayIndex: number){
-        if (this.currentActionParamArrays[arrayIndex].values[this.currentActionParamArrays[arrayIndex].values.length - 1] != "")
-        {
-            this.currentConditionParamArrays[arrayIndex].values.push("");
-        }
+		if (this.selectedAction.paramArrays[arrayIndex].values[this.selectedAction.paramArrays[arrayIndex].values.length - 1] != "")
+		{
+			this.selectedAction.paramArrays[arrayIndex].values.push("");
+		}
     }
 
 	private getTemplates()
@@ -181,7 +155,7 @@ export class RuleAddComponent {
 					if(this.allTemplateActions == null)
 					    return;
 
-					this.alertService.success(this.translate.instant("Sever connection for loading action templates worked")); // TODO: change hardcodedtext
+					this.alertService.success(this.translate.instant('rule.loadTemplateConditionsSucces'));
 				},
 				error => {
 
@@ -201,7 +175,7 @@ export class RuleAddComponent {
 					if(this.allTemplateConditions == null)
 						return;
 
-					this.alertService.success(this.translate.instant("Sever connection for loading condition templates worked")); // TODO: change hardcodedtext
+					this.alertService.success(this.translate.instant('rule.loadTemplateActionsSucces'));
 				},
 				error => {
 
@@ -214,75 +188,122 @@ export class RuleAddComponent {
 				});
 	}
 
+	private isStringEmptyOrUndefined(_string: string)
+    {
+        if(!_string || _string.replace(/\s/g, '').length == 0 )
+        {
+            return true;
+    }
+        return false;
+    }
+
+
+	private openSnackbar(message: string, action: string)
+    {
+        this.snackBar.open(message, action, {
+            duration: 2000,
+        });
+    }
 
 	private saveRule() {
 
-        console.log("Name: " + this.ruleName);
-        console.log("Description: " + this.ruleDescription);
+	    if(this.isStringEmptyOrUndefined(this.ruleName)){
+	        this.openSnackbar(this.translate.instant('rule.errorValueEmptyOrInvalide') + this.translate.instant('table.name'), "");
+	        return;
+        }
 
+        if(this.isStringEmptyOrUndefined(this.ruleDescription)){
+            this.openSnackbar(this.translate.instant('rule.errorValueEmptyOrInvalide') + this.translate.instant('table.description'), "");
+            return;
+        }
 
         switch (this.tabGroup.selectedIndex) {
             case 0: { // template mode
-                console.log("template mode");
 
-                if(!this.ruleTemplate.name){
-                    this.ruleTemplate.name = this.ruleName;
+                if(!this.selectedCondition)
+                {
+                    this.openSnackbar(this.translate.instant('rule.noConditionChosen'), "");
+                    return;
                 }
 
-
-                if(!this.ruleTemplate.description){
-                    this.ruleTemplate.description = this.ruleDescription;
+                for(const param of this.selectedCondition.params)
+                {
+                    if(!param.value)
+                    {
+                        this.openSnackbar(this.translate.instant('rule.missingParamInCondition') + param.name, "");
+                        return;
+                    }
                 }
+
+                for(const paramArray of this.selectedCondition.paramArrays)
+                {
+                    if(!paramArray.values[0])
+                    {
+                        this.openSnackbar(this.translate.instant('rule.missingParamInCondition') + paramArray.name, "");
+                        return;
+                    }
+                }
+
+                if(!this.selectedAction)
+                {
+                    this.openSnackbar(this.translate.instant('rule.noActionChosen'), "");
+                    return;
+                }
+
+                for(const param of this.selectedAction.params)
+                {
+                    if(!param.value)
+                    {
+                        this.openSnackbar(this.translate.instant('rule.missingParamInAction') + param.name, "");
+                        return;
+                    }
+                }
+
+                for(const paramArray of this.selectedAction.paramArrays)
+                {
+                    if(!paramArray.values[0])
+                    {
+                        this.openSnackbar(this.translate.instant('rule.missingParamInAction') + paramArray.name, "");
+                        return;
+                    }
+                }
+
+                console.log("here");
+
+                this.ruleTemplate.name = this.ruleName;
+                this.ruleTemplate.description = this.ruleDescription;
 
                 if (!this.ruleTemplate.contextID) {
                     this.ruleTemplate.contextID = this.context.context.id;
                 }
 
-                if(!this.ruleTemplate.templateCondition){
-                    console.log(this.selectedCondition);
-                    this.selectedCondition.paramArrays = this.currentConditionParamArrays;
-                    this.selectedCondition.params = this.currentConditionParams;
-                    this.ruleTemplate.templateCondition = this.selectedCondition;
-
-                }
-
-                if(!this.ruleTemplate.templateAction){
-                    this.selectedAction.paramArrays = this.currentActionParamArrays;
-                    this.selectedAction.params = this.currentActionParams;
-                    this.ruleTemplate.templateAction = this.selectedAction;
-                }
-
-
-                console.log(this.ruleTemplate);
+                this.ruleTemplate.templateCondition = this.selectedCondition;
+                this.ruleTemplate.templateAction = this.selectedAction;
 
                 this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule/').subscribe(
                     data => {
-                        console.log("here2");
                         this.dialogRef.close(true);
                     },
                     error => {
-                        console.log("here1");
                         this.dialogRef.close(error);
                     });
 
                 break;
             }
+
             case 1: { // expert mode
-                console.log("expert mode");
 
-                if(!this.ruleExpert.name){
-                    this.ruleExpert.name = this.ruleName;
+                if(this.isStringEmptyOrUndefined(this.ruleExpert.groovyCode)) {
+                    this.openSnackbar(this.translate.instant('rule.noCodeGiven'), "");
+                    return;
                 }
 
-                if(!this.ruleExpert.description){
-                    this.ruleExpert.description = this.ruleDescription;
-                }
+                this.ruleExpert.name = this.ruleName;
+                this.ruleExpert.description = this.ruleDescription;
 
                 if (!this.ruleExpert.contextID) {
                     this.ruleExpert.contextID = this.context.context.id;
                 }
-
-                console.log(this.ruleExpert);
 
                 this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/groovyrule/').subscribe(
                     data => {
@@ -292,8 +313,6 @@ export class RuleAddComponent {
                         this.dialogRef.close(error);
                     });
 
-
-
                 break;
             }
             default: {
@@ -301,24 +320,5 @@ export class RuleAddComponent {
                 break;
             }
         }
-
-
-        //console.log("Name: " + this.ruleTemplate);
-
-
-		/*
-		if (!this.rule.contextID) {
-			this.rule.contextID = this.context.context.id;
-		}
-		this.httpService.post(this.rule, environment.apiEndpoint + 'rule/templateRule/').subscribe(
-			data => {
-				this.dialogRef.close(true);
-			},
-			error => {
-				this.dialogRef.close(error);
-			});
-		this.loading = false;
-		*
-		 */
 	}
 }

@@ -373,6 +373,13 @@
   "rule.condition" : "Condition",
   "rule.action" : "Action",
   "rule.chooseCondition" : "Choose condition",
-  "rule.chooseAction" : "Choose action"
-
+  "rule.chooseAction" : "Choose action",
+  "rule.loadTemplateConditionsSucces" : "Template conditions loaded succesful.",
+  "rule.loadTemplateActionsSucces" : "Template actions loaded succesful.",
+  "rule.errorValueEmptyOrInvalide" : "The following param is empty or invalid: ",
+  "rule.noCodeGiven" : "No sourcecode has been provided.",
+  "rule.noConditionChosen" : "No condition has been chosen.",
+  "rule.noActionChosen" : "No action has been chosen.",
+  "rule.missingParamInCondition" : "One param is missing in the condition: ",
+  "rule.missingParamInAction" : "One param is missing in the action: "
 }

@@ -9,7 +9,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {EmailAccountAddComponent} from '../email';
 import {HttpErrorResponse} from '@angular/common/http';
 import { RuleAddComponent } from '.';
-import {ContextDTO} from '../_models';
+import {ContextDTO, TemplateRule} from '../_models';
+
 
 @Component({
 	moduleId: module.id,
@@ -18,7 +19,8 @@ import {ContextDTO} from '../_models';
 })
 export class RuleOverviewComponent {
 
-	rules: GroovyRule[];
+	expertRules: GroovyRule[];
+	templateRules: TemplateRule[];
 	loading = false;
 	selectedRule: GroovyRule;
 	toolId: string;
@@ -67,8 +69,27 @@ export class RuleOverviewComponent {
 		this.httpService.get(environment.apiEndpoint + 'rule/groovyrule/' + this.context.context.id)
 			.subscribe(
 				data => {
-					this.rules = data;
-					this.dataSource.data = this.rules;
+					this.expertRules = data;
+					this.dataSource.data = this.expertRules;
+					this.loading = false;
+					this.alertService.success(this.translate.instant('message.rule'));
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+
+
+		this.httpService.get(environment.apiEndpoint + 'rule/templaterule/' + this.context.context.id)
+			.subscribe(
+				data => {
+					this.templateRules = data;
+					this.dataSource.data = this.dataSource.data.concat(this.templateRules);
 					this.loading = false;
 					this.alertService.success(this.translate.instant('message.rule'));
 				},
@@ -96,7 +117,7 @@ export class RuleOverviewComponent {
 	}
 
 	public onDeleteClick() {
-		this.onDeleteDialog(this.selectedRule);
+		this.onDeleteDialog();
 	}
 /*
 	public editRule(rule: Rule) {
@@ -132,7 +153,7 @@ export class RuleOverviewComponent {
 	}
 
 
-	private editRule(rule: GroovyRule) {
+	private editRule(rule: GroovyRule | TemplateRule) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
@@ -160,7 +181,7 @@ export class RuleOverviewComponent {
 	}
 
 
-	private onDeleteDialog(config: GroovyRule) {
+	private onDeleteDialog() {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -181,9 +202,26 @@ export class RuleOverviewComponent {
 		});
 	}
 
-	private deleteRule(rule: GroovyRule) {
-		this.loading = true;
+	private deleteRule(rule: GroovyRule | TemplateRule) {
+																														// TODO: not sure which type rule is; instance of does not work because rule is Objcect; better solution?
+
 		this.httpService.delete(environment.apiEndpoint + 'rule/groovyrule/' + rule.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.rule.delete'));
+				this.deleted = true;
+				this.loadRules();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+
+		this.httpService.delete(environment.apiEndpoint + 'rule/templaterule/' + rule.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.rule.delete'));
 				this.deleted = true;
