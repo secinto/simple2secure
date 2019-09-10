@@ -36,7 +36,7 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "localhost";
+	private String baseHost = "https://simple2secure.info";
 	private String basePort = "51001/s2s";
 	private String basePortWeb = "51003";
 
