@@ -33,7 +33,7 @@ spring:
     banner-mode: "off"
   data:
     mongodb:
-      host: localhost
+      host: s2s-mongodb
       port: 27017
       database: s2s
 
@@ -54,7 +54,7 @@ spring:
   profiles: deployment
   data:
     mongodb:
-      host: localhost
+      host: s2s-mongodb
       port: 27017
       database: s2s
 ---
