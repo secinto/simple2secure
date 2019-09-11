@@ -130,7 +130,7 @@ export class RuleOverviewComponent {
 		dialogConfig.width = '500px';
 
 		dialogConfig.data = {
-			rule: new GroovyRule(),
+			//rule: new GroovyRule(),
 		};
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
@@ -153,7 +153,18 @@ export class RuleOverviewComponent {
 	}
 
 
-	private editRule(rule: GroovyRule | TemplateRule) {
+	private editRule(rule){//: GroovyRule | TemplateRule) {
+		/*
+		console.log(rule);
+
+		if(rule.groovyCode)
+			console.log("expert");
+
+		if(rule.templateAction)
+			console.log("template");
+
+		 */
+
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
@@ -202,39 +213,46 @@ export class RuleOverviewComponent {
 		});
 	}
 
-	private deleteRule(rule: GroovyRule | TemplateRule) {
-																														// TODO: not sure which type rule is; instance of does not work because rule is Objcect; better solution?
+	private deleteRule(rule) {
 
-		this.httpService.delete(environment.apiEndpoint + 'rule/groovyrule/' + rule.id).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.rule.delete'));
-				this.deleted = true;
-				this.loadRules();
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
+		if(rule.groovyCode) // must be an expert Rule if not undefined
+		{
+			this.httpService.delete(environment.apiEndpoint + 'rule/groovyrule/' + rule.id).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.rule.delete'));
+					this.deleted = true;
+					this.loadRules();
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+		}
 
-		this.httpService.delete(environment.apiEndpoint + 'rule/templaterule/' + rule.id).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.rule.delete'));
-				this.deleted = true;
-				this.loadRules();
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
+
+
+		if(rule.templateCondition)  // must be a template rule if not undefined
+		{
+			this.httpService.delete(environment.apiEndpoint + 'rule/templaterule/' + rule.id).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.rule.delete'));
+					this.deleted = true;
+					this.loadRules();
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+		}
 	}
 }

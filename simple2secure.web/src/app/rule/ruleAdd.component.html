@@ -1,4 +1,4 @@
-<h3 mat-dialog-title>{{ 'button.addRule' | translate }}</h3>
+<h3 mat-dialog-title>{{dialogTitle}}</h3>
 
 <mat-dialog-content>
     <!-- =========================================================================================================== -->
@@ -26,13 +26,14 @@
     </table>
 
 
+
     <!-- =========================================================================================================== -->
     <!-- Tabs for expert and template mode -->
-    <mat-tab-group #tabGroup mat-align-tabs="center" >
+    <mat-tab-group #tabGroup mat-align-tabs="center" [selectedIndex]="selectedTab">
 
         <!-- ------------------------------------------------------------------------------------------------------- -->
         <!-- Template -->
-        <mat-tab label="{{ 'menu.RuleTemplate' | translate }}">
+        <mat-tab #templateTab label="{{ 'menu.RuleTemplate' | translate }}" [disabled]="disableTemplateTab">
 
 
             <!-- Condition input -->
@@ -260,7 +261,7 @@
 
         <!-- ------------------------------------------------------------------------------------------------------- -->
         <!-- Expert -->
-        <mat-tab label="{{ 'menu.RuleExpert' | translate }}">
+        <mat-tab #editorTab label="{{ 'menu.RuleExpert' | translate }}" [disabled]="disableEditorTab">
             <!-- editor for expert mode -->
             <div #ace_editor  ace-editor
                  [(text)]="ruleExpert.groovyCode"

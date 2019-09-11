@@ -381,5 +381,6 @@
   "rule.noConditionChosen" : "No condition has been chosen.",
   "rule.noActionChosen" : "No action has been chosen.",
   "rule.missingParamInCondition" : "One param is missing in the condition: ",
-  "rule.missingParamInAction" : "One param is missing in the action: "
+  "rule.missingParamInAction" : "One param is missing in the action: ",
+  "rule.edit" : "Edit Rule"
 }

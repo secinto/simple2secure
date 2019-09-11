@@ -381,5 +381,6 @@
   "rule.noConditionChosen" : "Es wurde keine Bedingung ausgewählt.",
   "rule.noActionChosen" : "Es wurde keine Action ausgewählt.",
   "rule.missingParamInCondition" : "Es fehlt ein Parameter in der Bedingung: ",
-  "rule.missingParamInAction" : "Es fehlt ein Parameter in der Action: "
+  "rule.missingParamInAction" : "Es fehlt ein Parameter in der Action: ",
+  "rule.edit" : "Regel bearbeiten"
 }

@@ -8,7 +8,7 @@ import {AlertService, HttpService, DataService} from '../_services/index';
 import {
     MatDialogRef,
     MAT_DIALOG_DATA,
-    MatTabGroup, MatDialog, MatSnackBar,
+    MatTabGroup, MatDialog, MatSnackBar, MatTab,
 } from '@angular/material';
 import {GroovyRule} from '../_models/groovyRule';
 import {Router, ActivatedRoute} from '@angular/router';
@@ -22,6 +22,8 @@ import {AceEditorComponent} from 'ng2-ace-editor';
 import {TemplateCondition} from '../_models/templateCondition';
 import {TemplateAction} from '../_models/templateAction';
 import {DataType} from '../_models/dataType';
+import {falseIfMissing} from 'protractor/built/util';
+import {FormControl} from '@angular/forms';
 
 
 @Component({
@@ -41,6 +43,10 @@ export class RuleAddComponent {
 	selectedCondition: TemplateCondition;
 	selectedAction: TemplateAction;
 	dataType = DataType;
+    disableEditorTab: boolean;
+    disableTemplateTab: boolean;
+    selectedTab: number;
+    dialogTitle: string;
 
     @ViewChild('ace_editor') editor: ElementRef;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -60,12 +66,44 @@ export class RuleAddComponent {
 		@Inject(MAT_DIALOG_DATA) data)
 	{
 		this.context = JSON.parse(localStorage.getItem('context'));
-		//this.ruleExpert = data.rule;																					// TODO:
-		this.ruleExpert = new GroovyRule();
-		this.ruleTemplate = new TemplateRule();
+
+        this.selectedTab = 0;
+        if(data.rule)
+        {
+            this.dialogTitle = this.translate.instant('rule.edit');
+
+            this.ruleName = data.rule.name;
+            this.ruleDescription = data.rule.description;
+
+            if(data.rule.groovyCode)
+            {
+                this.selectedTab = 1;
+                this.disableTemplateTab = true; // only show expert mode
+                this.ruleExpert = data.rule;
+            }
+
+            if(data.rule.templateCondition)
+            {
+                this.selectedTab = 0;
+                this.disableEditorTab = true; // only show template mode
+                this.ruleTemplate = data.rule;
+                this.ruleExpert = new GroovyRule(); // will be needed for the ace-editor ngModel, but not used in this case
+                this.selectedCondition = this.ruleTemplate.templateCondition;
+                this.selectedAction = this.ruleTemplate.templateAction;
+            }
+        }
+        else
+        {
+            this.dialogTitle = this.translate.instant('button.addRule');
+
+            this.ruleExpert = new GroovyRule();
+            this.ruleTemplate = new TemplateRule();
+
+            this.disableTemplateTab = false;
+            this.disableEditorTab = false;
+        }
 
         this.getTemplates();
-
 	}
 
     ngAfterViewInit() {
