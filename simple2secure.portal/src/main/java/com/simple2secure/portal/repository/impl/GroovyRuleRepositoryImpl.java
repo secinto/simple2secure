@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.EmailAttribute;
 import com.simple2secure.api.model.GroovyRule;
 import com.simple2secure.portal.repository.GroovyRuleRepository;
 
