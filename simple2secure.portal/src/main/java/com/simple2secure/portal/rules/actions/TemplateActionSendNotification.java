@@ -34,6 +34,7 @@ public class TemplateActionSendNotification extends AbtractEmailAction{
 	protected void action(Email email) throws Exception {
 		String contextID = 
 				emailConfigRepository.find(email.getConfigId()).getContextId();	
+		
 		notificationUtils.addNewNotificationPortal(notification, 
 				contextID);	
 	}

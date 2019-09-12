@@ -31,15 +31,6 @@ public class TemplateActionSendEmail extends AbtractEmailAction{
 			description_en = "Address to which the email should be send",
 			type = DataType._STRING)
 	String emailAddress;
-	
-	
-	public TemplateActionSendEmail(String text, String emailAddress) {
-		this.text = text;
-		this.emailAddress = emailAddress;
-	}
-	
-	public TemplateActionSendEmail() {
-	}
 
 	@Override
 	protected void action(Email email) throws IOException {
