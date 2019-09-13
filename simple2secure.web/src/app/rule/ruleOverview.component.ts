@@ -1,7 +1,7 @@
 import {Component, Inject, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services/index';
-import {GroovyRule} from '../_models/groovyRule';
+import {RuleWithSourcecode} from '../_models/ruleWithSourcecode';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -19,10 +19,10 @@ import {ContextDTO, TemplateRule} from '../_models';
 })
 export class RuleOverviewComponent {
 
-	expertRules: GroovyRule[];
+	expertRules: RuleWithSourcecode[];
 	templateRules: TemplateRule[];
 	loading = false;
-	selectedRule: GroovyRule;
+	selectedRule: RuleWithSourcecode;
 	toolId: string;
 	currentUser: any;
 	deleted = false;
@@ -66,7 +66,7 @@ export class RuleOverviewComponent {
 
 	private loadRules() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'rule/groovyrule/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'rule/rulewithsource/' + this.context.context.id)
 			.subscribe(
 				data => {
 					this.expertRules = data;
@@ -104,7 +104,7 @@ export class RuleOverviewComponent {
 				});
 	}
 
-	public onMenuTriggerClick(rule: GroovyRule) {
+	public onMenuTriggerClick(rule: RuleWithSourcecode) {
 		this.selectedRule = rule;
 	}
 
@@ -130,7 +130,7 @@ export class RuleOverviewComponent {
 		dialogConfig.width = '500px';
 
 		dialogConfig.data = {
-			//rule: new GroovyRule(),
+			//rule: new RuleWithSourcecode(),
 		};
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
@@ -153,17 +153,7 @@ export class RuleOverviewComponent {
 	}
 
 
-	private editRule(rule){//: GroovyRule | TemplateRule) {
-		/*
-		console.log(rule);
-
-		if(rule.groovyCode)
-			console.log("expert");
-
-		if(rule.templateAction)
-			console.log("template");
-
-		 */
+	private editRule(rule){
 
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
@@ -215,9 +205,9 @@ export class RuleOverviewComponent {
 
 	private deleteRule(rule) {
 
-		if(rule.groovyCode) // must be an expert Rule if not undefined
+		if(rule.sourcecode) // must be an expert Rule if not undefined
 		{
-			this.httpService.delete(environment.apiEndpoint + 'rule/groovyrule/' + rule.id).subscribe(
+			this.httpService.delete(environment.apiEndpoint + 'rule/rulewithsource/' + rule.id).subscribe(
 				data => {
 					this.alertService.success(this.translate.instant('message.rule.delete'));
 					this.deleted = true;
@@ -233,8 +223,6 @@ export class RuleOverviewComponent {
 					this.loading = false;
 				});
 		}
-
-
 
 		if(rule.templateCondition)  // must be a template rule if not undefined
 		{

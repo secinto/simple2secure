@@ -252,10 +252,7 @@
                     </div>
                 </div>
 
-
-
             </mat-expansion-panel>
-
         </mat-tab>
 
 
@@ -264,7 +261,7 @@
         <mat-tab #editorTab label="{{ 'menu.RuleExpert' | translate }}" [disabled]="disableEditorTab">
             <!-- editor for expert mode -->
             <div #ace_editor  ace-editor
-                 [(text)]="ruleExpert.groovyCode"
+                 [(text)]="ruleExpert.sourcecode"
                  [mode]="'groovy'"
                  [theme]="'eclipse'"
                  [readOnly]="false"

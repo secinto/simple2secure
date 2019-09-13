@@ -34,7 +34,7 @@ export * from './coordinates';
 export  * from './testResult';
 export  * from './testResultObj';
 export * from './DTO/testResultDTO';
-export * from './groovyRule';
+export * from './ruleWithSourcecode';
 export * from './templateRule';
 export * from './test';
 export * from './testStep';

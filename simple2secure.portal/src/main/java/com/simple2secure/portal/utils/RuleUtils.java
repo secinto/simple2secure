@@ -35,9 +35,9 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-import com.simple2secure.api.model.GroovyRule;
+import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateRule;
-import com.simple2secure.portal.repository.GroovyRuleRepository;
+import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
 
 @Configuration
@@ -45,7 +45,7 @@ import com.simple2secure.portal.repository.TemplateRuleRepository;
 public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils{
 
 	@Autowired
-	GroovyRuleRepository groovyRuleRepository;
+	RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
 	
 	@Autowired
 	TemplateRuleRepository templateRuleRepository;
@@ -53,9 +53,9 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils{
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 	
-	public List<GroovyRule> getGroovyRulesByContextId(String contextId){
+	public List<RuleWithSourcecode> getRuleWithSourcecodeRepositoryByContextId(String contextId){
 		
-		return groovyRuleRepository.findByContextId(contextId);
+		return ruleWithSourcecodeRepository.findByContextId(contextId);
 	}
 	
 	public List<TemplateRule> getTemplateRulesByContextId(String contextId)

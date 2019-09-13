@@ -10,7 +10,7 @@ import {
     MAT_DIALOG_DATA,
     MatTabGroup, MatDialog, MatSnackBar, MatTab,
 } from '@angular/material';
-import {GroovyRule} from '../_models/groovyRule';
+import {RuleWithSourcecode} from '../_models/ruleWithSourcecode';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
@@ -22,8 +22,6 @@ import {AceEditorComponent} from 'ng2-ace-editor';
 import {TemplateCondition} from '../_models/templateCondition';
 import {TemplateAction} from '../_models/templateAction';
 import {DataType} from '../_models/dataType';
-import {falseIfMissing} from 'protractor/built/util';
-import {FormControl} from '@angular/forms';
 
 
 @Component({
@@ -35,7 +33,7 @@ import {FormControl} from '@angular/forms';
 export class RuleAddComponent {
     ruleName: string;
     ruleDescription: string;
-	ruleExpert: GroovyRule;
+	ruleExpert: RuleWithSourcecode;
 	ruleTemplate: TemplateRule;
 	context: ContextDTO;
 	allTemplateConditions: TemplateCondition[];
@@ -75,7 +73,7 @@ export class RuleAddComponent {
             this.ruleName = data.rule.name;
             this.ruleDescription = data.rule.description;
 
-            if(data.rule.groovyCode)
+            if(data.rule.sourcecode)
             {
                 this.selectedTab = 1;
                 this.disableTemplateTab = true; // only show expert mode
@@ -87,7 +85,7 @@ export class RuleAddComponent {
                 this.selectedTab = 0;
                 this.disableEditorTab = true; // only show template mode
                 this.ruleTemplate = data.rule;
-                this.ruleExpert = new GroovyRule(); // will be needed for the ace-editor ngModel, but not used in this case
+                this.ruleExpert = new RuleWithSourcecode(); // will be needed for the ace-editor ngModel, but not used in this case
                 this.selectedCondition = this.ruleTemplate.templateCondition;
                 this.selectedAction = this.ruleTemplate.templateAction;
             }
@@ -96,7 +94,7 @@ export class RuleAddComponent {
         {
             this.dialogTitle = this.translate.instant('button.addRule');
 
-            this.ruleExpert = new GroovyRule();
+            this.ruleExpert = new RuleWithSourcecode();
             this.ruleTemplate = new TemplateRule();
 
             this.disableTemplateTab = false;
@@ -206,9 +204,9 @@ export class RuleAddComponent {
 					if (error.status == 0) {
 						this.alertService.error(this.translate.instant('server.notresponding'));
 					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
+                    else {
+                        this.alertService.error(error.error.errorMessage);
+                    }
 				});
 
 		this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
@@ -338,7 +336,7 @@ export class RuleAddComponent {
 
             case 1: { // expert mode
 
-                if(this.isStringEmptyOrUndefined(this.ruleExpert.groovyCode)) {
+                if(this.isStringEmptyOrUndefined(this.ruleExpert.sourcecode)) {
                     this.openSnackbar(this.translate.instant('rule.noCodeGiven'), "");
                     return;
                 }
@@ -350,7 +348,7 @@ export class RuleAddComponent {
                     this.ruleExpert.contextID = this.context.context.id;
                 }
 
-                this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/groovyrule/').subscribe(
+                this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource/').subscribe(
                     data => {
                         this.dialogRef.close(true);
                     },

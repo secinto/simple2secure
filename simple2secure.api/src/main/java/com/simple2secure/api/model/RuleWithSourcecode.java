@@ -24,7 +24,7 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class GroovyRule extends GenericDBObject{
+public class RuleWithSourcecode extends GenericDBObject{
 
 	/**
 	 * 
@@ -37,9 +37,9 @@ public class GroovyRule extends GenericDBObject{
 
 	private String contextID;
 
-	private String groovyCode;
+	private String sourcecode;
 
-	public GroovyRule() {
+	public RuleWithSourcecode() {
 
 	}
 
@@ -67,12 +67,12 @@ public class GroovyRule extends GenericDBObject{
 		this.contextID = contextID;
 	}
 
-	public String getGroovyCode() {
-		return groovyCode;
+	public String getSourcecode() {
+		return sourcecode;
 	}
 
-	public void setGroovyCode(String groovyCode) {
-		this.groovyCode = groovyCode;
+	public void setSourcecode(String groovyCode) {
+		this.sourcecode = groovyCode;
 	}
 
 }

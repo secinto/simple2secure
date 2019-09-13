@@ -9,22 +9,22 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.GroovyRule;
-import com.simple2secure.portal.repository.GroovyRuleRepository;
+import com.simple2secure.api.model.RuleWithSourcecode;
+import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 
 @Repository
 @Transactional
-public class GroovyRuleRepositoryImpl extends GroovyRuleRepository {
+public class RuleWithSourcecodeRepositoryImpl extends RuleWithSourcecodeRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "groovyRule";
-		super.className = GroovyRule.class;
+		super.collectionName = "ruleWithSourcecode";
+		super.className = RuleWithSourcecode.class;
 	}
 
 	@Override
-	public List<GroovyRule> findByContextId(String contextId) {
+	public List<RuleWithSourcecode> findByContextId(String contextId) {
 		Query query = new Query(Criteria.where("contextID").is(contextId));
-		return mongoTemplate.find(query, GroovyRule.class);
+		return mongoTemplate.find(query, RuleWithSourcecode.class);
 	}
 }

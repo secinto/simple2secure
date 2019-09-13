@@ -32,7 +32,7 @@ import org.jeasy.rules.core.DefaultRulesEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.GroovyRule;
+import com.simple2secure.api.model.RuleWithSourcecode;
 
 import groovy.lang.GroovyClassLoader;
 
