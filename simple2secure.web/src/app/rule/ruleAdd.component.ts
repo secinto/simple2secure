@@ -46,7 +46,7 @@ export class RuleAddComponent {
     selectedTab: number;
     dialogTitle: string;
 
-    @ViewChild('ace_editor') editor: ElementRef;
+    @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
 
 	constructor(
@@ -87,6 +87,8 @@ export class RuleAddComponent {
                 this.ruleTemplate = data.rule;
                 this.ruleExpert = new RuleWithSourcecode(); // will be needed for the ace-editor ngModel, but not used in this case
                 this.selectedCondition = this.ruleTemplate.templateCondition;
+                console.log(this.selectedCondition.paramArrays[0].values);
+                console.log(this.ruleTemplate.templateCondition.paramArrays[0].values);
                 this.selectedAction = this.ruleTemplate.templateAction;
             }
         }
@@ -95,6 +97,41 @@ export class RuleAddComponent {
             this.dialogTitle = this.translate.instant('button.addRule');
 
             this.ruleExpert = new RuleWithSourcecode();
+
+            this.ruleExpert.sourcecode =
+                "import org.jeasy.rules.annotation.Action;\n" +
+                "import org.jeasy.rules.annotation.Condition;\n" +
+                "import org.jeasy.rules.annotation.Fact;\n" +
+                "import org.jeasy.rules.annotation.Rule;\n" +
+                "import com.simple2secure.api.model.Email;\n" +
+                "\n" +
+                "@Rule(name = \"rulename here\",\n" +
+                "             description = \"description\",\n" +
+                "             priority = 1)\n" +
+                "public class MyRule\n" +
+                "{\n" +
+                "\n" +
+                "\t\n" +
+                "\t@Condition\n" +
+                "\tpublic boolean condition(@Fact(\"com.simple2secure.api.model.Email\") Email email)\n" +
+                "\t{\n" +
+                "\t\t\n" +
+                "\t\t// implement your condition for the email checker here...\n" +
+                "\t\t\n" +
+                "\t\treturn true; //if action should be performed\n" +
+                "\t\treturn false; // false otherwise"+
+                "\t\t\n" +
+                "\t}\n" +
+                "\t\n" +
+                "\t@Action\n" +
+                "\tpublic void action(@Fact(\"com.simple2secure.api.model.Email\") Email email)\n" +
+                "\t{\n" +
+                "\t\t\n" +
+                "\t\t// implement your action for the email checker here...\n" +
+                "\t\t\n" +
+                "\t}\n" +
+                "}";
+
             this.ruleTemplate = new TemplateRule();
 
             this.disableTemplateTab = false;
@@ -106,52 +143,11 @@ export class RuleAddComponent {
 
     ngAfterViewInit() {
 
-		// set start code:                                                                                              // TODO:
-		/*
-        this.editor.getEditor().setText("" +
-			"import org.jeasy.rules.annotation.Action;\n" +
-			"import org.jeasy.rules.annotation.Condition;\n" +
-			"import org.jeasy.rules.annotation.Fact;\n" +
-			"import org.jeasy.rules.annotation.Rule;\n" +
-			"import com.simple2secure.api.model.Email;\n" +
-			"import com.simple2secure.portal.utils.NotificationUtils;\n" +
-			"import com.simple2secure.portal.repository.EmailConfigurationRepository;\n" +
-			"\n" +
-			"@Rule(name = \"rulename here\",\n" +
-			"             description = \"description\",\n" +
-			"             priority = 10)\n" +
-			"public class MyRule\n" +
-			"{\n" +
-			"\t\n" +
-			"\t@Autowired\n" +
-			"\tNotificationUtils notificationUtils;\n" +
-			"\n" +
-			"\t@Autowired\n" +
-			"\tEmailConfigurationRepository emailConfigRepository;\n" +
-			"\t\n" +
-			"\t@Condition\n" +
-			"\tpublic boolean condition(@Fact(\"com.simple2secure.api.model.Email\") Email email)\n" +
-			"\t\t// implement your condition for the email checker here...\n" +
-			"\t\t\n" +
-			"\t\treturn true; //if action should be performed\n" +
-			"\t\treturn false; // false otherwise"+
-			"\t}\n" +
-			"\t\n" +
-			"\t@Action\n" +
-			"\tpublic void action(@Fact(\"com.simple2secure.api.model.Email\") Email email)\n" +
-			"\t{\n" +
-			"\t\t\n" +
-			"\t\t// implement your action for the email checker here...\n" +
-			"\t\t\n" +
-			"\t\tString contextID = emailConfigRepository.find(email.getConfigId()).getContextId();\n" +
-			"\t\tnotificationUtils.addNewNotificationPortal(\"something is wrong with that email\", contextID);\n" +
-			"\t}\n" +
-			"}");
-*/
     }
 
 
-    // helping method to iterate over array of primitive in ngFor (ngModel); otherwise it will lose focus
+    // helping method to iterate over array of primitive in ngFor (ngModel)
+    // otherwise the input field loses focus on every character which has been typed by user
     trackByFn(index, item) {
         return index;
     }
@@ -230,15 +226,22 @@ export class RuleAddComponent {
 				});
 	}
 
-
-
 	private isStringEmptyOrUndefined(_string: string)
     {
         if(!_string || _string.replace(/\s/g, '').length == 0 )
         {
             return true;
-    }
+        }
         return false;
+    }
+
+    private removeArrayElement(index : number, array : any[])
+    {
+        if(array.length == 1) {
+            array[0] = "";
+        }else {
+            array.splice(index, 1);
+        }
     }
 
 
@@ -281,11 +284,23 @@ export class RuleAddComponent {
 
                 for(const paramArray of this.selectedCondition.paramArrays)
                 {
+
+                    // remove elements which are only whitespaces
+                   for(let i = 0; i < paramArray.values.length; i++)
+                   {
+                       if(this.isStringEmptyOrUndefined(paramArray.values[i]))
+                       {
+                           paramArray.values.splice(i,1);
+                           i--;
+                       }
+                   }
+
                     if(!paramArray.values[0])
                     {
                         this.openSnackbar(this.translate.instant('rule.missingParamInCondition') + paramArray.name, "");
                         return;
                     }
+
                 }
 
                 if(!this.selectedAction)
@@ -305,6 +320,16 @@ export class RuleAddComponent {
 
                 for(const paramArray of this.selectedAction.paramArrays)
                 {
+                    // remove elements which are only whitespaces
+                    for(let i = 0; i < paramArray.values.length; i++)
+                    {
+                        if(this.isStringEmptyOrUndefined(paramArray.values[i]))
+                        {
+                            paramArray.values.splice(i,1);
+                            i--;
+                        }
+                    }
+
                     if(!paramArray.values[0])
                     {
                         this.openSnackbar(this.translate.instant('rule.missingParamInAction') + paramArray.name, "");
