@@ -26,18 +26,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Model which holds the information for one rule parameter array. Will be used 
+ * in the rule engine for the condition/action-parameters
+ *
+ * @param <T> generic for the type of the param values.
+ */
 public class RuleParamArray<T> {
 	private String name;
 	private String description_en;
 	private String description_de;
-	private Collection<T> values;
+	private List<T> values;
 	private DataType type;
 	
 	public RuleParamArray() {
 		super();
 	}
 	
-	public RuleParamArray(String name, String description_en, String description_de, Collection<T> values,
+	public RuleParamArray(String name, String description_en, String description_de, List<T> values,
 			DataType type) {
 		super();
 		this.name = name;
@@ -65,7 +74,7 @@ public class RuleParamArray<T> {
 	public void setDescription_de(String description_de) {
 		this.description_de = description_de;
 	}
-	public Collection<T> getValues() {
+	public List<T> getValues() {
 		return values;
 	}
 	public void setValues(List<T> paramArray) {

@@ -24,11 +24,18 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Class holds the a rule with the information af a predefined conditionand
+ * action. 
+ * 
+ * Will be used  in the rule engine.
+ *
+ */
 public class TemplateRule extends GenericDBObject {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5156938336427387331L;
 
 	private String name;

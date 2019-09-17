@@ -24,23 +24,34 @@
 package com.simple2secure.api.model;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Class holds the information of a predefined action-class which has been 
+ * annotated as action. The params will be loaded from this class for each 
+ * predefined action. 
+ * 
+ * Will be used  in the rule engine for the condition/action-parameters
+ *
+ */
 public class TemplateAction extends GenericDBObject{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 3641649125428321240L;
 	
 	private String name;
 	private String description_en;
 	private String description_de;
-	private Collection<RuleParam<?>> params;
-	private Collection<RuleParamArray<?>> paramArrays;
+	private List<RuleParam<?>> params;
+	private List<RuleParamArray<?>> paramArrays;
 	
-	public TemplateAction(String name, String description_en, String description_de, Collection<RuleParam<?>> params,
-			Collection<RuleParamArray<?>> paramArrays) {
+	public TemplateAction(String name, String description_en, String description_de, List<RuleParam<?>> params,
+			List<RuleParamArray<?>> paramArrays) {
 		super();
 		this.name = name;
 		this.description_en = description_en;
@@ -76,19 +87,19 @@ public class TemplateAction extends GenericDBObject{
 		this.description_de = description_de;
 	}
 
-	public Collection<RuleParam<?>> getParams() {
+	public List<RuleParam<?>> getParams() {
 		return params;
 	}
 
-	public void setParams(Collection<RuleParam<?>> params) {
+	public void setParams(List<RuleParam<?>> params) {
 		this.params = params;
 	}
 
-	public Collection<RuleParamArray<?>> getParamArrays() {
+	public List<RuleParamArray<?>> getParamArrays() {
 		return paramArrays;
 	}
 
-	public void setParamArray(Collection<RuleParamArray<?>> paramArray) {
+	public void setParamArray(List<RuleParamArray<?>> paramArray) {
 		this.paramArrays = paramArray;
 	}
 }

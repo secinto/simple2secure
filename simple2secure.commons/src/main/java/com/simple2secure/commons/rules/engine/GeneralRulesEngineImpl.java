@@ -22,8 +22,7 @@
 
 package com.simple2secure.commons.rules.engine;
 
-import java.io.IOException;
-import java.util.List;
+
 
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rules;
@@ -32,52 +31,33 @@ import org.jeasy.rules.core.DefaultRulesEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.RuleWithSourcecode;
-
-import groovy.lang.GroovyClassLoader;
 
 /**
  * @author Richard Heinz
+ * 
+ * Implementation for a rule engine for different use cases.
+ * 
+ * For the engine is the easy-rules library (https://github.com/j-easy/easy-rules) 
+ * Version 3.3.0 used.
+ * 
+ * You can add and remove rules. A rule must hava a condition and an action. If 
+ * the the condition is satisfied the action will be performed.
+ * 
+ *  You can add and remove Facts, each rule will be used on each fact.
+ * 
  *
  */
-//@Service
 public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 
 	private static Logger log = LoggerFactory.getLogger(GeneralRulesEngineImpl.class);
 	
-
 	private Facts facts_ = new Facts();
 	protected Rules rules_ = new Rules();
 	private RulesEngine rules_engine_ = new DefaultRulesEngine();
 
-	
-	/**
-	 * Method to load sourcecode from string, creates rule and register it.
-	 * 
-	 * Attention: Does not support spring framework in source!
-	 * 
-	 * @param source which contains the sourcecode of a rule class
-	 * @throws IOException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 */
-	@Override
-	public void addRuleFromSource(String source)
-			throws IOException, InstantiationException, IllegalAccessException
-	{
-		try (GroovyClassLoader groovyClassLoader = new GroovyClassLoader()) {
-			Class<?> theParsedClass = groovyClassLoader.parseClass(source);
-
-			Object rule = theParsedClass.newInstance();
-			//autowireCapableBeanFactory.autowireBean(rule);
-			rules_.register(rule); // will automatic make a rule object in the background
-			log.debug("Registered new rule {} with GroovyClassLoader", rule.getClass().getName());
-		}
-	}
-
 
 	/**
-	 * Method to register new rule
+	 * Method to register a new rule
 	 * 
 	 * @param rule object
 	 */

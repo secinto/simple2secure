@@ -22,6 +22,16 @@
 
 package com.simple2secure.api.model;
 
+
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Model which holds the information for one rule parameter. Will be used in the 
+ * rule engine for the condition/action-parameters
+ *
+ * @param <T> generic for the type of the param value.
+ */
 public class RuleParam<T> {	
 	private String name;
 	private String description_en;

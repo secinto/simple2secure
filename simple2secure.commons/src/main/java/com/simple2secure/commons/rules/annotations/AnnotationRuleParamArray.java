@@ -30,6 +30,16 @@ import com.simple2secure.api.model.DataType;
 
 import java.lang.annotation.RetentionPolicy;
 
+
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Annotation do mark a list as a parameter in a predefined action or condition
+ * class for the rule engine. The data will be used to display in the web 
+ * simple2secure and to save a rule in the database.
+ *
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParamArray {

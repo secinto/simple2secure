@@ -51,6 +51,14 @@ import com.simple2secure.portal.repository.TemplateRuleRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.RuleUtils;
 
+/**
+ * 
+ * @author Richard Heinz
+ *
+ * In this class all request for the rules between web and server are 
+ * implemented 
+ *
+ */
 @RestController
 @RequestMapping("/api/rule")
 public class RuleController {
@@ -73,6 +81,17 @@ public class RuleController {
 	@Autowired
 	RuleUtils ruleUtils;
 
+	/**
+	 * Method to save/update the source code for a rule into/from the database
+	 * 
+	 * @param ruleWithSourcecode object which should be saved into the database
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the ruleWithSourcecode object or
+	 *                        with an error.
+	 * 
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/rulewithsource/", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -95,6 +114,18 @@ public class RuleController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 	
+	
+	/**
+	 * Method to save/update a rule with template action and condition into/from
+	 * the database
+	 * 
+	 * @param templateRule object which should be saved
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the templateRule object or an error.
+	 * 
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -117,6 +148,18 @@ public class RuleController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 	
+	
+	/**
+	 * Method to get all rules which are build with template actions and 
+	 * conditions from the database
+	 * 
+	 * @param contextId from the user which has send the request from the web
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the TemplateRule objects as a List 
+	 *  						or an error.
+	 * 
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/templaterule/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -136,6 +179,16 @@ public class RuleController {
 				HttpStatus.NOT_FOUND);
 	}
 
+	
+	/**
+	 * Method to get all free defined rules from the database
+	 * 
+	 * @param contextId from the user which has send the request from the web
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the rules in a List or an error.
+	 * 
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/rulewithsource/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -156,6 +209,15 @@ public class RuleController {
 	}
 	
 
+	/**
+	 * Method to get all predefined Conditions. If they are none saved in the 
+	 * database they will be searched.
+	 * 
+	 * @param rule_templates
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the Conditions in a List or an error.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/template_conditions/", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -179,6 +241,16 @@ public class RuleController {
 		return new ResponseEntity<Collection<TemplateCondition>>(conditions, HttpStatus.OK);
 	}
 	
+	
+	/**
+	 * Method to get all predefined Actions. If they are none saved in the 
+	 * database they will be searched.
+	 * 
+	 * @param rule_templates
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the Actions in a List or an error. 
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/template_actions/", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -203,7 +275,14 @@ public class RuleController {
 	}
 	
 	
-
+    /**
+     * Method to delete free defined rule.
+     * 
+     * @param ruleId of the rule which should be deleted
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the deleted rule or an error.
+     */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/rulewithsource/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -223,6 +302,15 @@ public class RuleController {
 		
 	}
 	
+	
+	/**
+	 * Method to delete a TemplateRule object.
+	 * 
+     * @param ruleId of the rule which should be deleted
+	 * @param locale which has been used in the web application
+	 * 
+	 * @return ResponseEntity object with the deleted rule or an error.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/templaterule/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")

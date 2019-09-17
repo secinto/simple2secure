@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.jeasy.rules.api.Action;
 import org.jeasy.rules.api.Condition;
@@ -44,9 +45,29 @@ import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
+import groovy.lang.GroovyClassLoader;
 
+
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * This class should provide all functionalities which are needed to create a 
+ * rule for the rule engine. 
+ *
+ */
 public class RuleUtils {
 	
+	/**
+	 * Method to save data from annoations of membervariables which are
+	 *  annotatied as RuleParam orRuleParamArray into collections. 
+	 *  
+	 * @param clazz which should be checked
+	 * @param params collection where the data of the RuleParam annotations
+	 *               should be saved  
+	 * @param paramArrays collection where the data RuleParamArray annotations
+	 *                    should be saved.
+	 */
 	private void saveParamsFromClass(Class clazz, Collection<RuleParam<?>> params, Collection<RuleParamArray<?>> paramArrays)
 	{
 		Field fs[] = clazz.getDeclaredFields();
@@ -132,7 +153,18 @@ public class RuleUtils {
 	    }
 	}
 	
-	private Collection<Class<?>> getAnnotatedClass(String path, Class annotation) throws IOException, ClassNotFoundException
+	/**
+	 * Method to fetch all classes in given path which has specific annotation.
+	 * 
+	 * @param path where to search
+	 * @param annotation which the class must have
+	 * 
+	 * @return clazzes collection where all found classes are saved
+	 * 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	private Collection<Class<?>> getAnnotatedClass(String path, Class<?> annotation) throws IOException, ClassNotFoundException
 	{
 		Collection<Class<?>> clazzes = new ArrayList<Class<?>>();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -145,79 +177,122 @@ public class RuleUtils {
 			if(clazz.getAnnotation(annotation) != null)
 				clazzes.add(clazz);		 
 	    }
+		
 		return clazzes;
 	}
 	
+
+	/**
+	 * Method to load all predefined Conditons from path and saved the 
+	 * information into a Collection. Only the annotations (name, description,
+	 *  params, ...) will be saved
+	 * 
+	 * 
+	 * @param path where the Condition classe are saved
+	 * 
+	 * @return conditions data which are saved into a collection
+	 * 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public Collection<TemplateCondition> loadTemplateConditions(String path) throws IOException, ClassNotFoundException
 	{
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Collection<TemplateCondition> conditions = new ArrayList<TemplateCondition>();
 		
-		ClassPath classPath = ClassPath.from(loader);
+		Collection<Class<?>> conditionsClazzes = getAnnotatedClass(path, AnnotationCondition.class);
 		
-		for (ClassPath.ClassInfo info : classPath.getTopLevelClassesRecursive(path))
+		for(Class<?> conditionClazz : conditionsClazzes)
 		{
-			Class clazz = Class.forName(info.getName(), true, loader);
+			AnnotationCondition annotationCondition = (AnnotationCondition) conditionClazz.getAnnotation(AnnotationCondition.class);
 			
-			AnnotationCondition annotationCondition = (AnnotationCondition) clazz.getAnnotation(AnnotationCondition.class);
-
-			if(annotationCondition != null)
-			    {	
-				    Collection<RuleParam<?>> conditionParams = new ArrayList<RuleParam<?>>();
-				    Collection<RuleParamArray<?>> conditionParamArrays = new ArrayList<RuleParamArray<?>>();
-				    
-				    saveParamsFromClass(clazz, conditionParams, conditionParamArrays);
-					
-					TemplateCondition conditionObj = new TemplateCondition(
-				    		annotationCondition.name(), 
-				    		annotationCondition.description_en(), 
-				    		annotationCondition.description_de(),
-				    		conditionParams, conditionParamArrays);
-					
-					conditions.add(conditionObj);
-			    }			 
+			List<RuleParam<?>> conditionParams = new ArrayList<RuleParam<?>>();
+		    List<RuleParamArray<?>> conditionParamArrays = new ArrayList<RuleParamArray<?>>();
+		    
+		    saveParamsFromClass(conditionClazz, conditionParams, conditionParamArrays);
+			
+		    // encapsulates the information from one predefined Action
+		    // into a TemplateAction object.
+			TemplateCondition conditionObj = new TemplateCondition(
+		    		annotationCondition.name(), 
+		    		annotationCondition.description_en(), 
+		    		annotationCondition.description_de(),
+		    		conditionParams, conditionParamArrays);
+			
+			conditions.add(conditionObj);
 	    }
+		
 		return conditions;	
 	}
 	
+	
+	/**
+	 * Method to load all predefined Actions from path and saved the 
+	 * information into a Collection. Only the annotations (name, description, params,
+	 * ...) will be saved
+	 * 
+	 * 
+	 * @param path where the Action classe are saved
+	 * 
+	 * @return actions data which are saved into a collection
+	 * 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public Collection<TemplateAction> loadTemplateActions(String path) throws IOException, ClassNotFoundException
 	{
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Collection<TemplateAction> actions = new ArrayList<TemplateAction>();
 		
-		ClassPath classPath = ClassPath.from(loader);
+		Collection<Class<?>> actionClazzes = getAnnotatedClass(path, AnnotationAction.class);
 		
-		for (ClassPath.ClassInfo info : classPath.getTopLevelClassesRecursive(path))
+		for(Class<?> actionClazz : actionClazzes)
 		{
-			Class clazz = Class.forName(info.getName(), true, loader);
+			AnnotationAction annotationAction = (AnnotationAction) actionClazz.getAnnotation(AnnotationAction.class);
 			
-			AnnotationAction annotationAction = (AnnotationAction) clazz.getAnnotation(AnnotationAction.class);
-
-			if(annotationAction != null)
-			    {	
-				    Collection<RuleParam<?>> actionParams = new ArrayList<RuleParam<?>>();
-				    Collection<RuleParamArray<?>> actionParamArrays = new ArrayList<RuleParamArray<?>>();
-				    
-				    saveParamsFromClass(clazz, actionParams, actionParamArrays);
-					
-				    TemplateAction actionObj = new TemplateAction(
-				    		annotationAction.name(), 
-				    		annotationAction.description_en(), 
-				    		annotationAction.description_de(),
-				    		actionParams, actionParamArrays);
-					
-				    actions.add(actionObj);
-			    }			 
-	    }
+			List<RuleParam<?>> actionParams = new ArrayList<RuleParam<?>>();
+			List<RuleParamArray<?>> actionParamArrays = new ArrayList<RuleParamArray<?>>();
+		    
+		    saveParamsFromClass(actionClazz, actionParams, actionParamArrays);
+			
+		    // encapsulates the information from one predefined Action
+		    // into a TemplateAction object.
+		    TemplateAction actionObj = new TemplateAction(
+		    		annotationAction.name(), 
+		    		annotationAction.description_en(), 
+		    		annotationAction.description_de(),
+		    		actionParams, actionParamArrays);
+			
+		    actions.add(actionObj);
+		}
+		
 		return actions;	
 	}
 
+	
+	/**
+	 * Method to build an Condition from the information which is saved inside 
+	 * the TemplateAction object.
+	 * 
+	 * @param conditionData holds the information which will be loaded into the
+	 * 					    predefined Condition 
+	 * @param path where the TemplateContitions are saved
+	 * 
+	 * @return condition which can be used for a rule
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
 	{
 		Class<?> conditionClass = null;
 		Condition condition = null;
+		
+		// fetches all classes which are annotatied as AnnotationAction.class
+		// from the given class
 		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationCondition.class);
 		
+		// takes required class
 		for(Class<?> clazz: clazzes)
 		{
 			if(clazz.getAnnotation(AnnotationCondition.class).name().equalsIgnoreCase(conditionData.getName()))
@@ -232,6 +307,7 @@ public class RuleUtils {
 		
 		Field fs[] = conditionClass.getDeclaredFields();
 		
+		// saves param data from conditionData into the Condition object
 		for(Field f : fs)
 		{
 			f.setAccessible(true);
@@ -269,12 +345,36 @@ public class RuleUtils {
 		return condition;
 	}
 
-	public Action buildActionFromTemplateAction(TemplateAction actionData, String path) throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException
+	
+	/**
+	 * Method to build an Action from the information which is saved inside 
+	 * the TemplateAction object.
+	 * 
+	 * @param actionData holds the information which will be loaded into the
+	 * 					 predefined Action 
+	 * @param path where the Actions are saved
+	 * 
+	 * @return action which can be used for a rule
+	 * 
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public Action buildActionFromTemplateAction(TemplateAction actionData,
+			String path) 
+					throws IllegalArgumentException, IllegalAccessException,
+					InstantiationException, ClassNotFoundException, IOException
 	{
 		Class<?> actionClass = null;
 		Action action = null;
+		
+		// fetches all classes which are annotatied as AnnotationAction.class
+		// from the given class
 		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationAction.class);
 		
+		// takes required class
 		for(Class<?> clazz: clazzes)
 		{
 			if(clazz.getAnnotation(AnnotationAction.class).name().equalsIgnoreCase(actionData.getName()))
@@ -287,8 +387,10 @@ public class RuleUtils {
 		
 		action = (Action) actionClass.newInstance();
 		
+		
 		Field fs[] = actionClass.getDeclaredFields();
 		
+		// saves param data from actionData into the Action object
 		for(Field f : fs)
 		{
 			f.setAccessible(true);
@@ -326,8 +428,33 @@ public class RuleUtils {
 		return action;
 	}
 	
+	
+	/**
+	 * Method to create a rule from a TemplateRule class which holds the 
+	 * information (name, description, params,...) about predefined conditions/
+	 * actions. 
+	 * 
+	 * @param ruleData TemplateRule object which holds the information about 
+	 *                 the future rule object.
+	 * @param pathConditonsTempates represents where the predefined 
+	 * 								Conditions are saved.
+	 * @param pathActionTemplates represents where the predefined 
+	 * 								Actions are saved.
+	 * 
+	 * @return a Rule object which can be used for the rule engine
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 * 
+	 */
 	public Rule buildRuleFromTemplateRule(TemplateRule ruleData, 
-			String pathConditonsTempates, String pathActionTemplates) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException
+			String pathConditonsTempates, String pathActionTemplates) 
+					throws ClassNotFoundException, InstantiationException,
+					IllegalAccessException, IllegalArgumentException, 
+					IOException
 	{
 		return new RuleBuilder().
 				name(ruleData.getName()).
@@ -337,4 +464,32 @@ public class RuleUtils {
 				build();
 	}
 	
+	
+	/**
+	 * Method to load source code from string and creates a object which 
+	 * represents a rule.
+	 * 
+	 * Attention: Does not support spring framework in source!
+	 * 
+	 * @param source which represents the source code of a rule class
+	 * @return rule which can be used for the rule engine
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * 
+	 */
+	public Object createRuleFromSource(String source)
+			throws IOException, InstantiationException, IllegalAccessException
+	{
+		try (GroovyClassLoader groovyClassLoader = new GroovyClassLoader()) {
+			Class<?> theParsedClass = groovyClassLoader.parseClass(source);
+
+			Object rule = theParsedClass.newInstance();
+	
+			//log.debug("Created new rule object {} with GroovyClassLoader", rule.getClass().getName());
+			
+			return rule;
+			
+		}
+	}
 }

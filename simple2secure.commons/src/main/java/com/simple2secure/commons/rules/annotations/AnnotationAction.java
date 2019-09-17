@@ -27,6 +27,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Annotation do mark a class as a action. The data will be used to display in 
+ * the web simple2secure and to save a rule in the database.
+ *
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationAction 

@@ -22,9 +22,6 @@
 
 package com.simple2secure.portal.rules;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.jeasy.rules.api.Rule;
@@ -36,10 +33,11 @@ import org.springframework.stereotype.Service;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
 import com.simple2secure.portal.utils.RuleUtils;
 
 @Service
-public class EmailRulesEngine extends PortalRulesEngine {
+public class EmailRulesEngine extends GeneralRulesEngineImpl {
 	
 	@Autowired
 	private RuleUtils ruleUtils;
@@ -49,11 +47,16 @@ public class EmailRulesEngine extends PortalRulesEngine {
 	public void checkMail(Email email, String contextId)
 	{   
 		addFact(email);
+		
+
 		List<RuleWithSourcecode> ruleWithSourcecodes = ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId);
 		
 		ruleWithSourcecodes.forEach(rule -> {
 			try {
-				addRuleFromSourceWithBean(rule.getSourcecode());
+				Object newRule = ruleUtils.createRuleFromSourceWithBean(rule.getSourcecode());
+				addRule(newRule);
+				
+				//addRuleFromSourceWithBean(rule.getSourcecode());
 			} catch (Exception e) {
 				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());
 			}
@@ -65,9 +68,9 @@ public class EmailRulesEngine extends PortalRulesEngine {
 				Rule ruleObj = ruleUtils.buildRuleFromTemplateRuleWithBean(ruleInfo,
 						"com.simple2secure.portal.rules.conditions" ,
 						"com.simple2secure.portal.rules.actions");
-				addRule( 
-						ruleObj
-						);
+				
+				addRule(ruleObj);
+				
 			}catch(Exception e)
 			{
 				log.debug("Unable to load Rule " + ruleInfo.getName() + " " + e.getMessage());
