@@ -76,7 +76,7 @@ def run_service():
 
             db_test.test_content = current_test
             print(db_test.test_content)
-            output = test_schema.dump(db_test).data
+            output = test_schema.dump(db_test)
             resp = file_utils.schedule_test_on_the_portal(output, app, app.config['POD_ID'])
 
             if resp.status_code == 200:
