@@ -1,35 +1,38 @@
-import {Component, Inject, ViewChild} from '@angular/core';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {Component, ViewChild} from '@angular/core';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {RuleWithSourcecode} from '../_models/ruleWithSourcecode';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {EmailAccountAddComponent} from '../email';
 import {HttpErrorResponse} from '@angular/common/http';
 import { RuleAddComponent } from '.';
 import {ContextDTO, TemplateRule} from '../_models';
-
 
 @Component({
 	moduleId: module.id,
 	templateUrl: 'ruleOverview.component.html',
 	selector: 'ruleOverview'
 })
+
 export class RuleOverviewComponent {
 
+	// rules (with source) objects from the database
 	expertRules: RuleWithSourcecode[];
+	// rules which will be built from the predefined action/conditons from the database
 	templateRules: TemplateRule[];
-	loading = false;
-	selectedRule: RuleWithSourcecode;
-	toolId: string;
-	currentUser: any;
-	deleted = false;
+	// rule which has been selected in the table, can be TemplateRule or RuleWithSourcecode
+	selectedRule;
 	context: ContextDTO;
+	loading = false;
 
+	// columns for the table where rules will be displayed
 	displayedColumns = ['name', 'description', 'action']
+	// source for the table data, (capsuled all rules)
 	dataSource = new MatTableDataSource();
+
+
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -42,7 +45,6 @@ export class RuleOverviewComponent {
 		private dialog: MatDialog,
 		private translate: TranslateService)
 	{
-
 	}
 
 	ngOnInit() {
@@ -62,10 +64,13 @@ export class RuleOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-
-
+	/**
+	 * Method to fetch all rules from the database and display them in the table
+	 */
 	private loadRules() {
 		this.loading = true;
+
+		// fetching the rules with source code
 		this.httpService.get(environment.apiEndpoint + 'rule/rulewithsource/' + this.context.context.id)
 			.subscribe(
 				data => {
@@ -84,7 +89,7 @@ export class RuleOverviewComponent {
 					this.loading = false;
 				});
 
-
+		// fetching the template rules
 		this.httpService.get(environment.apiEndpoint + 'rule/templaterule/' + this.context.context.id)
 			.subscribe(
 				data => {
@@ -104,7 +109,7 @@ export class RuleOverviewComponent {
 				});
 	}
 
-	public onMenuTriggerClick(rule: RuleWithSourcecode) {
+	public onMenuTriggerClick(rule) {
 		this.selectedRule = rule;
 	}
 
@@ -119,19 +124,13 @@ export class RuleOverviewComponent {
 	public onDeleteClick() {
 		this.onDeleteDialog();
 	}
-/*
-	public editRule(rule: Rule) {
-		this.dataService.set(rule);
-		this.router.navigate(['../edit'], {relativeTo: this.route, queryParams: {action: 'edit'}});
-	}
-*/
+
 	private openDialogAddRule(){
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
-		dialogConfig.data = {
-			//rule: new RuleWithSourcecode(),
-		};
+		dialogConfig.data = {};
+
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
@@ -158,9 +157,11 @@ export class RuleOverviewComponent {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
+		// gives the rule which should be edited
 		dialogConfig.data = {
 			rule: rule,
 		};
+
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
@@ -205,12 +206,12 @@ export class RuleOverviewComponent {
 
 	private deleteRule(rule) {
 
-		if(rule.sourcecode) // must be an expert Rule if not undefined
+		// must be an expert Rule if not undefined
+		if(rule.sourcecode)
 		{
 			this.httpService.delete(environment.apiEndpoint + 'rule/rulewithsource/' + rule.id).subscribe(
 				data => {
 					this.alertService.success(this.translate.instant('message.rule.delete'));
-					this.deleted = true;
 					this.loadRules();
 				},
 				error => {
@@ -222,14 +223,15 @@ export class RuleOverviewComponent {
 					}
 					this.loading = false;
 				});
+
 		}
 
-		if(rule.templateCondition)  // must be a template rule if not undefined
+		// must be a template rule if not undefined
+		if(rule.templateCondition)
 		{
 			this.httpService.delete(environment.apiEndpoint + 'rule/templaterule/' + rule.id).subscribe(
 				data => {
 					this.alertService.success(this.translate.instant('message.rule.delete'));
-					this.deleted = true;
 					this.loadRules();
 				},
 				error => {

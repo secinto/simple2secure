@@ -36,6 +36,14 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
 import com.simple2secure.portal.utils.RuleUtils;
 
+
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * A rule engine for checking mails. Extents the GeneralRulesEngineImpl. 
+ *
+ */
 @Service
 public class EmailRulesEngine extends GeneralRulesEngineImpl {
 	
@@ -44,28 +52,38 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 	
 	private static Logger log = LoggerFactory.getLogger(EmailRulesEngine.class);
 	
-	public void checkMail(Email email, String contextId)
-	{   
-		addFact(email);
-		
-
-		List<RuleWithSourcecode> ruleWithSourcecodes = ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId);
+	
+	/** 
+	 * Method to load, create and register all rules which are given for this
+	 * user.
+	 * 
+	 * @param contextId of the user
+	 */
+	private void registerRules(String contextId)
+	{
+		List<RuleWithSourcecode> ruleWithSourcecodes = 
+				ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId);
 		
 		ruleWithSourcecodes.forEach(rule -> {
 			try {
-				Object newRule = ruleUtils.createRuleFromSourceWithBean(rule.getSourcecode());
+				Object newRule = ruleUtils.createRuleFromSourceWithBean(
+						rule.getSourcecode());
 				addRule(newRule);
 				
-				//addRuleFromSourceWithBean(rule.getSourcecode());
 			} catch (Exception e) {
-				log.debug("Unable to load Rule " + rule.getName() + " " + e.getMessage());
+				log.debug("Unable to load Rule " + rule.getName() + " "+ e.getMessage());
 			}
 		});
 		
-		List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
+		log.debug("Created and registered expert rules with sourcecode {}");
+		
+		List<TemplateRule> templateRules = ruleUtils.
+				getTemplateRulesByContextId(contextId);
+		
 		templateRules.forEach(ruleInfo -> {
 			try {
-				Rule ruleObj = ruleUtils.buildRuleFromTemplateRuleWithBean(ruleInfo,
+				Rule ruleObj = ruleUtils.buildRuleFromTemplateRuleWithBean(
+						ruleInfo,
 						"com.simple2secure.portal.rules.conditions" ,
 						"com.simple2secure.portal.rules.actions");
 				
@@ -78,8 +96,21 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 			}
 		});		
 		
+		log.debug("Created and registered predefined template rules {}");
+	}
+	
+	
+	/**
+	 * Method to check an email with the given rules.
+	 * 
+	 * @param email which should be checked with the given rules
+	 * @param contextId of the logged in user in the web
+	 */
+	public void checkMail(Email email, String contextId)
+	{   
+		addFact(email);
+		registerRules(contextId);	
 		checkFacts();
-		
 		removeFact(email.getClass().getName());
 		rules_.clear();
 	}

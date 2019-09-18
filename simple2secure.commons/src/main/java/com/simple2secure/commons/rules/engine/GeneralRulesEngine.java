@@ -22,12 +22,8 @@
 
 package com.simple2secure.commons.rules.engine;
 
-import java.io.IOException;
-
 /**
  * @author Richard Heinz
- * 
- * 
  *
  */
 

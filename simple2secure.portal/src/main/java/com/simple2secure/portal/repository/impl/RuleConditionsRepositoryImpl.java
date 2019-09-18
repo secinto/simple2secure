@@ -33,6 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.repository.RuleConditionsRepository;
 
+
+/**
+ * @author Richard Heinz
+ *
+ */
 @Component
 @Repository
 @Transactional

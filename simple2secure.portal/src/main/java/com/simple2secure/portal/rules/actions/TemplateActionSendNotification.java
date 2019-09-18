@@ -31,16 +31,17 @@ import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.utils.NotificationUtils;
 
+/**
+ * 
+ * @author Richard Heinz
+ * 
+ * Action which is used as predefined Action in the rule engine. Sends an email
+ * with the given text. 
+ */
 @AnnotationAction(name = "send notification",
 description_de = "Sendet eine Notification an das Portal.",
 description_en = "Sends a notification to the portal.")
 public class TemplateActionSendNotification extends AbtractEmailAction{
-	
-	@AnnotationRuleParam(name = "text",
-			description_de = "Text der als Notification angezeigt wird.",
-			description_en = "Text which shown as notification",
-			type = DataType._STRING)
-	String notification;
 	
 	@Autowired	
 	NotificationUtils notificationUtils;
@@ -48,9 +49,15 @@ public class TemplateActionSendNotification extends AbtractEmailAction{
 	@Autowired	
 	EmailConfigurationRepository emailConfigRepository;
 	
-	public TemplateActionSendNotification(String notification) {
-		this.notification = notification;
-	}
+	/*
+	 * All field values which are annotated as AnnotationRuleParam or
+	 * AnnotationRuleParamArray are filled/saved during runtime directly. 
+	 */
+	@AnnotationRuleParam(name = "text",
+			description_de = "Text der als Notification angezeigt wird.",
+			description_en = "Text which shown as notification",
+			type = DataType._STRING)
+	String notification;
 
 	@Override
 	protected void action(Email email) throws Exception {

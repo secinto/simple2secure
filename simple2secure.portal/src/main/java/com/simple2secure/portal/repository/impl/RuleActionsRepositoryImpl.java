@@ -33,6 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.portal.repository.RuleActionsRepository;
 
+/**
+ * @author Richard Heinz
+ *
+ */
 @Component
 @Repository
 @Transactional

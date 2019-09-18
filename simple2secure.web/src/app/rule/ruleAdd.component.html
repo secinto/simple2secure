@@ -1,8 +1,13 @@
+<!-- title for the dialog -->
 <h3 mat-dialog-title>{{dialogTitle}}</h3>
 
+
+<!-- =============================================================================================================== -->
+<!-- body with the content of the dialog -->
 <mat-dialog-content>
+
     <!-- =========================================================================================================== -->
-    <!-- Input for name and description -->
+    <!-- Input for the name  -->
     <table class="full_width_input" cellspacing="0">
         <tr>
             <td>
@@ -14,6 +19,8 @@
             </td>
         </tr>
     </table>
+
+    <!-- Input for the description -->
     <table class="full_width_input" cellspacing="0">
         <tr>
             <td>
@@ -32,7 +39,7 @@
     <mat-tab-group #tabGroup mat-align-tabs="center" [selectedIndex]="selectedTab">
 
         <!-- ------------------------------------------------------------------------------------------------------- -->
-        <!-- Template -->
+        <!-- Template tab -->
         <mat-tab #templateTab label="{{ 'menu.RuleTemplate' | translate }}" [disabled]="disableTemplateTab">
 
 
@@ -54,7 +61,7 @@
                     <mat-option *ngFor="let condition of allTemplateConditions" [value] = "condition" matTooltip={{condition.description_en}}>{{condition.name}}</mat-option>
                 </mat-select>
 
-                <!-- views params for input -->
+                <!-- views condition params for input -->
                 <div *ngIf="selectedCondition">
                     <div *ngFor="let param of selectedCondition.params">
                         <tr>
@@ -92,7 +99,7 @@
                     </div>
                 </div>
 
-                <!-- view param arrays -->
+                <!-- view condition param arrays for input  -->
                 <div *ngIf="this.selectedCondition">
                     <div *ngFor = "let paramArray of this.selectedCondition.paramArrays, let arrayIndex = index">
                         <div *ngIf = "paramArray.values">
@@ -137,6 +144,7 @@
                             </div>
                         </div>
 
+                        <!-- button to add one more element in the condition param array -->
                         <div>
                             <button mat-raised-button color="primary" type="button" (click)="addValueConditionParamArray(arrayIndex)"
                                     class="mat-green-button">
@@ -166,7 +174,7 @@
                     <mat-option *ngFor="let action of allTemplateActions" [value] = "action" matTooltip={{action.description_en}} >{{action.name}}</mat-option>
                 </mat-select>
 
-                <!-- views params for input -->
+                <!-- views action params for input -->
                 <div *ngIf="selectedAction">
                     <div *ngFor="let param of selectedAction.params">
                         <tr>
@@ -204,7 +212,7 @@
                     </div>
                 </div>
 
-                <!-- view param arrays -->
+                <!-- view action param arrays for input -->
                 <div *ngIf="selectedAction">
                     <div *ngFor = "let paramArray of selectedAction.paramArrays, let arrayIndex = index">
                         <div *ngIf = "paramArray.values">
@@ -249,6 +257,7 @@
                             </div>
                         </div>
 
+                        <!-- button to add one more element in the action param array -->
                         <div>
                             <button mat-raised-button color="primary" type="button" (click)="addValueActionParamArray(arrayIndex)"
                                     class="mat-green-button">
@@ -263,7 +272,7 @@
 
 
         <!-- ------------------------------------------------------------------------------------------------------- -->
-        <!-- Expert -->
+        <!-- Expert tab -->
         <mat-tab #editorTab label="{{ 'menu.RuleExpert' | translate }}" [disabled]="disableEditorTab">
             <!-- editor for expert mode -->
             <div #ace_editor  ace-editor
@@ -279,7 +288,7 @@
 
 
 <!-- =============================================================================================================== -->
-<!-- save/cancel buttons  -->
+<!-- save/cancel buttons, fixed at the end of the dialog -->
 <div mat-dialog-actions>
     <button mat-button mat-raised-button  class="mat-green-button" color="primary"
             (click)="saveRule()" >{{ 'button.save' | translate }}

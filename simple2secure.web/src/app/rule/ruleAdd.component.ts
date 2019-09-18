@@ -1,15 +1,6 @@
-import {
-	Component,
-	ElementRef,
-	Inject,
-	ViewChild,
-} from '@angular/core';
+import { Component, Inject, ViewChild, } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services/index';
-import {
-    MatDialogRef,
-    MAT_DIALOG_DATA,
-    MatTabGroup, MatDialog, MatSnackBar, MatTab,
-} from '@angular/material';
+import {MatDialogRef, MAT_DIALOG_DATA, MatTabGroup, MatSnackBar, } from '@angular/material';
 import {RuleWithSourcecode} from '../_models/ruleWithSourcecode';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -23,28 +14,38 @@ import {TemplateCondition} from '../_models/templateCondition';
 import {TemplateAction} from '../_models/templateAction';
 import {DataType} from '../_models/dataType';
 
-
 @Component({
 	moduleId: module.id,
 	styleUrls: ['rule.component.css'],
 	templateUrl: 'ruleAdd.component.html',
 	selector: 'addRule'
 })
+
 export class RuleAddComponent {
+
     ruleName: string;
     ruleDescription: string;
+    // rule where the whole sourcecode has been given by user
 	ruleExpert: RuleWithSourcecode;
+	// rule which will be built with predefined actions/conditions
 	ruleTemplate: TemplateRule;
-	context: ContextDTO;
+	// predefined template conditons which will be fetched from the database
 	allTemplateConditions: TemplateCondition[];
+    // predefined template actions which will be fetched from the database
 	allTemplateActions: TemplateAction[];
+	// selected (by the user) condition which will be display
 	selectedCondition: TemplateCondition;
+    // selected (by the user) action which will be display
 	selectedAction: TemplateAction;
+	// object of the enum for the params, will be needed in the html, otherwise the enum cant be find
 	dataType = DataType;
+	// helping variables for the tab group
     disableEditorTab: boolean;
     disableTemplateTab: boolean;
     selectedTab: number;
+    // title which will be displayed at the head of the dialog
     dialogTitle: string;
+    context: ContextDTO;
 
     @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -66,38 +67,51 @@ export class RuleAddComponent {
 		this.context = JSON.parse(localStorage.getItem('context'));
 
         this.selectedTab = 0;
+
+        // if a rule should be edited the old data of the rule will be displayed
         if(data.rule)
         {
+            // set the title to "editing rule"
             this.dialogTitle = this.translate.instant('rule.edit');
 
+            // loading old name and description
             this.ruleName = data.rule.name;
             this.ruleDescription = data.rule.description;
 
+            // if sourcecode is defined it must be an RuleWithSourcecode object
             if(data.rule.sourcecode)
             {
-                this.selectedTab = 1;
-                this.disableTemplateTab = true; // only show expert mode
+                this.selectedTab = 1; // sets expert tab
+                this.disableTemplateTab = true; // disables TemplateTab
                 this.ruleExpert = data.rule;
             }
 
+            // if templateCondition is defined it must be an TemplateRule object
             if(data.rule.templateCondition)
             {
-                this.selectedTab = 0;
-                this.disableEditorTab = true; // only show template mode
+                this.selectedTab = 0; // sets template tab
+                this.disableEditorTab = true; // disables ExpertTab
                 this.ruleTemplate = data.rule;
-                this.ruleExpert = new RuleWithSourcecode(); // will be needed for the ace-editor ngModel, but not used in this case
+
+                // ruleExpert object will not be used in this case,
+                // but will be needed for the ace-editor ngModel => otherwise there will be errors
+                this.ruleExpert = new RuleWithSourcecode();
+
+                // displays the old condition
                 this.selectedCondition = this.ruleTemplate.templateCondition;
-                console.log(this.selectedCondition.paramArrays[0].values);
-                console.log(this.ruleTemplate.templateCondition.paramArrays[0].values);
+                // displays action
                 this.selectedAction = this.ruleTemplate.templateAction;
             }
         }
-        else
+        else // a ned rule will be added
         {
+            // set the title to "editing rule"
             this.dialogTitle = this.translate.instant('button.addRule');
 
+            this.ruleTemplate = new TemplateRule();
             this.ruleExpert = new RuleWithSourcecode();
 
+            // setting an empty sourcecode body so the user knows how to implement the rule
             this.ruleExpert.sourcecode =
                 "import org.jeasy.rules.annotation.Action;\n" +
                 "import org.jeasy.rules.annotation.Condition;\n" +
@@ -132,26 +146,76 @@ export class RuleAddComponent {
                 "\t}\n" +
                 "}";
 
-            this.ruleTemplate = new TemplateRule();
-
+            // enables both tabs so the user can choose
             this.disableTemplateTab = false;
             this.disableEditorTab = false;
         }
 
+        // fetches the template actions/conditions from the database
         this.getTemplates();
 	}
 
-    ngAfterViewInit() {
+    ngAfterViewInit() {}
 
+    /**
+     * Method to load template actions and conditions from the database
+     */
+    private getTemplates()
+    {
+        this.httpService.get(environment.apiEndpoint + 'rule/template_actions/')
+            .subscribe(
+                data => {
+                    this.allTemplateActions = data;
+
+                    if(this.allTemplateActions == null)
+                        return;
+
+                    this.alertService.success(this.translate.instant('rule.loadTemplateConditionsSucces'));
+                },
+                error => {
+
+                    if (error.status == 0) {
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                });
+
+        this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
+            .subscribe(
+                data => {
+                    this.allTemplateConditions = data;
+
+                    if(this.allTemplateConditions == null)
+                        return;
+
+                    this.alertService.success(this.translate.instant('rule.loadTemplateActionsSucces'));
+                },
+                error => {
+
+                    if (error.status == 0) {
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                });
     }
 
 
-    // helping method to iterate over array of primitive in ngFor (ngModel)
-    // otherwise the input field loses focus on every character which has been typed by user
+
+    /**
+     * helping method to iterate over array of primitive in ngFor (ngModel)
+     * otherwise the input field loses focus on every character which has been typed by user
+     * @param index of the selected item
+     * @param item
+     */
     trackByFn(index, item) {
         return index;
     }
 
+    //
 	showConditionParams(value: TemplateCondition){
 	    this.selectedCondition = value;
 	    this.selectedCondition.paramArrays.forEach(paramArray => {
@@ -160,22 +224,35 @@ export class RuleAddComponent {
         });
 	}
 
+    /**
+     * Saves the selected Template action.
+     *
+     * @param value selected TemplateAction
+     */
 	showActionParams(value: TemplateAction){
 	    this.selectedAction = value;
 	    this.selectedAction.paramArrays.forEach(paramArray => {
-	    	paramArray.values = new Array();
-	    	paramArray.values.push("");
+	    	paramArray.values = new Array(); // sets new array, otherwise it will be undefined
+	    	paramArray.values.push(""); // necessary to show a input field in the html
 		});
 	}
 
-	addValueConditionParamArray(arrayIndex: number){
 
+    /**
+     * add a new empty element to a condition param array if the last one is not empty
+     * @param arrayIndex of the chosen param array
+     */
+	addValueConditionParamArray(arrayIndex: number){
         if (this.selectedCondition.paramArrays[arrayIndex].values[this.selectedCondition.paramArrays[arrayIndex].values.length - 1] != "")
         {
             this.selectedCondition.paramArrays[arrayIndex].values.push("");
         }
 	}
 
+    /**
+     * add a new empty element to a action param array if the last one is not empty
+     * @param arrayIndex of the chosen param array
+     */
     addValueActionParamArray(arrayIndex: number){
 		if (this.selectedAction.paramArrays[arrayIndex].values[this.selectedAction.paramArrays[arrayIndex].values.length - 1] != "")
 		{
@@ -183,49 +260,10 @@ export class RuleAddComponent {
 		}
     }
 
-	private getTemplates()
-	{
-		this.httpService.get(environment.apiEndpoint + 'rule/template_actions/')
-			.subscribe(
-				data => {
-					this.allTemplateActions = data;
-
-					if(this.allTemplateActions == null)
-					    return;
-
-					this.alertService.success(this.translate.instant('rule.loadTemplateConditionsSucces'));
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-                    else {
-                        this.alertService.error(error.error.errorMessage);
-                    }
-				});
-
-		this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
-			.subscribe(
-				data => {
-					this.allTemplateConditions = data;
-
-					if(this.allTemplateConditions == null)
-						return;
-
-					this.alertService.success(this.translate.instant('rule.loadTemplateActionsSucces'));
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
-	}
-
+    /**
+     * Method to check if given strung is empty (whitespace also count as emptry) or undefined
+     * @param _string which should be checked
+     */
 	private isStringEmptyOrUndefined(_string: string)
     {
         if(!_string || _string.replace(/\s/g, '').length == 0 )
@@ -235,6 +273,11 @@ export class RuleAddComponent {
         return false;
     }
 
+    /**
+     * Method to remove one element of an array, if it is the first element it will only set to an empty string
+     * @param index
+     * @param array
+     */
     private removeArrayElement(index : number, array : any[])
     {
         if(array.length == 1) {
@@ -245,34 +288,48 @@ export class RuleAddComponent {
     }
 
 
-	private openSnackbar(message: string, action: string)
+    /**
+     * Opens a snackbar and displays message and action
+     * @param message which should be displayed
+     * @param action which should be performed when clicked
+     */
+	private openSnackbar(message: string, action: any)
     {
         this.snackBar.open(message, action, {
             duration: 2000,
         });
     }
 
+    /**
+     * Saves the new/updated rule if all needed parameter are given by the user
+     */
 	private saveRule() {
 
+	    // check if name is given
 	    if(this.isStringEmptyOrUndefined(this.ruleName)){
 	        this.openSnackbar(this.translate.instant('rule.errorValueEmptyOrInvalide') + this.translate.instant('table.name'), "");
 	        return;
         }
 
+	    // check if description is given
         if(this.isStringEmptyOrUndefined(this.ruleDescription)){
             this.openSnackbar(this.translate.instant('rule.errorValueEmptyOrInvalide') + this.translate.instant('table.description'), "");
             return;
         }
 
+        //checks which kind of rule is chosen by user
         switch (this.tabGroup.selectedIndex) {
-            case 0: { // template mode
+            // template mode
+            case 0: {
 
+                // checks if condition has ben chosen
                 if(!this.selectedCondition)
                 {
                     this.openSnackbar(this.translate.instant('rule.noConditionChosen'), "");
                     return;
                 }
 
+                // checks if all params are given by user
                 for(const param of this.selectedCondition.params)
                 {
                     if(!param.value)
@@ -282,6 +339,7 @@ export class RuleAddComponent {
                     }
                 }
 
+                // checks if all param arrays are given by user
                 for(const paramArray of this.selectedCondition.paramArrays)
                 {
 
@@ -295,6 +353,7 @@ export class RuleAddComponent {
                        }
                    }
 
+                   // checks if first element is not undefined or null
                     if(!paramArray.values[0])
                     {
                         this.openSnackbar(this.translate.instant('rule.missingParamInCondition') + paramArray.name, "");
@@ -303,12 +362,14 @@ export class RuleAddComponent {
 
                 }
 
+                // checks if action has ben chosen
                 if(!this.selectedAction)
                 {
                     this.openSnackbar(this.translate.instant('rule.noActionChosen'), "");
                     return;
                 }
 
+                // checks if all params are given by user
                 for(const param of this.selectedAction.params)
                 {
                     if(!param.value)
@@ -318,6 +379,7 @@ export class RuleAddComponent {
                     }
                 }
 
+                // checks if all param arrays are given by user
                 for(const paramArray of this.selectedAction.paramArrays)
                 {
                     // remove elements which are only whitespaces
@@ -330,6 +392,7 @@ export class RuleAddComponent {
                         }
                     }
 
+                    // checks if first element is not undefined or null
                     if(!paramArray.values[0])
                     {
                         this.openSnackbar(this.translate.instant('rule.missingParamInAction') + paramArray.name, "");
@@ -339,6 +402,7 @@ export class RuleAddComponent {
 
 
 
+                // saves all data from gui into the rule object
                 this.ruleTemplate.name = this.ruleName;
                 this.ruleTemplate.description = this.ruleDescription;
 
@@ -349,6 +413,7 @@ export class RuleAddComponent {
                 this.ruleTemplate.templateCondition = this.selectedCondition;
                 this.ruleTemplate.templateAction = this.selectedAction;
 
+                // tries to save the rule
                 this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule/').subscribe(
                     data => {
                         this.dialogRef.close(true);
@@ -359,13 +424,16 @@ export class RuleAddComponent {
                 break;
             }
 
-            case 1: { // expert mode
+            // expert mode
+            case 1: {
 
+                // checks if sourcecode is given
                 if(this.isStringEmptyOrUndefined(this.ruleExpert.sourcecode)) {
                     this.openSnackbar(this.translate.instant('rule.noCodeGiven'), "");
                     return;
                 }
 
+                // saves all data from gui into the rule object
                 this.ruleExpert.name = this.ruleName;
                 this.ruleExpert.description = this.ruleDescription;
 
@@ -373,6 +441,7 @@ export class RuleAddComponent {
                     this.ruleExpert.contextID = this.context.context.id;
                 }
 
+                // tries to save the rule
                 this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource/').subscribe(
                     data => {
                         this.dialogRef.close(true);
@@ -384,7 +453,6 @@ export class RuleAddComponent {
                 break;
             }
             default: {
-                //statements;
                 break;
             }
         }

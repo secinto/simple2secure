@@ -485,11 +485,8 @@ public class RuleUtils {
 			Class<?> theParsedClass = groovyClassLoader.parseClass(source);
 
 			Object rule = theParsedClass.newInstance();
-	
-			//log.debug("Created new rule object {} with GroovyClassLoader", rule.getClass().getName());
 			
 			return rule;
-			
 		}
 	}
 }

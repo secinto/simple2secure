@@ -1,8 +1,12 @@
+<!-- Button for adding a rule -->
 <button mat-raised-button color="primary" id="addButton" type="button" (click)="onOpenDialogAddRule()"
         class="pull-right mat-green-button">
     <i class="glyphicon glyphicon-plus"></i> {{ 'menu.addRule' | translate }}
 </button>
 
+
+<!-- =============================================================================================================== -->
+<!-- Table which displays all loaded rules -->
 <div class="example-container mat-elevation-z8 table table-striped">
         <div class="header-filter-table">
             <mat-form-field class="header-filter-field">
@@ -11,18 +15,19 @@
         </div>
         <mat-table #table [dataSource]="dataSource" matSort>
 
-            <!-- Position Column -->
+            <!-- Name Column -->
             <ng-container matColumnDef="name">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
                 <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
             </ng-container>
 
-            <!-- Name Column -->
+            <!-- Description Column -->
             <ng-container matColumnDef="description">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.description' | translate }}</mat-header-cell>
                 <mat-cell *matCellDef="let element"> {{element.description}}</mat-cell>
             </ng-container>
 
+            <!-- Action-Menu Column -->
             <ng-container matColumnDef="action">
                 <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate}}
                 </mat-header-cell>
@@ -46,6 +51,9 @@
         <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
     </div>
 
+
+<!-- =============================================================================================================== -->
+<!-- Menu which will open when action button is pressed ad a rule -->
     <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="onEditClick()">
             <mat-icon>edit</mat-icon>

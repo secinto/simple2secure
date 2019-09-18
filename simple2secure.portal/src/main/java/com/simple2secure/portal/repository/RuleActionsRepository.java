@@ -30,6 +30,10 @@ import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.MongoRepository;
 
+/**
+ * @author Richard Heinz
+ *
+ */
 @Component
 public abstract class RuleActionsRepository extends MongoRepository<TemplateAction>{
 

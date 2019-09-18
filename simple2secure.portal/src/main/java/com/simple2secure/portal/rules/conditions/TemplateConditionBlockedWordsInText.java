@@ -44,7 +44,7 @@ public class TemplateConditionBlockedWordsInText  extends AbtractEmailCondition 
 	protected boolean condition(Email email) {
 		for (String word : words) {
 			if (email.getText().toLowerCase().contains(word.toLowerCase()))
-				return true;
+				return true;	
 		}
 		return false;
 	}

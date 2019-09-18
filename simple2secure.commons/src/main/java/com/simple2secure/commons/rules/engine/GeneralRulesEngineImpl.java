@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * For the engine is the easy-rules library (https://github.com/j-easy/easy-rules) 
  * Version 3.3.0 used.
  * 
- * You can add and remove rules. A rule must hava a condition and an action. If 
+ * You can add and remove rules. A rule must have a condition and an action. If 
  * the the condition is satisfied the action will be performed.
  * 
  *  You can add and remove Facts, each rule will be used on each fact.

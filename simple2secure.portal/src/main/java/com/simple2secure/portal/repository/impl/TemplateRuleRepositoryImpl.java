@@ -35,6 +35,11 @@ import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
 
+/**
+ * 
+ * @author Richard Heinz
+ *
+ */
 @Repository
 @Transactional
 public class TemplateRuleRepositoryImpl extends TemplateRuleRepository{
