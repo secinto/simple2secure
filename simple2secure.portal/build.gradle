@@ -6,7 +6,7 @@ plugins {
 	id 'war'
 }
 
-mainClassName = "com.secinto.portal.Simple2SecurePortal"
+mainClassName = "com.simple2secure.portal.Simple2SecurePortal"
 
 
 sonarqube {

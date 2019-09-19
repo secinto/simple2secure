@@ -4,8 +4,6 @@ import urllib3
 class Config(object):
 
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    DEBUG = False
-    TESTING = False
     SECRET_KEY = "ChangeIt2019!"
     DATABASE_URI = 'sqlite:///:memory:'
     CELERY_BROKER_URL = "redis://localhost:6379"
@@ -21,11 +19,14 @@ class Config(object):
 
 
 class ProductionConfig(Config):
+    DEBUG = False
+    TESTING = False
     DATABASE_URI = 'mysql://user@localhost/foo'
     CELERY_BROKER_URL = "redis://redis:6379"
     CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 
 class DevelopmentConfig(Config):
-    DEBUG = False
+    DEBUG = True
+    Testing = True
 
