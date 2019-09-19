@@ -6,10 +6,18 @@ from src.util import json_utils
 from src.db.database import TestResult, Test, TestSequence
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 import src.celery.celery_tasks as celery_tasks
+import json
 from urllib import parse
 
 app = create_app()
 start_scheduler_tasks(app, celery_tasks)
+
+
+def to_pretty_json(value):
+    return value
+
+
+app.jinja_env.filters['tojson_pretty'] = to_pretty_json
 
 
 @app.route("/services")
@@ -91,7 +99,7 @@ def run_service():
 
             db_test.test_content = current_test
             print(db_test.test_content)
-            output = test_schema.dump(db_test).data
+            output = test_schema.dump(db_test)
             resp = file_utils.schedule_test_on_the_portal(output, app, app.config['POD_ID'])
 
             if resp.status_code == 200:
@@ -103,4 +111,4 @@ def run_service():
 
 
 if __name__ == '__main__':
-    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)
+    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True, use_reloader=False)
