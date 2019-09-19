@@ -23,7 +23,7 @@ def show_test_results():
     with app.app_context():
         file_utils.update_services_file()
         test_results = TestResult.query.all()
-        return render_template('test_results.html', len=len(test_results), test_results=test_results)
+        return render_template('testresults.html', len=len(test_results), test_results=test_results)
 
 
 @app.route("/")
