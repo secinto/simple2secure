@@ -71,17 +71,39 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils{
 		return  templateRuleRepository.findByContextId(contextId);
 	}
 	
+	
+	/**
+	 * Method to create a rule from a TemplateRule class which holds the 
+	 * information (name, description, params,...) about predefined conditions/
+	 * actions. The Condition and Action will be registered as Beans for Spring
+	 * 
+	 * @param ruleData TemplateRule object which holds the information about 
+	 *                 the future rule object.
+	 * @param packageNameConditons represents where the predefined 
+	 * 								Conditions are saved.
+	 * @param packageNameAction represents where the predefined 
+	 * 								Actions are saved.
+	 * 
+	 * @return a Rule object which can be used for the rule engine
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 * 
+	 */
 	public Rule buildRuleFromTemplateRuleWithBean(TemplateRule ruleData, 
-			String pathConditonsTempates, String pathActionTemplates) 
+			String packageNameConditonsTempates, String packageNameActionTemplates) 
 					throws ClassNotFoundException, InstantiationException,
 					IllegalAccessException, IllegalArgumentException, 
 					IOException
 	{
 		
-		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), pathConditonsTempates);
+		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditonsTempates);
 		autowireCapableBeanFactory.autowireBean(condition);
 		
-		Action action = buildActionFromTemplateAction(ruleData.getTemplateAction(), pathActionTemplates);
+		Action action = buildActionFromTemplateAction(ruleData.getTemplateAction(), packageNameActionTemplates);
 		autowireCapableBeanFactory.autowireBean(action);
 		
 		return new RuleBuilder().

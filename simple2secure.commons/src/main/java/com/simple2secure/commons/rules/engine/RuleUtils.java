@@ -154,9 +154,9 @@ public class RuleUtils {
 	}
 	
 	/**
-	 * Method to fetch all classes in given path which has specific annotation.
+	 * Method to fetch all classes in given package which has specific annotation.
 	 * 
-	 * @param path where to search
+	 * @param packageName where to search
 	 * @param annotation which the class must have
 	 * 
 	 * @return clazzes collection where all found classes are saved
@@ -164,13 +164,13 @@ public class RuleUtils {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	private Collection<Class<?>> getAnnotatedClass(String path, Class<?> annotation) throws IOException, ClassNotFoundException
+	private Collection<Class<?>> getAnnotatedClass(String packageName, Class<?> annotation) throws IOException, ClassNotFoundException
 	{
 		Collection<Class<?>> clazzes = new ArrayList<Class<?>>();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		ClassPath classPath = ClassPath.from(loader);
 		
-		for (ClassPath.ClassInfo info : classPath.getTopLevelClassesRecursive(path))
+		for (ClassPath.ClassInfo info : classPath.getTopLevelClassesRecursive(packageName))
 		{
 			Class clazz = Class.forName(info.getName(), true, loader);
 
@@ -183,23 +183,23 @@ public class RuleUtils {
 	
 
 	/**
-	 * Method to load all predefined Conditons from path and saved the 
+	 * Method to load all predefined Conditons from package and saved the 
 	 * information into a Collection. Only the annotations (name, description,
 	 *  params, ...) will be saved
 	 * 
 	 * 
-	 * @param path where the Condition classe are saved
+	 * @param packageName where the Condition classe are saved
 	 * 
 	 * @return conditions data which are saved into a collection
 	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public Collection<TemplateCondition> loadTemplateConditions(String path) throws IOException, ClassNotFoundException
+	public Collection<TemplateCondition> loadTemplateConditions(String packageName) throws IOException, ClassNotFoundException
 	{
 		Collection<TemplateCondition> conditions = new ArrayList<TemplateCondition>();
 		
-		Collection<Class<?>> conditionsClazzes = getAnnotatedClass(path, AnnotationCondition.class);
+		Collection<Class<?>> conditionsClazzes = getAnnotatedClass(packageName, AnnotationCondition.class);
 		
 		for(Class<?> conditionClazz : conditionsClazzes)
 		{
@@ -226,23 +226,23 @@ public class RuleUtils {
 	
 	
 	/**
-	 * Method to load all predefined Actions from path and saved the 
+	 * Method to load all predefined Actions from package and saved the 
 	 * information into a Collection. Only the annotations (name, description, params,
 	 * ...) will be saved
 	 * 
 	 * 
-	 * @param path where the Action classe are saved
+	 * @param packageName where the Action classe are saved
 	 * 
 	 * @return actions data which are saved into a collection
 	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public Collection<TemplateAction> loadTemplateActions(String path) throws IOException, ClassNotFoundException
+	public Collection<TemplateAction> loadTemplateActions(String packageName) throws IOException, ClassNotFoundException
 	{
 		Collection<TemplateAction> actions = new ArrayList<TemplateAction>();
 		
-		Collection<Class<?>> actionClazzes = getAnnotatedClass(path, AnnotationAction.class);
+		Collection<Class<?>> actionClazzes = getAnnotatedClass(packageName, AnnotationAction.class);
 		
 		for(Class<?> actionClazz : actionClazzes)
 		{
@@ -274,7 +274,7 @@ public class RuleUtils {
 	 * 
 	 * @param conditionData holds the information which will be loaded into the
 	 * 					    predefined Condition 
-	 * @param path where the TemplateContitions are saved
+	 * @param packageName where the TemplateContitions are saved
 	 * 
 	 * @return condition which can be used for a rule
 	 * 
@@ -283,14 +283,14 @@ public class RuleUtils {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String path) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
+	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String packageName) throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException
 	{
 		Class<?> conditionClass = null;
 		Condition condition = null;
 		
 		// fetches all classes which are annotatied as AnnotationAction.class
 		// from the given class
-		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationCondition.class);
+		Collection<Class<?>> clazzes = getAnnotatedClass(packageName, AnnotationCondition.class);
 		
 		// takes required class
 		for(Class<?> clazz: clazzes)
@@ -352,7 +352,7 @@ public class RuleUtils {
 	 * 
 	 * @param actionData holds the information which will be loaded into the
 	 * 					 predefined Action 
-	 * @param path where the Actions are saved
+	 * @param packageName where the Actions are saved
 	 * 
 	 * @return action which can be used for a rule
 	 * 
@@ -363,7 +363,7 @@ public class RuleUtils {
 	 * @throws IOException
 	 */
 	public Action buildActionFromTemplateAction(TemplateAction actionData,
-			String path) 
+			String packageName) 
 					throws IllegalArgumentException, IllegalAccessException,
 					InstantiationException, ClassNotFoundException, IOException
 	{
@@ -372,7 +372,7 @@ public class RuleUtils {
 		
 		// fetches all classes which are annotatied as AnnotationAction.class
 		// from the given class
-		Collection<Class<?>> clazzes = getAnnotatedClass(path, AnnotationAction.class);
+		Collection<Class<?>> clazzes = getAnnotatedClass(packageName, AnnotationAction.class);
 		
 		// takes required class
 		for(Class<?> clazz: clazzes)
@@ -436,9 +436,9 @@ public class RuleUtils {
 	 * 
 	 * @param ruleData TemplateRule object which holds the information about 
 	 *                 the future rule object.
-	 * @param pathConditonsTempates represents where the predefined 
+	 * @param packageNameConditons represents where the predefined 
 	 * 								Conditions are saved.
-	 * @param pathActionTemplates represents where the predefined 
+	 * @param packageNameAction represents where the predefined 
 	 * 								Actions are saved.
 	 * 
 	 * @return a Rule object which can be used for the rule engine
@@ -451,7 +451,7 @@ public class RuleUtils {
 	 * 
 	 */
 	public Rule buildRuleFromTemplateRule(TemplateRule ruleData, 
-			String pathConditonsTempates, String pathActionTemplates) 
+			String packageNameConditons, String packageNameAction) 
 					throws ClassNotFoundException, InstantiationException,
 					IllegalAccessException, IllegalArgumentException, 
 					IOException
@@ -459,8 +459,8 @@ public class RuleUtils {
 		return new RuleBuilder().
 				name(ruleData.getName()).
 				description(ruleData.getDescription()).
-				when(buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), pathConditonsTempates)).
-				then(buildActionFromTemplateAction(ruleData.getTemplateAction(), pathActionTemplates)).
+				when(buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditons)).
+				then(buildActionFromTemplateAction(ruleData.getTemplateAction(), packageNameAction)).
 				build();
 	}
 	
