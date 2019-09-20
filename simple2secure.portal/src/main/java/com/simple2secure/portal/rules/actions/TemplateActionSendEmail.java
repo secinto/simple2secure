@@ -60,6 +60,12 @@ public class TemplateActionSendEmail extends AbtractEmailAction{
 			type = DataType._STRING)
 	String text;
 	
+	@AnnotationRuleParam(name = "subject",
+			description_de = "Betreff der Email.",
+			description_en = "Subject of the email.",
+			type = DataType._STRING)
+	String subject;
+	
 	@AnnotationRuleParam(name = "emailaddress",
 			description_de = "Adresse an welche die Email versand werden soll.",
 			description_en = "Address to which the email should be send",
@@ -70,7 +76,7 @@ public class TemplateActionSendEmail extends AbtractEmailAction{
 	protected void action(Email email) throws IOException {
 		User user = new User(emailAddress, "test", true, null, true, true); 
 
-		mailUtils.sendEmail(user, text, text);
+		mailUtils.sendEmail(user, text, subject);
 	}
 }
 
