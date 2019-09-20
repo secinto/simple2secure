@@ -39,8 +39,14 @@ export class HelperService {
 	}
 
 	getTestStatusByTestResult(testRunDTO: TestRunDTO){
+		console.log(testRunDTO);
 		if(testRunDTO.testResult == null){
-			return 'UNKNOWN';
+			if(testRunDTO.testRun !== null && testRunDTO.testRun !== '') {
+				return testRunDTO.testRun.testStatus;
+			}
+			else {
+				return 'UNKNOWN';
+			}
 		}
 		else{
 			return testRunDTO.testRun.testStatus;

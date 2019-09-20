@@ -53,6 +53,12 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
 
         rest_utils.update_test_status(app, auth_token, test_run_id, test_id, "EXECUTED")
 
+        app.logger.info('Before sending test result: %s', test_result)
+
+        send_test_results(test_result)
+
+        app.logger.info('After sending test result')
+
         db.session.add(test_result)
         db.session.commit()
         

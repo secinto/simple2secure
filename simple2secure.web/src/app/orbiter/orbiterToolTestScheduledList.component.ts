@@ -158,8 +158,8 @@ export class OrbiterToolTestScheduledListComponent {
 				this.loading = false;
 			});
 	}
-
-	openDialogShowTestResult(): void {
+	
+	public openDialogShowTestResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
 		dialogConfig.data = {
@@ -170,7 +170,4 @@ export class OrbiterToolTestScheduledListComponent {
 
 	}
 
-	getTestStatusByTestResult(element: any) {
-
-	}
 }

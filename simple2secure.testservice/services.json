@@ -21,7 +21,7 @@
                     "executable": "nmap",
                     "parameter": {
                         "description": "Some simple nmap execution",
-                        "prefix": "",
+                        "prefix": "-T4 -F",
                         "value": "www.secinto.com"
                     }
                 }
