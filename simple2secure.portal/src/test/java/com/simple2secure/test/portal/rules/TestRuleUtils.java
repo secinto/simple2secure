@@ -85,7 +85,7 @@ public class TestRuleUtils {
 	@Test
 	public void testFetchingTemplateActions()
 	{		
-		// Path where the action classes are saved
+		// Package where the action classes are saved
 		String PACKAGE_TEMPLATE_ACTIONS = "com.simple2secure.test.portal.rules";
 		
 		try {
@@ -160,7 +160,7 @@ public class TestRuleUtils {
 	@Test
 	public void testFetchingTemplateConditions()
 	{
-		// Path where the condition classes are saved
+		// Package where the condition classes are saved
 		String PACKAGE_TEMPLATE_Conditions = "com.simple2secure.test.portal.rules";
 		
 		try {
@@ -235,7 +235,7 @@ public class TestRuleUtils {
 	@Test
 	public void testCreatingActionObjectFromActionData()
 	{
-		// Path where the action classes are saved
+		// Package where the action classes are saved
 		String PACKAGE_TEMPLATE_ACTIONS = "com.simple2secure.test.portal.rules";
 		
 		
@@ -320,7 +320,7 @@ public class TestRuleUtils {
 	@Test
 	public void testCreatingConditionObjectFromConditionData()
 	{
-		// Path where the condition classes are saved
+		// Package where the condition classes are saved
 		String PACKAGE_TEMPLATE_CONDITIONS = "com.simple2secure.test.portal.rules";
 		
 		
