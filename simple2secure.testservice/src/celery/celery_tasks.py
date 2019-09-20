@@ -12,9 +12,9 @@ celery = create_celery_app(app)
 
 
 @celery.task(name='celery.send_test_results')
-def send_test_results(test_result, auth_token, portal_url):
+def send_test_results(test_result, auth_token):
     with app.app_context():
-        response = rest_utils.portal_post_celery(portal_url + "test/saveTestResult", test_result, auth_token, app)
+        response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, auth_token, app)
 
         if response.status_code == 200:
             test_res = TestResult.query.filter_by(id=test_result["id"]).first()
@@ -55,12 +55,13 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
 
         app.logger.info('Before sending test result: %s', test_result)
 
-        send_test_results(test_result)
-
         app.logger.info('After sending test result')
 
         db.session.add(test_result)
         db.session.commit()
+
+        send_test_results(test_result, auth_token)
+
         
 @celery.task(name='celery.schedule_test_for_sequence')
 def schedule_test_for_sequence(parameter, command):

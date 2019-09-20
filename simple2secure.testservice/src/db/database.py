@@ -22,6 +22,8 @@ class TestResult(db.Model):
         self.timestamp = timestamp
         self.isSent = is_sent
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 class PodInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)

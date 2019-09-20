@@ -41,7 +41,7 @@ export class HelperService {
 	getTestStatusByTestResult(testRunDTO: TestRunDTO){
 		console.log(testRunDTO);
 		if(testRunDTO.testResult == null){
-			if(testRunDTO.testRun !== null && testRunDTO.testRun !== '') {
+			if(testRunDTO.testRun !== null) {
 				return testRunDTO.testRun.testStatus;
 			}
 			else {
