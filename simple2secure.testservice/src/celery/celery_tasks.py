@@ -17,7 +17,7 @@ def send_test_results(test_result, auth_token):
         response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, auth_token, app)
 
         if response.status_code == 200:
-            test_res = TestResult.query.filter_by(id=test_result["id"]).first()
+            test_res = TestResult.query.filter_by(id=test_result.id).first()
             test_res.isSent = True
             db.session.commit()
 

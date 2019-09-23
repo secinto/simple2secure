@@ -41,7 +41,7 @@ def get_test_results_from_db(app_obj, celery_task):
         test_results = TestResult.query.filter_by(isSent=False).all()
         for test_result in test_results:
             test_result_schema = TestResultSchema()
-            output = test_result_schema.dump(test_result).data
+            output = test_result_schema.dump(test_result)
 
             if not app_obj.config['AUTH_TOKEN']:
                 app_obj.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app_obj)
@@ -57,7 +57,7 @@ def sync_tests_with_the_portal(app_obj):
         if tests is not None:
             new_tests = []
             for test in tests:
-                output = test_schema.dump(test).data
+                output = test_schema.dump(test)
                 new_tests.append(output)
 
             if new_tests is not None:
