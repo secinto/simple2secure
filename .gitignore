@@ -30,3 +30,8 @@ simple2secure.service/bin/
 simple2secure.web/.idea/
 simple2secure.web/dist/
 simple2secure.web/node_modules/
+simple2secure.portal/logs/
+simple2secure.probe/logs/
+simple2secure.service/logs/
+simple2secure.service/release/logs/
+simple2secure.testservice/.idea/
