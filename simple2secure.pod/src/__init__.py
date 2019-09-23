@@ -36,7 +36,7 @@ def entrypoint(mode='app'):
 
     os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
-    app = Flask(__name__, template_folder='templates')
+    app = Flask(__name__)
     app.config.from_object(config_module.DevelopmentConfig)
 
     CORS(app)

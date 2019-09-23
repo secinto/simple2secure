@@ -3,12 +3,21 @@ from src import create_app
 from src.db.database_schema import TestSchema
 from src.util import file_utils
 from src.util import json_utils
-from src.db.database import TestResult, Test
+from src.db.database import TestResult, Test, TestSequence
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 import src.celery.celery_tasks as celery_tasks
+import json
+from urllib import parse
 
 app = create_app()
 start_scheduler_tasks(app, celery_tasks)
+
+
+def to_pretty_json(value):
+    return value
+
+
+app.jinja_env.filters['tojson_pretty'] = to_pretty_json
 
 
 @app.route("/services")
@@ -30,6 +39,20 @@ def show_test_results():
 def index():
     response = file_utils.read_json_testfile(app)
     return response
+
+@app.route("/services/run/sequence")
+def run_sequence():
+    with app.app_context():
+        full_url = request.url
+        splitted_url = parse.urlsplit(full_url)
+        url_query = parse.parse_qs(splitted_url.query)
+        tools = url_query["task"]
+        if "parameter" in url_query:
+            params = url_query["parameter"]
+        else:
+            params = [""]
+        testRun = celery_tasks.schedule_test_for_sequence(params[0], tools[0])
+        return testRun
 
 
 @app.route("/services/run")
@@ -88,4 +111,4 @@ def run_service():
 
 
 if __name__ == '__main__':
-    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)
+    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True, use_reloader=False)

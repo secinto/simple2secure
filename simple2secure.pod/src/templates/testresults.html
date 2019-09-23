@@ -11,10 +11,11 @@
             <th>#</th>
             <th>Name</th>
             <th>Hostname</th>
+			<th>Result</th>
         </tr>
 
         {%for i in range(0, len)%}
-            <tr><td>{{ i + 1 }}</td><td>{{test_results[i].name}}</td><td>{{ test_results[i].hostname }}</td></tr>
+            <tr><td>{{ i + 1 }}</td><td>{{test_results[i].name}}</td><td>{{ test_results[i].hostname }}</td><td><pre>{{ test_results[i].result }}</pre></td></tr>
         {%endfor%}
 
     </table>

@@ -7,20 +7,26 @@ from src.db.database import Notification, TestStatusDTO
 
 def get_auth_token(app):
     with app.app_context():
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-        return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
+        if not app.config['AUTH_TOKEN']:
+            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
+            return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
                              data=json.dumps(file_utils.parse_license_file(file_utils.get_license_file(), app).__dict__),
                              verify=False,
                              headers=headers).text
+        else:
+            return app.config['AUTH_TOKEN']
 
 
 def get_auth_token_object(app):
     with app.app_context():
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-        return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
+        if not app.config['AUTH_TOKEN']:
+            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
+            return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
                              data=json.dumps(file_utils.parse_license_file(file_utils.get_license_file(), app).__dict__),
                              verify=False,
                              headers=headers)
+        else:
+            return app.config['AUTH_TOKEN']
 
 
 def portal_post(url, data, app):
@@ -49,8 +55,10 @@ def portal_get(url, app):
 
 def portal_post_celery(url, data, auth_token, app):
     with app.app_context():
+
+        app.logger.info('Token before sending post request from (portal_post_celery): %s', app.config['AUTH_TOKEN'])
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " + auth_token}
-        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+        return requests.post(url, data=json.dumps(data.as_dict()), verify=False, headers=headers)
 
 
 def portal_post_test(url, data, app):
