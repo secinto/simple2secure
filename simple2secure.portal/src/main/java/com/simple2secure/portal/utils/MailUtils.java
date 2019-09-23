@@ -46,14 +46,12 @@ import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.FrontendRule;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Configuration
@@ -82,9 +80,6 @@ public class MailUtils {
 
 	@Autowired
 	ContextRepository contextRepository;
-
-	@Autowired
-	RuleRepository ruleRepository;
 
 	@Autowired
 	JavaMailSender javaMailSender;
@@ -273,8 +268,7 @@ public class MailUtils {
 			for (EmailConfiguration emailConfig : emailConfigList) {
 				if (emailConfig != null) {
 					List<Email> emailList = emailRepository.findByConfigId(emailConfig.getId());
-					List<FrontendRule> rules = ruleUtils.getFrontendRulesByToolId(emailConfig.getId());
-					EmailConfigurationDTO emailConfigDTO = new EmailConfigurationDTO(emailConfig, emailList, rules);
+					EmailConfigurationDTO emailConfigDTO = new EmailConfigurationDTO(emailConfig, emailList);
 					configurationList.add(emailConfigDTO);
 				}
 			}

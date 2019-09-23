@@ -53,10 +53,9 @@ export class LoginComponent implements OnInit {
 		private httpService: HttpService,
 		private dialog: MatDialog,
 		private alertService: AlertService)
-	{ }
+	{}
 
 	ngOnInit() {
-
 		this.hide = true;
 
 		// reset login status

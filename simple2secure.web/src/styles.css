@@ -461,27 +461,4 @@ tree-viewport{
     margin-right: 5px;
 }
 
-.mat-card-license-plan {
-    margin-top: 50px;
-}
 
-.mat-card-custom {
-    margin: 4px;
-}
-
-.mat-card-title-left {
-    display: inline;
-}
-
-.mat-card-title-right {
-    display: inline;
-    float: right;
-}
-
-.mat-expansion-panel{
-    margin-top: 50px !important;
-}
-
-.mat-expansion-panel-header-description{
-    flex-basis: 0 !important;
-}

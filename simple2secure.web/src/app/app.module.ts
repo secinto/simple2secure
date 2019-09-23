@@ -1,25 +1,3 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
-
 import {DatePipe} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
@@ -52,9 +30,29 @@ import {BootstrapModalModule} from 'ngx-modialog/plugins/bootstrap';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
-	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
-	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule, MatBadgeModule
+	MatButtonModule,
+	MatCheckboxModule,
+	MatInputModule,
+	MatFormFieldModule,
+	MatOptionModule,
+	MatSelectModule,
+	MatMenuModule,
+	MatIconModule,
+	MatSidenavModule,
+	MatButtonToggleModule,
+	MatTableModule,
+	MatTabsModule,
+	MatPaginatorModule,
+	MatSortModule,
+	MatProgressSpinnerModule,
+	MatDialogModule,
+	MatNativeDateModule,
+	MatDatepickerModule,
+	MatCardModule,
+	MatExpansionModule,
+	MatBadgeModule,
+	MatRadioModule, MatTooltipModule,
+	MatSnackBarModule,
 } from '@angular/material';
 import {AppComponent} from './app.component';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -79,11 +77,17 @@ import {
 	OsQueryReportDetailsComponent, ReportOverviewComponent
 } from './report/index';
 
-import {EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
+import {
+	EmailOverviewComponent,
+	EmailInboxComponent,
+	EmailAccountAddComponent,
+	EmailRuleOverviewComponent,
+	EmailComponent
+} from './email/index';
 import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
 import {SettingsComponent} from './settings/index';
 import {ActivationComponent, ActivatedComponent} from './activation/index';
-import {NotificationComponent} from './notification/index';
+import {NotificationComponent, NotificationOverviewComponent} from './notification/index';
 import {AnalysisComponent, AddQueryDialog} from './analysis/index';
 import {EqualValidator} from './_directives/equalValidator';
 import {
@@ -107,13 +111,7 @@ import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
-import {HelperService} from './_services/helper.service';
-import { NgMatSearchBarModule } from 'ng-mat-search-bar';
-import {SearchComponent} from './search/search.component';
-import {SearchResultComponent} from './search/searchResult.component';
-import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
-import {TruncatePipe} from './_helpers/truncate.pipe';
-import {NotificationDetailsComponent} from './notification/notificationDetails.component';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -177,8 +175,10 @@ export const httpInterceptorProviders = [
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		}),
 		AgmDirectionModule,
-		NgMatSearchBarModule,
-		Ng4LoadingSpinnerModule.forRoot()
+		AceEditorModule,
+		MatRadioModule,
+		MatTooltipModule,
+		MatSnackBarModule
 
 	],
 	declarations: [
@@ -223,10 +223,13 @@ export const httpInterceptorProviders = [
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
+		EmailRuleOverviewComponent,
+		EmailComponent,
 		SettingsComponent,
 		ActivationComponent,
 		ActivatedComponent,
 		NotificationComponent,
+		NotificationOverviewComponent,
 		RuleComponent,
 		RuleOverviewComponent,
 		RuleAddComponent,
@@ -238,11 +241,7 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
-		OrbiterToolTestScheduledListComponent,
-		SearchComponent,
-		SearchResultComponent,
-		TruncatePipe,
-		NotificationDetailsComponent
+		OrbiterToolTestScheduledListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -257,15 +256,13 @@ export const httpInterceptorProviders = [
 		UserContextAddDialogComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,
-		RuleOverviewComponent,
 		RuleAddComponent,
 		OsQueryReportDetailsComponent,
 		NetworkReportDetailsComponent,
 		UserDetailsComponent,
 		AddQueryDialog,
 		TestResultDetailsComponent,
-		TestDetailsComponent,
-		NotificationDetailsComponent
+		TestDetailsComponent
 	],
 	providers: [
 		AuthGuard,
@@ -274,7 +271,6 @@ export const httpInterceptorProviders = [
 		AuthenticationService,
 		HttpService,
 		DataService,
-		HelperService,
 		httpInterceptorProviders,
 		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
 		DatePipe
