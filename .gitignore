@@ -4,7 +4,6 @@
 .gradle/
 .settings/
 build/
-logs/
 bin/
 simple2secure.api/bin/
 simple2secure.commons/bin/
@@ -19,7 +18,6 @@ simple2secure.pod/result/
 simple2secure.pod/Scripts/
 simple2secure.pod/tcl/
 simple2secure.pod/src/models/__pycache__/
-simple2secure.pod/static/license/
 simple2secure.pod/type/pod.sqlite3
 simple2secure.pod/celery-queue/Dockerfile
 simple2secure.pod/celery-queue/requirements.txt
