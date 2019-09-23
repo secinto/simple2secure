@@ -31,27 +31,29 @@ import com.simple2secure.api.model.Email;
  * 
  * @author Richard Heinz
  *
- * Abstract action class which can be taken as template for an email rule
+ *         Abstract action class which can be taken as template for an email rule
  */
-public abstract class AbtractEmailAction implements Action{
+public abstract class AbtractEmailAction implements Action {
 
 	/**
-	 * Method to fetch the email object from the facts. There will only be one
-	 * object with the name "com.simple2secure.api.model.Email" (Map in the 
-	 * background)
+	 * Method to fetch the email object from the facts. There will only be one object with the name "com.simple2secure.api.model.Email" (Map
+	 * in the background)
 	 * 
-	 * @param facts which hold all saved facts
+	 * @param facts
+	 *          which hold all saved facts
 	 */
 	@Override
 	public void execute(Facts facts) throws Exception {
 		action(facts.get("com.simple2secure.api.model.Email"));
 	}
-	
+
 	/**
 	 * Method which has to be implemented in the specific action class
 	 * 
-	 * @param email which has triggered the rule
-	 * @throws Exception of any type can be thrown
+	 * @param email
+	 *          which has triggered the rule
+	 * @throws Exception
+	 *           of any type can be thrown
 	 */
 	protected abstract void action(Email email) throws Exception;
 }

@@ -24,7 +24,6 @@ package com.simple2secure.portal.rules.actions;
 
 import java.io.IOException;
 
-import org.jeasy.rules.api.Facts;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.simple2secure.api.model.DataType;
@@ -34,53 +33,34 @@ import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.utils.MailUtils;
 
-
 /**
  * 
  * @author Richard Heinz
  * 
- * Action which is used as predefined Action in the rule engine. Sends an email
- * with the given text.
+ *         Action which is used as predefined Action in the rule engine. Sends an email with the given text.
  */
-@AnnotationAction(name = "send email",
-		description_de = "Sendet eine Email mit definierten Text an die angegeben Adresse.",
-		description_en = "Sends an email with defined text to given address.")
-public class TemplateActionSendEmail extends AbtractEmailAction{
+@AnnotationAction(name = "send email", description_de = "Sendet eine Email mit definierten Text an die angegeben Adresse.", description_en = "Sends an email with defined text to given address.")
+public class TemplateActionSendEmail extends AbtractEmailAction {
 
 	@Autowired
 	MailUtils mailUtils;
 
 	/*
-	 * All field values which are annotated as AnnotationRuleParam or
-	 * AnnotationRuleParamArray are filled/saved during runtime directly. 
+	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
-	@AnnotationRuleParam(name = "text",
-			description_de = "Text der an gegene Adresse gesendet werden soll.",
-			description_en = "Text which will be send to given address",
-			type = DataType._STRING)
+	@AnnotationRuleParam(name = "text", description_de = "Text der an gegene Adresse gesendet werden soll.", description_en = "Text which will be send to given address", type = DataType._STRING)
 	String text;
-	
-	@AnnotationRuleParam(name = "subject",
-			description_de = "Betreff der Email.",
-			description_en = "Subject of the email.",
-			type = DataType._STRING)
+
+	@AnnotationRuleParam(name = "subject", description_de = "Betreff der Email.", description_en = "Subject of the email.", type = DataType._STRING)
 	String subject;
-	
-	@AnnotationRuleParam(name = "emailaddress",
-			description_de = "Adresse an welche die Email versand werden soll.",
-			description_en = "Address to which the email should be send",
-			type = DataType._STRING)
+
+	@AnnotationRuleParam(name = "emailaddress", description_de = "Adresse an welche die Email versand werden soll.", description_en = "Address to which the email should be send", type = DataType._STRING)
 	String emailAddress;
 
 	@Override
 	protected void action(Email email) throws IOException {
-		User user = new User(emailAddress, "test", true, null, true, true); 
+		User user = new User(emailAddress, "test", true, null, true, true);
 
 		mailUtils.sendEmail(user, text, subject);
 	}
 }
-
-
-
-
-

@@ -21,7 +21,6 @@
  */
 package com.simple2secure.portal.scheduler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,15 +50,6 @@ import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
-import ch.maxant.rules.AbstractAction;
-import ch.maxant.rules.CompileException;
-import ch.maxant.rules.DuplicateNameException;
-import ch.maxant.rules.Engine;
-import ch.maxant.rules.NoActionFoundException;
-import ch.maxant.rules.NoMatchingRuleFoundException;
-import ch.maxant.rules.ParseException;
-import ch.maxant.rules.Rule;
-
 @Component
 public class UpdateEmailScheduler {
 
@@ -74,7 +64,7 @@ public class UpdateEmailScheduler {
 
 	@Autowired
 	NotificationRepository notificationRepository;
-	
+
 	@Autowired
 	NotificationUtils notificationUtils;
 
@@ -89,8 +79,8 @@ public class UpdateEmailScheduler {
 
 	@Autowired
 	PortalUtils portalUtils;
-	
-	@Autowired 
+
+	@Autowired
 	EmailRulesEngine emailRulesEngine;
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
@@ -102,7 +92,7 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				Message[] msg = connect(cfg);
 				if (msg != null) {
-					
+
 					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
@@ -140,7 +130,7 @@ public class UpdateEmailScheduler {
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
 											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
 								}
-								
+
 								emailRulesEngine.checkMail(email, emailConfig.getContextId());
 
 								emailRepository.save(email);

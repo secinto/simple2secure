@@ -24,28 +24,28 @@ package com.simple2secure.commons.rules.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.simple2secure.api.model.DataType;
-
-import java.lang.annotation.RetentionPolicy;
-
 
 /**
  * 
  * @author Richard Heinz
  * 
- * Annotation do mark a field as a parameter in a predefined action or condition
- * class for the rule engine. The data will be used to display in the web 
- * simple2secure and to save a rule in the database.
+ *         Annotation do mark a field as a parameter in a predefined action or condition class for the rule engine. The data will be used to
+ *         display in the web simple2secure and to save a rule in the database.
  *
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParam {
-	
+
 	String name();
+
 	String description_de();
+
 	String description_en();
+
 	DataType type();
 }

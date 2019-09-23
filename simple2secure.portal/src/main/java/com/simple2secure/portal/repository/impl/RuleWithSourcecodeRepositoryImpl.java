@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 
-
 /**
  * 
  * @author Richard Heinz

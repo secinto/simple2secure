@@ -42,7 +42,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.google.gson.Gson;
-import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
@@ -83,16 +82,4 @@ public class TestConfigAPIs {
 
 		log.debug("Test response {}", content);
 	}
-
-	@Test
-	public void testGetConfigConfig() throws IOException {
-		File file = new File(getClass().getResource("/server/config.json").getFile());
-		String content = new String(Files.readAllBytes(file.toPath()));
-		Config config = gson.fromJson(content, Config.class);
-
-		assertNotNull(config);
-
-		log.debug("Test response {}", content);
-	}
-
 }

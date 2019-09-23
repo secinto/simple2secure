@@ -28,14 +28,13 @@ import com.simple2secure.api.dbo.GenericDBObject;
  * 
  * @author Richard Heinz
  * 
- * Class holds the a rule with the information af a predefined conditionand
- * action. 
+ *         Class holds the a rule with the information af a predefined conditionand action.
  * 
- * Will be used  in the rule engine.
+ *         Will be used in the rule engine.
  *
  */
 public class TemplateRule extends GenericDBObject {
-	
+
 	private static final long serialVersionUID = -5156938336427387331L;
 
 	private String name;
@@ -45,9 +44,9 @@ public class TemplateRule extends GenericDBObject {
 	private String contextID;
 
 	private TemplateCondition templateCondition;
-	
+
 	private TemplateAction templateAction;
-	
+
 	public TemplateRule() {
 
 	}
@@ -100,5 +99,5 @@ public class TemplateRule extends GenericDBObject {
 
 	public void setTemplateAction(TemplateAction templateAction) {
 		this.templateAction = templateAction;
-	}	
+	}
 }

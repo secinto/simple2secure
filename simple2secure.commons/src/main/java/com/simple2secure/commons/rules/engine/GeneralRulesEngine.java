@@ -27,15 +27,14 @@ package com.simple2secure.commons.rules.engine;
  *
  */
 
-public interface GeneralRulesEngine 
-{	
+public interface GeneralRulesEngine {
 	public void addRule(Object rule);
-	
+
 	public void removeRule(String ruleName);
-	
+
 	public void addFact(Object fact);
-	
+
 	public void removeFact(String classname);
-	
+
 	public void checkFacts();
 }

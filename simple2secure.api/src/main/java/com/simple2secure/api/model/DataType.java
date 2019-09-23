@@ -26,8 +26,7 @@ package com.simple2secure.api.model;
  * 
  * @author Richard Heinz
  * 
- * Emun for the email rule engine, to define which input type will be needed for
- * condition-/action-parameter.
+ *         Emun for the email rule engine, to define which input type will be needed for condition-/action-parameter.
  *
  */
 public enum DataType {

@@ -22,35 +22,32 @@
 
 package com.simple2secure.api.model;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
-
 
 /**
  * 
  * @author Richard Heinz
  * 
- * Class holds the information of a predefined condition-class which has been 
- * annotated as condition. The params will be loaded from this class for each 
- * predefined condition. 
+ *         Class holds the information of a predefined condition-class which has been annotated as condition. The params will be loaded from
+ *         this class for each predefined condition.
  * 
- * Will be used  in the rule engine for the condition/action-parameters
+ *         Will be used in the rule engine for the condition/action-parameters
  *
  */
-public class TemplateCondition extends GenericDBObject{
+public class TemplateCondition extends GenericDBObject {
 
 	private static final long serialVersionUID = -1291327703141018318L;
-	
+
 	private String name;
 	private String description_en;
 	private String description_de;
 	private List<RuleParam<?>> params;
 	private List<RuleParamArray<?>> paramArrays;
-	
-	public TemplateCondition(String name, String description_en, String description_de,
-			List<RuleParam<?>> params, List<RuleParamArray<?>> paramArrays) {
+
+	public TemplateCondition(String name, String description_en, String description_de, List<RuleParam<?>> params,
+			List<RuleParamArray<?>> paramArrays) {
 		super();
 		this.name = name;
 		this.description_en = description_en;
@@ -58,9 +55,9 @@ public class TemplateCondition extends GenericDBObject{
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}
-	
+
 	public TemplateCondition() {
-		
+
 	}
 
 	public String getName() {

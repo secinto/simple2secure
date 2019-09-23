@@ -31,15 +31,16 @@ import java.lang.annotation.Target;
  * 
  * @author Richard Heinz
  *
- * Annotation do mark a class as a condition. The data will be used to display 
- * in the web simple2secure and to save a rule in the database.
+ *         Annotation do mark a class as a condition. The data will be used to display in the web simple2secure and to save a rule in the
+ *         database.
  * 
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationCondition 
-{
+public @interface AnnotationCondition {
 	String name();
+
 	String description_de();
+
 	String description_en();
 }

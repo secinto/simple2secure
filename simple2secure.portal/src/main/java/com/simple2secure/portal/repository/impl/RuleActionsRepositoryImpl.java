@@ -22,8 +22,6 @@
 
 package com.simple2secure.portal.repository.impl;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Component;
@@ -40,7 +38,7 @@ import com.simple2secure.portal.repository.RuleActionsRepository;
 @Component
 @Repository
 @Transactional
-public class RuleActionsRepositoryImpl extends RuleActionsRepository{
+public class RuleActionsRepositoryImpl extends RuleActionsRepository {
 
 	@PostConstruct
 	public void init() {

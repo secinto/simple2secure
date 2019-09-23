@@ -47,7 +47,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 		if (dataInitializer != null) {
 			log.info("------------------ DATA INITIALIZATION ---------------------");
 			try {
-				dataInitializer.addDefaultConfiguration();
 				dataInitializer.addDefaultSettings();
 				dataInitializer.addDefaultLicensePlan();
 				dataInitializer.addDefaultUsers();

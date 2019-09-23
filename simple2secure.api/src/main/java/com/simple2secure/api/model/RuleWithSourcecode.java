@@ -24,15 +24,13 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-
 /**
  * 
  * @author Richard Heinz
  *
- * Model to save the source code of a rule in  the database. Will be used with 
- * the rule engine. 
+ *         Model to save the source code of a rule in the database. Will be used with the rule engine.
  */
-public class RuleWithSourcecode extends GenericDBObject{
+public class RuleWithSourcecode extends GenericDBObject {
 
 	private static final long serialVersionUID = -1812440159847822313L;
 

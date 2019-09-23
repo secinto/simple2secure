@@ -22,8 +22,6 @@
 
 package com.simple2secure.commons.rules.engine;
 
-
-
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rules;
 import org.jeasy.rules.api.RulesEngine;
@@ -31,73 +29,70 @@ import org.jeasy.rules.core.DefaultRulesEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * @author Richard Heinz
  * 
- * Implementation for a rule engine for different use cases.
+ *         Implementation for a rule engine for different use cases.
  * 
- * For the engine is the easy-rules library (https://github.com/j-easy/easy-rules) 
- * Version 3.3.0 used.
+ *         For the engine is the easy-rules library (https://github.com/j-easy/easy-rules) Version 3.3.0 used.
  * 
- * You can add and remove rules. A rule must have a condition and an action. If 
- * the the condition is satisfied the action will be performed.
+ *         You can add and remove rules. A rule must have a condition and an action. If the the condition is satisfied the action will be
+ *         performed.
  * 
- *  You can add and remove Facts, each rule will be used on each fact.
+ *         You can add and remove Facts, each rule will be used on each fact.
  * 
  *
  */
 public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 
 	private static Logger log = LoggerFactory.getLogger(GeneralRulesEngineImpl.class);
-	
+
 	private Facts facts_ = new Facts();
 	protected Rules rules_ = new Rules();
 	private RulesEngine rules_engine_ = new DefaultRulesEngine();
 
-
 	/**
 	 * Method to register a new rule
 	 * 
-	 * @param rule object
+	 * @param rule
+	 *          object
 	 */
 	@Override
 	public void addRule(Object rule) {
 		rules_.register(rule);
 		log.debug("Registered new rule {}", rule.getClass().getName());
 	}
-	
-	
+
 	/**
 	 * Method to delete rule by name
 	 * 
-	 * @param ruleName represents the name of the rule not class name!
+	 * @param ruleName
+	 *          represents the name of the rule not class name!
 	 */
 	@Override
 	public void removeRule(String ruleName) {
 		rules_.unregister(ruleName);
 		log.debug("Removed rule \"{}\"", ruleName);
 	}
-	
 
 	/**
-	 * Method to add fact 
+	 * Method to add fact
 	 * 
-	 * @param fact any object. If the object is same type of class as a saved 
-	 * fact, the old one will be overridden. (HashMap in the background).
+	 * @param fact
+	 *          any object. If the object is same type of class as a saved fact, the old one will be overridden. (HashMap in the background).
 	 */
 	@Override
 	public void addFact(Object fact) {
 		String fact_classname = fact.getClass().getName();
-		facts_.put(fact_classname, fact);		
+		facts_.put(fact_classname, fact);
 		log.debug("Added fact {}", fact_classname);
 	}
 
-	
 	/**
 	 * Method to remove known fact by classname
 	 * 
-	 * @param classname is the full classname with packages as prefix
+	 * @param classname
+	 *          is the full classname with packages as prefix
 	 */
 	@Override
 	public void removeFact(String classname) {
@@ -105,7 +100,6 @@ public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 		log.debug("Removed fact {}", classname);
 	}
 
-	
 	/**
 	 * Method to check all known facts with registered rules
 	 */
@@ -115,15 +109,3 @@ public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 		rules_engine_.fire(rules_, facts_);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-

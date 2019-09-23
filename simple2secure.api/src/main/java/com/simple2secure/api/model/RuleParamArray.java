@@ -22,18 +22,17 @@
 
 package com.simple2secure.api.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * 
  * @author Richard Heinz
  * 
- * Model which holds the information for one rule parameter array. Will be used 
- * in the rule engine for the condition/action-parameters
+ *         Model which holds the information for one rule parameter array. Will be used in the rule engine for the
+ *         condition/action-parameters
  *
- * @param <T> generic for the type of the param values.
+ * @param <T>
+ *          generic for the type of the param values.
  */
 public class RuleParamArray<T> {
 	private String name;
@@ -41,13 +40,12 @@ public class RuleParamArray<T> {
 	private String description_de;
 	private List<T> values;
 	private DataType type;
-	
+
 	public RuleParamArray() {
 		super();
 	}
-	
-	public RuleParamArray(String name, String description_en, String description_de, List<T> values,
-			DataType type) {
+
+	public RuleParamArray(String name, String description_en, String description_de, List<T> values, DataType type) {
 		super();
 		this.name = name;
 		this.description_en = description_en;
@@ -55,34 +53,43 @@ public class RuleParamArray<T> {
 		this.values = values;
 		this.type = type;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription_en() {
 		return description_en;
 	}
+
 	public void setDescription_en(String description_en) {
 		this.description_en = description_en;
 	}
+
 	public String getDescription_de() {
 		return description_de;
 	}
+
 	public void setDescription_de(String description_de) {
 		this.description_de = description_de;
 	}
+
 	public List<T> getValues() {
 		return values;
 	}
+
 	public void setValues(List<T> paramArray) {
 		this.values = paramArray;
 	}
+
 	public DataType getType() {
 		return type;
 	}
+
 	public void setType(DataType type) {
 		this.type = type;
 	}

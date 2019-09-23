@@ -38,7 +38,6 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Pod;
 import com.simple2secure.api.model.TestObjWeb;
-import com.simple2secure.portal.repository.ConfigRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -57,9 +56,6 @@ public class PodUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
-
-	@Autowired
-	ConfigRepository configRepository;
 
 	@Autowired
 	StepRepository stepRepository;
