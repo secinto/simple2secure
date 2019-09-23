@@ -6,6 +6,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,5 +50,14 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 		Query query = new Query(Criteria.where("testRunId").is(testRunId));
 		TestResult testResult = mongoTemplate.findOne(query, TestResult.class);
 		return testResult;
+	}
+
+	@Override
+	public List<TestResult> getSearchQueryByTestRunId(String searchQuery, String testRunId) {
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+		Query query = TextQuery.queryText(criteria).sortByScore();
+		query.addCriteria(Criteria.where("testRunId").is(testRunId));
+		List<TestResult> result = mongoTemplate.find(query, className, collectionName);
+		return result;
 	}
 }

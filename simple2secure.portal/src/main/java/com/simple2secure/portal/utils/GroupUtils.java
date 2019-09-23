@@ -376,7 +376,7 @@ public class GroupUtils {
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-				HttpStatus.NOT_FOUND);
+				HttpStatus.NO_CONTENT);
 	}
 
 	/**

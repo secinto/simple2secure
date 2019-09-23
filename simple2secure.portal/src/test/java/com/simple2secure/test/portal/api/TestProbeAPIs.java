@@ -1,24 +1,3 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
 package com.simple2secure.test.portal.api;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -49,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.PodStatus;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
@@ -56,7 +35,6 @@ import com.simple2secure.portal.repository.EmailListRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 
-@Disabled
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
@@ -86,10 +64,11 @@ public class TestProbeAPIs extends TestAPIBase {
 		// Create license object which should be deleted
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
 		license.setProbeId("789");
+		license.setStatus(PodStatus.ONLINE);
 		licenseRepository.save(license);
 
 		// API call to delete the created license
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -111,7 +90,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -126,31 +105,13 @@ public class TestProbeAPIs extends TestAPIBase {
 		String probeId = "102";
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + probeId;
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
 		assertNotNull(response);
 		// Not found status code must be returned
 		assertEquals(404, response.getStatusCodeValue());
-	}
-
-	@Test
-	public void testDeleteProbeUserAuthenticatedButUnprivileged() {
-		// Create license object which should be deleted
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
-		licenseRepository.save(license);
-
-		// API call to delete the created license
-		String url = loadedConfigItems.getUsersAPI() + "/deleteProbe/" + license.getProbeId();
-		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
-				new HttpEntity<String>(createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
-
-		// Access forbiden status code must be returned
-		assertNotNull(response);
-		assertEquals(403, response.getStatusCodeValue());
-		log.debug("Response {0}", response.toString());
 	}
 
 	@Test
@@ -171,7 +132,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -206,7 +167,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -228,7 +189,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -249,7 +210,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		groupRepository.save(group);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + probeId;
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -258,33 +219,4 @@ public class TestProbeAPIs extends TestAPIBase {
 		// Not found status code must be returned
 		assertEquals(404, response.getStatusCodeValue());
 	}
-
-	@Test
-	public void testChangeProbeGroupUserAuthenticatedButUnprivileged() {
-		// Create companyGroup object for the current group
-		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<String>());
-		ObjectId oldGroupId = groupRepository.saveAndReturnId(group);
-
-		// Create companyGroup object for the group which will be the new group
-		group.setName("New Group");
-		ObjectId newGroupId = groupRepository.saveAndReturnId(group);
-		group = groupRepository.find(newGroupId.toString());
-
-		// Create license object
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
-		license.setGroupId(oldGroupId.toString());
-		licenseRepository.save(license);
-
-		// API call to change the probe group
-		String url = loadedConfigItems.getUsersAPI() + "/changeGroup/" + license.getProbeId();
-		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<>(group, createHttpHeaders(UserRole.PROBE)), CompanyLicensePrivate.class);
-
-		assertNotNull(response);
-		// Access forbidden status code must be returned
-		assertEquals(403, response.getStatusCodeValue());
-
-	}
-
 }

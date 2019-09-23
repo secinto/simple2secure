@@ -1,3 +1,25 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
+
 import {Routes, RouterModule} from '@angular/router';
 import {HomeComponent} from './home/index';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
@@ -24,6 +46,8 @@ import {ReportComponent, ReportOverviewComponent} from './report';
 import {UserInvitationComponent} from './invitation/userInvitation.component';
 import {TestResultComponent} from './report/testResult.component';
 import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
+import {SearchComponent} from './search/search.component';
+import {SearchResultComponent} from './search/searchResult.component';
 
 const appRoutes: Routes = [
 	{
@@ -88,6 +112,14 @@ const appRoutes: Routes = [
 				component: SettingsComponent,
 				canActivate: [AuthGuard, RoleGuard],
 				data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN},
+			},
+			{
+				path: 'search',
+				component: SearchComponent,
+				data: {title: 'menu.searchResults'},
+				children: [
+					{path: ':searchquery', component: SearchResultComponent, data: {title: 'menu.searchResults'}},
+				]
 			}
 		]
 	},

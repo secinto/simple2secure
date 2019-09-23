@@ -1,3 +1,25 @@
+/**
+ *********************************************************************
+ *   simple2secure is a cyber risk and information security platform.
+ *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *********************************************************************
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as
+ *   published by the Free Software Foundation, either version 3 of the
+ *   License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *********************************************************************
+ */
+
 import {ViewChild, Component} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
@@ -7,6 +29,7 @@ import {ContextDTO, UserRole, Notification} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
+import {FormControl} from '@angular/forms';
 
 declare var $: any;
 
@@ -35,6 +58,7 @@ export class NavbarComponent {
 	returnUrl: string;
 	private timer;
 	showNotifications: boolean;
+	searchBarControl: FormControl = new FormControl('');
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -75,7 +99,7 @@ export class NavbarComponent {
 	public countunreadNotifications(notifications: Notification[]){
 		this.numOfUnreadNotification = 0;
 
-		for (var i = 0; i < notifications.length; i++) {
+		for (let i = 0; i < notifications.length; i++) {
 			if (!notifications[i].read){
 				this.numOfUnreadNotification++;
 			}
@@ -199,11 +223,17 @@ export class NavbarComponent {
 
 	openNotificationModal() {
 
-		if(this.showNotifications == true){
+		if (this.showNotifications == true){
 			this.showNotifications = false;
 		}
 		else{
 			this.showNotifications = true;
+		}
+	}
+
+	navigateToTheSearchPage(searchString: any) {
+		if (searchString.trim()){
+			this.router.navigate(['search', searchString]);
 		}
 	}
 

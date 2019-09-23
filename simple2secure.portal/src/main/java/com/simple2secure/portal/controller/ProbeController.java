@@ -119,8 +119,14 @@ public class ProbeController {
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
-			// delete All Probe dependencies
-			probeUtils.deleteProbeDependencies(probeId);
+
+			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+
+			if (license != null) {
+				// delete All Probe dependencies
+				probeUtils.deleteProbeDependencies(probeId);
+				return new ResponseEntity<>(license, HttpStatus.OK);
+			}
 		}
 
 		log.error("Problem occured while deleting probe with id {}", probeId);

@@ -81,6 +81,11 @@
     transform: scale(1.1);
 }
 
+#search-bar{
+    padding-top: 18px;
+    padding-right: 10px;
+}
+
 
 
 

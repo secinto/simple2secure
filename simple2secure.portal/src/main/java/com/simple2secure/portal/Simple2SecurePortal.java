@@ -1,24 +1,11 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
+/*
+ * Copyright (c) 2017 Secinto GmbH This software is the confidential and proprietary information of Secinto GmbH. All rights reserved.
+ * Secinto GmbH and its affiliates make no representations or warranties about the suitability of the software, either express or implied,
+ * including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement. NXP B.V.
+ * and its affiliates shall not be liable for any damages suffered by licensee as a result of using, modifying or distributing this software
+ * or its derivatives. This copyright notice must appear in all copies of this software.
  */
+
 package com.simple2secure.portal;
 
 import java.io.IOException;
@@ -49,6 +36,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.dao.MongoRepository;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 
 @EnableScheduling
@@ -75,6 +63,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	@Autowired
 	private Environment env;
 
+	@Autowired
+	private MongoRepository mongoRepository;
+
 	@Bean
 	public JavaMailSender getJavaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -89,9 +80,6 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 		props.put("mail.smtp.auth", mailSMTPAuth);
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.debug", "true");
-		// props.put("mail.smtp.socketFactory.port", mailSMTPPort);
-		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		// props.put("mail.smtp.socketFactory.fallback", "false");
 
 		return mailSender;
 	}
@@ -143,10 +131,15 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	@PostConstruct
 	public void currentActiveProfile() {
+
+		// Define the indexes for the full text search
+
+		mongoRepository.defineTextIndexes();
+
 		String[] activeProfiles = env.getActiveProfiles();
 
 		for (String profile : activeProfiles) {
-			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION)) {
+			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION) || profile.equals(StaticConfigItems.PROFILE_TEST)) {
 				LoadedConfigItems loadedConfigItems = LoadedConfigItems.getInstance();
 				loadedConfigItems.setBasePort("8443");
 				loadedConfigItems.setBaseProtocol("https");

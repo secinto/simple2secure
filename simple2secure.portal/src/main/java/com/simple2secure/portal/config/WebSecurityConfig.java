@@ -1,24 +1,3 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
 package com.simple2secure.portal.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,15 +71,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll()
 				.antMatchers("/api/service/").permitAll().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
 				.antMatchers("/api/user/activate/").anonymous().and().authorizeRequests().antMatchers("/api/test").anonymous().and()
-				.authorizeRequests().antMatchers("/api/user/sendResetPasswordEmail").anonymous().and().authorizeRequests()
-				.antMatchers("/api/user/resetPassword/**").anonymous().and().authorizeRequests().antMatchers("/api/user/updatePassword/**")
-				.anonymous().and().authorizeRequests().antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/download/**").anonymous().and().authorizeRequests().antMatchers("/api/device/**").anonymous().and()
-				.authorizeRequests().antMatchers("/api/license/activateProbe").anonymous().and().authorizeRequests()
-				.antMatchers("/api/license/activatePod/**").anonymous().and().authorizeRequests().antMatchers("/api/pod/config/**").anonymous()
-				.and().authorizeRequests().and()
-				// We filter the api/login requests
-				.addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests().antMatchers("/api/user/updatePassword/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and()
+				.authorizeRequests().antMatchers("/api/device/**").anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe")
+				.anonymous().and().authorizeRequests().antMatchers("/api/license/activatePod/**").anonymous().and().authorizeRequests()
+				.antMatchers("/api/pod/config/**").anonymous().and().authorizeRequests()
+				// filter the login requests
+				.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 				// And filter other requests to check the presence of JWTth in header
 				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 

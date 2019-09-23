@@ -1,24 +1,25 @@
 /**
+*********************************************************************
+*   simple2secure is a cyber risk and information security platform.
+*   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+*********************************************************************
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as
+*   published by the Free Software Foundation, either version 3 of the
+*   License, or (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*
  *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
+*/
+
 package com.simple2secure.portal.dao;
 
 import java.util.List;
@@ -27,12 +28,20 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 
 import com.mongodb.DBObject;
 import com.simple2secure.api.dbo.GenericDBObject;
+import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.Notification;
+import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 
 /**
@@ -173,6 +182,47 @@ public class MongoRepository<T extends GenericDBObject> {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Finds an item in the database by the search text
+	 *
+	 * @param searchQuery
+	 * @return
+	 */
+	public List<T> getBySearchQuery(String searchQuery, String contextId, boolean satisfyAllQueries) {
+
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+
+		if (satisfyAllQueries) {
+			criteria = TextCriteria.forDefaultLanguage().matching(searchQuery);
+		}
+
+		Query query = TextQuery.queryText(criteria).sortByScore();
+		query.addCriteria(Criteria.where("contextId").is(contextId));
+		List<T> result = mongoTemplate.find(query, this.className, this.collectionName);
+		return result;
+	}
+
+	/**
+	 * This function is used to define text Indexes for the full text search. It can be also implemented using annotation, but in our case we
+	 * do not have the spring packages in the api project, so the annotations are not available there. This function is called only one time
+	 * on the application start.
+	 */
+	public void defineTextIndexes() {
+
+		TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onField("content").build();
+		mongoTemplate.indexOps(Notification.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("queryResult").onField("query").build();
+		mongoTemplate.indexOps(Report.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("stringContent").build();
+		mongoTemplate.indexOps(NetworkReport.class).ensureIndex(textIndex);
+
+		textIndex = new TextIndexDefinitionBuilder().onField("result").onField("hostname").onField("name").build();
+		mongoTemplate.indexOps(TestResult.class).ensureIndex(textIndex);
+
 	}
 
 }

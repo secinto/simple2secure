@@ -283,7 +283,7 @@ public class GroupController {
 		} else {
 			log.error("Problem occured while moving group with id {}", sourceGroupId);
 			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.NO_CONTENT);
 		}
 	}
 }

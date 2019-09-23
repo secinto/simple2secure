@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +67,16 @@ public class ReportRepositoryImpl extends ReportRepository {
 		query.with(sort);
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 		return reports;
+	}
+
+	@Override
+	public List<Report> getSearchQueryByGroupId(String searchQuery, String groupId) {
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+		Query query = TextQuery.queryText(criteria).sortByScore();
+		query.addCriteria(Criteria.where("groupId").is(groupId));
+		List<Report> result = mongoTemplate.find(query, className, collectionName);
+		return result;
+
 	}
 
 }

@@ -1,24 +1,3 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
 package com.simple2secure.test.portal.utils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,7 +36,7 @@ public class TestMailUtils {
 	 */
 	@Test
 	public void testSendEmailPositive() throws IOException {
-		User user = new User("s2s.test@secinto.com", "test", true, null, true, true);
+		User user = new User("s2s.test@secinto.at", "test", true, null, true, true);
 		boolean result = mailUtils.sendEmail(user, "Sending Test Email from the test class", "Sending Test Email from the test class");
 		assertTrue(result);
 	}
@@ -99,7 +78,7 @@ public class TestMailUtils {
 
 	@Test
 	public void testSendHtmlEmailPositive() throws MessagingException {
-		User user = new User("s2s.test@secinto.com", "test", true, null, false, false);
+		User user = new User("s2s.test@secinto.at", "test", true, null, false, false);
 		String email = "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">\r\n" + "  <tr>\r\n" + "      <td>\r\n"
 				+ "          <table cellspacing=\"0\" cellpadding=\"0\">\r\n" + "              <tr>\r\n"
 				+ "                  <td style=\"border-radius: 2px;\" bgcolor=\"#ED2939\">\r\n"

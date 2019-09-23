@@ -6,4 +6,5 @@ def scanner(command, results, type):
     process = popen(command)
     report = str(process.read())
     # results[type + " - (" +command + ")"] = report
+    print(report)
     results[type] = report

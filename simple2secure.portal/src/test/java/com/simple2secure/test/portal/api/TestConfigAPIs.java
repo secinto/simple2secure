@@ -21,8 +21,11 @@
  */
 package com.simple2secure.test.portal.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.annotation.PostConstruct;
 
@@ -35,10 +38,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.google.gson.Gson;
+import com.simple2secure.api.model.Config;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
@@ -59,6 +63,8 @@ public class TestConfigAPIs {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	private Gson gson = new Gson();
+
 	@PostConstruct
 	public void init() {
 		/*
@@ -68,23 +74,25 @@ public class TestConfigAPIs {
 	}
 
 	@Test
-	public void testGetSettingsConfig() {
-		ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getSettingsURL(), Settings.class);
-		assertNotNull(response);
+	public void testGetSettingsConfig() throws IOException {
+		File file = new File(getClass().getResource("/server/settings.json").getFile());
+		String content = new String(Files.readAllBytes(file.toPath()));
+		Settings settings = gson.fromJson(content, Settings.class);
 
-		assertEquals(200, response.getStatusCodeValue());
+		assertNotNull(settings);
 
-		log.debug("Test response {}", response.toString());
+		log.debug("Test response {}", content);
 	}
 
 	@Test
-	public void testGetConfigConfig() {
-		ResponseEntity<Settings> response = restTemplate.getForEntity(loadedConfigItems.getConfigURL(), Settings.class);
-		assertNotNull(response);
+	public void testGetConfigConfig() throws IOException {
+		File file = new File(getClass().getResource("/server/config.json").getFile());
+		String content = new String(Files.readAllBytes(file.toPath()));
+		Config config = gson.fromJson(content, Config.class);
 
-		assertEquals(200, response.getStatusCodeValue());
+		assertNotNull(config);
 
-		log.debug("Test response {}", response.toString());
+		log.debug("Test response {}", content);
 	}
 
 }

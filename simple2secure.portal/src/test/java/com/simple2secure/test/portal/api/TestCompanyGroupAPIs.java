@@ -1,24 +1,3 @@
-/**
- *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
- *********************************************************************
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *********************************************************************
- */
 package com.simple2secure.test.portal.api;
 
 import static org.junit.Assert.assertEquals;
@@ -31,27 +10,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 
+@ExtendWith({ SpringExtension.class })
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@ActiveProfiles("test")
 public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	private static Logger log = LoggerFactory.getLogger(TestCompanyGroupAPIs.class);
@@ -60,7 +47,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 	protected LoadedConfigItems loadedConfigItems;
 
 	@Autowired
-	private TestRestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
 	@Autowired
 	private GroupRepository groupRepository;
@@ -73,15 +60,16 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 
 	HttpHeaders headers = new HttpHeaders();
 
-	@Disabled
 	@Test
 	public void testCreateRootGroupPositive() {
 
 		// We need to create CompanyGroup object and make an API call with it
 		CompanyGroup group = new CompanyGroup("Test Group", new ArrayList<>());
 
+		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
+
 		// API call to create root group
-		String url = loadedConfigItems.getUsersAPI() + "/group/" + getAdminUser().getId() + "/null";
+		String url = loadedConfigItems.getGroupAPI() + "/" + getAdminUser().getId() + "/null/" + contextUserAuth.get(0).getContextId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyGroup.class);
 
@@ -93,7 +81,6 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertTrue(response.getBody().isRootGroup());
 	}
 
-	@Disabled
 	@Test
 	public void testCreateSubGroupPositive() {
 
@@ -107,7 +94,8 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		CompanyGroup group = new CompanyGroup("Test Group", new ArrayList<>());
 
 		// API call to create root group
-		String url = loadedConfigItems.getUsersAPI() + "/group/" + getAdminUser().getId() + "/" + parentGroupId.toString();
+		String url = loadedConfigItems.getGroupAPI() + "/" + getAdminUser().getId() + "/" + parentGroupId.toString() + "/"
+				+ contextUserAuth.get(0).getContextId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyGroup.class);
 
@@ -119,7 +107,6 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertFalse(response.getBody().isRootGroup());
 	}
 
-	@Disabled
 	@Test
 	public void moveRootGroupWithAdminUserPositive() {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
@@ -135,7 +122,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
 				+ getAdminUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyGroup.class);
@@ -161,19 +148,17 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		String destGroupId = "1111";
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId + "/"
-				+ getAdminUser().getId();
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + sourceGroupId.toString() + "/" + destGroupId + "/" + getAdminUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyGroup.class);
 
 		// No need to move group because this is already root group and should be moved again to the root position
 		assertNotNull(response);
 
-		// Status 200 should be returned
-		assertEquals(404, response.getStatusCodeValue());
+		// Status 204 should be returned
+		assertEquals(204, response.getStatusCodeValue());
 	}
 
-	@Disabled
 	@Test
 	public void moveSubGroupWithAdminIfDestGroupIsNull() throws ItemNotFoundRepositoryException {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getAdminUser().getId());
@@ -199,8 +184,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		String destGroupId = "0000";
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + childGroupId.toString() + "/" + destGroupId + "/"
-				+ getAdminUser().getId();
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + childGroupId.toString() + "/" + destGroupId + "/" + getAdminUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyGroup.class);
 
@@ -219,7 +203,6 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		assertNull(childGroup.getParentId());
 	}
 
-	@Disabled
 	@Test
 	public void moveRootGroupWithSuperUserPositive() {
 		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
@@ -245,7 +228,7 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		groupAccessRightRepository.save(groupAccessRight);
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
 				+ getSuperUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.SUPERUSER)), CompanyGroup.class);
@@ -275,43 +258,15 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		String destGroupId = "1111";
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId + "/"
-				+ getSuperUser().getId();
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + sourceGroupId.toString() + "/" + destGroupId + "/" + getSuperUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.SUPERUSER)), CompanyGroup.class);
 
 		// No need to move group because this is already root group and should be moved again to the root position
 		assertNotNull(response);
 
-		// Status 200 should be returned
-		assertEquals(404, response.getStatusCodeValue());
-	}
-
-	@Test
-	public void moveRootGroupWithSuperUserIfGroupNotAssigned() {
-		List<ContextUserAuthentication> contextUserAuth = contextUserAuthRepo.getByUserId(getSuperUser().getId());
-
-		// Create source root group with the contextId of the admin user but without adding superuser to the list of the superuser in the
-		// group
-		CompanyGroup sourceGroup = new CompanyGroup("Source Group", new ArrayList<>());
-		sourceGroup.setRootGroup(true);
-		sourceGroup.setContextId(contextUserAuth.get(0).getContextId());
-		ObjectId sourceGroupId = groupRepository.saveAndReturnId(sourceGroup);
-
-		// This group does not exist
-		String destGroupId = "1111";
-
-		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId + "/"
-				+ getSuperUser().getId();
-		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
-				new HttpEntity<String>(createHttpHeaders(UserRole.SUPERUSER)), CompanyGroup.class);
-
-		// No need to move group because this is already root group and should be moved again to the root position
-		assertNotNull(response);
-
-		// Status 200 should be returned
-		assertEquals(404, response.getStatusCodeValue());
+		// Status 240 should be returned
+		assertEquals(204, response.getStatusCodeValue());
 	}
 
 	@Test
@@ -330,16 +285,16 @@ public class TestCompanyGroupAPIs extends TestAPIBase {
 		ObjectId destGroupId = groupRepository.saveAndReturnId(destGroup);
 
 		// API call to move source group to destGroup
-		String url = loadedConfigItems.getUsersAPI() + "/groups/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
+		String url = loadedConfigItems.getGroupAPI() + "/move/" + sourceGroupId.toString() + "/" + destGroupId.toString() + "/"
 				+ getSuperUser().getId();
 		ResponseEntity<CompanyGroup> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<String>(createHttpHeaders(UserRole.SUPERUSER)), CompanyGroup.class);
 
 		assertNotNull(response);
 
-		// Status 404 must be returned because neither toGroup nor fromGroup have added the superuserId to the list of the superusers and such
+		// Status 204 must be returned because neither toGroup nor fromGroup have added the superuserId to the list of the superusers and such
 		// superuser must not be able to move the group
-		assertEquals(404, response.getStatusCodeValue());
+		assertEquals(204, response.getStatusCodeValue());
 	}
 
 }

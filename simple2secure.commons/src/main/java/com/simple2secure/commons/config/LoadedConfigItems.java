@@ -1,21 +1,21 @@
 /**
  *********************************************************************
- *   simple2secure is a cyber risk and information security platform.
- *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+ *
+ * Copyright (C) 2019 by secinto GmbH (http://www.secinto.com)
+ *
  *********************************************************************
  *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU Affero General Public License for more details.
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *   You should have received a copy of the GNU Affero General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  *
  *********************************************************************
  */
@@ -36,13 +36,16 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "localhost";
+	private String baseHost = "https://localhost";
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
+
+	private String baseDockerContainer = "http://192.168.99.100:5000";
 
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
 	private String configURL = "/config/config.json";
+	private String endpointsURL = "/config/endpoints.json";
 	private String processorsURL = "/config/processors.json";
 	private String queryURL = "/config/queries.json";
 	private String toolsURL = "/config/tools.json";
@@ -51,7 +54,8 @@ public class LoadedConfigItems {
 	private String settingsURL = "/config/settings.json";
 	private String licensePlanURL = "/config/licensePlan.json";
 
-	private String usersAPI = "/api/users";
+	private String usersAPI = "/api/user";
+	private String endpointsAPI = "/api/endpoints";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
 	private String queryAPI = "/api/config/query";
@@ -62,6 +66,8 @@ public class LoadedConfigItems {
 	private String processorAPI = "/api/processors";
 	private String licenseAPI = "/api/license";
 	private String serviceAPI = "/api/service";
+	private String groupAPI = "/api/group";
+	private String probeAPI = "/api/probe";
 
 	private static LoadedConfigItems instance;
 
@@ -87,7 +93,10 @@ public class LoadedConfigItems {
 			LoadedConfigItems user = mapper.readValue(Resources.toString(Resources.getResource("config.items.yml"), Charset.forName("UTF-8")),
 					LoadedConfigItems.class);
 
-			log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
+			if (user != null) {
+				log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
+				instance = user;
+			}
 
 		} catch (Exception e) {
 			log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(), e.getStackTrace());
@@ -100,6 +109,10 @@ public class LoadedConfigItems {
 
 	public void setBaseProtocol(String baseProtocol) {
 		this.baseProtocol = baseProtocol;
+	}
+
+	public String getBaseDockerContainer() {
+		return baseDockerContainer;
 	}
 
 	public String getBaseHost() {
@@ -146,6 +159,10 @@ public class LoadedConfigItems {
 		return getBaseURL() + configURL;
 	}
 
+	public String getEndpointsURL() {
+		return getBaseURL() + endpointsURL;
+	}
+
 	public String getProcessorsURL() {
 		return getBaseURL() + processorsURL;
 	}
@@ -172,6 +189,10 @@ public class LoadedConfigItems {
 
 	public String getUsersAPI() {
 		return getBaseURL() + usersAPI;
+	}
+
+	public String getEndpointsAPI() {
+		return getBaseURL() + endpointsAPI;
 	}
 
 	public String getLoginAPI() {
@@ -212,6 +233,14 @@ public class LoadedConfigItems {
 
 	public String getServiceAPI() {
 		return getBaseURL() + serviceAPI;
+	}
+
+	public String getGroupAPI() {
+		return getBaseURL() + groupAPI;
+	}
+
+	public String getProbeAPI() {
+		return getBaseURL() + probeAPI;
 	}
 
 	public String getLicensePlanURL() {
