@@ -30,7 +30,7 @@ import {ResetComponent} from './resetPassword/index';
 import {AnalysisComponent} from './analysis/index';
 import {RegisterComponent} from './register/index';
 import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user/index';
-import {NetworkReportDetailsComponent, NetworkReportOverviewComponent,} from './network/index';
+import {NetworkReportDetailsComponent, NetworkReportOverviewComponent} from './network/index';
 import {AuthGuard} from './_guards/index';
 import {UpdatePasswordComponent} from './updatePassword';
 import {OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent} from './orbiter/index';

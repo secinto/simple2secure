@@ -20,5 +20,4 @@
  *********************************************************************
  */
 
-export * from './notification.component';
-export * from './notificationDetails.component';
+export * from './userInvitation.component';

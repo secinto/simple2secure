@@ -20,5 +20,5 @@
  *********************************************************************
  */
 
-export * from './notification.component';
-export * from './notificationDetails.component';
+export * from './search.component';
+export * from './searchResult.component';
