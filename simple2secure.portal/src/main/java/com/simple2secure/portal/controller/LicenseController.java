@@ -142,7 +142,7 @@ public class LicenseController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/activatePod", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/nPod", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePod licensePod, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		if (licensePod != null) {

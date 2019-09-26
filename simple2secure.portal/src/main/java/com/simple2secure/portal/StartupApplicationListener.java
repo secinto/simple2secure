@@ -50,8 +50,10 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 				dataInitializer.addDefaultSettings();
 				dataInitializer.addDefaultLicensePlan();
 				dataInitializer.addDefaultUsers();
+				log.info("------------------ DATA INITIALIZATION SUCCESS ---------------------");
 			} catch (IOException e) {
 				log.error(e.getMessage());
+				log.info("------------------ DATA INITIALIZATION ERROR ---------------------");
 			}
 		} else {
 			log.info("------------------ NO DATA INITIALIZATION ---------------------");

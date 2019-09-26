@@ -77,15 +77,14 @@ public class EmailController {
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (config != null) {
-			if (!mailUtils.checkIfEmailConfigExists(config.getEmail(), config.getContextId())) {
-				if (!Strings.isNullOrEmpty(config.getId())) {
-					emailConfigRepository.update(config);
-				} else {
-					emailConfigRepository.save(config);
-				}
-				return new ResponseEntity<>(config, HttpStatus.OK);
+			String configId = mailUtils.checkIfEmailConfigExists(config);
+			if (!Strings.isNullOrEmpty(configId)) {
+				config.setId(configId);
+				emailConfigRepository.update(config);
+			} else {
+				emailConfigRepository.save(config);
 			}
-
+			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),

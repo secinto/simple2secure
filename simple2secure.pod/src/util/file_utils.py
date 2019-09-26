@@ -28,23 +28,27 @@ def read_json_testfile(appObj):
 
 
 def parse_license_file(license_file, appObj):
-    lines = license_file.split("\n")
-    group_id = ""
-    pod_id = appObj.config['POD_ID']
+    if license_file is None:
+        dummy_license_obj = CompanyLicensePod("NO_ID", "NO_ID", appObj.config['POD_ID'], socket.gethostname(), "NONE")
+        return dummy_license_obj
+    else:
+        lines = license_file.split("\n")
+        group_id = ""
+        pod_id = appObj.config['POD_ID']
 
-    for line in lines:
-        if "#" not in line:
-            row = line.split("=")
-            if row[0] == GROUP_ID:
-                group_id = row[1]
-            elif row[0] == LICENSE_ID:
-                appObj.config['LICENSE_ID'] = row[1]
+        for line in lines:
+            if "#" not in line:
+                row = line.split("=")
+                if row[0] == GROUP_ID:
+                    group_id = row[1]
+                elif row[0] == LICENSE_ID:
+                    appObj.config['LICENSE_ID'] = row[1]
 
-    if group_id and appObj.config['LICENSE_ID']:
-        # send post to the portal to activate license
-        license_obj = CompanyLicensePod(group_id.rstrip(), appObj.config['LICENSE_ID'].rstrip(), pod_id,
+        if group_id and appObj.config['LICENSE_ID']:
+            # send post to the portal to activate license
+            license_obj = CompanyLicensePod(group_id.rstrip(), appObj.config['LICENSE_ID'].rstrip(), pod_id,
                                         socket.gethostname(), read_json_testfile(appObj))
-        return license_obj
+            return license_obj
 
 
 def get_license_file():

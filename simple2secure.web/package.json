@@ -8,7 +8,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "debug" : "ng serve --ssl true --ssl-key /node_modules/browser-sync/lib/server/certs/server.key --ssl-cert /node_modules/browser-sync/lib/server/certs/server.crt"
   },
   "private": true,
   "dependencies": {
@@ -83,8 +84,8 @@
     "zone.js": "^0.8.28"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.12.0",
-    "@angular/cli": "^7.2.2",
+    "@angular-devkit/build-angular": "^0.12.4",
+    "@angular/cli": "^7.3.9",
     "@angular/compiler-cli": "^7.2.1",
     "@angular/language-service": "^7.2.1",
     "@types/hammerjs": "^2.0.36",

@@ -213,13 +213,14 @@ public class MailUtils {
 	 * @param contextId
 	 * @return
 	 */
-	public boolean checkIfEmailConfigExists(String email, String contextId) {
+	public String checkIfEmailConfigExists(EmailConfiguration providedConfig) {
 
-		EmailConfiguration emailConfig = emailConfigRepository.findByEmailAndContextId(email.trim(), contextId);
+		EmailConfiguration emailConfig = emailConfigRepository.findByEmailAndContextId(providedConfig.getEmail().trim(),
+				providedConfig.getContextId());
 		if (emailConfig != null) {
-			return true;
+			return emailConfig.getId();
 		}
-		return false;
+		return null;
 
 	}
 
