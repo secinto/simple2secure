@@ -41,6 +41,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
+import com.simple2secure.api.model.Status;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
@@ -55,9 +57,6 @@ public class UpdateEmailScheduler {
 
 	private String STORE = "imap";
 	private String FOLDER = "inbox";
-	private String SOCKET_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
-	private String SOCKET_FACTORY_PORT = "465";
-	private String IMAP_AUTH = "true";
 
 	@Autowired
 	EmailConfigurationRepository emailConfigRepository;
@@ -85,18 +84,26 @@ public class UpdateEmailScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	@Scheduled(fixedRate = 50000)
+	@Scheduled(
+			fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
+		log.info("Checking configured email inboxes");
 		if (configs != null) {
 			for (EmailConfiguration cfg : configs) {
+				cfg.setCurrentStatus(Status.CHECKING);
+				emailConfigRepository.update(cfg);
 				Message[] msg = connect(cfg);
+				cfg.setCurrentStatus(Status.CONNECTED);
+				emailConfigRepository.update(cfg);
 				if (msg != null) {
-
+					cfg.setCurrentStatus(Status.SYNCHING);
+					emailConfigRepository.update(cfg);
 					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
 		}
+		log.info("Checking configured email inboxes finished");
 	}
 
 	/**
@@ -125,10 +132,10 @@ public class UpdateEmailScheduler {
 								if (content instanceof String) {
 									String body = (String) content;
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-											body, msg.getReceivedDate().toString());
+											body, msg.getReceivedDate());
 								} else if (content instanceof MimeMultipart) {
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate());
 								}
 
 								emailRulesEngine.checkMail(email, emailConfig.getContextId());
@@ -154,9 +161,10 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws NumberFormatException
 	 * @throws MessagingException
+	 * @throws ItemNotFoundRepositoryException
 	 */
 
-	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
+	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException, ItemNotFoundRepositoryException {
 		Properties props = new Properties();
 
 		props.setProperty("mail.imap.ssl.enable", "true");
@@ -171,7 +179,7 @@ public class UpdateEmailScheduler {
 
 		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
 
-		log.info("Connected to the store: " + store);
+		log.debug("Connected to the store: " + store);
 
 		// get inbox folder
 		Folder inbox = store.getFolder(FOLDER);
@@ -179,10 +187,17 @@ public class UpdateEmailScheduler {
 		// open inbox folder to read the messages
 		inbox.open(Folder.READ_ONLY);
 
-		// retrieve the messages
-		Message[] messages = inbox.getMessages();
-
-		log.info("Messages length: " + messages.length);
+		Message[] messages = null;
+		if (config.getLastEnd() == 0) {
+			messages = inbox.getMessages();
+		} else {
+			int newEnd = inbox.getMessageCount();
+			messages = inbox.getMessages(config.getLastEnd(), newEnd);
+			config.setLastEnd(newEnd);
+			emailConfigRepository.update(config);
+		}
+		log.debug("{} messages obtained from IMAP server {} for email address{} ", messages.length, config.getIncomingServer(),
+				config.getEmail());
 
 		return messages;
 	}

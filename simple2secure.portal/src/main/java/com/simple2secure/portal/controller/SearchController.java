@@ -59,7 +59,9 @@ public class SearchController {
 	SearchUtils searchUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{searchQuery}/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{searchQuery}/{contextId}",
+			method = RequestMethod.GET)
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable("searchQuery") String searchQuery,
 			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
 

@@ -50,13 +50,17 @@ public class ServiceController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.GET)
 	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
 		return new ResponseEntity<>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{versionId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{versionId}",
+			method = RequestMethod.GET)
 	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable("version") String version,
 			@RequestHeader("Accept-Language") String locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);

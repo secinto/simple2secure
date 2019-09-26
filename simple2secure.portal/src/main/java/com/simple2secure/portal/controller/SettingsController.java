@@ -67,7 +67,9 @@ public class SettingsController {
 	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<SettingsDTO> getSettings(@RequestHeader("Accept-Language") String locale) {
 		List<Settings> settings = settingsRepository.findAll();
@@ -85,7 +87,10 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -99,7 +104,10 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/licensePlan",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -117,7 +125,9 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/licensePlan/{licensePlanId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/licensePlan/{licensePlanId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable("licensePlanId") String licensePlanId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -136,7 +146,9 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testmacro/{testMacroId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/testmacro/{testMacroId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable("testMacroId") String testMacroId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -155,7 +167,10 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testmacro", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/testmacro",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {

@@ -3,6 +3,7 @@ package com.simple2secure.test.portal.rules;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.jeasy.rules.api.Rule;
@@ -27,7 +28,9 @@ import com.simple2secure.portal.rules.EmailRulesEngine;
 import com.simple2secure.portal.utils.RuleUtils;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 public class TestRuleEngine {
 
@@ -41,17 +44,18 @@ public class TestRuleEngine {
 	NotificationRepository notificationRepository;
 
 	@Test
-	public void testConditionBlockedDomain() {
+	public void testConditionBlockedDomain() throws ParseException {
 		// clearing the database for the notification
 		notificationRepository.deleteAll();
 
 		// email which should be checked
-		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text", "Mon Aug 19 10:00:00 CEST 2019");
+		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text",
+				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking domain
 		TemplateCondition condition = new TemplateCondition("blocked domains", "", "", null, new ArrayList<RuleParamArray<?>>() {
 			{
-				add(new RuleParamArray<String>("domains", null, null, // new ArrayList<RuleParam<?>>();
+				add(new RuleParamArray<>("domains", null, null, // new ArrayList<RuleParam<?>>();
 						new ArrayList<String>() {
 							{
 								add("g00gle.com");
@@ -64,7 +68,7 @@ public class TestRuleEngine {
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
 					{
-						add(new RuleParam<String>("text", "", "", "email came from blocked domain", DataType._STRING));
+						add(new RuleParam<>("text", "", "", "email came from blocked domain", DataType._STRING));
 					}
 				}, null);
 
@@ -85,17 +89,18 @@ public class TestRuleEngine {
 	}
 
 	@Test
-	public void testConditionBlockedEmail() {
+	public void testConditionBlockedEmail() throws ParseException {
 		// clearing the database for the notification
 		notificationRepository.deleteAll();
 
 		// email which should be checked
-		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text", "Mon Aug 19 10:00:00 CEST 2019");
+		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text",
+				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("blocked email addresses", "", "", null, new ArrayList<RuleParamArray<?>>() {
 			{
-				add(new RuleParamArray<String>("email addresses", null, null, new ArrayList<String>() {
+				add(new RuleParamArray<>("email addresses", null, null, new ArrayList<String>() {
 					{
 						add("alice@g00gle.com");
 					}
@@ -107,7 +112,7 @@ public class TestRuleEngine {
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
 					{
-						add(new RuleParam<String>("text", "", "", "email came from blocked address", DataType._STRING));
+						add(new RuleParam<>("text", "", "", "email came from blocked address", DataType._STRING));
 					}
 				}, null);
 
@@ -129,17 +134,18 @@ public class TestRuleEngine {
 	}
 
 	@Test
-	public void testConditionFindWordsInSubject() {
+	public void testConditionFindWordsInSubject() throws ParseException {
 		// clearing the database for the notification
 		notificationRepository.deleteAll();
 
 		// email which should be checked
-		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "WON MONEY", "alice@lottery.com", "text", "Mon Aug 19 10:00:00 CEST 2019");
+		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "WON MONEY", "alice@lottery.com", "text",
+				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("find words in subject", "", "", null, new ArrayList<RuleParamArray<?>>() {
 			{
-				add(new RuleParamArray<String>("words to find", null, null, new ArrayList<String>() {
+				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
 					{
 						add("won");
 						add("lottery");
@@ -152,7 +158,7 @@ public class TestRuleEngine {
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
 					{
-						add(new RuleParam<String>("text", "", "", "email had some blocked words in the subject", DataType._STRING));
+						add(new RuleParam<>("text", "", "", "email had some blocked words in the subject", DataType._STRING));
 					}
 				}, null);
 
@@ -175,18 +181,18 @@ public class TestRuleEngine {
 	}
 
 	@Test
-	public void testConditionFindWordsInText() {
+	public void testConditionFindWordsInText() throws ParseException {
 		// clearing the database for the notification
 		notificationRepository.deleteAll();
 
 		// email which should be checked
 		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@lottery.com",
-				"You won in the lottery. Just click here ...", "Mon Aug 19 10:00:00 CEST 2019");
+				"You won in the lottery. Just click here ...", Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("find words in text", "", "", null, new ArrayList<RuleParamArray<?>>() {
 			{
-				add(new RuleParamArray<String>("words to find", null, null, new ArrayList<String>() {
+				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
 					{
 						add("won");
 						add("lottery");
@@ -199,7 +205,7 @@ public class TestRuleEngine {
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
 					{
-						add(new RuleParam<String>("text", "", "", "email had some blocked words in the text", DataType._STRING));
+						add(new RuleParam<>("text", "", "", "email had some blocked words in the text", DataType._STRING));
 					}
 				}, null);
 

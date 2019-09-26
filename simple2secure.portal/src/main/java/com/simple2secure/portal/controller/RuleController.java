@@ -93,7 +93,10 @@ public class RuleController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/rulewithsource/", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/rulewithsource/",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -126,7 +129,10 @@ public class RuleController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/templaterule/",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -158,7 +164,9 @@ public class RuleController {
 	 * 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/templaterule/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/templaterule/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -188,7 +196,9 @@ public class RuleController {
 	 * 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/rulewithsource/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/rulewithsource/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -216,7 +226,9 @@ public class RuleController {
 	 * @return ResponseEntity object with the Conditions in a List or an error.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/template_conditions/", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/template_conditions/",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates,
 			@RequestHeader("Accept-Language") String locale) {
@@ -246,7 +258,9 @@ public class RuleController {
 	 * @return ResponseEntity object with the Actions in a List or an error.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/template_actions/", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/template_actions/",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates,
 			@RequestHeader("Accept-Language") String locale) {
@@ -277,7 +291,9 @@ public class RuleController {
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/rulewithsource/{ruleId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/rulewithsource/{ruleId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable("ruleId") String ruleId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -306,7 +322,9 @@ public class RuleController {
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/templaterule/{ruleId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/templaterule/{ruleId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable("ruleId") String ruleId,
 			@RequestHeader("Accept-Language") String locale) {

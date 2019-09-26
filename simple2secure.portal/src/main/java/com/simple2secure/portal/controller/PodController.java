@@ -93,7 +93,9 @@ public class PodController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<PodDTO>> getPodsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -126,7 +128,9 @@ public class PodController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(value = "/config/{podId}/{hostname}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/config/{podId}/{hostname}",
+			method = RequestMethod.GET)
 	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("podId") String podId, @PathVariable("hostname") String hostname)
 			throws ItemNotFoundRepositoryException {
 
@@ -155,7 +159,10 @@ public class PodController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduledTests/{podId}", method = RequestMethod.GET, consumes = "application/json")
+	@RequestMapping(
+			value = "/scheduledTests/{podId}",
+			method = RequestMethod.GET,
+			consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('POD')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {

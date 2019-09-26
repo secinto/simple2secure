@@ -35,6 +35,7 @@ import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
+import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -77,7 +78,8 @@ public class TestRunScheduler {
 	 *
 	 */
 
-	@Scheduled(fixedRate = 50000)
+	@Scheduled(
+			fixedRate = 50000)
 	public void checkTests() throws ItemNotFoundRepositoryException {
 
 		List<Test> tests = testRepository.getScheduledTest();
@@ -88,7 +90,7 @@ public class TestRunScheduler {
 				long currentTimestamp = System.currentTimeMillis();
 				// Calculate the difference between last execution time and current timestamp
 
-				long millisScheduled = portalUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
+				long millisScheduled = TimeUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
 				long nextExecutionTime = test.getLastExecution() + millisScheduled;
 				long executionTimeDifference = nextExecutionTime - currentTimestamp;
 

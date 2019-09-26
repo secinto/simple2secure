@@ -84,7 +84,9 @@ public class ProbeController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/changeGroup/{probeId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/changeGroup/{probeId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("probeId") String probeId, @RequestBody CompanyGroup group,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -113,7 +115,9 @@ public class ProbeController {
 	 * This function returns all devices according to the user id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/deleteProbe/{probeId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/deleteProbe/{probeId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> deleteProbe(@PathVariable("probeId") String probeId,
 			@RequestHeader("Accept-Language") String locale) {

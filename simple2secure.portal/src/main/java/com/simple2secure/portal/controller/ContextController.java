@@ -102,7 +102,9 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/add/{userId}/{contextId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/add/{userId}/{contextId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
 	public ResponseEntity<Context> addContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
@@ -164,7 +166,9 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{userId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -197,7 +201,9 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{userId}/{contextId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/delete/{userId}/{contextId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Context> deleteContext(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -232,7 +238,9 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{userId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/{userId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
 	public ResponseEntity<CurrentContext> selectUserContext(@PathVariable("userId") String userId, @RequestBody Context context,

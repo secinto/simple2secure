@@ -95,7 +95,9 @@ public class GroupController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{userId}/{parentGroupId}/{contextId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/{userId}/{parentGroupId}/{contextId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @PathVariable("userId") String userId,
 			@PathVariable("parentGroupId") String parentGroupId, @PathVariable("contextId") String contextId,
@@ -169,7 +171,9 @@ public class GroupController {
 	 * This function returns the group according to the group id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{groupID}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{groupID}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(groupId)) {
@@ -188,7 +192,9 @@ public class GroupController {
 	 * This function returns all groups according to the contextId
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/context/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/context/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -211,7 +217,9 @@ public class GroupController {
 	 * This function returns all groups according to the contextId
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{userId}/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@PathVariable("contextId") String contextId,
 			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
@@ -240,7 +248,9 @@ public class GroupController {
 	 * This function returns all users from the user repository
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{groupID}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/{groupID}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 
@@ -269,7 +279,9 @@ public class GroupController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/move/{sourceGroupId}/{destGroupId}/{userId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/move/{sourceGroupId}/{destGroupId}/{userId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable("sourceGroupId") String sourceGroupId,
 			@PathVariable("destGroupId") String destGroupId, @PathVariable("userId") String userId,

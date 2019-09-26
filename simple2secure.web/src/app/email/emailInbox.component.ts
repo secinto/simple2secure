@@ -39,6 +39,7 @@ export class EmailInboxComponent {
 	mails: Email[];
 	loading = false;
 	id: string;
+	correctdate: Date;
 
 	displayedColumns = ['from', 'subject', 'time'];
 	dataSource = new MatTableDataSource();

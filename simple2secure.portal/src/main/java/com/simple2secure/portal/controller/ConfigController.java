@@ -101,7 +101,9 @@ public class ConfigController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/query", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/query",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -127,7 +129,9 @@ public class ConfigController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(value = "/query/{queryId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/query/{queryId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteConfig(@PathVariable("queryId") String queryId, @RequestHeader("Accept-Language") String locale) {
 
@@ -150,7 +154,9 @@ public class ConfigController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
-	@RequestMapping(value = "/query/{probeId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/query/{probeId}/{select_all}",
+			method = RequestMethod.GET)
 	public ResponseEntity<List<QueryRun>> getQueriesByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 
@@ -198,7 +204,9 @@ public class ConfigController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/query/group/{groupId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/query/group/{groupId}/{select_all}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -218,7 +226,9 @@ public class ConfigController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/query/context/{contextId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/query/context/{contextId}/{select_all}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -254,7 +264,9 @@ public class ConfigController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/query/{id}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/query/{id}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -269,7 +281,9 @@ public class ConfigController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/copy/{sourceGroupId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/copy/{sourceGroupId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup,
 			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)
