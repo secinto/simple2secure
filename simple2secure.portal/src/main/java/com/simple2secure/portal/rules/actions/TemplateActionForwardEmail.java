@@ -10,12 +10,15 @@ import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.utils.MailUtils;
 
 /**
- * 
+ *
  * @author Richard Heinz
- * 
+ *
  *         Action which is used as predefined Action in the rule engine. Sends the received email.
  */
-@AnnotationAction(name = "forward email", description_de = "Sendet den inhalt der bekommen email weiter", description_en = "Forwards th received email to address")
+@AnnotationAction(
+		name = "forward email",
+		description_de = "Sendet den Inhalt der erhaltenen Mail weiter",
+		description_en = "Forwards the received email")
 public class TemplateActionForwardEmail extends AbtractEmailAction {
 
 	@Autowired
@@ -24,13 +27,25 @@ public class TemplateActionForwardEmail extends AbtractEmailAction {
 	/*
 	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
-	@AnnotationRuleParam(name = "text", description_de = "Text der an die Email angehängt werden soll.", description_en = "Text which will be attached to the mail", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name = "text",
+			description_de = "Text der an die Email angeh&aumlngt werden soll.",
+			description_en = "Text which will be attached to the mail",
+			type = DataType._STRING)
 	String text;
 
-	@AnnotationRuleParam(name = "subject", description_de = "Betreff der Email.", description_en = "Subject of the email.", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name = "subject",
+			description_de = "Betreff der Email.",
+			description_en = "Subject of the email.",
+			type = DataType._STRING)
 	String subject;
 
-	@AnnotationRuleParam(name = "emailaddress", description_de = "Adresse an welche die Email versand werden soll.", description_en = "Address to which the email should be send", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name = "emailaddress",
+			description_de = "Adresse an welche die Email versand werden soll.",
+			description_en = "Address to which the email should be send",
+			type = DataType._STRING)
 	String emailAddress;
 
 	@Override

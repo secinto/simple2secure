@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -29,18 +29,26 @@ import com.simple2secure.api.model.Email;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
-@AnnotationCondition(name = "blocked domains", description_de = "Regel wird ausgelöst wenn die EMail von einer der angegeben Domains kam.", description_en = "Rule will be triggerd if the mail was send by one of the given domains")
+@AnnotationCondition(
+		name = "blocked domains",
+		description_de = "Regel wird ausgel&oumlst wenn die Mail von einer der spezifizerten Domainen gekommen ist.",
+		description_en = "Rule will be triggerd if the mail was sent by one of the given domains")
 public class TemplateConditionBlockedDomains extends AbtractEmailCondition {
 
-	@AnnotationRuleParamArray(name = "domains", description_de = "Domains welche die Regel auslösen.", description_en = "Domains which will trigger the rule.", type = DataType._STRING)
+	@AnnotationRuleParamArray(
+			name = "domains",
+			description_de = "Domainen welche die Regel ausl&oumlsen.",
+			description_en = "Domains which will trigger the rule.",
+			type = DataType._STRING)
 	private Collection<String> domains;
 
 	@Override
 	protected boolean condition(Email email) {
 		String domainFrom = email.getFrom().split("@")[1].split(">")[0]; // returns only the domain from the sender
 
-		if (domains.contains(domainFrom))
+		if (domains.contains(domainFrom)) {
 			return true;
+		}
 
 		return false;
 	}

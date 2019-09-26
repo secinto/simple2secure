@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -32,12 +32,15 @@ import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.utils.NotificationUtils;
 
 /**
- * 
+ *
  * @author Richard Heinz
- * 
+ *
  *         Action which is used as predefined Action in the rule engine. Sends an email with the given text.
  */
-@AnnotationAction(name = "send notification", description_de = "Sendet eine Notification an das Portal.", description_en = "Sends a notification to the portal.")
+@AnnotationAction(
+		name = "send notification",
+		description_de = "Sendet eine Benachrichtigung an das Portal.",
+		description_en = "Sends a notification to the portal.")
 public class TemplateActionSendNotification extends AbtractEmailAction {
 
 	@Autowired
@@ -49,7 +52,11 @@ public class TemplateActionSendNotification extends AbtractEmailAction {
 	/*
 	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
-	@AnnotationRuleParam(name = "text", description_de = "Text der als Notification angezeigt wird.", description_en = "Text which shown as notification", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name = "text",
+			description_de = "Text der in der Benachrichtung enthalten sein soll.",
+			description_en = "Text which is shown as notification",
+			type = DataType._STRING)
 	String notification;
 
 	@Override
