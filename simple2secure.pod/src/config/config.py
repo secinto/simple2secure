@@ -2,7 +2,6 @@ import urllib3
 
 
 class Config(object):
-
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     SECRET_KEY = "ChangeIt2019!"
     DATABASE_URI = 'sqlite:///:memory:'
@@ -16,6 +15,7 @@ class Config(object):
     # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
     AUTH_TOKEN = ''
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    CONNECTED_WITH_PORTAL = False
 
 
 class ProductionConfig(Config):
@@ -29,4 +29,3 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEBUG = True
     Testing = True
-

@@ -3,6 +3,8 @@ from flask import json
 from src.db.database import db, TestResult, Test, TestStatus
 from src.db.database_schema import TestResultSchema, TestSchema
 from src.util import rest_utils, file_utils
+from src.util.file_utils import generate_test_object_from_json, update_services_file
+from src.util.rest_utils import sync_all_tests_with_portal
 
 
 def start_scheduler_tasks(app_obj, celery_tasks):
@@ -63,18 +65,18 @@ def sync_tests_with_the_portal(app_obj):
             if new_tests is not None:
 
                 if len(new_tests) > 0:
-                    sync_test = file_utils.sync_all_tests_with_portal(new_tests, app_obj)
+                    sync_test = sync_all_tests_with_portal(new_tests, app_obj)
 
                     if sync_test.status_code == 200:
                         test_array = json.loads(sync_test.text)
 
                         if len(test_array) > 0 :
                             for test_new in test_array:
-                                test_obj = file_utils.generate_test_object_from_json(test_new)
+                                test_obj = generate_test_object_from_json(test_new)
                                 db.session.add(test_obj)
                                 db.session.commit()
 
-                            file_utils.update_services_file()
+                            update_services_file()
 
                     else:
                         print(sync_test.text)

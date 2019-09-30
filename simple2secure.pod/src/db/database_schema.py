@@ -17,12 +17,13 @@ class PodInfoSchema(ma.ModelSchema):
 class TestSchema(ma.ModelSchema):
     class Meta:
         model = Test
-        
+
 
 class TestSequenceSchema(ma.ModelSchema):
     class Meta:
         model = TestSequence
-        
+
+
 class TestSequenceResultSchema(ma.ModelSchema):
     class Meta:
         model = TestSequenceResult

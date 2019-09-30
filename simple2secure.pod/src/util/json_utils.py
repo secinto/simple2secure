@@ -46,7 +46,7 @@ def parse_query_test(query_string, item_type):
         mysublist = item.split("=")
         # Check if current attribute equals the provided item_type
         if mysublist[0] == item_type:
-            correct_item = mylist[index+1].split("=")
+            correct_item = mylist[index + 1].split("=")
             return correct_item[1]
 
 
@@ -73,8 +73,10 @@ def get_tool(argument):
     else:
         return argument
 
+
 def construct_command(task):
     brk = ""
+
 
 def construct_command(tool, argument):
     # Construct command from the tool name and argument
