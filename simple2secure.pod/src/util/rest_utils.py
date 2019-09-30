@@ -1,29 +1,26 @@
 import requests
-from src.util import file_utils
 from flask import json
-from datetime import datetime
 from src.db.database import Notification, TestStatusDTO
-from src.util.license_utils import get_license
 
 
-def get_auth_token(app):
+def get_auth_token(data, app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
             headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
             return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                                 data=json.dumps(get_license(app).__dict__),
+                                 data=data,
                                  verify=False,
                                  headers=headers).text
         else:
             return app.config['AUTH_TOKEN']
 
 
-def get_auth_token_object(app):
+def get_auth_token_object(data, app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
             headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
             return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                                 data=json.dumps(get_license(app).__dict__),
+                                 data=data,
                                  verify=False,
                                  headers=headers)
         else:
@@ -135,4 +132,3 @@ def schedule_test_on_the_portal(test, app_obj, pod_id):
 def sync_all_tests_with_portal(test, app_obj):
     response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
     return response
-

@@ -1,6 +1,9 @@
 import datetime
+import json
 
 from flask import request
+
+from src.db.database import Test
 
 
 def shutdown_server():
@@ -13,6 +16,21 @@ def shutdown_server():
 def get_current_timestamp():
     timestamp = datetime.now().timestamp() * 1000
     return timestamp
+
+
+def generate_test_object(sync_test):
+    sync_test_json = json.loads(sync_test)
+    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test.id = sync_test_json["id"]
+    return test
+
+
+def generate_test_object_from_json(sync_test_json):
+    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test.id = sync_test_json["id"]
+    return test
 
 
 def print_error_message():

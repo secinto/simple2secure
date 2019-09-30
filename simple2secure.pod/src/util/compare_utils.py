@@ -1,10 +1,31 @@
 import hashlib
 import json
 
+from src.db.database import PodInfo, db
+
 
 def create_secure_hash(content):
     sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
     return sha3_hash
+
+
+def compare_hash_values(current_hash_string):
+    pod_info = PodInfo.query.first()
+
+    if pod_info is not None:
+        if pod_info.hash_value_service is None:
+            pod_info.hash_value_service = current_hash_string
+            db.session.commit()
+            return False
+        else:
+            if pod_info.hash_value_service == current_hash_string:
+                return True
+            else:
+                pod_info.hash_value_service = current_hash_string
+                db.session.commit()
+                return False
+
+    return False
 
 
 def is_same_sequence_content(prov_seq_cont, db_seq_cont):

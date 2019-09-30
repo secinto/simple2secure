@@ -1,39 +1,24 @@
-import inspect
-
 from src.db.database import db, Test, TestSequence, PodInfo, CompanyLicensePod
 from src.db.database_schema import TestSchema
 from src.util.compare_utils import is_same_sequence_content, create_secure_hash
-from src.util.file_utils import generate_test_object
 from src.util.rest_utils import sync_test_with_portal
+from src.util.util import generate_test_object
 
 import time
 import json
 
 
+
 def update_license(license_object):
-    if license_object is not None:
-        if isinstance(license_object, CompanyLicensePod):
-            db.session.add(license)
-            db.session.commit()
+    if isinstance(license_object, CompanyLicensePod):
+        db.session.add(license)
+        db.session.commit()
 
 
-def compare_hash_values(current_hash_string):
-    pod_info = PodInfo.query.first()
-
-    if pod_info is not None:
-        if pod_info.hash_value_service is None:
-            pod_info.hash_value_service = current_hash_string
-            db.session.commit()
-            return False
-        else:
-            if pod_info.hash_value_service == current_hash_string:
-                return True
-            else:
-                pod_info.hash_value_service = current_hash_string
-                db.session.commit()
-                return False
-
-    return False
+def update_pod_info(pod_info):
+    if isinstance(pod_info, PodInfo):
+        db.session.add(pod_info)
+        db.session.commit()
 
 
 def update_insert_tests_to_db(tests, app_obj):

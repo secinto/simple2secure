@@ -1,9 +1,10 @@
 import os
+import secrets
 import socket
 import zipfile
 
-from src.db.database import CompanyLicensePod
-from src.util.db_utils import update_license
+from src.db.database import CompanyLicensePod, PodInfo
+from src.util.db_utils import update_license, update_pod_info
 from src.util.file_utils import read_json_testfile
 
 EXPIRATION_DATE = "expirationDate"
@@ -63,3 +64,22 @@ def get_license_file():
             decoded_license_file = zip_file_content.decode()
             archive.close()
             return decoded_license_file
+
+
+def get_pod(app_obj):
+    with app_obj.app_context:
+        pod_info = PodInfo.query.first()
+        if pod_info is None:
+            create_pod()
+        else:
+            app_obj.config['POD_ID'] = pod_info.generated_id
+            app_obj.logger.info('Using existing pod id from the database: %s', app_obj.config['POD_ID'])
+
+
+def create_pod(app_obj):
+    with app_obj.app_context:
+        app_obj.config['POD_ID'] = secrets.token_urlsafe(20)
+        app_obj.logger.info('Generating new pod id: %s', app_obj.config['POD_ID'])
+        pod_info = PodInfo(app_obj.config['POD_ID'], "")
+        update_pod_info(pod_info)
+        return pod_info
