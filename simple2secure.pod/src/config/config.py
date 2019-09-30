@@ -13,7 +13,7 @@ class Config(object):
     GROUP_ID = ''
     LICENSE_ID = ''
     PORTAL_URL = 'https://localhost:8443/api/'
-    # PORTAL_URL = 'https://144.76.93.104:51001/s2s/api/'
+    # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
     AUTH_TOKEN = ''
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

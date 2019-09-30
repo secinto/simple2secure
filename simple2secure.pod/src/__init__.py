@@ -33,7 +33,6 @@ def create_celery_app(app):
 
 
 def entrypoint(mode='app'):
-
     os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
     app = Flask(__name__)
@@ -86,8 +85,5 @@ def authenticate(app):
                 app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
 
         except requests.exceptions.ConnectionError:
-                app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
-                # shutdown_server()
-
-
-
+            app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
+            # shutdown_server()
