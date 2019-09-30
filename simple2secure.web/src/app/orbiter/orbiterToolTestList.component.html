@@ -13,13 +13,13 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
+        <!-- Name Column -->
         <ng-container matColumnDef="testId">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
         </ng-container>
 
-        <!-- Position Column -->
+        <!-- Status Column -->
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}</mat-header-cell>
 
@@ -29,13 +29,14 @@
                     class="fas fa-times-circle fa-2x"></i></mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Version Column -->
         <ng-container matColumnDef="version">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.version' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.test_content.test_definition.version}}</mat-cell>
         </ng-container>
 
+        <!-- Action Column -->
         <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
             <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">

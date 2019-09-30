@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "debug": "ng serve --ssl true --ssl-key /node_modules/browser-sync/lib/server/certs/server.key --ssl-cert /node_modules/browser-sync/lib/server/certs/server.crt"
+    "debug": "ng serve --ssl true --ssl-key /certificates/privkey.pem --ssl-cert /certificates/cert.pem"
   },
   "private": true,
   "dependencies": {

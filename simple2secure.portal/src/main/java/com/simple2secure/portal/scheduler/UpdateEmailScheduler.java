@@ -21,6 +21,7 @@
  */
 package com.simple2secure.portal.scheduler;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -82,10 +83,18 @@ public class UpdateEmailScheduler {
 	@Autowired
 	EmailRulesEngine emailRulesEngine;
 
+	private Properties emailProperties;
+
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
-	@Scheduled(
-			fixedRate = 50000)
+	private Hashtable<String, Store> storeMapping = new Hashtable<>();
+
+	public UpdateEmailScheduler() {
+		emailProperties = new Properties();
+		emailProperties.setProperty("mail.imap.ssl.enable", "true");
+	}
+
+	@Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		log.info("Checking configured email inboxes");
@@ -93,10 +102,10 @@ public class UpdateEmailScheduler {
 			for (EmailConfiguration cfg : configs) {
 				cfg.setCurrentStatus(Status.CHECKING);
 				emailConfigRepository.update(cfg);
-				Message[] msg = connect(cfg);
+				Message[] msg = getMessagesForStore(getConnection(cfg), cfg);
 				cfg.setCurrentStatus(Status.CONNECTED);
 				emailConfigRepository.update(cfg);
-				if (msg != null) {
+				if (msg != null && msg.length > 0) {
 					cfg.setCurrentStatus(Status.SYNCHING);
 					emailConfigRepository.update(cfg);
 					extractEmailsFromMessages(msg, cfg.getId());
@@ -164,34 +173,40 @@ public class UpdateEmailScheduler {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 
-	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException, ItemNotFoundRepositoryException {
-		Properties props = new Properties();
+	public Store getConnection(EmailConfiguration config) throws NumberFormatException, MessagingException, ItemNotFoundRepositoryException {
 
-		props.setProperty("mail.imap.ssl.enable", "true");
+		if (storeMapping.containsKey(config.getId())) {
+			return storeMapping.get(config.getId());
+		} else {
 
-		// create a new session with the provided properties
-		Session session = Session.getDefaultInstance(props, null);
+			// create a new session with the provided properties
+			Session session = Session.getDefaultInstance(emailProperties, null);
 
-		// connect to the store using the provided credentials
-		Store store = session.getStore(STORE);
+			// connect to the store using the provided credentials
+			Store store = session.getStore(STORE);
 
-		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			log.debug("Connection to store {} established " + store);
 
-		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			storeMapping.put(config.getId(), store);
+			return store;
+		}
+	}
 
-		log.debug("Connected to the store: " + store);
-
+	public Message[] getMessagesForStore(Store store, EmailConfiguration config) throws MessagingException, ItemNotFoundRepositoryException {
 		// get inbox folder
 		Folder inbox = store.getFolder(FOLDER);
 
 		// open inbox folder to read the messages
 		inbox.open(Folder.READ_ONLY);
 
-		Message[] messages = null;
+		Message[] messages = new Message[0];
+		int newEnd = inbox.getMessageCount();
 		if (config.getLastEnd() == 0) {
 			messages = inbox.getMessages();
-		} else {
-			int newEnd = inbox.getMessageCount();
+			config.setLastEnd(newEnd);
+			emailConfigRepository.update(config);
+		} else if (config.getLastEnd() != newEnd) {
 			messages = inbox.getMessages(config.getLastEnd(), newEnd);
 			config.setLastEnd(newEnd);
 			emailConfigRepository.update(config);
@@ -200,6 +215,7 @@ public class UpdateEmailScheduler {
 				config.getEmail());
 
 		return messages;
+
 	}
 
 }
