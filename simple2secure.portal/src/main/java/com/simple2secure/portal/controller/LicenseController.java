@@ -144,7 +144,7 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(
-			value = "/nPod",
+			value = "/activatePod",
 			method = RequestMethod.POST,
 			consumes = "application/json")
 	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePod licensePod, @RequestHeader("Accept-Language") String locale)
@@ -175,20 +175,21 @@ public class LicenseController {
 					}
 
 					// save pod configuration
+					if (!Strings.isNullOrEmpty(configuration) && !configuration.equalsIgnoreCase("NONE")) {
 
-					podTestList = gson.fromJson(configuration, Test[].class);
+						podTestList = gson.fromJson(configuration, Test[].class);
 
-					if (podTestList != null) {
-						for (Test podTest : podTestList) {
-							if (podTest != null) {
-								if (Strings.isNullOrEmpty(podTest.getPodId())) {
-									podTest.setPodId(podId);
-									podTest.setHostname(licensePod.getHostname());
+						if (podTestList != null) {
+							for (Test podTest : podTestList) {
+								if (podTest != null) {
+									if (Strings.isNullOrEmpty(podTest.getPodId())) {
+										podTest.setPodId(podId);
+										podTest.setHostname(licensePod.getHostname());
+									}
 								}
 							}
 						}
 					}
-
 				} else {
 					podExists = true;
 				}

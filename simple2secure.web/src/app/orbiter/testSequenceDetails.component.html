@@ -1,0 +1,71 @@
+<h3 *ngIf="!isNewTest" mat-dialog-title>{{ 'orbiter.editsequence' | translate }}</h3>
+<h3 *ngIf="isNewTest" mat-dialog-title>{{ 'button.addSequence' | translate }}</h3>
+
+<div mat-dialog-content>
+    <form id="cfgForm" #configForm="ngForm">
+        <div>
+            <mat-accordion>
+                  <mat-form-field class="full_width_input">
+                         <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+                             [(ngModel)]="sequence.name" value="" name="name">
+                    </mat-form-field>
+                 
+					<mat-card>
+					  <mat-card-header>
+						Test Sequence
+					  </mat-card-header>
+					  <mat-card-content>
+						  <div
+							cdkDropList
+							cdkDropListOrientation="horizontal"
+							#testSequenceList="cdkDropList"
+							[cdkDropListData]="testSequence"
+						    class="example-list-horizontal"
+							(cdkDropListDropped)="dropHorizontal($event)"
+							[cdkDropListConnectedTo]="[testList]">
+						    	<div class="example-box-horizontal" *ngFor="let item of testSequence" cdkDrag>
+									{{item}}
+									<div class="test-class">
+										<mat-label>Select an adapter</mat-label>
+										<mat-select>
+											<mat-option *ngFor="let adapter of elements" [value]="adapter" (mousedown)="clicked($event)">
+									        {{adapter}}
+									    	</mat-option>
+										</mat-select>
+									</div>
+								</div>
+						  </div>			
+					  </mat-card-content>
+
+					</mat-card>
+					
+					<mat-card>
+					  <mat-card-header>
+						Tests
+					  </mat-card-header>
+					  <mat-card-content>
+						  <div
+						    cdkDropList
+						    #testList="cdkDropList"
+						    [cdkDropListData]="testNamesCurrent"
+						    [cdkDropListConnectedTo]="[testSequenceList]"
+							(cdkDropListDropped)="drop($event)"
+						    class="example-list">
+						    <div class="example-box" *ngFor="let item of testNamesCurrent" cdkDrag>{{item}}</div>
+						  </div>			
+					  </mat-card-content>
+
+					</mat-card>
+            </mat-accordion>
+
+        </div>
+    </form>
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveSequence()">{{ 'button.save' | translate }}
+    </button>
+</div>

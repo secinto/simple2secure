@@ -1,4 +1,11 @@
+<button mat-raised-button color="primary" id="addButton" type="button"
+        (click)="openDialogShowTest('new')"
+        class="pull-right mat-green-button">
+    <i class="glyphicon glyphicon-plus"></i> {{ 'button.addSequence' | translate }}
+</button>
+
 <div class="example-container mat-elevation-z8 table table-striped">
+
     <div class="header-filter-table">
         <mat-form-field class="header-filter-field">
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
@@ -7,23 +14,22 @@
     <mat-table #table [dataSource]="dataSource" matSort>
 
         <!-- Position Column -->
-        <ng-container matColumnDef="pod">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.pod' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
+        <ng-container matColumnDef="testId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.sequence.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Position Column -->
         <ng-container matColumnDef="status">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.sequence.timestamp' | translate }}</mat-header-cell>
+			<mat-cell *matCellDef="let element"> {{element.lastChangedTimeStamp}}</mat-cell>
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="group">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+        <ng-container matColumnDef="version">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.sequence.hash' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceHash}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -48,14 +54,20 @@
 </div>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="showPodTests()">
-        <mat-icon>code</mat-icon>
-        {{ 'button.showtests' | translate }}
+    <button mat-menu-item (click)="openDialogShowTest('edit')">
+        <mat-icon>edit</mat-icon>
+        {{ 'button.edit' | translate }}
     </button>
-	<button mat-menu-item (click)="showSequences()">
-		<mat-icon>code</mat-icon>
-		{{ 'button.showSequences' | translate }}
-	</button>
+
+    <button mat-menu-item (click)="runTest()">
+        <mat-icon>play_arrow</mat-icon>
+        {{ 'button.runtests' | translate }}
+    </button>
+
+    <button mat-menu-item (click)="openDeleteDialog()">
+        <mat-icon>delete</mat-icon>
+        {{ 'button.delete' | translate }}
+    </button>
 </mat-menu>
 
 

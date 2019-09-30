@@ -38,6 +38,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Pod;
 import com.simple2secure.api.model.TestObjWeb;
+import com.simple2secure.api.model.TestSequence;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -47,6 +48,7 @@ import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.TestRepository;
+import com.simple2secure.portal.repository.TestSequenceRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
@@ -80,6 +82,9 @@ public class PodUtils {
 
 	@Autowired
 	ContextUserAuthRepository contextUserAuthRepository;
+
+	@Autowired
+	TestSequenceRepository testSequenceRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -138,7 +143,8 @@ public class PodUtils {
 							String podStatus = getPodStatus(license);
 							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), podStatus);
 							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
-							PodDTO podDto = new PodDTO(pod, tests);
+							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(pod.getPodId());
+							PodDTO podDto = new PodDTO(pod, tests, test_sequences);
 							myPods.add(podDto);
 						}
 					}

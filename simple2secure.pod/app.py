@@ -1,13 +1,16 @@
 from flask import Response, json, request, render_template
 from src import create_app
-from src.db.database_schema import TestSchema
+from src.db.database_schema import TestSchema, TestSequenceSchema
 from src.util import file_utils
 from src.util import json_utils
+from src.util import task_utils
 from src.db.database import TestResult, Test, TestSequence
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 import src.celery.celery_tasks as celery_tasks
 import json
 from urllib import parse
+import time
+from src.db.database import db
 
 app = create_app()
 start_scheduler_tasks(app, celery_tasks)
@@ -40,19 +43,22 @@ def index():
     response = file_utils.read_json_testfile(app)
     return response
 
+
 @app.route("/services/run/sequence")
 def run_sequence():
     with app.app_context():
-        full_url = request.url
-        splitted_url = parse.urlsplit(full_url)
+        splitted_url = parse.urlsplit(request.url)
         url_query = parse.parse_qs(splitted_url.query)
-        tools = url_query["task"]
-        if "parameter" in url_query:
-            params = url_query["parameter"]
-        else:
-            params = [""]
-        testRun = celery_tasks.schedule_test_for_sequence(params[0], tools[0])
-        return testRun
+
+        test_sequence_schema = TestSequenceSchema()
+
+        test_sequence = task_utils.get_sequence_from_url(url_query, app)
+
+        sequence_to_provide = test_sequence_schema.dump(test_sequence).data
+
+        testRun = celery_tasks.schedule_sequence.delay(sequence_to_provide)
+
+        return "Task sequence has been scheduled"
 
 
 @app.route("/services/run")
@@ -90,7 +96,8 @@ def run_service():
 
                 if not json_utils.is_blank(precondition):
                     precondition_param_value = json_utils.parse_query_test(precondition, "precondition")
-                    current_test["test_definition"]["precondition"]["command"]["parameter"]["value"] = precondition_param_value
+                    current_test["test_definition"]["precondition"]["command"]["parameter"][
+                        "value"] = precondition_param_value
 
                 if not json_utils.is_blank(postcondition):
                     postcondition_param_value = json_utils.parse_query_test(postcondition, "postcondition")

@@ -105,4 +105,9 @@ export class OrbiterToolTestComponent {
 		this.dataService.setPods(this.selectedPod);
 		this.router.navigate([this.selectedPod.pod.podId], {relativeTo: this.route});
 	}
+	
+	public showSequences() {
+		this.dataService.setPods(this.selectedPod);
+		this.router.navigate(["sequences/" + this.selectedPod.pod.podId], {relativeTo: this.route});
+	}
 }
