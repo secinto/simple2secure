@@ -68,9 +68,13 @@ import {
 	OrbiterComponent,
 	OrbiterToolTestComponent,
 	OrbiterToolTestListComponent,
+	OrbiterToolTestScheduledListComponent,
+	OrbiterToolTestSequenceListComponent,
 	TestDetailsComponent,
-	TestResultDetailsComponent
+	TestResultDetailsComponent,
+	TestSequenceDetailsComponent
 } from './orbiter';
+
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
 
 
@@ -135,7 +139,9 @@ import {
 	MatCardModule,
 	MatExpansionModule,
 	MatBadgeModule,
-	MatRadioModule, MatTooltipModule,
+	MatListModule,
+	MatRadioModule,
+	MatTooltipModule,
 	MatSnackBarModule,
 } from '@angular/material';
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
@@ -155,7 +161,7 @@ import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
-import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
 
 
@@ -200,6 +206,7 @@ export const httpInterceptorProviders = [
 		MatDatepickerModule,
 		MatNativeDateModule,
 		MatCardModule,
+		MatListModule,
 		MatExpansionModule,
 		HttpClientModule,
 		ChartModule,
@@ -227,7 +234,9 @@ export const httpInterceptorProviders = [
 		MatTooltipModule,
 		MatSnackBarModule,
 		NgMatSearchBarModule,
-		Ng4LoadingSpinnerModule.forRoot()
+		Ng4LoadingSpinnerModule.forRoot(),
+		DragDropModule
+
 	],
 	declarations: [
 		AppComponent,
@@ -292,7 +301,9 @@ export const httpInterceptorProviders = [
 		SearchComponent,
 		SearchResultComponent,
 		TruncatePipe,
-		NotificationDetailsComponent
+		NotificationDetailsComponent,
+		OrbiterToolTestSequenceListComponent,
+		TestSequenceDetailsComponent,
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -314,7 +325,8 @@ export const httpInterceptorProviders = [
 		AddQueryDialog,
 		TestResultDetailsComponent,
 		TestDetailsComponent,
-		NotificationDetailsComponent
+		NotificationDetailsComponent,
+		TestSequenceDetailsComponent,
 	],
 	providers: [
 		AuthGuard,

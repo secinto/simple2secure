@@ -64,8 +64,20 @@ class TestSequence(db.Model):
         self.sequence_content = sequence_content
         self.hash_value = hash_value
         self.lastChangedTimestamp = last_changed_timestamp
-
-
+        
+class TestSequenceResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    podId = db.Column(db.Text)
+    sequence_name = db.Column(db.Text)
+    sequence_result = db.Column(db.Text)
+    time_stamp = db.Column(db.BigInteger)
+    
+    def __init__(self, podId, sequence_name, sequence_result, time_stamp):
+        self.podId = podId
+        self.sequence_name = sequence_name
+        self.sequence_result = sequence_result
+        self.time_stamp = time_stamp
+        
 class Notification:
     def __init__(self, content):
         self.content = content

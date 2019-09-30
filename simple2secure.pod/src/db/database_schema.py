@@ -1,5 +1,5 @@
 from flask_marshmallow import Marshmallow
-from src.db.database import TestResult, Test, PodInfo, TestSequence
+from src.db.database import TestResult, Test, PodInfo, TestSequence, TestSequenceResult
 
 ma = Marshmallow()
 
@@ -22,3 +22,7 @@ class TestSchema(ma.ModelSchema):
 class TestSequenceSchema(ma.ModelSchema):
     class Meta:
         model = TestSequence
+        
+class TestSequenceResultSchema(ma.ModelSchema):
+    class Meta:
+        model = TestSequenceResult

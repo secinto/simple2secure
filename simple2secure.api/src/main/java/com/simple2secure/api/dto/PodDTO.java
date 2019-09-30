@@ -26,6 +26,7 @@ import java.util.List;
 
 import com.simple2secure.api.model.Pod;
 import com.simple2secure.api.model.TestObjWeb;
+import com.simple2secure.api.model.TestSequence;
 
 public class PodDTO {
 
@@ -33,12 +34,14 @@ public class PodDTO {
 
 	private List<TestObjWeb> test;
 
+	private List<TestSequence> test_sequence;
 	public PodDTO() {
 	}
 
-	public PodDTO(Pod pod, List<TestObjWeb> test) {
+	public PodDTO(Pod pod, List<TestObjWeb> test, List<TestSequence> test_sequence) {
 		this.pod = pod;
 		this.test = test;
+		this.test_sequence = test_sequence;
 	}
 
 	public Pod getPod() {
@@ -57,4 +60,11 @@ public class PodDTO {
 		this.test = test;
 	}
 
+	public List<TestSequence> getTest_sequence() {
+		return test_sequence;
+	}
+
+	public void setTest_sequence(List<TestSequence> test_sequence) {
+		this.test_sequence = test_sequence;
+	}
 }

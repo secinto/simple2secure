@@ -1,11 +1,15 @@
 from src.util import rest_utils
 from src.util import json_utils
+from src.util import file_utils
 from scanner import scanner
-from src.db.database import db, TestResult, TestStatus
+from src.db.database import db, TestResult, TestStatus, TestSequence, TestSequenceResult
+from src.db.database_schema import TestSequenceSchema, TestSchema, TestSequenceResultSchema
 from flask import json
 from src import create_celery_app, entrypoint
 import threading
 import socket
+import time
+import sys
 
 app = entrypoint('celery')
 celery = create_celery_app(app)
@@ -71,4 +75,60 @@ def schedule_test_for_sequence(parameter, command):
             command), parameter), results, "sequence_result")
         return results["sequence_result"]
 
+@celery.task(name='celery.schedule_sequence')
+def schedule_sequence(test_sequence):
+    with app.app_context():
+        sequence = file_utils.update_add_sequence_to_db(test_sequence)
 
+        current_milli_time = int(round(time.time() * 1000))
+        test_sequence_result_obj = {}
+        firstRun = True
+        nextResult = ""
+        for i, task in enumerate(json.loads(sequence.sequence_content), 0):
+            if firstRun:
+                test_content =  json.loads(task['test_content'])
+                test_command = test_content['test_definition']['step']['command']['executable']
+                test_parameter = test_content['test_definition']['step']['command']['parameter']['value']
+                scan = schedule_test_for_sequence(test_parameter, test_command)
+                nextResult = scan.strip()
+                test_sequence_result_obj[test_content['name']] = nextResult
+                firstRun = False
+            else:
+                test_content = json.loads(task['test_content'])
+                test_command = test_content['test_definition']['step']['command']['executable']
+                scan = schedule_test_for_sequence(nextResult, test_command)
+                nextResult = scan.strip()
+                test_sequence_result_obj[test_content['name']] = nextResult
+ 
+        test_sequence_result_obj = json.dumps(test_sequence_result_obj)
+        testSeqRes = TestSequenceResult(sequence.podId, sequence.name, test_sequence_result_obj, current_milli_time)
+        
+        db.session.add(testSeqRes)
+        db.session.merge(sequence)
+        db.session.commit()
+
+        return sequence
+
+
+
+#         for i, task in enumerate(commands, 0):
+#             if firstRun:
+#                 #scan = schedule_test_for_sequence(parameter[i], task)
+#                 scan = schedule_test_for_sequence()
+#                 nextResult = scan
+#                 sequence_results[task] = nextResult
+#                 interimResult = open("temp.txt", 'w+')
+#                 interimResult.write(nextResult)
+#                 interimResult.close()
+#                 firstRun = False
+#             else:
+#                 #scan = schedule_test_for_sequence(nextResult, task)
+#                 scan = schedule_test_for_sequence()
+#                 nextResult = scan
+#                 sequence_results[task] = nextResult
+#                 interimResult = open("temp.txt", 'a+')
+#                 interimResult.write(nextResult)
+#                 interimResult.close()
+#         sequence_results_file = open("sequence_results.txt", "w+")
+#         sequence_results_file.write(json.dumps(sequence_results))
+#         sequence_results_file.close()

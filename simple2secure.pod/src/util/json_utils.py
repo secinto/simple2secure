@@ -73,6 +73,8 @@ def get_tool(argument):
     else:
         return argument
 
+def construct_command(task):
+    brk = ""
 
 def construct_command(tool, argument):
     # Construct command from the tool name and argument
