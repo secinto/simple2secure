@@ -90,9 +90,9 @@ class CompanyLicensePod(db.Model):
     configuration = db.Column(db.Text)
 
     def __init__(self, group_id, license_id, pod_id, hostname, configuration):
-        self.groupId = group_id
-        self.licenseId = license_id
-        self.podId = pod_id
+        self.group_id = group_id
+        self.license_id = license_id
+        self.pod_id = pod_id
         self.hostname = hostname
         self.configuration = configuration
 

@@ -1,16 +1,13 @@
 from flask import Response, json, request, render_template
 from src import create_app
 from src.db.database_schema import TestSchema, TestSequenceSchema
-from src.util import file_utils
-from src.util import json_utils
-from src.util import task_utils
-from src.db.database import TestResult, Test, TestSequence
+from src.util import file_utils, json_utils, task_utils
+from src.util.db_utils import update_insert_tests_to_db
+from src.db.database import TestResult, Test
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 import src.celery.celery_tasks as celery_tasks
 import json
 from urllib import parse
-import time
-from src.db.database import db
 
 app = create_app()
 start_scheduler_tasks(app, celery_tasks)
@@ -68,7 +65,7 @@ def run_service():
         test_schema = TestSchema()
         response = file_utils.read_json_testfile(app)
         # response_json_object = json.loads(response)
-        file_utils.update_insert_tests_to_db(response, app)
+        update_insert_tests_to_db(response, app)
 
         response_text = "All available tests from services.json have been scheduled"
 
@@ -115,6 +112,12 @@ def run_service():
                 response_text = "Problem occured while scheduling test!"
 
         return response_text
+
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 
 if __name__ == '__main__':

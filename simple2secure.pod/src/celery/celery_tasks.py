@@ -1,6 +1,5 @@
 from src.util import rest_utils
 from src.util import json_utils
-from src.util.db_utils import update_add_sequence_to_db
 from scanner import scanner
 from src.db.database import db, TestResult,  TestSequenceResult
 from flask import json
@@ -9,6 +8,7 @@ import threading
 import socket
 import time
 
+from src.util.task_utils import update_add_sequence_to_db
 from src.util.util import get_current_timestamp
 
 app = entrypoint('celery')

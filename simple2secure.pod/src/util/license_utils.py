@@ -16,22 +16,46 @@ LICENSE_FOLDER = 'static/license'
 HOSTNAME = socket.gethostname()
 
 
-def get_license(app_obj):
+def get_pod(app):
+    with app.app_context():
+        pod_info = PodInfo.query.first()
+        if pod_info is None:
+            create_pod(app)
+        else:
+            app.config['POD_ID'] = pod_info.generated_id
+            app.logger.info('Using existing pod id from the database: %s', app.config['POD_ID'])
+
+
+def create_pod(app):
+    with app.app_context():
+        app.config['POD_ID'] = secrets.token_urlsafe(20)
+        app.logger.info('Generating new pod id: %s', app.config['POD_ID'])
+        pod_info = PodInfo(app.config['POD_ID'], "")
+        update_pod_info(pod_info)
+        return pod_info
+
+
+# ----------------------------------------------------------------------
+# License part of license utils
+# ----------------------------------------------------------------------
+
+def get_license(app):
     store_license = CompanyLicensePod.query.first()
     if store_license is not None:
         return store_license
     else:
-        created_license = create_company_license_pod(app_obj)
-        update_license(created_license)
+        created_license = create_company_license_pod(app)
+        if created_license.license_id != 'NO_ID':
+            update_license(created_license)
         return created_license
 
 
-def create_company_license_pod(app_obj):
-    license_file = get_license_file()
-    configuration = read_json_testfile(app_obj)
+def create_company_license_pod(app):
+    license_file = get_license_file(app)
+    configuration = read_json_testfile()
 
     if license_file is None:
-        dummy_license_obj = CompanyLicensePod("NO_ID", "NO_ID", app_obj.config['POD_ID'], HOSTNAME, configuration)
+        dummy_license_obj = CompanyLicensePod("NO_ID", "NO_ID", app.config['POD_ID'], HOSTNAME, configuration)
         return dummy_license_obj
     else:
         lines = license_file.split("\n")
@@ -40,22 +64,35 @@ def create_company_license_pod(app_obj):
             if "#" not in line:
                 row = line.split("=")
                 if row[0] == GROUP_ID:
-                    app_obj.config['GROUP_ID'] = row[1].rstrip()
+                    app.config['GROUP_ID'] = row[1].rstrip()
                 elif row[0] == LICENSE_ID:
-                    app_obj.config['LICENSE_ID'] = row[1].rstrip()
+                    app.config['LICENSE_ID'] = row[1].rstrip()
 
-        if app_obj.config['GROUP_ID'] and app_obj.config['LICENSE_ID'] and app_obj.config['POD_ID']:
+        if app.config['GROUP_ID'] and app.config['LICENSE_ID'] and app.config['POD_ID']:
             # send post to the portal to activate license
-            license_obj = CompanyLicensePod(app_obj.config['GROUP_ID'], app_obj.config['LICENSE_ID'],
-                                            app_obj.config['POD_ID'], HOSTNAME, configuration)
+            license_obj = CompanyLicensePod(app.config['GROUP_ID'], app.config['LICENSE_ID'],
+                                            app.config['POD_ID'], HOSTNAME, configuration)
             return license_obj
 
 
-def get_license_file():
-    files = os.listdir(LICENSE_FOLDER)
+def get_license_file(app):
+    if os.path.exists(LICENSE_FOLDER):
+        files = os.listdir(LICENSE_FOLDER)
+    else:
+        app.logger.error('Provided path %s does not exist', LICENSE_FOLDER)
+        return None
+
+    file = 'license.zip'
 
     if len(files) == 1:
-        archive = zipfile.ZipFile(LICENSE_FOLDER + "/" + files[0], 'r')
+        file = files[0]
+    else:
+        for f in files:
+            if f.endswith('zip') and f.startswith('license'):
+                file = f
+
+    if file is not None and os.path.exists(LICENSE_FOLDER + "/" + file):
+        archive = zipfile.ZipFile(LICENSE_FOLDER + "/" + file, 'r')
 
         zip_files = [name for name in archive.namelist() if name.endswith('.dat')]
 
@@ -66,20 +103,3 @@ def get_license_file():
             return decoded_license_file
 
 
-def get_pod(app_obj):
-    with app_obj.app_context:
-        pod_info = PodInfo.query.first()
-        if pod_info is None:
-            create_pod()
-        else:
-            app_obj.config['POD_ID'] = pod_info.generated_id
-            app_obj.logger.info('Using existing pod id from the database: %s', app_obj.config['POD_ID'])
-
-
-def create_pod(app_obj):
-    with app_obj.app_context:
-        app_obj.config['POD_ID'] = secrets.token_urlsafe(20)
-        app_obj.logger.info('Generating new pod id: %s', app_obj.config['POD_ID'])
-        pod_info = PodInfo(app_obj.config['POD_ID'], "")
-        update_pod_info(pod_info)
-        return pod_info

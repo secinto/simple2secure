@@ -1,6 +1,5 @@
 from src.db.database import Test
 from src.db.database_schema import TestSchema
-from src.util.compare_utils import create_secure_hash, compare_hash_values
 
 import json
 
@@ -12,17 +11,20 @@ SIGNATURE = "signature"
 LICENSE_FOLDER = 'static/license'
 
 
-def read_json_testfile(appObj):
+def read_json_testfile():
     # Read test file and return it
     tests_file = open('services.json', 'r')
-    content = tests_file.read()
+    return tests_file.read()
+
+
+def convert_tests():
     converted_tests = []
 
     tests = Test.query.all()
 
-    for crnt_test in tests:
+    for test in tests:
         test_schema = TestSchema()
-        output = test_schema.dump(crnt_test).data
+        output = test_schema.dump(test).data
         converted_tests.append(output)
 
     return json.dumps(converted_tests)
@@ -38,6 +40,7 @@ def write_to_result_log(content):
     log_file = open("result/result.json", "w")
     log_file.write(content)
     log_file.close()
+
 
 def update_services_file():
     data = []

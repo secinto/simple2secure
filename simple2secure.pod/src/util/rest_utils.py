@@ -1,28 +1,17 @@
 import requests
 from flask import json
 from src.db.database import Notification, TestStatusDTO
+from src.util.license_utils import get_license
 
 
-def get_auth_token(data, app):
+def get_auth_token(app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
             headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
             return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                                 data=data,
+                                 data=get_license(),
                                  verify=False,
                                  headers=headers).text
-        else:
-            return app.config['AUTH_TOKEN']
-
-
-def get_auth_token_object(data, app):
-    with app.app_context():
-        if not app.config['AUTH_TOKEN']:
-            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-            return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                                 data=data,
-                                 verify=False,
-                                 headers=headers)
         else:
             return app.config['AUTH_TOKEN']
 

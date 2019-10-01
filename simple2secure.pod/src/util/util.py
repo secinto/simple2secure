@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime
+import hashlib
 import json
 
 from flask import request
@@ -11,6 +12,11 @@ def shutdown_server():
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
+
+
+def create_secure_hash(content):
+    sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
+    return sha3_hash
 
 
 def get_current_timestamp():

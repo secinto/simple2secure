@@ -1,12 +1,8 @@
 import hashlib
 import json
 
-from src.db.database import PodInfo, db
-
-
-def create_secure_hash(content):
-    sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
-    return sha3_hash
+from src.db.database import PodInfo
+from src.util.db_utils import update_pod_info
 
 
 def compare_hash_values(current_hash_string):
@@ -15,14 +11,14 @@ def compare_hash_values(current_hash_string):
     if pod_info is not None:
         if pod_info.hash_value_service is None:
             pod_info.hash_value_service = current_hash_string
-            db.session.commit()
+            update_pod_info(pod_info)
             return False
         else:
             if pod_info.hash_value_service == current_hash_string:
                 return True
             else:
                 pod_info.hash_value_service = current_hash_string
-                db.session.commit()
+                update_pod_info(pod_info)
                 return False
 
     return False
@@ -67,9 +63,9 @@ def is_same_test_definition(prov_test_def_, db_test_def_):
     db_step = db_test_def['step']
     db_postcond = db_test_def['postcondition']
 
-    if prov_descr == db_descr and prov_version == db_version and is_same_test_definition_task(prov_precond,
-                                                                                              db_precond) and is_same_test_definition_task(
-        prov_step, db_step) and is_same_test_definition_task(prov_postcond, db_postcond):
+    if prov_descr == db_descr and prov_version == db_version and is_same_test_definition_task(prov_precond, db_precond) \
+            and is_same_test_definition_task(prov_step, db_step) and is_same_test_definition_task(prov_postcond,
+                                                                                                  db_postcond):
         return True
     else:
         return False

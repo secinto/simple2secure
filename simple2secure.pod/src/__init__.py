@@ -1,19 +1,17 @@
-import json
+import logging
+import os
 
-from flask import Flask
-from flask_cors import CORS
-from src.db.database import db, PodInfo, Test, CompanyLicensePod
-from src.db.database_schema import ma, TestSchema
+import requests
 from celery import Celery
+from flask import Flask, request
+from flask_cors import CORS
 
 import src.config.config as config_module
-import requests
-import os
-import logging
-
+from src.db.database import db, PodInfo, Test, CompanyLicensePod
+from src.db.database_schema import ma, TestSchema
 from src.util.license_utils import get_license, get_pod
-from src.util.rest_utils import get_auth_token_object
-from src.util.util import print_error_message
+from src.util.rest_utils import get_auth_token
+from src.util.util import print_error_message, shutdown_server
 
 
 def create_app():
@@ -65,10 +63,12 @@ def authenticate(app):
     with app.app_context():
         try:
             stored_license = get_license(app);
-            if stored_license is not None:
+            if stored_license is not None and stored_license.license_id != 'NO_ID':
                 app.config['LICENSE_ID'] = stored_license.license_id
+            else:
+                raise RuntimeError('License ZIP file not available from file system under static/license')
 
-            auth_token_obj = get_auth_token_object(json.dumps(stored_license.__dict__), app)
+            auth_token_obj = get_auth_token(app)
 
             if auth_token_obj.status_code == 200:
                 app.config['AUTH_TOKEN'] = auth_token_obj.text
@@ -76,8 +76,10 @@ def authenticate(app):
             else:
                 app.logger.error('Error occured while activating the pod: %s', print_error_message())
                 app.config['CONNECTED_WITH_PORTAL'] = False
-
         except requests.exceptions.ConnectionError:
             app.logger.error('Error occured while activating the pod: %s', print_error_message())
             app.config['CONNECTED_WITH_PORTAL'] = False
-            # shutdown_server()
+            shutdown_server()
+        except RuntimeError as re:
+            app.logger.error('Error occurred while starting the pod: %s', re)
+

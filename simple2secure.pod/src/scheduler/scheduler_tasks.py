@@ -1,10 +1,13 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
-from src.db.database import db, TestResult, Test, TestStatus
+
+from src.db.database import TestResult, Test
 from src.db.database_schema import TestResultSchema, TestSchema
-from src.util import rest_utils, file_utils
-from src.util.file_utils import generate_test_object_from_json, update_services_file
-from src.util.rest_utils import sync_all_tests_with_portal
+from src.util.db_utils import update_test
+from src.util.file_utils import update_services_file
+from src.util.rest_utils import portal_get, send_notification, update_test_status, get_auth_token, \
+    sync_all_tests_with_portal
+from src.util.util import generate_test_object_from_json
 
 
 def start_scheduler_tasks(app_obj, celery_tasks):
@@ -21,7 +24,7 @@ def start_scheduler_tasks(app_obj, celery_tasks):
 
 def get_scheduled_tests(app_obj, celery_task):
     with app_obj.app_context():
-        request_test = rest_utils.portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
+        request_test = portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
                                              app_obj.config['POD_ID'], app_obj)
         if request_test.status_code == 200:
             test_run_array = json.loads(request_test.text)
@@ -30,10 +33,10 @@ def get_scheduled_tests(app_obj, celery_task):
                 current_test = json.loads(test_run["testContent"])
                 celery_task.schedule_test.delay(current_test["test_definition"], test_run["testId"],
                                                 test_run["testName"], app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'], test_run["id"])
-                rest_utils.send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
+                send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                              app_obj,
                                              app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
-                rest_utils.update_test_status(app_obj, app_obj.config['AUTH_TOKEN'], test_run["id"], test_run["testId"], "SCHEDULED")
+                update_test_status(app_obj, app_obj.config['AUTH_TOKEN'], test_run["id"], test_run["testId"], "SCHEDULED")
         else:
             print(request_test.status_code)
 
@@ -46,7 +49,7 @@ def get_test_results_from_db(app_obj, celery_task):
             output = test_result_schema.dump(test_result)
 
             if not app_obj.config['AUTH_TOKEN']:
-                app_obj.config['AUTH_TOKEN'] = rest_utils.get_auth_token(app_obj)
+                app_obj.config['AUTH_TOKEN'] = get_auth_token(app_obj)
 
             celery_task.send_test_results.delay(output, app_obj.config['AUTH_TOKEN'], app_obj.config['PORTAL_URL'])
 
@@ -73,8 +76,7 @@ def sync_tests_with_the_portal(app_obj):
                         if len(test_array) > 0 :
                             for test_new in test_array:
                                 test_obj = generate_test_object_from_json(test_new)
-                                db.session.add(test_obj)
-                                db.session.commit()
+                                update_test(test_obj)
 
                             update_services_file()
 
