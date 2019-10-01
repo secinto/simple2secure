@@ -9,8 +9,9 @@ from flask_cors import CORS
 import src.config.config as config_module
 from src.db.database import db, PodInfo, Test, CompanyLicensePod
 from src.db.database_schema import ma, TestSchema
+from src.util import db_utils
 from src.util.license_utils import get_license, get_pod
-from src.util.rest_utils import get_auth_token
+from src.util.rest_utils import activate_pod
 from src.util.util import print_error_message, shutdown_server
 
 
@@ -63,23 +64,20 @@ def authenticate(app):
     with app.app_context():
         try:
             stored_license = get_license(app);
-            if stored_license is not None and stored_license.license_id != 'NO_ID':
-                app.config['LICENSE_ID'] = stored_license.license_id
+            if stored_license is not None and stored_license.licenseId != 'NO_ID':
+                app.config['LICENSE_ID'] = stored_license.licenseId
             else:
                 raise RuntimeError('License ZIP file not available from file system under static/license')
 
-            auth_token_obj = get_auth_token(app)
+            if not stored_license.activated:
+                activate_pod(app)
+                stored_license.activated = True
+                db_utils.update(stored_license)
 
-            if auth_token_obj.status_code == 200:
-                app.config['AUTH_TOKEN'] = auth_token_obj.text
-                app.config['CONNECTED_WITH_PORTAL'] = True
-            else:
-                app.logger.error('Error occured while activating the pod: %s', print_error_message())
-                app.config['CONNECTED_WITH_PORTAL'] = False
-        except requests.exceptions.ConnectionError:
-            app.logger.error('Error occured while activating the pod: %s', print_error_message())
+        except requests.exceptions.ConnectionError as ce:
+            app.logger.error('Error occurred while activating the pod: %s', print_error_message())
             app.config['CONNECTED_WITH_PORTAL'] = False
-            shutdown_server()
+            raise RuntimeError('Activating pod on portal did not work: %s', ce)
         except RuntimeError as re:
             app.logger.error('Error occurred while starting the pod: %s', re)
 

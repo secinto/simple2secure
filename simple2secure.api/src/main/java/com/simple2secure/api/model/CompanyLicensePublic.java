@@ -28,7 +28,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "CompanyLicenseObj")
+@Table(
+		name = "CompanyLicenseObj")
 public class CompanyLicensePublic extends GenericDBObject {
 
 	/**
@@ -49,11 +50,11 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String expirationDate;
 
-	protected boolean activated;
+	protected boolean activated = false;
 
 	protected String hostname;
 
-	protected PodStatus status;
+	protected PodStatus status = PodStatus.UNKNOWN;
 
 	protected long lastOnlineTimestamp;
 

@@ -4,9 +4,9 @@ from src.db.database import TestResult, Test, PodInfo, TestSequence, TestSequenc
 ma = Marshmallow()
 
 
-class CompanyLicensePod(ma.ModelSchema):
+class CompanyLicensePodSchema(ma.ModelSchema):
     class Meta:
-        model = CompanyLicensePod
+        fields = ("groupId", "licenseId", "podId", "hostname", "configuration")
 
 
 class TestResultSchema(ma.ModelSchema):

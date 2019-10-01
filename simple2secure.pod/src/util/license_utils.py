@@ -1,10 +1,11 @@
+import glob
 import os
 import secrets
 import socket
 import zipfile
 
 from src.db.database import CompanyLicensePod, PodInfo
-from src.util.db_utils import update_license, update_pod_info
+from src.util.db_utils import update
 from src.util.file_utils import read_json_testfile
 
 EXPIRATION_DATE = "expirationDate"
@@ -31,7 +32,7 @@ def create_pod(app):
         app.config['POD_ID'] = secrets.token_urlsafe(20)
         app.logger.info('Generating new pod id: %s', app.config['POD_ID'])
         pod_info = PodInfo(app.config['POD_ID'], "")
-        update_pod_info(pod_info)
+        update(pod_info)
         return pod_info
 
 
@@ -39,18 +40,35 @@ def create_pod(app):
 # License part of license utils
 # ----------------------------------------------------------------------
 
-def get_license(app):
-    store_license = CompanyLicensePod.query.first()
-    if store_license is not None:
-        return store_license
+def get_license(app, check_for_new=False):
+    if check_for_new:
+        get_and_store_license(app)
     else:
-        created_license = create_company_license_pod(app)
-        if created_license.license_id != 'NO_ID':
-            update_license(created_license)
-        return created_license
+        stored_license = CompanyLicensePod.query.first()
+        if stored_license is not None and stored_license.licenseId != 'NO_ID':
+            return stored_license
+        else:
+            return get_and_store_license(app)
 
 
-def create_company_license_pod(app):
+def get_and_store_license(app):
+
+    created_license = create_license(app)
+    if created_license.licenseId != 'NO_ID':
+        update(created_license)
+    return created_license
+
+
+def create_license(app):
+    """Reads the license from file if available and returns a CompanyLicensePod object from it if the POD_ID has been
+    already created and the license file is available from the default folder
+
+    Parameters:
+        app: Context object
+
+    Returns:
+        CompanyLicensePod: either a dummy object if no license is available or the correct object
+    """
     license_file = get_license_file(app)
     configuration = read_json_testfile()
 
@@ -69,7 +87,6 @@ def create_company_license_pod(app):
                     app.config['LICENSE_ID'] = row[1].rstrip()
 
         if app.config['GROUP_ID'] and app.config['LICENSE_ID'] and app.config['POD_ID']:
-            # send post to the portal to activate license
             license_obj = CompanyLicensePod(app.config['GROUP_ID'], app.config['LICENSE_ID'],
                                             app.config['POD_ID'], HOSTNAME, configuration)
             return license_obj
@@ -77,22 +94,18 @@ def create_company_license_pod(app):
 
 def get_license_file(app):
     if os.path.exists(LICENSE_FOLDER):
-        files = os.listdir(LICENSE_FOLDER)
+        files = glob.glob(LICENSE_FOLDER + '/*.zip')
     else:
         app.logger.error('Provided path %s does not exist', LICENSE_FOLDER)
         return None
 
-    file = 'license.zip'
-
     if len(files) == 1:
         file = files[0]
     else:
-        for f in files:
-            if f.endswith('zip') and f.startswith('license'):
-                file = f
+        file = max(files, key=os.path.getctime)
 
-    if file is not None and os.path.exists(LICENSE_FOLDER + "/" + file):
-        archive = zipfile.ZipFile(LICENSE_FOLDER + "/" + file, 'r')
+    if file is not None and os.path.exists(file):
+        archive = zipfile.ZipFile(file, 'r')
 
         zip_files = [name for name in archive.namelist() if name.endswith('.dat')]
 

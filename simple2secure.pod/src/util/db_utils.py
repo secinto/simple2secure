@@ -5,6 +5,11 @@ from src.db.database import db, Test, TestSequence, PodInfo, CompanyLicensePod
 from src.util.util import create_secure_hash
 
 
+def update(some_object):
+    db.session.add(some_object)
+    db.session.commit()
+
+
 def update_license(license_object):
     if isinstance(license_object, CompanyLicensePod):
         db.session.add(license_object)

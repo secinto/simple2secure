@@ -1,19 +1,34 @@
 import requests
 from flask import json
 from src.db.database import Notification, TestStatusDTO
+from src.db.database_schema import CompanyLicensePodSchema
 from src.util.license_utils import get_license
+from src.util.util import print_error_message
 
 
 def get_auth_token(app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
-            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-            return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                                 data=get_license(),
-                                 verify=False,
-                                 headers=headers).text
+            activate_pod(app)
+
+        return app.config['AUTH_TOKEN']
+
+
+def activate_pod(app):
+    with app.app_context():
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
+        license_schema = CompanyLicensePodSchema()
+        dumped_license = json.dumps(license_schema.dump(get_license(app)))
+        resp_data = requests.post(app.config['PORTAL_URL'] + "license/activatePod",
+                                  data=dumped_license,
+                                  verify=False,
+                                  headers=headers)
+        if resp_data.status_code == 200:
+            app.config['AUTH_TOKEN'] = resp_data.text
+            app.config['CONNECTED_WITH_PORTAL'] = True
         else:
-            return app.config['AUTH_TOKEN']
+            app.logger.error('Error occurred while activating the pod: %s', print_error_message())
+            app.config['CONNECTED_WITH_PORTAL'] = False
 
 
 def portal_post(url, data, app):

@@ -83,18 +83,23 @@ class TestSequenceResult(db.Model):
 
 class CompanyLicensePod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Text)
-    license_id = db.Column(db.Text)
-    pod_id = db.Column(db.Text)
-    hostname = db.Column(db.BigInteger)
+    groupId = db.Column(db.Text)
+    licenseId = db.Column(db.Text)
+    podId = db.Column(db.Text)
+    hostname = db.Column(db.Text)
     configuration = db.Column(db.Text)
+    activated = db.Column(db.Boolean)
 
     def __init__(self, group_id, license_id, pod_id, hostname, configuration):
-        self.group_id = group_id
-        self.license_id = license_id
-        self.pod_id = pod_id
+        self.groupId = group_id
+        self.licenseId = license_id
+        self.podId = pod_id
         self.hostname = hostname
         self.configuration = configuration
+        self.activated = False
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Notification:
