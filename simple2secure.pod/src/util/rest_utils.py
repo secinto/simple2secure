@@ -1,7 +1,7 @@
 import requests
 from flask import json
 from src.db.database import Notification, TestStatusDTO
-from src.db.database_schema import CompanyLicensePodSchema
+from src.db.database_schema import CompanyLicensePublicSchema, TestSchema
 from src.util.license_utils import get_license
 from src.util.util import print_error_message
 
@@ -17,7 +17,7 @@ def get_auth_token(app):
 def activate_pod(app):
     with app.app_context():
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-        license_schema = CompanyLicensePodSchema()
+        license_schema = CompanyLicensePublicSchema()
         dumped_license = json.dumps(license_schema.dump(get_license(app)))
         resp_data = requests.post(app.config['PORTAL_URL'] + "license/activatePod",
                                   data=dumped_license,
@@ -84,6 +84,7 @@ def portal_post_test_response(url, data, app):
 
         app.logger.info('Token before sending post request from (portal_post_test_response): %s',
                         app.config['AUTH_TOKEN'])
+
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config[
                                                                                                         'AUTH_TOKEN']}
@@ -122,17 +123,17 @@ def check_auth_token(app):
         return "Error"
 
 
-def sync_test_with_portal(test, app_obj):
-    response = portal_post_test(app_obj.config['PORTAL_URL'] + "test/saveTestPod", test, app_obj)
-    return response
-
-
 def schedule_test_on_the_portal(test, app_obj, pod_id):
     response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/scheduleTestPod/" + pod_id,
                                          test, app_obj)
     return response
 
 
-def sync_all_tests_with_portal(test, app_obj):
-    response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", test, app_obj)
+def sync_all_tests_with_portal(tests, app_obj):
+    dumped_tests = []
+    test_schema = TestSchema()
+    for test in tests:
+        output = test_schema.dump(test)
+        dumped_tests.append(output)
+    response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", dumped_tests, app_obj)
     return response

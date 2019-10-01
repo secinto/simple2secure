@@ -3,7 +3,7 @@ from flask import json
 
 from src.db.database import TestResult, Test
 from src.db.database_schema import TestResultSchema, TestSchema
-from src.util.db_utils import update_test
+from src.util.db_utils import update
 from src.util.file_utils import update_services_file
 from src.util.rest_utils import portal_get, send_notification, update_test_status, get_auth_token, \
     sync_all_tests_with_portal
@@ -76,7 +76,7 @@ def sync_tests_with_the_portal(app_obj):
                         if len(test_array) > 0 :
                             for test_new in test_array:
                                 test_obj = generate_test_object_from_json(test_new)
-                                update_test(test_obj)
+                                update(test_obj)
 
                             update_services_file()
 

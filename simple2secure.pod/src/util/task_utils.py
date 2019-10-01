@@ -5,8 +5,8 @@ import time
 import json
 
 from src.util.compare_utils import is_same_sequence_content
-from src.util.db_utils import update_insert_tests_to_db
 from src.util.file_utils import read_json_testfile
+from src.util.test_utils import update_insert_tests_to_db
 from src.util.util import create_secure_hash
 
 

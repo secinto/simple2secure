@@ -1,3 +1,5 @@
+import sys
+
 from src.util import rest_utils
 from src.util import json_utils
 from scanner import scanner
@@ -11,7 +13,7 @@ import time
 from src.util.task_utils import update_add_sequence_to_db
 from src.util.util import get_current_timestamp
 
-app = entrypoint('celery')
+app = entrypoint(sys.argv, 'celery')
 celery = create_celery_app(app)
 
 

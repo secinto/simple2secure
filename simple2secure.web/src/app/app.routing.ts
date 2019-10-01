@@ -21,33 +21,36 @@
  */
 
 import {Routes, RouterModule} from '@angular/router';
-import {HomeComponent} from './home/index';
-import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
-import {LoginLayoutComponent} from './_layouts/loginLayout/index';
-import {LoginComponent} from './login/index';
-import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
-import {ResetComponent} from './resetPassword/index';
-import {AnalysisComponent} from './analysis/index';
-import {RegisterComponent} from './register/index';
-import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user/index';
-import {NetworkReportDetailsComponent, NetworkReportOverviewComponent} from './network/index';
-import {AuthGuard} from './_guards/index';
-import {UpdatePasswordComponent} from './updatePassword';
-import {OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent} from './orbiter/index';
-import {EmailComponent, EmailOverviewComponent, EmailRuleOverviewComponent} from './email/index';
-import {SettingsComponent} from './settings/index';
-import {ActivationComponent, ActivatedComponent} from './activation/index';
-import {RuleOverviewComponent, RuleAddComponent} from './rule/index';
-import {UserGroupComponent} from './user/userGroup.component';
-import {RoleGuard} from './_guards/role.guard';
+import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
+import {LoginLayoutComponent} from './_layouts/loginLayout';
+import {AuthGuard, RoleGuard} from './_guards';
 import {UserRole} from './_models';
-import {OsQueryReportDetailsComponent, OsQueryReportOverviewComponent} from './osquery';
-import {ReportComponent, ReportOverviewComponent} from './report';
-import {UserInvitationComponent} from './invitation/userInvitation.component';
+import {HomeComponent} from './home';
+import {LoginComponent} from './login';
+import {SettingsComponent} from './settings';
+import {ResetComponent} from './resetPassword';
+import {UpdatePasswordComponent} from './updatePassword';
+import {UserInvitationComponent} from './invitation';
+import {RegisterComponent} from './register';
+import {ActivationComponent, ActivatedComponent} from './activation';
+import {AnalysisComponent} from './analysis';
+import {UserGroupComponent, UserComponent, UserDetailsComponent, UserOverviewComponent} from './user';
+import {EmailComponent, EmailOverviewComponent, EmailRuleOverviewComponent} from './email';
+import {RuleOverviewComponent} from './rule';
+import {OrbiterOverviewComponent,
+	OrbiterComponent,
+	OrbiterToolTestComponent,
+	OrbiterToolTestListComponent,
+	OrbiterToolTestSequenceListComponent,
+	OrbiterToolTestScheduledListComponent} from './orbiter';
+import {OsQueryReportDetailsComponent,
+	OsQueryReportOverviewComponent,
+	ReportComponent,
+	ReportOverviewComponent,
+	NetworkReportDetailsComponent,
+	NetworkReportOverviewComponent} from './report';
 import {TestResultComponent} from './report/testResult.component';
-import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
-import {SearchComponent} from './search/search.component';
-import {SearchResultComponent} from './search/searchResult.component';
+import {SearchComponent, SearchResultComponent} from './search';
 
 const appRoutes: Routes = [
 	{
@@ -85,6 +88,7 @@ const appRoutes: Routes = [
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
+					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
 				]
 			},
 			{

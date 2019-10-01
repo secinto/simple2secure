@@ -33,7 +33,7 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
-@RequestMapping("/api/sequence")
+@RequestMapping("/api/sequences")
 public class TestSequenceController {
 
 	private static Logger log = LoggerFactory.getLogger(TestSequenceController.class);
@@ -66,7 +66,9 @@ public class TestSequenceController {
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{podId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{podId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequence>> getAllSequences(@PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -86,7 +88,9 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/add",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @RequestHeader("Accept-Language") String locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
@@ -115,7 +119,9 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{sequenceId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/delete/{sequenceId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestSequence> deleteTest(@PathVariable("sequenceId") String sequenceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {

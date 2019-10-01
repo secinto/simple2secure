@@ -15,7 +15,7 @@ class PodInfo(db.Model):
 
 
 class Test(db.Model):
-    id = db.Column(db.Text, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     podId = db.Column(db.Text)
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
@@ -81,21 +81,19 @@ class TestSequenceResult(db.Model):
         self.time_stamp = time_stamp
 
 
-class CompanyLicensePod(db.Model):
+class CompanyLicensePublic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     groupId = db.Column(db.Text)
     licenseId = db.Column(db.Text)
     podId = db.Column(db.Text)
     hostname = db.Column(db.Text)
-    configuration = db.Column(db.Text)
     activated = db.Column(db.Boolean)
 
-    def __init__(self, group_id, license_id, pod_id, hostname, configuration):
+    def __init__(self, group_id, license_id, pod_id, hostname):
         self.groupId = group_id
         self.licenseId = license_id
         self.podId = pod_id
         self.hostname = hostname
-        self.configuration = configuration
         self.activated = False
 
     def as_dict(self):

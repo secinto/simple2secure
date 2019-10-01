@@ -4,30 +4,12 @@ from src.db.database_schema import TestSchema
 import json
 
 ALLOWED_EXTENSIONS = {'zip'}
-EXPIRATION_DATE = "expirationDate"
-GROUP_ID = "groupId"
-LICENSE_ID = "licenseId"
-SIGNATURE = "signature"
-LICENSE_FOLDER = 'static/license'
 
 
 def read_json_testfile():
     # Read test file and return it
     tests_file = open('services.json', 'r')
     return tests_file.read()
-
-
-def convert_tests():
-    converted_tests = []
-
-    tests = Test.query.all()
-
-    for test in tests:
-        test_schema = TestSchema()
-        output = test_schema.dump(test).data
-        converted_tests.append(output)
-
-    return json.dumps(converted_tests)
 
 
 def allowed_file(filename):

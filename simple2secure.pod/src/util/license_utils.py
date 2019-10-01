@@ -4,7 +4,7 @@ import secrets
 import socket
 import zipfile
 
-from src.db.database import CompanyLicensePod, PodInfo
+from src.db.database import CompanyLicensePublic, PodInfo
 from src.util.db_utils import update
 from src.util.file_utils import read_json_testfile
 
@@ -44,7 +44,7 @@ def get_license(app, check_for_new=False):
     if check_for_new:
         get_and_store_license(app)
     else:
-        stored_license = CompanyLicensePod.query.first()
+        stored_license = CompanyLicensePublic.query.first()
         if stored_license is not None and stored_license.licenseId != 'NO_ID':
             return stored_license
         else:
@@ -52,7 +52,6 @@ def get_license(app, check_for_new=False):
 
 
 def get_and_store_license(app):
-
     created_license = create_license(app)
     if created_license.licenseId != 'NO_ID':
         update(created_license)
@@ -70,10 +69,9 @@ def create_license(app):
         CompanyLicensePod: either a dummy object if no license is available or the correct object
     """
     license_file = get_license_file(app)
-    configuration = read_json_testfile()
 
     if license_file is None:
-        dummy_license_obj = CompanyLicensePod("NO_ID", "NO_ID", app.config['POD_ID'], HOSTNAME, configuration)
+        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", app.config['POD_ID'], HOSTNAME)
         return dummy_license_obj
     else:
         lines = license_file.split("\n")
@@ -87,8 +85,8 @@ def create_license(app):
                     app.config['LICENSE_ID'] = row[1].rstrip()
 
         if app.config['GROUP_ID'] and app.config['LICENSE_ID'] and app.config['POD_ID']:
-            license_obj = CompanyLicensePod(app.config['GROUP_ID'], app.config['LICENSE_ID'],
-                                            app.config['POD_ID'], HOSTNAME, configuration)
+            license_obj = CompanyLicensePublic(app.config['GROUP_ID'], app.config['LICENSE_ID'],
+                                            app.config['POD_ID'], HOSTNAME)
             return license_obj
 
 
@@ -102,7 +100,7 @@ def get_license_file(app):
     if len(files) == 1:
         file = files[0]
     else:
-        file = max(files, key=os.path.getctime)
+        file = min(files, key=os.path.getctime)
 
     if file is not None and os.path.exists(file):
         archive = zipfile.ZipFile(file, 'r')

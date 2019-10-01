@@ -2,7 +2,7 @@ import hashlib
 import json
 
 from src.db.database import PodInfo
-from src.util.db_utils import update_pod_info
+from src.util.db_utils import update
 
 
 def compare_hash_values(current_hash_string):
@@ -11,14 +11,14 @@ def compare_hash_values(current_hash_string):
     if pod_info is not None:
         if pod_info.hash_value_service is None:
             pod_info.hash_value_service = current_hash_string
-            update_pod_info(pod_info)
+            update(pod_info)
             return False
         else:
             if pod_info.hash_value_service == current_hash_string:
                 return True
             else:
                 pod_info.hash_value_service = current_hash_string
-                update_pod_info(pod_info)
+                update(pod_info)
                 return False
 
     return False

@@ -1,12 +1,12 @@
 from flask_marshmallow import Marshmallow
-from src.db.database import TestResult, Test, PodInfo, TestSequence, TestSequenceResult, CompanyLicensePod
+from src.db.database import TestResult, Test, PodInfo, TestSequence, TestSequenceResult
 
 ma = Marshmallow()
 
 
-class CompanyLicensePodSchema(ma.ModelSchema):
+class CompanyLicensePublicSchema(ma.ModelSchema):
     class Meta:
-        fields = ("groupId", "licenseId", "podId", "hostname", "configuration")
+        fields = ("groupId", "licenseId", "podId", "hostname")
 
 
 class TestResultSchema(ma.ModelSchema):
