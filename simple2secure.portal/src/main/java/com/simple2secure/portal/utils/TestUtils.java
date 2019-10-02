@@ -94,17 +94,14 @@ public class TestUtils {
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
 	 * the license which has been used for the activation.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
+	public TestResult saveTestResult(TestResult testResult, String locale) {
 		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
 			if (!Strings.isNullOrEmpty(testResult.getTestRunId())) {
 				testResult.setId(null);
 				testResultRepository.save(testResult);
-				return new ResponseEntity<>(testResult, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return testResult;
 	}
 
 	/**
@@ -115,11 +112,10 @@ public class TestUtils {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<TestResultDTO>> getTestResultByContextId(String contextId, String locale) {
+	public List<TestResultDTO> getTestResultByContextId(String contextId, String locale) {
+		List<TestResultDTO> results = new ArrayList<>();
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
 			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-			List<TestResultDTO> results = new ArrayList<>();
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
 
@@ -145,14 +141,9 @@ public class TestUtils {
 						}
 					}
 				}
-				if (results != null) {
-					return new ResponseEntity<>(results, HttpStatus.OK);
-				}
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return results;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

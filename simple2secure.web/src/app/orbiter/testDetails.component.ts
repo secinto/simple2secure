@@ -71,7 +71,7 @@ export class TestDetailsComponent{
 	public updateSaveTest() {
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test';
+		this.url = environment.apiEndpoint + 'test/save';
 		this.httpService.post(this.test, this.url).subscribe(
 			data => {
 				if (this.type === 'new') {

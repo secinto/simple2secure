@@ -57,38 +57,26 @@ def portal_get(url, app):
         return data_request
 
 
-def portal_post_celery(url, data, auth_token, app):
-    with app.app_context():
-        app.logger.info('Token before sending post request from (portal_post_celery): %s', app.config['AUTH_TOKEN'])
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                   'Authorization': "Bearer " + auth_token}
-        return requests.post(url, data=json.dumps(data.as_dict()), verify=False, headers=headers)
-
-
-def portal_post_test(url, data, app):
-    with app.app_context():
-        if not app.config['AUTH_TOKEN']:
-            app.config['AUTH_TOKEN'] = get_auth_token(app)
-
-        app.logger.info('Token before sending post request from (portal_post_test): %s', app.config['AUTH_TOKEN'])
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
-                                                                                                    app.config[
-                                                                                                        'AUTH_TOKEN']}
-        return requests.post(url, data=json.dumps(data), verify=False, headers=headers).text
-
-
-def portal_post_test_response(url, data, app):
+def portal_post(url, data, app):
     with app.app_context():
         if not app.config['AUTH_TOKEN']:
             app.config['AUTH_TOKEN'] = get_auth_token(app)
 
         app.logger.info('Token before sending post request from (portal_post_test_response): %s',
                         app.config['AUTH_TOKEN'])
-
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
                                                                                                     app.config[
                                                                                                         'AUTH_TOKEN']}
         return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+
+
+
+def portal_post_celery(url, data, auth_token, app):
+    with app.app_context():
+        app.logger.info('Token before sending post request from (portal_post_celery): %s', app.config['AUTH_TOKEN'])
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
+                   'Authorization': "Bearer " + auth_token}
+        return requests.post(url, data=json.dumps(data.as_dict()), verify=False, headers=headers)
 
 
 def send_notification(content, app, auth_token, pod_id):
@@ -124,7 +112,7 @@ def check_auth_token(app):
 
 
 def schedule_test_on_the_portal(test, app_obj, pod_id):
-    response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/scheduleTestPod/" + pod_id,
+    response = portal_post(app_obj.config['PORTAL_URL'] + "test/scheduleTestPod/" + pod_id,
                                          test, app_obj)
     return response
 
@@ -135,5 +123,5 @@ def sync_all_tests_with_portal(tests, app_obj):
     for test in tests:
         output = test_schema.dump(test)
         dumped_tests.append(output)
-    response = portal_post_test_response(app_obj.config['PORTAL_URL'] + "test/syncTests", dumped_tests, app_obj)
+    response = portal_post(app_obj.config['PORTAL_URL'] + "test/syncTests", dumped_tests, app_obj)
     return response

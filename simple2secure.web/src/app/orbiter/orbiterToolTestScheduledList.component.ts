@@ -141,7 +141,7 @@ export class OrbiterToolTestScheduledListComponent {
 
 	public deleteTestRun(testRun: TestRunDTO) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'test/delete/testrun/' + testRun.testRun.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'test/testrun/delete/' + testRun.testRun.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
