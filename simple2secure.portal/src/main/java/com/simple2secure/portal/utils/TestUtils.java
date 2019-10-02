@@ -146,6 +146,40 @@ public class TestUtils {
 		return results;
 	}
 
+	public Test synchronizeReceivedTests(Test test) {
+		Test returnTest = new Test();
+		Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+
+		if (currentPortalTest != null) {
+			boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
+					test.getLastChangedTimestamp());
+
+			returnTest = currentPortalTest;
+
+			if (isPortalTestOlder) {
+				currentPortalTest.setHash_value(test.getHash_value());
+				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+				currentPortalTest.setTest_content(test.getTest_content());
+				currentPortalTest.setActive(true);
+				testRepository.save(currentPortalTest);
+			}
+		} else {
+			currentPortalTest = new Test();
+			currentPortalTest.setHash_value(test.getHash_value());
+			currentPortalTest.setName(test.getName());
+			currentPortalTest.setPodId(test.getPodId());
+			currentPortalTest.setHostname(test.getHostname());
+			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+			currentPortalTest.setTest_content(test.getTest_content());
+			currentPortalTest.setActive(true);
+
+			testRepository.save(currentPortalTest);
+
+			returnTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+		}
+		return returnTest;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ResponseEntity<List<TestResultDTO>> getTestResultsByPodId(String podId, String locale) {
 		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {

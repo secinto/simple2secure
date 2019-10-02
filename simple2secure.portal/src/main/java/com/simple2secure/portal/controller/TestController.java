@@ -353,42 +353,6 @@ public class TestController {
 	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(locale) && test != null) {
-			if (!Strings.isNullOrEmpty(test.getPodId())) {
-				Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
-				Test returnTestValue = new Test();
-
-				if (currentPortalTest != null) {
-					boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
-							test.getLastChangedTimestamp());
-
-					returnTestValue = currentPortalTest;
-
-					if (isPortalTestOlder) {
-						currentPortalTest.setHash_value(test.getHash_value());
-						currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-						currentPortalTest.setTest_content(test.getTest_content());
-						currentPortalTest.setActive(true);
-						testRepository.update(currentPortalTest);
-					}
-				} else {
-					currentPortalTest = new Test();
-					currentPortalTest.setHash_value(test.getHash_value());
-					currentPortalTest.setName(test.getName());
-					currentPortalTest.setPodId(test.getPodId());
-					currentPortalTest.setHostname(test.getHostname());
-					currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-					currentPortalTest.setTest_content(test.getTest_content());
-					currentPortalTest.setActive(true);
-
-					testRepository.save(currentPortalTest);
-
-					returnTestValue = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
-				}
-				return new ResponseEntity<>(returnTestValue, HttpStatus.OK);
-			}
-		}
-
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -402,22 +366,17 @@ public class TestController {
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
-			List<Test> portalTests = testRepository.getByPodId(tests.get(0).getPodId());
-			List<Test> newTests = new ArrayList<>();
-			if (portalTests != null) {
-				List<String> podTestNames = testUtils.getTestNamesFromTestList(tests);
-
-				for (Test portalTest : portalTests) {
-					if (!podTestNames.contains(portalTest.getName())) {
-						newTests.add(portalTest);
-					}
+			String podId = "";
+			for (Test test : tests) {
+				testUtils.synchronizeReceivedTests(test);
+				if (Strings.isNullOrEmpty(podId)) {
+					podId = test.getPodId();
 				}
-
-				return new ResponseEntity<>(newTests, HttpStatus.OK);
 			}
-
+			List<Test> synchronizedTests = new ArrayList<>();
+			synchronizedTests = testRepository.getByPodId(podId);
+			return new ResponseEntity<>(synchronizedTests, HttpStatus.OK);
 		}
-
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
