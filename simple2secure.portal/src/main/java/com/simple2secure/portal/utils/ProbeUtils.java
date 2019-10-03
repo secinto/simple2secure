@@ -93,8 +93,8 @@ public class ProbeUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getProbeId())) {
-							Probe probe = new Probe(license.getProbeId(), group, license.isActivated());
+						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+							Probe probe = new Probe(license.getDeviceId(), group, license.isActivated());
 							myProbes.add(probe);
 						}
 					}
@@ -108,7 +108,7 @@ public class ProbeUtils {
 	public void deleteProbeDependencies(String probeId) {
 		if (!Strings.isNullOrEmpty(probeId)) {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
-			licenseRepository.deleteByProbeId(probeId);
+			licenseRepository.deleteByDeviceId(probeId);
 			log.debug("Deleted dependencies for probe id {}", probeId);
 		}
 

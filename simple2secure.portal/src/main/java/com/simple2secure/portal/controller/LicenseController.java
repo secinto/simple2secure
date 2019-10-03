@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -49,10 +49,8 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.LicensePlan;
-import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
-import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -66,6 +64,7 @@ import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
+import com.simple2secure.portal.utils.LicenseUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
@@ -119,6 +118,9 @@ public class LicenseController {
 	PortalUtils portalUtils;
 
 	@Autowired
+	LicenseUtils licenseUtils;
+
+	@Autowired
 	RestTemplate restTemplate;
 
 	// private Gson gson = new Gson();
@@ -131,7 +133,14 @@ public class LicenseController {
 		LicenseUtil.initialize(licenseFilePath, privateKeyPath, publicKeyPath);
 	}
 
+	/*
+	 * TODO: Check if it is enough to have only one token generated and if the current license structure and process is secure. Because anyone
+	 * with the license can activate a device and provide data. Thus, we need to verify that this is the best way to do so.
+	 */
+
 	/**
+	 * This function is used to activate POD or PROBE with the provided license. If it can be used to activate any additional device a new
+	 * access token is generated and returned to the device.
 	 *
 	 * @param groupId
 	 * @param licenseId
@@ -141,144 +150,51 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(
-			value = "/activatePod",
+			value = "/authenticate",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	public ResponseEntity<String> activatePod(@RequestBody CompanyLicensePublic licensePod, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (licensePod != null) {
-			String groupId = licensePod.getGroupId();
-			String licenseId = licensePod.getLicenseId();
-			String podId = licensePod.getPodId();
-			String hostname = licensePod.getHostname();
-			// String configuration = licensePod.getConfiguration();
-
-			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(podId)
-					&& !Strings.isNullOrEmpty(hostname)) {
-				CompanyGroup group = groupRepository.find(groupId);
-				CompanyLicensePrivate license = licenseRepository.findByLicenseIdAndPodId(licenseId, podId);
-
-				if (license == null) {
-					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
-					if (licenses != null && licenses.size() > 0) {
-						CompanyLicensePrivate tempLicense = licenses.get(0);
-						if (!Strings.isNullOrEmpty(tempLicense.getPodId())) {
-							license = tempLicense.copyLicense();
-						} else {
-							license = tempLicense;
-						}
-					}
-				}
-
-				if (group != null && license != null) {
-
-					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
-					String accessToken = tokenAuthenticationService.addPodAuthentication(podId, group, license);
-					if (!Strings.isNullOrEmpty(accessToken)) {
-
-						if (Strings.isNullOrEmpty(license.getPodId())) {
-							license.setPodId(podId);
-						}
-
-						license.setAccessToken(accessToken);
-						license.setActivated(true);
-						license.setHostname(licensePod.getHostname());
-						license.setLastOnlineTimestamp(System.currentTimeMillis());
-
-						licenseRepository.save(license);
-
-						// save pod configuration
-						// if (!Strings.isNullOrEmpty(configuration) && !configuration.equalsIgnoreCase("NONE")) {
-						//
-						// Test[] podTestList = gson.fromJson(configuration, Test[].class);
-						//
-						// if (podTestList != null && podTestList.length > 0) {
-						// for (Test podTest : podTestList) {
-						// if (podTest != null) {
-						// if (Strings.isNullOrEmpty(podTest.getPodId())) {
-						// podTest.setPodId(podId);
-						// podTest.setHostname(licensePod.getHostname());
-						// }
-						// testRepository.save(podTest);
-						// }
-						// }
-						// }
-						// }
-					}
-					return new ResponseEntity(accessToken, HttpStatus.OK);
-				}
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
-				HttpStatus.NOT_FOUND);
-
-	}
-
-	/**
-	 * This function is used to update the license in the mongodb and activate the probe when the license is imported for the first time
-	 *
-	 * @param groupId
-	 * @param licenseId
-	 * @param locale
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/activateProbe",
-			method = RequestMethod.POST,
-			consumes = "application/json")
-	public ResponseEntity<String> activateLicense(@RequestBody CompanyLicensePublic licensePublic,
+	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (licensePublic != null) {
 
-			String groupId = licensePublic.getGroupId();
-			String licenseId = licensePublic.getLicenseId();
-			String probeId = licensePublic.getProbeId();
-
-			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(probeId)) {
-				CompanyGroup group = groupRepository.find(groupId);
-				CompanyLicensePrivate license = licenseRepository.findByLicenseIdAndProbeId(licenseId, probeId);
-				if (license == null) {
-					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
-					if (licenses != null && licenses.size() > 0) {
-						CompanyLicensePrivate tempLicense = licenses.get(0);
-						if (!Strings.isNullOrEmpty(tempLicense.getProbeId())) {
-							license = tempLicense.copyLicense();
-						} else {
-							license = tempLicense;
-						}
-					}
-				}
-
-				if (group != null && license != null) {
-
-					license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
-					String accessToken = tokenAuthenticationService.addProbeAuthentication(probeId, group, license);
-
-					if (!Strings.isNullOrEmpty(accessToken)) {
-
-						license.setProbeId(probeId);
-						license.setAccessToken(accessToken);
-						license.setActivated(true);
-
-						licenseRepository.save(license);
-
-						return new ResponseEntity(accessToken, HttpStatus.OK);
-					}
-				}
+			boolean podAuthentication = false;
+			if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && licensePublic.isDevicePod()) {
+				podAuthentication = true;
+			} else if (Strings.isNullOrEmpty(licensePublic.getDeviceId()) && !licensePublic.isDevicePod()) {
+				podAuthentication = false;
+			} else {
+				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
+						HttpStatus.NOT_FOUND);
 			}
+			if (!licensePublic.isActivated()) {
+				licensePublic = licenseUtils.activateLicense(licensePublic, podAuthentication);
+			} else {
+				licensePublic = licenseUtils.checkToken(licensePublic, podAuthentication);
+			}
+
+			return new ResponseEntity(licensePublic, HttpStatus.OK);
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
 				HttpStatus.NOT_FOUND);
-
 	}
 
+	/**
+	 * Obtains the license for the provided group and user for the associated license plan. Returns the license contained in a ZIP file
+	 * together with the public key for verification of the signature. The ZIP is returned as byte array. It is used in the WEB to provide a
+	 * license download.
+	 *
+	 * @param groupId
+	 * @param userId
+	 * @param locale
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(
 			value = "/{groupId}/{userId}",
 			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
@@ -323,76 +239,5 @@ public class LicenseController {
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
 				HttpStatus.NOT_FOUND);
-	}
-
-	@RequestMapping(
-			value = "/{licenseId}/{groupId}/{probeId}",
-			method = RequestMethod.GET)
-	public ResponseEntity<Boolean> checkLicense(@PathVariable("licenseId") String licenseId, @PathVariable("groupId") String groupId,
-			@PathVariable("probeId") String probeId, @RequestHeader("Accept-Language") String locale) throws Exception {
-		CompanyLicensePrivate license = licenseRepository.find(licenseId);
-		if (license != null && license.isActivated()) {
-			if (license.getGroupId().equalsIgnoreCase(groupId) && license.getProbeId().equalsIgnoreCase(probeId)) {
-				return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
-			}
-		}
-		return new ResponseEntity<>(Boolean.FALSE, HttpStatus.OK);
-	}
-
-	@RequestMapping(
-			value = "/token",
-			method = RequestMethod.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CompanyLicensePublic> checkAccessToken(@RequestBody CompanyLicensePublic licensePublic,
-			@RequestHeader("Accept-Language") String locale) throws Exception {
-		if (!Strings.isNullOrEmpty(licensePublic.getAccessToken())) {
-			String accessToken = licensePublic.getAccessToken();
-			CompanyLicensePrivate licensePrivate = licenseRepository.findByProbeId(licensePublic.getProbeId());
-
-			if (licensePrivate != null) {
-				boolean isTokenValid = false;
-				isTokenValid = tokenAuthenticationService.validateToken(accessToken, licensePrivate.getTokenSecret());
-
-				if (isTokenValid) {
-					// Generate new access token if validity is smaller than the value defined in
-					// settings
-					List<Settings> settings = settingsRepository.findAll();
-					if (settings != null && settings.size() == 1) {
-						long tokenMinValidityTime = TimeUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeRestValidityTime(),
-								settings.get(0).getAccessTokenProbeRestValidityTimeUnit());
-						long tokenExpirationTime = tokenAuthenticationService.getTokenExpirationDate(accessToken, licensePrivate.getTokenSecret())
-								.getTime();
-
-						if (tokenExpirationTime - System.currentTimeMillis() <= tokenMinValidityTime) {
-							if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
-								CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
-								if (group != null) {
-									accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
-									licensePrivate.setAccessToken(accessToken);
-									licenseRepository.update(licensePrivate);
-								}
-							}
-						}
-					}
-					log.debug("Probe access token is still valid.");
-					return new ResponseEntity<>(licensePrivate.getPublicLicense(), HttpStatus.OK);
-				} else {
-					if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
-						CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
-						if (group != null) {
-							accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getProbeId(), group, licensePrivate);
-							licensePrivate.setAccessToken(accessToken);
-							licenseRepository.update(licensePrivate);
-							/*
-							 * IMPORANT: Always use getPublicLicense if sending data to the probe because only than the private sensitive data is cleared.
-							 * Using a normal cast wont.
-							 */
-							return new ResponseEntity<>(licensePrivate.getPublicLicense(), HttpStatus.OK);
-						}
-					}
-				}
-			}
-		}
-		return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 	}
 }

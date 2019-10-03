@@ -13,7 +13,7 @@ from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
 from src.util import db_utils
 from src.util.license_utils import get_license, get_pod
-from src.util.rest_utils import activate_pod, sync_all_tests_with_portal
+from src.util.rest_utils import authenticate_pod, sync_all_tests_with_portal, check_portal_alive
 from src.util.test_utils import get_tests
 from src.util.util import print_error_message, shutdown_server
 
@@ -74,6 +74,7 @@ def entrypoint(argv, mode='app'):
 
     if mode == 'app':
         logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+        check_portal_alive(app)
         get_pod(app)
         authenticate(app, activate)
         init_tests(app)
@@ -88,18 +89,19 @@ def authenticate(app, activate=False):
             if stored_license is not None and stored_license.licenseId != 'NO_ID':
                 app.config['LICENSE_ID'] = stored_license.licenseId
             else:
-                raise RuntimeError('License ZIP file not available from file system under static/license')
+                raise RuntimeError('NO license stored and no license ZIP file available from file system under '
+                                   'static/license')
 
             if activate or not stored_license.activated:
-                activate_pod(app)
+                authenticate_pod(app, stored_license)
                 stored_license.activated = True
                 db_utils.update(stored_license)
 
         except requests.exceptions.ConnectionError as ce:
             app.logger.error('Error occurred while activating the pod: %s', print_error_message())
-            app.config['CONNECTED_WITH_PORTAL'] = False
             raise RuntimeError('Activating pod on portal did not work: %s', ce)
         except RuntimeError as re:
+            app.config['CONNECTED_WITH_PORTAL'] = False
             app.logger.error('Error occurred while starting the pod: %s', re)
 
 
@@ -109,7 +111,7 @@ def init_tests(app):
             tests = get_tests(app)
             if tests is not None:
                 resp = sync_all_tests_with_portal(tests, app)
-                if resp.status_code == 200:
+                if resp is not None and resp.status_code == 200:
                     app.logger.info('Synchronized tests with portal successfully!')
                 else:
                     app.config['CONNECTED_WITH_PORTAL'] = False

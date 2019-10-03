@@ -1,27 +1,4 @@
-import hashlib
 import json
-
-from src.db.database import PodInfo
-from src.util.db_utils import update
-
-
-def compare_hash_values(current_hash_string):
-    pod_info = PodInfo.query.first()
-
-    if pod_info is not None:
-        if pod_info.hash_value_service is None:
-            pod_info.hash_value_service = current_hash_string
-            update(pod_info)
-            return False
-        else:
-            if pod_info.hash_value_service == current_hash_string:
-                return True
-            else:
-                pod_info.hash_value_service = current_hash_string
-                update(pod_info)
-                return False
-
-    return False
 
 
 def is_same_sequence_content(prov_seq_cont, db_seq_cont):

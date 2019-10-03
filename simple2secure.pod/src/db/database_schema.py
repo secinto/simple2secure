@@ -6,7 +6,7 @@ ma = Marshmallow()
 
 class CompanyLicensePublicSchema(ma.ModelSchema):
     class Meta:
-        fields = ("groupId", "licenseId", "podId", "hostname")
+        fields = ("groupId", "licenseId", "expirationDate", "deviceId", "hostname", "accessToken")
 
 
 class TestResultSchema(ma.ModelSchema):

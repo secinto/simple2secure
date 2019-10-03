@@ -135,7 +135,7 @@ public class PodController {
 			throws ItemNotFoundRepositoryException {
 
 		List<Test> test = testRepository.getByPodId(podId);
-		CompanyLicensePrivate podLicense = licenseRepository.findByPodId(podId);
+		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(podId);
 
 		if (podLicense != null) {
 			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
@@ -166,7 +166,7 @@ public class PodController {
 	@PreAuthorize("hasAnyAuthority('POD')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		CompanyLicensePrivate podLicense = licenseRepository.findByPodId(podId);
+		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(podId);
 
 		if (podLicense != null) {
 			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());

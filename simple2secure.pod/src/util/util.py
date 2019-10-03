@@ -24,6 +24,10 @@ def get_current_timestamp():
     return timestamp
 
 
+def get_date_from_string(date_string):
+    return datetime.strptime(date_string, '%m/%d/%Y').date()
+
+
 def generate_test_object(sync_test):
     sync_test_json = json.loads(sync_test)
     test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],

@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -50,11 +51,14 @@ public class ServiceController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
+	@Autowired
+	LoadedConfigItems loadedConfigItems;
+
 	@RequestMapping(
 			value = "",
 			method = RequestMethod.GET)
 	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
-		return new ResponseEntity<>(new Service("ProbeService", "0.1.0"), HttpStatus.OK);
+		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

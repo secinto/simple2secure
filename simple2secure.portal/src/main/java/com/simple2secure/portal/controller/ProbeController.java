@@ -93,7 +93,7 @@ public class ProbeController {
 
 		if (!Strings.isNullOrEmpty(probeId) && group != null) {
 			// retrieve license from database
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 			CompanyGroup dbGroup = groupRepository.find(group.getId());
 			if (license != null && dbGroup != null) {
 
@@ -124,7 +124,7 @@ public class ProbeController {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
 
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 
 			if (license != null) {
 				// delete All Probe dependencies

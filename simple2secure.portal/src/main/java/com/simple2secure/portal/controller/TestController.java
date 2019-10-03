@@ -308,7 +308,7 @@ public class TestController {
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (test != null && !Strings.isNullOrEmpty(podId)) {
-			CompanyLicensePrivate license = licenseRepository.findByPodId(podId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
 
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());

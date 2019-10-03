@@ -264,7 +264,7 @@ public class TokenAuthenticationService {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
 
 					if (isAccessTokenValid) {
-						if (!Strings.isNullOrEmpty(license.getPodId())) {
+						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 							return license != null
 									? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.POD.name()))
 									: null;

@@ -118,7 +118,7 @@ public class ProcessorController {
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {

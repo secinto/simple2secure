@@ -96,7 +96,7 @@ public class TestRunScheduler {
 
 				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
 
-					CompanyLicensePrivate license = licenseRepository.findByPodId(test.getPodId());
+					CompanyLicensePrivate license = licenseRepository.findByDeviceId(test.getPodId());
 
 					if (license != null) {
 

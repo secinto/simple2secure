@@ -31,15 +31,11 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract List<CompanyLicensePrivate> findByUserId(String userId);
 
-	public abstract CompanyLicensePrivate findByProbeId(String probeId);
-
-	public abstract CompanyLicensePrivate findByPodId(String podId);
+	public abstract CompanyLicensePrivate findByDeviceId(String deviceId);
 
 	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
 
-	public abstract CompanyLicensePrivate findByLicenseIdAndProbeId(String licenseId, String probeId);
-
-	public abstract CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId);
+	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String podId, boolean deviceIsPod);
 
 	public abstract CompanyLicensePrivate findByLicenseAndHostname(String licenseId, String hostname);
 
@@ -51,8 +47,6 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract void deleteByGroupId(String groupId);
 
-	public abstract void deleteByProbeId(String probeId);
-
-	public abstract void deleteByPodId(String podId);
+	public abstract void deleteByDeviceId(String probeId);
 
 }

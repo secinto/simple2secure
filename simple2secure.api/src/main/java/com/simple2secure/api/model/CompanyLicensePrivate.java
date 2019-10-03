@@ -25,7 +25,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "License")
+@Table(
+		name = "License")
 public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	/**
@@ -58,7 +59,7 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 	 * @return
 	 */
 	public CompanyLicensePublic getPublicLicense() {
-		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
+		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, deviceId);
 		publicLicense.setActivated(activated);
 		publicLicense.setAccessToken(accessToken);
 		return publicLicense;

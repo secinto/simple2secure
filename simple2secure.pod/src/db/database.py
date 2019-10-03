@@ -7,10 +7,12 @@ db = SQLAlchemy()
 class PodInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     generated_id = db.Column(db.Text)
+    access_token = db.Column(db.Text)
     hash_value_service = db.Column(db.Text)
 
-    def __init__(self, generated_id, hash_value_service):
+    def __init__(self, generated_id, access_token, hash_value_service):
         self.generated_id = generated_id
+        self.access_token = access_token
         self.hash_value_service = hash_value_service
 
 
@@ -85,16 +87,20 @@ class CompanyLicensePublic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     groupId = db.Column(db.Text)
     licenseId = db.Column(db.Text)
-    podId = db.Column(db.Text)
+    deviceId = db.Column(db.Text)
+    accessToken = db.Column(db.Text)
     hostname = db.Column(db.Text)
     activated = db.Column(db.Boolean)
+    expirationDate = db.Column(db.Date)
 
-    def __init__(self, group_id, license_id, pod_id, hostname):
+    def __init__(self, group_id, license_id, pod_id, expiration_date, hostname):
         self.groupId = group_id
         self.licenseId = license_id
-        self.podId = pod_id
+        self.deviceId = pod_id
+        self.expirationDate = expiration_date
         self.hostname = hostname
         self.activated = False
+        self.accessToken = ""
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -110,9 +110,9 @@ public class PodUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getPodId())) {
+						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 							String status = getPodStatus(license);
-							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), status);
+							Pod pod = new Pod(license.getDeviceId(), group, license.isActivated(), license.getHostname(), status);
 							myPods.add(pod);
 						}
 					}
@@ -139,9 +139,9 @@ public class PodUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getPodId())) {
+						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 							String podStatus = getPodStatus(license);
-							Pod pod = new Pod(license.getPodId(), group, license.isActivated(), license.getHostname(), podStatus);
+							Pod pod = new Pod(license.getDeviceId(), group, license.isActivated(), license.getHostname(), podStatus);
 							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
 							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(pod.getPodId());
 							PodDTO podDto = new PodDTO(pod, tests, test_sequences);
@@ -163,7 +163,7 @@ public class PodUtils {
 	public void deletePodDependencies(String podId) {
 		if (!Strings.isNullOrEmpty(podId)) {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
-			licenseRepository.deleteByPodId(podId);
+			licenseRepository.deleteByDeviceId(podId);
 			log.debug("Deleted dependencies for probe id {}", podId);
 		}
 	}

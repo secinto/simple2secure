@@ -22,7 +22,6 @@
 package com.simple2secure.api.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -39,18 +38,17 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String groupId;
 
-	protected String probeId;
-
-	protected String podId;
+	protected String deviceId;
 
 	protected String licenseId;
 
-	@Lob
 	protected String accessToken;
 
 	protected String expirationDate;
 
 	protected boolean activated = false;
+
+	protected boolean deviceIsPod = false;
 
 	protected String hostname;
 
@@ -71,9 +69,20 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.expirationDate = expirationDate;
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String probeId) {
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId) {
 		this(groupId, licenseId, expirationDate);
-		this.probeId = probeId;
+		this.deviceId = deviceId;
+	}
+
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, String hostname) {
+		this(groupId, licenseId, expirationDate, deviceId);
+		this.hostname = hostname;
+	}
+
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, String hostname,
+			String accessToken) {
+		this(groupId, licenseId, expirationDate, deviceId, hostname);
+		this.accessToken = accessToken;
 	}
 
 	public String getGroupId() {
@@ -84,20 +93,20 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.groupId = groupId;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
-	public String getPodId() {
-		return podId;
+	public boolean isDevicePod() {
+		return deviceIsPod;
 	}
 
-	public void setPodId(String podId) {
-		this.podId = podId;
+	public void setDevicePod(boolean deviceIsPod) {
+		this.deviceIsPod = deviceIsPod;
 	}
 
 	public String getLicenseId() {

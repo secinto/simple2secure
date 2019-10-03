@@ -35,7 +35,9 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 public class TestProbeAPIs extends TestAPIBase {
 
@@ -59,12 +61,12 @@ public class TestProbeAPIs extends TestAPIBase {
 	public void testDeleteProbeUserAuthenticated() {
 		// Create license object which should be deleted
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
+		license.setDeviceId("789");
 		license.setStatus(PodStatus.ONLINE);
 		licenseRepository.save(license);
 
 		// API call to delete the created license
-		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -74,7 +76,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		log.debug("Response {0}", response.toString());
 
 		// License should not exist in the database. NULL must be returned
-		license = licenseRepository.findByProbeId("789");
+		license = licenseRepository.findByDeviceId("789");
 		assertNull(license);
 	}
 
@@ -82,11 +84,11 @@ public class TestProbeAPIs extends TestAPIBase {
 	public void testDeleteProbeUserNotAuthenticated() {
 		// Create license object which should be deleted
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
+		license.setDeviceId("789");
 		licenseRepository.save(license);
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -123,12 +125,12 @@ public class TestProbeAPIs extends TestAPIBase {
 
 		// Create license object
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
+		license.setDeviceId("789");
 		license.setGroupId(oldGroupId.toString());
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -158,12 +160,12 @@ public class TestProbeAPIs extends TestAPIBase {
 
 		// Create license object
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
+		license.setDeviceId("789");
 		license.setGroupId(oldGroupId.toString());
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -180,12 +182,12 @@ public class TestProbeAPIs extends TestAPIBase {
 
 		// Create license object
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
-		license.setProbeId("789");
+		license.setDeviceId("789");
 		license.setGroupId("");
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getProbeId();
+		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 

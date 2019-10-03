@@ -1,3 +1,5 @@
+from email._header_value_parser import get_token
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
 
@@ -5,8 +7,7 @@ from src.db.database import TestResult, Test
 from src.db.database_schema import TestResultSchema, TestSchema
 from src.util.db_utils import update
 from src.util.file_utils import update_services_file
-from src.util.rest_utils import portal_get, send_notification, update_test_status, get_auth_token, \
-    sync_all_tests_with_portal
+from src.util.rest_utils import portal_get, send_notification, update_test_status, sync_all_tests_with_portal
 from src.util.util import generate_test_object_from_json
 
 
@@ -49,7 +50,7 @@ def get_test_results_from_db(app_obj, celery_task):
             output = test_result_schema.dump(test_result)
 
             if not app_obj.config['AUTH_TOKEN']:
-                app_obj.config['AUTH_TOKEN'] = get_auth_token(app_obj)
+                app_obj.config['AUTH_TOKEN'] = get_token(app_obj)
 
             celery_task.send_test_results.delay(output, app_obj.config['AUTH_TOKEN'], app_obj.config['PORTAL_URL'])
 
@@ -82,7 +83,3 @@ def sync_tests_with_the_portal(app_obj):
 
                     else:
                         print(sync_test.text)
-
-
-
-

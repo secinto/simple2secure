@@ -123,9 +123,9 @@ public class TestUtils {
 
 					if (licensesByGroup != null) {
 						for (CompanyLicensePrivate license : licensesByGroup) {
-							if (!Strings.isNullOrEmpty(license.getPodId())) {
+							if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 
-								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getPodId());
+								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getDeviceId());
 
 								if (testRunList != null) {
 									for (TestRun testRun : testRunList) {

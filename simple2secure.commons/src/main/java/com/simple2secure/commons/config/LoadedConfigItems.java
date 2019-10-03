@@ -42,6 +42,8 @@ public class LoadedConfigItems {
 
 	private String baseDockerContainer = "http://192.168.99.100:5000";
 
+	private String version = "0.2.0";
+
 	private String reportURL = "/config/reports.json";
 	private String stepsURL = "/config/steps.json";
 	private String configURL = "/config/config.json";
@@ -245,5 +247,9 @@ public class LoadedConfigItems {
 
 	public String getLicensePlanURL() {
 		return getBaseURL() + licensePlanURL;
+	}
+
+	public String getVersion() {
+		return version;
 	}
 }

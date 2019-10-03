@@ -166,9 +166,9 @@ public class GroupUtils {
 
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (!Strings.isNullOrEmpty(license.getProbeId())) {
-						reportRepository.deleteByProbeId(license.getProbeId());
-						networkReportRepository.deleteByProbeId(license.getProbeId());
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						reportRepository.deleteByProbeId(license.getDeviceId());
+						networkReportRepository.deleteByProbeId(license.getDeviceId());
 					}
 					licenseRepository.delete(license);
 				}
