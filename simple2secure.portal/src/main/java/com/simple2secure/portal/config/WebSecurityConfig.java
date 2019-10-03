@@ -59,7 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
 				"/api/user/sendResetPasswordEmail", "/api/user/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
-				"/api/download/**", "/api/device/**", "/api/license/authenticate", "/api/pod/config/**");
+				"/api/download/**", "/api/device/**", "/api/license/authenticate/**", "/api/pod/config/**");
 	}
 
 	// TODO - find better solution for antMatchers!
@@ -78,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/api/download/**").permitAll().and().authorizeRequests()
 			.antMatchers("/api/device/**").permitAll().and().authorizeRequests()
 			.antMatchers("/api/pod/config/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/license/authenticate").permitAll().and().authorizeRequests()
+			.antMatchers("/api/license/authenticate/**").permitAll().and().authorizeRequests()
 			// filter the login requests
 			.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 			// And filter other requests to check the presence of JWTth in header

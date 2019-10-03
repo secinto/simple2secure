@@ -130,8 +130,13 @@ def online_and_authenticated(app):
 
 
 def check_portal_alive(app):
-    response = portal_get(app.config['PORTAL_URL'] + "service", app, False)
-    if response.status_code == 200:
-        app.config['CONNECTED_WITH_PORTAL'] = True
-    else:
-        app.config['CONNECTED_WITH_PORTAL'] = False
+    try:
+        response = portal_get(app.config['PORTAL_URL'] + "service", app, False)
+        if response.status_code == 200:
+            app.config['CONNECTED_WITH_PORTAL'] = True
+        else:
+            app.config['CONNECTED_WITH_PORTAL'] = False
+
+    except requests.exceptions.ConnectionError as ce:
+        app.logger.error('Error occurred while checking the status of the portal: %s', ce)
+

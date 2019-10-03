@@ -74,7 +74,7 @@ def create_license(app):
     license_file = get_license_file(app)
 
     if license_file is None:
-        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", app.config['POD_ID'], HOSTNAME)
+        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", app.config['POD_ID'], datetime.datetime.now().date(), HOSTNAME)
         return dummy_license_obj
     else:
         lines = license_file.split("\n")
