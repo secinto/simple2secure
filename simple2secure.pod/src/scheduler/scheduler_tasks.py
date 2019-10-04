@@ -5,10 +5,8 @@ from flask import json
 
 from src.db.database import TestResult, Test
 from src.db.database_schema import TestResultSchema, TestSchema
-from src.util.db_utils import update
-from src.util.file_utils import update_services_file
-from src.util.rest_utils import portal_get, send_notification, update_test_status, sync_all_tests_with_portal
-from src.util.util import generate_test_object_from_json
+from src.util.rest_utils import portal_get, send_notification, update_test_status
+from src.util.test_utils import sync_tests
 
 
 def start_scheduler_tasks(app_obj, celery_tasks):
@@ -56,30 +54,4 @@ def get_test_results_from_db(app_obj, celery_task):
 
 
 def sync_tests_with_the_portal(app_obj):
-    test_schema = TestSchema()
-    with app_obj.app_context():
-        tests = Test.query.all()
-
-        if tests is not None:
-            new_tests = []
-            for test in tests:
-                output = test_schema.dump(test)
-                new_tests.append(output)
-
-            if new_tests is not None:
-
-                if len(new_tests) > 0:
-                    sync_test = sync_all_tests_with_portal(new_tests, app_obj)
-
-                    if sync_test.status_code == 200:
-                        test_array = json.loads(sync_test.text)
-
-                        if len(test_array) > 0 :
-                            for test_new in test_array:
-                                test_obj = generate_test_object_from_json(test_new)
-                                update(test_obj)
-
-                            update_services_file()
-
-                    else:
-                        print(sync_test.text)
+    return sync_tests(app_obj)

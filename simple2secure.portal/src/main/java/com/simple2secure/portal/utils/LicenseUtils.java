@@ -17,11 +17,13 @@ import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
+import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
 public class LicenseUtils {
@@ -42,6 +44,9 @@ public class LicenseUtils {
 	@Autowired
 	TokenAuthenticationService tokenAuthenticationService;
 
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
+
 	/**
 	 * Activates the provided license and creates a private license {@link CompanyLicensePrivate} and stores it in the database. If the
 	 * license has not been activated before, it creates a secret for this license otherwise just a new access token is created. Thus, it is
@@ -54,7 +59,11 @@ public class LicenseUtils {
 	 *          True if the activation is coming from a POD, otherwise false.
 	 * @return
 	 */
-	public CompanyLicensePublic activateLicense(CompanyLicensePublic licensePublic, boolean podActivation) {
+	public LicenseActivation activateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale) {
+		LicenseActivation activation = new LicenseActivation(false);
+
+		activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
+
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
 			String licenseId = licensePublic.getLicenseId();
@@ -113,26 +122,42 @@ public class LicenseUtils {
 						}
 
 						licenseRepository.save(license);
-
-						return license;
+						activation.setAccessToken(accessToken);
+						activation.setSuccess(true);
+						return activation;
 					}
+				} else {
+					activation.setMessage(messageByLocaleService.getMessage("specified_license_not_available", locale));
 				}
+			} else {
+				activation.setMessage(messageByLocaleService.getMessage("specified_license_not_available", locale));
 			}
 		}
-		return licensePublic;
+		return activation;
 	}
 
-	public CompanyLicensePublic checkToken(CompanyLicensePublic licensePublic, boolean checkForPod) throws ItemNotFoundRepositoryException {
+	public LicenseActivation checkToken(CompanyLicensePublic licensePublic, boolean checkForPod, String locale)
+			throws ItemNotFoundRepositoryException {
+		LicenseActivation activation = new LicenseActivation(false);
+
+		activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
+
 		if (!Strings.isNullOrEmpty(licensePublic.getAccessToken())) {
 			String accessToken = licensePublic.getAccessToken();
 			CompanyLicensePrivate licensePrivate = null;
 
 			String deviceId = licensePublic.getDeviceId();
+			String licenseId = licensePublic.getLicenseId();
+			String groupId = licensePublic.getGroupId();
 
-			if (checkForPod && !Strings.isNullOrEmpty(deviceId)) {
-				licensePrivate = licenseRepository.findByDeviceId(deviceId);
+			if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(groupId)) {
+				licensePrivate = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId, checkForPod);
+				if (licensePrivate == null) {
+					return activateLicense(licensePublic, checkForPod, locale);
+				}
 			} else {
-				return null;
+				activation.setMessage(messageByLocaleService.getMessage("activation_parameter_missing", locale));
+				return activation;
 			}
 
 			if (!Strings.isNullOrEmpty(accessToken)) {
@@ -151,47 +176,68 @@ public class LicenseUtils {
 
 						if (tokenExpirationTime - System.currentTimeMillis() <= tokenMinValidityTime) {
 							if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
-								CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
+								CompanyGroup group = groupRepository.find(groupId);
+
 								if (checkForPod) {
-									accessToken = tokenAuthenticationService.addPodAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+									accessToken = tokenAuthenticationService.addPodAuthentication(deviceId, group, licensePrivate);
 								} else {
-									accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+									accessToken = tokenAuthenticationService.addProbeAuthentication(deviceId, group, licensePrivate);
 								}
 								licensePrivate.setAccessToken(accessToken);
 								licenseRepository.update(licensePrivate);
+
+								log.debug("Access token is still valid.");
+
+								activation.setAccessToken(accessToken);
+
+							} else {
+								activation.setMessage(messageByLocaleService.getMessage("license_already_expired", locale));
+								return activation;
 							}
 						}
+						activation.setSuccess(true);
+						return activation;
+
 					}
-				}
-				log.debug("Access token is still valid.");
-				return licensePrivate.getPublicLicense();
-			} else {
-				log.debug("Access token is not valid anymore, trying to create a new one");
+				} else {
+					log.debug("Access token is not valid anymore, trying to create a new one");
 
-				if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
-					log.debug("License is still valid, creating a new access token");
+					if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
+						log.debug("License is still valid, creating a new access token");
 
-					CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
+						CompanyGroup group = groupRepository.find(licensePrivate.getGroupId());
 
-					if (group != null) {
+						if (group != null) {
 
-						if (checkForPod) {
-							accessToken = tokenAuthenticationService.addPodAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+							if (checkForPod) {
+								accessToken = tokenAuthenticationService.addPodAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+							} else {
+								accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+							}
+
+							licensePrivate.setAccessToken(accessToken);
+							licenseRepository.save(licensePrivate);
+							/*
+							 * IMPORANT: Always use getPublicLicense if sending data to the PROBE or POD because only than the private sensitive data is
+							 * cleared. Using a normal cast wont.
+							 */
+							activation.setSuccess(true);
+							activation.setAccessToken(accessToken);
+
+							return activation;
 						} else {
-							accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
+							activation.setMessage(messageByLocaleService.getMessage("provided_group_not_found", locale));
+							return activation;
 						}
-
-						licensePrivate.setAccessToken(accessToken);
-						licenseRepository.save(licensePrivate);
-						/*
-						 * IMPORANT: Always use getPublicLicense if sending data to the PROBE or POD because only than the private sensitive data is
-						 * cleared. Using a normal cast wont.
-						 */
-						return licensePrivate.getPublicLicense();
+					} else {
+						activation.setMessage(messageByLocaleService.getMessage("license_already_expired", locale));
+						return activation;
 					}
 				}
+			} else {
+				return activateLicense(licensePublic, checkForPod, locale);
 			}
 		}
-		return null;
+		return activation;
 	}
 }

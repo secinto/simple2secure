@@ -92,7 +92,7 @@ public class LicenseController {
 			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
 				if (license.isActivated()) {
 					ProbeConfiguration.isLicenseValid = true;
-					ProbeConfiguration.probeId = license.getProbeId();
+					ProbeConfiguration.probeId = license.getDeviceId();
 					ProbeConfiguration.groupId = license.getGroupId();
 					ProbeConfiguration.authKey = license.getAccessToken();
 					return StartConditions.LICENSE_VALID;
@@ -172,7 +172,7 @@ public class LicenseController {
 				activateLicenseInDB(authToken, license);
 
 				ProbeConfiguration.authKey = authToken;
-				ProbeConfiguration.probeId = license.getProbeId();
+				ProbeConfiguration.probeId = license.getDeviceId();
 				ProbeConfiguration.groupId = license.getGroupId();
 				ProbeConfiguration.setAPIAvailablitity(true);
 				log.info("License successfully activated and AuthToken obtained");
@@ -232,9 +232,9 @@ public class LicenseController {
 		 * a new CompanyLisnecePublic object from it.
 		 */
 		if (storedLicense != null) {
-			if (Strings.isNullOrEmpty(storedLicense.getProbeId())) {
+			if (Strings.isNullOrEmpty(storedLicense.getDeviceId())) {
 				probeId = UUID.randomUUID().toString();
-				storedLicense.setProbeId(probeId);
+				storedLicense.setDeviceId(probeId);
 			}
 			storedLicense.setGroupId(groupId);
 			storedLicense.setLicenseId(licenseId);

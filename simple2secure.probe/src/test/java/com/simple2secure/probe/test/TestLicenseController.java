@@ -70,7 +70,7 @@ public class TestLicenseController {
 		licenseFrDB = licenseController.loadLicenseFromDB();
 
 		assertEquals(compLicense.getLicenseId(), licenseFrDB.getLicenseId());
-		assertEquals(compLicense.getProbeId(), licenseFrDB.getProbeId());
+		assertEquals(compLicense.getDeviceId(), licenseFrDB.getDeviceId());
 		assertEquals(compLicense.getGroupId(), licenseFrDB.getGroupId());
 		assertEquals(compLicense.getExpirationDate(), licenseFrDB.getExpirationDate());
 	}

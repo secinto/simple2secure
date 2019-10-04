@@ -27,7 +27,6 @@ def get_current_timestamp():
 def get_date_from_string(date_string):
     return datetime.strptime(date_string, '%m/%d/%Y').date()
 
-
 def generate_test_object(sync_test):
     sync_test_json = json.loads(sync_test)
     test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
@@ -36,11 +35,13 @@ def generate_test_object(sync_test):
     return test
 
 
-def generate_test_object_from_json(sync_test_json):
-    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
-                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
-    test.id = sync_test_json["id"]
-    return test
+def generate_test_object_from_json(sync_test_json, existing_test):
+    existing_test.name = sync_test_json["name"]
+    existing_test.test_content = sync_test_json["test_content"]
+    existing_test.podId = sync_test_json["podId"]
+    existing_test.hash_value = sync_test_json["hash_value"]
+    existing_test.lastChangedTimestamp = sync_test_json["lastChangedTimestamp"]
+    return existing_test
 
 
 def print_error_message():

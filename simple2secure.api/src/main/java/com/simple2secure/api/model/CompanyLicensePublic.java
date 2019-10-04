@@ -24,6 +24,7 @@ package com.simple2secure.api.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
@@ -46,8 +47,10 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String expirationDate;
 
+	@JsonProperty
 	protected boolean activated = false;
 
+	@JsonProperty
 	protected boolean deviceIsPod = false;
 
 	protected String hostname;

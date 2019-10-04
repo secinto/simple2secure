@@ -146,7 +146,7 @@ public class TestUtils {
 		return results;
 	}
 
-	public Test synchronizeReceivedTests(Test test) {
+	public Test synchronizeReceivedTest(Test test) {
 		Test returnTest = new Test();
 		Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
 

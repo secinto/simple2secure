@@ -53,6 +53,7 @@ import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
@@ -167,13 +168,23 @@ public class LicenseController {
 				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
 						HttpStatus.NOT_FOUND);
 			}
-			if (!licensePublic.isActivated()) {
-				licensePublic = licenseUtils.activateLicense(licensePublic, podAuthentication);
-			} else {
-				licensePublic = licenseUtils.checkToken(licensePublic, podAuthentication);
-			}
+			LicenseActivation activation = null;
 
-			return new ResponseEntity(licensePublic, HttpStatus.OK);
+			if (!licensePublic.isActivated()) {
+				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale);
+			} else {
+				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale);
+			}
+			if (activation.isSuccess()) {
+				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
+				if (licensePrivate != null) {
+					licensePublic = licensePrivate.getPublicLicense();
+				}
+
+				return new ResponseEntity(licensePublic, HttpStatus.OK);
+			} else {
+				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
+			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
 				HttpStatus.NOT_FOUND);

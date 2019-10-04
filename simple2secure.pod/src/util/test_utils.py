@@ -1,11 +1,14 @@
 import json
 import time
 
+import requests
+
 from src.db.database import Test
 from src.db.database_schema import TestSchema
 from src.util.db_utils import update
-from src.util.file_utils import read_json_testfile
-from src.util.util import create_secure_hash
+from src.util.file_utils import read_json_testfile, update_services_file
+from src.util.rest_utils import sync_test_with_portal
+from src.util.util import create_secure_hash, generate_test_object_from_json
 
 
 def get_tests(app):
@@ -45,7 +48,37 @@ def update_insert_tests_to_db(tests, app_obj):
                 db_test.lastChangedTimestamp = current_milli_time
                 update(db_test)
 
-        # TODO: Synchronizing with portal needs to be performed but should be done as scheduled task
+
+def sync_tests(app):
+    with app.app_context():
+        try:
+            tests = get_tests(app)
+            if tests is not None:
+                sync_ok = False
+
+                for test in tests:
+                    resp = sync_test_with_portal(test, app)
+                    if resp is not None and resp.status_code == 200:
+                        synchronized_test = json.loads(resp.text)
+                        if synchronized_test is not None:
+                            test_obj = generate_test_object_from_json(synchronized_test, test)
+                            update(test_obj)
+                            sync_ok = True
+                    else:
+                        sync_ok = False
+                        if resp is not None:
+                            app.logger.info('Failed to synchronize test %s with portal. %s', test.name, resp.text)
+                        else:
+                            app.logger.info('Failed to synchronize test %s with portal.', test.name)
+
+                if sync_ok:
+                    update_services_file()
+                    app.logger.info('Synchronized tests with portal successfully!')
+
+        except requests.exceptions.ConnectionError as ce:
+            app.logger.error('Error occurred while activating the pod: %s', ce)
+        except RuntimeError as re:
+            app.logger.error('Error occurred while synchronizing tests with portal: %s', re)
 
 
 def convert_tests():

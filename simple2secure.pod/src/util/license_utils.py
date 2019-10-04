@@ -45,7 +45,7 @@ def create_pod(app):
 
 def get_license(app, check_for_new=False):
     if check_for_new:
-        get_and_store_license(app)
+        return get_and_store_license(app, check_for_new)
     else:
         stored_license = CompanyLicensePublic.query.first()
         if stored_license is not None and stored_license.licenseId != 'NO_ID':
@@ -54,8 +54,13 @@ def get_license(app, check_for_new=False):
             return get_and_store_license(app)
 
 
-def get_and_store_license(app):
+def get_and_store_license(app, check_for_new=False):
     created_license = create_license(app)
+    if check_for_new:
+        stored_license = CompanyLicensePublic.query.first()
+        if stored_license is not None and stored_license.licenseId == created_license.licenseId:
+            return stored_license
+
     if created_license.licenseId != 'NO_ID':
         update(created_license)
     return created_license
@@ -107,7 +112,7 @@ def get_license_file(app):
     if len(files) == 1:
         file = files[0]
     elif len(files) > 1:
-        file = min(files, key=os.path.getctime)
+        file = max(files, key=os.path.getctime)
 
     if file is not None and os.path.exists(file):
         archive = zipfile.ZipFile(file, 'r')

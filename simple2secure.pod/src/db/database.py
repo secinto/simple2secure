@@ -1,3 +1,5 @@
+import json
+
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 
@@ -92,6 +94,7 @@ class CompanyLicensePublic(db.Model):
     hostname = db.Column(db.Text)
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
+    deviceIsPod = db.Column(db.Boolean)
 
     def __init__(self, group_id, license_id, pod_id, expiration_date, hostname):
         self.groupId = group_id
@@ -101,6 +104,7 @@ class CompanyLicensePublic(db.Model):
         self.hostname = hostname
         self.activated = False
         self.accessToken = ""
+        self.deviceIsPod = True
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -134,6 +138,11 @@ class NotificationDTO:
     def __init__(self, notification, testRunDTO):
         self.notification = notification
         self.testRunDTO = testRunDTO
+
+
+class ResponseError:
+    def __init__(self, errorMessage):
+        self.errorMessage = errorMessage
 
 
 class TestStatus(Enum):

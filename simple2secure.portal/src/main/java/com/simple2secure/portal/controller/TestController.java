@@ -368,7 +368,7 @@ public class TestController {
 		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
 			String podId = "";
 			for (Test test : tests) {
-				testUtils.synchronizeReceivedTests(test);
+				testUtils.synchronizeReceivedTest(test);
 				if (Strings.isNullOrEmpty(podId)) {
 					podId = test.getPodId();
 				}
@@ -376,6 +376,22 @@ public class TestController {
 			List<Test> synchronizedTests = new ArrayList<>();
 			synchronizedTests = testRepository.getByPodId(podId);
 			return new ResponseEntity<>(synchronizedTests, HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/syncTest",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('POD')")
+	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(locale) && test != null) {
+			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
+			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);

@@ -13,8 +13,8 @@ from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
 from src.util import db_utils
 from src.util.license_utils import get_license, get_pod
-from src.util.rest_utils import authenticate_pod, sync_all_tests_with_portal, check_portal_alive
-from src.util.test_utils import get_tests
+from src.util.rest_utils import authenticate_pod, check_portal_alive
+from src.util.test_utils import get_tests, sync_tests
 from src.util.util import print_error_message, shutdown_server
 
 
@@ -85,7 +85,7 @@ def entrypoint(argv, mode='app'):
 def authenticate(app, activate=False):
     with app.app_context():
         try:
-            stored_license = get_license(app)
+            stored_license = get_license(app, True)
             if stored_license is not None and stored_license.licenseId != 'NO_ID':
                 app.config['LICENSE_ID'] = stored_license.licenseId
             else:
@@ -94,8 +94,6 @@ def authenticate(app, activate=False):
 
             if activate or not stored_license.activated:
                 authenticate_pod(app, stored_license)
-                stored_license.activated = True
-                db_utils.update(stored_license)
 
         except requests.exceptions.ConnectionError as ce:
             app.logger.error('Error occurred while activating the pod: %s', print_error_message())
@@ -106,16 +104,4 @@ def authenticate(app, activate=False):
 
 
 def init_tests(app):
-    with app.app_context():
-        try:
-            tests = get_tests(app)
-            if tests is not None:
-                resp = sync_all_tests_with_portal(tests, app)
-                if resp is not None and resp.status_code == 200:
-                    app.logger.info('Synchronized tests with portal successfully!')
-                else:
-                    app.config['CONNECTED_WITH_PORTAL'] = False
-                    app.logger.info('Failed to synchronize tests with portal. %s', resp)
-
-        except RuntimeError as re:
-            app.logger.error('Error occurred while initializing tests: %s', re)
+    sync_tests(app)
