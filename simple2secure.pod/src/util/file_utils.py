@@ -114,20 +114,20 @@ def update_insert_tests_to_db(tests, app_obj):
         if db_test is None:
             current_test = Test(test["name"], json.dumps(test), test_hash,
                                 current_milli_time, app_obj.config['POD_ID'])
-            output = test_schema.dump(current_test)
+            output = test_schema.dump(current_test).data
             sync_test = sync_test_with_portal(output, app_obj)
             test_obj = generate_test_object(sync_test)
             db.session.add(test_obj)
             db.session.commit()
 
         else:
-            output = test_schema.dump(db_test)
+            output = test_schema.dump(db_test).data
             if not db_test.hash_value == test_hash:
                 db_test.test_content = json.dumps(test)
                 db_test.hash_value = test_hash
                 db_test.lastChangedTimestamp = current_milli_time
 
-            output = test_schema.dump(db_test)
+            output = test_schema.dump(db_test).data
             sync_test = sync_test_with_portal(output, app_obj)
             test_obj = generate_test_object(sync_test)
             db_test.test_content = test_obj.test_content
