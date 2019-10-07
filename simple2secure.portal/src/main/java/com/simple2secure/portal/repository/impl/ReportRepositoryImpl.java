@@ -48,7 +48,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public void deleteByProbeId(String probeId) {
+	public void deleteByDeviceId(String probeId) {
 		List<Report> reports = getReportsByProbeId(probeId);
 
 		if (reports != null) {

@@ -31,6 +31,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['orbiter.css'],
 	templateUrl: 'orbiterToolTest.component.html'
 })
 
@@ -39,7 +40,7 @@ export class OrbiterToolTestComponent {
 	selectedPod: PodDTO;
 	pods: PodDTO[];
 	context: ContextDTO;
-	displayedColumns = ['podId', 'pod', 'group', 'status', 'action'];
+	displayedColumns: string[] = ['podId', 'pod', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;

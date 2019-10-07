@@ -116,7 +116,7 @@ public class LicenseUtils {
 						license.setAccessToken(accessToken);
 						license.setHostname(hostname);
 						license.setLastOnlineTimestamp(System.currentTimeMillis());
-
+						license.setDevicePod(podActivation);
 						if (!license.isActivated()) {
 							license.setActivated(true);
 						}

@@ -28,11 +28,11 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class NetworkReportRepository extends MongoRepository<NetworkReport> {
 
-	public abstract List<NetworkReport> getReportsByProbeId(String probeId);
+	public abstract List<NetworkReport> getReportsByDeviceId(String deviceId);
 
 	public abstract List<NetworkReport> getReportsByGroupId(String groupId);
 
-	public abstract void deleteByProbeId(String probeId);
+	public abstract void deleteByDeviceId(String deviceId);
 
 	public abstract List<NetworkReport> getReportsByName(String name);
 

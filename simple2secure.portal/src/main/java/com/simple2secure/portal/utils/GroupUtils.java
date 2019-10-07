@@ -162,13 +162,13 @@ public class GroupUtils {
 		// if this flag is set all group dependencies will be deleted
 		if (deleteAll) {
 			// Delete all licenses and all probe reports which were created
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(groupId);
+			List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(groupId);
 
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						reportRepository.deleteByProbeId(license.getDeviceId());
-						networkReportRepository.deleteByProbeId(license.getDeviceId());
+						reportRepository.deleteByDeviceId(license.getDeviceId());
+						networkReportRepository.deleteByDeviceId(license.getDeviceId());
 					}
 					licenseRepository.delete(license);
 				}

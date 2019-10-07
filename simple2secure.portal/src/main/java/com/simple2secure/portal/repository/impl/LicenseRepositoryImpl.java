@@ -24,8 +24,14 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByGroupId(String groupId) {
+	public List<CompanyLicensePrivate> findAllByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
+		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public List<CompanyLicensePrivate> findByGroupIdAndDeviceType(String groupId, boolean deviceIsPod) {
+		Query query = new Query(Criteria.where("groupId").is(groupId).and("deviceIsPod").is(deviceIsPod));
 		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 	}
 
@@ -37,7 +43,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 
 	@Override
 	public CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId, boolean deviceIsPod) {
-		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("probeId").is(deviceId).and("deviceIsPod").is(deviceIsPod));
+		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("deviceId").is(deviceId).and("deviceIsPod").is(deviceIsPod));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 
@@ -67,7 +73,8 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 
 	@Override
 	public void deleteByGroupId(String groupId) {
-		List<CompanyLicensePrivate> licenses = findByGroupId(groupId);
+		Query query = new Query(Criteria.where("groupId").is(groupId));
+		List<CompanyLicensePrivate> licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 
 		if (licenses != null) {
 			for (CompanyLicensePrivate license : licenses) {

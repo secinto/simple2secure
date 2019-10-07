@@ -41,6 +41,7 @@ import {UserInfo} from '../_models/userInfo';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['user.pod.css'],
 	templateUrl: 'userOverview.component.html',
 	selector: 'userOverviewComponent'
 })

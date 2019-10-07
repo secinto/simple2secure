@@ -224,7 +224,7 @@ public class LicenseController {
 					/*
 					 * TODO: Generates a new license for each request. Should not be the case
 					 */
-					List<CompanyLicensePrivate> companyLicenses = licenseRepository.findByGroupId(groupId);
+					List<CompanyLicensePrivate> companyLicenses = licenseRepository.findAllByGroupId(groupId);
 					String licenseId = LicenseUtil.generateLicenseId();
 					CompanyLicensePrivate companyLicense = new CompanyLicensePrivate(groupId, licenseId, expirationDate, false);
 

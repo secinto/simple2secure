@@ -139,11 +139,11 @@ public class TestProbeAPIs extends TestAPIBase {
 		assertEquals(200, response.getStatusCodeValue());
 
 		// There should be no licenses with the old groupId in the database
-		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(oldGroupId.toString());
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(oldGroupId.toString(), false);
 		assertTrue(licenses.isEmpty());
 
 		// There should be one license with the new groupId in the database
-		licenses = licenseRepository.findByGroupId(newGroupId.toString());
+		licenses = licenseRepository.findByGroupIdAndDeviceType(newGroupId.toString(), false);
 		assertFalse(licenses.isEmpty());
 	}
 

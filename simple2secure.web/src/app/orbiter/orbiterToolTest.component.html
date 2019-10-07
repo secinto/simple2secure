@@ -4,7 +4,14 @@
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
     </div>
-    <mat-table #table [dataSource]="dataSource" matSort>
+    <mat-table [dataSource]="dataSource" matSort>
+
+        <!-- PodId Column -->
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.podId}}</mat-cell>
+        </ng-container>
 
         <!-- Pod Hostname Column -->
         <ng-container matColumnDef="pod">
@@ -12,21 +19,14 @@
             <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Status Column -->
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="podId">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.podId}}</mat-cell>
-        </ng-container>        
-        
-        <!-- Name Column -->
+        <!-- Group Column -->
         <ng-container matColumnDef="group">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
             </mat-header-cell>

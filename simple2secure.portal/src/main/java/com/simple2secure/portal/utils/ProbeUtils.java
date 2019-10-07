@@ -89,7 +89,7 @@ public class ProbeUtils {
 		List<Probe> myProbes = new ArrayList<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		for (CompanyGroup group : assignedGroups) {
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupId(group.getId());
+			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(group.getId(), false);
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {

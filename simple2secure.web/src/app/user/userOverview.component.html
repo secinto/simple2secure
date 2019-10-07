@@ -393,7 +393,7 @@
                         <input matInput (keyup)="applyFilterPod($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortPod="matSort" #table [dataSource]="podDataSource" matSort>
+                <mat-table #sortPod="matSort" [dataSource]="podDataSource" matSort>
 
                     <ng-container matColumnDef="pod">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}

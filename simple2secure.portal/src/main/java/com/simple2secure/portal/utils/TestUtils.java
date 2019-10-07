@@ -119,7 +119,7 @@ public class TestUtils {
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
 
-					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupId(group.getId());
+					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
 
 					if (licensesByGroup != null) {
 						for (CompanyLicensePrivate license : licensesByGroup) {

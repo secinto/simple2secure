@@ -27,7 +27,9 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class LicenseRepository extends MongoRepository<CompanyLicensePrivate> {
-	public abstract List<CompanyLicensePrivate> findByGroupId(String groupId);
+	public abstract List<CompanyLicensePrivate> findAllByGroupId(String groupId);
+
+	public abstract List<CompanyLicensePrivate> findByGroupIdAndDeviceType(String groupId, boolean deviceIsPod);
 
 	public abstract List<CompanyLicensePrivate> findByUserId(String userId);
 
