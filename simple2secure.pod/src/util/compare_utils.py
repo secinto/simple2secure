@@ -1,4 +1,7 @@
 import json
+import logging
+
+log = logging.getLogger('pod.util.compare_utils')
 
 
 def is_same_sequence_content(prov_seq_cont, db_seq_cont):

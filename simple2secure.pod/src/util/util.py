@@ -1,3 +1,6 @@
+import getopt
+import logging
+import sys
 from datetime import datetime
 import hashlib
 import json
@@ -28,23 +31,31 @@ def get_date_from_string(date_string):
     return datetime.strptime(date_string, '%m/%d/%Y').date()
 
 
-def check_command_params(argv):
-    argumentsList = argv[1:]
+def check_command_params(argv, app):
+    with app.app_context():
+        argumentsList = argv[1:]
 
-    try:
-        opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
-    except getopt.GetoptError:
-        print('app.py -a <True/False>')
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt == '-h':
+        try:
+            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+        except getopt.GetoptError:
             print('app.py -a <True/False>')
-            sys.exit()
-        elif opt in ("-a", "-activate"):
-            return True
+            sys.exit(2)
 
-    return False
+        for opt, arg in opts:
+            if opt == '-h':
+                print('app.py -a <True/False>')
+                sys.exit()
+            elif opt in ("-a", "-activate"):
+                app.config['ACTIVATE_LICENSE'] = True
+
+
+def init_logger(app):
+    with app.app_context():
+        logging.basicConfig(filename=app.config['LOG_FILE'],
+                            level=logging.getLevelName(app.config['LOG_LEVEL_NAME']),
+                            format=app.config['LOG_FORMAT'])
+
+        logging.getLogger().addHandler(logging.StreamHandler())
 
 
 def generate_test_object(sync_test):
@@ -65,14 +76,14 @@ def generate_test_object_from_json(sync_test_json, existing_test):
 
 
 def print_error_message():
-    return "----------------------------------------------\n" \
-           "----------------------------------------------\n" \
-           "--                                          --\n" \
-           "--!!!Error occured - portal not reachable!!!--\n" \
-           "--                                          --\n" \
-           "--********POD HAS NOT BEEN ACTIVATED********--\n" \
-           "----------------------------------------------" \
-           "----------------------------------------------"
+    return "-----------------------------------------------\n" \
+           "-----------------------------------------------\n" \
+           "--                                           --\n" \
+           "--!!!Error occurred - portal not reachable!!!--\n" \
+           "--                                           --\n" \
+           "--*********POD HAS NOT BEEN ACTIVATED********--\n" \
+           "-----------------------------------------------" \
+           "-----------------------------------------------"
 
 
 def print_success_message_auth(app):
@@ -82,18 +93,16 @@ def print_success_message_auth(app):
               "--       Extracting the pod license         --\n" \
               "----------------------------------------------\n" \
               "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
-                                                                    "-- * Pod Group Id : " + app.config[
-                  'GROUP_ID'] + "\n" \
-                                "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
-                                                                          "----------------------------------------------\n" \
-                                                                          "----------------------------------------------\n" \
-                                                                          "--          ACTIVATING THE LICENSE          --\n" \
-                                                                          "----------------------------------------------\n" \
-                                                                          "-- * Auth Token : " + app.config[
-                  'AUTH_TOKEN'] + "\n" \
-                                  "----------------------------------------------\n" \
-                                  "----------------------------------------------\n" \
-                                  "---------------INITIALIZATION END-------------\n" \
-                                  "----------------------------------------------\n"
+              "-- * Pod Group Id : " + app.config['GROUP_ID'] + "\n" \
+              "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
+              "----------------------------------------------\n" \
+              "----------------------------------------------\n" \
+              "--          ACTIVATING THE LICENSE          --\n" \
+              "----------------------------------------------\n" \
+              "-- * Auth Token : " + app.config['AUTH_TOKEN'] + "\n" \
+              "----------------------------------------------\n" \
+              "----------------------------------------------\n" \
+              "---------------INITIALIZATION END-------------\n" \
+              "----------------------------------------------\n"
 
-    app.logger.info('Pod Informaticn: %s', message)
+    app.logger.info('Pod information: %s', message)

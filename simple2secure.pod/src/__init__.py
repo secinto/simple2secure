@@ -1,7 +1,5 @@
-import getopt
 import logging
 import os
-import sys
 
 import requests
 from celery import Celery
@@ -13,10 +11,11 @@ from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
 from src.util import db_utils
+from src.util.db_utils import init_db
 from src.util.license_utils import get_license, get_pod
 from src.util.rest_utils import authenticate_pod, check_portal_alive
 from src.util.test_utils import get_tests, sync_tests
-from src.util.util import print_error_message, shutdown_server, check_command_params
+from src.util.util import print_error_message, shutdown_server, check_command_params, init_logger
 
 
 def create_app(argv):
@@ -47,7 +46,16 @@ def entrypoint(argv, mode='app'):
     app = Flask(__name__)
     app.config.from_object(config_module.DevelopmentConfig)
 
+    activate = False
+
+    # Check command line arguments and initialize logger, thereafter loggers can be used
+    if mode == 'app':
+        check_command_params(argv, app)
+        init_logger(app)
+
     CORS(app)
+
+    log = logging.getLogger('pod.init')
 
     if not app.config['SQLALCHEMY_DATABASE_URI']:
         db_path = os.path.abspath(os.path.relpath('db'))
@@ -56,28 +64,29 @@ def entrypoint(argv, mode='app'):
 
         db_uri = 'sqlite:///{}'.format(db_path + '/pod.db')
 
-        print('Database URI {}\n'.format(db_uri))
+        log.info('Database URI {}\r\n'.format(db_uri))
+
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
-    activate = False
-
-    if mode == 'app':
-        activate = check_command_params(argv)
-
     # DB, marshmallow and Celery initialization
+    log.info("Initialization of DB and Marshmallow")
     db.init_app(app)
     ma.init_app(app)
 
     with app.app_context():
-        db.create_all()
-        db.session.commit()
+        log.info("Creating tables in the DB if not existent")
+        init_db(app)
 
     if mode == 'app':
-        logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+        log.info('Check connection to PORTAL')
         check_portal_alive(app)
+        log.info('Obtaining the POD info')
         get_pod(app)
+        log.info('Authenticating the POD against the PORTAL')
         authenticate(app, activate)
-        init_tests(app)
+        log.info('Initializing tests - verifying if the DB contains the latest version')
+        sync_tests(app)
+        log.info('Initialize and run celery worker')
         run_worker()
 
     return app
@@ -86,23 +95,24 @@ def entrypoint(argv, mode='app'):
 def authenticate(app, activate=False):
     with app.app_context():
         try:
+            log = logging.getLogger('pod.init')
+
+            log.info('Obtaining the license')
             stored_license = get_license(app, True)
             if stored_license is not None and stored_license.licenseId != 'NO_ID':
+                log.info('License is available and contains a license ID')
                 app.config['LICENSE_ID'] = stored_license.licenseId
             else:
+                log.info('No license available either from the DB or the file system')
                 raise RuntimeError('NO license stored and no license ZIP file available from file system under '
                                    'static/license')
 
             if activate or not stored_license.activated:
+                log.info('License will be activated on the PORTAL, obtaining a new auth token')
                 authenticate_pod(app, stored_license)
 
         except requests.exceptions.ConnectionError as ce:
-            app.logger.error('Error occurred while activating the pod: %s', print_error_message())
-            raise RuntimeError('Activating pod on portal did not work: %s', ce)
+            raise RuntimeError('Activating POD on PORTAL did not work: %s', ce)
         except RuntimeError as re:
             app.config['CONNECTED_WITH_PORTAL'] = False
-            app.logger.error('Error occurred while starting the pod: %s', re)
-
-
-def init_tests(app):
-    sync_tests(app)
+            log.error('Error occurred while starting the POD: %s', re)

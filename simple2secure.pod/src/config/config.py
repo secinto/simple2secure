@@ -16,6 +16,10 @@ class Config(object):
     AUTH_TOKEN = ''
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CONNECTED_WITH_PORTAL = False
+    ACTIVATE_LICENSE = False
+    LOG_FILE = 'logs/app.log'
+    LOG_LEVEL_NAME = 'DEBUG'
+    LOG_FORMAT = '%(asctime)-15s %(message)s'
 
 
 class ProductionConfig(Config):

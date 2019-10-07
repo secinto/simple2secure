@@ -1,5 +1,6 @@
 import datetime
 import glob
+import logging
 import os
 import secrets
 import socket
@@ -7,7 +8,6 @@ import zipfile
 
 from src.db.database import CompanyLicensePublic, PodInfo
 from src.util.db_utils import update
-from src.util.file_utils import read_json_testfile
 from src.util.util import get_date_from_string
 
 EXPIRATION_DATE = "expirationDate"
@@ -18,24 +18,50 @@ LICENSE_FOLDER = 'static/license'
 
 HOSTNAME = socket.gethostname()
 
+log = logging.getLogger('pod.util.license_utils')
+
 
 def get_pod(app):
+    """
+    Obtains the PodInfo object for this POD if available from the database or creates it and stores it in the DB.
+
+    Parameters:
+        app: Context object
+    Returns:
+        CompanyLicensePod: either a dummy object if no license is available or the correct object
+    """
     with app.app_context():
         pod_info = PodInfo.query.first()
         if pod_info is None:
-            create_pod(app)
+            pod_info = create_pod(app)
         else:
-            app.config['POD_ID'] = pod_info.generated_id
+            log.info('Using existing pod id from the database: %s', app.config['POD_ID'])
+
+        app.config['POD_ID'] = pod_info.generated_id
+
+        if pod_info.access_token:
             app.config['AUTH_TOKEN'] = pod_info.access_token
-            app.logger.info('Using existing pod id from the database: %s', app.config['POD_ID'])
 
 
 def create_pod(app):
+    """
+
+    Parameters:
+        app: Context object
+    Returns:
+        PodInfo: Returns the currently created PodInfo object from the
+
+    """
     with app.app_context():
         app.config['POD_ID'] = secrets.token_urlsafe(20)
-        app.logger.info('Generating new pod id: %s', app.config['POD_ID'])
+        log.info('Generated new pod id: %s', app.config['POD_ID'])
+
+        if app.config['AUTH_TOKEN']:
+            log.info("Currently not storing the AUTH_TOKEN with the PodInfo since it is not available")
+
         pod_info = PodInfo(app.config['POD_ID'], app.config['AUTH_TOKEN'], "")
         update(pod_info)
+        log.info("Stored new PodInfo in DB")
         return pod_info
 
 
@@ -44,6 +70,17 @@ def create_pod(app):
 # ----------------------------------------------------------------------
 
 def get_license(app, check_for_new=False):
+    """
+    Checks if a license is available. If a license is already contained in the database this is returned. If not a
+    new one is created. If check_for_new is specified it is checked if a new license in the file system exists and
+    uses this one as the new license.
+
+    Parameters:
+        app: Context object
+        check_for_new: True if it should be checked if a new license file is available from the file system
+    Returns:
+        CompanyLicensePod: either a dummy object if no license is available or the correct object
+    """
     if check_for_new:
         return get_and_store_license(app, check_for_new)
     else:
@@ -55,11 +92,20 @@ def get_license(app, check_for_new=False):
 
 
 def get_and_store_license(app, check_for_new=False):
+    """
+    Parameters:
+        app: Context object
+        check_for_new: True if it should be checked if a new license file is available from the file system
+    Returns:
+        CompanyLicensePod: either a dummy object if no license is available or the correct object
+    """
     created_license = create_license(app)
     if check_for_new:
         stored_license = CompanyLicensePublic.query.first()
         if stored_license is not None and stored_license.licenseId == created_license.licenseId:
             return stored_license
+        else:
+            created_license.id = stored_license.id
 
     if created_license.licenseId != 'NO_ID':
         update(created_license)
@@ -68,7 +114,8 @@ def get_and_store_license(app, check_for_new=False):
 
 def create_license(app):
     """Reads the license from file if available and returns a CompanyLicensePod object from it if the POD_ID has been
-    already created and the license file is available from the default folder
+    already created and the license file is available from the default folder. If no license is available from the
+    file system a dummy license object is returned.
 
     Parameters:
         app: Context object
@@ -101,10 +148,20 @@ def create_license(app):
 
 
 def get_license_file(app):
+    """
+    Reads the license file from the file system if the directory is available and a license ZIP file is contained in
+    it. If several licenses are available from the directory, the newest one is returned.
+
+    Parameters:
+        app: Context object
+
+    Returns:
+        A byte stream of the decoded ZIP license file
+    """
     if os.path.exists(LICENSE_FOLDER):
         files = glob.glob(LICENSE_FOLDER + '/*.zip')
     else:
-        app.logger.error('Provided path %s does not exist', LICENSE_FOLDER)
+        log.error('Provided path %s does not exist', LICENSE_FOLDER)
         return None
 
     file = None

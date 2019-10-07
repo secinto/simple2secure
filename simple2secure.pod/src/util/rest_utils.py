@@ -1,9 +1,13 @@
+import logging
+
 import requests
 from flask import json
 from src.db.database import Notification, TestStatusDTO
 from src.db.database_schema import CompanyLicensePublicSchema, TestSchema
 from src.util.db_utils import update
 from src.util.license_utils import get_license
+
+log = logging.getLogger('pod.util.rest_utils')
 
 
 def get_auth_token(app):
@@ -34,7 +38,7 @@ def send_license(app, url, licensePublic=None, perform_check=True):
 
         resp_data = portal_post(url, license_json, app, False)
 
-        if resp_data.status_code == 200 and resp_data.text:
+        if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
             accessToken = json.loads(resp_data.text)['accessToken']
             if accessToken:
                 licensePublic.accessToken = accessToken
@@ -42,13 +46,15 @@ def send_license(app, url, licensePublic=None, perform_check=True):
                 app.config['AUTH_TOKEN'] = accessToken
                 app.config['CONNECTED_WITH_PORTAL'] = True
                 update(licensePublic)
-                app.logger.info('Obtained new access token from portal')
+                log.info('Obtained new access token from portal')
             else:
-                app.logger.error('No access token was provided as response to the authentication')
-        else:
+                log.error('No access token was provided as response to the authentication')
+        elif resp_data is not None:
             message = json.loads(resp_data.text)['errorMessage']
-            app.logger.error('Error occurred while activating the pod: %s', message)
+            log.error('Error occurred while activating the pod: %s', message)
             app.config['CONNECTED_WITH_PORTAL'] = False
+        else:
+            log.error('No connection to PORTAL, thus not sending the license')
 
 
 def create_headers(app):
@@ -58,7 +64,7 @@ def create_headers(app):
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + app.config['AUTH_TOKEN']}
 
-    app.logger.debug('Token before sending post request from (portal_post_test_response): %s',
+    log.debug('Token before sending post request from (portal_post_test_response): %s',
                     app.config['AUTH_TOKEN'])
     return headers
 
@@ -120,14 +126,18 @@ def sync_test_with_portal(test, app, perform_check=True):
 def online_and_authenticated(app):
     with app.app_context():
         if not app.config['CONNECTED_WITH_PORTAL'] == '' and not app.config['AUTH_TOKEN'] == '':
+            log.info('POD is connected to PORTAL and is authenticated')
             return True
         elif app.config['AUTH_TOKEN'] == '':
+            log.info('POD is connected to PORTAL but authentication is missing')
             if get_auth_token(app):
+                log.info('Authentication against PORTAL was successful')
                 return True
             else:
+                log.info('Authentication against PORTAL was NOT successful')
                 return False
         else:
-            app.logger.info("Not synchronizing tests with portal because POD is not authenticated or connected")
+            log.info("No connection to PORTAL and AUTH_TOKEN is available")
             return False
 
 

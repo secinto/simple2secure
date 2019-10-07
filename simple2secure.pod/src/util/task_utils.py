@@ -1,3 +1,5 @@
+import logging
+
 from src.db.database_schema import TestSchema
 from src.db.database import TestSequence, Test
 
@@ -8,6 +10,8 @@ from src.util.compare_utils import is_same_sequence_content
 from src.util.file_utils import read_json_testfile
 from src.util.test_utils import update_insert_tests_to_db
 from src.util.util import create_secure_hash
+
+log = logging.getLogger('pod.util.task_utils')
 
 
 def get_sequence_from_url(url_query, app):

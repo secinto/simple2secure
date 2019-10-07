@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from src.util import rest_utils
@@ -15,6 +16,8 @@ from src.util.util import get_current_timestamp
 
 app = entrypoint(sys.argv, 'celery')
 celery = create_celery_app(app)
+
+log = logging.getLogger('pod.celery.start_celery')
 
 
 @celery.task(name='celery.send_test_results')

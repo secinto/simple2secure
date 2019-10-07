@@ -1,12 +1,16 @@
+import logging
 from email._header_value_parser import get_token
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
 
+
 from src.db.database import TestResult, Test
 from src.db.database_schema import TestResultSchema, TestSchema
 from src.util.rest_utils import portal_get, send_notification, update_test_status
 from src.util.test_utils import sync_tests
+
+log = logging.getLogger('pod.scheduler.scheduler_tasks')
 
 
 def start_scheduler_tasks(app_obj, celery_tasks):
@@ -37,7 +41,10 @@ def get_scheduled_tests(app_obj, celery_task):
                                              app_obj.config['AUTH_TOKEN'], app_obj.config['POD_ID'])
                 update_test_status(app_obj, app_obj.config['AUTH_TOKEN'], test_run["id"], test_run["testId"], "SCHEDULED")
         else:
-            print(request_test.status_code)
+            if request_test is None:
+                log.error('Call to get scheduled tests returned nothing')
+            else:
+                log.error('Status code is not as expected: {}', request_test.status_code)
 
 
 def get_test_results_from_db(app_obj, celery_task):

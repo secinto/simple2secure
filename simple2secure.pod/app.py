@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from flask import Response, json, request, render_template
@@ -21,6 +22,8 @@ def to_pretty_json(value):
 
 
 app.jinja_env.filters['tojson_pretty'] = to_pretty_json
+
+log = logging.getLogger('pod.celery.start_celery')
 
 
 @app.route("/services")

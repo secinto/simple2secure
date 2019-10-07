@@ -1,4 +1,7 @@
+import logging
 import platform
+
+log = logging.getLogger('pod.util.json_utils')
 
 
 def get_json_test_object(data, test_id, key, attribute):

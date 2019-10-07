@@ -1,3 +1,5 @@
+import logging
+
 from src.db.database import Test
 from src.db.database_schema import TestSchema
 
@@ -5,6 +7,7 @@ import json
 
 ALLOWED_EXTENSIONS = {'zip'}
 
+log = logging.getLogger('pod.util.file_utils')
 
 def read_json_testfile():
     # Read test file and return it
