@@ -260,30 +260,13 @@ public class TestController {
 			Test convertedTest = testUtils.convertTestWebObjtoTestObject(test);
 
 			if (convertedTest != null) {
-				if (!Strings.isNullOrEmpty(convertedTest.getPodId())) {
-					if (Strings.isNullOrEmpty(test.getTestId())) {
-						boolean isSaveable = testUtils.checkIfTestIsSaveable(convertedTest);
 
-						if (isSaveable) {
-							testRepository.save(convertedTest);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
-									HttpStatus.NOT_FOUND);
-						}
-
-					} else {
-						boolean isUpdateable = testUtils.checkIfTestIsUpdateable(convertedTest);
-						if (isUpdateable) {
-							testRepository.update(convertedTest);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
-									HttpStatus.NOT_FOUND);
-						}
-					}
-					return new ResponseEntity<>(convertedTest, HttpStatus.OK);
-				}
+				testRepository.save(convertedTest);
+				return new ResponseEntity<>(convertedTest, HttpStatus.OK);
+			} else {
+				return new ResponseEntity(
+						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
+						HttpStatus.NOT_FOUND);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),

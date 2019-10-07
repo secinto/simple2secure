@@ -88,7 +88,7 @@
             </form>
 
         </mat-tab>
-
+        // USERS TAB
         <mat-tab *ngIf="showMyUsers" label="{{ 'table.myusers' | translate }}">
             <button *ngIf="showGroupTable" mat-raised-button color="primary" id="addButton" type="button"
                     (click)="openDialogAddUser()"
@@ -102,7 +102,7 @@
                         <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
+                <mat-table #sort="matSort" #table [dataSource]="userDataSource" matSort>
 
                     <ng-container matColumnDef="userRole">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'userRole.placeholder' | translate }}
@@ -170,8 +170,8 @@
         </mat-tab>
 
         //CONTEXT TAB
-        <mat-tab *ngIf="addnewContext" label="{{ 'table.mycontexts' | translate }}">
-            <button *ngIf="addnewContext" mat-raised-button color="primary" id="addButton" type="button"
+        <mat-tab *ngIf="addNewContext" label="{{ 'table.mycontexts' | translate }}">
+            <button *ngIf="addNewContext" mat-raised-button color="primary" id="addButton" type="button"
                     (click)="openDialogNewContext()"
                     class="pull-right mat-green-button">
                 <i class="glyphicon glyphicon-plus"></i> {{ 'button.addContext' | translate }}
@@ -183,7 +183,7 @@
                         <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortCntx="matSort" #table [dataSource]="dataSource4" matSort>
+                <mat-table #sortCntx="matSort" #table [dataSource]="contextDataSource" matSort>
 
                     <ng-container matColumnDef="name">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
@@ -301,7 +301,7 @@
                 </mat-menu>
             </div>
         </mat-tab>
-
+        //PROBES TAB
         <mat-tab label="{{ 'table.myprobes' | translate }}">
 
 
@@ -318,7 +318,7 @@
                         <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="dataSource2" matSort>
+                <mat-table #sortDev="matSort" #table [dataSource]="probeDataSource" matSort>
 
                     <ng-container matColumnDef="probe">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
@@ -384,7 +384,7 @@
                 </button>
             </mat-menu>
         </mat-tab>
-
+        //PODS TAB
         <mat-tab label="{{ 'table.mypods' | translate }}">
 
             <div *ngIf="showPodTable" class="example-container mat-elevation-z8 table table-striped">
@@ -393,12 +393,18 @@
                         <input matInput (keyup)="applyFilterPod($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortPod="matSort" #table [dataSource]="dataSource5" matSort>
+                <mat-table #sortPod="matSort" #table [dataSource]="podDataSource" matSort>
 
                     <ng-container matColumnDef="pod">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="podId">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.podId}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">

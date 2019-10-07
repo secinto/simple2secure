@@ -368,6 +368,7 @@ public class TestUtils {
 			// test should exist in the database, update the existing one
 			test = testRepository.find(testObjWeb.getTestId());
 			if (test != null) {
+				test.setName(testObjWeb.getName());
 				test.setScheduled(testObjWeb.isScheduled());
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());

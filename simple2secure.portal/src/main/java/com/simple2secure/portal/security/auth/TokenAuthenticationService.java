@@ -227,7 +227,7 @@ public class TokenAuthenticationService {
 				if (user != null) {
 
 					boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
-
+					log.info("Got request from {} which needs to be authenicated", request.getRequestURL());
 					if (isAccessTokenValid) {
 
 						CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());

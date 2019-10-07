@@ -9,6 +9,7 @@ from flask import Flask
 from flask_cors import CORS
 
 import src.config.config as config_module
+from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
 from src.util import db_utils
@@ -24,6 +25,7 @@ def create_app(argv):
 
 def create_celery_app(app):
     # Initialize Celery
+
     celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
                     backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
     celery.conf.broker_url = app.config['CELERY_BROKER_URL']
@@ -47,26 +49,37 @@ def entrypoint(argv, mode='app'):
 
     CORS(app)
 
-    # DB, marshmallow and Celery initialization
-    db.init_app(app)
-    ma.init_app(app)
+    if not app.config['SQLALCHEMY_DATABASE_URI']:
+        db_path = os.path.abspath(os.path.relpath('db'))
+        if not os.path.exists(db_path):
+            os.makedirs(db_path)
+
+        db_uri = 'sqlite:///{}'.format(db_path + '/pod.db')
+
+        print('Database URI {}\n'.format(db_uri))
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
     activate = False
 
-    argumentsList = argv[1:]
+    if mode == 'app':
+        argumentsList = argv[1:]
 
-    try:
-        opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
-    except getopt.GetoptError:
-        print('app.py -a <True/False>')
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt == '-h':
+        try:
+            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+        except getopt.GetoptError:
             print('app.py -a <True/False>')
-            sys.exit()
-        elif opt in ("-a", "-activate"):
-            activate = True
+            sys.exit(2)
+
+        for opt, arg in opts:
+            if opt == '-h':
+                print('app.py -a <True/False>')
+                sys.exit()
+            elif opt in ("-a", "-activate"):
+                activate = True
+
+    # DB, marshmallow and Celery initialization
+    db.init_app(app)
+    ma.init_app(app)
 
     with app.app_context():
         db.create_all()
@@ -78,6 +91,7 @@ def entrypoint(argv, mode='app'):
         get_pod(app)
         authenticate(app, activate)
         init_tests(app)
+        run_worker()
 
     return app
 

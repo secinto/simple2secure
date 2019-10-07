@@ -25,7 +25,7 @@ def get_scheduled_tests(app_obj, celery_task):
     with app_obj.app_context():
         request_test = portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
                                              app_obj.config['POD_ID'], app_obj)
-        if request_test.status_code == 200:
+        if request_test is not None and request_test.status_code == 200:
             test_run_array = json.loads(request_test.text)
 
             for test_run in test_run_array:

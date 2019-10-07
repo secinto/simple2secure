@@ -39,7 +39,7 @@ export class OrbiterToolTestComponent {
 	selectedPod: PodDTO;
 	pods: PodDTO[];
 	context: ContextDTO;
-	displayedColumns = ['pod', 'group', 'status', 'action'];
+	displayedColumns = ['podId', 'pod', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;

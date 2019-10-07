@@ -67,7 +67,7 @@ export class UserOverviewComponent {
 	context: ContextDTO;
 	showMyUsers: boolean;
 	addNewGroup: boolean;
-	addnewContext: boolean;
+	addNewContext: boolean;
 	showGroupTable: boolean;
 	showUserTable: boolean;
 	showProbeTable: boolean;
@@ -79,13 +79,13 @@ export class UserOverviewComponent {
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
 	displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
-	displayedColumnsPods = ['pod', 'group', 'status', 'activated'];
+	displayedColumnsPods = ['podId', 'pod', 'group', 'status', 'activated'];
 
-	dataSource = new MatTableDataSource();
-	dataSource2 = new MatTableDataSource();
-	dataSource3 = new MatTableDataSource();
-	dataSource4 = new MatTableDataSource();
-	dataSource5 = new MatTableDataSource();
+	userDataSource = new MatTableDataSource();
+	probeDataSource = new MatTableDataSource();
+	groupDataSource = new MatTableDataSource();
+	contextDataSource = new MatTableDataSource();
+	podDataSource = new MatTableDataSource();
 	options = {focused: true, allowDrag: true};
 
 	@ViewChild('paginator') paginator: MatPaginator;
@@ -129,38 +129,38 @@ export class UserOverviewComponent {
 		}
 
 		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
-			this.addnewContext = true;
+			this.addNewContext = true;
 		}
 		else {
-			this.addnewContext = false;
+			this.addNewContext = false;
 		}
 	}
 
 	ngAfterViewInit() {
-		this.dataSource.paginator = this.paginator;
-		this.dataSource2.paginator = this.paginator2;
-		this.dataSource3.paginator = this.paginator3;
-		this.dataSource.sort = this.sort;
-		this.dataSource2.sort = this.sortDev;
-		this.dataSource3.sort = this.sortCntx;
+		this.userDataSource.paginator = this.paginator;
+		this.probeDataSource.paginator = this.paginator2;
+		this.groupDataSource.paginator = this.paginator3;
+		this.userDataSource.sort = this.sort;
+		this.probeDataSource.sort = this.sortDev;
+		this.groupDataSource.sort = this.sortCntx;
 	}
 
 	applyFilter(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource3.filter = filterValue;
+		this.groupDataSource.filter = filterValue;
 	}
 
 	applyFilterDev(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource2.filter = filterValue;
+		this.probeDataSource.filter = filterValue;
 	}
 
 	applyFilterPod(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource5.filter = filterValue;
+		this.podDataSource.filter = filterValue;
 	}
 
 	private loadMyProfile() {
@@ -169,11 +169,11 @@ export class UserOverviewComponent {
 			.subscribe(
 				data => {
 					this.myProfile = data;
-					this.dataSource.data = this.myProfile.myUsersList;
-					this.dataSource2.data = this.myProfile.myProbes;
-					this.dataSource3.data = this.myProfile.myGroups;
-					this.dataSource4.data = this.myProfile.myContexts;
-					this.dataSource5.data = this.myProfile.myPods;
+					this.userDataSource.data = this.myProfile.myUsersList;
+					this.probeDataSource.data = this.myProfile.myProbes;
+					this.groupDataSource.data = this.myProfile.myGroups;
+					this.contextDataSource.data = this.myProfile.myContexts;
+					this.podDataSource.data = this.myProfile.myPods;
 					this.checkMyGroupSize(this.myProfile.myGroups);
 					this.checkMyUsersSize(this.myProfile.myUsersList);
 					this.checkMyProbesSize(this.myProfile.myProbes);
@@ -870,19 +870,19 @@ export class UserOverviewComponent {
 		setTimeout(() => {
 			switch (indexNumber) {
 				case 1:
-					!this.dataSource.paginator ? this.dataSource.paginator = this.paginator : null;
-					!this.dataSource.sort ? this.dataSource.sort = this.sort : null;
+					!this.userDataSource.paginator ? this.userDataSource.paginator = this.paginator : null;
+					!this.userDataSource.sort ? this.userDataSource.sort = this.sort : null;
 					break;
 				case 2:
-					!this.dataSource4.paginator ? this.dataSource4.paginator = this.paginator3 : null;
-					!this.dataSource4.sort ? this.dataSource4.sort = this.sortCntx : null;
+					!this.contextDataSource.paginator ? this.contextDataSource.paginator = this.paginator3 : null;
+					!this.contextDataSource.sort ? this.contextDataSource.sort = this.sortCntx : null;
 					break;
 				case 4:
-					!this.dataSource2.paginator ? this.dataSource2.paginator = this.paginator2 : null;
-					!this.dataSource2.sort ? this.dataSource2.sort = this.sortDev : null;
+					!this.probeDataSource.paginator ? this.probeDataSource.paginator = this.paginator2 : null;
+					!this.probeDataSource.sort ? this.probeDataSource.sort = this.sortDev : null;
 				case 5:
-					!this.dataSource5.paginator ? this.dataSource5.paginator = this.paginator4 : null;
-					!this.dataSource5.sort ? this.dataSource5.sort = this.sortPod : null;
+					!this.podDataSource.paginator ? this.podDataSource.paginator = this.paginator4 : null;
+					!this.podDataSource.sort ? this.podDataSource.sort = this.sortPod : null;
 			}
 		});
 	}

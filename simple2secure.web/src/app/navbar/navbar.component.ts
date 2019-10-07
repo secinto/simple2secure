@@ -77,7 +77,7 @@ export class NavbarComponent {
 		this.showNotifications = false;
 		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-		this.timer = Observable.timer(3000, 3000);
+		this.timer = Observable.timer(10000, 10000);
 		this.timer.subscribe((t) => this.getNotifications());
 	}
 

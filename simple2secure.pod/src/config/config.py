@@ -7,7 +7,7 @@ class Config(object):
     DATABASE_URI = 'sqlite:///:memory:'
     CELERY_BROKER_URL = "redis://localhost:6379"
     CELERY_RESULT_BACKEND = "redis://localhost:6379"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///../db/pod.db"
+    SQLALCHEMY_DATABASE_URI = ""
     POD_ID = ''
     GROUP_ID = ''
     LICENSE_ID = ''

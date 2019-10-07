@@ -6,7 +6,7 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
+        <!-- Pod Hostname Column -->
         <ng-container matColumnDef="pod">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.pod' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
@@ -20,8 +20,15 @@
         </ng-container>
 
         <!-- Name Column -->
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.podId}}</mat-cell>
+        </ng-container>        
+        
+        <!-- Name Column -->
         <ng-container matColumnDef="group">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
         </ng-container>
