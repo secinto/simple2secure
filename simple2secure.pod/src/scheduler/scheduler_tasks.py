@@ -44,7 +44,7 @@ def get_scheduled_tests(app_obj, celery_task):
             if request_test is None:
                 log.error('Call to get scheduled tests returned nothing')
             else:
-                log.error('Status code is not as expected: {}', request_test.status_code)
+                log.error('Status code is not as expected: {}'.format(request_test.status_code))
 
 
 def get_test_results_from_db(app_obj, celery_task):
@@ -53,11 +53,7 @@ def get_test_results_from_db(app_obj, celery_task):
         for test_result in test_results:
             test_result_schema = TestResultSchema()
             output = test_result_schema.dump(test_result)
-
-            if not app_obj.config['AUTH_TOKEN']:
-                app_obj.config['AUTH_TOKEN'] = get_token(app_obj)
-
-            celery_task.send_test_results.delay(output, app_obj.config['AUTH_TOKEN'], app_obj.config['PORTAL_URL'])
+            celery_task.send_test_results.delay(output)
 
 
 def sync_tests_with_the_portal(app_obj):

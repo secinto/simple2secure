@@ -21,13 +21,12 @@ log = logging.getLogger('pod.celery.start_celery')
 
 
 @celery.task(name='celery.send_test_results')
-def send_test_results(test_result, auth_token):
+def send_test_results(test_result):
     with app.app_context():
-        response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result,
-                                                 auth_token, app)
+        response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, app)
 
         if response.status_code == 200:
-            test_res = TestResult.query.filter_by(id=test_result.id).first()
+            test_res = TestResult.query.filter_by(id=test_result['id']).first()
             test_res.isSent = True
             db.session.commit()
 
@@ -64,14 +63,13 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
 
         rest_utils.update_test_status(app, auth_token, test_run_id, test_id, "EXECUTED")
 
-        app.logger.info('Before sending test result: %s', test_result)
-
-        app.logger.info('After sending test result')
+        log.info('Before sending test result: %s', test_result)
 
         db.session.add(test_result)
         db.session.commit()
 
-        send_test_results(test_result, auth_token)
+        send_test_results(json.dumps(test_result.as_dict()))
+        log.info('After sending test result')
 
 
 @celery.task(name='celery.schedule_test_for_sequence')

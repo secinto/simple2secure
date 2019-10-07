@@ -77,13 +77,10 @@ def get_tool(argument):
         return argument
 
 
-def construct_command(task):
-    brk = ""
+def construct_command(tool, argument):
+    # Construct command from the tool name and argument
 
-# def construct_command(tool, argument):
-#    # Construct command from the tool name and argument
-#
-#    if argument is None and tool is None:
-#        return ""
-#    else:
-#        return tool + ' ' + argument
+    if argument is None and tool is None:
+        return ""
+    else:
+        return tool + ' ' + argument

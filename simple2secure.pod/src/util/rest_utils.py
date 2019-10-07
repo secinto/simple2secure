@@ -73,9 +73,9 @@ def portal_get(url, app, perform_check=True):
     if perform_check:
         if not online_and_authenticated(app):
             return None
-    else:
-        with app.app_context():
-            return requests.get(url, verify=False, headers=create_headers(app))
+
+    with app.app_context():
+        return requests.get(url, verify=False, headers=create_headers(app))
 
 
 def portal_post(url, data, app, perform_check=True):
@@ -87,16 +87,16 @@ def portal_post(url, data, app, perform_check=True):
         return requests.post(url, data=data, verify=False, headers=create_headers(app))
 
 
-def portal_post_celery(url, data, auth_token, app, perform_check=True):
+def portal_post_celery(url, data, app, perform_check=True):
     if perform_check:
         if not online_and_authenticated(app):
             return None
-    else:
-        with app.app_context():
-            app.logger.info('Token before sending post request from (portal_post_celery): %s', app.config['AUTH_TOKEN'])
-            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                       'Authorization': "Bearer " + auth_token}
-            return requests.post(url, data=json.dumps(data.as_dict()), verify=False, headers=headers)
+
+    with app.app_context():
+        log.info('Token before sending post request from (portal_post_celery): %s', app.config['AUTH_TOKEN'])
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
+                   'Authorization': "Bearer " + app.config['AUTH_TOKEN']}
+        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
 
 
 def send_notification(content, app, pod_id, perform_check=True):
