@@ -16,7 +16,7 @@ from src.util import db_utils
 from src.util.license_utils import get_license, get_pod
 from src.util.rest_utils import authenticate_pod, check_portal_alive
 from src.util.test_utils import get_tests, sync_tests
-from src.util.util import print_error_message, shutdown_server
+from src.util.util import print_error_message, shutdown_server, check_command_params
 
 
 def create_app(argv):
@@ -62,20 +62,7 @@ def entrypoint(argv, mode='app'):
     activate = False
 
     if mode == 'app':
-        argumentsList = argv[1:]
-
-        try:
-            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
-        except getopt.GetoptError:
-            print('app.py -a <True/False>')
-            sys.exit(2)
-
-        for opt, arg in opts:
-            if opt == '-h':
-                print('app.py -a <True/False>')
-                sys.exit()
-            elif opt in ("-a", "-activate"):
-                activate = True
+        activate = check_command_params(argv)
 
     # DB, marshmallow and Celery initialization
     db.init_app(app)

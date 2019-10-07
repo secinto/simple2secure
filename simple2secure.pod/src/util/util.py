@@ -27,6 +27,26 @@ def get_current_timestamp():
 def get_date_from_string(date_string):
     return datetime.strptime(date_string, '%m/%d/%Y').date()
 
+
+def check_command_params(argv):
+    argumentsList = argv[1:]
+
+    try:
+        opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+    except getopt.GetoptError:
+        print('app.py -a <True/False>')
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print('app.py -a <True/False>')
+            sys.exit()
+        elif opt in ("-a", "-activate"):
+            return True
+
+    return False
+
+
 def generate_test_object(sync_test):
     sync_test_json = json.loads(sync_test)
     test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
