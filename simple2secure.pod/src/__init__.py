@@ -87,7 +87,7 @@ def entrypoint(argv, mode='app'):
         log.info('Initializing tests - verifying if the DB contains the latest version')
         sync_tests(app)
         log.info('Initialize and run celery worker')
-        run_worker()
+        #run_worker()
 
     return app
 
@@ -112,7 +112,7 @@ def authenticate(app, activate=False):
                 authenticate_pod(app, stored_license)
 
         except requests.exceptions.ConnectionError as ce:
-            raise RuntimeError('Activating POD on PORTAL did not work: %s', ce)
+            raise RuntimeError('Activating POD on PORTAL did not work: %s', ce.strerror)
         except RuntimeError as re:
             app.config['CONNECTED_WITH_PORTAL'] = False
             log.error('Error occurred while starting the POD: %s', re)

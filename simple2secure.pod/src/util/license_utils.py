@@ -35,9 +35,8 @@ def get_pod(app):
         if pod_info is None:
             pod_info = create_pod(app)
         else:
+            app.config['POD_ID'] = pod_info.generated_id
             log.info('Using existing pod id from the database: %s', app.config['POD_ID'])
-
-        app.config['POD_ID'] = pod_info.generated_id
 
         if pod_info.access_token:
             app.config['AUTH_TOKEN'] = pod_info.access_token
@@ -104,8 +103,6 @@ def get_and_store_license(app, check_for_new=False):
         stored_license = CompanyLicensePublic.query.first()
         if stored_license is not None and stored_license.licenseId == created_license.licenseId:
             return stored_license
-        else:
-            created_license.id = stored_license.id
 
     if created_license.licenseId != 'NO_ID':
         update(created_license)
