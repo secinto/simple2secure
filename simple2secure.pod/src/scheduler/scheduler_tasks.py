@@ -1,12 +1,11 @@
 import logging
-from email._header_value_parser import get_token
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
 
-from src.db.database import TestResult, Test
-from src.db.database_schema import TestResultSchema, TestSchema
-from src.util.rest_utils import portal_get, send_notification, update_test_status
+from src.db.database import TestResult
+from src.db.database_schema import TestResultSchema
+from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive
 from src.util.test_utils import sync_tests
 
 log = logging.getLogger('pod.scheduler.scheduler_tasks')
@@ -17,10 +16,14 @@ def start_scheduler_tasks(app_obj, celery_tasks):
     scheduler.add_job(func=get_scheduled_tests, trigger="interval", seconds=15,
                       kwargs={'app_obj': app_obj, 'celery_task': celery_tasks})
 
-    scheduler.add_job(func=get_test_results_from_db, trigger="interval", seconds=20,
+    scheduler.add_job(func=get_test_results_from_db, trigger="interval", seconds=60,
                       kwargs={'app_obj': app_obj, 'celery_task': celery_tasks})
 
-    scheduler.add_job(func=sync_tests_with_the_portal, trigger="interval", seconds=30, kwargs={'app_obj': app_obj})
+    scheduler.add_job(func=sync_tests_with_the_portal, trigger="interval", seconds=60, kwargs={'app_obj': app_obj})
+
+    scheduler.add_job(func=check_portal_alive, trigger="interval", seconds=60,
+                      kwargs={'app': app_obj, 'celery_task': celery_tasks})
+
     scheduler.start()
 
 
@@ -34,8 +37,7 @@ def get_scheduled_tests(app_obj, celery_task):
             for test_run in test_run_array:
                 current_test = json.loads(test_run["testContent"])
                 celery_task.schedule_test.delay(current_test["test_definition"], test_run["testId"],
-                                                test_run["testName"], app_obj.config['AUTH_TOKEN'],
-                                                app_obj.config['POD_ID'], test_run["id"])
+                                                test_run["testName"], app_obj.config['POD_ID'], test_run["id"])
                 send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                   app_obj, app_obj.config['POD_ID'])
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")

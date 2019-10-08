@@ -1,48 +1,44 @@
-import base64
 import logging
-import sys
-
-from src.db.database_schema import TestResultSchema
-from src.util import rest_utils
-from src.util import json_utils
-from scanner import scanner
-from src.db.database import db, TestResult,  TestSequenceResult
-from flask import json
-from src import create_celery_app, entrypoint
-import threading
 import socket
+import sys
+import threading
 import time
 
+from flask import json
+
+from scanner import scanner
+from src import create_celery_app, entrypoint
+from src.db.database import db, TestResult, TestSequenceResult
+from src.db.database_schema import TestResultSchema
+from src.util import json_utils
+from src.util import rest_utils
 from src.util.db_utils import update
+from src.util.rest_utils import check_portal_alive
 from src.util.task_utils import update_add_sequence_to_db
 from src.util.util import get_current_timestamp
 
 app = entrypoint(sys.argv, 'celery')
 celery = create_celery_app(app)
 
-log = logging.getLogger('pod.celery.start_celery')
+log = logging.getLogger('celery.celery_tasks')
 
 
 @celery.task(name='celery.send_test_results')
 def send_test_results(test_result):
     with app.app_context():
-        log.info('Test Result normal {}'.format(test_result))
+        response = rest_utils.portal_post(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, app)
 
-        data = json.dumps(test_result)
-
-        log.info('Test Result as_dict {}'.format(data))
-
-        response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, app)
-
-        if response.status_code == 200:
+        if response is not None and response.status_code == 200:
             test_res = TestResult.query.filter_by(id=test_result['id']).first()
             test_res.isSent = True
             update(test_res)
             log.info('Test result {} updated in DB'.format(test_res.name))
+        else:
+            log.error('Sending test result {} was not successful'.format(test_result['name']))
 
 
 @celery.task(name='celery.schedule_test')
-def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
+def schedule_test(test, test_id, test_name, pod_id, test_run_id):
     with app.app_context():
         results = {}
 
@@ -65,14 +61,13 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
         postcondition_scan.start()
 
         timestamp = get_current_timestamp()
-        test_result = TestResult("Result - " + timestamp.__str__(),  json.dumps(results), test_run_id,
+        test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
                                  socket.gethostname(), timestamp, False)
 
-        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app, pod_id)
+        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app,
+                                     pod_id)
 
         rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
-
-        log.info('Before storing test result: {}'.format(test_result))
 
         db.session.add(test_result)
         db.session.commit()
@@ -120,10 +115,20 @@ def schedule_sequence(test_sequence):
                 test_sequence_result_obj[test_content['name']] = nextResult
 
         test_sequence_result_json = json.dumps(test_sequence_result_obj)
-        test_sequence_result = TestSequenceResult(sequence.podId, sequence.name, test_sequence_result_json, current_milli_time)
+        test_sequence_result = TestSequenceResult(sequence.podId, sequence.name, test_sequence_result_json,
+                                                  current_milli_time)
 
         db.session.add(test_sequence_result)
         db.session.merge(sequence)
         db.session.commit()
 
         return sequence
+
+
+@celery.task(name='celery.update_info')
+def check_online(podId, authToken, connected):
+    with app.app_context():
+        app.config['POD_ID'] = podId
+        app.config['AUTH_TOKEN'] = authToken
+        app.config['CONNECTED_WITH_PORTAL'] = connected
+

@@ -122,7 +122,6 @@ export class OrbiterToolTestScheduledListComponent {
 
 		dialogConfig.disableClose = true;
 		dialogConfig.autoFocus = true;
-
 		dialogConfig.data = {
 			id: 1,
 			title: this.translate.instant('message.areyousure'),
@@ -158,7 +157,7 @@ export class OrbiterToolTestScheduledListComponent {
 				this.loading = false;
 			});
 	}
-	
+
 	public openDialogShowTestResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';

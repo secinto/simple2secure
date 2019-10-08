@@ -227,7 +227,6 @@ public class TokenAuthenticationService {
 				if (user != null) {
 
 					boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
-					log.info("Got request from {} which needs to be authenicated", request.getRequestURL());
 					if (isAccessTokenValid) {
 
 						CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());
@@ -241,23 +240,20 @@ public class TokenAuthenticationService {
 							}
 
 						}
-
-						return user != null
-								? new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()))
-								: null;
+						return new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()));
 					} else {
+						log.error("Provided token not valid anymore for user {}", token.getUserId());
 						return null;
 					}
 				} else {
 					log.error("User with following id: {} does not exist", token.getUserId());
 					return null;
 				}
-
 			}
 
 			else {
-				// Handle token for probeId
-				// Check if there is a token with this id in the licenseRepo - for probe
+				// Handle token for devices
+				// Check if there is a token with this id in the licenseRepo
 				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 
 				if (license != null) {
@@ -265,24 +261,27 @@ public class TokenAuthenticationService {
 
 					if (isAccessTokenValid) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							return license != null
-									? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.POD.name()))
-									: null;
+							return new UsernamePasswordAuthenticationToken(license, null,
+									CustomAuthenticationProvider.getAuthorities(UserRole.POD.name()));
 						}
-						return license != null
-								? new UsernamePasswordAuthenticationToken(license, null, CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()))
-								: null;
+						/*
+						 * TODO: Verify if assigning the role PROBE is OK if no device id has been specified.
+						 */
+						return new UsernamePasswordAuthenticationToken(license, null,
+								CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()));
 					} else {
+						log.error("Provided token not valid anymore for device {}", license.getDeviceId());
+
 						return null;
 					}
 				} else {
-					log.error("Token not found");
+					log.error("Token not found for request {}", request.getRequestURI());
 					return null;
 
 				}
 			}
 		} else {
-			log.error("Provided request does not contain accessToken in the header");
+			log.error("Provided request does not contain accessToken in the header. Request from {}", request.getRequestURI());
 			return null;
 		}
 
@@ -303,7 +302,7 @@ public class TokenAuthenticationService {
 			if (portalUtils.isAccessTokenExpired(expirationDate)) {
 				return false;
 			}
-			log.info("Token still valid!" + " Expiration date: " + expirationDate.toString());
+			log.info("Token still valid! Expiration date {} ", expirationDate.toString());
 			return true;
 		} catch (JwtException | IllegalArgumentException e) {
 			log.error("Error: {}", e);

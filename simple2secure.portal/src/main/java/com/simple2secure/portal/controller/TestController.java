@@ -163,7 +163,7 @@ public class TestController {
 
 					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId, TestRunType.MANUAL_PORTAL,
 							currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-
+					testRun.setHostname(test.getHostname());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
@@ -300,7 +300,7 @@ public class TestController {
 					String test_content = test.getTest_content().replace("\'", "\"");
 					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
 							TestStatus.PLANNED, System.currentTimeMillis());
-
+					testRun.setHostname(test.getHostname());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(

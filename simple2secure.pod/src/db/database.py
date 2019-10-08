@@ -9,12 +9,19 @@ db = SQLAlchemy()
 class PodInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     generated_id = db.Column(db.Text)
+    authToken = db.Column(db.Text)
+    connected = db.Column(db.Boolean)
+    groupId = db.Column(db.Text)
+    licenseId = db.Column(db.Text)
     hash_value_service = db.Column(db.Text)
 
-    def __init__(self, generated_id, hash_value_service):
+    def __init__(self, generated_id):
         self.generated_id = generated_id
-        self.hash_value_service = hash_value_service
-
+        self.connected = False
+        self.authToken = ""
+        self.groupId = ""
+        self.licenseId = ""
+        self.hash_value_service = ""
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)

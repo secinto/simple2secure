@@ -23,7 +23,7 @@ def to_pretty_json(value):
 
 app.jinja_env.filters['tojson_pretty'] = to_pretty_json
 
-log = logging.getLogger('pod.celery.start_celery')
+log = logging.getLogger('pod.start_pod')
 
 
 @app.route("/services")

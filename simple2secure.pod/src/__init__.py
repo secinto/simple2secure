@@ -1,7 +1,6 @@
 import logging
 import os
 
-import requests
 from celery import Celery
 from flask import Flask
 from flask_cors import CORS
@@ -11,7 +10,7 @@ from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
 from src.util import db_utils
-from src.util.db_utils import init_db
+from src.util.db_utils import init_db, update
 from src.util.license_utils import get_license, get_pod
 from src.util.rest_utils import authenticate_pod, check_portal_alive
 from src.util.test_utils import get_tests, sync_tests
@@ -46,16 +45,18 @@ def entrypoint(argv, mode='app'):
     app = Flask(__name__)
     app.config.from_object(config_module.DevelopmentConfig)
 
-    activate = False
-
     # Check command line arguments and initialize logger, thereafter loggers can be used
-    if mode == 'app':
-        check_command_params(argv, app)
+    if mode != 'app':
         init_logger(app)
 
-    CORS(app)
+    if mode == 'app':
+        check_command_params(argv, app)
+        log = logging.getLogger('pod.init')
+    else:
+        app.config['IS_CELERY'] = True
+        log = logging.getLogger('celery.init')
 
-    log = logging.getLogger('pod.init')
+    CORS(app)
 
     if not app.config['SQLALCHEMY_DATABASE_URI']:
         db_path = os.path.abspath(os.path.relpath('db'))
@@ -64,7 +65,7 @@ def entrypoint(argv, mode='app'):
 
         db_uri = 'sqlite:///{}'.format(db_path + '/pod.db')
 
-        log.info('Database URI {}\r\n'.format(db_uri))
+        log.info('Database URI {}'.format(db_uri))
 
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
@@ -81,9 +82,9 @@ def entrypoint(argv, mode='app'):
         log.info('Check connection to PORTAL')
         check_portal_alive(app)
         log.info('Obtaining the POD info')
-        get_pod(app)
+        podInfo = get_pod(app)
         log.info('Authenticating the POD against the PORTAL')
-        authenticate(app, activate)
+        authenticate(app, podInfo)
         log.info('Initializing tests - verifying if the DB contains the latest version')
         sync_tests(app)
         log.info('Initialize and run celery worker')
@@ -92,26 +93,26 @@ def entrypoint(argv, mode='app'):
     return app
 
 
-def authenticate(app, activate=False):
+def authenticate(app, podInfo):
     with app.app_context():
-        try:
-            log = logging.getLogger('pod.init')
+        log = logging.getLogger('pod.init')
 
-            log.info('Obtaining the license')
-            stored_license = get_license(app, True)
-            if stored_license is not None and stored_license.licenseId != 'NO_ID':
-                log.info('License is available and contains a license ID')
-                app.config['LICENSE_ID'] = stored_license.licenseId
-            else:
-                log.info('No license available either from the DB or the file system')
-                raise RuntimeError('NO license stored and no license ZIP file available from file system under '
-                                   'static/license')
+        log.info('Obtaining the license')
+        stored_license = get_license(app, True)
+        if stored_license is not None and stored_license.licenseId != 'NO_ID':
+            log.info('License is available and contains a license ID')
+            app.config['LICENSE_ID'] = stored_license.licenseId
+        else:
+            log.info('No license available either from the DB or the file system')
+            raise RuntimeError('NO license stored and no license ZIP file available from file system under '
+                               'static/license')
 
-            log.info('POD will be authenticated on the PORTAL, obtaining an auth token')
-            authenticate_pod(app, stored_license)
+        log.info('POD will be authenticated on the PORTAL, obtaining an auth token')
+        authenticate_pod(app, stored_license)
 
-        except requests.exceptions.ConnectionError as ce:
-            raise RuntimeError('Activating POD on PORTAL did not work: %s', ce.strerror)
-        except RuntimeError as re:
-            app.config['CONNECTED_WITH_PORTAL'] = False
-            log.error('Error occurred while starting the POD: %s', re)
+        podInfo.connected = app.config['CONNECTED_WITH_PORTAL']
+        podInfo.authToken = app.config['AUTH_TOKEN']
+        podInfo.licenseId = app.config['LICENSE_ID']
+        podInfo.groupId = app.config['GROUP_ID']
+
+        update(podInfo)

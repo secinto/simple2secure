@@ -31,6 +31,7 @@ public class TestRun extends GenericDBObject {
 	private static final long serialVersionUID = 8963088362714211548L;
 	private String testId;
 	private String testName;
+	private String hostname;
 	private String podId;
 	private String contextId;
 	private TestRunType testRunType;
@@ -84,6 +85,14 @@ public class TestRun extends GenericDBObject {
 
 	public void setContextId(String contextId) {
 		this.contextId = contextId;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 	public TestRunType getTestRunType() {

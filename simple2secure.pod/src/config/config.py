@@ -14,12 +14,14 @@ class Config(object):
     PORTAL_URL = 'https://localhost:8443/api/'
     # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
     AUTH_TOKEN = ''
+    IS_CELERY = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CONNECTED_WITH_PORTAL = False
     ACTIVATE_LICENSE = False
     LOG_FILE = 'logs/app.log'
     LOG_LEVEL_NAME = 'INFO'
-    LOG_FORMAT = '%(asctime)-15s %(message)s'
+    LOG_FORMAT = '[%(asctime)s-%(name)s-%(levelname)s-%(relativeCreated)6d-%(threadName)s] %(message)s'
+    LOG_FORMAT_CH = '[%(asctime)s-%(name)s-%(levelname)s-%(threadName)s] %(message)s'
 
 
 class ProductionConfig(Config):

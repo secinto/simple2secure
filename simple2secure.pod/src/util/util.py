@@ -54,8 +54,10 @@ def init_logger(app):
         logging.basicConfig(filename=app.config['LOG_FILE'],
                             level=logging.getLevelName(app.config['LOG_LEVEL_NAME']),
                             format=app.config['LOG_FORMAT'])
-
-        logging.getLogger().addHandler(logging.StreamHandler())
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(logging.Formatter(app.config['LOG_FORMAT_CH']))
+        logging.getLogger().addHandler(ch)
 
 
 def generate_test_object(sync_test):
