@@ -11,6 +11,7 @@ class CompanyLicensePublicSchema(ma.ModelSchema):
 
 class TestResultSchema(ma.ModelSchema):
     class Meta:
+        # fields = ("result", "hostname", "name", "testRunId", "timestamp")
         model = TestResult
 
 

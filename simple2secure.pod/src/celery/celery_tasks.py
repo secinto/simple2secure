@@ -1,6 +1,8 @@
+import base64
 import logging
 import sys
 
+from src.db.database_schema import TestResultSchema
 from src.util import rest_utils
 from src.util import json_utils
 from scanner import scanner
@@ -11,6 +13,7 @@ import threading
 import socket
 import time
 
+from src.util.db_utils import update
 from src.util.task_utils import update_add_sequence_to_db
 from src.util.util import get_current_timestamp
 
@@ -23,12 +26,19 @@ log = logging.getLogger('pod.celery.start_celery')
 @celery.task(name='celery.send_test_results')
 def send_test_results(test_result):
     with app.app_context():
+        log.info('Test Result normal {}'.format(test_result))
+
+        data = json.dumps(test_result)
+
+        log.info('Test Result as_dict {}'.format(data))
+
         response = rest_utils.portal_post_celery(app.config['PORTAL_URL'] + "test/saveTestResult", test_result, app)
 
         if response.status_code == 200:
             test_res = TestResult.query.filter_by(id=test_result['id']).first()
             test_res.isSent = True
-            db.session.commit()
+            update(test_res)
+            log.info('Test result {} updated in DB'.format(test_res.name))
 
 
 @celery.task(name='celery.schedule_test')
@@ -55,20 +65,23 @@ def schedule_test(test, test_id, test_name, auth_token, pod_id, test_run_id):
         postcondition_scan.start()
 
         timestamp = get_current_timestamp()
-        test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
+        test_result = TestResult("Result - " + timestamp.__str__(),  json.dumps(results), test_run_id,
                                  socket.gethostname(), timestamp, False)
 
-        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app,
-                                     auth_token, pod_id)
+        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app, pod_id)
 
-        rest_utils.update_test_status(app, auth_token, test_run_id, test_id, "EXECUTED")
+        rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
 
-        log.info('Before sending test result: %s', test_result)
+        log.info('Before storing test result: {}'.format(test_result))
 
         db.session.add(test_result)
         db.session.commit()
 
-        send_test_results(json.dumps(test_result.as_dict()))
+        test_result_schema = TestResultSchema()
+        output = test_result_schema.dump(test_result)
+        log.info('Before sending test result: {}'.format(output))
+
+        send_test_results(output)
         log.info('After sending test result')
 
 

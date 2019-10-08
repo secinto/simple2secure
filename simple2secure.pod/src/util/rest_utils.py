@@ -27,7 +27,6 @@ def get_auth_token(app):
 def authenticate_pod(app, licensePublic):
     send_license(app, app.config['PORTAL_URL'] + "license/authenticate", licensePublic, False)
 
-
 def send_license(app, url, licensePublic=None, perform_check=True):
     with app.app_context():
         if licensePublic is None:
@@ -64,8 +63,7 @@ def create_headers(app):
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + app.config['AUTH_TOKEN']}
 
-    log.debug('Token before sending post request from (portal_post_test_response): %s',
-                    app.config['AUTH_TOKEN'])
+    log.info('Created headers {}'.format(headers))
     return headers
 
 
@@ -84,6 +82,7 @@ def portal_post(url, data, app, perform_check=True):
             return None
 
     with app.app_context():
+        log.info('Token before sending post request from (portal_post): %s', app.config['AUTH_TOKEN'])
         return requests.post(url, data=data, verify=False, headers=create_headers(app))
 
 
@@ -108,6 +107,10 @@ def send_notification(content, app, pod_id, perform_check=True):
 def update_test_status(app, test_run_id, test_id, test_status, perform_check=True):
     url = app.config['PORTAL_URL'] + "test/updateTestStatus"
     test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
+    log.info('TestStatus normal {}'.format(test_run_dto))
+    log.info('TestStatus dict {}'.format(test_run_dto.__dict__))
+    log.info('TestStatus json {}'.format(json.dumps(test_run_dto.__dict__)))
+
     return portal_post(url, json.dumps(test_run_dto.__dict__), app, perform_check)
 
 

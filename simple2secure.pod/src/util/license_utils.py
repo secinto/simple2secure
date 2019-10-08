@@ -38,9 +38,7 @@ def get_pod(app):
             app.config['POD_ID'] = pod_info.generated_id
             log.info('Using existing pod id from the database: %s', app.config['POD_ID'])
 
-        if pod_info.access_token:
-            app.config['AUTH_TOKEN'] = pod_info.access_token
-
+    return pod_info
 
 def create_pod(app):
     """
@@ -58,7 +56,7 @@ def create_pod(app):
         if app.config['AUTH_TOKEN']:
             log.info("Currently not storing the AUTH_TOKEN with the PodInfo since it is not available")
 
-        pod_info = PodInfo(app.config['POD_ID'], app.config['AUTH_TOKEN'], "")
+        pod_info = PodInfo(app.config['POD_ID'], "")
         update(pod_info)
         log.info("Stored new PodInfo in DB")
         return pod_info

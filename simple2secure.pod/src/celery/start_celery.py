@@ -23,7 +23,7 @@ def _get_proc_cmdline(proc):
 class MyHandler(PatternMatchingEventHandler):
 
     def on_any_event(self, event):
-        print("detected change. event = {}".format(event))
+        log.info("detected change. event = {}".format(event))
 
         for proc in psutil.process_iter():
             proc_cmdline = _get_proc_cmdline(proc)
@@ -38,17 +38,17 @@ class MyHandler(PatternMatchingEventHandler):
                 continue
 
             proc.kill()
-            print("Just killed {} on working dir {}".format(proc_cmdline, proc.cwd()))
+            log.info("Just killed {} on working dir {}".format(proc_cmdline, proc.cwd()))
 
         run_worker()
 
 
 def run_worker():
-    print("Ready to call {} ".format(celery_cmdline))
-    print("Current working dir {}".format(celery_working_dir))
+    log.info("Ready to call {} ".format(celery_cmdline))
+    log.info("Current working dir {}".format(celery_working_dir))
     os.chdir(celery_working_dir)
     subprocess.Popen(celery_cmdline)
-    print("Done callling {} ".format(celery_cmdline))
+    log.info("Done calling {} ".format(celery_cmdline))
 
 
 if __name__ == "__main__":
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     observer = Observer()
     observer.schedule(event_handler, code_dir_to_monitor, recursive=True)
     observer.start()
-    print("file change observer started")
+    log.info("file change observer started")
 
     try:
         while True:

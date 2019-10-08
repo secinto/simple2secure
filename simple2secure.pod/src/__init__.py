@@ -87,7 +87,7 @@ def entrypoint(argv, mode='app'):
         log.info('Initializing tests - verifying if the DB contains the latest version')
         sync_tests(app)
         log.info('Initialize and run celery worker')
-        #run_worker()
+        run_worker()
 
     return app
 
@@ -107,9 +107,8 @@ def authenticate(app, activate=False):
                 raise RuntimeError('NO license stored and no license ZIP file available from file system under '
                                    'static/license')
 
-            if activate or not stored_license.activated:
-                log.info('License will be activated on the PORTAL, obtaining a new auth token')
-                authenticate_pod(app, stored_license)
+            log.info('POD will be authenticated on the PORTAL, obtaining an auth token')
+            authenticate_pod(app, stored_license)
 
         except requests.exceptions.ConnectionError as ce:
             raise RuntimeError('Activating POD on PORTAL did not work: %s', ce.strerror)

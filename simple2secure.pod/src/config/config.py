@@ -18,7 +18,7 @@ class Config(object):
     CONNECTED_WITH_PORTAL = False
     ACTIVATE_LICENSE = False
     LOG_FILE = 'logs/app.log'
-    LOG_LEVEL_NAME = 'DEBUG'
+    LOG_LEVEL_NAME = 'INFO'
     LOG_FORMAT = '%(asctime)-15s %(message)s'
 
 

@@ -9,12 +9,10 @@ db = SQLAlchemy()
 class PodInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     generated_id = db.Column(db.Text)
-    access_token = db.Column(db.Text)
     hash_value_service = db.Column(db.Text)
 
-    def __init__(self, generated_id, access_token, hash_value_service):
+    def __init__(self, generated_id, hash_value_service):
         self.generated_id = generated_id
-        self.access_token = access_token
         self.hash_value_service = hash_value_service
 
 
