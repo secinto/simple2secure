@@ -1,9 +1,8 @@
 from os import *
-import subprocess
 
 
 def scanner(command, results, type):
-    #    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    #    process = subprocess.popen(command, stdout=subprocess.PIPE)
     #    stdout = process.communicate()[0]
     #    report = str(stdout, 'iso-8859-1')
     #    results[type] = report
