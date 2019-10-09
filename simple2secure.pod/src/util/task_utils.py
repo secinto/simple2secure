@@ -29,9 +29,6 @@ def get_sequence_from_url(url_query, app):
         test = Test.query.filter_by(name=task).first()
         if test:
             sequence_content.append(test_schema.dump(test).data)
-        else:
-            response_text = "Some of the tasks from the sequence are not included in the services.json config. To be " \
-                            "scheduled in the sequence they have to be included in services.json! "
 
     sequence_hash = create_secure_hash(json.dumps(sequence_content))
 

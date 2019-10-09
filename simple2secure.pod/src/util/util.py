@@ -1,13 +1,15 @@
 import getopt
+import hashlib
+import json
 import logging
 import sys
 from datetime import datetime
-import hashlib
-import json
 
 from flask import request
 
 from src.db.database import Test
+
+log = logging.getLogger('pod.util')
 
 
 def shutdown_server():
@@ -95,16 +97,18 @@ def print_success_message_auth(app):
               "--       Extracting the pod license         --\n" \
               "----------------------------------------------\n" \
               "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
-              "-- * Pod Group Id : " + app.config['GROUP_ID'] + "\n" \
-              "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
-              "----------------------------------------------\n" \
-              "----------------------------------------------\n" \
-              "--          ACTIVATING THE LICENSE          --\n" \
-              "----------------------------------------------\n" \
-              "-- * Auth Token : " + app.config['AUTH_TOKEN'] + "\n" \
-              "----------------------------------------------\n" \
-              "----------------------------------------------\n" \
-              "---------------INITIALIZATION END-------------\n" \
-              "----------------------------------------------\n"
+                                                                    "-- * Pod Group Id : " + app.config[
+                  'GROUP_ID'] + "\n" \
+                                "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "--          ACTIVATING THE LICENSE          --\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "-- * Auth Token : " + app.config[
+                  'AUTH_TOKEN'] + "\n" \
+                                  "----------------------------------------------\n" \
+                                  "----------------------------------------------\n" \
+                                  "---------------INITIALIZATION END-------------\n" \
+                                  "----------------------------------------------\n"
 
     app.logger.info('Pod information: %s', message)

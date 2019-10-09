@@ -22,15 +22,15 @@ def start_scheduler_tasks(app_obj, celery_tasks):
     scheduler.add_job(func=sync_tests_with_the_portal, trigger="interval", seconds=60, kwargs={'app_obj': app_obj})
 
     scheduler.add_job(func=check_portal_alive, trigger="interval", seconds=60,
-                      kwargs={'app': app_obj, 'celery_task': celery_tasks})
+                      kwargs={'app': app_obj})
 
     scheduler.start()
 
 
 def get_scheduled_tests(app_obj, celery_task):
     with app_obj.app_context():
-        request_test = portal_get(app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
-                                  app_obj.config['POD_ID'], app_obj)
+        request_test = portal_get(app_obj, app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
+                                  app_obj.config['POD_ID'])
         if request_test is not None and request_test.status_code == 200:
             test_run_array = json.loads(request_test.text)
 
@@ -39,7 +39,7 @@ def get_scheduled_tests(app_obj, celery_task):
                 celery_task.schedule_test.delay(current_test["test_definition"], test_run["testId"],
                                                 test_run["testName"], app_obj.config['POD_ID'], test_run["id"])
                 send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
-                                  app_obj, app_obj.config['POD_ID'])
+                                  app_obj)
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")
         else:
             if request_test is None:
