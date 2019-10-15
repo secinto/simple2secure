@@ -167,7 +167,7 @@ public class LicenseController {
 	 */
 	public boolean activateLicense(CompanyLicensePublic license) {
 		if (license != null) {
-			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activate", license);
+			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (authToken != null) {
 				activateLicenseInDB(authToken, license);
 

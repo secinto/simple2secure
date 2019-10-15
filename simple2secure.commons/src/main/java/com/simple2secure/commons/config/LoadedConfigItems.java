@@ -40,8 +40,6 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String baseDockerContainer = "http://192.168.99.100:5000";
-
 	private String version = "0.2.0";
 
 	private String reportURL = "/config/reports.json";
@@ -111,10 +109,6 @@ public class LoadedConfigItems {
 
 	public void setBaseProtocol(String baseProtocol) {
 		this.baseProtocol = baseProtocol;
-	}
-
-	public String getBaseDockerContainer() {
-		return baseDockerContainer;
 	}
 
 	public String getBaseHost() {

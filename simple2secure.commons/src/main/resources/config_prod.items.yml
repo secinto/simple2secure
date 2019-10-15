@@ -2,7 +2,6 @@ baseProtocol: https
 baseHost:  localhost
 basePort: 51001/s2s
 basePortWeb: 51003
-baseDockerContainer: http://192.168.99.100:5000
 reportURL: /config/reports.json
 stepsURL: /config/steps.json
 configURL: /config/config.json

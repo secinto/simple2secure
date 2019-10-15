@@ -161,7 +161,7 @@ public class LicenseController {
 			boolean podAuthentication = false;
 			if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && licensePublic.isDevicePod()) {
 				podAuthentication = true;
-			} else if (Strings.isNullOrEmpty(licensePublic.getDeviceId()) && !licensePublic.isDevicePod()) {
+			} else if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && !licensePublic.isDevicePod()) {
 				podAuthentication = false;
 			} else {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");

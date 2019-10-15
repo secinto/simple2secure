@@ -44,11 +44,11 @@ public class ProcessStreamObservable extends Observable implements Runnable {
 	public void run() {
 		running = true;
 		String line = "INIT";
+		log.debug("Observable is starting");
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			while ((line = reader.readLine()) != null && running) {
 				setChanged();
-				log.debug("ProcessStream produced: {}", line);
 				notifyObservers(line);
 			}
 			if (!running) {

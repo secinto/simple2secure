@@ -318,7 +318,7 @@
                         <input matInput (keyup)="applyFilterProbe($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="probeDataSource" matSort>
+                <mat-table #sortUser="matSort" #table [dataSource]="probeDataSource" matSort>
 
                     <ng-container matColumnDef="probe">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}

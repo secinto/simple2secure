@@ -1,4 +1,6 @@
-jar {
-	baseName = 'simple2secure.api'
-	version =  '1.0.0-RC'
+plugins { id "org.sonarqube" version "2.6.2" }
+
+sonarqube {
+	properties { property "sonar.projectBaseDir", "$projectDir/.." }
 }
+apply plugin: 'java'
