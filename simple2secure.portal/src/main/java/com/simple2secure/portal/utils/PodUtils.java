@@ -164,7 +164,7 @@ public class PodUtils {
 		if (!Strings.isNullOrEmpty(podId)) {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
 			licenseRepository.deleteByDeviceId(podId);
-			log.debug("Deleted dependencies for probe id {}", podId);
+			log.debug("Deleted dependencies for pod id {}", podId);
 		}
 	}
 

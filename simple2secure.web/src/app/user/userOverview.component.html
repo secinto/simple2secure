@@ -99,7 +99,7 @@
             <div *ngIf="showUserTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterUser($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
                 <mat-table #sort="matSort" #table [dataSource]="userDataSource" matSort>
@@ -131,7 +131,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsUsers;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator
+                <mat-paginator #userPaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -155,7 +155,7 @@
                         <mat-icon>edit</mat-icon>
                         {{ 'button.edit' | translate }}
                     </button>
-                    <button mat-menu-item (click)="onDeleteClick()">
+                    <button mat-menu-item (click)="onDeleteUserClick()">
                         <mat-icon>delete</mat-icon>
                         {{ 'button.delete' | translate }}
                     </button>
@@ -180,7 +180,7 @@
             <div *ngIf="showContextTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterUser($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
                 <mat-table #sortCntx="matSort" #table [dataSource]="contextDataSource" matSort>
@@ -226,7 +226,7 @@
                     <mat-icon>edit</mat-icon>
                     {{ 'button.edit' | translate }}
                 </button>
-                <button mat-menu-item (click)="onContextDeleteClick()">
+                <button mat-menu-item (click)="onDeleteContextClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>
@@ -315,7 +315,7 @@
             <div *ngIf="showProbeTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterProbe($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
                 <mat-table #sortDev="matSort" #table [dataSource]="probeDataSource" matSort>
@@ -356,7 +356,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator2
+                <mat-paginator #probePaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -378,7 +378,7 @@
                     <mat-icon>edit</mat-icon>
                     {{ 'probe.change.group' | translate }}
                 </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
+                <button mat-menu-item (click)="onDeleteProbeClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>
@@ -443,7 +443,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsPods"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsPods;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator4
+                <mat-paginator #podPaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -459,23 +459,12 @@
                 </div>
             </div>
 
-            <mat-menu #menuProbe="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
-                </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-            </mat-menu>
-
             <mat-menu #menuPod="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
+                <button mat-menu-item (click)="openDialogChangePodGroup()">
                     <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
+                    {{ 'pod.change.group' | translate }}
                 </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
+                <button mat-menu-item (click)="onDeletePodClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>

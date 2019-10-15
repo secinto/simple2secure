@@ -180,4 +180,31 @@ public class PodController {
 
 	}
 
+	/**
+	 * This function deletes the specified the POD with the specified ID if it exists
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/deletePod/{podId}",
+			method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (!Strings.isNullOrEmpty(podId)) {
+
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+
+			if (license != null) {
+				// delete All Probe dependencies
+				podUtils.deletePodDependencies(podId);
+				return new ResponseEntity<>(license, HttpStatus.OK);
+			}
+		}
+
+		log.error("Problem occured while deleting pod with id {}", podId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_pod", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
 }
