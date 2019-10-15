@@ -8,7 +8,7 @@ import subprocess
 
 code_dir_to_monitor = os.getcwd()
 celery_working_dir = code_dir_to_monitor  # happen to be the same. It may be different on your machine
-celery_cmdline = 'celery -A src.celery.celery_tasks.celery worker --loglevel=info'.split(" ")
+celery_cmdline = 'celery -A src.celery.celery_tasks.celery worker --purge --loglevel=info'.split(" ")
 
 log = logging.getLogger('celery.start_celery')
 

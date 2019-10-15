@@ -71,7 +71,7 @@ def update_pod_status_license(app, groupId, licenseId):
 
         if groupId and licenseId:
             podInfo.authToken = groupId
-            podInfo.connected = licenseId
+            podInfo.licenseId = licenseId
             log.info('Updating PodInfo with groupId and licenseId')
             update(podInfo)
 

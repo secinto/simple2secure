@@ -1,16 +1,17 @@
+import json
 import logging
 import sys
 
 from flask import Response, json, request, render_template
-from src import create_app
-from src.db.database_schema import TestSchema, TestSequenceSchema
-from src.util import file_utils, json_utils, task_utils
-from src.db.database import TestResult, Test
-from src.scheduler.scheduler_tasks import start_scheduler_tasks
-import src.celery.celery_tasks as celery_tasks
-import json
-from urllib import parse
 
+import src.celery.celery_tasks as celery_tasks
+from src import create_app
+from src.db.database import TestResult, Test
+from src.db.database_schema import TestSchema
+from src.scheduler.scheduler_tasks import start_scheduler_tasks
+from src.util import file_utils, json_utils
+from src.util.file_utils import update_services_file, read_json_testfile
+from src.util.rest_utils import schedule_test_on_the_portal
 from src.util.test_utils import update_insert_tests_to_db
 
 app = create_app(sys.argv)
@@ -28,7 +29,7 @@ log = logging.getLogger('pod.start_pod')
 
 @app.route("/services")
 def parse_tests():
-    tests_string = file_utils.read_json_testfile(app)
+    tests_string = read_json_testfile()
     resp = Response(tests_string, status=200, mimetype='application/json')
     return resp
 
@@ -36,7 +37,7 @@ def parse_tests():
 @app.route("/results")
 def show_test_results():
     with app.app_context():
-        file_utils.update_services_file()
+        update_services_file()
         test_results = TestResult.query.all()
         return render_template('testresults.html', len=len(test_results), test_results=test_results)
 
@@ -46,30 +47,12 @@ def index():
     return parse_tests()
 
 
-@app.route("/services/run/sequence")
-def run_sequence():
-    with app.app_context():
-        splitted_url = parse.urlsplit(request.url)
-        url_query = parse.parse_qs(splitted_url.query)
-
-        test_sequence_schema = TestSequenceSchema()
-
-        test_sequence = task_utils.get_sequence_from_url(url_query, app)
-
-        sequence_to_provide = test_sequence_schema.dump(test_sequence).data
-
-        testRun = celery_tasks.schedule_sequence.delay(sequence_to_provide)
-
-        return "Task sequence has been scheduled"
-
-
 @app.route("/services/run")
 def run_service():
     with app.app_context():
 
         test_schema = TestSchema()
-        response = file_utils.read_json_testfile(app)
-        # response_json_object = json.loads(response)
+        response = file_utils.read_json_testfile()
         update_insert_tests_to_db(response, app)
 
         response_text = "All available tests from services.json have been scheduled"
@@ -109,7 +92,7 @@ def run_service():
             db_test.test_content = current_test
             print(db_test.test_content)
             output = test_schema.dump(db_test)
-            resp = file_utils.schedule_test_on_the_portal(output, app, app.config['POD_ID'])
+            resp = schedule_test_on_the_portal(output, app)
 
             if resp.status_code == 200:
                 response_text = "Test " + test_name_response + " has been scheduled"

@@ -30,6 +30,11 @@ def write_to_result_log(content):
 
 
 def update_services_file():
+    """
+    Synchronizes the services.json file with the Tests stored in the DB locally. The locally stored tests are
+    synchronized with the Portal. Thus, all locations should be synchronized. This is done because if no DB entries
+    are available the services.json is used as backup.
+    """
     data = []
     tests = Test.query.all()
     if tests is not None:

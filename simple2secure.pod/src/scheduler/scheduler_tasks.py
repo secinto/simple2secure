@@ -20,12 +20,12 @@ def start_scheduler_tasks(app_obj, celery_tasks):
     """
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=get_scheduled_tests, trigger="interval", seconds=15,
-                      kwargs={'app_obj': app_obj, 'celery_task': celery_tasks})
+                      kwargs={'app_obj': app_obj, 'celery_tasks': celery_tasks})
 
     scheduler.add_job(func=get_test_results_from_db, trigger="interval", seconds=60,
-                      kwargs={'app_obj': app_obj, 'celery_task': celery_tasks})
+                      kwargs={'app_obj': app_obj, 'celery_tasks': celery_tasks})
 
-    scheduler.add_job(func=sync_tests, trigger="interval", seconds=60, kwargs={'app_obj': app_obj})
+    scheduler.add_job(func=sync_tests, trigger="interval", seconds=60, kwargs={'app': app_obj})
 
     scheduler.add_job(func=check_portal_alive, trigger="interval", seconds=60,
                       kwargs={'app': app_obj})

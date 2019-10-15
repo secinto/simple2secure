@@ -15,6 +15,17 @@ log = logging.getLogger('pod.util.rest_utils')
 
 
 def portal_get(app, url, useWithoutAuthentication=False):
+    """
+    Utility function for getting data from the PORTAL. Required are the application context, the URL from which a GET
+    should be performed and a boolean indicating if authentication should be sent or not. If no authentication is sent
+    but would be required an error will be logged and usually either none or an response code indicating the problem is
+    returned.
+
+    :param app:  The application context
+    :param url: The URL from which a get should be performed
+    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :return: The response data as obtained from the call
+    """
     headers = create_headers(app, useWithoutAuthentication)
 
     if not headers:
@@ -30,6 +41,18 @@ def portal_get(app, url, useWithoutAuthentication=False):
 
 
 def portal_post(app, url, data, useWithoutAuthentication=False):
+    """
+    Utility function for posting data to the PORTAL. Required are the application context, the URL from which a GET
+    should be performed, the data which should be transmitted to the PORTAL and a boolean indicating if authentication
+    should be sent or not. If no authentication is sent  but would be required an error will be logged and usually
+    either none or an response code indicating the problem is returned.
+
+    :param app:  The application context
+    :param url: The URL from which a get should be performed
+    :param data: The data which should be sent in to PORTAL
+    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :return: The response data as obtained from the call
+    """
     headers = create_headers(app, useWithoutAuthentication)
 
     if not headers:
