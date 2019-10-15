@@ -72,10 +72,10 @@ def entrypoint(argv, mode='app'):
         log.info("Creating tables in the DB if not existent")
         init_db()
 
-    if not app.config['POD_ID']:
-        log.info('Obtaining the POD info')
-        podInfo = get_pod(app)
-        app.config['POD_ID'] = podInfo.generated_id
+        if not app.config['POD_ID']:
+            log.info('Obtaining the POD info')
+            podInfo = get_pod(app)
+            app.config['POD_ID'] = podInfo.generated_id
 
     if mode == 'app':
         log.info('Check connection to PORTAL')

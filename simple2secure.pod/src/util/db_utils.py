@@ -37,9 +37,10 @@ def get_pod(app):
     with app.app_context():
         pod_info = PodInfo.query.first()
         if pod_info is None:
-            pod_info = create_pod(app)
-        else:
-            log.debug('Using existing pod id from the database: {}'.format(pod_info.generated_id))
+            create_pod(app)
+            pod_info = PodInfo.query.first()
+
+        log.debug('Using existing pod id from the database: {}'.format(pod_info.generated_id))
 
         return pod_info
 
@@ -58,7 +59,6 @@ def create_pod(app):
         pod_info = PodInfo(podId)
         update(pod_info)
         log.info("Stored new PodInfo in DB")
-        return pod_info
 
 
 def update_pod_status_license(app, groupId, licenseId):
@@ -128,7 +128,6 @@ def get_license(app, check_for_new=False):
                 return stored_license
 
             if created_license.licenseId != 'NO_ID':
-                update(created_license)
                 return created_license
 
         return stored_license
@@ -171,4 +170,5 @@ def create_license(app):
 
         if groupId and licenseId:
             license_obj = CompanyLicensePublic(groupId, licenseId, podInfo.generated_id, expiration_date, HOSTNAME)
+            update(license_obj)
             return license_obj
