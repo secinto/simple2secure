@@ -210,6 +210,8 @@ def create_headers(app, useWithoutAuthentication=False):
     if podInfo.connected:
         if not podInfo.authToken:
             authToken = get_auth_token(app)
+        else:
+            authToken = podInfo.authToken
 
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
                    'Authorization': "Bearer " + authToken}
