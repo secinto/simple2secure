@@ -211,9 +211,9 @@ def create_headers(app, useWithoutAuthentication=False):
         if not podInfo.authToken:
             authToken = get_auth_token(app)
 
-            headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                       'Authorization': "Bearer " + authToken}
-            log.debug('Created headers {}'.format(headers))
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
+                   'Authorization': "Bearer " + authToken}
+        log.debug('Created headers {}'.format(headers))
     else:
         log.info('Not connected to PORTAL, not creating headers')
 
