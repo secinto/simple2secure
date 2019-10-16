@@ -62,6 +62,7 @@ public class NetworkScheduler extends TimerTask {
 			report.setProcessorName("PCAP Network Statistics");
 			report.setDeviceId(ProbeConfiguration.probeId);
 			report.setGroupId(ProbeConfiguration.groupId);
+			report.setHostname(ProbeConfiguration.hostname);
 			Map<String, String> content = new TreeMap<>();
 			content.put("PacketsCaptured", String.valueOf(statistics.getNumPacketsCaptured()));
 			content.put("PacketsDropped", String.valueOf(statistics.getNumPacketsDropped()));

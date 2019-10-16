@@ -28,23 +28,29 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "Processor")
+@Table(
+		name = "Processor")
 public class Processor extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 6776396393360976891L;
-	private boolean isGroovy;
+
+	@JsonProperty
+	private boolean groovy = false;
+
 	private String groupId;
 	private String name;
 	private String processor_class;
 
 	@Lob
-	@Column(columnDefinition = "CLOB")
+	@Column(
+			columnDefinition = "CLOB")
 	private String groovyProcessor;
 
 	private long analysisInterval;
@@ -54,12 +60,11 @@ public class Processor extends GenericDBObject {
 	 * Default Constructor
 	 */
 	public Processor() {
-		isGroovy = false;
 	}
 
 	public Processor(String name, String processor_class, String groovyProcessor) {
 		super();
-		isGroovy = true;
+		groovy = true;
 		this.name = name;
 		this.processor_class = processor_class;
 		this.groovyProcessor = groovyProcessor;
@@ -90,11 +95,11 @@ public class Processor extends GenericDBObject {
 	}
 
 	public boolean isGroovy() {
-		return isGroovy;
+		return groovy;
 	}
 
-	public void setGroovy(boolean isGroovy) {
-		this.isGroovy = isGroovy;
+	public void setGroovy(boolean groovy) {
+		this.groovy = groovy;
 	}
 
 	public String getGroovyProcessor() {

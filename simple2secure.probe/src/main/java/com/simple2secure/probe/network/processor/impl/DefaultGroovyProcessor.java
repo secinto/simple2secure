@@ -71,15 +71,16 @@ public class DefaultGroovyProcessor extends PacketProcessor {
 
 		try {
 			Processor groovyProcessor = packet.getProcessor();
+			if (groovyProcessor != null) {
+				Class groovy = classLoader.parseClass(groovyProcessor.getGroovyProcessor());
 
-			Class groovy = classLoader.parseClass(groovyProcessor.getGroovyProcessor());
+				Constructor<?> constructor = groovy.getConstructor(String.class, Map.class);
 
-			Constructor<?> constructor = groovy.getConstructor(String.class, Map.class);
-
-			Map<String, String> options = new HashMap<>();
-			PacketProcessor processor = (PacketProcessor) constructor.newInstance(groovy.getCanonicalName(), options);
-			if (processor != null) {
-				innerGroovyProcessor = processor;
+				Map<String, String> options = new HashMap<>();
+				PacketProcessor processor = (PacketProcessor) constructor.newInstance(groovy.getCanonicalName(), options);
+				if (processor != null) {
+					innerGroovyProcessor = processor;
+				}
 			}
 		} catch (Exception e) {
 			log.error("Error occured during the instantiation of groovy script: " + e.getMessage());

@@ -163,7 +163,7 @@ public class PodController {
 			value = "/scheduledTests/{podId}",
 			method = RequestMethod.GET,
 			consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(podId);

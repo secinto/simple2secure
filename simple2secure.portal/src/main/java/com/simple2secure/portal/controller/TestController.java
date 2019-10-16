@@ -286,7 +286,7 @@ public class TestController {
 			value = "/scheduleTestPod/{podId}",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) {
 
@@ -322,7 +322,7 @@ public class TestController {
 			value = "/saveTestResult",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @RequestHeader("Accept-Language") String locale) {
 		TestResult result = testUtils.saveTestResult(testResult, locale);
 		return new ResponseEntity<>(result, HttpStatus.OK);
@@ -332,7 +332,7 @@ public class TestController {
 	@RequestMapping(
 			value = "/saveTestPod",
 			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
@@ -344,7 +344,7 @@ public class TestController {
 	@RequestMapping(
 			value = "/syncTests",
 			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
@@ -368,7 +368,7 @@ public class TestController {
 	@RequestMapping(
 			value = "/syncTest",
 			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 
@@ -384,7 +384,7 @@ public class TestController {
 	@RequestMapping(
 			value = "/updateTestStatus",
 			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 

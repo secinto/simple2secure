@@ -120,7 +120,7 @@ public class TokenAuthenticationService {
 
 			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
 			claims.put(CLAIM_DEVICEID, deviceId);
-			claims.put(CLAIM_USERROLE, UserRole.PROBE);
+			claims.put(CLAIM_USERROLE, UserRole.DEVICE);
 			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
 
@@ -177,7 +177,11 @@ public class TokenAuthenticationService {
 	}
 
 	public Authentication getAuthentication(HttpServletRequest request) {
+		log.info("Request with authentication requirement from {}", request.getRequestURL());
 		String accessToken = resolveToken(request);
+		if (request.getRequestURL().toString().contains("processor")) {
+			log.debug("");
+		}
 		if (accessToken != null) {
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 			UserRole userRole = UserRole.LOGINUSER;
@@ -222,13 +226,13 @@ public class TokenAuthenticationService {
 					if (isAccessTokenValid) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 							return new UsernamePasswordAuthenticationToken(license, null,
-									CustomAuthenticationProvider.getAuthorities(UserRole.POD.name()));
+									CustomAuthenticationProvider.getAuthorities(UserRole.DEVICE.name()));
 						}
 						/*
 						 * TODO: Verify if assigning the role PROBE is OK if no device id has been specified.
 						 */
 						return new UsernamePasswordAuthenticationToken(license, null,
-								CustomAuthenticationProvider.getAuthorities(UserRole.PROBE.name()));
+								CustomAuthenticationProvider.getAuthorities(UserRole.LOGINUSER.name()));
 					} else {
 						log.error("Provided token not valid anymore for device {}", license.getDeviceId());
 

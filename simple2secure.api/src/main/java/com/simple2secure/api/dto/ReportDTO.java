@@ -13,7 +13,7 @@ import com.simple2secure.api.model.Report;
 public class ReportDTO extends Report {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 4813182193819532383L;
 	private String username;
@@ -27,6 +27,7 @@ public class ReportDTO extends Report {
 	public ReportDTO(String username, Report report) {
 		super(report.getDeviceId(), report.getQuery(), report.getQueryResult(), report.getQueryTimestamp(), true);
 		this.username = username;
+		this.setHostname(report.getHostname());
 	}
 
 	public String getUsername() {

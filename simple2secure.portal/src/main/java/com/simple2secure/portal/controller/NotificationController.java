@@ -64,7 +64,7 @@ public class NotificationController {
 			value = "/{podId}",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'POD')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) {
 		if (notification != null && !Strings.isNullOrEmpty(podId)) {

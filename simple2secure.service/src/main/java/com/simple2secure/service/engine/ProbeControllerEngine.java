@@ -58,7 +58,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 	private SimpleLoggingObserver observer;
 
 	private String probeLibraryPath = "./libs/simple2secure.probe.jar";
-	private String licensePath = "license.zip";
+	private String licensePath = System.getProperty("user.dir") + "/license/";
 
 	private boolean stopped = true;
 
@@ -76,7 +76,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 		triggerScheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
 		observer = new SimpleLoggingObserver();
-
+		log.info("Using {} as licensePath", licensePath);
 	}
 
 	public ProbeControllerEngine(String probeLibraryPath, String licensePath) {

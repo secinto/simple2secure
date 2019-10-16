@@ -80,7 +80,7 @@ public final class ProbeUtils {
 	 * This function checks if the server is reachable
 	 */
 	public static void isServerReachable() {
-		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL())) {
+		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL() + "/api/service")) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		} else {

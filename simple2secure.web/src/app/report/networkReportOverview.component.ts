@@ -35,6 +35,7 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['network.result.css'],
 	templateUrl: 'networkReportOverview.component.html'
 })
 
@@ -45,7 +46,7 @@ export class NetworkReportOverviewComponent {
 	selectedReport: any;
 	loading = false;
 
-	displayedColumns = ['probe', 'processorName', 'startTime', 'action'];
+	displayedColumns = ['probe', 'hostname', 'processorName', 'startTime', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;

@@ -28,7 +28,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "Report")
+@Table(
+		name = "Report")
 public class Report extends GenericDBObject {
 
 	/**
@@ -38,6 +39,7 @@ public class Report extends GenericDBObject {
 	private String groupId;
 	private String deviceId;
 	private String query;
+	private String hostname;
 
 	@Lob
 	private String queryResult;
@@ -110,6 +112,14 @@ public class Report extends GenericDBObject {
 
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 }

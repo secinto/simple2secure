@@ -29,9 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -72,8 +70,6 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 	private NetworkReport report;
 
-	private int packetCounter;
-
 	private String content;
 
 	private String srcMac, destMac, srcIp, destIp, protocol;
@@ -101,9 +97,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		report.setDeviceId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
-
-		// reportContent = new TreeMap<>();
-		packetCounter = 0;
+		report.setHostname(ProbeConfiguration.hostname);
 		sourceIp = new TreeMap<>();
 		destinationIp = new TreeMap<>();
 		sourceMac = new TreeMap<>();
@@ -213,20 +207,16 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				report.setGroupId(ProbeConfiguration.groupId);
 				report.setStartTime(analysisStartTime.toString());
 				report.setProcessorName(packet.getProcessor().getName());
-
+				report.setHostname(ProbeConfiguration.hostname);
 				// reportContent = new TreeMap<>();
 				sourceIp = new TreeMap<>();
 				destinationIp = new TreeMap<>();
-				packetCounter = 0;
 				sourceMac = new TreeMap<>();
 				destinationMac = new TreeMap<>();
 				protocols = new TreeMap<>();
 				maxLength = 0;
 			} else {
-				packetCounter++;
-
 				countNetworkTraffic();
-
 			}
 		} catch (ParseException e) {
 			log.error("Error occured during the expiration time check: " + e.getMessage());
@@ -362,33 +352,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		content = content.replace("}\"", "}");
 		content = content.replace("'", "\"");
 		log.debug(content);
-		// entry.put("Source MAC", contentSrcMac);
-		// entry.put("Destination MAC", contentDstMac);
-		// entry.put("Protocol", contentProtocol);
-		// entry.put("contentMaxPacketLength", contentMaxPacketLength);
-	}
 
-	/**
-	 * This function returns the entry with the maximum value
-	 *
-	 * @param map
-	 * @return
-	 */
-	private Map.Entry<String, Integer> getMostUsedEntry(Map<String, Integer> map) {
-		SortedSet<Map.Entry<String, Integer>> sortedSet = entriesSortedByValues(map);
-		return sortedSet.last();
-	}
-
-	private static <K, V extends Comparable<? super V>> SortedSet<Map.Entry<K, V>> entriesSortedByValues(Map<K, V> map) {
-		SortedSet<Map.Entry<K, V>> sortedEntries = new TreeSet<>(new Comparator<Map.Entry<K, V>>() {
-			@Override
-			public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
-				int res = e1.getValue().compareTo(e2.getValue());
-				return res != 0 ? res : 1;
-			}
-		});
-		sortedEntries.addAll(map.entrySet());
-		return sortedEntries;
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {

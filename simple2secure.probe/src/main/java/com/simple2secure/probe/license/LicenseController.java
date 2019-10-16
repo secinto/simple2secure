@@ -24,6 +24,7 @@ package com.simple2secure.probe.license;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.License;
@@ -52,30 +54,50 @@ public class LicenseController {
 
 	/**
 	 * Obtains the license from the specified path. It requires a license ZIP file as input, containing the license.dat and the public key for
-	 * verification. If not an exception
+	 * verification. If not an exception is thrown. If the importFilePath specifies a folder all ZIP files are obtained and the newest is used
+	 * as input. If a file is specified this is used.
 	 *
 	 * @param importFilePath
-	 * @return
+	 *          The path to the license folder or file.
+	 * @return The {@link CompanyLicensePublic} object obtained from the file if any.
 	 * @throws Exception
 	 */
 	public CompanyLicensePublic loadLicenseFromPath(String importFilePath) throws Exception {
 		CompanyLicensePublic license = null;
-		File inputFile = new File(importFilePath);
-
-		if (inputFile != null && inputFile.exists()) {
-			List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
-			if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
-				License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
-				if (checkLicenseProps(downloadedLicense)) {
-					return createLicenseForAuth(downloadedLicense);
-				} else {
-					log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
+		if (FileUtil.fileOrFolderExists(importFilePath)) {
+			File inputFile = null;
+			if (FileUtil.isDirectory(importFilePath)) {
+				List<File> files = FileUtil.getFilesFromDirectory(importFilePath, false, Arrays.asList(new String[] { "zip" }));
+				inputFile = null;
+				for (File file : files) {
+					if (inputFile == null) {
+						inputFile = file;
+					}
+					if (inputFile.lastModified() < file.lastModified()) {
+						inputFile = file;
+					}
 				}
 			} else {
-				log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
+				inputFile = new File(importFilePath);
+			}
+
+			if (inputFile != null && inputFile.exists()) {
+				List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
+				if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
+					License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
+					if (checkLicenseProps(downloadedLicense)) {
+						return createLicenseForAuth(downloadedLicense);
+					} else {
+						log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
+					}
+				} else {
+					log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
+				}
+			} else {
+				log.error("No usable license found in path {}", importFilePath);
 			}
 		} else {
-			log.error("Specified ZIP file {} doesn't exist!", importFilePath);
+			log.error("Specified path {} doesn't contain a folder nor a file", importFilePath);
 		}
 		return license;
 	}
@@ -98,6 +120,7 @@ public class LicenseController {
 					ProbeConfiguration.probeId = license.getDeviceId();
 					ProbeConfiguration.groupId = license.getGroupId();
 					ProbeConfiguration.authKey = license.getAccessToken();
+					ProbeConfiguration.hostname = license.getHostname();
 					return StartConditions.LICENSE_VALID;
 				}
 				return StartConditions.LICENSE_NOT_ACTIVATED;
@@ -177,6 +200,7 @@ public class LicenseController {
 				ProbeConfiguration.authKey = authToken;
 				ProbeConfiguration.probeId = license.getDeviceId();
 				ProbeConfiguration.groupId = license.getGroupId();
+				ProbeConfiguration.hostname = license.getHostname();
 				ProbeConfiguration.setAPIAvailablitity(true);
 				log.info("License successfully activated and AuthToken obtained");
 				return true;

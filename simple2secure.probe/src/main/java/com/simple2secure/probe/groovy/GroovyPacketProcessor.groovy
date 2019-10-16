@@ -16,7 +16,7 @@
  *
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *   
+ *
  *********************************************************************
  */
 package com.simple2secure.probe.groovy
@@ -28,8 +28,6 @@ class GroovyPacketProcessor extends PacketProcessor {
 
 	@Override
 	public PacketContainer processPacket() {
-		// TODO Auto-generated method stub
-		println "test";
 		println this.packet.id;
 		return null;
 	}
@@ -37,7 +35,6 @@ class GroovyPacketProcessor extends PacketProcessor {
 	@Override
 	public void performAnalysis() {
 		// TODO Auto-generated method stub
-		
-	}
 
+	}
 }

@@ -28,6 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
@@ -41,6 +42,7 @@ public class NetworkReport extends GenericDBObject {
 	private static final long serialVersionUID = -5984944130903360444L;
 	private String groupId;
 	private String deviceId;
+	private String hostname;
 
 	@Lob
 	private String stringContent;
@@ -49,6 +51,8 @@ public class NetworkReport extends GenericDBObject {
 	private List<PacketInfo> ipPairs;
 	private String startTime;
 	private String processorName;
+
+	@JsonProperty
 	private boolean sent;
 
 	public NetworkReport() {
@@ -92,6 +96,14 @@ public class NetworkReport extends GenericDBObject {
 
 	public void setStartTime(String startTime) {
 		this.startTime = startTime;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 	public boolean isSent() {

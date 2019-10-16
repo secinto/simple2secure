@@ -56,6 +56,7 @@ public class QueryRunnable implements Runnable {
 		if (!Strings.isNullOrEmpty(queryResult)) {
 			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date().toString(), false);
 			result.setGroupId(ProbeConfiguration.groupId);
+			result.setHostname(ProbeConfiguration.hostname);
 			DBUtil.getInstance().save(result);
 		}
 	}

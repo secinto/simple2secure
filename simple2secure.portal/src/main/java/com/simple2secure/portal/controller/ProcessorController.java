@@ -113,7 +113,7 @@ public class ProcessorController {
 	@RequestMapping(
 			value = "/{probeId}",
 			method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
 			@RequestHeader("Accept-Language") String locale) {
 

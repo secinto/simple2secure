@@ -9,7 +9,13 @@
 
         <ng-container matColumnDef="probe">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.probe' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+        </ng-container>
+
+        <!-- Host Column -->
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
         </ng-container>
 
         <!-- Position Column -->
@@ -21,7 +27,7 @@
         <!-- Name Column -->
         <ng-container matColumnDef="startTime">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.startTime}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.startTime | date : 'short'}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
