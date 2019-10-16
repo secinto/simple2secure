@@ -25,27 +25,24 @@ import java.util.List;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Pod;
-import com.simple2secure.api.model.Probe;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.UserInfo;
 
 public class UserDTO {
 
 	private List<UserRoleDTO> myUsersList;
 	private List<CompanyGroup> myGroups;
-	private List<Probe> myProbes;
-	private List<Pod> myPods;
+	private List<Device> myDevices;
 	private List<Context> myContexts;
 	private List<String> assignedGroups;
 	private UserInfo myProfile;
 
-	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Probe> myProbes, List<Pod> myPods,
-			List<Context> myContexts, List<String> assignedGroups) {
+	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Device> myDevices, List<Context> myContexts,
+			List<String> assignedGroups) {
 		myProfile = user;
 		myUsersList = myUsers;
 		this.myGroups = myGroups;
-		this.myProbes = myProbes;
-		this.myPods = myPods;
+		this.myDevices = myDevices;
 		this.myContexts = myContexts;
 		this.assignedGroups = assignedGroups;
 	}
@@ -74,14 +71,6 @@ public class UserDTO {
 		this.myGroups = myGroups;
 	}
 
-	public List<Probe> getMyProbes() {
-		return myProbes;
-	}
-
-	public void setMyProbes(List<Probe> myProbes) {
-		this.myProbes = myProbes;
-	}
-
 	public List<Context> getMyContexts() {
 		return myContexts;
 	}
@@ -98,11 +87,11 @@ public class UserDTO {
 		this.assignedGroups = assignedGroups;
 	}
 
-	public List<Pod> getMyPods() {
-		return myPods;
+	public List<Device> getMyDevices() {
+		return myDevices;
 	}
 
-	public void setMyPods(List<Pod> myPods) {
-		this.myPods = myPods;
+	public void setMyDevices(List<Device> myDevices) {
+		this.myDevices = myDevices;
 	}
 }

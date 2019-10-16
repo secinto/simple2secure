@@ -320,10 +320,10 @@
                 </div>
                 <mat-table #sortUser="matSort" #table [dataSource]="probeDataSource" matSort>
 
-                    <ng-container matColumnDef="probe">
+                    <ng-container matColumnDef="probeId">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+                        <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">
@@ -395,7 +395,7 @@
                 </div>
                 <mat-table #sortPod="matSort" [dataSource]="podDataSource" matSort>
 
-                    <ng-container matColumnDef="pod">
+                    <ng-container matColumnDef="hostname">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
@@ -404,7 +404,7 @@
                     <ng-container matColumnDef="podId">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
                         </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.podId}}</mat-cell>
+                        <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">

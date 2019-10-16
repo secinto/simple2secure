@@ -22,6 +22,8 @@
 package com.simple2secure.probe.license;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
@@ -194,9 +197,29 @@ public class LicenseController {
 	 *
 	 */
 	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
-		license.setAccessToken(authToken);
-		license.setActivated(true);
-		updateLicenseInDB(license);
+		if (!Strings.isNullOrEmpty(authToken)) {
+			CompanyLicensePublic receivedLicense = JSONUtils.fromString(authToken, CompanyLicensePublic.class);
+			if (receivedLicense != null) {
+				if (!receivedLicense.getDeviceId().equals(license.getDeviceId())) {
+					log.error("Received license doesn't contain the same device ID, needs to be verified, continuing for now!");
+				}
+				license.setAccessToken(receivedLicense.getAccessToken());
+				license.setActivated(true);
+				updateLicenseInDB(license);
+			} else {
+				if (authToken.contains("accessToken")) {
+					int start = authToken.indexOf("accessToken") + "accessToken".length();
+					int actualStart = authToken.indexOf(":\"", start);
+					int actualEnd = authToken.indexOf("\"", actualStart);
+					String accessToken = authToken.substring(actualStart, actualEnd);
+					if (!Strings.isNullOrEmpty(accessToken)) {
+						license.setAccessToken(accessToken.trim());
+						license.setActivated(true);
+						updateLicenseInDB(license);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -210,7 +233,7 @@ public class LicenseController {
 	 */
 	public CompanyLicensePublic createLicenseForAuth(License license) {
 		String probeId = "";
-		String groupId, licenseId, expirationDate;
+		String groupId, licenseId, expirationDate, hostname = "LOCALHOST";
 
 		if (license == null) {
 			return null;
@@ -221,6 +244,11 @@ public class LicenseController {
 		groupId = license.getProperty("groupId");
 		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			log.error("Couldn't obtain hostname locally.");
+		}
 
 		/*
 		 * Obtain license stored in DB if any.
@@ -243,6 +271,8 @@ public class LicenseController {
 			probeId = UUID.randomUUID().toString();
 			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
 		}
+		storedLicense.setStatus(DeviceStatus.ONLINE);
+		storedLicense.setHostname(hostname);
 		/*
 		 * Update the license in the local DB.
 		 */
@@ -251,7 +281,7 @@ public class LicenseController {
 	}
 
 	/**
-	 * Verifies the validity of the stored license using the Token service from the Portal. If the response contains a
+	 * Verifies the validity of the stored license using the authenticate service from the Portal. If the response contains a
 	 * {@link CompanyLicensePublic} it returns it otherwise null is returned.
 	 *
 	 * @return
@@ -259,7 +289,7 @@ public class LicenseController {
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			}

@@ -21,8 +21,8 @@
  */
 
 import {Component, Inject} from '@angular/core';
-import {CompanyGroup, Probe, ContextDTO} from '../_models/index';
-import {AlertService, DataService, HttpService} from '../_services/index';
+import {CompanyGroup, Device, ContextDTO} from '../_models';
+import {AlertService, DataService, HttpService} from '../_services';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
@@ -41,7 +41,7 @@ export class UserProbeChangeGroupComponent {
 	url: string;
 	currentUser: any;
 	groups: CompanyGroup[];
-	probe: Probe;
+	probe: Device;
 	selectedGroup: CompanyGroup;
 	context: ContextDTO;
 
@@ -88,7 +88,7 @@ export class UserProbeChangeGroupComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'probe/changeGroup/' + this.probe.probeId;
+		this.url = environment.apiEndpoint + 'probe/changeGroup/' + this.probe.deviceId;
 		this.httpService.post(this.selectedGroup, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);

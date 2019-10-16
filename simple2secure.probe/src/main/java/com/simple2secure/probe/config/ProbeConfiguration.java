@@ -58,7 +58,6 @@ public class ProbeConfiguration {
 
 	private static boolean apiAvailable = false;
 	public static boolean runInTesting = true;
-	public static boolean isInstrumented = false;
 
 	public static String authKey = "";
 	public static String groupId = "";

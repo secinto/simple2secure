@@ -61,8 +61,8 @@ public class ReportScheduler extends TimerTask {
 	private void sendReport(Report report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getProbeId())) {
-				report.setProbeId(ProbeConfiguration.probeId);
+			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+				report.setDeviceId(ProbeConfiguration.probeId);
 			}
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
@@ -82,8 +82,8 @@ public class ReportScheduler extends TimerTask {
 	private void sendNetworkReport(NetworkReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getProbeId())) {
-				report.setProbeId(ProbeConfiguration.probeId);
+			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+				report.setDeviceId(ProbeConfiguration.probeId);
 			}
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);

@@ -24,31 +24,31 @@ package com.simple2secure.api.dto;
 
 import java.util.List;
 
-import com.simple2secure.api.model.Pod;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestSequence;
 
-public class PodDTO {
+public class DeviceDTO {
 
-	private Pod pod;
+	private Device pod;
 
 	private List<TestObjWeb> test;
 
 	private List<TestSequence> test_sequence;
-	public PodDTO() {
+	public DeviceDTO() {
 	}
 
-	public PodDTO(Pod pod, List<TestObjWeb> test, List<TestSequence> test_sequence) {
+	public DeviceDTO(Device pod, List<TestObjWeb> test, List<TestSequence> test_sequence) {
 		this.pod = pod;
 		this.test = test;
 		this.test_sequence = test_sequence;
 	}
 
-	public Pod getPod() {
+	public Device getPod() {
 		return pod;
 	}
 
-	public void setPod(Pod pod) {
+	public void setPod(Device pod) {
 		this.pod = pod;
 	}
 

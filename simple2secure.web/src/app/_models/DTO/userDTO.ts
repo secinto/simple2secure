@@ -25,14 +25,13 @@ import {CompanyGroup} from '../companygroup';
 import {UserRoleDTO} from './userRoleDTO';
 import {Context} from '../context';
 import {UserInfo} from '../userInfo';
-import {Pod} from '../pod';
+import {Device} from '../device';
 
 export class UserDTO {
 	myProfile: UserInfo;
 	myUsersList: UserRoleDTO[];
 	myGroups: CompanyGroup[];
-	myProbes: Probe[];
-	myPods: Pod[];
+	myDevices: Device[];
 	myContexts: Context[];
 	assignedGroups: string[];
 }

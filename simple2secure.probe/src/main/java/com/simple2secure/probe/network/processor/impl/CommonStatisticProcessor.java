@@ -98,7 +98,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
-		report.setProbeId(ProbeConfiguration.probeId);
+		report.setDeviceId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime.toString());
 
@@ -201,7 +201,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				// set new start time
 				// set reportContent stringBuilder
 				// initialize new report
-				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
+				if (!Strings.isNullOrEmpty(report.getDeviceId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
 					writeNetworkTrafficResults();
 					report.setStringContent(content);
 					report.setSent(false);
@@ -209,7 +209,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				}
 				analysisStartTime = new Date();
 				report = new NetworkReport();
-				report.setProbeId(ProbeConfiguration.probeId);
+				report.setDeviceId(ProbeConfiguration.probeId);
 				report.setGroupId(ProbeConfiguration.groupId);
 				report.setStartTime(analysisStartTime.toString());
 				report.setProcessorName(packet.getProcessor().getName());

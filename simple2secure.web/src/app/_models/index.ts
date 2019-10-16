@@ -35,7 +35,7 @@ export * from './command';
 export * from './testCase';
 export * from './notification';
 export * from './companygroup';
-export * from './probe';
+export * from './device';
 export * from './networkReport';
 export * from './userRole';
 export * from './timeunit';

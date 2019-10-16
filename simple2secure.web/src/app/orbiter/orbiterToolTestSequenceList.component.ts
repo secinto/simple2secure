@@ -71,7 +71,7 @@ export class OrbiterToolTestSequenceListComponent {
 		this.isSequenceChanged = false;
 		this.context = JSON.parse(localStorage.getItem('context'));
 		this.pod = this.dataService.getPods();
-		this.loadSequences(this.pod.pod.podId);
+		this.loadSequences(this.pod.pod.deviceId);
 	}
 
 	ngAfterViewInit() {
@@ -133,7 +133,7 @@ export class OrbiterToolTestSequenceListComponent {
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
 				this.isSequenceChanged = true;
-				this.loadSequences(this.pod.pod.podId);
+				this.loadSequences(this.pod.pod.deviceId);
 			}
 		});
 
@@ -190,7 +190,7 @@ export class OrbiterToolTestSequenceListComponent {
 				this.alertService.success(this.translate.instant('message.sequence.delete'));
 				this.loading = false;
 				this.isSequenceChanged = true;
-				this.loadSequences(this.pod.pod.podId);
+				this.loadSequences(this.pod.pod.deviceId);
 			},
 			error => {
 				if (error.status == 0) {

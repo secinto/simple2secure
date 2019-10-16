@@ -45,8 +45,9 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.utils.ProbeUtils;
+import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
 @RequestMapping("/api/probe")
@@ -76,7 +77,10 @@ public class ProbeController {
 	GroupUtils groupUtils;
 
 	@Autowired
-	ProbeUtils probeUtils;
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	TestUtils testUtils;
 
 	/**
 	 * This function returns all devices according to the user id
@@ -128,7 +132,7 @@ public class ProbeController {
 
 			if (license != null) {
 				// delete All Probe dependencies
-				probeUtils.deleteProbeDependencies(probeId);
+				deviceUtils.deleteDependencies(probeId);
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
 		}

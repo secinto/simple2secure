@@ -22,34 +22,40 @@
 
 package com.simple2secure.api.model;
 
-public class Pod {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-	private String podId;
+public class Device {
+
+	private String deviceId;
 	private CompanyGroup group;
+	@JsonProperty
 	private boolean activated;
 	private String hostname;
 	private String status;
+	@JsonProperty
+	private boolean pod;
 
-	public Pod() {
+	public Device() {
 
 	}
 
-	public Pod(String podId, CompanyGroup group, boolean activated, String hostname, String status) {
+	public Device(String deviceId, CompanyGroup group, boolean activated, String hostname, String status, boolean pod) {
 		super();
 
-		this.podId = podId;
+		this.deviceId = deviceId;
 		this.group = group;
 		this.activated = activated;
 		this.hostname = hostname;
 		this.status = status;
+		this.pod = pod;
 	}
 
-	public String getPodId() {
-		return podId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setPodId(String podId) {
-		this.podId = podId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 	public boolean isActivated() {
@@ -83,4 +89,13 @@ public class Pod {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	public boolean isPod() {
+		return pod;
+	}
+
+	public void setPod(boolean pod) {
+		this.pod = pod;
+	}
+
 }

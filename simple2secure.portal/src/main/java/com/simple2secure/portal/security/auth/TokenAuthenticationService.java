@@ -90,18 +90,18 @@ public class TokenAuthenticationService {
 	static final String CLAIMS_SUBJECT = "data";
 	static final String CLAIM_USERID = "userID";
 	static final String CLAIM_USERROLE = "userRole";
-	static final String CLAIM_PROBEID = "probeID";
+	static final String CLAIM_DEVICEID = "deviceId";
 
 	/**
 	 * This function is used to create probe authentication token so that it is available to send data to the portal
 	 *
-	 * @param probeId
+	 * @param deviceId
 	 * @param group
 	 * @param license
 	 * @return
 	 */
-	public String addProbeAuthentication(String probeId, CompanyGroup group, CompanyLicensePrivate license) {
-		if (!Strings.isNullOrEmpty(probeId) && group != null && license != null) {
+	public String addDeviceAuthentication(String deviceId, CompanyGroup group, CompanyLicensePrivate license) {
+		if (!Strings.isNullOrEmpty(deviceId) && group != null && license != null) {
 
 			List<Settings> settings = settingsRepository.findAll();
 
@@ -119,7 +119,7 @@ public class TokenAuthenticationService {
 			}
 
 			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-			claims.put(CLAIM_PROBEID, probeId);
+			claims.put(CLAIM_DEVICEID, deviceId);
 			claims.put(CLAIM_USERROLE, UserRole.PROBE);
 			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
@@ -127,46 +127,6 @@ public class TokenAuthenticationService {
 			return accessToken;
 		} else {
 			log.error("Probe id or group is null");
-			return null;
-		}
-
-	}
-
-	/**
-	 * This function is used to create pod authentication token so that it is available to send data to the portal
-	 *
-	 * @param podId
-	 * @param group
-	 * @param license
-	 * @return
-	 */
-	public String addPodAuthentication(String podId, CompanyGroup group, CompanyLicensePrivate license) {
-		if (!Strings.isNullOrEmpty(podId) && group != null && license != null) {
-
-			List<Settings> settings = settingsRepository.findAll();
-
-			long expirationTime = 0;
-
-			if (settings != null) {
-				if (settings.size() == 1) {
-					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
-							settings.get(0).getAccessTokenProbeValidityUnit());
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
-
-			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-			claims.put(CLAIM_PROBEID, podId);
-			claims.put(CLAIM_USERROLE, UserRole.POD);
-			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
-
-			return accessToken;
-		} else {
-			log.error("Pod id or group is null");
 			return null;
 		}
 

@@ -31,7 +31,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "NetworkReport")
+@Table(
+		name = "NetworkReport")
 public class NetworkReport extends GenericDBObject {
 
 	/**
@@ -39,7 +40,7 @@ public class NetworkReport extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -5984944130903360444L;
 	private String groupId;
-	private String probeId;
+	private String deviceId;
 
 	@Lob
 	private String stringContent;
@@ -54,8 +55,8 @@ public class NetworkReport extends GenericDBObject {
 		// content = new TreeMap<String, String>();
 	}
 
-	public NetworkReport(String probeId, String content, String startTime, boolean sent) {
-		this.probeId = probeId;
+	public NetworkReport(String deviceId, String content, String startTime, boolean sent) {
+		this.deviceId = deviceId;
 		// this.content = content;
 		this.startTime = startTime;
 		this.sent = sent;
@@ -69,12 +70,12 @@ public class NetworkReport extends GenericDBObject {
 		this.groupId = groupId;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 	public String getStringContent() {

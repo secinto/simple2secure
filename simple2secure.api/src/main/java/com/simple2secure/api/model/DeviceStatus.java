@@ -22,6 +22,6 @@
 
 package com.simple2secure.api.model;
 
-public enum PodStatus {
+public enum DeviceStatus {
 	ONLINE, OFFLINE, UNKNOWN
 }

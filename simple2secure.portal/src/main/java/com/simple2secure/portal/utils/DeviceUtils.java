@@ -31,12 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.simple2secure.api.dto.PodDTO;
+import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.Pod;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestSequence;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
@@ -52,9 +51,9 @@ import com.simple2secure.portal.repository.TestSequenceRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
-public class PodUtils {
+public class DeviceUtils {
 
-	private static Logger log = LoggerFactory.getLogger(PodUtils.class);
+	private static Logger log = LoggerFactory.getLogger(DeviceUtils.class);
 
 	@Autowired
 	GroupRepository groupRepository;
@@ -92,35 +91,35 @@ public class PodUtils {
 	@Autowired
 	TestUtils testUtils;
 
-	private Gson gson = new Gson();
-
 	/**
-	 * This function returns all pods from the current context
+	 * This function returns all probes from the current context
 	 *
 	 * @param context
 	 * @return
 	 */
-	public List<Pod> getAllPodsFromCurrentContext(Context context) {
-		log.debug("Retrieving pods for the context {}", context.getName());
+	public List<Device> getAllDevicesFromCurrentContext(Context context) {
+		log.debug("Retrieving devices for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
-		List<Pod> myPods = new ArrayList<>();
+		List<Device> myDevices = new ArrayList<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		for (CompanyGroup group : assignedGroups) {
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
+			List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(group.getId());
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String status = getPodStatus(license);
-							Pod pod = new Pod(license.getDeviceId(), group, license.isActivated(), license.getHostname(), status);
-							myPods.add(pod);
+							String deviceStatus = getDeviceStatus(license);
+
+							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus,
+									license.isDevicePod());
+							myDevices.add(probe);
 						}
 					}
 				}
 			}
 		}
-		log.debug("Retrieved {0} pods for context {1}", myPods.size(), context.getName());
-		return myPods;
+		log.debug("Retrieved {0} probes for context {1}", myDevices.size(), context.getName());
+		return myDevices;
 	}
 
 	/**
@@ -129,10 +128,10 @@ public class PodUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<PodDTO> getAllPodsFromCurrentContextWithTests(Context context) {
+	public List<DeviceDTO> getAllDevicesFromCurrentContextWithTests(Context context) {
 		log.debug("Retrieving pods for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
-		List<PodDTO> myPods = new ArrayList<>();
+		List<DeviceDTO> myDevices = new ArrayList<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		for (CompanyGroup group : assignedGroups) {
 			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
@@ -140,46 +139,47 @@ public class PodUtils {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String podStatus = getPodStatus(license);
-							Pod pod = new Pod(license.getDeviceId(), group, license.isActivated(), license.getHostname(), podStatus);
-							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(pod.getPodId()));
-							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(pod.getPodId());
-							PodDTO podDto = new PodDTO(pod, tests, test_sequences);
-							myPods.add(podDto);
+							String deviceStatus = getDeviceStatus(license);
+							Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
+							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(device.getDeviceId()));
+							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(device.getDeviceId());
+							DeviceDTO deviceDTO = new DeviceDTO(device, tests, test_sequences);
+							myDevices.add(deviceDTO);
 						}
 					}
 				}
 			}
 		}
-		log.debug("Retrieved {0} pods for context {1}", myPods.size(), context.getName());
-		return myPods;
+		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
+		return myDevices;
 	}
 
 	/**
-	 * This function deletes the pod dependencies according to the podId
+	 * This function deletes the device dependencies for the specified device id
 	 *
-	 * @param podId
+	 * @param deviceId
 	 */
-	public void deletePodDependencies(String podId) {
-		if (!Strings.isNullOrEmpty(podId)) {
+	public void deleteDependencies(String deviceId) {
+		if (!Strings.isNullOrEmpty(deviceId)) {
 			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
-			licenseRepository.deleteByDeviceId(podId);
-			log.debug("Deleted dependencies for pod id {}", podId);
+			licenseRepository.deleteByDeviceId(deviceId);
+			log.debug("Deleted dependencies for probe id {}", deviceId);
 		}
+
 	}
 
 	/**
 	 * This method checks the current status (online, offline, unknown) of the pod according to the lastOnlineTimestamp
 	 *
-	 * @param podLicense
+	 * @param deviceLicense
 	 * @return
 	 */
-	private String getPodStatus(CompanyLicensePrivate podLicense) {
+	private String getDeviceStatus(CompanyLicensePrivate deviceLicense) {
 		// make it multilingual
-		if (podLicense.getLastOnlineTimestamp() == 0) {
+		if (deviceLicense.getLastOnlineTimestamp() == 0) {
 			return "Unknown";
 		} else {
-			long timeDiff = System.currentTimeMillis() - podLicense.getLastOnlineTimestamp();
+			long timeDiff = System.currentTimeMillis() - deviceLicense.getLastOnlineTimestamp();
 			if (timeDiff > 60000) {
 				return "Offline";
 			} else {

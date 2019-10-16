@@ -219,7 +219,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 	private boolean startProbe() {
 		log.debug("Starting probe process via invoking a java process");
 		try {
-			probeProcess = ProcessUtils.invokeJavaProcess("-jar", probeLibraryPath, "-l", licensePath);
+			probeProcess = ProcessUtils.invokeJavaProcess("-jar", probeLibraryPath, "-l", licensePath, "-instrumentation");
 			log.debug("Probe started using JAR. Alive {}", probeProcess.getProcess().isAlive());
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();

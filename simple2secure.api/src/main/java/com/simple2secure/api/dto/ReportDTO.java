@@ -25,7 +25,7 @@ public class ReportDTO extends Report {
 	 * @param interval
 	 */
 	public ReportDTO(String username, Report report) {
-		super(report.getProbeId(), report.getQuery(), report.getQueryResult(), report.getQueryTimestamp(), true);
+		super(report.getDeviceId(), report.getQuery(), report.getQueryResult(), report.getQueryTimestamp(), true);
 		this.username = username;
 	}
 

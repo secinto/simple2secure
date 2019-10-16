@@ -36,7 +36,7 @@ public class Report extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -7217360147886001090L;
 	private String groupId;
-	private String probeId;
+	private String deviceId;
 	private String query;
 
 	@Lob
@@ -55,9 +55,9 @@ public class Report extends GenericDBObject {
 	 * @param report_class
 	 * @param interval
 	 */
-	public Report(String probeId, String query, String queryResult, String queryTimestamp, boolean isSent) {
+	public Report(String deviceId, String query, String queryResult, String queryTimestamp, boolean isSent) {
 		super();
-		this.probeId = probeId;
+		this.deviceId = deviceId;
 		this.query = query;
 		this.queryResult = queryResult;
 		this.queryTimestamp = queryTimestamp;
@@ -104,12 +104,12 @@ public class Report extends GenericDBObject {
 		this.queryTimestamp = queryTimestamp;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 }
