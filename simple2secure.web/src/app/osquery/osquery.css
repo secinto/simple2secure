@@ -1,3 +1,15 @@
+.turn-green {
+  background-color: #8fa02c !important;
+}
+
+.turn-red {
+  background-color: #AA3939 !important;
+}
+
+.turn-white {
+  background-color: white !important;
+}
+
 .mat-header-cell:first-child,.mat-cell:first-child{
   flex:20%;
   text-align: left;
