@@ -21,6 +21,7 @@
  */
 package com.simple2secure.api.model;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.ElementCollection;
@@ -49,21 +50,13 @@ public class NetworkReport extends GenericDBObject {
 
 	@ElementCollection
 	private List<PacketInfo> ipPairs;
-	private String startTime;
+	private Date startTime;
 	private String processorName;
 
 	@JsonProperty
 	private boolean sent;
 
 	public NetworkReport() {
-		// content = new TreeMap<String, String>();
-	}
-
-	public NetworkReport(String deviceId, String content, String startTime, boolean sent) {
-		this.deviceId = deviceId;
-		// this.content = content;
-		this.startTime = startTime;
-		this.sent = sent;
 	}
 
 	public String getGroupId() {
@@ -90,11 +83,11 @@ public class NetworkReport extends GenericDBObject {
 		this.stringContent = stringContent;
 	}
 
-	public String getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(String startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 

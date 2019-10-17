@@ -58,7 +58,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 		report = new NetworkReport();
 		report.setDeviceId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
-		report.setStartTime(analysisStartTime.toString());
+		report.setStartTime(analysisStartTime);
 
 		reportContent = new HashMap<>();
 		packetCounter = 0;
@@ -85,7 +85,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				// set new start time
 				// set reportContent stringBuilder
 				// initialize new report
-				if (!Strings.isNullOrEmpty(report.getDeviceId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
+				if (!Strings.isNullOrEmpty(report.getDeviceId()) && report.getStartTime() != null) {
 					report.setStringContent(JSONUtils.toString(reportContent));
 					report.setProcessorName(packet.getProcessor().getName());
 					report.setSent(false);
@@ -98,7 +98,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				report = new NetworkReport();
 				report.setDeviceId(ProbeConfiguration.probeId);
 				report.setGroupId(ProbeConfiguration.groupId);
-				report.setStartTime(analysisStartTime.toString());
+				report.setStartTime(analysisStartTime);
 				reportContent = new HashMap<>();
 				packetCounter = 0;
 				reportContentString = "";

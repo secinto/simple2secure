@@ -35,6 +35,7 @@ import {UserGroupComponent} from '../user';
 @Component({
 	moduleId: module.id,
 	selector: 'osQueryConfigDetails',
+	styleUrls: ['osquery.css'],
 	templateUrl: 'osqueryConfigurationDetails.component.html'
 })
 

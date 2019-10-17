@@ -22,18 +22,15 @@
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.maxmind.geoip2.model.CityResponse;
 import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.Coordinates;
@@ -41,6 +38,7 @@ import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.api.model.Report;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 
@@ -74,12 +72,13 @@ public class ReportUtils {
 				if (report != null) {
 					if (report.getQueryResult() != null) {
 						try {
+							JsonNode node = JSONUtils.fromString(report.getQueryResult());
 
-							// Fri Jan 18 08:24:33 CET 2019
-							DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
-							Date date = format.parse(report.getQueryTimestamp());
-
-							graphReports.add(new GraphReport(report.getId(), report.getQuery(), report.getQueryResult().length(), date.getTime()));
+							int length = report.getQueryResult().length();
+							if (node != null) {
+								length = node.size();
+							}
+							graphReports.add(new GraphReport(report.getId(), report.getQuery(), length, report.getQueryTimestamp().getTime()));
 
 						} catch (Exception e) {
 							log.error("Error occured while trying to parse string to jsonArray: {}", e);

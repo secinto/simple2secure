@@ -21,6 +21,8 @@
  */
 package com.simple2secure.api.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -44,7 +46,7 @@ public class Report extends GenericDBObject {
 	@Lob
 	private String queryResult;
 
-	private String queryTimestamp;
+	private Date queryTimestamp;
 	private boolean isSent;
 
 	public Report() {
@@ -57,7 +59,7 @@ public class Report extends GenericDBObject {
 	 * @param report_class
 	 * @param interval
 	 */
-	public Report(String deviceId, String query, String queryResult, String queryTimestamp, boolean isSent) {
+	public Report(String deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
 		super();
 		this.deviceId = deviceId;
 		this.query = query;
@@ -98,11 +100,11 @@ public class Report extends GenericDBObject {
 		this.queryResult = queryResult;
 	}
 
-	public String getQueryTimestamp() {
+	public Date getQueryTimestamp() {
 		return queryTimestamp;
 	}
 
-	public void setQueryTimestamp(String queryTimestamp) {
+	public void setQueryTimestamp(Date queryTimestamp) {
 		this.queryTimestamp = queryTimestamp;
 	}
 

@@ -37,6 +37,7 @@ class SimpleGroovyPacketProcessor extends PacketProcessor {
 
 	@Override
 	public PacketContainer processPacket() {
+
 		return null;
 	}
 

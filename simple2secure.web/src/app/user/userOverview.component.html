@@ -326,10 +326,22 @@
                         <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
                     </ng-container>
 
+                    <ng-container matColumnDef="hostname">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+                    </ng-container>
+
                     <ng-container matColumnDef="group">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="activated">
@@ -395,16 +407,16 @@
                 </div>
                 <mat-table #sortPod="matSort" [dataSource]="podDataSource" matSort>
 
-                    <ng-container matColumnDef="hostname">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
-                    </ng-container>
-
                     <ng-container matColumnDef="podId">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="hostname">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">

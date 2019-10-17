@@ -58,7 +58,7 @@ public class NetworkScheduler extends TimerTask {
 		try {
 			PcapStat statistics = monitor.getReceiverHandle().getStats();
 			NetworkReport report = new NetworkReport();
-			report.setStartTime(new Date().toString());
+			report.setStartTime(new Date());
 			report.setProcessorName("PCAP Network Statistics");
 			report.setDeviceId(ProbeConfiguration.probeId);
 			report.setGroupId(ProbeConfiguration.groupId);

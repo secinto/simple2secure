@@ -22,6 +22,7 @@
 package com.simple2secure.api.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.simple2secure.api.model.Coordinates;
@@ -39,7 +40,7 @@ public class NetworkReportDTO extends NetworkReport {
 
 	}
 
-	public NetworkReportDTO(List<Coordinates> coordinates, String reportId, String groupId, String startTime, String processorName) {
+	public NetworkReportDTO(List<Coordinates> coordinates, String reportId, String groupId, Date startTime, String processorName) {
 		super.setId(reportId);
 		super.setGroupId(groupId);
 		super.setStartTime(startTime);

@@ -50,7 +50,7 @@ def get_scheduled_tests(app_obj, celery_tasks):
             for test_run in test_run_array:
                 current_test = json.loads(test_run["testContent"])
                 celery_tasks.execute_test.delay(current_test["test_definition"], test_run["testId"],
-                                                test_run["testName"], app_obj.config['POD_ID'], test_run["id"])
+                                                test_run["testName"], test_run["id"])
                 send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                   app_obj)
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")
@@ -72,6 +72,4 @@ def get_test_results_from_db(app_obj, celery_tasks):
     with app_obj.app_context():
         test_results = TestResult.query.filter_by(isSent=False).all()
         for test_result in test_results:
-            test_result_schema = TestResultSchema()
-            output = test_result_schema.dump(test_result)
-            celery_tasks.send_test_result.delay(output)
+            celery_tasks.send_test_result.delay(test_result)

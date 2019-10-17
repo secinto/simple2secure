@@ -78,7 +78,7 @@ export class UserOverviewComponent {
 	isGroupDeletable = false;
 
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
-	displayedColumnsDevices = ['probeId', 'group', 'activated', 'action'];
+	displayedColumnsDevices = ['probeId', 'hostname', 'group', 'status', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
 	displayedColumnsPods = ['podId', 'hostname', 'group', 'status', 'action'];
 

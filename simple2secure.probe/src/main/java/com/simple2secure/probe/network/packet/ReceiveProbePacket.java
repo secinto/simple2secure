@@ -26,10 +26,7 @@ import com.simple2secure.probe.utils.DBUtil;
 
 public class ReceiveProbePacket {
 
-	private ProbePacket probePacket;
-
 	public ReceiveProbePacket(ProbePacket probePacket) {
-		this.probePacket = probePacket;
 		storeReceivedProbePacketToDB(probePacket);
 	}
 

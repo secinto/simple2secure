@@ -179,9 +179,7 @@ public class TokenAuthenticationService {
 	public Authentication getAuthentication(HttpServletRequest request) {
 		log.info("Request with authentication requirement from {}", request.getRequestURL());
 		String accessToken = resolveToken(request);
-		if (request.getRequestURL().toString().contains("processor")) {
-			log.debug("");
-		}
+
 		if (accessToken != null) {
 			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
 			UserRole userRole = UserRole.LOGINUSER;

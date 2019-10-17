@@ -7,6 +7,7 @@ from flask import json
 from scanner import scanner
 from src import create_celery_app, entrypoint
 from src.db.database import db, TestResult
+from src.db.database_schema import TestResultSchema
 from src.util import json_utils
 from src.util import rest_utils
 from src.util.db_utils import update
@@ -26,7 +27,10 @@ def send_test_result(test_result):
     :param test_result: The test result as JSON which should be sent to the PORTAL
     """
     with app.app_context():
-        response = rest_utils.portal_post(app, app.config['PORTAL_URL'] + "test/saveTestResult", test_result)
+        test_result_schema = TestResultSchema()
+        output = test_result_schema.dump(test_result)
+
+        response = rest_utils.portal_post(app, app.config['PORTAL_URL'] + "test/saveTestResult", json.dumps(output))
 
         if response is not None and response.status_code == 200:
             stored_test_result = TestResult.query.filter_by(id=test_result['id']).first()
@@ -71,11 +75,11 @@ def execute_test(test, test_id, test_name, test_run_id):
     timestamp = get_current_timestamp()
     test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
                              socket.gethostname(), timestamp, False)
+    with app.app_context():
+        db.session.add(test_result)
+        db.session.commit()
 
-    db.session.add(test_result)
-    db.session.commit()
+        rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app)
 
-    rest_utils.send_notification("Test " + test_name + " has been executed by the pod " + socket.gethostname(), app)
-
-    rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
+        rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
 

@@ -349,7 +349,6 @@
   "test.step": "Step",
   "test.postcondition": "Postcondition",
   "test.testresult": "Test Result",
-  "table.pod": "Hostname",
   "table.executable": "Executable",
   "table.prefix": "Prefix",
   "table.value": "Value",
