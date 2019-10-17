@@ -19,7 +19,7 @@
  *
  *********************************************************************
  */
-package com.simple2secure.commons.process;
+package com.simple2secure.commons;
 
 import java.util.Observable;
 import java.util.Observer;
