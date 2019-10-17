@@ -32,6 +32,7 @@ import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
+import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 
@@ -61,16 +62,19 @@ public class ReportScheduler extends TimerTask {
 	private void sendReport(Report report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getProbeId())) {
-				report.setProbeId(ProbeConfiguration.probeId);
+			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+				report.setDeviceId(ProbeConfiguration.probeId);
 			}
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
 			}
-			report.setSent(true);
-			log.debug("Sending report {} with timestamp {} to the API.", report.getQuery(), report.getQueryTimestamp());
-			RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
-			DBUtil.getInstance().merge(report);
+			log.debug("Sending query report {} with timestamp {} to the API.", report.getQuery(),
+					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
+			if (!Strings.isNullOrEmpty(response)) {
+				report.setSent(true);
+				DBUtil.getInstance().merge(report);
+			}
 		}
 	}
 
@@ -82,16 +86,20 @@ public class ReportScheduler extends TimerTask {
 	private void sendNetworkReport(NetworkReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getProbeId())) {
-				report.setProbeId(ProbeConfiguration.probeId);
+			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+				report.setDeviceId(ProbeConfiguration.probeId);
 			}
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
 			}
-			report.setSent(true);
-			log.info("Sending network report to the server with id: " + report.getId());
-			RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report, ProbeConfiguration.authKey);
-			DBUtil.getInstance().merge(report);
+			log.info("Sending network report {} with timestamp {} to the API ", report.getId(),
+					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
+					ProbeConfiguration.authKey);
+			if (!Strings.isNullOrEmpty(response)) {
+				report.setSent(true);
+				DBUtil.getInstance().merge(report);
+			}
 		}
 
 	}

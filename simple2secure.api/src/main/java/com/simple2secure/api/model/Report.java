@@ -21,6 +21,8 @@
  */
 package com.simple2secure.api.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -28,7 +30,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "Report")
+@Table(
+		name = "Report")
 public class Report extends GenericDBObject {
 
 	/**
@@ -36,13 +39,14 @@ public class Report extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -7217360147886001090L;
 	private String groupId;
-	private String probeId;
+	private String deviceId;
 	private String query;
+	private String hostname;
 
 	@Lob
 	private String queryResult;
 
-	private String queryTimestamp;
+	private Date queryTimestamp;
 	private boolean isSent;
 
 	public Report() {
@@ -55,9 +59,9 @@ public class Report extends GenericDBObject {
 	 * @param report_class
 	 * @param interval
 	 */
-	public Report(String probeId, String query, String queryResult, String queryTimestamp, boolean isSent) {
+	public Report(String deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
 		super();
-		this.probeId = probeId;
+		this.deviceId = deviceId;
 		this.query = query;
 		this.queryResult = queryResult;
 		this.queryTimestamp = queryTimestamp;
@@ -96,20 +100,28 @@ public class Report extends GenericDBObject {
 		this.queryResult = queryResult;
 	}
 
-	public String getQueryTimestamp() {
+	public Date getQueryTimestamp() {
 		return queryTimestamp;
 	}
 
-	public void setQueryTimestamp(String queryTimestamp) {
+	public void setQueryTimestamp(Date queryTimestamp) {
 		this.queryTimestamp = queryTimestamp;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 }

@@ -74,7 +74,7 @@ public class StepController {
 	@RequestMapping(
 			value = "/{probeId}/{select_all}",
 			method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
 		log.debug("Retrieving steps for probe id {}", probeId);

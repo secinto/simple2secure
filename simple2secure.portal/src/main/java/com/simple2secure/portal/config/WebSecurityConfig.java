@@ -27,7 +27,7 @@ import com.simple2secure.portal.security.auth.JWTLoginFilter;
 @EnableWebSecurity
 @EnableMongoRepositories("com.simple2secure.portal.dao")
 @CrossOrigin(
-		origins = "http://localhost:9000")
+		origins = "https://localhost:9000")
 @EnableGlobalMethodSecurity(
 		prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -66,23 +66,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().authorizeRequests()
-			.antMatchers("/").permitAll().and().authorizeRequests()
-			.antMatchers("/api/login").permitAll().and().authorizeRequests()
-			.antMatchers("/api/service").permitAll().and().authorizeRequests()
-			.antMatchers("/api/register/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/user/activate/").permitAll().and().authorizeRequests()
-			.antMatchers("/api/test").permitAll().and().authorizeRequests()
-			.antMatchers("/api/user/updatePassword/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/user/invite/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/download/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/device/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/pod/config/**").permitAll().and().authorizeRequests()
-			.antMatchers("/api/license/authenticate/**").permitAll().and().authorizeRequests()
-			// filter the login requests
-			.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-			// And filter other requests to check the presence of JWTth in header
-			.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests().antMatchers("/api/login")
+				.permitAll().and().authorizeRequests().antMatchers("/api/service").permitAll().and().authorizeRequests()
+				.antMatchers("/api/register/**").permitAll().and().authorizeRequests().antMatchers("/api/user/activate/").permitAll().and()
+				.authorizeRequests().antMatchers("/api/test").permitAll().and().authorizeRequests().antMatchers("/api/user/updatePassword/**")
+				.permitAll().and().authorizeRequests().antMatchers("/api/user/invite/**").permitAll().and().authorizeRequests()
+				.antMatchers("/api/download/**").permitAll().and().authorizeRequests().antMatchers("/api/device/**").permitAll().and()
+				.authorizeRequests().antMatchers("/api/pod/config/**").permitAll().and().authorizeRequests()
+				.antMatchers("/api/license/authenticate/**").permitAll().and().authorizeRequests()
+				// filter the login requests
+				.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+				// And filter other requests to check the presence of JWTth in header
+				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 
 		http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
 		http.formLogin().successHandler(authenticationSuccessHandler);

@@ -43,7 +43,7 @@ export class OsqueryConfigurationEditComponent {
 	action: string;
 	probeId: string;
 	groupId: string;
-
+	alwaysFalseButton = false;
 	timeUnits = Timeunit;
 
 	constructor(
@@ -68,6 +68,7 @@ export class OsqueryConfigurationEditComponent {
 			this.queryRun = data.queryRun;
 			this.groupId = data.groupId;
 		}
+		this.alwaysFalseButton = false;
 	}
 
 	extractTimeUnits(): Array<string> {
@@ -88,5 +89,13 @@ export class OsqueryConfigurationEditComponent {
 			error => {
 				this.dialogRef.close(error);
 			});
+	}
+
+	setCheckedStatus(value) {
+		if (value == 0) {
+			this.alwaysFalseButton = true;
+		} else {
+			this.alwaysFalseButton = false;
+		}
 	}
 }

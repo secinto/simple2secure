@@ -120,7 +120,7 @@ public class RESTUtils {
 
 		conn.setDoOutput(true);
 		conn.setRequestMethod(method);
-		conn.setRequestProperty("Content-Type", "application/json");
+		conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 		conn.setRequestProperty("Accept-Language", "en");
 		if (!Strings.isNullOrEmpty(authKey)) {
 			conn.setRequestProperty("Authorization", BEARER + authKey);

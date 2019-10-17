@@ -22,6 +22,7 @@ import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.rules.EmailRulesEngine;
@@ -50,13 +51,23 @@ public class TestRuleEngine {
 
 		// email which should be checked
 		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text",
-				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
+				TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking domain
 		TemplateCondition condition = new TemplateCondition("blocked domains", "", "", null, new ArrayList<RuleParamArray<?>>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(new RuleParamArray<>("domains", null, null, // new ArrayList<RuleParam<?>>();
 						new ArrayList<String>() {
+							/**
+							 *
+							 */
+							private static final long serialVersionUID = 1L;
+
 							{
 								add("g00gle.com");
 							}
@@ -67,6 +78,11 @@ public class TestRuleEngine {
 		// an notification will be saved in the database if rule was triggered
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add(new RuleParam<>("text", "", "", "email came from blocked domain", DataType._STRING));
 					}
@@ -95,12 +111,22 @@ public class TestRuleEngine {
 
 		// email which should be checked
 		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@g00gle.com", "text",
-				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
+				TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("blocked email addresses", "", "", null, new ArrayList<RuleParamArray<?>>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(new RuleParamArray<>("email addresses", null, null, new ArrayList<String>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add("alice@g00gle.com");
 					}
@@ -111,6 +137,11 @@ public class TestRuleEngine {
 		// an notification will be saved in the database if rule was triggered
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add(new RuleParam<>("text", "", "", "email came from blocked address", DataType._STRING));
 					}
@@ -140,12 +171,22 @@ public class TestRuleEngine {
 
 		// email which should be checked
 		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "WON MONEY", "alice@lottery.com", "text",
-				Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
+				TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("find words in subject", "", "", null, new ArrayList<RuleParamArray<?>>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add("won");
 						add("lottery");
@@ -157,6 +198,11 @@ public class TestRuleEngine {
 		// an notification will be saved in the database if rule was triggered
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add(new RuleParam<>("text", "", "", "email had some blocked words in the subject", DataType._STRING));
 					}
@@ -187,12 +233,22 @@ public class TestRuleEngine {
 
 		// email which should be checked
 		Email email1 = new Email("1", "5d4ad93028dad11740e9f4b5", 1, "subject", "alice@lottery.com",
-				"You won in the lottery. Just click here ...", Email.emailDateFormat.parse("Mon Aug 19 10:00:00 CEST 2019"));
+				"You won in the lottery. Just click here ...", TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("find words in text", "", "", null, new ArrayList<RuleParamArray<?>>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add("won");
 						add("lottery");
@@ -204,6 +260,11 @@ public class TestRuleEngine {
 		// an notification will be saved in the database if rule was triggered
 		TemplateAction action = new TemplateAction("send notification", // text
 				"", "", new ArrayList<RuleParam<?>>() {
+					/**
+					 *
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						add(new RuleParam<>("text", "", "", "email had some blocked words in the text", DataType._STRING));
 					}

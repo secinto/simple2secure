@@ -22,6 +22,9 @@
 package com.simple2secure.probe.license;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.License;
@@ -49,30 +54,50 @@ public class LicenseController {
 
 	/**
 	 * Obtains the license from the specified path. It requires a license ZIP file as input, containing the license.dat and the public key for
-	 * verification. If not an exception
+	 * verification. If not an exception is thrown. If the importFilePath specifies a folder all ZIP files are obtained and the newest is used
+	 * as input. If a file is specified this is used.
 	 *
 	 * @param importFilePath
-	 * @return
+	 *          The path to the license folder or file.
+	 * @return The {@link CompanyLicensePublic} object obtained from the file if any.
 	 * @throws Exception
 	 */
 	public CompanyLicensePublic loadLicenseFromPath(String importFilePath) throws Exception {
 		CompanyLicensePublic license = null;
-		File inputFile = new File(importFilePath);
-
-		if (inputFile != null && inputFile.exists()) {
-			List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
-			if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
-				License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
-				if (checkLicenseProps(downloadedLicense)) {
-					return createLicenseForAuth(downloadedLicense);
-				} else {
-					log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
+		if (FileUtil.fileOrFolderExists(importFilePath)) {
+			File inputFile = null;
+			if (FileUtil.isDirectory(importFilePath)) {
+				List<File> files = FileUtil.getFilesFromDirectory(importFilePath, false, Arrays.asList(new String[] { "zip" }));
+				inputFile = null;
+				for (File file : files) {
+					if (inputFile == null) {
+						inputFile = file;
+					}
+					if (inputFile.lastModified() < file.lastModified()) {
+						inputFile = file;
+					}
 				}
 			} else {
-				log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
+				inputFile = new File(importFilePath);
+			}
+
+			if (inputFile != null && inputFile.exists()) {
+				List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
+				if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
+					License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
+					if (checkLicenseProps(downloadedLicense)) {
+						return createLicenseForAuth(downloadedLicense);
+					} else {
+						log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
+					}
+				} else {
+					log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
+				}
+			} else {
+				log.error("No usable license found in path {}", importFilePath);
 			}
 		} else {
-			log.error("Specified ZIP file {} doesn't exist!", importFilePath);
+			log.error("Specified path {} doesn't contain a folder nor a file", importFilePath);
 		}
 		return license;
 	}
@@ -95,6 +120,7 @@ public class LicenseController {
 					ProbeConfiguration.probeId = license.getDeviceId();
 					ProbeConfiguration.groupId = license.getGroupId();
 					ProbeConfiguration.authKey = license.getAccessToken();
+					ProbeConfiguration.hostname = license.getHostname();
 					return StartConditions.LICENSE_VALID;
 				}
 				return StartConditions.LICENSE_NOT_ACTIVATED;
@@ -174,6 +200,7 @@ public class LicenseController {
 				ProbeConfiguration.authKey = authToken;
 				ProbeConfiguration.probeId = license.getDeviceId();
 				ProbeConfiguration.groupId = license.getGroupId();
+				ProbeConfiguration.hostname = license.getHostname();
 				ProbeConfiguration.setAPIAvailablitity(true);
 				log.info("License successfully activated and AuthToken obtained");
 				return true;
@@ -194,9 +221,29 @@ public class LicenseController {
 	 *
 	 */
 	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
-		license.setAccessToken(authToken);
-		license.setActivated(true);
-		updateLicenseInDB(license);
+		if (!Strings.isNullOrEmpty(authToken)) {
+			CompanyLicensePublic receivedLicense = JSONUtils.fromString(authToken, CompanyLicensePublic.class);
+			if (receivedLicense != null) {
+				if (!receivedLicense.getDeviceId().equals(license.getDeviceId())) {
+					log.error("Received license doesn't contain the same device ID, needs to be verified, continuing for now!");
+				}
+				license.setAccessToken(receivedLicense.getAccessToken());
+				license.setActivated(true);
+				updateLicenseInDB(license);
+			} else {
+				if (authToken.contains("accessToken")) {
+					int start = authToken.indexOf("accessToken") + "accessToken".length();
+					int actualStart = authToken.indexOf(":\"", start);
+					int actualEnd = authToken.indexOf("\"", actualStart);
+					String accessToken = authToken.substring(actualStart, actualEnd);
+					if (!Strings.isNullOrEmpty(accessToken)) {
+						license.setAccessToken(accessToken.trim());
+						license.setActivated(true);
+						updateLicenseInDB(license);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -210,7 +257,7 @@ public class LicenseController {
 	 */
 	public CompanyLicensePublic createLicenseForAuth(License license) {
 		String probeId = "";
-		String groupId, licenseId, expirationDate;
+		String groupId, licenseId, expirationDate, hostname = "LOCALHOST";
 
 		if (license == null) {
 			return null;
@@ -221,6 +268,11 @@ public class LicenseController {
 		groupId = license.getProperty("groupId");
 		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			log.error("Couldn't obtain hostname locally.");
+		}
 
 		/*
 		 * Obtain license stored in DB if any.
@@ -243,6 +295,8 @@ public class LicenseController {
 			probeId = UUID.randomUUID().toString();
 			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
 		}
+		storedLicense.setStatus(DeviceStatus.ONLINE);
+		storedLicense.setHostname(hostname);
 		/*
 		 * Update the license in the local DB.
 		 */
@@ -251,7 +305,7 @@ public class LicenseController {
 	}
 
 	/**
-	 * Verifies the validity of the stored license using the Token service from the Portal. If the response contains a
+	 * Verifies the validity of the stored license using the authenticate service from the Portal. If the response contains a
 	 * {@link CompanyLicensePublic} it returns it otherwise null is returned.
 	 *
 	 * @return
@@ -259,7 +313,7 @@ public class LicenseController {
 	public CompanyLicensePublic checkTokenValidity() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/token", license, ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (!Strings.isNullOrEmpty(response)) {
 				return JSONUtils.fromString(response, CompanyLicensePublic.class);
 			}

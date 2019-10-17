@@ -54,8 +54,9 @@ public class QueryRunnable implements Runnable {
 		String queryString = query.getSqlQuery();
 		String queryResult = executeQuery(queryString);
 		if (!Strings.isNullOrEmpty(queryResult)) {
-			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date().toString(), false);
+			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
 			result.setGroupId(ProbeConfiguration.groupId);
+			result.setHostname(ProbeConfiguration.hostname);
 			DBUtil.getInstance().save(result);
 		}
 	}
@@ -95,10 +96,13 @@ public class QueryRunnable implements Runnable {
 
 			result = IOUtils.toString(reader);
 			log.debug("OSQuery {} resulted {}", query, result);
-			result = "[" + StringUtils.substringBetween(result, "[", "]").trim() + "]";
+			result = StringUtils.substringBetween(result, "[", "]").trim();
+			if (!Strings.isNullOrEmpty(result)) {
+				result = "[" + result + "]";
+			}
 			p.destroy();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Execution during QSQuery. Reason {}", e.getMessage());
 		}
 		return result;
 	}

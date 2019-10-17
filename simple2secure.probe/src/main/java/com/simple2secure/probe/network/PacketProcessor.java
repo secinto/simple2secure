@@ -22,7 +22,6 @@
 package com.simple2secure.probe.network;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +30,7 @@ public abstract class PacketProcessor {
 
 	private String name;
 
-	public String DATE_FORMAT = "EEE, yyyy-MM-dd hh:mm:ss.SSS";
-
 	final long ONE_MINUTE_IN_MILLIS = 60000;
-
-	public SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
 	private Map<String, String> options;
 

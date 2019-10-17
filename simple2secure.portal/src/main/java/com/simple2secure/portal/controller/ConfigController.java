@@ -153,7 +153,7 @@ public class ConfigController {
 	 * This function returns the query config for the specified user
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	@RequestMapping(
 			value = "/query/{probeId}/{select_all}",
 			method = RequestMethod.GET)

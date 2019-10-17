@@ -92,7 +92,7 @@ public class ReportController {
 			value = "",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	@PreAuthorize("hasAuthority('PROBE')")
+	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
 		if (report != null) {
 			reportsRepository.save(report);
@@ -185,7 +185,7 @@ public class ReportController {
 			value = "/network",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	@PreAuthorize("hasAuthority('PROBE')")
+	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@RequestHeader("Accept-Language") String locale) {
 		if (networkReport != null) {

@@ -33,6 +33,7 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['query.result.css'],
 	templateUrl: 'osqueryReportOverview.component.html'
 })
 
@@ -42,7 +43,7 @@ export class OsQueryReportOverviewComponent {
 	selectedReport: any;
 	currentUser: any;
 	loading = false;
-	displayedColumns = ['query', 'probe', 'timestamp', 'action'];
+	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;

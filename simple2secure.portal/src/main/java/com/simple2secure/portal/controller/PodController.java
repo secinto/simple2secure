@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.PodDTO;
+import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Test;
@@ -51,7 +51,7 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.PodUtils;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
@@ -82,7 +82,7 @@ public class PodController {
 	LoadedConfigItems loadedConfigItems;
 
 	@Autowired
-	PodUtils podUtils;
+	DeviceUtils deviceUtils;
 
 	@Autowired
 	TestUtils testUtils;
@@ -97,13 +97,13 @@ public class PodController {
 			value = "/{contextId}",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<PodDTO>> getPodsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<DeviceDTO>> getPodsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
-				List<PodDTO> pods = podUtils.getAllPodsFromCurrentContextWithTests(context);
+				List<DeviceDTO> pods = deviceUtils.getAllDevicesFromCurrentContextWithTests(context);
 
 				if (pods != null) {
 					return new ResponseEntity<>(pods, HttpStatus.OK);
@@ -163,7 +163,7 @@ public class PodController {
 			value = "/scheduledTests/{podId}",
 			method = RequestMethod.GET,
 			consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(podId);
@@ -197,7 +197,7 @@ public class PodController {
 
 			if (license != null) {
 				// delete All Probe dependencies
-				podUtils.deletePodDependencies(podId);
+				deviceUtils.deleteDependencies(podId);
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
 		}

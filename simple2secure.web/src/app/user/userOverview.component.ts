@@ -22,14 +22,13 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
-import {AlertService, DataService, HttpService} from '../_services/index';
+import {AlertService, DataService, HttpService} from '../_services';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {CompanyGroup, ContextDTO, User, UserDTO, UserRole} from '../_models/index';
+import {CompanyGroup, ContextDTO, User, UserDTO, UserRole, Device} from '../_models';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {v4} from 'uuid';
 import {RuleOverviewComponent} from '../rule';
 import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -79,9 +78,9 @@ export class UserOverviewComponent {
 	isGroupDeletable = false;
 
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
-	displayedColumnsDevices = ['probe', 'group', 'activated', 'action'];
+	displayedColumnsDevices = ['probeId', 'hostname', 'group', 'status', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
-	displayedColumnsPods = ['podId', 'pod', 'group', 'status', 'action'];
+	displayedColumnsPods = ['podId', 'hostname', 'group', 'status', 'action'];
 
 	userDataSource = new MatTableDataSource();
 	probeDataSource = new MatTableDataSource();
@@ -173,16 +172,30 @@ export class UserOverviewComponent {
 				data => {
 					this.myProfile = data;
 					this.userDataSource.data = this.myProfile.myUsersList;
-					this.probeDataSource.data = this.myProfile.myProbes;
 					this.groupDataSource.data = this.myProfile.myGroups;
 					this.contextDataSource.data = this.myProfile.myContexts;
-					this.podDataSource.data = this.myProfile.myPods;
+
+					const probes: Array<Device> = [];
+					const pods: Array<Device> = [];
+
+					for (let i = 0; i < this.myProfile.myDevices.length; i++) {
+						if (this.myProfile.myDevices[i].pod) {
+							pods.push(this.myProfile.myDevices[i]);
+							console.log('Found POD');
+						}
+						else {
+							probes.push(this.myProfile.myDevices[i]);
+							console.log('Found PROBE');
+						}
+					}
+					this.podDataSource.data = pods;
+					this.probeDataSource.data = probes;
 
 					this.checkMyGroupSize(this.myProfile.myGroups);
 					this.checkMyUsersSize(this.myProfile.myUsersList);
-					this.checkMyProbesSize(this.myProfile.myProbes);
+					this.checkMyProbesSize(probes);
 					this.checkMyContextsSize(this.myProfile.myContexts);
-					this.checkMyPodsSize(this.myProfile.myPods);
+					this.checkMyPodsSize(pods);
 
 					this.dataService.setGroups(this.myProfile.myGroups);
 					if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.contextDeleted &&
@@ -259,15 +272,14 @@ export class UserOverviewComponent {
 	checkMyProbesSize(probes: any) {
 		if (probes.length > 0) {
 			this.showProbeTable = true;
-		}
-		else {
-			this.showProbeTable = false;
+		} else {
+		this.showProbeTable = false;
 		}
 	}
 
 	checkMyPodsSize(pods: any) {
 		if (pods.length > 0) {
-			this.showPodTable = true;
+				this.showPodTable = true;
 		}
 		else {
 			this.showPodTable = false;
@@ -296,7 +308,6 @@ export class UserOverviewComponent {
 					this.loading = false;
 				});
 	}
-
 
 	updateUserInfo() {
 		this.loading = true;

@@ -58,7 +58,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 	private SimpleLoggingObserver observer;
 
 	private String probeLibraryPath = "./libs/simple2secure.probe.jar";
-	private String licensePath = "license.zip";
+	private String licensePath = System.getProperty("user.dir") + "/license/";
 
 	private boolean stopped = true;
 
@@ -76,7 +76,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 		triggerScheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
 		observer = new SimpleLoggingObserver();
-
+		log.info("Using {} as licensePath", licensePath);
 	}
 
 	public ProbeControllerEngine(String probeLibraryPath, String licensePath) {
@@ -219,7 +219,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 	private boolean startProbe() {
 		log.debug("Starting probe process via invoking a java process");
 		try {
-			probeProcess = ProcessUtils.invokeJavaProcess("-jar", probeLibraryPath, "-l", licensePath);
+			probeProcess = ProcessUtils.invokeJavaProcess("-jar", probeLibraryPath, "-l", licensePath, "-instrumentation");
 			log.debug("Probe started using JAR. Alive {}", probeProcess.getProcess().isAlive());
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();

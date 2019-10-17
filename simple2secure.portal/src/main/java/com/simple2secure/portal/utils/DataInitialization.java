@@ -136,7 +136,7 @@ public class DataInitialization {
 	/**
 	 * This function adds default queries for each group which is created
 	 *
-	 * @param probeId
+	 * @param groupId The group ID for which a default query should be created
 	 * @throws IOException
 	 */
 	public void addDefaultGroupQueries(String groupId) throws IOException {

@@ -22,10 +22,6 @@
 package com.simple2secure.probe.utils;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +34,6 @@ import com.simple2secure.commons.network.NetUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public final class ProbeUtils {
-
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
 
 	private static Logger log = LoggerFactory.getLogger(ProbeUtils.class);
 
@@ -68,19 +62,11 @@ public final class ProbeUtils {
 		return null;
 	}
 
-	public static Date convertStringtoDate(String date) {
-		try {
-			return DATE_FORMAT.parse(date);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	/**
 	 * This function checks if the server is reachable
 	 */
 	public static void isServerReachable() {
-		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL())) {
+		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL() + "/api/service")) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		} else {

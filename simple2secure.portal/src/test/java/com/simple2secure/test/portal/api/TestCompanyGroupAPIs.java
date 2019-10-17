@@ -12,8 +12,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -37,11 +35,11 @@ import com.simple2secure.portal.repository.GroupAccesRightRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 public class TestCompanyGroupAPIs extends TestAPIBase {
-
-	private static Logger log = LoggerFactory.getLogger(TestCompanyGroupAPIs.class);
 
 	@Autowired
 	protected LoadedConfigItems loadedConfigItems;

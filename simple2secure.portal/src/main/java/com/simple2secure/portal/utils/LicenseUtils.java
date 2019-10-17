@@ -103,11 +103,7 @@ public class LicenseUtils {
 
 					String accessToken = null;
 
-					if (podActivation) {
-						accessToken = tokenAuthenticationService.addPodAuthentication(deviceId, group, license);
-					} else {
-						accessToken = tokenAuthenticationService.addProbeAuthentication(deviceId, group, license);
-					}
+					accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, license);
 
 					if (!Strings.isNullOrEmpty(accessToken)) {
 						if (Strings.isNullOrEmpty(license.getDeviceId())) {
@@ -117,6 +113,7 @@ public class LicenseUtils {
 						license.setHostname(hostname);
 						license.setLastOnlineTimestamp(System.currentTimeMillis());
 						license.setDevicePod(podActivation);
+						license.setStatus(licensePublic.getStatus());
 						if (!license.isActivated()) {
 							license.setActivated(true);
 						}
@@ -178,11 +175,8 @@ public class LicenseUtils {
 							if (!LicenseDateUtil.isLicenseExpired(licensePrivate.getExpirationDate())) {
 								CompanyGroup group = groupRepository.find(groupId);
 
-								if (checkForPod) {
-									accessToken = tokenAuthenticationService.addPodAuthentication(deviceId, group, licensePrivate);
-								} else {
-									accessToken = tokenAuthenticationService.addProbeAuthentication(deviceId, group, licensePrivate);
-								}
+								accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
+
 								licensePrivate.setAccessToken(accessToken);
 								licenseRepository.update(licensePrivate);
 
@@ -209,11 +203,7 @@ public class LicenseUtils {
 
 						if (group != null) {
 
-							if (checkForPod) {
-								accessToken = tokenAuthenticationService.addPodAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
-							} else {
-								accessToken = tokenAuthenticationService.addProbeAuthentication(licensePrivate.getDeviceId(), group, licensePrivate);
-							}
+							accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
 
 							licensePrivate.setAccessToken(accessToken);
 							licenseRepository.save(licensePrivate);

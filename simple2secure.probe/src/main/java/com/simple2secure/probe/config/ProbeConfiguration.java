@@ -36,6 +36,7 @@ import org.h2.mvstore.cache.CacheLongKeyLIRS.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
@@ -58,11 +59,11 @@ public class ProbeConfiguration {
 
 	private static boolean apiAvailable = false;
 	public static boolean runInTesting = true;
-	public static boolean isInstrumented = false;
 
 	public static String authKey = "";
 	public static String groupId = "";
 	public static String probeId = "";
+	public static String hostname = "";
 
 	public static String licenseId = "";
 
@@ -420,9 +421,19 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		return Arrays.asList(JSONUtils.fromString(
-				RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI() + "/" + ProbeConfiguration.probeId, ProbeConfiguration.authKey),
-				Processor[].class));
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI() + "/" + ProbeConfiguration.probeId,
+				ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(response)) {
+			Processor[] processorArray = JSONUtils.fromString(response, Processor[].class);
+			if (processorArray != null && processorArray.length > 0) {
+				return Arrays.asList(processorArray);
+			} else {
+				log.trace("No processors specified for PROBE");
+			}
+		} else {
+			log.error("Getting specified list of processors for PROBE was not successful.");
+		}
+		return null;
 	}
 
 	/**

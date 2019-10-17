@@ -159,7 +159,7 @@ export class TestSequenceDetailsComponent{
 		this.loading = true;
 		
 		if(!this.sequence.podId){
-			this.sequence.podId = this.pod.pod.podId;
+			this.sequence.podId = this.pod.pod.deviceId;
 		}
 		
 		if(!(this.testSequence.length == 0)){

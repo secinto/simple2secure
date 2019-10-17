@@ -1,18 +1,42 @@
 [
 	{
-		"name": "Query 1",
+		"name": "Startup Items",
 		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from os_version;",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from startup_items;",
 		"active": 1
 	},	
 	{
-		"name": "Query 2",
+		"name": "Windows Crashes",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from windows_crashes;",
+		"active": 1
+	},	
+	{
+		"name": "Windows Events",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from windows_events;",
+		"active": 1
+	},	
+	{
+		"name": "Windows Users",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from windows_users;",
+		"active": 1
+	},	
+	{
+		"name": "System Info",
 		"always": false,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from os_info;",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from system_info;",
 		"active": 1
 	}
 ]

@@ -37,7 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +64,9 @@ import com.simple2secure.portal.repository.UserRepository;
 
 @ActiveProfiles("test")
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 public class TestAPIBase {
 
 	private static Logger log = LoggerFactory.getLogger(TestAPIBase.class);
@@ -100,12 +101,9 @@ public class TestAPIBase {
 	@LocalServerPort
 	protected int randomServerPort;
 
-	@Autowired
-	private ApplicationContext appContext;
-
 	private User adminUser;
 
-	private User probeUser;
+	private User deviceUser;
 
 	private User superUser;
 
@@ -132,11 +130,11 @@ public class TestAPIBase {
 		loadedConfigItems.setBasePort(String.valueOf(randomServerPort));
 
 		adminUser = createUser(UserRole.ADMIN);
-		probeUser = createUser(UserRole.PROBE);
+		deviceUser = createUser(UserRole.DEVICE);
 		superUser = createUser(UserRole.SUPERUSER);
 		createSettings();
 		setAccessTokenAdmin(obtainAccessToken(adminUser));
-		setAccessTokenProbe(obtainAccessToken(probeUser));
+		setAccessTokenProbe(obtainAccessToken(deviceUser));
 		setAccessTokenSuperUser(obtainAccessToken(superUser));
 	}
 
@@ -297,7 +295,7 @@ public class TestAPIBase {
 	}
 
 	public User getProbeUser() {
-		return probeUser;
+		return deviceUser;
 	}
 
 	public User getSuperUser() {

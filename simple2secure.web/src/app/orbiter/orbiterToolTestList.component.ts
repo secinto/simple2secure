@@ -68,7 +68,7 @@ export class OrbiterToolTestListComponent {
 		this.isTestChanged = false;
 		this.context = JSON.parse(localStorage.getItem('context'));
 		this.pod = this.dataService.getPods();
-		this.loadTests(this.pod.pod.podId);
+		this.loadTests(this.pod.pod.deviceId);
 	}
 
 	ngAfterViewInit() {
@@ -123,7 +123,7 @@ export class OrbiterToolTestListComponent {
 		dialogConfig.data = {
 			tests: this.selectedTest,
 			type: type,
-			podId: this.pod.pod.podId
+			podId: this.pod.pod.deviceId
 		};
 
 		const dialogRef = this.dialog.open(TestDetailsComponent, dialogConfig);
@@ -131,7 +131,7 @@ export class OrbiterToolTestListComponent {
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
 				this.isTestChanged = true;
-				this.loadTests(this.pod.pod.podId);
+				this.loadTests(this.pod.pod.deviceId);
 			}
 		});
 
@@ -188,7 +188,7 @@ export class OrbiterToolTestListComponent {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
 				this.isTestChanged = true;
-				this.loadTests(this.pod.pod.podId);
+				this.loadTests(this.pod.pod.deviceId);
 			},
 			error => {
 				if (error.status == 0) {

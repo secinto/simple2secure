@@ -51,8 +51,7 @@ import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.Pod;
-import com.simple2secure.api.model.Probe;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInfo;
 import com.simple2secure.api.model.UserInvitation;
@@ -76,11 +75,10 @@ import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.ContextUtils;
 import com.simple2secure.portal.utils.DataInitialization;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.MailUtils;
-import com.simple2secure.portal.utils.PodUtils;
 import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.ProbeUtils;
 import com.simple2secure.portal.utils.UserUtils;
 
 @RestController
@@ -141,10 +139,7 @@ public class UserController {
 	GroupUtils groupUtils;
 
 	@Autowired
-	ProbeUtils probeUtils;
-
-	@Autowired
-	PodUtils podUtils;
+	DeviceUtils deviceUtils;
 
 	@Autowired
 	ContextUtils contextUtils;
@@ -178,7 +173,6 @@ public class UserController {
 		User user = userRepository.find(userId);
 
 		if (user != null && !Strings.isNullOrEmpty(contextId)) {
-
 			// Retrieving the context according to the current active context
 			Context context = contextRepository.find(contextId);
 
@@ -190,18 +184,18 @@ public class UserController {
 				List<String> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Probe> myProbes = probeUtils.getAllProbesFromCurrentContext(context);
-				List<Pod> myPods = podUtils.getAllPodsFromCurrentContext(context);
+				List<Device> myDevices = deviceUtils.getAllDevicesFromCurrentContext(context);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
 				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
-
+				log.debug("Found {} devices, {} groups, {} users, and {} contexts", myDevices.size(), groups.size(), myUsers.size(),
+						myContexts.size());
 				if (contextUserAuth != null) {
 					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
 						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, user);
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myProbes, myPods, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myDevices, myContexts, assignedGroups);
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}

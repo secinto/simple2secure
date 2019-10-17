@@ -22,6 +22,7 @@
 package com.simple2secure.api.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -43,6 +44,7 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String licenseId;
 
+	@Lob
 	protected String accessToken;
 
 	protected String expirationDate;
@@ -55,7 +57,7 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	protected String hostname;
 
-	protected PodStatus status = PodStatus.UNKNOWN;
+	protected DeviceStatus status = DeviceStatus.UNKNOWN;
 
 	protected long lastOnlineTimestamp;
 
@@ -152,11 +154,11 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.hostname = hostname;
 	}
 
-	public PodStatus getStatus() {
+	public DeviceStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(PodStatus status) {
+	public void setStatus(DeviceStatus status) {
 		this.status = status;
 	}
 

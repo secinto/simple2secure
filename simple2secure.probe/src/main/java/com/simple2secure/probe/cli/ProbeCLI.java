@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.service.ServiceCommand;
-import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
@@ -47,6 +46,9 @@ public class ProbeCLI {
 
 	private static String OPTION_FILEPATH_SHORT = "l";
 	private static String OPTION_FILEPATH = "licensePath";
+
+	private static String OPTION_INSTRUMENTATION_SHORT = "i";
+	private static String OPTION_INSTRUMENTATION = "instrumentation";
 
 	/**
 	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
@@ -164,6 +166,8 @@ public class ProbeCLI {
 
 		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
+		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).hasArg().argName("INSTRUMENTATION")
+				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
 		options.addOption(filePath);
 		try {
@@ -174,7 +178,8 @@ public class ProbeCLI {
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
 			}
-			if (ProbeConfiguration.isInstrumented) {
+
+			if (line.hasOption(instrumentation.getOpt())) {
 				client.startInstrumentation();
 			} else {
 				client.startWorkerThreads();
