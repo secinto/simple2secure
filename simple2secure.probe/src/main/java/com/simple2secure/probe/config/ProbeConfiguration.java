@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.h2.mvstore.cache.CacheLongKeyLIRS.Config;
 import org.slf4j.Logger;
@@ -83,6 +84,8 @@ public class ProbeConfiguration {
 
 	private static PropertyChangeSupport support;
 
+	public static ResourceBundle rb;
+
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving it from the standard path, the database, and the WebAPI
 	 * by calling updateConfig()
@@ -106,6 +109,8 @@ public class ProbeConfiguration {
 		currentSteps = new HashMap<>();
 		currentProcessors = new HashMap<>();
 		currentQueries = new HashMap<>();
+		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
+
 		loadConfig();
 	}
 

@@ -29,7 +29,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "QueryRun")
+@Table(
+		name = "QueryRun")
 public class QueryRun extends GenericDBObject {
 
 	/**
@@ -44,9 +45,15 @@ public class QueryRun extends GenericDBObject {
 
 	private String sqlQuery;
 	private int active;
+	private int systemsAvailable;
+
+	public static int NONE = 0;
+	public static int WINDOWS = 1;
+	public static int LINUX = 2;
+	public static int MACOS = 4;
 
 	public QueryRun() {
-
+		systemsAvailable = NONE;
 	}
 
 	public QueryRun(String groupId, String name, boolean always, long analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
@@ -116,4 +123,13 @@ public class QueryRun extends GenericDBObject {
 	public void setActive(int active) {
 		this.active = active;
 	}
+
+	public int getSystemsAvailable() {
+		return systemsAvailable;
+	}
+
+	public void setSystemsAvailable(int systemsAvailable) {
+		this.systemsAvailable = systemsAvailable;
+	}
+
 }

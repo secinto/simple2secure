@@ -144,7 +144,7 @@
   "table.numoftestsresults": "Number of test results", 
   "table.runningtime": "Running time",
   "table.frequency": "Frequency",      
-  "table.query": "Query",  
+  "table.query": "Queries",
   "table.queryresults": "Query Results",   
   "table.priority": "Priority",  
   "table.description": "Description",   
