@@ -28,14 +28,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.license.License;
 import com.simple2secure.commons.license.LicenseUtil;
-import com.simple2secure.commons.rest.RESTUtils;
-import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.ProbeGUI;
 import com.simple2secure.probe.license.LicenseController;
 
@@ -100,28 +96,13 @@ public class LicenseGUIController {
 			log.error("The directory you tried to import, does not contain the expected files.");
 		}
 
-		if (!licenseController.checkLicenseProps(downloadedLicense)) {
-			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
-			log.error("Problem occured during the license validation. The server is not responding. Try again later!");
-			importButton.setDisable(false);
-		}
-
 		licenseForAuth = licenseController.createLicenseForAuth(downloadedLicense);
-		authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/activateProbe", licenseForAuth,
-				ProbeConfiguration.authKey);
-		if (Strings.isNullOrEmpty(authToken)) {
+
+		if (licenseForAuth == null) {
 			errorLabel.setText("Problem occured during the license validation. The server is not responding. Try again later!");
 			log.error("Problem occured during the license validation. The server is not responding. Try again later!");
 			importButton.setDisable(false);
 		}
-
-		licenseController.activateLicenseInDB(authToken, licenseForAuth);
-
-		ProbeConfiguration.authKey = authToken;
-		ProbeConfiguration.probeId = licenseForAuth.getDeviceId();
-		ProbeConfiguration.groupId = licenseForAuth.getGroupId();
-		ProbeConfiguration.setAPIAvailablitity(true);
-
 		ProbeGUI.initRootPane();
 	}
 

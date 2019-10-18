@@ -6,7 +6,7 @@ import requests
 
 from src.db.database import Test
 from src.db.database_schema import TestSchema
-from src.util.db_utils import update
+from src.util.db_utils import update, clear_pod_status_auth
 from src.util.file_utils import read_json_testfile, update_services_file
 from src.util.rest_utils import sync_test_with_portal
 from src.util.util import create_secure_hash, generate_test_object_from_json
@@ -112,6 +112,7 @@ def sync_tests(app):
                         sync_ok = False
                         if resp is not None:
                             log.info('Failed to synchronize test {} with portal. Response data: {}'.format(test.name, resp.text))
+                            clear_pod_status_auth(app)
                         else:
                             log.info('Failed to synchronize test {} with portal.'.format(test.name))
 
@@ -126,6 +127,7 @@ def sync_tests(app):
 
         except requests.exceptions.ConnectionError as ce:
             app.logger.error('Error occurred while activating the pod: %s', ce)
+            clear_pod_status_auth(app)
         except RuntimeError as re:
             app.logger.error('Error occurred while synchronizing tests with portal: %s', re)
 

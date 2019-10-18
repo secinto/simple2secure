@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -65,8 +64,9 @@ public class ProbeConfiguration {
 	public static String groupId = "";
 	public static String probeId = "";
 	public static String hostname = "";
-
 	public static String licenseId = "";
+
+	public static String licensePath = "";
 
 	public static boolean isLicenseValid = false;
 	public static boolean isCheckingLicense = false;
@@ -182,18 +182,12 @@ public class ProbeConfiguration {
 	 * license is not valid anymore the properties are set accordingly.
 	 */
 	private void verifyLicense() {
-		CompanyLicensePublic licenseObj = licenseController.checkTokenValidity();
-
-		if (licenseObj != null) {
-			licenseController.updateLicenseInDB(licenseObj);
-			authKey = licenseObj.getAccessToken();
+		if (licenseController.authenticateLicense()) {
 			isLicenseValid = true;
 			if (support != null) {
 				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
 			}
 		} else {
-			// CompanyLicensePublic license = licenseController.loadLicenseFromDB();
-			// DBUtil.getInstance().delete(license);
 			isLicenseValid = false;
 			if (support != null) {
 				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);

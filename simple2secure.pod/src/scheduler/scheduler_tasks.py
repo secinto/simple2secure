@@ -5,6 +5,7 @@ from flask import json
 
 from src.db.database import TestResult
 from src.db.database_schema import TestResultSchema
+from src.util.db_utils import clear_pod_status_auth
 from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive
 from src.util.test_utils import sync_tests
 
@@ -55,6 +56,7 @@ def get_scheduled_tests(app_obj, celery_tasks):
                                   app_obj)
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")
         else:
+            clear_pod_status_auth(app_obj)
             if request_test is None:
                 log.error('Call to get scheduled tests returned nothing')
             else:

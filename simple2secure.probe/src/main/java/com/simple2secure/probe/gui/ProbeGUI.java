@@ -109,19 +109,18 @@ public class ProbeGUI extends Application {
 
 		ProbeConfiguration.isGuiRunning = true;
 
-		StartConditions startConditions = licenseCon.checkProbeStartConditions();
+		StartConditions startConditions = licenseCon.checkLicenseValidity();
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:
 			initLicenseImportPane("There is no license stored, please import a license.");
 			break;
-		case LICENSE_EXPIRED:
-		case LICENSE_NOT_ACTIVATED:
 		case LICENSE_VALID:
 			initRootPane();
 			break;
 		default:
 			initRootPane();
+			break;
 		}
 	}
 

@@ -22,8 +22,13 @@
 package com.simple2secure.probe.license;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +58,38 @@ public class LicenseController {
 	}
 
 	/**
+	 * Checks if there is a license stored in the DB. Checks if the license is activated. If not, it is activated and if the activation was
+	 * successful {@link StartConditions#LICENSE_VALID} is returned. If the license is expired or the activation was not successful it is
+	 * tried to obtain a license from the specified license path. If a valid license is available it is activated and
+	 * {@link StartConditions#LICENSE_VALID} is returned. Otherwise {@link StartConditions.LICENSE_NOT_AVAILABLE} is returned.
+	 *
+	 * @return The {@link StartConditions} which corresponds to the current state.
+	 */
+	public StartConditions checkLicenseValidity() {
+		CompanyLicensePublic license = loadLicenseFromDB();
+		if (license != null) {
+			ProbeConfiguration.probeId = license.getDeviceId();
+			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
+				if (license.isActivated()) {
+					ProbeConfiguration.isLicenseValid = true;
+					ProbeConfiguration.groupId = license.getGroupId();
+					ProbeConfiguration.authKey = license.getAccessToken();
+					return StartConditions.LICENSE_VALID;
+				} else {
+					if (authenticateLicense()) {
+						return StartConditions.LICENSE_VALID;
+					}
+				}
+			}
+		}
+		license = loadLicenseFromPath();
+		if (license != null && authenticateLicense()) {
+			return StartConditions.LICENSE_VALID;
+		}
+		return StartConditions.LICENSE_NOT_AVAILABLE;
+	}
+
+	/**
 	 * Obtains the license from the specified path. It requires a license ZIP file as input, containing the license.dat and the public key for
 	 * verification. If not an exception is thrown. If the importFilePath specifies a folder all ZIP files are obtained and the newest is used
 	 * as input. If a file is specified this is used.
@@ -62,72 +99,55 @@ public class LicenseController {
 	 * @return The {@link CompanyLicensePublic} object obtained from the file if any.
 	 * @throws Exception
 	 */
-	public CompanyLicensePublic loadLicenseFromPath(String importFilePath) throws Exception {
+	public CompanyLicensePublic loadLicenseFromPath() {
 		CompanyLicensePublic license = null;
-		if (FileUtil.fileOrFolderExists(importFilePath)) {
-			File inputFile = null;
-			if (FileUtil.isDirectory(importFilePath)) {
-				List<File> files = FileUtil.getFilesFromDirectory(importFilePath, false, Arrays.asList(new String[] { "zip" }));
-				inputFile = null;
-				for (File file : files) {
-					if (inputFile == null) {
-						inputFile = file;
-					}
-					if (inputFile.lastModified() < file.lastModified()) {
-						inputFile = file;
-					}
-				}
-			} else {
-				inputFile = new File(importFilePath);
-			}
-
-			if (inputFile != null && inputFile.exists()) {
-				List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
-				if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
-					License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
-					if (checkLicenseProps(downloadedLicense)) {
-						return createLicenseForAuth(downloadedLicense);
-					} else {
-						log.error("The required license properties couldn't be obtained from the ZIP file {}", importFilePath);
+		try {
+			String licensePath = ProbeConfiguration.licensePath;
+			if (FileUtil.fileOrFolderExists(licensePath)) {
+				File inputFile = null;
+				if (FileUtil.isDirectory(licensePath)) {
+					List<File> files = FileUtil.getFilesFromDirectory(licensePath, false, Arrays.asList(new String[] { "zip" }));
+					inputFile = null;
+					for (File file : files) {
+						if (inputFile == null) {
+							inputFile = file;
+						}
+						if (inputFile.lastModified() < file.lastModified()) {
+							inputFile = file;
+						}
 					}
 				} else {
-					log.error("Unzipping file {} didn't result in correct amount of files!", importFilePath);
+					inputFile = new File(licensePath);
+				}
+
+				if (inputFile != null && inputFile.exists()) {
+					List<File> unzippedFiles = ZIPUtils.unzipImportedFile(inputFile);
+					if (LicenseUtil.checkLicenseDirValidity(unzippedFiles)) {
+						License downloadedLicense = LicenseUtil.getLicense(unzippedFiles);
+						return loadLicenseForAuth(downloadedLicense);
+					} else {
+						log.error("Unzipping file {} didn't result in correct amount of files!", licensePath);
+					}
+				} else {
+					log.error("No usable license found in path {}", licensePath);
 				}
 			} else {
-				log.error("No usable license found in path {}", importFilePath);
+				log.error("Specified path {} doesn't contain a folder nor a file", licensePath);
 			}
-		} else {
-			log.error("Specified path {} doesn't contain a folder nor a file", importFilePath);
+		} catch (IOException | InvalidKeyException | SignatureException | NoSuchAlgorithmException | InvalidKeySpecException ioe) {
+			log.error("Couldn't load license from path because {}", ioe.getMessage());
 		}
 		return license;
 	}
 
-	/**
-	 * Checks if there is a license stored in the DB. Checks if the license found in DB is expired. Checks if the license is activated.
-	 * Depending on the outcome either {@link StartConditions#LICENSE_NOT_AVAILABLE} if there is no license stored in the DB is returned.
-	 * {@link StartConditions#LICENSE_EXPIRED} if the license is in DB but expired is returned. {@link StartConditions#LICENSE_NOT_ACTIVATED}
-	 * is returned if the license is not expired but it is not activated set. {@link StartConditions#LICENSE_VALID} if the license is not
-	 * expired and it is activated.
-	 *
-	 * @return The {@link StartConditions} which corresponds to the current state.
-	 */
-	public StartConditions checkProbeStartConditions() {
-		CompanyLicensePublic license = loadLicenseFromDB();
-		if (license != null) {
-			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
-				if (license.isActivated()) {
-					ProbeConfiguration.isLicenseValid = true;
-					ProbeConfiguration.probeId = license.getDeviceId();
-					ProbeConfiguration.groupId = license.getGroupId();
-					ProbeConfiguration.authKey = license.getAccessToken();
-					ProbeConfiguration.hostname = license.getHostname();
-					return StartConditions.LICENSE_VALID;
-				}
-				return StartConditions.LICENSE_NOT_ACTIVATED;
-			}
-			return StartConditions.LICENSE_EXPIRED;
+	public CompanyLicensePublic loadLicenseForAuth(License license) {
+		if (checkLicenseProps(license)) {
+			return createLicenseForAuth(license);
+		} else {
+			log.error("The required license properties couldn't be obtained from the provided license.");
 		}
-		return StartConditions.LICENSE_NOT_AVAILABLE;
+		return null;
+
 	}
 
 	/**
@@ -146,41 +166,11 @@ public class LicenseController {
 
 		if (!Strings.isNullOrEmpty(license.getProperty("groupId")) && !Strings.isNullOrEmpty(license.getProperty("licenseId"))
 				&& !Strings.isNullOrEmpty(license.getExpirationDateAsString())) {
-			isLicensePropsValid = true;
+			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDateAsString())) {
+				isLicensePropsValid = true;
+			}
 		}
 		return isLicensePropsValid;
-	}
-
-	/**
-	 * Updates the license in the DB with the local license.
-	 *
-	 * @param license
-	 *          The license which should be updated in the database.
-	 */
-	public void updateLicenseInDB(CompanyLicensePublic license) {
-		if (license != null) {
-			CompanyLicensePublic loadedLicense = loadLicenseFromDB();
-			if (loadedLicense != null) {
-				license.setId(loadedLicense.getId());
-			}
-
-			DBUtil.getInstance().merge(license);
-		}
-	}
-
-	/**
-	 * Loads the license from the data base.
-	 *
-	 * @return The {@link CompanyLicensePublic} from stored in the database.
-	 */
-	public CompanyLicensePublic loadLicenseFromDB() {
-		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(CompanyLicensePublic.class);
-
-		if (licenses.size() != 1) {
-			return null;
-		} else {
-			return licenses.get(0);
-		}
 	}
 
 	/**
@@ -191,16 +181,16 @@ public class LicenseController {
 	 *          The license which should be used for activation.
 	 * @return
 	 */
-	public boolean activateLicense(CompanyLicensePublic license) {
+	public boolean authenticateLicense() {
+		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
 			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (authToken != null) {
-				activateLicenseInDB(authToken, license);
+				activateLicenseAndUpdateInDB(authToken, license);
 
 				ProbeConfiguration.authKey = authToken;
 				ProbeConfiguration.probeId = license.getDeviceId();
 				ProbeConfiguration.groupId = license.getGroupId();
-				ProbeConfiguration.hostname = license.getHostname();
 				ProbeConfiguration.setAPIAvailablitity(true);
 				log.info("License successfully activated and AuthToken obtained");
 				return true;
@@ -212,43 +202,9 @@ public class LicenseController {
 	}
 
 	/**
-	 * Sets the needed Flags in the DB to mark the license activated.
-	 *
-	 * @param authToken
-	 *          The token which the server returns if the activation succeeded.
-	 * @param license
-	 *          The {@link CompanyLicensePublic} which should be set to activated.
-	 *
-	 */
-	public void activateLicenseInDB(String authToken, CompanyLicensePublic license) {
-		if (!Strings.isNullOrEmpty(authToken)) {
-			CompanyLicensePublic receivedLicense = JSONUtils.fromString(authToken, CompanyLicensePublic.class);
-			if (receivedLicense != null) {
-				if (!receivedLicense.getDeviceId().equals(license.getDeviceId())) {
-					log.error("Received license doesn't contain the same device ID, needs to be verified, continuing for now!");
-				}
-				license.setAccessToken(receivedLicense.getAccessToken());
-				license.setActivated(true);
-				updateLicenseInDB(license);
-			} else {
-				if (authToken.contains("accessToken")) {
-					int start = authToken.indexOf("accessToken") + "accessToken".length();
-					int actualStart = authToken.indexOf(":\"", start);
-					int actualEnd = authToken.indexOf("\"", actualStart);
-					String accessToken = authToken.substring(actualStart, actualEnd);
-					if (!Strings.isNullOrEmpty(accessToken)) {
-						license.setAccessToken(accessToken.trim());
-						license.setActivated(true);
-						updateLicenseInDB(license);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Creates a CompanyLicenseObj to send it to the server for authentication. Also checks if there is already a license stored in the DB, if
-	 * there is a license stored it just updates the license. If there is no license stored in the DB, it creates a new entry in the DB.
+	 * Creates a {@link CompanyLicensePublic} from the provided {@link License}. It also checks if there is already a license stored in the
+	 * DB, if there is a license stored it just updates the license. If there is no license stored in the DB, it creates a new entry in the
+	 * DB.
 	 *
 	 * @param license
 	 *          The {@link License} object which should be used for creating a {@link CompanyLicensePublic} for authentication
@@ -256,8 +212,7 @@ public class LicenseController {
 	 *
 	 */
 	public CompanyLicensePublic createLicenseForAuth(License license) {
-		String probeId = "";
-		String groupId, licenseId, expirationDate, hostname = "LOCALHOST";
+		String groupId, licenseId, expirationDate;
 
 		if (license == null) {
 			return null;
@@ -269,7 +224,7 @@ public class LicenseController {
 		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
 		try {
-			hostname = InetAddress.getLocalHost().getHostName();
+			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
 			log.error("Couldn't obtain hostname locally.");
 		}
@@ -285,18 +240,18 @@ public class LicenseController {
 		 */
 		if (storedLicense != null) {
 			if (Strings.isNullOrEmpty(storedLicense.getDeviceId())) {
-				probeId = UUID.randomUUID().toString();
-				storedLicense.setDeviceId(probeId);
+				ProbeConfiguration.probeId = UUID.randomUUID().toString();
+				storedLicense.setDeviceId(ProbeConfiguration.probeId);
 			}
 			storedLicense.setGroupId(groupId);
 			storedLicense.setLicenseId(licenseId);
 			storedLicense.setExpirationDate(expirationDate);
 		} else {
-			probeId = UUID.randomUUID().toString();
-			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, probeId);
+			ProbeConfiguration.probeId = UUID.randomUUID().toString();
+			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, ProbeConfiguration.probeId);
 		}
 		storedLicense.setStatus(DeviceStatus.ONLINE);
-		storedLicense.setHostname(hostname);
+		storedLicense.setHostname(ProbeConfiguration.hostname);
 		/*
 		 * Update the license in the local DB.
 		 */
@@ -305,23 +260,72 @@ public class LicenseController {
 	}
 
 	/**
-	 * Verifies the validity of the stored license using the authenticate service from the Portal. If the response contains a
-	 * {@link CompanyLicensePublic} it returns it otherwise null is returned.
+	 * Sets the needed Flags in the DB to mark the license activated.
 	 *
-	 * @return
+	 * @param authToken
+	 *          The token which the server returns if the activation succeeded.
+	 * @param license
+	 *          The {@link CompanyLicensePublic} which should be set to activated.
+	 *
 	 */
-	public CompanyLicensePublic checkTokenValidity() {
-		CompanyLicensePublic license = loadLicenseFromDB();
-		if (license != null) {
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
-			if (!Strings.isNullOrEmpty(response)) {
-				return JSONUtils.fromString(response, CompanyLicensePublic.class);
+	public boolean activateLicenseAndUpdateInDB(String authToken, CompanyLicensePublic license) {
+		if (!Strings.isNullOrEmpty(authToken)) {
+			CompanyLicensePublic receivedLicense = JSONUtils.fromString(authToken, CompanyLicensePublic.class);
+			if (receivedLicense != null) {
+				if (!receivedLicense.getDeviceId().equals(license.getDeviceId())) {
+					log.error("Received license doesn't contain the same device ID, needs to be verified, continuing for now!");
+					return false;
+				}
+				license.setAccessToken(receivedLicense.getAccessToken());
+				license.setActivated(true);
+				updateLicenseInDB(license);
+				return true;
+			} else {
+				if (authToken.contains("accessToken")) {
+					int start = authToken.indexOf("accessToken") + "accessToken".length();
+					int actualStart = authToken.indexOf(":\"", start);
+					int actualEnd = authToken.indexOf("\"", actualStart);
+					String accessToken = authToken.substring(actualStart, actualEnd);
+					if (!Strings.isNullOrEmpty(accessToken)) {
+						license.setAccessToken(accessToken.trim());
+						license.setActivated(true);
+						updateLicenseInDB(license);
+						return true;
+					}
+				}
 			}
-			log.error("The reponse from the Token service from the Portal didn't return a CompanyLicensePublic object.");
-		} else {
-			log.error("Couldn't find license in DB. Need to do something here");
 		}
-		return null;
-
+		return false;
 	}
+
+	/**
+	 * Updates the license in the DB with the local license.
+	 *
+	 * @param license
+	 *          The license which should be updated in the database.
+	 */
+	public void updateLicenseInDB(CompanyLicensePublic license) {
+		if (license != null) {
+			CompanyLicensePublic loadedLicense = loadLicenseFromDB();
+			if (loadedLicense != null) {
+				license.setId(loadedLicense.getId());
+			}
+			DBUtil.getInstance().merge(license);
+		}
+	}
+
+	/**
+	 * Loads the license from the data base.
+	 *
+	 * @return The {@link CompanyLicensePublic} from stored in the database.
+	 */
+	public CompanyLicensePublic loadLicenseFromDB() {
+		List<CompanyLicensePublic> licenses = DBUtil.getInstance().findAll(CompanyLicensePublic.class);
+		if (licenses.size() != 1) {
+			return null;
+		} else {
+			return licenses.get(0);
+		}
+	}
+
 }
