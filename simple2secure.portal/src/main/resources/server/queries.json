@@ -1,42 +1,368 @@
 [
 	{
-		"name": "Startup Items",
+		"name": "Users",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from startup_items;",
-		"active": 1
-	},	
+		"sqlQuery": "select * from users",
+		"active": 1,
+		"systemsAvailable": 1
+	},
 	{
-		"name": "Windows Crashes",
+		"name": "Video card info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from video_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Uptime",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from windows_crashes;",
-		"active": 1
-	},	
+		"sqlQuery": "select * from uptime",
+		"active": 1,
+		"systemsAvailable": 1
+	},
 	{
-		"name": "Windows Events",
+		"name": "Running processes",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from processes",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Pipes",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from pipes",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disk performance",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from windows_events;",
-		"active": 1
-	},	
+		"sqlQuery": "select * from physical_disk_performance",
+		"active": 1,
+		"systemsAvailable": 1
+	},
 	{
-		"name": "Windows Users",
+		"name": "Patches",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from windows_users;",
-		"active": 1
-	},	
+		"sqlQuery": "select * from patches",
+		"active": 1,
+		"systemsAvailable": 1
+	},
 	{
-		"name": "System Info",
-		"always": false,
+		"name": "Logical drives",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from logical_drives",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Logged in users",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from logged_in_users",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Activer routes",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "10"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from routes",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Autoexec applications",
+		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from system_info;",
-		"active": 1
+		"sqlQuery": "select * from autoexec",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Bios info - Windows",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from wmi_bios_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Installed programs",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from programs",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Logon sessions",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from logon_sessions",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "OS version",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from os_version",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Open sockets processes",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from process_open_sockets",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Platform info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from platform_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Processes memory map",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select Ü from process_memory_map",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Scheduled tasks (Windows)",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from scheduled_tasks",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Shared resources",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from shared resources",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Startup items",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from startup_items",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "System info",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "10"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from system_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "System time",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from system time",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows crashes",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from windows_crashes",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows events",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "10"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from windows_events",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows registry",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "30"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from registry",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows services",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from services",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Listening ports",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from listening_ports",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Kernel info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from kernel_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Network interface details",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from interface_details",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Network interface addresses",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from interface_addresses",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Internet Explorer extensions",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "5"
+		},
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from ie_extendsions",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "List of certificates",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from certificates",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "CPU info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from cpu_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "ARP cache",
+		"always": true,
+		"analysisInterval": {
+			"$numberInt": "10"
+		},
+		"analysisIntervalUnit": "MINUTES",
+		"sqlQuery": "select * from arp_cache",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Hosts file",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from etc_hosts",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disk info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"sqlQuery": "select * from disk_info",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Chrome extensions",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from chrome_extensions",
+		"active": 1,
+		"systemsAvailable": 1
 	}
 ]
