@@ -81,7 +81,7 @@ project(':simple2secure.probe') {
 			// compile group: 'org.pcap4j', name: 'pcap4j', version: '1.7.3'
 			// compile group: 'org.pcap4j', name: 'pcap4j-packetfactory-static', version: '1.7.3'
 			
-			compile group: 'org.pcap4j', name: 'pcap4j', version: '1.8.2', ext: 'pom'
+			compile group: 'org.pcap4j', name: 'pcap4j', version: '1.8.2'
 			compile group: 'org.pcap4j', name: 'pcap4j-packetfactory-static', version: '1.8.2'
 
 			compile 'org.hibernate:hibernate-core:5.0.7.Final'

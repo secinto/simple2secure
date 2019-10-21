@@ -39,7 +39,7 @@ import {NotificationComponent, NotificationDetailsComponent} from './notificatio
 import {ConfigurationDetailsComponent} from './configuration';
 import {
 	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
-	UserGroupApplyConfigComponent, UserProbeChangeGroupComponent, UserContextAddDialogComponent
+	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
 import {
 	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
@@ -263,7 +263,7 @@ export const httpInterceptorProviders = [
 		UserGroupComponent,
 		UserGroupDialogComponent,
 		UserGroupApplyConfigComponent,
-		UserProbeChangeGroupComponent,
+		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
@@ -314,7 +314,7 @@ export const httpInterceptorProviders = [
 		NetworkStepConfigurationEditComponent,
 		OsqueryConfigurationEditComponent,
 		UserGroupApplyConfigComponent,
-		UserProbeChangeGroupComponent,
+		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,

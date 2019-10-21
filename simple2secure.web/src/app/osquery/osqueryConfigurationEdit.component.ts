@@ -82,7 +82,7 @@ export class OsqueryConfigurationEditComponent {
 			this.queryRun.groupId = this.groupId;
 		}
 
-		this.httpService.post(this.queryRun, environment.apiEndpoint + 'config/query').subscribe(
+		this.httpService.post(this.queryRun, environment.apiEndpoint + 'query').subscribe(
 			data => {
 				this.dialogRef.close(true);
 			},

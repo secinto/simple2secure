@@ -98,7 +98,7 @@ export class OsqueryConfigurationDetailsComponent {
 
 	loadQueries() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'config/query/group/' + this.groupId + '/true')
+		this.httpService.get(environment.apiEndpoint + 'query/group/' + this.groupId + '/true')
 			.subscribe(
 				data => {
 					this.queries = data;
@@ -213,7 +213,7 @@ export class OsqueryConfigurationDetailsComponent {
 
 	deleteConfig(queryConfig: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'config/query/' + queryConfig.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'query/' + queryConfig.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.osquery.delete'));
 				this.deleted = true;
