@@ -66,7 +66,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to delete the created license
-		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getDeviceId();
+		String url = loadedConfigItems.getDeviceAPI() + "/deleteProbe/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -88,7 +88,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + license.getDeviceId();
+		String url = loadedConfigItems.getDeviceAPI() + "/deleteProbe/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -103,7 +103,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		String probeId = "102";
 
 		// API call to delete the created license without auth token (not provided in the headers)
-		String url = loadedConfigItems.getProbeAPI() + "/deleteProbe/" + probeId;
+		String url = loadedConfigItems.getDeviceAPI() + "/deleteProbe/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.DELETE,
 				new HttpEntity<String>(createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -130,7 +130,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
+		String url = loadedConfigItems.getDeviceAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -165,7 +165,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
+		String url = loadedConfigItems.getDeviceAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeadersWithoutAccessToken()), CompanyLicensePrivate.class);
 
@@ -187,7 +187,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		licenseRepository.save(license);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + license.getDeviceId();
+		String url = loadedConfigItems.getDeviceAPI() + "/changeGroup/" + license.getDeviceId();
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 
@@ -208,7 +208,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		groupRepository.save(group);
 
 		// API call to change the probe group
-		String url = loadedConfigItems.getProbeAPI() + "/changeGroup/" + probeId;
+		String url = loadedConfigItems.getDeviceAPI() + "/changeGroup/" + probeId;
 		ResponseEntity<CompanyLicensePrivate> response = restTemplate.exchange(url, HttpMethod.POST,
 				new HttpEntity<>(group, createHttpHeaders(UserRole.ADMIN)), CompanyLicensePrivate.class);
 

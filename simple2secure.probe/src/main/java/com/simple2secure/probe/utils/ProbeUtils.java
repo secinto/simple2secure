@@ -25,9 +25,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.network.NetUtils;
@@ -75,4 +77,15 @@ public final class ProbeUtils {
 		}
 	}
 
+	public static String getOsinfo() {
+		if (SystemUtils.IS_OS_WINDOWS) {
+			return OSInfo.WINDOWS.name();
+		} else if (SystemUtils.IS_OS_MAC) {
+			return OSInfo.OSX.name();
+		} else if (SystemUtils.IS_OS_LINUX) {
+			return OSInfo.LINUX.name();
+		} else {
+			return OSInfo.UNKNOWN.name();
+		}
+	}
 }

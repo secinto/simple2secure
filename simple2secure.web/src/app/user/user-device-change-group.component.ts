@@ -31,17 +31,17 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'userProbeChangeGroup.component.html',
-	selector: 'UserProbeChangeGroupComponent',
+	templateUrl: 'user-device-change-group.component.html',
+	selector: 'UserDeviceChangeGroupComponent',
 })
 
-export class UserProbeChangeGroupComponent {
+export class UserDeviceChangeGroupComponent {
 	loading = false;
 	id: string;
 	url: string;
 	currentUser: any;
 	groups: CompanyGroup[];
-	probe: Device;
+	device: Device;
 	selectedGroup: CompanyGroup;
 	context: ContextDTO;
 
@@ -53,11 +53,11 @@ export class UserProbeChangeGroupComponent {
 		private location: Location,
 		private alertService: AlertService,
 		private translate: TranslateService,
-		private dialogRef: MatDialogRef<UserProbeChangeGroupComponent>,
+		private dialogRef: MatDialogRef<UserDeviceChangeGroupComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-		this.probe = data;
-		this.selectedGroup = this.probe.group;
+		this.device = data;
+		this.selectedGroup = this.device.group;
 	}
 
 	ngOnInit() {
@@ -88,7 +88,7 @@ export class UserProbeChangeGroupComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'probe/changeGroup/' + this.probe.deviceId;
+		this.url = environment.apiEndpoint + 'device/changeGroup/' + this.device.deviceId;
 		this.httpService.post(this.selectedGroup, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);
@@ -99,7 +99,7 @@ export class UserProbeChangeGroupComponent {
 			});
 	}
 
-	extractGroups(groups: CompanyGroup[]) {
+	public extractGroups(groups: CompanyGroup[]) {
 		this.groups = [];
 		for (let i = 0; i < groups.length; i++) {
 			if (groups[i].id == this.selectedGroup.id) {

@@ -6,7 +6,6 @@ usersAPI: /api/users
 loginAPI: /api/login
 reportsAPI: /api/reports
 queryAPI: /api/config/query
-configAPI: /api/config
 deviceAPI: /api/device
 packetAPI: /api/packet
 stepAPI: /api/steps
@@ -14,4 +13,3 @@ processorAPI: /api/processors
 licenseAPI: /api/license
 serviceAPI: /api/service
 groupAPI: /api/group
-probeAPI: /api/probe

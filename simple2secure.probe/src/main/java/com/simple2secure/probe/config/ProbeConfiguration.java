@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.h2.mvstore.cache.CacheLongKeyLIRS.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,7 @@ import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.network.PacketProcessorFSM;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeConfiguration {
 
@@ -65,7 +65,7 @@ public class ProbeConfiguration {
 	public static String probeId = "";
 	public static String hostname = "";
 	public static String licenseId = "";
-
+	public static String osinfo = "";
 	public static String licensePath = "";
 
 	public static boolean isLicenseValid = false;
@@ -110,7 +110,7 @@ public class ProbeConfiguration {
 		currentProcessors = new HashMap<>();
 		currentQueries = new HashMap<>();
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
-
+		osinfo = ProbeUtils.getOsinfo();
 		loadConfig();
 	}
 
@@ -144,12 +144,10 @@ public class ProbeConfiguration {
 	 * @param standardConfig
 	 *          the path to the offline Configuration file. <code>StaticConfigValues.XML_LOCATION</code> can be used.
 	 */
-	public void loadConfig() {
+	private void loadConfig() {
 		updateProcessorsLocal();
 		updateStepsLocal();
 		updateQueriesLocal();
-
-		checkAndUpdateConfigFromAPI();
 	}
 
 	/**
@@ -392,29 +390,6 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Returns the {@link Config} object from the associated Portal API.
-	 *
-	 * @return The obtained {@link Config} object.
-	 */
-	public Config getConfigFromAPI() {
-		return JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getConfigAPI(), ProbeConfiguration.authKey),
-				Config.class);
-	}
-
-	/**
-	 * Return the {@link Config} object from the database.
-	 *
-	 * @return The obtained {@link Config} object.
-	 */
-	public Config getConfigFromDatabase() {
-		List<Config> configs = DBUtil.getInstance().findAll(Config.class);
-		if (configs != null && configs.size() == 1) {
-			return configs.get(0);
-		}
-		return null;
-	}
-
-	/**
 	 * Returns a List of {@link Processor} objects from the associated Portal API.
 	 *
 	 * @return The obtained List of {@link Processor} objects.
@@ -528,9 +503,9 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link QueryRun} objects.
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(JSONUtils
-				.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false,
-						ProbeConfiguration.authKey), QueryRun[].class));
+		return Arrays.asList(JSONUtils.fromString(RESTUtils.sendGet(
+				LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.osinfo + "/" + ProbeConfiguration.probeId + "/" + false,
+				ProbeConfiguration.authKey), QueryRun[].class));
 	}
 
 	/**

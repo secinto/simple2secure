@@ -30,7 +30,7 @@ import com.simple2secure.api.model.TestSequence;
 
 public class DeviceDTO {
 
-	private Device pod;
+	private Device device;
 
 	private List<TestObjWeb> test;
 
@@ -38,18 +38,18 @@ public class DeviceDTO {
 	public DeviceDTO() {
 	}
 
-	public DeviceDTO(Device pod, List<TestObjWeb> test, List<TestSequence> test_sequence) {
-		this.pod = pod;
+	public DeviceDTO(Device device, List<TestObjWeb> test, List<TestSequence> test_sequence) {
+		this.device = device;
 		this.test = test;
 		this.test_sequence = test_sequence;
 	}
 
 	public Device getPod() {
-		return pod;
+		return device;
 	}
 
 	public void setPod(Device pod) {
-		this.pod = pod;
+		this.device = pod;
 	}
 
 	public List<TestObjWeb> getTest() {
