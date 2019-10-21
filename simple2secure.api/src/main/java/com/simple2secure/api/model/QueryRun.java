@@ -43,9 +43,10 @@ public class QueryRun extends GenericDBObject {
 
 	@JsonProperty
 	private boolean always;
-	private long analysisInterval;
+	private int analysisInterval;
 	private TimeUnit analysisIntervalUnit;
-
+	@JsonProperty
+	private boolean osquery;
 	private String sqlQuery;
 	private int active;
 	private int systemsAvailable;
@@ -61,9 +62,10 @@ public class QueryRun extends GenericDBObject {
 	public QueryRun() {
 		systemsAvailable = NONE;
 		graphAble = true;
+		osquery = true;
 	}
 
-	public QueryRun(String groupId, String name, boolean always, long analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
+	public QueryRun(String groupId, String name, boolean always, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
 			int active) {
 		super();
 		this.groupId = groupId;
@@ -91,11 +93,11 @@ public class QueryRun extends GenericDBObject {
 		this.always = always;
 	}
 
-	public long getAnalysisInterval() {
+	public int getAnalysisInterval() {
 		return analysisInterval;
 	}
 
-	public void setAnalysisInterval(long analysisInterval) {
+	public void setAnalysisInterval(int analysisInterval) {
 		this.analysisInterval = analysisInterval;
 	}
 

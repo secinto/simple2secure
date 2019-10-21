@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
@@ -47,6 +46,7 @@ import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -87,8 +87,6 @@ public class TestUtils {
 
 	@Autowired
 	TestUtils testUtils;
-
-	private Gson gson = new Gson();
 
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
@@ -349,7 +347,7 @@ public class TestUtils {
 			testObjWeb.getTest_content().getTest_definition().setVersion("0.0.1");
 		}
 
-		String testContent = gson.toJson(testObjWeb.getTest_content());
+		String testContent = JSONUtils.toString(testObjWeb.getTest_content());
 
 		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
 			// new test
@@ -440,7 +438,7 @@ public class TestUtils {
 
 			for (Test test : tests) {
 				TestObjWeb testObjWeb = new TestObjWeb();
-				TestContent testContent = gson.fromJson(test.getTest_content(), TestContent.class);
+				TestContent testContent = JSONUtils.fromString(test.getTest_content(), TestContent.class);
 				testObjWeb.setTest_content(testContent);
 				testObjWeb.setName(test.getName());
 				testObjWeb.setActive(test.isActive());

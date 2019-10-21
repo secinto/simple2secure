@@ -5,7 +5,7 @@ basePortWeb: 51003
 usersAPI: /api/users
 loginAPI: /api/login
 reportsAPI: /api/reports
-queryAPI: /api/config/query
+queryAPI: /api/query
 deviceAPI: /api/device
 packetAPI: /api/packet
 stepAPI: /api/steps

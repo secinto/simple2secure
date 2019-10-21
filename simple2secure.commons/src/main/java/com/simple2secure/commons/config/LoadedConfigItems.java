@@ -45,7 +45,7 @@ public class LoadedConfigItems {
 	private String usersAPI = "/api/user";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
-	private String queryAPI = "/api/config/query";
+	private String queryAPI = "/api/query";
 	private String deviceAPI = "/api/device";
 	private String packetAPI = "/api/packet";
 	private String stepAPI = "/api/steps";

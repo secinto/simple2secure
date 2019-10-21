@@ -136,12 +136,13 @@ public class ProbeCLI {
 	public static void main(String[] args) {
 		Options options = new Options();
 
-		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
+		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
 		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).hasArg().argName("INSTRUMENTATION")
 				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
 		options.addOption(filePath);
+		options.addOption(instrumentation);
 		try {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);

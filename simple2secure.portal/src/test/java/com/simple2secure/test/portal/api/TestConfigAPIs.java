@@ -40,9 +40,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.google.gson.Gson;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.Simple2SecurePortal;
 
 @ExtendWith({ SpringExtension.class })
@@ -60,8 +60,6 @@ public class TestConfigAPIs {
 	@LocalServerPort
 	protected int randomServerPort;
 
-	private Gson gson = new Gson();
-
 	@PostConstruct
 	public void init() {
 		/*
@@ -74,7 +72,7 @@ public class TestConfigAPIs {
 	public void testGetSettingsConfig() throws IOException {
 		File file = new File(getClass().getResource("/server/settings.json").getFile());
 		String content = new String(Files.readAllBytes(file.toPath()));
-		Settings settings = gson.fromJson(content, Settings.class);
+		Settings settings = JSONUtils.fromString(content, Settings.class);
 
 		assertNotNull(settings);
 

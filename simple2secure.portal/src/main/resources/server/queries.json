@@ -174,7 +174,7 @@
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select Ü from process_memory_map",
+		"sqlQuery": "select * from process_memory_map",
 		"active": 1,
 		"osquery": true,
 		"systemsAvailable": 1
@@ -252,9 +252,7 @@
 	{
 		"name": "Windows registry",
 		"always": true,
-		"analysisInterval": {
-			"$numberInt": "30"
-		},
+		"analysisInterval": 30,
 		"analysisIntervalUnit": "MINUTES",
 		"sqlQuery": "select * from registry",
 		"active": 1,

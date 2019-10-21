@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -26,19 +25,19 @@ public class GroupRepositoryImpl extends GroupRepository {
 
 	@Override
 	public List<CompanyGroup> findByContextId(String contextId) {
-		Query query = new Query(Criteria.where("contextId").is(contextId)).with(new Sort(Direction.ASC, "name"));
+		Query query = new Query(Criteria.where("contextId").is(contextId)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 
 	@Override
 	public List<CompanyGroup> findRootGroupsByContextId(String contextId) {
-		Query query = new Query(Criteria.where("contextId").is(contextId).and("rootGroup").is(true)).with(new Sort(Direction.ASC, "name"));
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("rootGroup").is(true)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 
 	@Override
 	public List<CompanyGroup> findByParentId(String parentId) {
-		Query query = new Query(Criteria.where("parentId").is(parentId)).with(new Sort(Direction.ASC, "name"));
+		Query query = new Query(Criteria.where("parentId").is(parentId)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 

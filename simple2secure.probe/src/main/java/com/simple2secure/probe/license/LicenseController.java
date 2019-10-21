@@ -184,9 +184,9 @@ public class LicenseController {
 	public boolean authenticateLicense() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
-			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
-			if (authToken != null) {
-				license = activateLicenseAndUpdateInDB(authToken, license);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
+			if (response != null) {
+				license = activateLicenseAndUpdateInDB(response, license);
 				if (license != null) {
 					ProbeConfiguration.authKey = license.getAccessToken();
 					ProbeConfiguration.probeId = license.getDeviceId();

@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
 import org.pcap4j.packet.EthernetPacket.EthernetHeader;
@@ -94,10 +95,12 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
+
 		report.setDeviceId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
 		report.setStartTime(analysisStartTime);
 		report.setHostname(ProbeConfiguration.hostname);
+
 		sourceIp = new TreeMap<>();
 		destinationIp = new TreeMap<>();
 		sourceMac = new TreeMap<>();
@@ -168,7 +171,12 @@ public class CommonStatisticProcessor extends PacketProcessor {
 			destIp = "-";
 			protocol = "ppp." + header.getProtocol().name();
 		} else {
-			log.debug("Packet with unexpected protocol type arrived");
+			String payloadHeader = packet.getPayload().getHeader().toString().trim();
+			if (!Strings.isNullOrEmpty(payloadHeader)) {
+				String packetType = StringUtils.substringBetween(payloadHeader, "[", "]").trim();
+				packetType = StringUtils.substringBefore(packetType, "header");
+				log.debug("Packet with not monitored protocol type arrived. Type {}", packetType);
+			}
 			srcIp = "?";
 			destIp = "?";
 			protocol = "?";
@@ -197,17 +205,20 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				// initialize new report
 				if (!Strings.isNullOrEmpty(report.getDeviceId()) && report.getStartTime() != null) {
 					writeNetworkTrafficResults();
+					report.setProcessorName(packet.getProcessor().getName());
 					report.setStringContent(content);
 					report.setSent(false);
 					DBUtil.getInstance().save(report);
 				}
 				analysisStartTime = new Date();
+
 				report = new NetworkReport();
 				report.setDeviceId(ProbeConfiguration.probeId);
 				report.setGroupId(ProbeConfiguration.groupId);
 				report.setStartTime(analysisStartTime);
 				report.setProcessorName(packet.getProcessor().getName());
 				report.setHostname(ProbeConfiguration.hostname);
+
 				// reportContent = new TreeMap<>();
 				sourceIp = new TreeMap<>();
 				destinationIp = new TreeMap<>();
