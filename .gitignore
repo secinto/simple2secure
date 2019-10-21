@@ -35,3 +35,7 @@ simple2secure.web/.idea/
 simple2secure.web/dist/
 simple2secure.web/node_modules/
 .pydevproject
+simple2secure.service/release/libs/simple2secure.service.jar
+simple2secure.service/release/libs/simple2secure.probe.jar
+simple2secure.probe/src/test/resources/licenses/license.zip
+simple2secure.probe/src/test/resources/licenses/1/license.dat
