@@ -157,7 +157,7 @@ public class LicenseController {
 	 *          The {@link License} for which the properties are checked.
 	 * @return True if the properties in the license object are set, false if only one property is null or empty
 	 */
-	public boolean checkLicenseProps(License license) {
+	private boolean checkLicenseProps(License license) {
 		Boolean isLicensePropsValid = false;
 
 		if (license == null) {
@@ -186,14 +186,17 @@ public class LicenseController {
 		if (license != null) {
 			String authToken = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (authToken != null) {
-				activateLicenseAndUpdateInDB(authToken, license);
-
-				ProbeConfiguration.authKey = authToken;
-				ProbeConfiguration.probeId = license.getDeviceId();
-				ProbeConfiguration.groupId = license.getGroupId();
-				ProbeConfiguration.setAPIAvailablitity(true);
-				log.info("License successfully activated and AuthToken obtained");
-				return true;
+				license = activateLicenseAndUpdateInDB(authToken, license);
+				if (license != null) {
+					ProbeConfiguration.authKey = license.getAccessToken();
+					ProbeConfiguration.probeId = license.getDeviceId();
+					ProbeConfiguration.groupId = license.getGroupId();
+					ProbeConfiguration.setAPIAvailablitity(true);
+					log.info("License successfully activated and AuthToken obtained");
+					return true;
+				} else {
+					log.error("A problem occured while activating the license in DB.");
+				}
 			} else {
 				log.error("A problem occured while loading the license from path.");
 			}
@@ -268,18 +271,17 @@ public class LicenseController {
 	 *          The {@link CompanyLicensePublic} which should be set to activated.
 	 *
 	 */
-	public boolean activateLicenseAndUpdateInDB(String authToken, CompanyLicensePublic license) {
+	private CompanyLicensePublic activateLicenseAndUpdateInDB(String authToken, CompanyLicensePublic license) {
 		if (!Strings.isNullOrEmpty(authToken)) {
 			CompanyLicensePublic receivedLicense = JSONUtils.fromString(authToken, CompanyLicensePublic.class);
 			if (receivedLicense != null) {
 				if (!receivedLicense.getDeviceId().equals(license.getDeviceId())) {
 					log.error("Received license doesn't contain the same device ID, needs to be verified, continuing for now!");
-					return false;
+					return null;
 				}
 				license.setAccessToken(receivedLicense.getAccessToken());
 				license.setActivated(true);
 				updateLicenseInDB(license);
-				return true;
 			} else {
 				if (authToken.contains("accessToken")) {
 					int start = authToken.indexOf("accessToken") + "accessToken".length();
@@ -290,12 +292,11 @@ public class LicenseController {
 						license.setAccessToken(accessToken.trim());
 						license.setActivated(true);
 						updateLicenseInDB(license);
-						return true;
 					}
 				}
 			}
 		}
-		return false;
+		return loadLicenseFromDB();
 	}
 
 	/**

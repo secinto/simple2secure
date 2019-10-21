@@ -42,6 +42,12 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
+	public List<CompanyLicensePrivate> findByDeviceStatusOnline() {
+		Query query = new Query(Criteria.where("status").is("ONLINE"));
+		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
 	public CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId, boolean deviceIsPod) {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("deviceId").is(deviceId).and("deviceIsPod").is(deviceIsPod));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);

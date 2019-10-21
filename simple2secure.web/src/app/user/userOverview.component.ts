@@ -380,7 +380,7 @@ export class UserOverviewComponent {
 
 	public deleteProbe(probe: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'probe/deleteProbe/' + probe.probeId).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'probe/deleteProbe/' + probe.deviceId).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.probe.delete'));
 				this.loadMyProfile();
@@ -400,7 +400,7 @@ export class UserOverviewComponent {
 
 	public deletePod(pod: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'pod/deletePod/' + pod.podId).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'pod/deletePod/' + pod.deviceId).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.pod.delete'));
 				this.loadMyProfile();

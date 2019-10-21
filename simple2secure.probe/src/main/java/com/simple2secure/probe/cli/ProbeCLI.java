@@ -149,6 +149,8 @@ public class ProbeCLI {
 
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
+			} else {
+				client.init("./license/");
 			}
 
 			if (line.hasOption(instrumentation.getOpt())) {

@@ -479,9 +479,19 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(
-				JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
-						ProbeConfiguration.authKey), Step[].class));
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
+				ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(response)) {
+			Step[] stepArray = JSONUtils.fromString(response, Step[].class);
+			if (stepArray != null && stepArray.length > 0) {
+				return Arrays.asList(stepArray);
+			} else {
+				log.trace("No steps specified for PROBE");
+			}
+		} else {
+			log.error("Getting specified list of steps for PROBE was not successful.");
+		}
+		return null;
 	}
 
 	/**
@@ -528,9 +538,19 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link QueryRun} objects.
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(JSONUtils
-				.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false,
-						ProbeConfiguration.authKey), QueryRun[].class));
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false,
+				ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(response)) {
+			QueryRun[] queryArray = JSONUtils.fromString(response, QueryRun[].class);
+			if (queryArray != null && queryArray.length > 0) {
+				return Arrays.asList(queryArray);
+			} else {
+				log.trace("No queries specified for PROBE");
+			}
+		} else {
+			log.error("Getting specified list of queries for PROBE was not successful.");
+		}
+		return null;
 	}
 
 	/**

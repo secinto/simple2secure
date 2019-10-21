@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
@@ -205,6 +206,21 @@ public class PodController {
 		log.error("Problem occured while deleting pod with id {}", podId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_pod", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	@RequestMapping(
+			value = "/status/{deviceId}",
+			method = RequestMethod.POST)
+	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			if (license != null) {
+				license.setLastOnlineTimestamp(System.currentTimeMillis());
+				licenseRepository.update(license);
+			}
+		}
+		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 }

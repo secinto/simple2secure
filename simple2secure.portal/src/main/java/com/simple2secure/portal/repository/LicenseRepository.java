@@ -35,6 +35,8 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract CompanyLicensePrivate findByDeviceId(String deviceId);
 
+	public abstract List<CompanyLicensePrivate> findByDeviceStatusOnline();
+
 	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
 
 	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId, boolean deviceIsPod);

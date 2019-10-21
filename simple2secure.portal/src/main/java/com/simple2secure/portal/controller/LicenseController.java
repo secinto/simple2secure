@@ -154,7 +154,7 @@ public class LicenseController {
 			value = "/authenticate",
 			method = RequestMethod.POST,
 			consumes = "application/json")
-	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
+	public ResponseEntity<CompanyLicensePublic> authenticate(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (licensePublic != null) {
 
