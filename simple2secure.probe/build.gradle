@@ -24,3 +24,12 @@ jar {
 		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 }
+
+task copyJar( type: Copy) {
+		dependsOn jar
+		from jar
+		into "../simple2secure.service/release/libs/"
+		
+		rename '(.+)-1.0.0-RC(.+)', '$1$2'
+}
+
