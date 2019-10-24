@@ -26,5 +26,5 @@ export * from './userOverview.component';
 export * from './userGroup.component';
 export * from './userGroupDialog.component';
 export * from './userGroupApplyConfig.component';
-export * from './userProbeChangeGroup.component';
+export * from './user-device-change-group.component';
 export * from './userContextAddDialog.component';

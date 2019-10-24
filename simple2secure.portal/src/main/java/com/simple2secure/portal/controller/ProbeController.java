@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -140,6 +141,21 @@ public class ProbeController {
 		log.error("Problem occured while deleting probe with id {}", probeId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_probe", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	@RequestMapping(
+			value = "/status/{deviceId}",
+			method = RequestMethod.POST)
+	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			if (license != null) {
+				license.setLastOnlineTimestamp(System.currentTimeMillis());
+				licenseRepository.update(license);
+			}
+		}
+		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 }

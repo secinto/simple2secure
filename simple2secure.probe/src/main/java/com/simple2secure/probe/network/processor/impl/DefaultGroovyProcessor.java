@@ -28,6 +28,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.probe.network.PacketContainer;
 import com.simple2secure.probe.network.PacketProcessor;
@@ -71,7 +72,7 @@ public class DefaultGroovyProcessor extends PacketProcessor {
 
 		try {
 			Processor groovyProcessor = packet.getProcessor();
-			if (groovyProcessor != null) {
+			if (groovyProcessor != null && !Strings.isNullOrEmpty(groovyProcessor.getGroovyProcessor())) {
 				Class groovy = classLoader.parseClass(groovyProcessor.getGroovyProcessor());
 
 				Constructor<?> constructor = groovy.getConstructor(String.class, Map.class);

@@ -34,7 +34,7 @@ import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
-import {UserProbeChangeGroupComponent} from './userProbeChangeGroup.component';
+import {UserDeviceChangeGroupComponent} from './user-device-change-group.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 import {UserInfo} from '../_models/userInfo';
 
@@ -78,7 +78,7 @@ export class UserOverviewComponent {
 	isGroupDeletable = false;
 
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
-	displayedColumnsDevices = ['probeId', 'group', 'activated', 'action'];
+	displayedColumnsDevices = ['probeId', 'hostname', 'group', 'status', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
 	displayedColumnsPods = ['podId', 'hostname', 'group', 'status', 'action'];
 
@@ -378,33 +378,13 @@ export class UserOverviewComponent {
 			});
 	}
 
-	public deleteProbe(probe: any) {
+	public deleteDevice(device: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'probe/deleteProbe/' + probe.probeId).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'device/delete/' + device.deviceId).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.probe.delete'));
 				this.loadMyProfile();
 				this.probeDeleted = true;
-				this.loading = false;
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
-	}
-
-	public deletePod(pod: any) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'pod/deletePod/' + pod.podId).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.pod.delete'));
-				this.loadMyProfile();
-				this.podDeleted = true;
 				this.loading = false;
 			},
 			error => {
@@ -748,8 +728,8 @@ export class UserOverviewComponent {
 		});
 	}
 
-	openDialogChangeProbeGroup(): void {
-		const dialogRef = this.dialog2.open(UserProbeChangeGroupComponent, {
+	openDialogChangeDeviceGroup(): void {
+		const dialogRef = this.dialog2.open(UserDeviceChangeGroupComponent, {
 			width: '350px',
 			data: this.selectedItem
 		});
@@ -904,10 +884,10 @@ export class UserOverviewComponent {
 					this.deleteGroup(this.selectedItem);
 				}
 				else if (type == 'probe') {
-					this.deleteProbe(this.selectedItem);
+					this.deleteDevice(this.selectedItem);
 				}
 				else if (type == 'pod') {
-					this.deletePod(this.selectedItem);
+					this.deleteDevice(this.selectedItem);
 				}
 				else if (type == 'context') {
 					this.deleteContext(this.selectedItem);

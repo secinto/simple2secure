@@ -33,9 +33,8 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
@@ -59,48 +58,21 @@ public class ProbeCLI {
 	 */
 	public void init(String importFilePath) {
 
+		ProbeConfiguration.licensePath = importFilePath;
+
 		TLSConfig.initializeTLSConfiguration(
 				new String[] { "1009697567", "93791718698785438451096221151509119784", "132145755450301565074331139870923558714" });
 
 		LicenseController licenseController = new LicenseController();
 
-		StartConditions startConditions = licenseController.checkProbeStartConditions();
-
-		CompanyLicensePublic licenseFile = null;
+		StartConditions startConditions = licenseController.checkLicenseValidity();
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:
-			try {
-				licenseFile = licenseController.loadLicenseFromPath(importFilePath);
-				if (!licenseController.activateLicense(licenseFile)) {
-					log.error("A problem occured while activating the license.");
-				}
-			} catch (Exception e) {
-				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
-			}
+			log.error("A problem occured while updating the license.");
 			break;
-		case LICENSE_NOT_ACTIVATED:
-			try {
-				if (!Strings.isNullOrEmpty(importFilePath)) {
-					licenseFile = licenseController.loadLicenseFromPath(importFilePath);
-				} else {
-					licenseFile = licenseController.loadLicenseFromDB();
-				}
-				if (!licenseController.activateLicense(licenseFile)) {
-					log.error("A problem occured while activating the license.");
-				}
-			} catch (Exception e) {
-				log.error("A problem occured while loading the license from path. Concrete exception: {}", e);
-			}
-			break;
-		case LICENSE_VALID:
-			log.info("Found valid license. Starting probe!");
-			break;
-		case LICENSE_EXPIRED:
-			/*
-			 * TODO: Insert handling for licenses which are expired for more than a predefined period.
-			 */
-			log.info("License expired!");
+		default:
+			log.info("A valid license is available");
 			break;
 		}
 	}
@@ -164,12 +136,13 @@ public class ProbeCLI {
 	public static void main(String[] args) {
 		Options options = new Options();
 
-		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(true).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
+		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
 		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).hasArg().argName("INSTRUMENTATION")
 				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
 		options.addOption(filePath);
+		options.addOption(instrumentation);
 		try {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);
@@ -177,6 +150,8 @@ public class ProbeCLI {
 
 			if (line.hasOption(filePath.getOpt())) {
 				client.init(line.getOptionValue(filePath.getOpt()));
+			} else {
+				client.init("./license/");
 			}
 
 			if (line.hasOption(instrumentation.getOpt())) {

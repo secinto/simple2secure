@@ -56,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
-	public void configure(WebSecurity web) throws Exception {
+	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
 				"/api/user/sendResetPasswordEmail", "/api/user/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
 				"/api/download/**", "/api/device/**", "/api/license/authenticate/**", "/api/pod/config/**");

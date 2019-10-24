@@ -22,7 +22,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.simple2secure.api" level="debug" />
+	<logger name="com.simple2secure.commons" level="debug" />
 
 	<root level="debug">
 		<appender-ref ref="STDOUT" />

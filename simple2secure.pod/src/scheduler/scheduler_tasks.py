@@ -5,6 +5,7 @@ from flask import json
 
 from src.db.database import TestResult
 from src.db.database_schema import TestResultSchema
+from src.util.db_utils import clear_pod_status_auth
 from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive
 from src.util.test_utils import sync_tests
 
@@ -50,11 +51,12 @@ def get_scheduled_tests(app_obj, celery_tasks):
             for test_run in test_run_array:
                 current_test = json.loads(test_run["testContent"])
                 celery_tasks.execute_test.delay(current_test["test_definition"], test_run["testId"],
-                                                test_run["testName"], app_obj.config['POD_ID'], test_run["id"])
+                                                test_run["testName"], test_run["id"])
                 send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                   app_obj)
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")
         else:
+            clear_pod_status_auth(app_obj)
             if request_test is None:
                 log.error('Call to get scheduled tests returned nothing')
             else:
@@ -72,6 +74,4 @@ def get_test_results_from_db(app_obj, celery_tasks):
     with app_obj.app_context():
         test_results = TestResult.query.filter_by(isSent=False).all()
         for test_result in test_results:
-            test_result_schema = TestResultSchema()
-            output = test_result_schema.dump(test_result)
-            celery_tasks.send_test_result.delay(output)
+            celery_tasks.send_test_result.delay(test_result)

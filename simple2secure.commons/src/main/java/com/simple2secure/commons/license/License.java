@@ -21,18 +21,16 @@
  */
 package com.simple2secure.commons.license;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import com.simple2secure.commons.time.TimeUtils;
+
 public class License {
 	public static final String EXPIRATION_DATE = "expirationDate";
-	public static final String LICENSE_DATE_FORMAT = "MM/dd/yyyy";
-
 	private Properties licenseProperties;
 
 	public License(Properties licenseProperties) {
@@ -40,11 +38,7 @@ public class License {
 	}
 
 	public Date getExpirationDate() {
-		try {
-			return new SimpleDateFormat(LICENSE_DATE_FORMAT).parse(getProperty(EXPIRATION_DATE));
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
+		return TimeUtils.parseDate(TimeUtils.SIMPLE_DATE_FORMAT, getProperty(EXPIRATION_DATE));
 	}
 
 	public String getExpirationDateAsString() {

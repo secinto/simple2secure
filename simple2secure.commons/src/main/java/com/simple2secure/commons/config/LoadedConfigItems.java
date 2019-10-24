@@ -45,8 +45,7 @@ public class LoadedConfigItems {
 	private String usersAPI = "/api/user";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
-	private String queryAPI = "/api/config/query";
-	private String configAPI = "/api/config";
+	private String queryAPI = "/api/query";
 	private String deviceAPI = "/api/device";
 	private String packetAPI = "/api/packet";
 	private String stepAPI = "/api/steps";
@@ -54,7 +53,6 @@ public class LoadedConfigItems {
 	private String licenseAPI = "/api/license";
 	private String serviceAPI = "/api/service";
 	private String groupAPI = "/api/group";
-	private String probeAPI = "/api/probe";
 
 	private static LoadedConfigItems instance;
 
@@ -146,10 +144,6 @@ public class LoadedConfigItems {
 		return getBaseURL() + queryAPI;
 	}
 
-	public String getConfigAPI() {
-		return getBaseURL() + configAPI;
-	}
-
 	public String getDeviceAPI() {
 		return getBaseURL() + deviceAPI;
 	}
@@ -176,10 +170,6 @@ public class LoadedConfigItems {
 
 	public String getGroupAPI() {
 		return getBaseURL() + groupAPI;
-	}
-
-	public String getProbeAPI() {
-		return getBaseURL() + probeAPI;
 	}
 
 	public String getVersion() {

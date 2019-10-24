@@ -10,6 +10,7 @@ from src.db.database import TestResult, Test
 from src.db.database_schema import TestSchema
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 from src.util import file_utils, json_utils
+from src.util.db_utils import clear_pod_status_auth
 from src.util.file_utils import update_services_file, read_json_testfile
 from src.util.rest_utils import schedule_test_on_the_portal
 from src.util.test_utils import update_insert_tests_to_db
@@ -98,6 +99,7 @@ def run_service():
                 response_text = "Test " + test_name_response + " has been scheduled"
             else:
                 response_text = "Problem occured while scheduling test!"
+                clear_pod_status_auth(app)
 
         return response_text
 

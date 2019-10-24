@@ -24,7 +24,7 @@ package com.simple2secure.probe.utils;
 import java.util.Locale;
 
 import com.simple2secure.commons.messages.Message;
-import com.simple2secure.probe.gui.ProbeGUI;
+import com.simple2secure.probe.config.ProbeConfiguration;
 
 public class LocaleHolder {
 	private static Locale locale;
@@ -46,6 +46,6 @@ public class LocaleHolder {
 	}
 
 	public static Message getMessage(String key) {
-		return new Message(key, ProbeGUI.rb.getString(key));
+		return new Message(key, ProbeConfiguration.rb.getString(key));
 	}
 }

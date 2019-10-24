@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -118,7 +119,7 @@ public class LicenseUtils {
 						license.setHostname(hostname);
 						license.setLastOnlineTimestamp(System.currentTimeMillis());
 						license.setDevicePod(podActivation);
-						license.setStatus(licensePublic.getStatus());
+						license.setStatus(DeviceStatus.ONLINE);
 						if (!license.isActivated()) {
 							license.setActivated(true);
 						}
@@ -181,8 +182,9 @@ public class LicenseUtils {
 								CompanyGroup group = groupRepository.find(groupId);
 
 								accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
-
+								licensePrivate.setLastOnlineTimestamp(System.currentTimeMillis());
 								licensePrivate.setAccessToken(accessToken);
+								licensePrivate.setStatus(DeviceStatus.ONLINE);
 								licenseRepository.update(licensePrivate);
 
 								log.debug("Access token is still valid.");
@@ -209,8 +211,9 @@ public class LicenseUtils {
 						if (group != null) {
 
 							accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
-
+							licensePrivate.setLastOnlineTimestamp(System.currentTimeMillis());
 							licensePrivate.setAccessToken(accessToken);
+							licensePrivate.setStatus(DeviceStatus.ONLINE);
 							licenseRepository.save(licensePrivate);
 							/*
 							 * IMPORANT: Always use getPublicLicense if sending data to the PROBE or POD because only than the private sensitive data is

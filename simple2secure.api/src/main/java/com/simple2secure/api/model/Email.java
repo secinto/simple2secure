@@ -21,8 +21,6 @@
  */
 package com.simple2secure.api.model;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.simple2secure.api.dbo.GenericDBObject;
@@ -41,8 +39,6 @@ public class Email extends GenericDBObject {
 	private String from;
 	private String text;
 	private Date receivedDate;
-
-	public static DateFormat emailDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 
 	public Email() {
 	}
@@ -107,10 +103,6 @@ public class Email extends GenericDBObject {
 
 	public Date getReceivedDate() {
 		return receivedDate;
-	}
-
-	public String getReceivedDateString() {
-		return emailDateFormat.format(receivedDate);
 	}
 
 	public void setReceivedDate(Date receivedDate) {

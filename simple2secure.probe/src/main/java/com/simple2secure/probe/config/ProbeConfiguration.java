@@ -31,13 +31,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
-import org.h2.mvstore.cache.CacheLongKeyLIRS.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -50,6 +49,7 @@ import com.simple2secure.probe.network.PacketProcessor;
 import com.simple2secure.probe.network.PacketProcessorFSM;
 import com.simple2secure.probe.utils.DBUtil;
 import com.simple2secure.probe.utils.JsonUtils;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeConfiguration {
 
@@ -64,8 +64,9 @@ public class ProbeConfiguration {
 	public static String groupId = "";
 	public static String probeId = "";
 	public static String hostname = "";
-
 	public static String licenseId = "";
+	public static String osinfo = "";
+	public static String licensePath = "";
 
 	public static boolean isLicenseValid = false;
 	public static boolean isCheckingLicense = false;
@@ -82,6 +83,8 @@ public class ProbeConfiguration {
 	private LicenseController licenseController = new LicenseController();
 
 	private static PropertyChangeSupport support;
+
+	public static ResourceBundle rb;
 
 	/***
 	 * Returns the configuration if already initialized. If not, it tries retrieving it from the standard path, the database, and the WebAPI
@@ -106,6 +109,8 @@ public class ProbeConfiguration {
 		currentSteps = new HashMap<>();
 		currentProcessors = new HashMap<>();
 		currentQueries = new HashMap<>();
+		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
+		osinfo = ProbeUtils.getOsinfo();
 		loadConfig();
 	}
 
@@ -139,12 +144,10 @@ public class ProbeConfiguration {
 	 * @param standardConfig
 	 *          the path to the offline Configuration file. <code>StaticConfigValues.XML_LOCATION</code> can be used.
 	 */
-	public void loadConfig() {
+	private void loadConfig() {
 		updateProcessorsLocal();
 		updateStepsLocal();
 		updateQueriesLocal();
-
-		checkAndUpdateConfigFromAPI();
 	}
 
 	/**
@@ -177,18 +180,12 @@ public class ProbeConfiguration {
 	 * license is not valid anymore the properties are set accordingly.
 	 */
 	private void verifyLicense() {
-		CompanyLicensePublic licenseObj = licenseController.checkTokenValidity();
-
-		if (licenseObj != null) {
-			licenseController.updateLicenseInDB(licenseObj);
-			authKey = licenseObj.getAccessToken();
+		if (licenseController.authenticateLicense()) {
 			isLicenseValid = true;
 			if (support != null) {
 				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
 			}
 		} else {
-			// CompanyLicensePublic license = licenseController.loadLicenseFromDB();
-			// DBUtil.getInstance().delete(license);
 			isLicenseValid = false;
 			if (support != null) {
 				support.firePropertyChange("isLicenseValid", ProbeConfiguration.isLicenseValid, isLicenseValid);
@@ -393,29 +390,6 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Returns the {@link Config} object from the associated Portal API.
-	 *
-	 * @return The obtained {@link Config} object.
-	 */
-	public Config getConfigFromAPI() {
-		return JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getConfigAPI(), ProbeConfiguration.authKey),
-				Config.class);
-	}
-
-	/**
-	 * Return the {@link Config} object from the database.
-	 *
-	 * @return The obtained {@link Config} object.
-	 */
-	public Config getConfigFromDatabase() {
-		List<Config> configs = DBUtil.getInstance().findAll(Config.class);
-		if (configs != null && configs.size() == 1) {
-			return configs.get(0);
-		}
-		return null;
-	}
-
-	/**
 	 * Returns a List of {@link Processor} objects from the associated Portal API.
 	 *
 	 * @return The obtained List of {@link Processor} objects.
@@ -480,9 +454,20 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		return Arrays.asList(
-				JSONUtils.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
-						ProbeConfiguration.authKey), Step[].class));
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
+				ProbeConfiguration.authKey);
+
+		if (!Strings.isNullOrEmpty(response)) {
+			Step[] stepArray = JSONUtils.fromString(response, Step[].class);
+			if (stepArray != null && stepArray.length > 0) {
+				return Arrays.asList(stepArray);
+			} else {
+				log.trace("No steps specified for PROBE");
+			}
+		} else {
+			log.error("Getting specified list of steps for PROBE was not successful.");
+		}
+		return null;
 	}
 
 	/**
@@ -529,9 +514,20 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link QueryRun} objects.
 	 */
 	private List<QueryRun> getQueriesFromAPI() {
-		return Arrays.asList(JSONUtils
-				.fromString(RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + false,
-						ProbeConfiguration.authKey), QueryRun[].class));
+		String response = RESTUtils.sendGet(
+				LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + ProbeConfiguration.osinfo + "/" + false,
+				ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(response)) {
+			QueryRun[] queryRunArray = JSONUtils.fromString(response, QueryRun[].class);
+			if (queryRunArray != null && queryRunArray.length > 0) {
+				return Arrays.asList(queryRunArray);
+			} else {
+				log.trace("No queries specified for PROBE");
+			}
+		} else {
+			log.error("Getting specified list of queries for PROBE was not successful.");
+		}
+		return null;
 	}
 
 	/**

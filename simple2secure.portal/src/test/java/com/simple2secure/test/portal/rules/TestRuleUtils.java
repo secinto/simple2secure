@@ -25,7 +25,9 @@ import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.utils.RuleUtils;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 public class TestRuleUtils {
 
@@ -33,39 +35,49 @@ public class TestRuleUtils {
 	private RuleUtils ruleUtils;
 
 	private boolean compareRuleParam(RuleParam<?> p1, RuleParam<?> p2) {
-		if (p1.getType() != p2.getType())
+		if (p1.getType() != p2.getType()) {
 			return false;
+		}
 
-		if (!p1.getName().equals(p2.getName()))
+		if (!p1.getName().equals(p2.getName())) {
 			return false;
+		}
 
-		if (!p1.getDescription_de().equals(p2.getDescription_de()))
+		if (!p1.getDescription_de().equals(p2.getDescription_de())) {
 			return false;
+		}
 
-		if (!p1.getDescription_en().equals(p2.getDescription_en()))
+		if (!p1.getDescription_en().equals(p2.getDescription_en())) {
 			return false;
+		}
 
-		if (p1.getValue() != p2.getValue())
+		if (p1.getValue() != p2.getValue()) {
 			return false;
+		}
 
 		return true;
 	}
 
 	private boolean compareRuleParamArrays(RuleParamArray<?> p1, RuleParamArray<?> p2) {
-		if (p1.getType() != p2.getType())
+		if (p1.getType() != p2.getType()) {
 			return false;
+		}
 
-		if (!p1.getName().equals(p2.getName()))
+		if (!p1.getName().equals(p2.getName())) {
 			return false;
+		}
 
-		if (!p1.getDescription_de().equals(p2.getDescription_de()))
+		if (!p1.getDescription_de().equals(p2.getDescription_de())) {
 			return false;
+		}
 
-		if (!p1.getDescription_en().equals(p2.getDescription_en()))
+		if (!p1.getDescription_en().equals(p2.getDescription_en())) {
 			return false;
+		}
 
-		if (p1.getValues() != p2.getValues())
+		if (p1.getValues() != p2.getValues()) {
 			return false;
+		}
 
 		return true;
 	}
@@ -216,31 +228,36 @@ public class TestRuleUtils {
 
 		// preparing an TemplateAction object like the user would do it at the
 		// web interface
-		List<RuleParam<?>> ruleParams = new ArrayList<RuleParam<?>>();
+		List<RuleParam<?>> ruleParams = new ArrayList<>();
 
-		RuleParam<Integer> paramInt = new RuleParam<Integer>();
+		RuleParam<Integer> paramInt = new RuleParam<>();
 		paramInt.setName("varInt");
 		paramInt.setValue(42);
 
 		ruleParams.add(paramInt);
 
-		RuleParam<Double> paramDouble = new RuleParam<Double>();
+		RuleParam<Double> paramDouble = new RuleParam<>();
 		paramDouble.setName("varDouble");
 		paramDouble.setValue(27.03);
 
 		ruleParams.add(paramDouble);
 
-		RuleParam<String> paramString = new RuleParam<String>();
+		RuleParam<String> paramString = new RuleParam<>();
 		paramString.setName("varString");
 		paramString.setValue("some text");
 
 		ruleParams.add(paramString);
 
-		List<RuleParamArray<?>> ruleParamArrays = new ArrayList<RuleParamArray<?>>();
+		List<RuleParamArray<?>> ruleParamArrays = new ArrayList<>();
 
-		RuleParamArray<Integer> arrayInt = new RuleParamArray<Integer>();
+		RuleParamArray<Integer> arrayInt = new RuleParamArray<>();
 		arrayInt.setName("arrayInt");
 		arrayInt.setValues(new ArrayList<Integer>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(1);
 				add(2);
@@ -250,9 +267,14 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayInt);
 
-		RuleParamArray<Double> arrayDouble = new RuleParamArray<Double>();
+		RuleParamArray<Double> arrayDouble = new RuleParamArray<>();
 		arrayDouble.setName("arrayDouble");
 		arrayDouble.setValues(new ArrayList<Double>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(1.1);
 				add(2.2);
@@ -262,9 +284,14 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayDouble);
 
-		RuleParamArray<String> arrayString = new RuleParamArray<String>();
+		RuleParamArray<String> arrayString = new RuleParamArray<>();
 		arrayString.setName("arrayString");
 		arrayString.setValues(new ArrayList<String>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add("string1");
 				add("string2");
@@ -287,6 +314,11 @@ public class TestRuleUtils {
 			assertEquals(27.03, action.getVarDouble(), "verDouble has not been injected right");
 			assertEquals("some text", action.getVarString(), "varString has not been injected right");
 			assertEquals(new ArrayList<Integer>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add(1);
 					add(2);
@@ -294,6 +326,11 @@ public class TestRuleUtils {
 				}
 			}, action.arrayInt, "arrayInt has not been injected right");
 			assertEquals(new ArrayList<Double>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add(1.1);
 					add(2.2);
@@ -301,6 +338,11 @@ public class TestRuleUtils {
 				}
 			}, action.arrayDouble, "arrayDouble has not been injected right");
 			assertEquals(new ArrayList<String>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add("string1");
 					add("string2");
@@ -324,31 +366,36 @@ public class TestRuleUtils {
 
 		// preparing an TemplateCondition object like the user would do it at
 		// the web interface
-		List<RuleParam<?>> ruleParams = new ArrayList<RuleParam<?>>();
+		List<RuleParam<?>> ruleParams = new ArrayList<>();
 
-		RuleParam<Integer> paramInt = new RuleParam<Integer>();
+		RuleParam<Integer> paramInt = new RuleParam<>();
 		paramInt.setName("varInt");
 		paramInt.setValue(42);
 
 		ruleParams.add(paramInt);
 
-		RuleParam<Double> paramDouble = new RuleParam<Double>();
+		RuleParam<Double> paramDouble = new RuleParam<>();
 		paramDouble.setName("varDouble");
 		paramDouble.setValue(27.03);
 
 		ruleParams.add(paramDouble);
 
-		RuleParam<String> paramString = new RuleParam<String>();
+		RuleParam<String> paramString = new RuleParam<>();
 		paramString.setName("varString");
 		paramString.setValue("some text");
 
 		ruleParams.add(paramString);
 
-		List<RuleParamArray<?>> ruleParamArrays = new ArrayList<RuleParamArray<?>>();
+		List<RuleParamArray<?>> ruleParamArrays = new ArrayList<>();
 
-		RuleParamArray<Integer> arrayInt = new RuleParamArray<Integer>();
+		RuleParamArray<Integer> arrayInt = new RuleParamArray<>();
 		arrayInt.setName("arrayInt");
 		arrayInt.setValues(new ArrayList<Integer>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(1);
 				add(2);
@@ -358,9 +405,14 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayInt);
 
-		RuleParamArray<Double> arrayDouble = new RuleParamArray<Double>();
+		RuleParamArray<Double> arrayDouble = new RuleParamArray<>();
 		arrayDouble.setName("arrayDouble");
 		arrayDouble.setValues(new ArrayList<Double>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add(1.1);
 				add(2.2);
@@ -370,9 +422,14 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayDouble);
 
-		RuleParamArray<String> arrayString = new RuleParamArray<String>();
+		RuleParamArray<String> arrayString = new RuleParamArray<>();
 		arrayString.setName("arrayString");
 		arrayString.setValues(new ArrayList<String>() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				add("string1");
 				add("string2");
@@ -395,6 +452,11 @@ public class TestRuleUtils {
 			assertEquals(27.03, condition.getVarDouble(), "verDouble has not been injected right");
 			assertEquals("some text", condition.getVarString(), "varString has not been injected right");
 			assertEquals(new ArrayList<Integer>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add(1);
 					add(2);
@@ -402,6 +464,11 @@ public class TestRuleUtils {
 				}
 			}, condition.arrayInt, "arrayInt has not been injected right");
 			assertEquals(new ArrayList<Double>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add(1.1);
 					add(2.2);
@@ -409,6 +476,11 @@ public class TestRuleUtils {
 				}
 			}, condition.arrayDouble, "arrayDouble has not been injected right");
 			assertEquals(new ArrayList<String>() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add("string1");
 					add("string2");

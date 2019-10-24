@@ -5,7 +5,8 @@ from flask import json
 
 from src.db.database import Notification, TestStatusDTO
 from src.db.database_schema import CompanyLicensePublicSchema, TestSchema
-from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license
+from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license, \
+    clear_pod_status_auth
 
 log = logging.getLogger('pod.util.rest_utils')
 
@@ -84,7 +85,7 @@ def get_auth_token(app):
     """
     podInfo = get_pod(app)
     if not podInfo.authToken:
-        send_license(app, None, False)
+        send_license(app, None)
         podInfo = get_pod(app)
 
     return podInfo.authToken
@@ -108,7 +109,7 @@ def send_license(app, licensePublic=None):
     license_schema = CompanyLicensePublicSchema()
     license_json = json.dumps(license_schema.dump(licensePublic))
 
-    resp_data = portal_post(app, url, license_json)
+    resp_data = portal_post(app, url, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
         accessToken = json.loads(resp_data.text)['accessToken']
@@ -123,8 +124,10 @@ def send_license(app, licensePublic=None):
     elif resp_data is not None:
         message = json.loads(resp_data.text)['errorMessage']
         log.error('Error occurred while activating the pod: %s', message)
+        clear_pod_status_auth(app)
     else:
         log.error('No connection to PORTAL, thus not sending the license')
+        clear_pod_status_auth(app)
 
 
 def send_notification(content, app):

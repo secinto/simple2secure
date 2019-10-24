@@ -93,6 +93,14 @@ def update_pod_status_auth(app, authToken):
         return podInfo
 
 
+def clear_pod_status_auth(app):
+    with app.app_context():
+        podInfo = PodInfo.query.first()
+        if podInfo is not None:
+            podInfo.authToken = ''
+            update(podInfo)
+
+
 def update_pod_status_connection(app, connected=True):
     with app.app_context():
         podInfo = PodInfo.query.first()

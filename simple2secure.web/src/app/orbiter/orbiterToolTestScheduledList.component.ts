@@ -34,6 +34,7 @@ import {HelperService} from '../_services/helper.service';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['scheduled.tests.css'],
 	templateUrl: 'orbiterToolTestScheduledList.component.html'
 })
 
@@ -45,7 +46,7 @@ export class OrbiterToolTestScheduledListComponent {
 	showTestResult = false;
 	tests: TestRunDTO[];
 	context: ContextDTO;
-	displayedColumns = ['name', 'type', 'status', 'action'];
+	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
 	dataSource = new MatTableDataSource();

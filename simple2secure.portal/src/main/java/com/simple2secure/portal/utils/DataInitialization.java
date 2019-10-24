@@ -35,7 +35,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Processor;
@@ -48,6 +47,7 @@ import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
@@ -94,8 +94,6 @@ public class DataInitialization {
 	@Autowired
 	protected UserUtils userUtils;
 
-	private Gson gson = new Gson();
-
 	/**
 	 *
 	 * @param userId
@@ -112,7 +110,7 @@ public class DataInitialization {
 		if (groupList == null || groupList.isEmpty()) {
 			File file = new File(getClass().getResource("/server/group.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			CompanyGroup group = gson.fromJson(content, CompanyGroup.class);
+			CompanyGroup group = JSONUtils.fromString(content, CompanyGroup.class);
 
 			if (group != null) {
 				group.setContextId(contextId);
@@ -136,7 +134,8 @@ public class DataInitialization {
 	/**
 	 * This function adds default queries for each group which is created
 	 *
-	 * @param groupId The group ID for which a default query should be created
+	 * @param groupId
+	 *          The group ID for which a default query should be created
 	 * @throws IOException
 	 */
 	public void addDefaultGroupQueries(String groupId) throws IOException {
@@ -146,7 +145,7 @@ public class DataInitialization {
 
 			File file = new File(getClass().getResource("/server/queries.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			QueryRun[] queries = gson.fromJson(content, QueryRun[].class);
+			QueryRun[] queries = JSONUtils.fromString(content, QueryRun[].class);
 
 			if (queries != null) {
 				List<QueryRun> queryList = Arrays.asList(queries);
@@ -172,7 +171,7 @@ public class DataInitialization {
 
 			File file = new File(getClass().getResource("/server/processors.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			Processor[] processorsArray = gson.fromJson(content, Processor[].class);
+			Processor[] processorsArray = JSONUtils.fromString(content, Processor[].class);
 
 			if (processorsArray != null) {
 				List<Processor> processors = Arrays.asList(processorsArray);
@@ -197,7 +196,7 @@ public class DataInitialization {
 
 			File file = new File(getClass().getResource("/server/settings.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			Settings settings = gson.fromJson(content, Settings.class);
+			Settings settings = JSONUtils.fromString(content, Settings.class);
 
 			if (settings != null) {
 				settingsRepository.save(settings);
@@ -212,7 +211,7 @@ public class DataInitialization {
 
 			File file = new File(getClass().getResource("/server/licensePlan.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			LicensePlan licensePlan = gson.fromJson(content, LicensePlan.class);
+			LicensePlan licensePlan = JSONUtils.fromString(content, LicensePlan.class);
 
 			if (licensePlan != null) {
 				licensePlanRepository.save(licensePlan);
@@ -232,7 +231,7 @@ public class DataInitialization {
 
 			File file = new File(getClass().getResource("/server/steps.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			Step[] stepArray = gson.fromJson(content, Step[].class);
+			Step[] stepArray = JSONUtils.fromString(content, Step[].class);
 
 			if (stepArray != null) {
 				List<Step> steps = Arrays.asList(stepArray);

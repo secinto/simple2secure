@@ -27,7 +27,7 @@
         <!-- Name Column -->
         <ng-container matColumnDef="timestamp">
             <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'table.time' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.queryTimestamp}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.queryTimestamp | date : 'short'}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">

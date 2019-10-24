@@ -22,7 +22,6 @@
 		"processor_class": "com.simple2secure.probe.network.processor.impl.DefaultGroovyProcessor",
 		"analysisInterval": 2,
 		"analysisIntervalUnit": "MINUTES",
-		"groovy": true,
-		"groovyProcessor": "package com.simple2secure.probe.groovy\r\n\r\nimport org.slf4j.Logger\r\nimport org.slf4j.LoggerFactory\r\n\r\nimport com.simple2secure.probe.network.PacketContainer\r\nimport com.simple2secure.probe.network.PacketProcessor\r\n\r\nclass SimpleGroovyPacketProcessor extends PacketProcessor {\r\n\r\n\tprivate static Logger log = LoggerFactory.getLogger(SimpleGroovyPacketProcessor.class);\r\n\r\n\tpublic SimpleGroovyPacketProcessor(String name, Map<String, String> options) {\r\n\t\tsuper(name, options);\r\n\t}\r\n\r\n\t@Override\r\n\tpublic PacketContainer processPacket() {\r\n\t\tString test = this.packet.getId();\r\n\t\tlog.debug(\"Processing packet in groovy with id {}\", test);\r\n\t\treturn this.packet;\r\n\t}\r\n\r\n\t@Override\r\n\tpublic void performAnalysis() {\r\n\t\tlog.debug(\"Groovy script perform start analysis {} for packet with timestamp {}\", this.packet.getTimestamp());\r\n\t}\r\n}\r\n"
+		"groovy": false
 	}
 ]

@@ -26,10 +26,12 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "QueryRun")
+@Table(
+		name = "QueryRun")
 public class QueryRun extends GenericDBObject {
 
 	/**
@@ -38,18 +40,32 @@ public class QueryRun extends GenericDBObject {
 	private static final long serialVersionUID = 4400048729580737036L;
 	private String groupId;
 	private String name;
-	private boolean always;
-	private long analysisInterval;
-	private TimeUnit analysisIntervalUnit;
 
+	@JsonProperty
+	private boolean always;
+	private int analysisInterval;
+	private TimeUnit analysisIntervalUnit;
+	@JsonProperty
+	private boolean osquery;
 	private String sqlQuery;
 	private int active;
+	private int systemsAvailable;
+
+	@JsonProperty
+	private boolean graphAble;
+
+	public static int NONE = 0;
+	public static int WINDOWS = 1;
+	public static int LINUX = 2;
+	public static int MACOS = 4;
 
 	public QueryRun() {
-
+		systemsAvailable = NONE;
+		graphAble = true;
+		osquery = true;
 	}
 
-	public QueryRun(String groupId, String name, boolean always, long analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
+	public QueryRun(String groupId, String name, boolean always, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
 			int active) {
 		super();
 		this.groupId = groupId;
@@ -77,11 +93,11 @@ public class QueryRun extends GenericDBObject {
 		this.always = always;
 	}
 
-	public long getAnalysisInterval() {
+	public int getAnalysisInterval() {
 		return analysisInterval;
 	}
 
-	public void setAnalysisInterval(long analysisInterval) {
+	public void setAnalysisInterval(int analysisInterval) {
 		this.analysisInterval = analysisInterval;
 	}
 
@@ -116,4 +132,21 @@ public class QueryRun extends GenericDBObject {
 	public void setActive(int active) {
 		this.active = active;
 	}
+
+	public int getSystemsAvailable() {
+		return systemsAvailable;
+	}
+
+	public void setSystemsAvailable(int systemsAvailable) {
+		this.systemsAvailable = systemsAvailable;
+	}
+
+	public boolean isGraphAble() {
+		return graphAble;
+	}
+
+	public void setGraphAble(boolean graphAble) {
+		this.graphAble = graphAble;
+	}
+
 }
