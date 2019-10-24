@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -37,9 +37,9 @@ import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
 import com.simple2secure.portal.utils.RuleUtils;
 
 /**
- * 
+ *
  * @author Richard Heinz
- * 
+ *
  *         A rule engine for checking mails. Extents the GeneralRulesEngineImpl.
  *
  */
@@ -53,7 +53,7 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 
 	/**
 	 * Method to load, create and register all rules which are given for this user.
-	 * 
+	 *
 	 * @param contextId
 	 *          of the user
 	 */
@@ -70,7 +70,7 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 			}
 		});
 
-		log.debug("Created and registered expert rules with sourcecode {}");
+		log.debug("Created and registered expert rules with sourcecode");
 
 		List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
 
@@ -82,17 +82,16 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 				addRule(ruleObj);
 
 			} catch (Exception e) {
-				log.debug("Unable to load Rule " + ruleInfo.getName() + " " + e.getMessage());
-				e.printStackTrace();
+				log.error("Unable to load Rule " + ruleInfo.getName() + " " + e.getMessage());
 			}
 		});
 
-		log.debug("Created and registered predefined template rules {}");
+		log.debug("Created and registered predefined template rules");
 	}
 
 	/**
 	 * Method to check an email with the given rules.
-	 * 
+	 *
 	 * @param email
 	 *          which should be checked with the given rules
 	 * @param contextId

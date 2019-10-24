@@ -1,8 +1,11 @@
 package com.simple2secure.portal.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +61,10 @@ public class LicenseUtils {
 	 * @param podActivation
 	 *          True if the activation is coming from a POD, otherwise false.
 	 * @return
+	 * @throws UnsupportedEncodingException
 	 */
-	public LicenseActivation activateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale) {
+	public LicenseActivation activateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale)
+			throws UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
 
 		activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
@@ -134,7 +139,7 @@ public class LicenseUtils {
 	}
 
 	public LicenseActivation checkToken(CompanyLicensePublic licensePublic, boolean checkForPod, String locale)
-			throws ItemNotFoundRepositoryException {
+			throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
 
 		activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
@@ -229,5 +234,24 @@ public class LicenseUtils {
 			}
 		}
 		return activation;
+	}
+
+	public String getPayloadFromTheToken(String token) {
+		String[] split_string = token.split("\\.");
+		String base64EncodedHeader = split_string[0];
+		String base64EncodedBody = split_string[1];
+		String base64EncodedSignature = split_string[2];
+
+		Base64 base64Url = new Base64(true);
+
+		String payload = new String(base64Url.decode(base64EncodedBody));
+
+		return payload;
+
+	}
+
+	public String getFieldFromPayload(String payload, String field) {
+		JSONObject jsonObject = new JSONObject(payload);
+		return jsonObject.getString(field);
 	}
 }

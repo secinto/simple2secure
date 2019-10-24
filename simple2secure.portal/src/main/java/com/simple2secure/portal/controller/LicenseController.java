@@ -22,6 +22,7 @@
 package com.simple2secure.portal.controller;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -55,6 +57,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -62,6 +65,7 @@ import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TokenRepository;
+import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
@@ -116,6 +120,12 @@ public class LicenseController {
 	TokenAuthenticationService tokenAuthenticationService;
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	ContextUserAuthRepository contextUserRepository;
+
+	@Autowired
 	PortalUtils portalUtils;
 
 	@Autowired
@@ -148,14 +158,12 @@ public class LicenseController {
 	 * @param locale
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
+	 * @throws UnsupportedEncodingException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/authenticate",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
 			boolean podAuthentication = false;
@@ -202,9 +210,7 @@ public class LicenseController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/{groupId}/{userId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
@@ -251,4 +257,37 @@ public class LicenseController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
+	/**
+	 * This function deletes the user from the current context
+	 *
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
+	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @RequestHeader("Accept-Language") String locale)
+			throws Exception {
+		if (!Strings.isNullOrEmpty(authToken)) {
+
+			String payload = licenseUtils.getPayloadFromTheToken(authToken);
+			String userID = licenseUtils.getFieldFromPayload(payload, "userID");
+			if (userID != null) {
+				List<ContextUserAuthentication> user_contexts = contextUserRepository.getByUserId(userID);
+				if (user_contexts != null) {
+					for (ContextUserAuthentication context : user_contexts) {
+						if (context.isOwnContext()) {
+							CompanyGroup group = groupRepository.findStandardGroupByContextId(context.getContextId());
+							if (group != null) {
+								return getLicense(group.getId(), userID, locale);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 }

@@ -236,7 +236,10 @@ public class UserUtils {
 							return new ResponseEntity<>(user, HttpStatus.OK);
 						} else {
 							userRepository.deleteByUserID(userID.toString());
-							contextUserAuthRepository.deleteById(contextUserId.toString());
+
+							if (contextUserId != null) {
+								contextUserAuthRepository.deleteById(contextUserId.toString());
+							}
 
 							log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 

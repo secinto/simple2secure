@@ -54,4 +54,10 @@ public class GroupRepositoryImpl extends GroupRepository {
 		}
 
 	}
+
+	@Override
+	public CompanyGroup findStandardGroupByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("standardGroup").is(true));
+		return mongoTemplate.findOne(query, CompanyGroup.class, collectionName);
+	}
 }
