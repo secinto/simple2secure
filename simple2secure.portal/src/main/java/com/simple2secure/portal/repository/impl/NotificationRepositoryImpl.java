@@ -78,7 +78,7 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	@Override
 	public List<Notification> findAllSortDescending(String contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
-		query = query.with(new Sort(Sort.Direction.DESC, "_id"));
+		query = query.with(Sort.by(Sort.Direction.DESC, "_id"));
 
 		return mongoTemplate.find(query, Notification.class);
 	}

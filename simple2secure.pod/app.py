@@ -1,20 +1,36 @@
-from flask import Response, json, request, render_template
-from src import create_app
-from src.db.database_schema import TestSchema
-from src.util import file_utils
-from src.util import json_utils
-from src.db.database import TestResult, Test, TestSequence
-from src.scheduler.scheduler_tasks import start_scheduler_tasks
-import src.celery.celery_tasks as celery_tasks
-from urllib import parse
+import json
+import logging
+import sys
 
-app = create_app()
+from flask import Response, json, request, render_template
+
+import src.celery.celery_tasks as celery_tasks
+from src import create_app
+from src.db.database import TestResult, Test
+from src.db.database_schema import TestSchema
+from src.scheduler.scheduler_tasks import start_scheduler_tasks
+from src.util import file_utils, json_utils
+from src.util.db_utils import clear_pod_status_auth
+from src.util.file_utils import update_services_file, read_json_testfile
+from src.util.rest_utils import schedule_test_on_the_portal
+from src.util.test_utils import update_insert_tests_to_db
+
+app = create_app(sys.argv)
 start_scheduler_tasks(app, celery_tasks)
+
+
+def to_pretty_json(value):
+    return value
+
+
+app.jinja_env.filters['tojson_pretty'] = to_pretty_json
+
+log = logging.getLogger('pod.start_pod')
 
 
 @app.route("/services")
 def parse_tests():
-    tests_string = file_utils.read_json_testfile(app)
+    tests_string = read_json_testfile()
     resp = Response(tests_string, status=200, mimetype='application/json')
     return resp
 
@@ -22,29 +38,14 @@ def parse_tests():
 @app.route("/results")
 def show_test_results():
     with app.app_context():
-        file_utils.update_services_file()
+        update_services_file()
         test_results = TestResult.query.all()
         return render_template('testresults.html', len=len(test_results), test_results=test_results)
 
 
 @app.route("/")
 def index():
-    response = file_utils.read_json_testfile(app)
-    return response
-
-@app.route("/services/run/sequence")
-def run_sequence():
-    with app.app_context():
-        full_url = request.url
-        splitted_url = parse.urlsplit(full_url)
-        url_query = parse.parse_qs(splitted_url.query)
-        tools = url_query["task"]
-        if "parameter" in url_query:
-            params = url_query["parameter"]
-        else:
-            params = [""]
-        testRun = celery_tasks.schedule_test_for_sequence(params[0], tools[0])
-        return testRun
+    return parse_tests()
 
 
 @app.route("/services/run")
@@ -52,9 +53,8 @@ def run_service():
     with app.app_context():
 
         test_schema = TestSchema()
-        response = file_utils.read_json_testfile(app)
-        # response_json_object = json.loads(response)
-        file_utils.update_insert_tests_to_db(response, app)
+        response = file_utils.read_json_testfile()
+        update_insert_tests_to_db(response, app)
 
         response_text = "All available tests from services.json have been scheduled"
 
@@ -82,7 +82,8 @@ def run_service():
 
                 if not json_utils.is_blank(precondition):
                     precondition_param_value = json_utils.parse_query_test(precondition, "precondition")
-                    current_test["test_definition"]["precondition"]["command"]["parameter"]["value"] = precondition_param_value
+                    current_test["test_definition"]["precondition"]["command"]["parameter"][
+                        "value"] = precondition_param_value
 
                 if not json_utils.is_blank(postcondition):
                     postcondition_param_value = json_utils.parse_query_test(postcondition, "postcondition")
@@ -91,16 +92,17 @@ def run_service():
 
             db_test.test_content = current_test
             print(db_test.test_content)
-            output = test_schema.dump(db_test).data
-            resp = file_utils.schedule_test_on_the_portal(output, app, app.config['POD_ID'])
+            output = test_schema.dump(db_test)
+            resp = schedule_test_on_the_portal(output, app)
 
             if resp.status_code == 200:
                 response_text = "Test " + test_name_response + " has been scheduled"
             else:
                 response_text = "Problem occured while scheduling test!"
+                clear_pod_status_auth(app)
 
         return response_text
 
 
 if __name__ == '__main__':
-    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True)
+    app.run(ssl_context='adhoc', host='0.0.0.0', threaded=True, use_reloader=False)

@@ -56,9 +56,10 @@ public class DefaultPacketProcessor extends PacketProcessor {
 
 		analysisStartTime = new Date();
 		report = new NetworkReport();
-		report.setProbeId(ProbeConfiguration.probeId);
+		report.setDeviceId(ProbeConfiguration.probeId);
 		report.setGroupId(ProbeConfiguration.groupId);
-		report.setStartTime(analysisStartTime.toString());
+		report.setStartTime(analysisStartTime);
+		report.setHostname(ProbeConfiguration.hostname);
 
 		reportContent = new HashMap<>();
 		packetCounter = 0;
@@ -85,9 +86,10 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				// set new start time
 				// set reportContent stringBuilder
 				// initialize new report
-				if (!Strings.isNullOrEmpty(report.getProbeId()) && !Strings.isNullOrEmpty(report.getStartTime())) {
+				if (!Strings.isNullOrEmpty(report.getDeviceId()) && report.getStartTime() != null) {
 					report.setStringContent(JSONUtils.toString(reportContent));
 					report.setProcessorName(packet.getProcessor().getName());
+					report.setHostname(ProbeConfiguration.hostname);
 					report.setSent(false);
 					/*
 					 * TODO: Need to find a compacted way
@@ -96,9 +98,9 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				}
 				analysisStartTime = new Date();
 				report = new NetworkReport();
-				report.setProbeId(ProbeConfiguration.probeId);
+				report.setDeviceId(ProbeConfiguration.probeId);
 				report.setGroupId(ProbeConfiguration.groupId);
-				report.setStartTime(analysisStartTime.toString());
+				report.setStartTime(analysisStartTime);
 				reportContent = new HashMap<>();
 				packetCounter = 0;
 				reportContentString = "";

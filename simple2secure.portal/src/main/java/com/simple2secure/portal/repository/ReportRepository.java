@@ -33,7 +33,7 @@ public abstract class ReportRepository extends MongoRepository<Report> {
 
 	public abstract List<Report> getReportsByGroupId(String groupId);
 
-	public abstract void deleteByProbeId(String probeId);
+	public abstract void deleteByDeviceId(String deviceId);
 
 	public abstract List<Report> getSearchQueryByGroupId(String searchQuery, String groupId);
 }

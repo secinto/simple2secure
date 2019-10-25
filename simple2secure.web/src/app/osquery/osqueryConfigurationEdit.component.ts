@@ -43,7 +43,7 @@ export class OsqueryConfigurationEditComponent {
 	action: string;
 	probeId: string;
 	groupId: string;
-
+	alwaysFalseButton = false;
 	timeUnits = Timeunit;
 
 	constructor(
@@ -68,6 +68,7 @@ export class OsqueryConfigurationEditComponent {
 			this.queryRun = data.queryRun;
 			this.groupId = data.groupId;
 		}
+		this.alwaysFalseButton = false;
 	}
 
 	extractTimeUnits(): Array<string> {
@@ -81,12 +82,20 @@ export class OsqueryConfigurationEditComponent {
 			this.queryRun.groupId = this.groupId;
 		}
 
-		this.httpService.post(this.queryRun, environment.apiEndpoint + 'config/query').subscribe(
+		this.httpService.post(this.queryRun, environment.apiEndpoint + 'query').subscribe(
 			data => {
 				this.dialogRef.close(true);
 			},
 			error => {
 				this.dialogRef.close(error);
 			});
+	}
+
+	setCheckedStatus(value) {
+		if (value == 0) {
+			this.alwaysFalseButton = true;
+		} else {
+			this.alwaysFalseButton = false;
+		}
 	}
 }

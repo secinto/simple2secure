@@ -97,8 +97,57 @@ public class TestController {
 	@Autowired
 	TestUtils testUtils;
 
+	/*
+	 * -------------------------------------------------------------------------------------------------------------------------------------
+	 *
+	 * WEB Interfaces
+	 *
+	 * -------------------------------------------------------------------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Returns a list of tests available from the specified pod. This function is used from the web.
+	 *
+	 * @param podId
+	 *          The ID to identify the POD
+	 * @param locale
+	 * @return
+	 */
+	@RequestMapping(
+			value = "/{podId}",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<TestObjWeb>> getTestByPodId(@PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) {
+		return testUtils.getTestByPodId(podId, locale);
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTest/{contextId}/{userId}", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/delete/{testId}",
+			method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Test> deleteTest(@PathVariable("testId") String testId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(testId)) {
+			Test test = testRepository.find(testId);
+			if (test != null) {
+				testRepository.delete(test);
+				return new ResponseEntity<>(test, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/scheduleTest/{contextId}/{userId}",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @PathVariable("contextId") String contextId,
 			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
@@ -114,7 +163,7 @@ public class TestController {
 
 					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId, TestRunType.MANUAL_PORTAL,
 							currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-
+					testRun.setHostname(test.getHostname());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
@@ -130,41 +179,9 @@ public class TestController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTestPod/{podId}", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable("podId") String podId,
-			@RequestHeader("Accept-Language") String locale) {
-
-		if (test != null && !Strings.isNullOrEmpty(podId)) {
-			CompanyLicensePrivate license = licenseRepository.findByPodId(podId);
-
-			if (license != null) {
-				CompanyGroup group = groupRepository.find(license.getGroupId());
-
-				if (group != null) {
-					String test_content = test.getTest_content().replace("\'", "\"");
-					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
-							TestStatus.PLANNED, System.currentTimeMillis());
-
-					testRunRepository.save(testRun);
-
-					notificationUtils.addNewNotificationPortal(
-							test.getName() + " has been scheduled for the execution manually using the pod " + license.getHostname(),
-							group.getContextId());
-
-					return new ResponseEntity<>(testRun, HttpStatus.OK);
-
-				}
-
-			}
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_test", locale)),
-				HttpStatus.NOT_FOUND);
-
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/getScheduledTests/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/getScheduledTests/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestRunDTO>> getScheduledTestsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -190,167 +207,30 @@ public class TestController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @RequestHeader("Accept-Language") String locale) {
-		return testUtils.saveTestResult(testResult, locale);
-	}
-
-	@RequestMapping(value = "/testresult/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/testresult/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<TestResultDTO>> getTestResultByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
-		return testUtils.getTestResultByContextId(contextId, locale);
+		List<TestResultDTO> results = testUtils.getTestResultByContextId(contextId, locale);
+
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/testresult/delete/{testResultId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/testresult/delete/{testResultId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestResult> deleteTestResult(@PathVariable("testResultId") String testResultId,
 			@RequestHeader("Accept-Language") String locale) {
 		return testUtils.deleteTestResult(testResultId, locale);
 	}
 
-	@RequestMapping(value = "/{podId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<TestObjWeb>> getTestByPodId(@PathVariable("podId") String podId,
-			@RequestHeader("Accept-Language") String locale) {
-		return testUtils.getTestByPodId(podId, locale);
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'POD')")
-	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
-		if (!Strings.isNullOrEmpty(locale) && test != null) {
-
-			Test convertedTest = testUtils.convertTestWebObjtoTestObject(test);
-
-			if (convertedTest != null) {
-				if (!Strings.isNullOrEmpty(convertedTest.getPodId())) {
-					if (Strings.isNullOrEmpty(test.getTestId())) {
-						boolean isSaveable = testUtils.checkIfTestIsSaveable(convertedTest);
-
-						if (isSaveable) {
-							testRepository.save(convertedTest);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
-									HttpStatus.NOT_FOUND);
-						}
-
-					} else {
-						boolean isUpdateable = testUtils.checkIfTestIsUpdateable(convertedTest);
-						if (isUpdateable) {
-							testRepository.update(convertedTest);
-						} else {
-							return new ResponseEntity(
-									new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
-									HttpStatus.NOT_FOUND);
-						}
-					}
-					return new ResponseEntity<>(convertedTest, HttpStatus.OK);
-				}
-			}
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/saveTestPod", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(locale) && test != null) {
-			if (!Strings.isNullOrEmpty(test.getPodId())) {
-				Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
-				Test returnTestValue = new Test();
-
-				if (currentPortalTest != null) {
-					boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
-							test.getLastChangedTimestamp());
-
-					returnTestValue = currentPortalTest;
-
-					if (isPortalTestOlder) {
-						currentPortalTest.setHash_value(test.getHash_value());
-						currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-						currentPortalTest.setTest_content(test.getTest_content());
-						currentPortalTest.setActive(true);
-						testRepository.update(currentPortalTest);
-					}
-				} else {
-					currentPortalTest = new Test();
-					currentPortalTest.setHash_value(test.getHash_value());
-					currentPortalTest.setName(test.getName());
-					currentPortalTest.setPodId(test.getPodId());
-					currentPortalTest.setHostname(test.getHostname());
-					currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-					currentPortalTest.setTest_content(test.getTest_content());
-					currentPortalTest.setActive(true);
-
-					testRepository.save(currentPortalTest);
-
-					returnTestValue = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
-				}
-				return new ResponseEntity<>(returnTestValue, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/syncTests", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
-	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
-			List<Test> portalTests = testRepository.getByPodId(tests.get(0).getPodId());
-			List<Test> newTests = new ArrayList<>();
-			if (portalTests != null) {
-				List<String> podTestNames = testUtils.getTestNamesFromTestList(tests);
-
-				for (Test portalTest : portalTests) {
-					if (!podTestNames.contains(portalTest.getName())) {
-						newTests.add(portalTest);
-					}
-				}
-
-				return new ResponseEntity<>(newTests, HttpStatus.OK);
-			}
-
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{testId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Test> deleteTest(@PathVariable("testId") String testId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(testId)) {
-			Test test = testRepository.find(testId);
-			if (test != null) {
-				testRepository.delete(test);
-				return new ResponseEntity<>(test, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
-				HttpStatus.NOT_FOUND);
-
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/testrun/{testRunId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/testrun/delete/{testRunId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestRun> deleteTestRun(@PathVariable("testRunId") String testRunId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -369,8 +249,142 @@ public class TestController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('POD')")
+	@RequestMapping(
+			value = "/save",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
+		if (!Strings.isNullOrEmpty(locale) && test != null) {
+
+			Test convertedTest = testUtils.convertTestWebObjtoTestObject(test);
+
+			if (convertedTest != null) {
+
+				testRepository.save(convertedTest);
+				return new ResponseEntity<>(convertedTest, HttpStatus.OK);
+			} else {
+				return new ResponseEntity(
+						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale)),
+						HttpStatus.NOT_FOUND);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/*
+	 * -------------------------------------------------------------------------------------------------------------------------------------
+	 *
+	 * POD Interfaces
+	 *
+	 * -------------------------------------------------------------------------------------------------------------------------------------
+	 */
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/scheduleTestPod/{podId}",
+			method = RequestMethod.POST,
+			consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) {
+
+		if (test != null && !Strings.isNullOrEmpty(podId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+
+			if (license != null) {
+				CompanyGroup group = groupRepository.find(license.getGroupId());
+
+				if (group != null) {
+					String test_content = test.getTest_content().replace("\'", "\"");
+					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
+							TestStatus.PLANNED, System.currentTimeMillis());
+					testRun.setHostname(test.getHostname());
+					testRunRepository.save(testRun);
+
+					notificationUtils.addNewNotificationPortal(
+							test.getName() + " has been scheduled for the execution manually using the pod " + license.getHostname(),
+							group.getContextId());
+
+					return new ResponseEntity<>(testRun, HttpStatus.OK);
+
+				}
+
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_test", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@RequestMapping(
+			value = "/saveTestResult",
+			method = RequestMethod.POST,
+			consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @RequestHeader("Accept-Language") String locale) {
+		TestResult result = testUtils.saveTestResult(testResult, locale);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/saveTestPod",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/syncTests",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
+			String podId = "";
+			for (Test test : tests) {
+				testUtils.synchronizeReceivedTest(test);
+				if (Strings.isNullOrEmpty(podId)) {
+					podId = test.getPodId();
+				}
+			}
+			List<Test> synchronizedTests = new ArrayList<>();
+			synchronizedTests = testRepository.getByPodId(podId);
+			return new ResponseEntity<>(synchronizedTests, HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/syncTest",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(locale) && test != null) {
+			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
+			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
+			value = "/updateTestStatus",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 

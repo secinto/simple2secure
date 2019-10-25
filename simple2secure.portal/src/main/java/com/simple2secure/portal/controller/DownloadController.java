@@ -61,7 +61,9 @@ public class DownloadController {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.GET)
 	public ResponseEntity<byte[]> downloadProbe(@RequestHeader("Accept-Language") String locale) throws IOException, URISyntaxException {
 
 		HttpHeaders httpHeaders = new HttpHeaders();

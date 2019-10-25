@@ -51,17 +51,12 @@ import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.probe.utils.PcapUtil;
 
 public class ProbePacketCrafter {
-	private String groupId;
-	private String name;
-	private boolean always;
-	private int requestCount;
-	private long analysisInterval;
 	private static TimeUnit analysisIntervalUnit;
 	private static String packetAsHexStream;
 
 	public static ProbePacket craftProbePacket(String type, String groupId, String name, boolean always, int requestCount,
 			long analysisInterval) throws UnsupportedEncodingException {
-		analysisIntervalUnit = analysisIntervalUnit.SECONDS;
+		analysisIntervalUnit = TimeUnit.SECONDS;
 		if (type.equals("arp")) {
 			Packet result = craftArpPacket("192.168.123.111", "192.168.123.1", MacAddress.getByName("30:24:32:FC:89:38"));
 			packetAsHexStream = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());

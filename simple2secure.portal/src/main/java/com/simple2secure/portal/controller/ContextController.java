@@ -153,7 +153,7 @@ public class ContextController {
 				}
 			}
 		}
-		log.error("Problem occured while adding context " + context.getName());
+		log.error("Problem occured while adding context");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}
@@ -255,7 +255,7 @@ public class ContextController {
 				return new ResponseEntity<>(currentContext, HttpStatus.OK);
 			}
 		}
-		log.error("Problem occured while updating/creating context {}" + context.getName());
+		log.error("Problem occured while updating/creating context");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 	}

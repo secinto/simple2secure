@@ -4,24 +4,31 @@
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
     </div>
-    <mat-table #table [dataSource]="dataSource" matSort>
+    <mat-table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
-        <ng-container matColumnDef="pod">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.pod' | translate }}</mat-header-cell>
+        <!-- PodId Column -->
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod.deviceId}}</mat-cell>
+        </ng-container>
+
+        <!-- Pod Hostname Column -->
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Status Column -->
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Group Column -->
         <ng-container matColumnDef="group">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'menu.group' | translate }}
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
         </ng-container>
@@ -52,6 +59,10 @@
         <mat-icon>code</mat-icon>
         {{ 'button.showtests' | translate }}
     </button>
+	<button mat-menu-item (click)="showSequences()">
+		<mat-icon>code</mat-icon>
+		{{ 'button.showSequences' | translate }}
+	</button>
 </mat-menu>
 
 

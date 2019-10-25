@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+@SuppressWarnings("deprecation")
 @Component
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 
@@ -16,16 +17,16 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
-    public TaskScheduler taskScheduler() {
-        return new ConcurrentTaskScheduler();
-    }
+	public TaskScheduler taskScheduler() {
+		return new ConcurrentTaskScheduler();
+	}
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE").allowedOrigins("*").allowedHeaders("*")
-		.exposedHeaders("Authorization");
+				.exposedHeaders("Authorization");
 	}
 
 }

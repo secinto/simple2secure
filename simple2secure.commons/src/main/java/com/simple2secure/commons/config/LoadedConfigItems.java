@@ -40,26 +40,12 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String baseDockerContainer = "http://192.168.99.100:5000";
-
-	private String reportURL = "/config/reports.json";
-	private String stepsURL = "/config/steps.json";
-	private String configURL = "/config/config.json";
-	private String endpointsURL = "/config/endpoints.json";
-	private String processorsURL = "/config/processors.json";
-	private String queryURL = "/config/queries.json";
-	private String toolsURL = "/config/tools.json";
-	private String testsURL = "/config/tests.json";
-	private String groupURL = "/config/group.json";
-	private String settingsURL = "/config/settings.json";
-	private String licensePlanURL = "/config/licensePlan.json";
+	private String version = "0.2.0";
 
 	private String usersAPI = "/api/user";
-	private String endpointsAPI = "/api/endpoints";
 	private String loginAPI = "/api/login";
 	private String reportsAPI = "/api/reports";
-	private String queryAPI = "/api/config/query";
-	private String configAPI = "/api/config";
+	private String queryAPI = "/api/query";
 	private String deviceAPI = "/api/device";
 	private String packetAPI = "/api/packet";
 	private String stepAPI = "/api/steps";
@@ -67,7 +53,6 @@ public class LoadedConfigItems {
 	private String licenseAPI = "/api/license";
 	private String serviceAPI = "/api/service";
 	private String groupAPI = "/api/group";
-	private String probeAPI = "/api/probe";
 
 	private static LoadedConfigItems instance;
 
@@ -111,10 +96,6 @@ public class LoadedConfigItems {
 		this.baseProtocol = baseProtocol;
 	}
 
-	public String getBaseDockerContainer() {
-		return baseDockerContainer;
-	}
-
 	public String getBaseHost() {
 		return baseHost;
 	}
@@ -147,52 +128,8 @@ public class LoadedConfigItems {
 		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
 	}
 
-	public String getReportURL() {
-		return getBaseURL() + reportURL;
-	}
-
-	public String getStepsURL() {
-		return getBaseURL() + stepsURL;
-	}
-
-	public String getConfigURL() {
-		return getBaseURL() + configURL;
-	}
-
-	public String getEndpointsURL() {
-		return getBaseURL() + endpointsURL;
-	}
-
-	public String getProcessorsURL() {
-		return getBaseURL() + processorsURL;
-	}
-
-	public String getQueryURL() {
-		return getBaseURL() + queryURL;
-	}
-
-	public String getToolsURL() {
-		return getBaseURL() + toolsURL;
-	}
-
-	public String getTestsURL() {
-		return getBaseURL() + testsURL;
-	}
-
-	public String getGroupURL() {
-		return getBaseURL() + groupURL;
-	}
-
-	public String getSettingsURL() {
-		return getBaseURL() + settingsURL;
-	}
-
 	public String getUsersAPI() {
 		return getBaseURL() + usersAPI;
-	}
-
-	public String getEndpointsAPI() {
-		return getBaseURL() + endpointsAPI;
 	}
 
 	public String getLoginAPI() {
@@ -205,10 +142,6 @@ public class LoadedConfigItems {
 
 	public String getQueryAPI() {
 		return getBaseURL() + queryAPI;
-	}
-
-	public String getConfigAPI() {
-		return getBaseURL() + configAPI;
 	}
 
 	public String getDeviceAPI() {
@@ -239,11 +172,7 @@ public class LoadedConfigItems {
 		return getBaseURL() + groupAPI;
 	}
 
-	public String getProbeAPI() {
-		return getBaseURL() + probeAPI;
-	}
-
-	public String getLicensePlanURL() {
-		return getBaseURL() + licensePlanURL;
+	public String getVersion() {
+		return version;
 	}
 }

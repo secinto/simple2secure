@@ -41,7 +41,8 @@ public class CustomErrorController implements ErrorController {
 	@Autowired
 	private ErrorAttributes errorAttributes;
 
-	@RequestMapping(value = PATH)
+	@RequestMapping(
+			value = PATH)
 	public Map<String, Object> error(HttpServletRequest request, WebRequest webrequest, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<>();
 		Map<String, Object> errAttributes = getErrorAttributes(webrequest, false);

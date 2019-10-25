@@ -20,6 +20,85 @@
  *********************************************************************
  */
 
+/**
+ * Internal core components
+ */
+
+import {HomeComponent} from './home';
+import {LoginComponent} from './login';
+import {ActivationComponent, ActivatedComponent} from './activation';
+import {UserInvitationComponent} from './invitation';
+import {RegisterComponent} from './register';
+import {ResetComponent} from './resetPassword';
+import {UpdatePasswordComponent} from './updatePassword';
+
+import {AlertComponent, FooterComponent} from './components';
+
+import {SearchComponent, SearchResultComponent} from './search';
+import {NotificationComponent, NotificationDetailsComponent} from './notification';
+import {ConfigurationDetailsComponent} from './configuration';
+import {
+	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
+	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
+} from './user';
+import {
+	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
+} from './osquery';
+import {
+	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
+	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
+}
+	from './network';
+import {
+	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
+	OsQueryReportDetailsComponent, ReportOverviewComponent
+} from './report';
+import {
+	EmailOverviewComponent,
+	EmailInboxComponent,
+	EmailAccountAddComponent,
+	EmailRuleOverviewComponent,
+	EmailComponent
+} from './email';
+import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule';
+import {SettingsComponent} from './settings';
+import {AnalysisComponent, AddQueryDialog} from './analysis';
+import {
+	OrbiterOverviewComponent,
+	OrbiterComponent,
+	OrbiterToolTestComponent,
+	OrbiterToolTestListComponent,
+	OrbiterToolTestScheduledListComponent,
+	OrbiterToolTestSequenceListComponent,
+	TestDetailsComponent,
+	TestResultDetailsComponent,
+	TestSequenceDetailsComponent
+} from './orbiter';
+
+import {ConfirmationDialog} from './dialog/confirmation-dialog';
+
+
+/**
+ * Internal common components
+ */
+import {EqualValidator} from './_directives';
+import {AuthGuard} from './_guards';
+import {TruncatePipe} from './_helpers';
+import {AlertService, AuthenticationService, DataService, HelperService, HttpService} from './_services';
+import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
+import {LoginLayoutComponent} from './_layouts/loginLayout';
+import {NavbarComponent} from './navbar';
+
+/**
+ * Internal framework components
+ */
+import {routing} from './app.routing';
+import {AppComponent} from './app.component';
+
+/**
+ * Third party components
+ */
+
 import {DatePipe} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
@@ -28,68 +107,43 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DataTableModule} from 'angular2-datatable';
 import {Angular2FontawesomeModule} from 'angular2-fontawesome/angular2-fontawesome';
 import {TabsModule} from 'ng2-tabs';
-import {routing} from './app.routing';
 import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {NgxJsonViewerModule} from 'ngx-json-viewer';
-import {AlertComponent} from './components/index';
-import {AuthGuard} from './_guards/index';
-import {AlertService, AuthenticationService, DataService, HttpService} from './_services/index';
-import {HomeComponent} from './home/index';
-import {LoginComponent} from './login/index';
-import {OrbiterOverviewComponent} from './orbiter/orbiterOverview.component';
-import {TestDetailsComponent} from './orbiter/testDetails.component';
-import {TestResultDetailsComponent} from './report/testResultDetails.component';
-import {ResetComponent} from './resetPassword/index';
-import {UpdatePasswordComponent} from './updatePassword/index';
-import {UserInvitationComponent} from './invitation/userInvitation.component';
-import {RegisterComponent} from './register/index';
-import {FooterComponent} from './components/index';
+import {NgMatSearchBarModule} from 'ng-mat-search-bar';
 import {FileUploadModule} from 'ng2-file-upload';
 import {ModalModule} from 'ngx-modialog';
 import {BootstrapModalModule} from 'ngx-modialog/plugins/bootstrap';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {Nl2BrPipeModule} from 'nl2br-pipe';
 import {
-	MatButtonModule, MatCheckboxModule, MatInputModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatMenuModule, MatIconModule,
-	MatSidenavModule, MatButtonToggleModule, MatTableModule, MatTabsModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatDialogModule,
-	MatNativeDateModule, MatDatepickerModule, MatCardModule, MatExpansionModule, MatBadgeModule
+	MatButtonModule,
+	MatCheckboxModule,
+	MatInputModule,
+	MatFormFieldModule,
+	MatOptionModule,
+	MatSelectModule,
+	MatMenuModule,
+	MatIconModule,
+	MatSidenavModule,
+	MatButtonToggleModule,
+	MatTableModule,
+	MatTabsModule,
+	MatPaginatorModule,
+	MatSortModule,
+	MatProgressSpinnerModule,
+	MatDialogModule,
+	MatNativeDateModule,
+	MatDatepickerModule,
+	MatCardModule,
+	MatExpansionModule,
+	MatBadgeModule,
+	MatListModule,
+	MatRadioModule,
+	MatTooltipModule,
+	MatSnackBarModule,
 } from '@angular/material';
-import {AppComponent} from './app.component';
-import {DashboardLayoutComponent} from './_layouts/dashboardLayout/index';
-import {LoginLayoutComponent} from './_layouts/loginLayout/index';
-import {NavbarComponent} from './navbar/index';
-import {ConfigurationDetailsComponent} from './configuration/index';
-import {
-	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
-	UserGroupApplyConfigComponent, UserProbeChangeGroupComponent, UserContextAddDialogComponent
-} from './user/index';
-import {
-	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
-} from './osquery/index';
-import {
-	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
-	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
-}
-	from './network/index';
-
-import {
-	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent
-} from './report/index';
-
-import {EmailOverviewComponent, EmailInboxComponent, EmailAccountAddComponent} from './email/index';
-import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule/index';
-import {SettingsComponent} from './settings/index';
-import {ActivationComponent, ActivatedComponent} from './activation/index';
-import {NotificationComponent} from './notification/index';
-import {AnalysisComponent, AddQueryDialog} from './analysis/index';
-import {EqualValidator} from './_directives/equalValidator';
-import {
-	OrbiterComponent, OrbiterToolTestComponent, OrbiterToolTestListComponent
-} from './orbiter/index';
-import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
 import {TreeModule} from 'angular-tree-component';
 import {TreeTableModule} from 'ng-treetable';
@@ -101,19 +155,16 @@ import {NotificationDialog} from './dialog/notification-dialog';
 import * as highstock from 'highcharts/modules/stock.src';
 import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
 import {TestResultComponent} from './report/testResult.component';
-import {OrbiterToolTestScheduledListComponent} from './orbiter/orbiterToolTestScheduledList.component';
-import {HelperService} from './_services/helper.service';
-import { NgMatSearchBarModule } from 'ng-mat-search-bar';
-import {SearchComponent} from './search/search.component';
-import {SearchResultComponent} from './search/searchResult.component';
-import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
-import {TruncatePipe} from './_helpers/truncate.pipe';
-import {NotificationDetailsComponent} from './notification/notificationDetails.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { AceEditorModule } from 'ng2-ace-editor';
+
+
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -155,6 +206,7 @@ export const httpInterceptorProviders = [
 		MatDatepickerModule,
 		MatNativeDateModule,
 		MatCardModule,
+		MatListModule,
 		MatExpansionModule,
 		HttpClientModule,
 		ChartModule,
@@ -177,8 +229,13 @@ export const httpInterceptorProviders = [
 			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
 		}),
 		AgmDirectionModule,
+		AceEditorModule,
+		MatRadioModule,
+		MatTooltipModule,
+		MatSnackBarModule,
 		NgMatSearchBarModule,
-		Ng4LoadingSpinnerModule.forRoot()
+		Ng4LoadingSpinnerModule.forRoot(),
+		DragDropModule
 
 	],
 	declarations: [
@@ -206,7 +263,7 @@ export const httpInterceptorProviders = [
 		UserGroupComponent,
 		UserGroupDialogComponent,
 		UserGroupApplyConfigComponent,
-		UserProbeChangeGroupComponent,
+		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
@@ -223,6 +280,8 @@ export const httpInterceptorProviders = [
 		EmailOverviewComponent,
 		EmailInboxComponent,
 		EmailAccountAddComponent,
+		EmailRuleOverviewComponent,
+		EmailComponent,
 		SettingsComponent,
 		ActivationComponent,
 		ActivatedComponent,
@@ -242,7 +301,9 @@ export const httpInterceptorProviders = [
 		SearchComponent,
 		SearchResultComponent,
 		TruncatePipe,
-		NotificationDetailsComponent
+		NotificationDetailsComponent,
+		OrbiterToolTestSequenceListComponent,
+		TestSequenceDetailsComponent,
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -253,11 +314,10 @@ export const httpInterceptorProviders = [
 		NetworkStepConfigurationEditComponent,
 		OsqueryConfigurationEditComponent,
 		UserGroupApplyConfigComponent,
-		UserProbeChangeGroupComponent,
+		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		EmailAccountAddComponent,
 		EmailInboxComponent,
-		RuleOverviewComponent,
 		RuleAddComponent,
 		OsQueryReportDetailsComponent,
 		NetworkReportDetailsComponent,
@@ -265,7 +325,8 @@ export const httpInterceptorProviders = [
 		AddQueryDialog,
 		TestResultDetailsComponent,
 		TestDetailsComponent,
-		NotificationDetailsComponent
+		NotificationDetailsComponent,
+		TestSequenceDetailsComponent,
 	],
 	providers: [
 		AuthGuard,

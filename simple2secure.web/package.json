@@ -8,7 +8,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "debug": "ng serve --ssl true --ssl-key /certificates/privkey.pem --ssl-cert /certificates/cert.pem"
   },
   "private": true,
   "dependencies": {
@@ -55,6 +56,7 @@
     "ng-json-view": "^2.2.0",
     "ng-mat-search-bar": "^3.2.0",
     "ng-treetable": "^1.3.3",
+    "ng2-ace-editor": "^0.3.9",
     "ng2-drag-drop": "^3.0.2",
     "ng2-dragula": "^2.1.1",
     "ng2-file-upload": "^1.3.0",
@@ -82,8 +84,8 @@
     "zone.js": "^0.8.28"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.12.0",
-    "@angular/cli": "^7.2.2",
+    "@angular-devkit/build-angular": "^0.12.4",
+    "@angular/cli": "^7.3.9",
     "@angular/compiler-cli": "^7.2.1",
     "@angular/language-service": "^7.2.1",
     "@types/hammerjs": "^2.0.36",

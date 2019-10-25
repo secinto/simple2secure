@@ -1,4 +1,15 @@
+import getopt
+import hashlib
+import json
+import logging
+import sys
+from datetime import datetime
+
 from flask import request
+
+from src.db.database import Test
+
+log = logging.getLogger('pod.util')
 
 
 def shutdown_server():
@@ -6,3 +17,98 @@ def shutdown_server():
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
+
+
+def create_secure_hash(content):
+    sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
+    return sha3_hash
+
+
+def get_current_timestamp():
+    timestamp = datetime.now().timestamp() * 1000
+    return timestamp
+
+
+def get_date_from_string(date_string):
+    return datetime.strptime(date_string, '%m/%d/%Y').date()
+
+
+def check_command_params(argv, app):
+    with app.app_context():
+        argumentsList = argv[1:]
+
+        try:
+            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+        except getopt.GetoptError:
+            print('app.py -a <True/False>')
+            sys.exit(2)
+
+        for opt, arg in opts:
+            if opt == '-h':
+                print('app.py -a <True/False>')
+                sys.exit()
+            elif opt in ("-a", "-activate"):
+                app.config['ACTIVATE_LICENSE'] = True
+
+
+def init_logger(app):
+    with app.app_context():
+        logging.basicConfig(filename=app.config['LOG_FILE'],
+                            level=logging.getLevelName(app.config['LOG_LEVEL_NAME']),
+                            format=app.config['LOG_FORMAT'])
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(logging.Formatter(app.config['LOG_FORMAT_CH']))
+        logging.getLogger().addHandler(ch)
+
+
+def generate_test_object(sync_test):
+    sync_test_json = json.loads(sync_test)
+    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
+    test.id = sync_test_json["id"]
+    return test
+
+
+def generate_test_object_from_json(sync_test_json, existing_test):
+    existing_test.name = sync_test_json["name"]
+    existing_test.test_content = sync_test_json["test_content"]
+    existing_test.podId = sync_test_json["podId"]
+    existing_test.hash_value = sync_test_json["hash_value"]
+    existing_test.lastChangedTimestamp = sync_test_json["lastChangedTimestamp"]
+    return existing_test
+
+
+def print_error_message():
+    return "-----------------------------------------------\n" \
+           "-----------------------------------------------\n" \
+           "--                                           --\n" \
+           "--!!!Error occurred - portal not reachable!!!--\n" \
+           "--                                           --\n" \
+           "--*********POD HAS NOT BEEN ACTIVATED********--\n" \
+           "-----------------------------------------------" \
+           "-----------------------------------------------"
+
+
+def print_success_message_auth(app):
+    message = "----------------------------------------------\n" \
+              "----------------INITIALIZATION----------------\n" \
+              "----------------------------------------------\n" \
+              "--       Extracting the pod license         --\n" \
+              "----------------------------------------------\n" \
+              "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
+                                                                    "-- * Pod Group Id : " + app.config[
+                  'GROUP_ID'] + "\n" \
+                                "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "--          ACTIVATING THE LICENSE          --\n" \
+                                                                          "----------------------------------------------\n" \
+                                                                          "-- * Auth Token : " + app.config[
+                  'AUTH_TOKEN'] + "\n" \
+                                  "----------------------------------------------\n" \
+                                  "----------------------------------------------\n" \
+                                  "---------------INITIALIZATION END-------------\n" \
+                                  "----------------------------------------------\n"
+
+    app.logger.info('Pod information: %s', message)

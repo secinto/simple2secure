@@ -33,7 +33,7 @@ public class Token extends GenericDBObject {
 	private static final long serialVersionUID = -4546453754611943213L;
 
 	private String userId;
-	private String probeId;
+	private String deviceId;
 	private String accessToken;
 	private String refreshToken;
 	private Date lastLoginDate;
@@ -41,9 +41,9 @@ public class Token extends GenericDBObject {
 	public Token() {
 	};
 
-	public Token(String userId, String probeId, String accessToken, String refreshToken, Date lastLoginDate) {
+	public Token(String userId, String deviceId, String accessToken, String refreshToken, Date lastLoginDate) {
 		this.userId = userId;
-		this.probeId = probeId;
+		this.deviceId = deviceId;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.lastLoginDate = lastLoginDate;
@@ -57,12 +57,12 @@ public class Token extends GenericDBObject {
 		this.userId = userId;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 	public String getAccessToken() {

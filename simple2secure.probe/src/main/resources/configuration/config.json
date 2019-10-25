@@ -1,7 +1,7 @@
 {
 	"version": 1, 
-	"showInterfaces": false,
-	"externalAddress": "monitor.simple2secure.com",
-	"processingFactory": "com.simple2secure.probe.processor.DefaultPacketProcessingFactory",
+	"show_interfaces": "false",
+	"external_address": "monitor.simple2secure.com",
+	"processing_factory": "com.simple2secure.probe.processor.DefaultPacketProcessingFactory",
 	"bpfFilter" : "not (host 127.0.0.1 and port (8080 or 9000))"
 }

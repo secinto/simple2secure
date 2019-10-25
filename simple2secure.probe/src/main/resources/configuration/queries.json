@@ -1,18 +1,10 @@
 [
 	{
-		"name": "Query 1",
-		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from os_version;",
-		"active": 1
-	},	
-	{
-		"name": "Query 2",
+		"name": "System Info",
 		"always": false,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from os_info;",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"sqlQuery": "select * from system_info;",
 		"active": 1
 	}
 ]

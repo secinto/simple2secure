@@ -26,8 +26,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -175,25 +173,5 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	private String getQuery(String fieldName) {
 		String query = "from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
-	}
-
-	/**
-	 * Gets the single result.
-	 *
-	 * @param query
-	 *          the query
-	 * @return the single result
-	 */
-	@SuppressWarnings("unchecked")
-	private T getSingleResult(Query query) {
-		try {
-			return (T) query.getSingleResult();
-		} catch (NonUniqueResultException exc) {
-			return (T) query.getResultList().get(0);
-		} catch (NoResultException exc) {
-			return null;
-		} catch (Exception e) {
-			return null;
-		}
 	}
 }

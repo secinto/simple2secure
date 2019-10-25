@@ -20,32 +20,41 @@
  *********************************************************************
  */
 
-import {Component, Inject, ViewChild} from '@angular/core';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {FrontendRule} from '../_models/index';
-import {AlertService, HttpService, DataService} from '../_services/index';
+import {Component, ViewChild} from '@angular/core';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
+import {AlertService, HttpService, DataService} from '../_services';
+import {RuleWithSourcecode} from '../_models';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
+import {HttpErrorResponse} from '@angular/common/http';
+import {ContextDTO, TemplateRule} from '../_models';
+import {RuleAddComponent} from './ruleAdd.component';
 
 @Component({
 	moduleId: module.id,
-	styleUrls: ['rule.component.css'],
 	templateUrl: 'ruleOverview.component.html',
 	selector: 'ruleOverview'
 })
+
 export class RuleOverviewComponent {
 
-	rules: FrontendRule[];
+	// rules (with source) objects from the database
+	expertRules: RuleWithSourcecode[];
+	// rules which will be built from the predefined action/conditons from the database
+	templateRules: TemplateRule[];
+	// rule which has been selected in the table, can be TemplateRule or RuleWithSourcecode
+	selectedRule;
+	context: ContextDTO;
 	loading = false;
-	selectedRule: FrontendRule;
-	toolId: string;
-	currentUser: any;
-	deleted = false;
 
-	displayedColumns = ['name', 'description', 'priority', 'action'];
+	// columns for the table where rules will be displayed
+	displayedColumns = ['name', 'description', 'action']
+	// source for the table data, (capsuled all rules)
 	dataSource = new MatTableDataSource();
+
+
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -56,18 +65,14 @@ export class RuleOverviewComponent {
 		private alertService: AlertService,
 		private dataService: DataService,
 		private dialog: MatDialog,
-		private translate: TranslateService,
-		private dialogRef: MatDialogRef<RuleOverviewComponent>,
-		@Inject(MAT_DIALOG_DATA) data)
+		private translate: TranslateService)
 	{
-		this.rules = data.rules;
-		this.dataSource.data = this.rules;
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.toolId = this.route.snapshot.paramMap.get('id');
-		//this.loadRules();
+
+		this.context = JSON.parse(localStorage.getItem('context'));
+		this.loadRules();
 	}
 
 	ngAfterViewInit() {
@@ -81,16 +86,39 @@ export class RuleOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
+	/**
+	 * Method to fetch all rules from the database and display them in the table
+	 */
 	private loadRules() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'rule/' + this.toolId + '/' + this.currentUser.userID)
+
+		// fetching the rules with source code
+		this.httpService.get(environment.apiEndpoint + 'rule/rulewithsource/' + this.context.context.id)
 			.subscribe(
 				data => {
-					this.rules = data;
-					this.dataSource.data = this.rules;
+					this.expertRules = data;
+					this.dataSource.data = this.expertRules;
 					this.loading = false;
 					this.alertService.success(this.translate.instant('message.rule'));
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
 
+		// fetching the template rules
+		this.httpService.get(environment.apiEndpoint + 'rule/templaterule/' + this.context.context.id)
+			.subscribe(
+				data => {
+					this.templateRules = data;
+					this.dataSource.data = this.dataSource.data.concat(this.templateRules);
+					this.loading = false;
+					this.alertService.success(this.translate.instant('message.rule'));
 				},
 				error => {
 					if (error.status == 0) {
@@ -103,8 +131,12 @@ export class RuleOverviewComponent {
 				});
 	}
 
-	public onMenuTriggerClick(rule: FrontendRule) {
+	public onMenuTriggerClick(rule) {
 		this.selectedRule = rule;
+	}
+
+	public onOpenDialogAddRule(){
+		this.openDialogAddRule();
 	}
 
 	public onEditClick() {
@@ -112,15 +144,68 @@ export class RuleOverviewComponent {
 	}
 
 	public onDeleteClick() {
-		this.openDialog(this.selectedRule);
+		this.onDeleteDialog();
 	}
 
-	public editRule(rule: FrontendRule) {
-		this.dataService.set(rule);
-		this.router.navigate(['../edit'], {relativeTo: this.route, queryParams: {action: 'edit'}});
+	private openDialogAddRule(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '500px';
+
+		dialogConfig.data = {};
+
+		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.rule.dialog'));
+				this.loadRules();
+			}
+			else {
+                 if (result instanceof HttpErrorResponse) {
+                    if (result.status == 0) {
+                    	this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                    	this.alertService.error(result.error.errorMessage);
+                    }
+                 }
+			}
+		});
 	}
 
-	public openDialog(config: FrontendRule) {
+
+	private editRule(rule){
+
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '500px';
+
+		// gives the rule which should be edited
+		dialogConfig.data = {
+			rule: rule,
+		};
+
+		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.rule.dialog'));
+				this.loadRules();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
+
+
+	private onDeleteDialog() {
 		const dialogConfig = new MatDialogConfig();
 
 		dialogConfig.disableClose = true;
@@ -141,22 +226,45 @@ export class RuleOverviewComponent {
 		});
 	}
 
-	public deleteRule(rule: FrontendRule) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'email/' + rule.id).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.rule.delete'));
-				this.deleted = true;
-				this.loadRules();
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
+	private deleteRule(rule) {
+
+		// must be an expert Rule if not undefined
+		if(rule.sourcecode)
+		{
+			this.httpService.delete(environment.apiEndpoint + 'rule/rulewithsource/' + rule.id).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.rule.delete'));
+					this.loadRules();
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+
+		}
+
+		// must be a template rule if not undefined
+		if(rule.templateCondition)
+		{
+			this.httpService.delete(environment.apiEndpoint + 'rule/templaterule/' + rule.id).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.rule.delete'));
+					this.loadRules();
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+		}
 	}
 }

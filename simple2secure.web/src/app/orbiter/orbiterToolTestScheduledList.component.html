@@ -12,6 +12,24 @@
             <mat-cell *matCellDef="let element"> {{element.testRun.testName}}</mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testResult.hostname}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.podId}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="time">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testResult.timestamp | date : 'short' }}</mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.executionType' | translate }}
             </mat-header-cell>

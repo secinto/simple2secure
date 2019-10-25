@@ -20,10 +20,10 @@
  *********************************************************************
  */
 
-import {Pod} from '../pod';
+import {Device} from '../device';
 import {TestObjWeb} from '../testObjWeb';
 
 export class PodDTO {
-	public pod: Pod;
+	public pod: Device;
 	public test: TestObjWeb[];
 }

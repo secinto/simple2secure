@@ -60,7 +60,6 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.RuleRepository;
 import com.simple2secure.portal.repository.TokenRepository;
 import com.simple2secure.portal.repository.UserInfoRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
@@ -105,9 +104,6 @@ public class UserUtils {
 
 	@Autowired
 	LicenseRepository licenseRepository;
-
-	@Autowired
-	RuleRepository ruleRepository;
 
 	@Autowired
 	EmailRepository emailRepository;
@@ -240,7 +236,10 @@ public class UserUtils {
 							return new ResponseEntity<>(user, HttpStatus.OK);
 						} else {
 							userRepository.deleteByUserID(userID.toString());
-							contextUserAuthRepository.deleteById(contextUserId.toString());
+
+							if (contextUserId != null) {
+								contextUserAuthRepository.deleteById(contextUserId.toString());
+							}
 
 							log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 

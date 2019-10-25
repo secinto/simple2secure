@@ -31,7 +31,7 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 	}
 
 	@Override
-	public List<NetworkReport> getReportsByProbeId(String probeId) {
+	public List<NetworkReport> getReportsByDeviceId(String probeId) {
 		List<NetworkReport> networkReports = new ArrayList<>();
 		Query query = new Query(Criteria.where("probeId").is(probeId));
 		networkReports = mongoTemplate.find(query, NetworkReport.class, collectionName);
@@ -47,8 +47,8 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 	}
 
 	@Override
-	public void deleteByProbeId(String probeId) {
-		List<NetworkReport> reports = getReportsByProbeId(probeId);
+	public void deleteByDeviceId(String probeId) {
+		List<NetworkReport> reports = getReportsByDeviceId(probeId);
 
 		if (reports != null) {
 			for (NetworkReport report : reports) {

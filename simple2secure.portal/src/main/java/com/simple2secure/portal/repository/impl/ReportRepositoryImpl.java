@@ -48,7 +48,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public void deleteByProbeId(String probeId) {
+	public void deleteByDeviceId(String probeId) {
 		List<Report> reports = getReportsByProbeId(probeId);
 
 		if (reports != null) {
@@ -63,8 +63,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 	public List<Report> getReportsByName(String name) {
 		List<Report> reports = new ArrayList<>();
 		Query query = new Query(Criteria.where("query").is(name));
-		Sort sort = new Sort(Sort.Direction.ASC, "queryTimestamp");
-		query.with(sort);
+		query.with(Sort.by(Sort.Direction.ASC, "queryTimestamp"));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 		return reports;
 	}

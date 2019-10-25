@@ -6,25 +6,25 @@
                 <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
             </mat-form-field>
         </div>
-        <mat-table #table [dataSource]="dataSource" matSort>
+        <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-            <!-- Position Column -->
+            <!-- From Column -->
             <ng-container matColumnDef="from">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.from' | translate }}</mat-header-cell>
                 <mat-cell *matCellDef="let element"> {{element.from}}</mat-cell>
             </ng-container>
 
-            <!-- Name Column -->
+            <!-- Subject Column -->
             <ng-container matColumnDef="subject">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.subject' | translate }}</mat-header-cell>
                 <mat-cell *matCellDef="let element"> {{element.subject}}</mat-cell>
             </ng-container>
 
-            <!-- Name Column -->
+            <!-- Time Column -->
             <ng-container matColumnDef="time">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.receivedDate' | translate }}
                 </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.receivedDate}}</mat-cell>
+                <mat-cell *matCellDef="let element"> {{ element.receivedDate | date: 'short' }}</mat-cell>
             </ng-container>
 
 

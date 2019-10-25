@@ -1,0 +1,68 @@
+{
+"sourcecode": "
+  package com.simple2secure.portal.rules;
+
+import java.util.List;
+
+import javax.lang.model.element.Element;
+
+import org.jeasy.rules.annotation.Action;
+import org.jeasy.rules.annotation.Condition;
+import org.jeasy.rules.annotation.Fact;
+import org.jeasy.rules.annotation.Rule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.EmailAttribute;
+import com.simple2secure.api.model.EmailAttributeEnum;
+import com.simple2secure.portal.repository.EmailAttributesListRepository;
+
+@Component
+@Rule(name = \"block email addresses\",description = \"rule which blocks specific email addresses\", priority = 1)
+public class RuleBlockedEmailAddresses
+{
+	@Autowired
+	EmailAttributesListRepository emailAttributesListRepository;	
+	
+    /**
+    * Method to check if the text of an email includes specific(given) words.
+    * The forbidden words are saved in the words_to_find_ collection.
+    * 
+    *
+    * @param email where the text should be checked
+    * @return boolean true if the rule is followed, false otherwise
+    *
+    */
+	@Condition
+	public boolean checkingEmailAddress(@Fact(\"com.simple2secure.api.model.Email\") Email email)
+	{
+		List<EmailAttribute> blocked_addresses = emailAttributesListRepository
+				.findByAttributeType(EmailAttributeEnum.BLACKLIST);	
+
+		for(EmailAttribute element : blocked_addresses)
+		{
+			if(email.getFrom().equals(element.getAttribute()))
+			    return true;
+		}
+		return false;
+	}
+	
+    /**
+    * Method which will be executed when a forbidden word has been found
+    * 
+    *
+    * @param email where the forbidden word has been found
+    * @return boolean true if the rule is followed, false otherwise
+    *
+    */
+	@Action
+	public void found(@Fact(\"com.simple2secure.api.model.Email\") Email email) throws Exception
+	{
+		//email.setSpam(true);
+		//email.addSpamInfo(\"Blocked mail address: \"+ email.getFrom());
+	}
+}
+
+" 
+}

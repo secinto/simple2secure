@@ -34,6 +34,7 @@ import {HelperService} from '../_services/helper.service';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['scheduled.tests.css'],
 	templateUrl: 'orbiterToolTestScheduledList.component.html'
 })
 
@@ -45,7 +46,7 @@ export class OrbiterToolTestScheduledListComponent {
 	showTestResult = false;
 	tests: TestRunDTO[];
 	context: ContextDTO;
-	displayedColumns = ['name', 'type', 'status', 'action'];
+	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
 	dataSource = new MatTableDataSource();
@@ -122,7 +123,6 @@ export class OrbiterToolTestScheduledListComponent {
 
 		dialogConfig.disableClose = true;
 		dialogConfig.autoFocus = true;
-
 		dialogConfig.data = {
 			id: 1,
 			title: this.translate.instant('message.areyousure'),
@@ -141,7 +141,7 @@ export class OrbiterToolTestScheduledListComponent {
 
 	public deleteTestRun(testRun: TestRunDTO) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'test/delete/testrun/' + testRun.testRun.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'test/testrun/delete/' + testRun.testRun.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
@@ -158,7 +158,7 @@ export class OrbiterToolTestScheduledListComponent {
 				this.loading = false;
 			});
 	}
-	
+
 	public openDialogShowTestResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';

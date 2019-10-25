@@ -62,7 +62,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
-		return new MongoClient(getHost(), port);
+		return new MongoClient(getHost(), 27017);
 	}
 
 	@Override

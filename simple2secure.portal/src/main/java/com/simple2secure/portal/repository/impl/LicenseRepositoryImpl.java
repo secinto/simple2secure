@@ -24,8 +24,14 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByGroupId(String groupId) {
+	public List<CompanyLicensePrivate> findAllByGroupId(String groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
+		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public List<CompanyLicensePrivate> findByGroupIdAndDeviceType(String groupId, boolean deviceIsPod) {
+		Query query = new Query(Criteria.where("groupId").is(groupId).and("deviceIsPod").is(deviceIsPod));
 		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 	}
 
@@ -36,8 +42,14 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicensePrivate findByLicenseIdAndProbeId(String licenseId, String probeId) {
-		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("probeId").is(probeId));
+	public List<CompanyLicensePrivate> findByDeviceStatusOnline() {
+		Query query = new Query(Criteria.where("status").is("ONLINE"));
+		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId, boolean deviceIsPod) {
+		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("deviceId").is(deviceId).and("deviceIsPod").is(deviceIsPod));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 
@@ -60,20 +72,15 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicensePrivate findByProbeId(String probeId) {
-		Query query = new Query(Criteria.where("probeId").is(probeId));
-		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
-	}
-
-	@Override
-	public CompanyLicensePrivate findByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+	public CompanyLicensePrivate findByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("deviceId").is(deviceId));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 
 	@Override
 	public void deleteByGroupId(String groupId) {
-		List<CompanyLicensePrivate> licenses = findByGroupId(groupId);
+		Query query = new Query(Criteria.where("groupId").is(groupId));
+		List<CompanyLicensePrivate> licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 
 		if (licenses != null) {
 			for (CompanyLicensePrivate license : licenses) {
@@ -90,31 +97,14 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public void deleteByProbeId(String probeId) {
-		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = findByProbeId(probeId);
+	public void deleteByDeviceId(String deviceId) {
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = findByDeviceId(deviceId);
 			if (license != null) {
 				delete(license);
 			}
 		}
 
-	}
-
-	@Override
-	public CompanyLicensePrivate findByLicenseIdAndPodId(String licenseId, String podId) {
-		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("podId").is(podId));
-		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
-	}
-
-	@Override
-	public void deleteByPodId(String podId) {
-		// TODO Auto-generated method stub
-		if (!Strings.isNullOrEmpty(podId)) {
-			CompanyLicensePrivate license = findByPodId(podId);
-			if (license != null) {
-				delete(license);
-			}
-		}
 	}
 
 	@Override

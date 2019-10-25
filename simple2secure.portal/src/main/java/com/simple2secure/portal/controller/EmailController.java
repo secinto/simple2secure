@@ -72,20 +72,21 @@ public class EmailController {
 	public static final Logger logger = LoggerFactory.getLogger(EmailController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (config != null) {
-			if (!mailUtils.checkIfEmailConfigExists(config.getEmail(), config.getContextId())) {
-				if (!Strings.isNullOrEmpty(config.getId())) {
-					emailConfigRepository.update(config);
-				} else {
-					emailConfigRepository.save(config);
-				}
-				return new ResponseEntity<>(config, HttpStatus.OK);
+			String configId = mailUtils.checkIfEmailConfigExists(config);
+			if (!Strings.isNullOrEmpty(configId)) {
+				config.setId(configId);
+				emailConfigRepository.update(config);
+			} else {
+				emailConfigRepository.save(config);
 			}
-
+			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale)),
@@ -93,7 +94,9 @@ public class EmailController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -121,7 +124,9 @@ public class EmailController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/{emailConfigId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/{emailConfigId}",
+			method = RequestMethod.DELETE)
 	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable("emailConfigId") String emailConfigId,
 			@RequestHeader("Accept-Language") String locale) {
 

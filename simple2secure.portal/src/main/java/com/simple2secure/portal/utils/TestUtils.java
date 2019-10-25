@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
@@ -47,6 +46,7 @@ import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -88,23 +88,18 @@ public class TestUtils {
 	@Autowired
 	TestUtils testUtils;
 
-	private Gson gson = new Gson();
-
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
 	 * the license which has been used for the activation.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<TestResult> saveTestResult(TestResult testResult, String locale) {
+	public TestResult saveTestResult(TestResult testResult, String locale) {
 		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
 			if (!Strings.isNullOrEmpty(testResult.getTestRunId())) {
 				testResult.setId(null);
 				testResultRepository.save(testResult);
-				return new ResponseEntity<>(testResult, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return testResult;
 	}
 
 	/**
@@ -115,21 +110,20 @@ public class TestUtils {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<TestResultDTO>> getTestResultByContextId(String contextId, String locale) {
+	public List<TestResultDTO> getTestResultByContextId(String contextId, String locale) {
+		List<TestResultDTO> results = new ArrayList<>();
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
 			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-			List<TestResultDTO> results = new ArrayList<>();
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
 
-					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupId(group.getId());
+					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
 
 					if (licensesByGroup != null) {
 						for (CompanyLicensePrivate license : licensesByGroup) {
-							if (!Strings.isNullOrEmpty(license.getPodId())) {
+							if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 
-								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getPodId());
+								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getDeviceId());
 
 								if (testRunList != null) {
 									for (TestRun testRun : testRunList) {
@@ -145,14 +139,43 @@ public class TestUtils {
 						}
 					}
 				}
-				if (results != null) {
-					return new ResponseEntity<>(results, HttpStatus.OK);
-				}
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return results;
+	}
+
+	public Test synchronizeReceivedTest(Test test) {
+		Test returnTest = new Test();
+		Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+
+		if (currentPortalTest != null) {
+			boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
+					test.getLastChangedTimestamp());
+
+			returnTest = currentPortalTest;
+
+			if (isPortalTestOlder) {
+				currentPortalTest.setHash_value(test.getHash_value());
+				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+				currentPortalTest.setTest_content(test.getTest_content());
+				currentPortalTest.setActive(true);
+				testRepository.save(currentPortalTest);
+			}
+		} else {
+			currentPortalTest = new Test();
+			currentPortalTest.setHash_value(test.getHash_value());
+			currentPortalTest.setName(test.getName());
+			currentPortalTest.setPodId(test.getPodId());
+			currentPortalTest.setHostname(test.getHostname());
+			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
+			currentPortalTest.setTest_content(test.getTest_content());
+			currentPortalTest.setActive(true);
+
+			testRepository.save(currentPortalTest);
+
+			returnTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+		}
+		return returnTest;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -324,7 +347,7 @@ public class TestUtils {
 			testObjWeb.getTest_content().getTest_definition().setVersion("0.0.1");
 		}
 
-		String testContent = gson.toJson(testObjWeb.getTest_content());
+		String testContent = JSONUtils.toString(testObjWeb.getTest_content());
 
 		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
 			// new test
@@ -343,6 +366,7 @@ public class TestUtils {
 			// test should exist in the database, update the existing one
 			test = testRepository.find(testObjWeb.getTestId());
 			if (test != null) {
+				test.setName(testObjWeb.getName());
 				test.setScheduled(testObjWeb.isScheduled());
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
@@ -414,7 +438,7 @@ public class TestUtils {
 
 			for (Test test : tests) {
 				TestObjWeb testObjWeb = new TestObjWeb();
-				TestContent testContent = gson.fromJson(test.getTest_content(), TestContent.class);
+				TestContent testContent = JSONUtils.fromString(test.getTest_content(), TestContent.class);
 				testObjWeb.setTest_content(testContent);
 				testObjWeb.setName(test.getName());
 				testObjWeb.setActive(test.isActive());

@@ -37,13 +37,19 @@ public class EmailConfiguration extends GenericDBObject {
 	private String outgoingPort;
 	private String email;
 	private String password;
+	private int lastEnd;
+
+	private Status currentStatus;
 
 	public EmailConfiguration() {
-
+		currentStatus = Status.CREATED;
+		lastEnd = 0;
 	}
 
 	public EmailConfiguration(String contextId, String incomingServer, String incomingPort, String outgoingServer, String outgoingPort,
 			String email, String password) {
+		this();
+
 		this.contextId = contextId;
 		this.incomingServer = incomingServer;
 		this.incomingPort = incomingPort;
@@ -108,4 +114,21 @@ public class EmailConfiguration extends GenericDBObject {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public Status getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public void setCurrentStatus(Status currentStatus) {
+		this.currentStatus = currentStatus;
+	}
+
+	public int getLastEnd() {
+		return lastEnd;
+	}
+
+	public void setLastEnd(int lastEnd) {
+		this.lastEnd = lastEnd;
+	}
+
 }

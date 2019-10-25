@@ -24,7 +24,7 @@ package com.simple2secure.commons.test;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 
-import com.simple2secure.commons.process.LoggingObserver;
+import com.simple2secure.commons.LoggingObserver;
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
 

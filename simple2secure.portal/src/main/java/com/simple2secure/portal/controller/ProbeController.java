@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -45,8 +46,9 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.utils.ProbeUtils;
+import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
 @RequestMapping("/api/probe")
@@ -76,7 +78,10 @@ public class ProbeController {
 	GroupUtils groupUtils;
 
 	@Autowired
-	ProbeUtils probeUtils;
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	TestUtils testUtils;
 
 	/**
 	 * This function returns all devices according to the user id
@@ -84,14 +89,16 @@ public class ProbeController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/changeGroup/{probeId}", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/changeGroup/{probeId}",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("probeId") String probeId, @RequestBody CompanyGroup group,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(probeId) && group != null) {
 			// retrieve license from database
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 			CompanyGroup dbGroup = groupRepository.find(group.getId());
 			if (license != null && dbGroup != null) {
 
@@ -113,18 +120,20 @@ public class ProbeController {
 	 * This function returns all devices according to the user id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/deleteProbe/{probeId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/deleteProbe/{probeId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> deleteProbe(@PathVariable("probeId") String probeId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
 
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 
 			if (license != null) {
 				// delete All Probe dependencies
-				probeUtils.deleteProbeDependencies(probeId);
+				deviceUtils.deleteDependencies(probeId);
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
 		}
@@ -132,6 +141,21 @@ public class ProbeController {
 		log.error("Problem occured while deleting probe with id {}", probeId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_probe", locale)),
 				HttpStatus.NOT_FOUND);
+	}
+
+	@RequestMapping(
+			value = "/status/{deviceId}",
+			method = RequestMethod.POST)
+	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			if (license != null) {
+				license.setLastOnlineTimestamp(System.currentTimeMillis());
+				licenseRepository.update(license);
+			}
+		}
+		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 }

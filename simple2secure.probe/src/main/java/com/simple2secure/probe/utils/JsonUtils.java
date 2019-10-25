@@ -28,9 +28,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -43,8 +40,6 @@ import com.simple2secure.commons.json.JSONUtils;
  *
  */
 public class JsonUtils {
-	private static Logger log = LoggerFactory.getLogger(JsonUtils.class);
-
 	/**
 	 * This function reads JSON from the URL.
 	 *

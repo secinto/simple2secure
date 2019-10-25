@@ -26,8 +26,10 @@ import com.simple2secure.portal.security.auth.JWTLoginFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMongoRepositories("com.simple2secure.portal.dao")
-@CrossOrigin(origins = "http://localhost:9000")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@CrossOrigin(
+		origins = "https://localhost:9000")
+@EnableGlobalMethodSecurity(
+		prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -45,10 +47,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	private String[] antmatchers = { "/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
-			"/api/user/sendResetPasswordEmail", "/api/user/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
-			"/api/download/**", "/api/device/**", "/api/license/activateProbe", "/api/license/activatePod/**", "/api/pod/config/**" };
-
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -58,24 +56,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
-	public void configure(WebSecurity web) throws Exception {
+	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
 				"/api/user/sendResetPasswordEmail", "/api/user/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
-				"/api/download/**", "/api/device/**", "/api/license/activateProbe", "/api/license/activatePod/**", "/api/pod/config/**");
+				"/api/download/**", "/api/device/**", "/api/license/authenticate/**", "/api/pod/config/**");
 	}
 
 	// TODO - find better solution for antMatchers!
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/api/login").permitAll()
-				.antMatchers("/api/service/").permitAll().antMatchers("/api/register/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/user/activate/").anonymous().and().authorizeRequests().antMatchers("/api/test").anonymous().and()
-				.authorizeRequests().antMatchers("/api/user/updatePassword/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/user/invite/**").anonymous().and().authorizeRequests().antMatchers("/api/download/**").anonymous().and()
-				.authorizeRequests().antMatchers("/api/device/**").anonymous().and().authorizeRequests().antMatchers("/api/license/activateProbe")
-				.anonymous().and().authorizeRequests().antMatchers("/api/license/activatePod/**").anonymous().and().authorizeRequests()
-				.antMatchers("/api/pod/config/**").anonymous().and().authorizeRequests()
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests().antMatchers("/api/login")
+				.permitAll().and().authorizeRequests().antMatchers("/api/service").permitAll().and().authorizeRequests()
+				.antMatchers("/api/register/**").permitAll().and().authorizeRequests().antMatchers("/api/user/activate/").permitAll().and()
+				.authorizeRequests().antMatchers("/api/test").permitAll().and().authorizeRequests().antMatchers("/api/user/updatePassword/**")
+				.permitAll().and().authorizeRequests().antMatchers("/api/user/invite/**").permitAll().and().authorizeRequests()
+				.antMatchers("/api/download/**").permitAll().and().authorizeRequests().antMatchers("/api/device/**").permitAll().and()
+				.authorizeRequests().antMatchers("/api/pod/config/**").permitAll().and().authorizeRequests()
+				.antMatchers("/api/license/authenticate/**").permitAll().and().authorizeRequests()
 				// filter the login requests
 				.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 				// And filter other requests to check the presence of JWTth in header
@@ -89,8 +87,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// auth.authenticationProvider(authProvider());
-		// auth.userDetailsService(userDetailsService);
 		auth.authenticationProvider(authProvider);
 	}
 }

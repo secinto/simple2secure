@@ -22,13 +22,14 @@
 package com.simple2secure.commons.license;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.simple2secure.commons.time.TimeUtils;
 
 public class LicenseDateUtil {
 
@@ -74,7 +75,7 @@ public class LicenseDateUtil {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(field, value);
-		return convertDateToLicenseFormatString(c.getTime());
+		return TimeUtils.formatDate(TimeUtils.SIMPLE_DATE_FORMAT, c.getTime());
 	}
 
 	/**
@@ -103,31 +104,7 @@ public class LicenseDateUtil {
 	public static String getLicenseExpirationDate(long time, TimeUnit unit, int field, int value) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis() + unit.toMillis(time));
-		return convertDateToLicenseFormatString(calendar.getTime());
-	}
-
-	/**
-	 * Creates the license expiration date in String representation from the given expiration date as {@link Date}.
-	 *
-	 * @param expirationDate
-	 *          The desired license expiration date.
-	 * @return The date as string representation in the {@link #LICENSE_DATE_FORMAT} date format.
-	 */
-	public static String convertDateToLicenseFormatString(Date expirationDate) {
-		return new SimpleDateFormat(License.LICENSE_DATE_FORMAT).format(expirationDate);
-	}
-
-	/**
-	 * Converts the provided string to a {@link Date} object assuming the {@link #LICENSE_DATE_FORMAT} date format.
-	 *
-	 * @param date
-	 *          The date as string which should be converted
-	 * @return The {@link Date} object created from the provided string.
-	 * @throws ParseException
-	 *           Thrown if the provided date can't be parsed due to an illegal format.
-	 */
-	public static Date convertLicenseFormatStringToDate(String date) throws ParseException {
-		return new SimpleDateFormat(License.LICENSE_DATE_FORMAT).parse(date);
+		return TimeUtils.formatDate(TimeUtils.SIMPLE_DATE_FORMAT, calendar.getTime());
 	}
 
 	/**
@@ -135,14 +112,14 @@ public class LicenseDateUtil {
 	 * false.
 	 *
 	 * @param expirationDateString
-	 *          The string containing a date in the {@link #LICENSE_DATE_FORMAT}.
+	 *          The string containing a date in the {@link #SIMPLE_DATE_FORMAT}.
 	 * @return True if the provided date is past the current date.
 	 * @throws ParseException
 	 *           Thrown if the provided date can't be parsed due to an illegal format.
 	 */
 	public static boolean isLicenseExpired(String expirationDateString) {
 		try {
-			Date expirationDate = convertLicenseFormatStringToDate(expirationDateString);
+			Date expirationDate = TimeUtils.parseDate(TimeUtils.SIMPLE_DATE_FORMAT, expirationDateString);
 			return System.currentTimeMillis() > expirationDate.getTime();
 		} catch (Exception e) {
 			log.error("Couldn't check license expiration due to parsing error. Reason {}", e);

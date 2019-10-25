@@ -88,7 +88,7 @@
             </form>
 
         </mat-tab>
-
+        // USERS TAB
         <mat-tab *ngIf="showMyUsers" label="{{ 'table.myusers' | translate }}">
             <button *ngIf="showGroupTable" mat-raised-button color="primary" id="addButton" type="button"
                     (click)="openDialogAddUser()"
@@ -99,10 +99,10 @@
             <div *ngIf="showUserTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterUser($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
+                <mat-table #sort="matSort" #table [dataSource]="userDataSource" matSort>
 
                     <ng-container matColumnDef="userRole">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'userRole.placeholder' | translate }}
@@ -131,7 +131,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsUsers;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator
+                <mat-paginator #userPaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -155,7 +155,7 @@
                         <mat-icon>edit</mat-icon>
                         {{ 'button.edit' | translate }}
                     </button>
-                    <button mat-menu-item (click)="onDeleteClick()">
+                    <button mat-menu-item (click)="onDeleteUserClick()">
                         <mat-icon>delete</mat-icon>
                         {{ 'button.delete' | translate }}
                     </button>
@@ -170,8 +170,8 @@
         </mat-tab>
 
         //CONTEXT TAB
-        <mat-tab *ngIf="addnewContext" label="{{ 'table.mycontexts' | translate }}">
-            <button *ngIf="addnewContext" mat-raised-button color="primary" id="addButton" type="button"
+        <mat-tab *ngIf="addNewContext" label="{{ 'table.mycontexts' | translate }}">
+            <button *ngIf="addNewContext" mat-raised-button color="primary" id="addButton" type="button"
                     (click)="openDialogNewContext()"
                     class="pull-right mat-green-button">
                 <i class="glyphicon glyphicon-plus"></i> {{ 'button.addContext' | translate }}
@@ -180,10 +180,10 @@
             <div *ngIf="showContextTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterUser($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortCntx="matSort" #table [dataSource]="dataSource4" matSort>
+                <mat-table #sortCntx="matSort" #table [dataSource]="contextDataSource" matSort>
 
                     <ng-container matColumnDef="name">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
@@ -226,7 +226,7 @@
                     <mat-icon>edit</mat-icon>
                     {{ 'button.edit' | translate }}
                 </button>
-                <button mat-menu-item (click)="onContextDeleteClick()">
+                <button mat-menu-item (click)="onDeleteContextClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>
@@ -301,7 +301,7 @@
                 </mat-menu>
             </div>
         </mat-tab>
-
+        //PROBES TAB
         <mat-tab label="{{ 'table.myprobes' | translate }}">
 
 
@@ -315,21 +315,33 @@
             <div *ngIf="showProbeTable" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">
-                        <input matInput (keyup)="applyFilterDev($event.target.value)" placeholder="Filter">
+                        <input matInput (keyup)="applyFilterProbe($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortDev="matSort" #table [dataSource]="dataSource2" matSort>
+                <mat-table #sortUser="matSort" #table [dataSource]="probeDataSource" matSort>
 
-                    <ng-container matColumnDef="probe">
+                    <ng-container matColumnDef="probeId">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
                         </mat-header-cell>
-                        <mat-cell *matCellDef="let element"> {{element.probeId}}</mat-cell>
+                        <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="hostname">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="group">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
                     </ng-container>
 
                     <ng-container matColumnDef="activated">
@@ -356,7 +368,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator2
+                <mat-paginator #probePaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -374,17 +386,17 @@
             </div>
 
             <mat-menu #menuProbe="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
+                <button mat-menu-item (click)="openDialogChangeDeviceGroup()">
                     <mat-icon>edit</mat-icon>
                     {{ 'probe.change.group' | translate }}
                 </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
+                <button mat-menu-item (click)="onDeleteProbeClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>
             </mat-menu>
         </mat-tab>
-
+        //PODS TAB
         <mat-tab label="{{ 'table.mypods' | translate }}">
 
             <div *ngIf="showPodTable" class="example-container mat-elevation-z8 table table-striped">
@@ -393,10 +405,16 @@
                         <input matInput (keyup)="applyFilterPod($event.target.value)" placeholder="Filter">
                     </mat-form-field>
                 </div>
-                <mat-table #sortPod="matSort" #table [dataSource]="dataSource5" matSort>
+                <mat-table #sortPod="matSort" [dataSource]="podDataSource" matSort>
 
-                    <ng-container matColumnDef="pod">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
+                    <ng-container matColumnDef="podId">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="hostname">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
                     </ng-container>
@@ -437,7 +455,7 @@
                     <mat-header-row *matHeaderRowDef="displayedColumnsPods"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumnsPods;"></mat-row>
                 </mat-table>
-                <mat-paginator #paginator4
+                <mat-paginator #podPaginator
                                [pageSize]="10"
                                [pageSizeOptions]="[5, 10, 20]"
                                [showFirstLastButtons]="true">
@@ -453,23 +471,12 @@
                 </div>
             </div>
 
-            <mat-menu #menuProbe="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
-                    <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
-                </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
-                    <mat-icon>delete</mat-icon>
-                    {{ 'button.delete' | translate }}
-                </button>
-            </mat-menu>
-
             <mat-menu #menuPod="matMenu">
-                <button mat-menu-item (click)="openDialogChangeProbeGroup()">
+                <button mat-menu-item (click)="openDialogChangePodGroup()">
                     <mat-icon>edit</mat-icon>
-                    {{ 'probe.change.group' | translate }}
+                    {{ 'pod.change.group' | translate }}
                 </button>
-                <button mat-menu-item (click)="onProbeDeleteClick()">
+                <button mat-menu-item (click)="onDeletePodClick()">
                     <mat-icon>delete</mat-icon>
                     {{ 'button.delete' | translate }}
                 </button>

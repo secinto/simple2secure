@@ -1,26 +1,27 @@
 [
 	{
-	  "name": "common-stats",
-	  "processor_class": "com.simple2secure.probe.network.processor.impl.CommonStatisticProcessor",
-	  "analysisInterval": 2,
-	  "analysisIntervalUnit": "MINUTES"
+		"name": "common-stats",
+		"processor_class": "com.simple2secure.probe.network.processor.impl.CommonStatisticProcessor",
+		"analysisInterval": 2,
+		"analysisIntervalUnit": "MINUTES"
 	},
 	{
-	  "name": "common-pattern",
-	  "processor_class": "com.simple2secure.probe.network.processor.impl.CommonPatternProcessor",
-	  "analysisInterval": 2,
-	  "analysisIntervalUnit": "MINUTES"
+		"name": "common-pattern",
+		"processor_class": "com.simple2secure.probe.network.processor.impl.CommonPatternProcessor",
+		"analysisInterval": 2,
+		"analysisIntervalUnit": "MINUTES"
 	},
 	{
-	  "name": "default-packet-processor",
-	  "processor_class": "com.simple2secure.probe.network.processor.impl.DefaultPacketProcessor",
-	  "analysisInterval": 2,
-	  "analysisIntervalUnit": "MINUTES"
-	},	
+		"name": "default-packet-processor",
+		"processor_class": "com.simple2secure.probe.network.processor.impl.DefaultPacketProcessor",
+		"analysisInterval": 2,
+		"analysisIntervalUnit": "MINUTES"
+	},
 	{
-	  "name": "groovy-processor",
-	  "processor_class": "com.simple2secure.probe.network.processor.impl.DefaultGroovyProcessor",
-	  "analysisInterval": 2,
-	  "analysisIntervalUnit": "MINUTES"
-	}	
+		"name": "groovy-processor",
+		"processor_class": "com.simple2secure.probe.network.processor.impl.DefaultGroovyProcessor",
+		"analysisInterval": 2,
+		"analysisIntervalUnit": "MINUTES",
+		"groovy": false
+	}
 ]

@@ -1,22 +1,28 @@
+import logging
+import os
+
+from celery import Celery
 from flask import Flask
 from flask_cors import CORS
+
+import src.config.config as config_module
+from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
-from src.util import rest_utils, file_utils
-from celery import Celery
-import src.config.config as config_module
-import secrets
-import requests
-import os
-import logging
+from src.util.db_utils import init_db, update, get_pod
+from src.util.util import print_error_message, shutdown_server, check_command_params, init_logger
+from src.util.auth_utils import authenticate
+from src.util.rest_utils import check_portal_alive
+from src.util.test_utils import get_tests, sync_tests
 
 
-def create_app():
-    return entrypoint('app')
+def create_app(argv):
+    return entrypoint(argv, 'app')
 
 
 def create_celery_app(app):
     # Initialize Celery
+
     celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
                     backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
     celery.conf.broker_url = app.config['CELERY_BROKER_URL']
@@ -32,62 +38,53 @@ def create_celery_app(app):
     return celery
 
 
-def entrypoint(mode='app'):
-
+def entrypoint(argv, mode='app'):
     os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
     app = Flask(__name__)
     app.config.from_object(config_module.DevelopmentConfig)
 
-    CORS(app)
-
-    # DB, marshmallow and Celery initialization
-    db.init_app(app)
-    ma.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
+    # Check command line arguments and initialize logger, thereafter loggers can be used
+    if mode != 'app':
+        init_logger(app)
 
     if mode == 'app':
-        logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+        check_command_params(argv, app)
+        log = logging.getLogger('pod.init')
+    else:
+        log = logging.getLogger('celery.init')
+
+    CORS(app)
+
+    if not app.config['SQLALCHEMY_DATABASE_URI']:
+        db_path = os.path.abspath(os.path.relpath('db'))
+        if not os.path.exists(db_path):
+            os.makedirs(db_path)
+        db_uri = 'sqlite:///{}'.format(db_path + '/pod.db')
+        log.info('Database URI {}'.format(db_uri))
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
+    with app.app_context():
+        # DB, marshmallow and Celery initialization
+        log.info("Initialization of DB and Marshmallow")
+        db.init_app(app)
+        ma.init_app(app)
+        log.info("Creating tables in the DB if not existent")
+        init_db()
+
+        if not app.config['POD_ID']:
+            log.info('Obtaining the POD info')
+            podInfo = get_pod(app)
+            app.config['POD_ID'] = podInfo.generated_id
+
+    if mode == 'app':
+        log.info('Check connection to PORTAL')
+        check_portal_alive(app)
+        log.info('Authenticating the POD against the PORTAL')
         authenticate(app)
+        log.info('Initializing tests - verifying if the DB contains the latest version')
+        sync_tests(app)
+        log.info('Initialize and run celery worker')
+        run_worker()
 
     return app
-
-
-def authenticate(app):
-    with app.app_context():
-        pod_info = PodInfo.query.first()
-        # If there is not pod_info object in database, generate new pod_id and save object to db
-        if pod_info is None:
-            app.config['POD_ID'] = secrets.token_urlsafe(20)
-            pod_info = PodInfo(app.config['POD_ID'], "")
-            db.session.add(pod_info)
-            db.session.commit()
-            app.logger.info('Generating new pod id: %s', app.config['POD_ID'])
-        # if there is a podInfo object in database, set saved pod_id into the app.config[POD_ID] variable
-        else:
-            app.config['POD_ID'] = pod_info.generated_id
-            app.logger.info('Using existing pod id from the database: %s', app.config['POD_ID'])
-
-        try:
-            auth_token_obj = rest_utils.get_auth_token_object(app)
-
-            if auth_token_obj.status_code == 200:
-                app.config['AUTH_TOKEN'] = auth_token_obj.text
-                license_from_file = file_utils.get_license_file()
-                license_file = file_utils.parse_license_file(license_from_file, app)
-                app.config['LICENSE_ID'] = license_file.licenseId
-                rest_utils.print_success_message_auth(app)
-
-            else:
-                # shutdown_server()
-                app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
-
-        except requests.exceptions.ConnectionError:
-                app.logger.error('Error occured while activating the pod: %s', rest_utils.print_error_message())
-                # shutdown_server()
-
-
-

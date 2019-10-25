@@ -1,4 +1,7 @@
+import logging
 import platform
+
+log = logging.getLogger('pod.util.json_utils')
 
 
 def get_json_test_object(data, test_id, key, attribute):
@@ -46,7 +49,7 @@ def parse_query_test(query_string, item_type):
         mysublist = item.split("=")
         # Check if current attribute equals the provided item_type
         if mysublist[0] == item_type:
-            correct_item = mylist[index+1].split("=")
+            correct_item = mylist[index + 1].split("=")
             return correct_item[1]
 
 

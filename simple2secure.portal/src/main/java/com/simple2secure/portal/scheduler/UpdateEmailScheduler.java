@@ -21,7 +21,7 @@
  */
 package com.simple2secure.portal.scheduler;
 
-import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,32 +42,22 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.ExtendedRule;
-import com.simple2secure.api.model.PortalRule;
+import com.simple2secure.api.model.Status;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.RuleRepository;
+import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
+import com.simple2secure.portal.rules.EmailRulesEngine;
 import com.simple2secure.portal.utils.MailUtils;
+import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
-
-import ch.maxant.rules.AbstractAction;
-import ch.maxant.rules.CompileException;
-import ch.maxant.rules.DuplicateNameException;
-import ch.maxant.rules.Engine;
-import ch.maxant.rules.NoActionFoundException;
-import ch.maxant.rules.NoMatchingRuleFoundException;
-import ch.maxant.rules.ParseException;
-import ch.maxant.rules.Rule;
 
 @Component
 public class UpdateEmailScheduler {
 
 	private String STORE = "imap";
 	private String FOLDER = "inbox";
-	private String SOCKET_FACTORY_CLASS = "javax.net.ssl.SSLSocketFactory";
-	private String SOCKET_FACTORY_PORT = "465";
-	private String IMAP_AUTH = "true";
 
 	@Autowired
 	EmailConfigurationRepository emailConfigRepository;
@@ -76,7 +66,10 @@ public class UpdateEmailScheduler {
 	NotificationRepository notificationRepository;
 
 	@Autowired
-	RuleRepository ruleRepository;
+	NotificationUtils notificationUtils;
+
+	@Autowired
+	RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
 
 	@Autowired
 	EmailRepository emailRepository;
@@ -87,19 +80,39 @@ public class UpdateEmailScheduler {
 	@Autowired
 	PortalUtils portalUtils;
 
+	@Autowired
+	EmailRulesEngine emailRulesEngine;
+
+	private Properties emailProperties;
+
 	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
+
+	private Hashtable<String, Store> storeMapping = new Hashtable<>();
+
+	public UpdateEmailScheduler() {
+		emailProperties = new Properties();
+		emailProperties.setProperty("mail.imap.ssl.enable", "true");
+	}
 
 	@Scheduled(fixedRate = 50000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
+		log.info("Checking configured email inboxes");
 		if (configs != null) {
 			for (EmailConfiguration cfg : configs) {
-				Message[] msg = connect(cfg);
-				if (msg != null) {
+				cfg.setCurrentStatus(Status.CHECKING);
+				emailConfigRepository.update(cfg);
+				Message[] msg = getMessagesForStore(getConnection(cfg), cfg);
+				cfg.setCurrentStatus(Status.CONNECTED);
+				emailConfigRepository.update(cfg);
+				if (msg != null && msg.length > 0) {
+					cfg.setCurrentStatus(Status.SYNCHING);
+					emailConfigRepository.update(cfg);
 					extractEmailsFromMessages(msg, cfg.getId());
 				}
 			}
 		}
+		log.info("Checking configured email inboxes finished");
 	}
 
 	/**
@@ -128,13 +141,13 @@ public class UpdateEmailScheduler {
 								if (content instanceof String) {
 									String body = (String) content;
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-											body, msg.getReceivedDate().toString());
+											body, msg.getReceivedDate());
 								} else if (content instanceof MimeMultipart) {
 									email = new Email(messageId.toString(), configId, msg.getMessageNumber(), msg.getSubject(), msg.getFrom()[0].toString(),
-											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate().toString());
+											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate());
 								}
 
-								// emailsRuleChecker(email, emailConfig);
+								emailRulesEngine.checkMail(email, emailConfig.getContextId());
 
 								emailRepository.save(email);
 							} catch (Exception e) {
@@ -145,64 +158,9 @@ public class UpdateEmailScheduler {
 					} catch (MessagingException e1) {
 						log.error("Problem occured messageId not found");
 					}
-
 				}
 			}
 		}
-
-	}
-
-	/**
-	 * This function checks the rules for the email and in case that some rules applies it will be automatically added to the notification
-	 * repository
-	 */
-
-	private void emailsRuleChecker(Email email, EmailConfiguration emailConfig) {
-
-		List<PortalRule> portalRules = ruleRepository.findByToolId(email.getConfigId());
-		// Rule r1 = new Rule("SubjectInvalid", "input.subject == 'test'", "notificationAction", 3, "com.simple2secure.api.model.Email", null);
-
-		List<Rule> rules = new ArrayList<>();
-		if (portalRules != null) {
-			for (PortalRule pRule : portalRules) {
-				ExtendedRule extRule = pRule.getRule();
-				Rule r1 = new Rule(extRule.getName(), extRule.getExpression(), extRule.getOutcome(), extRule.getPriority(), extRule.getNamespace());
-				rules.add(r1);
-			}
-
-			if (rules == null || rules.isEmpty()) {
-				log.error("No rules provided!");
-			} else {
-				AbstractAction<Email, Void> a1 = new AbstractAction<Email, Void>("notificationAction") {
-					@Override
-					public Void execute(Email input) {
-
-						// adding to the notification repository!
-						/*
-						 * Notification notification = new Notification(emailConfig.getContextId(), email.getConfigId(), "Subject",
-						 * "NEW EMAIL WITH INVALID SUBJECT FOUND!", email.getReceivedDate(), false);
-						 */
-						// notificationRepository.save(notification);
-						log.info("NEW EMAIL WITH INVALID SUBJECT FOUND!");
-						return null;
-					}
-				};
-
-				List<AbstractAction<Email, Void>> actions = new ArrayList<>();
-				actions.add(a1);
-
-				try {
-
-					Engine engine = new Engine(rules, true);
-					engine.executeAllActions(email, actions);
-				} catch (DuplicateNameException | CompileException | ParseException | NoMatchingRuleFoundException | NoActionFoundException e) {
-					log.error(e.getMessage());
-				}
-			}
-		} else {
-			log.error("No rules provided!");
-		}
-
 	}
 
 	/**
@@ -212,58 +170,51 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws NumberFormatException
 	 * @throws MessagingException
+	 * @throws ItemNotFoundRepositoryException
 	 */
 
-	public Message[] connect(EmailConfiguration config) throws NumberFormatException, MessagingException {
-		Properties props = new Properties();
+	public Store getConnection(EmailConfiguration config) throws NumberFormatException, MessagingException, ItemNotFoundRepositoryException {
 
-		props.setProperty("mail.imap.ssl.enable", "true");
+		if (storeMapping.containsKey(config.getId())) {
+			return storeMapping.get(config.getId());
+		} else {
 
-		// create a new session with the provided properties
-		Session session = Session.getDefaultInstance(props, null);
+			// create a new session with the provided properties
+			Session session = Session.getDefaultInstance(emailProperties, null);
 
-		// connect to the store using the provided credentials
-		Store store = session.getStore(STORE);
+			// connect to the store using the provided credentials
+			Store store = session.getStore(STORE);
 
-		store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			log.debug("Connection to store {} established " + store);
 
-		// store.connect(config.getIncomingServer(), Integer.parseInt(config.getIncomingPort()), config.getEmail(), config.getPassword());
+			storeMapping.put(config.getId(), store);
+			return store;
+		}
+	}
 
-		log.info("Connected to the store: " + store);
-
+	public Message[] getMessagesForStore(Store store, EmailConfiguration config) throws MessagingException, ItemNotFoundRepositoryException {
 		// get inbox folder
 		Folder inbox = store.getFolder(FOLDER);
 
 		// open inbox folder to read the messages
 		inbox.open(Folder.READ_ONLY);
 
-		// retrieve the messages
-		Message[] messages = inbox.getMessages();
-
-		log.info("Messages length: " + messages.length);
+		Message[] messages = new Message[0];
+		int newEnd = inbox.getMessageCount();
+		if (config.getLastEnd() == 0) {
+			messages = inbox.getMessages();
+			config.setLastEnd(newEnd);
+			emailConfigRepository.update(config);
+		} else if (config.getLastEnd() != newEnd) {
+			messages = inbox.getMessages(config.getLastEnd(), newEnd);
+			config.setLastEnd(newEnd);
+			emailConfigRepository.update(config);
+		}
+		log.debug("{} messages obtained from IMAP server {} for email address{} ", messages.length, config.getIncomingServer(),
+				config.getEmail());
 
 		return messages;
-	}
-
-	/**
-	 * This function creates a new properties object from the EmailConfiguration object and returns it.
-	 *
-	 * @param config
-	 * @return
-	 */
-	private Properties setEmailConfiguration(EmailConfiguration config) {
-		Properties props = new Properties();
-
-		props.setProperty("mail.imap.host", config.getIncomingServer());
-		props.setProperty("mail.imap.port", config.getIncomingPort());
-		props.setProperty("mail.imap.socketFactory.class", SOCKET_FACTORY_CLASS);
-		props.setProperty("mail.imap.socketFactory.port", config.getIncomingPort());
-		props.setProperty("mail.imap.auth", IMAP_AUTH);
-		props.setProperty("mail.mime.ignoreunknownencoding", "true");
-
-		props.put("mail.store.protocol", STORE);
-
-		return props;
 
 	}
 

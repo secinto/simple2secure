@@ -168,7 +168,7 @@ public class ContextUtils {
 	 */
 	public ObjectId addContextUserAuthentication(String userId, String contextId, UserRole userRole, boolean defaultContext) {
 
-		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(userId) && userRole != null) {
+		if (!Strings.isNullOrEmpty(userId) && userRole != null) {
 			ContextUserAuthentication contextUserAuthentication = new ContextUserAuthentication(userId, contextId, userRole, defaultContext);
 
 			return contextUserAuthRepository.saveAndReturnId(contextUserAuthentication);

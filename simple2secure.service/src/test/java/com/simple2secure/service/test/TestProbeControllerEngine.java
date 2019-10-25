@@ -28,10 +28,18 @@ import com.simple2secure.service.engine.ProbeControllerEngine;
 public class TestProbeControllerEngine {
 
 	@Test
-	public void testProbeControllerEngineStartDefault() throws Exception {
+	public void testProbeControllerEngineStartWithPath() throws Exception {
 		ProbeControllerEngine engine = new ProbeControllerEngine(System.getProperty("user.dir") + "\\release\\libs\\simple2secure.probe.jar",
-				System.getProperty("user.dir") + "\\release\\license.zip");
+				System.getProperty("user.dir") + "\\release\\license");
 		engine.start();
 		engine.stop();
 	}
+
+	@Test
+	public void testProbeControllerEngineStartDefault() throws Exception {
+		ProbeControllerEngine engine = new ProbeControllerEngine();
+		engine.start();
+		engine.stop();
+	}
+
 }

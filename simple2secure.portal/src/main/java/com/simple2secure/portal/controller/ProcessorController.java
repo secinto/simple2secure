@@ -77,7 +77,10 @@ public class ProcessorController {
 	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -107,13 +110,15 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{probeId}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'PROBE')")
+	@RequestMapping(
+			value = "/{probeId}",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
 			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = licenseRepository.findByProbeId(probeId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {
@@ -151,7 +156,9 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/group/{groupId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/group/{groupId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable("groupId") String groupId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -169,7 +176,9 @@ public class ProcessorController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(value = "/{processorId}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/{processorId}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteProcessor(@PathVariable("processorId") String processorId,
 			@RequestHeader("Accept-Language") String locale) {

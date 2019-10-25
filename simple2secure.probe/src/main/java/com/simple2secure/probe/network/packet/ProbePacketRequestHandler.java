@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Timer;
 
 import org.pcap4j.packet.Packet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.commons.collections.ProcessingQueue;
@@ -41,8 +39,6 @@ import com.simple2secure.probe.utils.PacketUtil;
  * has changed.
  */
 public class ProbePacketRequestHandler implements Runnable {
-	private static Logger log = LoggerFactory.getLogger(ProbePacketRequestHandler.class);
-
 	public static boolean dbHasChanged = false;
 	private boolean running = false;
 	private List<ProbePacket> probePacketList;

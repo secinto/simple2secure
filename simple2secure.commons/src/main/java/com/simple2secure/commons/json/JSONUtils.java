@@ -22,17 +22,25 @@
 package com.simple2secure.commons.json;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSONUtils {
 	private static Logger log = LoggerFactory.getLogger(JSONUtils.class);
 
-	private static ObjectMapper mapper = new ObjectMapper();
+	private static ObjectMapper mapper;
+
+	static {
+		mapper = new ObjectMapper();
+		mapper.getFactory().configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true);
+	}
 
 	/**
 	 * Creates an object of the specified valueType from the provided JSON String content provided as input. If mapping the {@link String} to
@@ -49,6 +57,22 @@ public class JSONUtils {
 			return mapper.readValue(content, valueType);
 		} catch (Exception e) {
 			log.error("Couldn't map string to Class {}. Reason {}", valueType, e);
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a JsonNode from the provided string if possible. Otherwise null is returned.
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static JsonNode fromString(String content) {
+		try {
+			JsonNode actualObj = mapper.readTree(content);
+			return actualObj;
+		} catch (IOException e) {
+			log.error("Couldn't map string to JsonNode. Reason {}", e);
 		}
 		return null;
 	}

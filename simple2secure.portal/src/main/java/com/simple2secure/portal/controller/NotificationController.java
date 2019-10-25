@@ -60,8 +60,11 @@ public class NotificationController {
 	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{podId}", method = RequestMethod.POST, consumes = "application/json")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'POD')")
+	@RequestMapping(
+			value = "/{podId}",
+			method = RequestMethod.POST,
+			consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable("podId") String podId,
 			@RequestHeader("Accept-Language") String locale) {
 		if (notification != null && !Strings.isNullOrEmpty(podId)) {
@@ -75,7 +78,9 @@ public class NotificationController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{contextId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Notification>> getNotificationsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -92,7 +97,9 @@ public class NotificationController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "read", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "read",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {

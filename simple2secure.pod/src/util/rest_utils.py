@@ -1,147 +1,242 @@
-import requests
-from src.util import file_utils
-from flask import json
-from datetime import datetime
-from src.db.database import Notification, TestStatusDTO
+import logging
 
+import requests
+from flask import json
+
+from src.db.database import Notification, TestStatusDTO
+from src.db.database_schema import CompanyLicensePublicSchema, TestSchema
+from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license, \
+    clear_pod_status_auth
+
+log = logging.getLogger('pod.util.rest_utils')
+
+# -------------------------------------------
+# Main POST and GET functions used internally
+# -------------------------------------------
+
+
+def portal_get(app, url, useWithoutAuthentication=False):
+    """
+    Utility function for getting data from the PORTAL. Required are the application context, the URL from which a GET
+    should be performed and a boolean indicating if authentication should be sent or not. If no authentication is sent
+    but would be required an error will be logged and usually either none or an response code indicating the problem is
+    returned.
+
+    :param app:  The application context
+    :param url: The URL from which a get should be performed
+    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :return: The response data as obtained from the call
+    """
+    headers = create_headers(app, useWithoutAuthentication)
+
+    if not headers:
+        return None
+
+    log.info('Sending request to portal using (portal_get)')
+    try:
+        return requests.get(url, verify=False, headers=headers)
+    except requests.exceptions.ConnectionError as ce:
+        log.error('Sending request (portal_get) to portal failed. Reason {}'.format(ce.strerror))
+        update_pod_status_connection(app, False)
+        return None
+
+
+def portal_post(app, url, data, useWithoutAuthentication=False):
+    """
+    Utility function for posting data to the PORTAL. Required are the application context, the URL from which a GET
+    should be performed, the data which should be transmitted to the PORTAL and a boolean indicating if authentication
+    should be sent or not. If no authentication is sent  but would be required an error will be logged and usually
+    either none or an response code indicating the problem is returned.
+
+    :param app:  The application context
+    :param url: The URL from which a get should be performed
+    :param data: The data which should be sent in to PORTAL
+    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :return: The response data as obtained from the call
+    """
+    headers = create_headers(app, useWithoutAuthentication)
+
+    if not headers:
+        return None
+
+    log.info('Sending request to portal using (portal_post)')
+    try:
+        return requests.post(url, data=data, verify=False, headers=headers)
+    except requests.exceptions.ConnectionError as ce:
+        log.error('Sending request (portal_post) to portal failed. Reason {}'.format(ce.strerror))
+        update_pod_status_connection(app, False)
+        return None
+
+
+# ----------------------------------------
+# Functions for PORTAL interaction
+# ----------------------------------------
 
 def get_auth_token(app):
-    with app.app_context():
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-        return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                             data=json.dumps(file_utils.parse_license_file(file_utils.get_license_file(), app).__dict__),
-                             verify=False,
-                             headers=headers).text
+    """
+    Obtains the AUTH TOKEN for this application. Either the authentication token has already been obtained from the
+    database with the help of PodInfo which is performed during startup or we need to communicate with the portal to
+    obtain a new one. This can be achieved by providing the used license to the portal.
+
+    Parameters:
+        app: Context object
+    Returns:
+       authToken: Returns the current authToken to use for authentication
+    """
+    podInfo = get_pod(app)
+    if not podInfo.authToken:
+        send_license(app, None)
+        podInfo = get_pod(app)
+
+    return podInfo.authToken
 
 
-def get_auth_token_object(app):
-    with app.app_context():
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
-        return requests.post(app.config['PORTAL_URL'] + "license/activatePod",
-                             data=json.dumps(file_utils.parse_license_file(file_utils.get_license_file(), app).__dict__),
-                             verify=False,
-                             headers=headers)
+def send_license(app, licensePublic=None):
+    """
+    Sends the license to the PORTAL for obtaining the current authentication token.
+    If the license is provided it is used otherwise the currently stored license is obtained from the
+    database and used.
+
+    :param app: The application context object
+    :param licensePublic: A license if available.
+    :param perform_check: Specifies if the connection check should be performed
+    """
+    url = app.config['PORTAL_URL'] + "license/authenticate"
+
+    if licensePublic is None:
+        licensePublic = get_license(app)
+
+    license_schema = CompanyLicensePublicSchema()
+    license_json = json.dumps(license_schema.dump(licensePublic))
+
+    resp_data = portal_post(app, url, license_json, True)
+
+    if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
+        accessToken = json.loads(resp_data.text)['accessToken']
+        if accessToken:
+            licensePublic.accessToken = accessToken
+            licensePublic.activated = True
+            update(licensePublic)
+            update_pod_status_auth(app, accessToken)
+            log.info('Obtained new access token from portal')
+        else:
+            log.error('No access token was provided as response to the authentication')
+    elif resp_data is not None:
+        message = json.loads(resp_data.text)['errorMessage']
+        log.error('Error occurred while activating the pod: %s', message)
+        clear_pod_status_auth(app)
+    else:
+        log.error('No connection to PORTAL, thus not sending the license')
+        clear_pod_status_auth(app)
 
 
-def portal_post(url, data, app):
-    with app.app_context():
-        app.logger.info('Token before sending post request from (portal_post): %s', app.config['AUTH_TOKEN'])
-        if not app.config['AUTH_TOKEN']:
-            app.config['AUTH_TOKEN'] = get_auth_token(app)
+def send_notification(content, app):
+    """
+    Sends the provided content as notification to the PORTAL. This is then shown in the PORTAL as information.
 
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
-                                                                                                    app.config['AUTH_TOKEN']}
-        requests.post(url, data=json.dumps(data), verify=False, headers=headers)
+    :param content: A string with the notification which should be shown in the PORTAL
+    :param app: The application context
+    :return:
+    """
+    url = app.config['PORTAL_URL'] + "notification/pod/" + app.config['POD_ID']
 
-
-def portal_get(url, app):
-    with app.app_context():
-        if not app.config['AUTH_TOKEN']:
-            app.config['AUTH_TOKEN'] = get_auth_token(app)
-
-        app.logger.info('Token before sending get request from (portal_get): %s', app.config['AUTH_TOKEN'])
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
-                                                                                                    app.config['AUTH_TOKEN']}
-        data_request = requests.get(url, verify=False, headers=headers)
-
-        return data_request
-
-
-def portal_post_celery(url, data, auth_token, app):
-    with app.app_context():
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " + auth_token}
-        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
-
-
-def portal_post_test(url, data, app):
-    with app.app_context():
-        if not app.config['AUTH_TOKEN']:
-            app.config['AUTH_TOKEN'] = get_auth_token(app)
-
-        app.logger.info('Token before sending post request from (portal_post_test): %s', app.config['AUTH_TOKEN'])
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
-                                                                                                    app.config['AUTH_TOKEN']}
-        return requests.post(url, data=json.dumps(data), verify=False, headers=headers).text
-
-
-def portal_post_test_response(url, data, app):
-    with app.app_context():
-        if not app.config['AUTH_TOKEN']:
-            app.config['AUTH_TOKEN'] = get_auth_token(app)
-
-        app.logger.info('Token before sending post request from (portal_post_test_response): %s', app.config['AUTH_TOKEN'])
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN', 'Authorization': "Bearer " +
-                                                                                                    app.config['AUTH_TOKEN']}
-        return requests.post(url, data=json.dumps(data), verify=False, headers=headers)
-
-
-def send_notification(content, app, auth_token, pod_id):
-    url = app.config['PORTAL_URL'] + "notification/pod/" + pod_id
     notification = Notification(content)
-
-    with app.app_context():
-        app.logger.info('Token before sending post request from (send_notification): %s',
-                        auth_token)
-        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                   'Authorization': "Bearer " + auth_token}
-        requests.post(url, data=json.dumps(notification.__dict__), verify=False, headers=headers)
+    return portal_post(app, url, json.dumps(notification.__dict__))
 
 
-def update_test_status(app, auth_token, test_run_id, test_id, test_status):
+def update_test_status(app, test_run_id, test_id, test_status):
+    """
+    Updates the status of the specified test run to the specified test status. This information is shown in the PORTAL
+
+    :param app: The application context
+    :param test_run_id: The id of the test run
+    :param test_id: The id of the test
+    :param test_status: The current status of the test run
+    :return:
+    """
     url = app.config['PORTAL_URL'] + "test/updateTestStatus"
     test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
+    return portal_post(app, url, json.dumps(test_run_dto.__dict__))
 
-    with app.app_context():
-        app.logger.info('Token before sending post request from (update_test_status): %s',
-                        auth_token)
+
+def schedule_test_on_the_portal(test, app):
+    """
+    Schedules the test on the PORTAL, actually just updating the status on the PORTAL for this test to be shown in
+    the scheduled tests view
+
+    :param test:
+    :param app:
+    :return:
+    """
+    url = app.config['PORTAL_URL'] + "test/scheduleTestPod/" + app.config['POD_ID']
+    return portal_post(app, url, test)
+
+
+def sync_test_with_portal(test, app):
+    """
+    Synchronizes the provided test with the PORTAL.
+
+    :param test: The test to be synchronized
+    :param app: The application context
+    :return:
+    """
+    test_schema = TestSchema()
+    test_json = test_schema.dump(test)
+    return portal_post(app, app.config['PORTAL_URL'] + "test/syncTest", json.dumps(test_json))
+
+
+# ----------------------------------------
+# Helper functions
+# ----------------------------------------
+
+
+def create_headers(app, useWithoutAuthentication=False):
+    """"
+    Creates the required header information for communicating with the PORTAL. Especially the  authentication token
+    is obtained and added to the header parameters.
+
+    Parameters:
+        app: The application context for access of the configuration
+        useWithoutAuthentication: Specifies if an auth token must not be present in the headers
+    Returns:
+       authToken: Returns the current authToken to use for authentication
+     """
+    podInfo = get_pod(app)
+
+    headers = None
+
+    if useWithoutAuthentication:
+        headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
+        log.debug('Created headers without auth token {}'.format(headers))
+        return headers
+
+    if podInfo.connected:
+        if not podInfo.authToken:
+            authToken = get_auth_token(app)
+        else:
+            authToken = podInfo.authToken
+
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                   'Authorization': "Bearer " + auth_token}
-        requests.post(url, data=json.dumps(test_run_dto.__dict__), verify=False, headers=headers)
-
-
-def check_auth_token(app):
-    auth_token_request = get_auth_token(app)
-    if auth_token_request.status_code == 200:
-        return auth_token_request.text
+                   'Authorization': "Bearer " + authToken}
+        log.debug('Created headers {}'.format(headers))
     else:
-        return "Error"
+        log.info('Not connected to PORTAL, not creating headers')
+
+    return headers
 
 
-def get_current_timestamp():
-    timestamp = datetime.now().timestamp() * 1000
-    return timestamp
+def check_portal_alive(app):
+    """
+    Verifies if a connection to the PORTAL is available. Stores the connection status in the PodInfo.
 
+    Parameters:
+        app: Context object
+    Returns:
+       authToken: Returns the current authToken to use for authentication
+    """
+    response = portal_get(app, app.config['PORTAL_URL'] + "service", True)
 
-def print_error_message():
-    return "----------------------------------------------\n" \
-           "----------------------------------------------\n" \
-           "--                                          --\n" \
-           "--!!!Error occured - portal not reachable!!!--\n" \
-           "--                                          --\n" \
-           "--********POD HAS NOT BEEN ACTIVATED********--\n" \
-           "----------------------------------------------" \
-           "----------------------------------------------"
-
-
-def print_success_message_auth(app):
-    message = "----------------------------------------------\n" \
-           "----------------INITIALIZATION----------------\n" \
-           "----------------------------------------------\n" \
-           "--       Extracting the pod license         --\n" \
-           "----------------------------------------------\n" \
-           "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
-           "-- * Pod Group Id : " + app.config['GROUP_ID'] + "\n" \
-           "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
-           "----------------------------------------------\n" \
-           "----------------------------------------------\n" \
-           "--          ACTIVATING THE LICENSE          --\n" \
-           "----------------------------------------------\n" \
-           "-- * Auth Token : " + app.config['AUTH_TOKEN'] + "\n" \
-           "----------------------------------------------\n" \
-           "----------------------------------------------\n" \
-           "---------------INITIALIZATION END-------------\n" \
-           "----------------------------------------------\n"
-
-    app.logger.info('Pod Informaticn: %s', message)
-
-
+    if response is not None and response.status_code == 200:
+        update_pod_status_connection(app, True)
+    else:
+        update_pod_status_connection(app, False)

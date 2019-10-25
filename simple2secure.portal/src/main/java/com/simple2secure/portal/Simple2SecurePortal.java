@@ -37,11 +37,11 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.MongoRepository;
-import com.simple2secure.portal.repository.ServiceLibraryRepository;
 
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
-		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
+@SpringBootApplication(
+		scanBasePackages = { "com.simple2secure.portal" },
+		exclude = { EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	private static Logger log = LoggerFactory.getLogger(Simple2SecurePortal.class);
@@ -58,11 +58,9 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	private String mailSMTPPort;
 
 	@Autowired
-	private ServiceLibraryRepository serviceLibraryRepository;
-
-	@Autowired
 	private Environment env;
 
+	@SuppressWarnings("rawtypes")
 	@Autowired
 	private MongoRepository mongoRepository;
 
@@ -130,16 +128,19 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 	}
 
 	@PostConstruct
-	public void currentActiveProfile() {
+	public void initializePortal() {
 
 		// Define the indexes for the full text search
+		log.info("Initialize portal");
 
+		log.info("Initialize database");
 		mongoRepository.defineTextIndexes();
 
 		String[] activeProfiles = env.getActiveProfiles();
-
+		log.info("Initialize active profile");
 		for (String profile : activeProfiles) {
 			if (profile.equals(StaticConfigItems.PROFILE_PRODUCTION) || profile.equals(StaticConfigItems.PROFILE_TEST)) {
+				log.info("Initialize config items");
 				LoadedConfigItems loadedConfigItems = LoadedConfigItems.getInstance();
 				loadedConfigItems.setBasePort("8443");
 				loadedConfigItems.setBaseProtocol("https");
@@ -147,7 +148,6 @@ public class Simple2SecurePortal extends SpringBootServletInitializer {
 				loadedConfigItems.setBasePortWeb("9000");
 			}
 		}
-
 	}
 
 	public static void main(String[] args) throws IOException {

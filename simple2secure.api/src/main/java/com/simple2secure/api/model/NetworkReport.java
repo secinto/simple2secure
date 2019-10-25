@@ -21,6 +21,7 @@
  */
 package com.simple2secure.api.model;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.ElementCollection;
@@ -28,10 +29,12 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "NetworkReport")
+@Table(
+		name = "NetworkReport")
 public class NetworkReport extends GenericDBObject {
 
 	/**
@@ -39,26 +42,21 @@ public class NetworkReport extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -5984944130903360444L;
 	private String groupId;
-	private String probeId;
+	private String deviceId;
+	private String hostname;
 
 	@Lob
 	private String stringContent;
 
 	@ElementCollection
 	private List<PacketInfo> ipPairs;
-	private String startTime;
+	private Date startTime;
 	private String processorName;
+
+	@JsonProperty
 	private boolean sent;
 
 	public NetworkReport() {
-		// content = new TreeMap<String, String>();
-	}
-
-	public NetworkReport(String probeId, String content, String startTime, boolean sent) {
-		this.probeId = probeId;
-		// this.content = content;
-		this.startTime = startTime;
-		this.sent = sent;
 	}
 
 	public String getGroupId() {
@@ -69,12 +67,12 @@ public class NetworkReport extends GenericDBObject {
 		this.groupId = groupId;
 	}
 
-	public String getProbeId() {
-		return probeId;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setProbeId(String probeId) {
-		this.probeId = probeId;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 	public String getStringContent() {
@@ -85,12 +83,20 @@ public class NetworkReport extends GenericDBObject {
 		this.stringContent = stringContent;
 	}
 
-	public String getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(String startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
 	public boolean isSent() {
