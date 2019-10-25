@@ -1,13 +1,9 @@
 buildscript {
 	repositories {
 		jcenter()
-			maven {
-					url "https://plugins.gradle.org/m2/"
-			}
 	}
 	dependencies {
 		classpath 'org.ajoberstar:gradle-git-publish:2.1.1'
-		classpath 'org.openjfx:javafx-plugin:0.0.8'
 	}
 }
 
@@ -17,7 +13,6 @@ plugins {
 
 
 apply plugin: 'org.ajoberstar.git-publish'
-apply plugin: 'org.openjfx.javafxplugin'
 
 
 javafx {
