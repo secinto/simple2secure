@@ -54,6 +54,9 @@ public class NetworkScheduler extends TimerTask {
 		checkNetworkFilter();
 	}
 
+	/**
+	 * Obtains the network statistics as recorded by the PCAP library.
+	 */
 	private void getNetworkStatistics() {
 		try {
 			PcapStat statistics = monitor.getReceiverHandle().getStats();
