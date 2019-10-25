@@ -26,8 +26,8 @@ FROM nginx:1.14.1-alpine
 
 ## Copy our default nginx config and certificates
 COPY nginx/default.conf /etc/nginx/conf.d/
-COPY certificates/nginx.crt /etc/ssl/
-COPY certificates/nginx.key /etc/ssl
+COPY ../simple2secure.info/nginx.crt /etc/ssl/
+COPY ../simple2scure.info/nginx.key /etc/ssl
 
 ## Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*

@@ -5,4 +5,5 @@ RUN ./simple2secure.portal/gradlew simple2secure.portal:build -x test
 
 FROM tomcat:8.5
 MAINTAINER secinto GmbH
+COPY ../simple2scure.info/keystore.p12 /usr/local/tomcat/ssl/
 COPY --from=builder /home/gradle/src/simple2secure.portal/build/libs/simple2secure.portal.war /usr/local/tomcat/webapps/s2s.war
