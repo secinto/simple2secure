@@ -5,18 +5,19 @@ import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.Settings;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.time.TimeUtils;
@@ -254,7 +255,7 @@ public class LicenseUtils {
 	}
 
 	public String getFieldFromPayload(String payload, String field) {
-		JSONObject jsonObject = new JSONObject(payload);
-		return jsonObject.getString(field);
+		JsonNode node = JSONUtils.fromString(payload);
+		return node.findValue(field).asText();
 	}
 }
