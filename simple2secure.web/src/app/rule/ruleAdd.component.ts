@@ -340,7 +340,7 @@ export class RuleAddComponent {
             return;
         }
 
-        //checks which kind of rule is chosen by user
+        // checks which kind of rule is chosen by user
         switch (this.tabGroup.selectedIndex) {
             // template mode
             case 0: {
