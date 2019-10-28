@@ -52,7 +52,7 @@ if response.status_code == 200:
             portal_url + '/api/license/downloadLicenseForScript',
             data=token, headers=headers, verify=False
         )
-        open('./simple2secure/simple2secure.pod/static/license/license' + create_timestamp_with_file_ending(),
+        open('./static/license/license' + create_timestamp_with_file_ending(),
              'wb').write(license_file.content)
         print('License downloaded successfully')
     else:
