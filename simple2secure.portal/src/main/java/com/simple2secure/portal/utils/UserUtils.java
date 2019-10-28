@@ -184,7 +184,7 @@ public class UserUtils {
 	}
 
 	/**
-	 * This function is used to add user in case that we user the type AddedByUser.
+	 * This function is used to add user in case that we add the user with type AddedByUser.
 	 *
 	 * @param userRegistration
 	 * @param locale
@@ -323,6 +323,28 @@ public class UserUtils {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
 				HttpStatus.NOT_FOUND);
 
+	}
+
+	/**
+	 * This function checks if user already exists and calls the inviteUserToContext in case if the registration type is ADDED_BY_USER, in all
+	 * other cases an error will be returned. If user does not exist, according to the registration type the correct function will be called:
+	 * addNewUserAddedByRegistration or addUserStandardRegistration
+	 *
+	 * @param userRegistration
+	 * @param locale
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 * @throws IOException
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ResponseEntity<User> resendActivation(User user, String locale) throws ItemNotFoundRepositoryException, IOException {
+		// Return userId and get user with id from this id
+		if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**

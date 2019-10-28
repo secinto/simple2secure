@@ -49,128 +49,65 @@ export class HttpService {
 	currentLang: string;
 
 	public get(url: string): Observable<any> {
-		this.currentLang = this.translate.currentLang;
+		const headers = this.getHeaders(true);
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
-			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<any>(url, {headers});
 	}
 
 	public post(item: any, url: string): Observable<any> {
-		this.currentLang = this.translate.currentLang;
+		const headers = this.getHeaders(true);
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
-			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.post<any>(url, item, {headers});
 	}
 
 	public delete(url: string): Observable<any> {
-		this.currentLang = this.translate.currentLang;
+		const headers = this.getHeaders(true);
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
-			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.delete<any>(url, {headers});
 	}
 
 	public getFile(url: string): Observable<Blob> {
-		this.currentLang = this.translate.currentLang;
+		const headers = this.getHeaders(true);
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-
-		const headers = new HttpHeaders().set('Authorization', localStorage.getItem('token'))
-			.set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
 		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe();
 	}
 
 	public postLogin(username: string, password: string): Observable<HttpResponse<any>> {
-		const headers = new HttpHeaders()
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
+		const headers = this.getHeaders();
 		return this.httpClient.post<any>(environment.apiEndpoint + 'login',
 			JSON.stringify({username: username, password: password}), {observe: 'response', headers});
 	}
 
 	public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
-		const headers = new HttpHeaders()
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
+		const headers = this.getHeaders();
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, {observe: 'response', headers});
 	}
 
 	public postReset(email: String): Observable<HttpResponse<any>> {
-		this.currentLang = this.translate.currentLang;
+		return this.postEmail(environment.apiEndpoint + 'user/sendResetPasswordEmail', email);
+	}
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
+	public postResend(email: String): Observable<HttpResponse<any>> {
+		return this.postEmail(environment.apiEndpoint + 'user/resendActivation', email);
+	}
 
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
-		return this.httpClient.post<any>(environment.apiEndpoint + 'user/sendResetPasswordEmail', email,
+	private postEmail(url: string, email: String): Observable<HttpResponse<any>> {
+		const headers = this.getHeaders();
+		return this.httpClient.post<any>(url, email,
 			{observe: 'response', headers});
 	}
 
 	public postUpdatePassword(password: String, token: String): Observable<HttpResponse<any>> {
-		this.currentLang = this.translate.currentLang;
-
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
+		const headers = this.getHeaders();
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/updatePassword/' + token, password,
 			{observe: 'response', headers});
 	}
 
 	public postUpdatePasswordFirstLogin(password: String, authenticationToken: String): Observable<HttpResponse<any>> {
-		this.currentLang = this.translate.currentLang;
-
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
-
+		const headers = this.getHeaders();
 		return this.httpClient.post<any>(environment.apiEndpoint + 'user/activate/updatePassword/' +
 			authenticationToken, password, {observe: 'response', headers});
 	}
-
-	/*parseErrorBlob(err: HttpErrorResponse): Observable<any> {
-		const reader: FileReader = new FileReader();
-
-		const obs = Observable.create((observer: any) => {
-			reader.onloadend = (e) => {
-				observer.error(JSON.parse(reader.result));
-				observer.complete();
-			};
-		});
-		reader.readAsText(err.error);
-		return obs;
-	}*/
 
 	public updateContext(context: Context, userId: string) {
 
@@ -185,17 +122,28 @@ export class HttpService {
 	}
 
 	public processInvitation(url: string): Observable<any> {
+		const headers = this.getHeaders();
+		return this.httpClient.get<any>(url, {headers});
+	}
+
+	private getHeaders(withAuth: boolean = false): HttpHeaders {
 		this.currentLang = this.translate.currentLang;
 
 		if (!this.currentLang) {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		const headers = new HttpHeaders().set('Accept-Language', this.currentLang)
-			.set('Access-Control-Allow-Origin', '*')
-			.set('Access-Control-Allow-Credentials', 'true');
-		return this.httpClient.get<any>(url, {headers});
+		if (withAuth) {
+			return new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+				.set('Accept-Language', this.currentLang)
+				.set('Access-Control-Allow-Origin', '*')
+				.set('Access-Control-Allow-Credentials', 'true');
+		}
+		else {
+			return new HttpHeaders().set('Accept-Language', this.currentLang)
+				.set('Access-Control-Allow-Origin', '*')
+				.set('Access-Control-Allow-Credentials', 'true');
+		}
 	}
-
 
 }

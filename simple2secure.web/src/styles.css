@@ -267,20 +267,20 @@ body{
         pointer-events: none;
 }
 
+.mat-green-button-with-hover{
+    background-color: #A7BD26 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.mat-green-button-with-hover:hover{
+    background-color: #8fa02c !important;
+}
+
 .mat-grey-button{
 	background-color: grey !important;
 	color: white !important;
 	font-weight: bold !important;
-}
-
-.mat-green-button-with-hover{
-	background-color: #A7BD26 !important;
-	color: white !important;
-	font-weight: bold !important;
-}
-
-.mat-green-button-with-hover:hover{
-	background-color: #8fa02c !important;
 }
 
 .mat-red-button{
@@ -288,6 +288,14 @@ body{
 	color: white !important;
 	font-weight: bold !important;	
 }
+
+.mat-blue-button{
+    background-color: #3e6bbd !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+
 
 .mat-icon-green{
 	color: #A7BD26 !important;

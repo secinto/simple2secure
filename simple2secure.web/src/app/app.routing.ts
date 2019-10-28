@@ -29,6 +29,7 @@ import {HomeComponent} from './home';
 import {LoginComponent} from './login';
 import {SettingsComponent} from './settings';
 import {ResetComponent} from './resetPassword';
+import {ResendComponent} from './resendActivation';
 import {UpdatePasswordComponent} from './updatePassword';
 import {UserInvitationComponent} from './invitation';
 import {RegisterComponent} from './register';
@@ -162,7 +163,15 @@ const appRoutes: Routes = [
 			}
 		]
 	},
-
+	{
+		path: 'resendActivation', component: LoginLayoutComponent,
+		children: [
+			{
+				path: '',
+				component: ResendComponent
+			}
+		]
+	},
 	{
 		path: 'reset', component: LoginLayoutComponent,
 		children: [

@@ -53,6 +53,10 @@ div.input input {
     display: inline-block;
 }
 
+#resendActivationLink {
+    display: inline-block;
+}
+
 .login-same-level {
 
 }

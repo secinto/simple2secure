@@ -30,6 +30,7 @@ import {ActivationComponent, ActivatedComponent} from './activation';
 import {UserInvitationComponent} from './invitation';
 import {RegisterComponent} from './register';
 import {ResetComponent} from './resetPassword';
+import {ResendComponent} from './resendActivation';
 import {UpdatePasswordComponent} from './updatePassword';
 
 import {AlertComponent, FooterComponent} from './components';
@@ -298,12 +299,13 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
 		OrbiterToolTestScheduledListComponent,
+		OrbiterToolTestSequenceListComponent,
 		SearchComponent,
 		SearchResultComponent,
 		TruncatePipe,
 		NotificationDetailsComponent,
-		OrbiterToolTestSequenceListComponent,
 		TestSequenceDetailsComponent,
+		ResendComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,

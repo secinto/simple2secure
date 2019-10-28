@@ -39,6 +39,11 @@
                     'login.password.forgot' | translate }}
                 </button>
             </div>
+            <div class="form-group" id="resendActivationLink">
+                <button [routerLink]="['/resendActivation']" mat-raised-button class="mat-blue-button" formnovalidate>{{
+                    'login.resend.activation' | translate }}
+                </button>
+            </div>
         </div>
 
     </form>
