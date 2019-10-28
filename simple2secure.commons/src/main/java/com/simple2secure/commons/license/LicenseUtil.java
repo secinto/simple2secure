@@ -192,7 +192,7 @@ public class LicenseUtil {
 	 *          The localFilePath where all the license data should be stored.
 	 * @return The resulting key path for the specified resource.
 	 */
-	public static String getLicenseKeyPath(String keyPath, String localFilePath) throws IllegalArgumentException {
+	public static String getLicenseKeyPath(String keyPath, String localFilePath) {
 		ClassLoader classLoader = LicenseUtil.class.getClassLoader();
 		URL keyURL = classLoader.getResource(keyPath);
 		if (keyURL != null) {
@@ -213,7 +213,7 @@ public class LicenseUtil {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Couldn't find provided key in path " + keyPath);
+		return null;
 	}
 
 	/**
