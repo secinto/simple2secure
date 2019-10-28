@@ -107,7 +107,7 @@ public class LicenseUtil {
 			publicKeyFilePath = publicKeyFile.getAbsolutePath();
 			privateKeyFilePath = privateKeyFile.getAbsolutePath();
 
-			LicenseUtil.initialize(licenseFilePath, privateKeyFilePath, publicKeyFilePath);
+			initialized = true;
 		} catch (Exception e) {
 			throw new RuntimeException("Couldn't self initialize license utils. Reason {}", e);
 		}
@@ -122,6 +122,7 @@ public class LicenseUtil {
 	 */
 	public static void initialize(String filePath) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
+		selfInitialize();
 	}
 
 	/**
@@ -139,15 +140,15 @@ public class LicenseUtil {
 	public static void initialize(String filePath, String privateKey, String publicKey) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
 
-		publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
-
-		if (!Strings.isNullOrEmpty(privateKey)) {
+		if (!Strings.isNullOrEmpty(publicKey) && !Strings.isNullOrEmpty(privateKey)) {
+			publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
 			privateKeyFilePath = LicenseUtil.getLicenseKeyPath(privateKey, licenseFilePath);
-		} else {
-			privateKeyFilePath = workingDirectory + File.separator + privateKeyFileName;
+			if (!Strings.isNullOrEmpty(publicKeyFilePath) && !Strings.isNullOrEmpty(privateKeyFilePath)) {
+				initialized = true;
+			} else {
+				selfInitialize();
+			}
 		}
-
-		initialized = true;
 	}
 
 	/**
@@ -190,7 +191,7 @@ public class LicenseUtil {
 	 *          The localFilePath where all the license data should be stored.
 	 * @return The resulting key path for the specified resource.
 	 */
-	public static String getLicenseKeyPath(String keyPath, String localFilePath) throws IllegalArgumentException {
+	public static String getLicenseKeyPath(String keyPath, String localFilePath) {
 		ClassLoader classLoader = LicenseUtil.class.getClassLoader();
 		URL keyURL = classLoader.getResource(keyPath);
 		if (keyURL != null) {
@@ -211,7 +212,8 @@ public class LicenseUtil {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Couldn't find provided key in path " + keyPath);
+		log.error("Couldn't find provided key in path {} ", keyPath);
+		return null;
 	}
 
 	/**
