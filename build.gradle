@@ -132,9 +132,6 @@ project(':simple2secure.portal') {
 }
 
 
-ConfigurableFileTree ft_commons = fileTree(dir: 'simple2secure.commons/src/main/resources', includes: ['test.yml'])
-ConfigurableFileTree ft_portal = fileTree(dir: 'simple2secure.portal/src/main/resources', includes: ['test.yml'])
-
 task gitTask {
 	description 'Pushes the source code to the git repository'
 	doLast {
@@ -142,28 +139,30 @@ task gitTask {
 	}
 }
 
-task deleteTask(type: Delete){
-	description 'Deletes the unnecessary configuration yaml files'
-	doLast {
-		println "Deleting the files"
-	
-		//ft_commons.visit { FileVisitDetails fvd ->
-				//    delete fvd.file
-			 // }
-		
-		//ft_portal.visit { FileVisitDetails fvd ->
-				 //   delete fvd.file
-			 // }
-	}
-}
 
 task overwriteTask{
 		doLast {
 		description 'Overwrites the actual configuration according to the used profile'
-		println "First copying"
-				file("simple2secure.commons/src/main/resources/test-new.yml").renameTo(file("simple2secure.commons/src/main/resources/test2.yml"))
+		println "Renaming and copying"
+				file("simple2secure.commons/src/main/resources/config.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config_local.items.yml"))
+				file("simple2secure.commons/src/main/resources/config_git.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config.items.yml"))
+				file("simple2secure.portal/src/main/resources/application.yml").renameTo(file("simple2secure.portal/src/main/resources/application_local.yml"))
+				file("simple2secure.portal/src/main/resources/application_git.yml").renameTo(file("simple2secure.portal/src/main/resources/application.yml"))
 		}
 }
+
+
+task deleteTask(type: Delete) {
+		doLast {
+			description 'Deletes files which must not be copied to github'
+			println "Deleting files"
+			delete file('simple2secure.info')
+			delete file('simple2secure.portal/src/main/resources/keys')
+			delete file('simple2secure.portal/src/main/resources/probe')
+			delete file('simple2secure.probe/src/main/resources/keys')
+		}
+}
+
 
 deleteTask.dependsOn overwriteTask
 gitTask.dependsOn deleteTask
@@ -171,13 +170,13 @@ gitTask.shouldRunAfter deleteTask
 
 gitPublish {
 		// where to publish to (repo must exist)
-		repoUri = 'git@github.com:emirSecinto/test.git'
+		repoUri = 'git@github.com:secinto/simple2secure.git'
 
 		// where to fetch from prior to fetching from the remote (i.e. a local repo to save time)
-		referenceRepoUri = '/.git/refs/remotes/origin/develop_search_engine'
+		referenceRepoUri = '/.git/refs/remotes/origin/master'
 
 		// branch will be created if it doesn't exist
-		branch = 'test-branch'
+		branch = 'master'
 
 		// generally, you don't need to touch this
 		repoDir = file("$buildDir/somewhereelse") // defaults to $buildDir/gitPublish

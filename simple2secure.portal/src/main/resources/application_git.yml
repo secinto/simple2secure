@@ -1,0 +1,63 @@
+mail:
+  username: 
+  password: 
+  imap:
+    host: 
+    auth: true
+    starttls.enable: true
+    socketFactory:
+      port: 993
+      class: javax.net.ssl.SSLSocketFactory
+  smtp:
+    auth: true
+    starttls.enable: true
+    host: 
+    ssl.trust: 
+    port: 587   
+    socketFactory:
+      class: javax.net.ssl.SSLSocketFactory
+
+license:
+  filepath: temp/license/
+  privateKey: keys/private.key
+  publicKey: keys/public.key
+  
+spring:
+  profiles:
+    active: prod,default
+  main:
+    banner-mode: "off"
+  data:
+    mongodb:
+      host: s2s-mongodb
+      port: 27017
+      database: s2s
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:keys/keystore.p12
+    key-store-password: 
+    key-store-type: PKCS12
+    key-alias: 
+    trust-store: classpath:keys/cacerts
+    trust-store-password: 
+  certificate:
+    serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784, 82608546408201705581087460839067218768, 70317815677293606821836133181142060207, 38728757322028685062470573603165479671       
+---      
+spring:
+  profiles: deployment
+  data:
+    mongodb:
+      host: s2s-mongodb
+      port: 27017
+      database: s2s
+---
+spring:
+  profiles: test
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: s2s_test

@@ -1,8 +1,8 @@
 mail:
-  username: 
-  password: 
+  username: s2s.test@secinto.at
+  password: AT.19.secinto.s2s.new
   imap:
-    host: 
+    host: imap.ionos.de
     auth: true
     starttls.enable: true
     socketFactory:
@@ -11,8 +11,8 @@ mail:
   smtp:
     auth: true
     starttls.enable: true
-    host: 
-    ssl.trust: 
+    host: smtp.ionos.de
+    ssl.trust: smtp.ionos.de
     port: 587   
     socketFactory:
       class: javax.net.ssl.SSLSocketFactory
@@ -38,11 +38,11 @@ server:
   ssl:
     enabled: true
     key-store: classpath:keys/keystore.p12
-    key-store-password: 
+    key-store-password: Latinica.1
     key-store-type: PKCS12
-    key-alias: 
+    key-alias: tomcat
     trust-store: classpath:keys/cacerts
-    trust-store-password: 
+    trust-store-password: testtest
   certificate:
     serial: 1009697567, 81076418332334433471467571647819559628, 96259972520886039836715359477840487195, 132145755450301565074331139870923558714, 93791718698785438451096221151509119784, 82608546408201705581087460839067218768, 70317815677293606821836133181142060207, 38728757322028685062470573603165479671       
 ---      
