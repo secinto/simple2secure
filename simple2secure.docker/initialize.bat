@@ -7,7 +7,7 @@ echo **************************************************************
 echo Would you like to skip git checkout (yes/no)?
 set /p choice= "Please Select one of the above options :" 
 if %choice%==yes goto RUNDOCKER
-else goto GITCHECKOUT
+if %choice%==no goto GITCHECKOUT
 
 :GITCHECKOUT
 echo Deleting %directory% directory

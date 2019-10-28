@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-MAINTAINER "Secinto GmbH"
+MAINTAINER "secinto GmbH"
 
 RUN apt-get update -y && \
  		apt-get install -y python3-pip python3-dev nmap build-essential libssl-dev libffi-dev wget git
