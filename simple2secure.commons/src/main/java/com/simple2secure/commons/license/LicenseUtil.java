@@ -107,7 +107,7 @@ public class LicenseUtil {
 			publicKeyFilePath = publicKeyFile.getAbsolutePath();
 			privateKeyFilePath = privateKeyFile.getAbsolutePath();
 
-			LicenseUtil.initialize(licenseFilePath, privateKeyFilePath, publicKeyFilePath);
+			initialized = true;
 		} catch (Exception e) {
 			throw new RuntimeException("Couldn't self initialize license utils. Reason {}", e);
 		}
@@ -122,6 +122,7 @@ public class LicenseUtil {
 	 */
 	public static void initialize(String filePath) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
+		selfInitialize();
 	}
 
 	/**
@@ -139,15 +140,16 @@ public class LicenseUtil {
 	public static void initialize(String filePath, String privateKey, String publicKey) {
 		licenseFilePath = LicenseUtil.getLicensePath(filePath);
 
-		publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
-
-		if (!Strings.isNullOrEmpty(privateKey)) {
+		if (!Strings.isNullOrEmpty(publicKey) && !Strings.isNullOrEmpty(privateKey)) {
+			publicKeyFilePath = LicenseUtil.getLicenseKeyPath(publicKey, licenseFilePath);
 			privateKeyFilePath = LicenseUtil.getLicenseKeyPath(privateKey, licenseFilePath);
-		} else {
-			privateKeyFilePath = workingDirectory + File.separator + privateKeyFileName;
+			if (!Strings.isNullOrEmpty(publicKeyFilePath) && !Strings.isNullOrEmpty(privateKeyFilePath)) {
+				initialized = true;
+			} else {
+				selfInitialize();
+			}
 		}
 
-		initialized = true;
 	}
 
 	/**

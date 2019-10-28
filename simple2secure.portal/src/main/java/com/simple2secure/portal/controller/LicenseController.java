@@ -141,7 +141,11 @@ public class LicenseController {
 		licenseFilePath = LicenseUtil.getLicensePath(licenseFilePath);
 		publicKeyPath = LicenseUtil.getLicenseKeyPath(publicKeyPath, licenseFilePath);
 		privateKeyPath = LicenseUtil.getLicenseKeyPath(privateKeyPath, licenseFilePath);
-		LicenseUtil.initialize(licenseFilePath, privateKeyPath, publicKeyPath);
+		if (!Strings.isNullOrEmpty(publicKeyPath) && !Strings.isNullOrEmpty(privateKeyPath)) {
+			LicenseUtil.initialize(licenseFilePath, privateKeyPath, publicKeyPath);
+		} else {
+			LicenseUtil.initialize(licenseFilePath);
+		}
 	}
 
 	/*
@@ -161,7 +165,10 @@ public class LicenseController {
 	 * @throws UnsupportedEncodingException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/authenticate",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
@@ -210,7 +217,9 @@ public class LicenseController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{groupId}/{userId}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
@@ -265,7 +274,9 @@ public class LicenseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/downloadLicenseForScript",
+			method = RequestMethod.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @RequestHeader("Accept-Language") String locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
