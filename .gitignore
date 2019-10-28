@@ -39,3 +39,5 @@ simple2secure.service/release/libs/simple2secure.service.jar
 simple2secure.service/release/libs/simple2secure.probe.jar
 simple2secure.probe/src/test/resources/licenses/license.zip
 simple2secure.probe/src/test/resources/licenses/1/license.dat
+simple2secure.commons/src/main/resources/config_local.items.yml
+simple2secure.portal/src/main/resources/application_local.yml
