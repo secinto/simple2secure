@@ -16,4 +16,4 @@ echo Creating empty %directory% directory!
 mkdir %directory%
 echo Cloning simple2secure project in the %directory% directory...
 git clone https://github.com/secinto/simple2secure.git %directory%
-call /simple2secure/simple2secure.pod/create_docker.bat
+call simple2secure/simple2secure.pod/create_docker.bat
