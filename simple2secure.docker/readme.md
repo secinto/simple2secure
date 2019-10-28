@@ -21,8 +21,10 @@ Standard tools which are installed with the simple2secure pod are:
   with the view to find bugs, errors or vulnerabilities related to command
   injection attack
   - **nmap** - tool for network discovery and security auditing.
+  - **traceroute** - computer network diagnostic tool.
 
 
 You can install additional tools by adding the entry in the
-**docker-compose.yaml** file in the **simple2secure.docker** folder and
-rerunning **initialize.bat** script.
+**Dockerfile** file in the **simple2secure.docker/simple2secure/simple2secure.pod**
+folder and rerunning **initialize.bat** script from the **simple2secure.docker**
+folder. This type you must set the option to skip the git checkout.

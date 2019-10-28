@@ -242,9 +242,7 @@ public class LicenseUtils {
 
 	public String getPayloadFromTheToken(String token) {
 		String[] split_string = token.split("\\.");
-		String base64EncodedHeader = split_string[0];
 		String base64EncodedBody = split_string[1];
-		String base64EncodedSignature = split_string[2];
 
 		Base64 base64Url = new Base64(true);
 
