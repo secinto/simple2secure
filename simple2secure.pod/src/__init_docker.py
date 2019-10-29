@@ -52,9 +52,13 @@ if response.status_code == 200:
             portal_url + '/api/license/downloadLicenseForScript',
             data=token, headers=headers, verify=False
         )
-        open('./static/license/license' + create_timestamp_with_file_ending(),
-             'wb').write(license_file.content)
-        print('License downloaded successfully')
+
+        if license_file.status_code == 200:
+            open('./static/license/license' + create_timestamp_with_file_ending(),
+                 'wb').write(license_file.content)
+            print('License downloaded successfully')
+        else:
+            print(license_file.text)
     else:
         print("Error occured during authorization")
 else:
