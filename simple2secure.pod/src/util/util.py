@@ -38,7 +38,7 @@ def check_command_params(argv, app):
         argumentsList = argv[1:]
 
         try:
-            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+            opts, args = getopt.getopt(argumentsList, "ha:", ["activate=", "docker"])
         except getopt.GetoptError:
             print('app.py -a <True/False>')
             sys.exit(2)
@@ -49,6 +49,9 @@ def check_command_params(argv, app):
                 sys.exit()
             elif opt in ("-a", "-activate"):
                 app.config['ACTIVATE_LICENSE'] = True
+
+            elif opt == '--docker':
+                app.config['USE_CELERY_IN_DOCKER'] = True
 
 
 def init_logger(app):

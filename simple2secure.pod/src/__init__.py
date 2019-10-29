@@ -23,8 +23,13 @@ def create_app(argv):
 def create_celery_app(app):
     # Initialize Celery
 
-    celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
-                    backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
+    if app.config['USE_CELERY_IN_DOCKER']:
+        celery = Celery('celery_tasks', broker=config_module.ProductionConfig.CELERY_BROKER_URL,
+                        backend=config_module.ProductionConfig.CELERY_BROKER_URL)
+    else:
+        celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
+                        backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
+
     celery.conf.broker_url = app.config['CELERY_BROKER_URL']
     celery.conf.result_backend = app.config['CELERY_RESULT_BACKEND']
 
@@ -52,6 +57,7 @@ def entrypoint(argv, mode='app'):
         check_command_params(argv, app)
         log = logging.getLogger('pod.init')
     else:
+        check_command_params(argv, app)
         log = logging.getLogger('celery.init')
 
     CORS(app)
