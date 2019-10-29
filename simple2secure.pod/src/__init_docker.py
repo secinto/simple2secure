@@ -22,6 +22,7 @@ print("Please select the portal url:")
 print("1. " + localhost_portal)
 print("2. " + hetzner_portal)
 
+# TODO: This script should only work with the simple2secure.info portal (This is only for testing purposes)
 portal_option = input("Select an option 1 or 2: ")
 
 portal_url = localhost_portal
