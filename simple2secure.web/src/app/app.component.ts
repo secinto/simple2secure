@@ -15,8 +15,8 @@ import 'hammerjs';
 
 export class AppComponent implements OnInit {
 
-	title = 'simple2Secure Portal';
-	translatedTitle = 'simple2Secure Portal';
+	title = 'simple2secure Portal';
+	translatedTitle = 'simple2secure Portal';
 
 	constructor(
 		private router: Router,
