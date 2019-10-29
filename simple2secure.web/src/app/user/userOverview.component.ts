@@ -783,7 +783,7 @@ export class UserOverviewComponent {
 			this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id + '/' + this.currentUser.userID;
 			this.httpService.post(null, this.url).subscribe(
 				data => {
-					this.alertService.success(this.translate.instant('node.move.success'));
+					this.alertService.success(this.translate.instant('group.move.success'));
 					this.loading = false;
 				},
 				error => {
@@ -800,7 +800,7 @@ export class UserOverviewComponent {
 		}
 		else {
 			this.moveNotPossible = true;
-			this.alertService.error(this.translate.instant('node.move.error'));
+			this.alertService.error(this.translate.instant('group.move.error'));
 			this.loadMyProfile();
 		}
 	}

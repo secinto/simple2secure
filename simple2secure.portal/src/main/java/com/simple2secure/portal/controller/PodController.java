@@ -172,7 +172,7 @@ public class PodController {
 		if (podLicense != null) {
 			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
 			licenseRepository.update(podLicense);
-			return testUtils.getScheduledTestsByPodId(podId, locale);
+			return testUtils.getScheduledTestsByDeviceId(podId, locale);
 		}
 
 		return new ResponseEntity(

@@ -159,6 +159,24 @@ def update_test_status(app, test_run_id, test_id, test_status):
     return portal_post(app, url, json.dumps(test_run_dto.__dict__))
 
 
+def update_sequence_status(app, sequence_run_id, sequence_id, status):
+    """
+    Sends the status of the sequence to the PORTAL.
+
+    :param app: The application context
+    :param sequence_run_id: The id of the sequence test run
+    :param sequence_id: The id of the sequence
+    :param status: The current status of the sequence test run
+    :return:
+    """
+    url = app.config['PORTAL_URL'] + "sequence/update/status/" + sequence_run_id
+    info = {'sequence_run_id': sequence_run_id, 'sequence_id': sequence_id, 'status': status}
+    dumped_info = json.dumps(info)
+
+    with app.app_context():
+        return portal_post(app, url, dumped_info)
+
+
 def schedule_test_on_the_portal(test, app):
     """
     Schedules the test on the PORTAL, actually just updating the status on the PORTAL for this test to be shown in

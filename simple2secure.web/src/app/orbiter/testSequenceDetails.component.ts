@@ -25,12 +25,15 @@ import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} f
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import {Timeunit} from '../_models';
+import {Timeunit, Test} from '../_models';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import { PodDTO } from '../_models/DTO/podDTO';
 import { TestSequence } from '../_models/testSequence';
-import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDropList} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDropList, DragRef} from '@angular/cdk/drag-drop';
+import { CarouselComponent } from 'ngx-carousel-lib';
+import { some } from 'highcharts/highcharts.src';
+
 
 @Component({
 	moduleId: module.id,
@@ -38,159 +41,171 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDropList} from '@ang
 	styleUrls: ['orbiter.css'],
 })
 
-export class TestSequenceDetailsComponent{
-	loading = false;
-	sequence = new TestSequence();
-	tests: TestObjWeb[] = [];
-	type: string;
-	isTestChanged = false;
-	isNewTest = false;
-	url: string;
-	timeUnits = Timeunit;
-	pod: PodDTO;
-	testNamesCurrent: string[] = [];
-	elements: string[] = ["None","adapter1", "adapter2", "adapter3"];
-	isPreviousTest = false;
-	
-  	testSequence: string[] = [];
+export class TestSequenceDetailsComponent {
+    loading = false;
+    sequence = new TestSequence();
+    sequenceToShow: TestObjWeb[] = [];
+    tests: TestObjWeb[] = [];
+    type: string;
+    isTestChanged = false;
+    isNewTest = false;
+    url: string;
+    pod: PodDTO;
+    testNamesCurrent: string[] = [];
+    @ViewChild('carousel') topCarousel: CarouselComponent;
 
-	constructor(
-		private dataService: DataService,
-		private alertService: AlertService,
-		private dialogRef: MatDialogRef<TestSequenceDetailsComponent>,
-		private dialog: MatDialog,
-		private httpService: HttpService,
-		private translate: TranslateService,
-		@Inject(MAT_DIALOG_DATA) data)
-	{	
-		
-		this.type = data.type;
-		if (this.type == 'new'){
-			this.isNewTest = true;
-		}
-		else if (this.type =='edit'){
-			this.isNewTest = false;
-			this.sequence = data.sequence;
-			this.testSequence = this.sequence.sequenceContent;
-		}else {
-			
-		}
+    constructor(
+        private dataService: DataService,
+        private alertService: AlertService,
+        private dialogRef: MatDialogRef<TestSequenceDetailsComponent>,
+        private dialog: MatDialog,
+        private httpService: HttpService,
+        private translate: TranslateService,
+        @Inject(MAT_DIALOG_DATA) data) {
 
-		//this.isNewTest = true;
-	}
+        this.type = data.type;
+        if (this.type == 'new') {
+            this.isNewTest = true;
+        }
+        else if (this.type == 'edit') {
+            this.isNewTest = false;
+            this.sequence = data.sequence;
+            this.sequence.sequenceContent = this.sequence.sequenceContent;
+        } else {
 
-	extractTimeUnits(): Array<string> {
-		const keys = Object.keys(this.timeUnits);
-		return keys.slice();
-	}
-	
-	ngOnInit(){
-		this.pod = this.dataService.getPods();
-		this.tests = this.pod.test;		
-		this.testNamesCurrent = this.getTestNamesFromObject(this.tests);
-	}
-	
-	getTestNamesFromObject(tests: TestObjWeb[]){
-		let testNames: string[] = [];
-		for (var testObj of tests) {
-			testNames.push(testObj.name);	
-		}
-		return testNames; 
-	} 
+        }
+    }
 
-	dropHorizontal(event: CdkDragDrop<any[]>) {		
-		if (event.previousContainer === event.container) {
-			moveItemInArray(this.testSequence, event.previousIndex, event.currentIndex);
-		}
-		else{
-			this.testSequence.push(event.previousContainer.data[event.previousIndex]);
-		}	    
-	  }
+    ngOnInit() {
+        this.pod = this.dataService.getPods();
+        this.tests = this.pod.test;
+        this.testNamesCurrent = this.getTestNamesFromObject(this.tests);
+        this.topCarousel.perspective = 800;
+        this.loadTests(this.pod.pod.deviceId);
+    }
+
+    ngAfterViewInit(){
+        this.getTestForSequenceToShow(this.sequence);
+    }
+
+    getTestNamesFromObject(tests: TestObjWeb[]) {
+        const testNames: string[] = [];
+        for (const testObj of tests) {
+            testNames.push(testObj.name);
+        }
+        return testNames;
+    }
+
+    getTestForSequenceToShow(sequence: TestSequence) {
+        const someContent = sequence.sequenceContent;
+        // console.log(this.tests);
+        if (Array.isArray(someContent) && someContent.length > 0) {
+            for (let i = 0; i < someContent.length; i++) {
+                for (const test of this.tests) {
+                    if (test.name === someContent[i]) {
+                        this.sequenceToShow.push(test);
+                    }
+                }
+            }
+        }
+    }
+
+    prev() {
+        this.topCarousel.slidePrev();
+    }
+    next() {
+        this.topCarousel.slideNext();
+    }
+
+    addTestToSequence(item: TestObjWeb){
+        if (this.sequence.sequenceContent){
+            this.sequence.sequenceContent.push(item.name);
+            this.sequenceToShow.push(item);
+        }else {
+            this.sequence.sequenceContent = [];
+            this.sequence.sequenceContent.push(item.name);
+            this.sequenceToShow.push(item);
+        }
+        this.topCarousel.slideNext();
+        this.topCarousel.update();
+    }
+
+    removeTestFromSequence(item: TestObjWeb){
+        const index = this.sequence.sequenceContent.indexOf(item.name, 0);
+        const showIndex = this.sequenceToShow.indexOf(item, 0);
+        if (showIndex > -1) {
+            this.sequence.sequenceContent.splice(showIndex, 1);
+            this.sequenceToShow.splice(showIndex, 1);
+        }
+        this.topCarousel.slidePrev();
+        this.topCarousel.update();
+    }
+
+    public loadTests(podId: string) {
+        this.loading = true;
+        this.httpService.get(environment.apiEndpoint + 'test/' + podId)
+            .subscribe(
+                data => {
+                    this.tests = data;
+                    if (!this.isTestChanged) {
+                        if (data.length > 0) {
+                            this.alertService.success(this.translate.instant('message.data'));
+                        }
+                        else {
+                            this.alertService.error(this.translate.instant('message.data.notProvided'));
+                        }
+                    }
+
+                    this.loading = false;
+                },
+                error => {
+                    if (error.status == 0) {
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
+    }
 
 
-	drop(event: CdkDragDrop<string[]>) {
-		if (event.previousContainer === event.container) {
-			moveItemInArray(this.testNamesCurrent, event.previousIndex, event.currentIndex);	
-		}		
-		else{
-			let index = this.testSequence.indexOf(event.previousContainer.data[event.previousIndex]);
-			if(index !== -1){
-				this.testSequence.splice(index, 1);
-			}
-		}	    
-	  }
+    public updateSaveSequence() {
+        this.loading = true;
 
-	clicked(event){
-		console.log(event);
-	}
+        if (!this.sequence.podId) {
+            this.sequence.podId = this.pod.pod.deviceId;
+        }
 
+        if (!(this.sequence.sequenceContent.length == 0)) {
+            this.sequence.sequenceContent = this.sequence.sequenceContent;
+        }
 
-	
-	public loadTests(podId: string){
-		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/' + podId)
-			.subscribe(
-				data => {
-					this.tests = data;
-					if (!this.isTestChanged){
-						if (data.length > 0) {
-							this.alertService.success(this.translate.instant('message.data'));
-						}
-						else {
-							this.alertService.error(this.translate.instant('message.data.notProvided'));
-						}
-					}
+        this.url = environment.apiEndpoint + 'sequence/add';
+        this.httpService.post(this.sequence, this.url).subscribe(
+            data => {
+                if (this.type === 'new') {
+                    this.alertService.success(this.translate.instant('message.sequence.create'));
+                }
+                else {
+                    this.alertService.success(this.translate.instant('message.sequence.update'));
+                }
+                this.close(true);
+            },
+            error => {
+                if (error.status == 0) {
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else {
+                    this.alertService.error(error.error.errorMessage);
+                }
+                this.loading = false;
+            }
+            );
+    }
 
-					this.loading = false;
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-	}
-
-
-	public updateSaveSequence() {
-		this.loading = true;
-		
-		if(!this.sequence.podId){
-			this.sequence.podId = this.pod.pod.deviceId;
-		}
-		
-		if(!(this.testSequence.length == 0)){
-			this.sequence.sequenceContent = this.testSequence;
-		}
-		
-		this.url = environment.apiEndpoint + 'sequence/add';
-		this.httpService.post(this.sequence, this.url).subscribe(
-			data => {
-				if (this.type === 'new') {
-					this.alertService.success(this.translate.instant('message.sequence.create'));
-				}
-				else {
-					this.alertService.success(this.translate.instant('message.sequence.update'));
-				}
-				this.close(true);
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			}
-		);
-	}
-	
-	public close(value: boolean){
-		this.dialogRef.close(value);
-	}
+    public close(value: boolean) {
+        this.dialogRef.close(value);
+    }
 
 }

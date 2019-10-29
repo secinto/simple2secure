@@ -6,11 +6,13 @@ from flask import json
 
 from scanner import scanner
 from src import create_celery_app, entrypoint
-from src.db.database import db, TestResult
-from src.db.database_schema import TestResultSchema
+from src.db.database import db, TestResult, TestSequenceResult
+from src.db.database_schema import TestResultSchema, TestSequenceResultSchema
 from src.util import json_utils
 from src.util import rest_utils
 from src.util.db_utils import update
+from src.util.rest_utils import portal_post
+from src.util.test_sequence_utils import update_sequence
 from src.util.util import get_current_timestamp
 
 app = entrypoint(sys.argv, 'celery')
@@ -83,3 +85,51 @@ def execute_test(test, test_id, test_name, test_run_id):
 
         rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
 
+
+@celery.task(name='celery.schedule_test_for_sequence')
+def schedule_test_for_sequence(parameter, command):
+    with app.app_context():
+        results = {}
+        scanner(json_utils.construct_command(json_utils.get_tool(
+            command), parameter), results, "sequence_result")
+        return results["sequence_result"]
+
+
+@celery.task(name='celery.schedule_sequence')
+def schedule_sequence(test_sequence, sequence_run_id ,sequence_id, auth_token):
+    with app.app_context():
+        sequence = update_sequence(test_sequence)
+
+        current_milli_time = get_current_timestamp()
+
+        test_sequence_result_obj = {}
+        firstRun = True
+        nextResult = ""
+        for i, task in enumerate(json.loads(sequence.sequence_content), 0):
+            if firstRun:
+                test_content =  json.loads(task['test_content'])
+                test_command = test_content['test_definition']['step']['command']['executable']
+                test_parameter = test_content['test_definition']['step']['command']['parameter']['value']
+                scan = schedule_test_for_sequence(test_parameter, test_command)
+                nextResult = scan.strip()
+                test_sequence_result_obj[task['name']] = nextResult
+                firstRun = False
+            else:
+                test_content = json.loads(task['test_content'])
+                test_command = test_content['test_definition']['step']['command']['executable']
+                scan = schedule_test_for_sequence(nextResult, test_command)
+                nextResult = scan.strip()
+                test_sequence_result_obj[task['name']] = nextResult
+ 
+        test_sequence_result_obj = json.dumps(test_sequence_result_obj)
+        testSeqRes = TestSequenceResult(sequence_run_id, sequence_id, sequence.podId, sequence.name,
+                                        test_sequence_result_obj, current_milli_time)
+        test_result_schema = TestSequenceResultSchema()
+        output = test_result_schema.dump(testSeqRes).data
+        portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", output)
+        
+        db.session.add(testSeqRes)
+        db.session.merge(sequence)
+        db.session.commit()
+
+        return sequence

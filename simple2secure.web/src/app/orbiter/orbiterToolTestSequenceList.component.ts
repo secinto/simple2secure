@@ -139,11 +139,11 @@ export class OrbiterToolTestSequenceListComponent {
 
 	}
 
-	public runTest(){
+	public runSequence(){
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' +
+		this.url = environment.apiEndpoint + 'sequence/scheduleSequence/' +
 			this.context.context.id + '/' + this.currentUser.userID;
 		this.httpService.post(this.selectedSequence, this.url).subscribe(
 			data => {

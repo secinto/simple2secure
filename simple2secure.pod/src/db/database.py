@@ -23,6 +23,7 @@ class PodInfo(db.Model):
         self.licenseId = ""
         self.hash_value_service = ""
 
+
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     podId = db.Column(db.Text)
@@ -77,14 +78,19 @@ class TestResult(db.Model):
 
 
 class TestSequenceResult(db.Model):
+    __tablename__ = "test_sequence_result"
     id = db.Column(db.Integer, primary_key=True)
-    podId = db.Column(db.Text)
+    sequence_run_id = db.Column(db.Text)
+    sequence_id = db.Column(db.Text)
+    pod_id = db.Column(db.Text)
     sequence_name = db.Column(db.Text)
     sequence_result = db.Column(db.Text)
     time_stamp = db.Column(db.BigInteger)
 
-    def __init__(self, pod_id, sequence_name, sequence_result, time_stamp):
-        self.podId = pod_id
+    def __init__(self, sequence_run_id, sequence_id, pod_id, sequence_name, sequence_result, time_stamp):
+        self.sequence_run_id = sequence_run_id
+        self.sequence_id = sequence_id
+        self.pod_id = pod_id
         self.sequence_name = sequence_name
         self.sequence_result = sequence_result
         self.time_stamp = time_stamp

@@ -31,21 +31,22 @@ def is_same_test(prov_test, db_test):
 
 def is_same_test_definition(prov_test_def_, db_test_def_):
     prov_test_def = prov_test_def_['test_definition']
+    db_test_def = db_test_def_['test_definition']
     prov_descr = prov_test_def['description']
     prov_version = prov_test_def['version']
     prov_precond = prov_test_def['precondition']
     prov_step = prov_test_def['step']
     prov_postcond = prov_test_def['postcondition']
-    db_test_def = db_test_def_['test_definition']
     db_descr = db_test_def['description']
     db_version = db_test_def['version']
     db_precond = db_test_def['precondition']
     db_step = db_test_def['step']
     db_postcond = db_test_def['postcondition']
 
-    if prov_descr == db_descr and prov_version == db_version and is_same_test_definition_task(prov_precond, db_precond) \
-            and is_same_test_definition_task(prov_step, db_step) and is_same_test_definition_task(prov_postcond,
-                                                                                                  db_postcond):
+    if prov_descr == db_descr and prov_version == db_version \
+            and is_same_test_definition_task(prov_precond, db_precond) \
+            and is_same_test_definition_task(prov_step, db_step) \
+            and is_same_test_definition_task(prov_postcond, db_postcond):
         return True
     else:
         return False

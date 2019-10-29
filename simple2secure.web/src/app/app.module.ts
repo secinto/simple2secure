@@ -52,7 +52,7 @@ import {
 	from './network';
 import {
 	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent
+	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent
 } from './report';
 import {
 	EmailOverviewComponent,
@@ -148,7 +148,7 @@ import {
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
 import {TreeModule} from 'angular-tree-component';
 import {TreeTableModule} from 'ng-treetable';
-import {RoleGuard} from './_guards/role.guard';
+import {RoleGuard} from './_guards';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
@@ -161,9 +161,9 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
-import {TestResultComponent} from './report/testResult.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
+import {CarouselModule} from 'ngx-carousel-lib';
 
 
 
@@ -217,6 +217,7 @@ export const httpInterceptorProviders = [
 		TreeviewModule.forRoot(),
 		TreeModule.forRoot(),
 		NgxJsonViewModule,
+		CarouselModule,
 		TranslateModule.forRoot({
 			loader: {
 				provide: TranslateLoader,
@@ -304,6 +305,7 @@ export const httpInterceptorProviders = [
 		SearchResultComponent,
 		TruncatePipe,
 		NotificationDetailsComponent,
+		OrbiterToolTestSequenceListComponent,
 		TestSequenceDetailsComponent,
 		ResendComponent
 	],

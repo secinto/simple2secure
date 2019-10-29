@@ -4,9 +4,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
 
 from src.db.database import TestResult
-from src.db.database_schema import TestResultSchema
+from src.db.database_schema import TestSequenceSchema
 from src.util.db_utils import clear_pod_status_auth
-from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive
+from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive, \
+    update_sequence_status
+from src.util.test_sequence_utils import get_sequence_from_run
 from src.util.test_utils import sync_tests
 
 log = logging.getLogger('pod.scheduler.scheduler_tasks')
@@ -24,6 +26,9 @@ def start_scheduler_tasks(app_obj, celery_tasks):
                       kwargs={'app_obj': app_obj, 'celery_tasks': celery_tasks})
 
     scheduler.add_job(func=get_test_results_from_db, trigger="interval", seconds=60,
+                      kwargs={'app_obj': app_obj, 'celery_tasks': celery_tasks})
+
+    scheduler.add_job(func=get_scheduled_sequence, trigger="interval", seconds=15,
                       kwargs={'app_obj': app_obj, 'celery_tasks': celery_tasks})
 
     scheduler.add_job(func=sync_tests, trigger="interval", seconds=60, kwargs={'app': app_obj})
@@ -60,7 +65,7 @@ def get_scheduled_tests(app_obj, celery_tasks):
             if request_test is None:
                 log.error('Call to get scheduled tests returned nothing')
             else:
-                log.error('Status code is not as expected: {}'.format(request_test.status_code))
+                log.error('Status code for get scheduled tests is not as expected: {}'.format(request_test.status_code))
 
 
 def get_test_results_from_db(app_obj, celery_tasks):
@@ -75,3 +80,40 @@ def get_test_results_from_db(app_obj, celery_tasks):
         test_results = TestResult.query.filter_by(isSent=False).all()
         for test_result in test_results:
             celery_tasks.send_test_result.delay(test_result)
+
+
+def get_scheduled_sequence(app_obj, celery_tasks):
+    """
+
+    :param app_obj:
+    :param celery_tasks:
+    :return:
+    """
+    with app_obj.app_context():
+        request_sequence = portal_get(app_obj,
+                                      app_obj.config['PORTAL_URL'] + "sequence/scheduledSequence/" + app_obj.config[
+                                          'POD_ID'])
+
+        if request_sequence is not None and request_sequence.status_code == 200:
+            test_sequence_schema = TestSequenceSchema()
+            sequence_run_content = json.loads(request_sequence.text)
+
+            if len(sequence_run_content) != 0:
+                sequence_run_id = sequence_run_content[0]['id']
+                sequence_id = sequence_run_content[0]['sequenceId']
+
+                for sequence_run in sequence_run_content:
+                    curr_sequence = get_sequence_from_run(sequence_run)
+                    sequence_to_provide = test_sequence_schema.dump(curr_sequence).data
+                    celery_tasks.schedule_sequence.delay(sequence_to_provide, sequence_run_id, sequence_id,
+                                                         app_obj.config['AUTH_TOKEN'])
+                    send_notification(
+                        "Sequence " + curr_sequence.name + " has been scheduled for the execution in the pod",
+                        app_obj)
+                    update_sequence_status(app_obj, sequence_run_id, sequence_id, "SCHEDULED")
+        else:
+            clear_pod_status_auth(app_obj)
+            if request_sequence is None:
+                log.error('Call to get scheduled test sequence returned nothing')
+            else:
+                log.error('Status code for get scheduled test sequence is not as expected: {}'.format(request_sequence.status_code))

@@ -43,11 +43,11 @@ def get_and_store_tests_from_file(app):
         A list of all tests currently stored in the database
     """
     tests_as_string = read_json_testfile()
-    update_insert_tests_to_db(tests_as_string, app)
+    update_tests(tests_as_string, app)
     return Test.query.all()
 
 
-def update_insert_tests_to_db(tests, app):
+def update_tests(tests, app):
     """
     Reads the provided JSON data and obtains the test descriptions contained in it. It is checked if the contained
     test is already stored locally in the database. If not it is added or if it contains changes the entry is

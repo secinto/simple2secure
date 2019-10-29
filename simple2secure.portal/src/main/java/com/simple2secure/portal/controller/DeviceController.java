@@ -154,7 +154,7 @@ public class DeviceController {
 		if (license != null) {
 			license.setLastOnlineTimestamp(System.currentTimeMillis());
 			licenseRepository.update(license);
-			return testUtils.getScheduledTestsByPodId(deviceId, locale);
+			return testUtils.getScheduledTestsByDeviceId(deviceId, locale);
 		}
 
 		return new ResponseEntity(

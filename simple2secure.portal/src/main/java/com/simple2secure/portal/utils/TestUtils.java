@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
@@ -51,6 +52,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.repository.SequenceRunRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
@@ -78,6 +80,9 @@ public class TestUtils {
 
 	@Autowired
 	GroupRepository groupRepository;
+
+	@Autowired
+	SequenceRunRepository sequenceRunRepository;
 
 	@Autowired
 	TestRunRepository testRunRepository;
@@ -253,6 +258,27 @@ public class TestUtils {
 	}
 
 	/**
+	 * This function returns all tests by pod Id.
+	 *
+	 * @param deviceId
+	 * @param locale
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(String deviceId, String locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
+
+			List<SequenceRun> sequenceRuns = sequenceRunRepository.getSequenceRunByDeviceId(deviceId);
+
+			if (sequenceRuns != null) {
+				return new ResponseEntity<>(sequenceRuns, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	/**
 	 * This function returns all tests which are not executed and which are scheduled for the next run.
 	 *
 	 * @param hostname
@@ -261,10 +287,10 @@ public class TestUtils {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<TestRun>> getScheduledTestsByPodId(String podId, String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(String deviceId, String locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
 
-			List<TestRun> testRunList = testRunRepository.getPlannedTests(podId);
+			List<TestRun> testRunList = testRunRepository.getPlannedTests(deviceId);
 
 			if (testRunList != null) {
 				return new ResponseEntity<>(testRunList, HttpStatus.OK);
