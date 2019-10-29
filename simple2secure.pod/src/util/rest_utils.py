@@ -237,6 +237,8 @@ def check_portal_alive(app):
     response = portal_get(app, app.config['PORTAL_URL'] + "service", True)
 
     if response is not None and response.status_code == 200:
+        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is alive')
         update_pod_status_connection(app, True)
     else:
+        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is dead')
         update_pod_status_connection(app, False)

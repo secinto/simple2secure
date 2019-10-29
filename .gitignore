@@ -39,3 +39,6 @@ simple2secure.service/release/libs/simple2secure.service.jar
 simple2secure.service/release/libs/simple2secure.probe.jar
 simple2secure.probe/src/test/resources/licenses/license.zip
 simple2secure.probe/src/test/resources/licenses/1/license.dat
+simple2secure.docker/simple2secure/
+simple2secure.pod/db/pod.db
+simple2secure.pod/static/license/license1572339717510.8267.zip
