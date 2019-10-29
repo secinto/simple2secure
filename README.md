@@ -65,10 +65,6 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### Start celery worker from the console (Open console and type)
-```
-celery -A src.celery.celery_tasks.celery worker --loglevel=info
-```
 
 ## General info on the portal and the pod
 

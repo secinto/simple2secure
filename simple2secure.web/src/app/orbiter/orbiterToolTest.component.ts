@@ -78,7 +78,7 @@ export class OrbiterToolTestComponent {
 
 	loadPods() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'pod/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id)
 			.subscribe(
 				data => {
 					this.pods = data;

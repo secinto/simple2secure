@@ -18,24 +18,25 @@ from src.util.util import get_current_timestamp
 app = entrypoint(sys.argv, 'celery')
 celery = create_celery_app(app)
 
+HOSTNAME = socket.gethostname()
+
 log = logging.getLogger('celery.celery_tasks')
 
 
 @celery.task(name='celery.send_test_result')
-def send_test_result(test_result):
+def send_test_result(test_result, test_id):
     """
     Celery task which sends the provided test result to the PORTAL and updates the status of the result in the database.
 
     :param test_result: The test result as JSON which should be sent to the PORTAL
+    :param test_id:
     """
     with app.app_context():
-        test_result_schema = TestResultSchema()
-        output = test_result_schema.dump(test_result)
-
-        response = rest_utils.portal_post(app, app.config['PORTAL_URL'] + "test/saveTestResult", json.dumps(output))
+        log.info(test_result)
+        response = portal_post(app, app.config['PORTAL_URL'] + "test/saveTestResult", json.dumps(test_result))
 
         if response is not None and response.status_code == 200:
-            stored_test_result = TestResult.query.filter_by(id=test_result['id']).first()
+            stored_test_result = TestResult.query.filter_by(id=test_id).first()
             stored_test_result.isSent = True
             update(stored_test_result)
             log.info('Test result {} updated in DB'.format(stored_test_result.name))
@@ -76,7 +77,7 @@ def execute_test(test, test_id, test_name, test_run_id):
 
     timestamp = get_current_timestamp()
     test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
-                             socket.gethostname(), timestamp, False)
+                             HOSTNAME, timestamp, False)
     with app.app_context():
         db.session.add(test_result)
         db.session.commit()
@@ -88,6 +89,13 @@ def execute_test(test, test_id, test_name, test_run_id):
 
 @celery.task(name='celery.schedule_test_for_sequence')
 def schedule_test_for_sequence(parameter, command):
+    """
+    Schedule test for a sequence
+
+    :param parameter:
+    :param command:
+    :return:
+    """
     with app.app_context():
         results = {}
         scanner(json_utils.construct_command(json_utils.get_tool(
@@ -96,7 +104,15 @@ def schedule_test_for_sequence(parameter, command):
 
 
 @celery.task(name='celery.schedule_sequence')
-def schedule_sequence(test_sequence, sequence_run_id ,sequence_id, auth_token):
+def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
+    """
+    Schedule a test sequence to be executed
+
+    :param test_sequence:
+    :param sequence_run_id:
+    :param sequence_id:
+    :return:
+    """
     with app.app_context():
         sequence = update_sequence(test_sequence)
 
@@ -127,9 +143,11 @@ def schedule_sequence(test_sequence, sequence_run_id ,sequence_id, auth_token):
         test_result_schema = TestSequenceResultSchema()
         output = test_result_schema.dump(testSeqRes).data
         portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", output)
-        
-        db.session.add(testSeqRes)
-        db.session.merge(sequence)
-        db.session.commit()
+
+        update(testSeqRes)
+        update(sequence)
+        # db.session.add(testSeqRes)
+        # db.session.merge(sequence)
+        # db.session.commit()
 
         return sequence

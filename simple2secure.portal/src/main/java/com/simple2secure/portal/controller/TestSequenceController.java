@@ -120,7 +120,7 @@ public class TestSequenceController {
 				Test dbTest = testRepository.getTestByName(testId);
 				testList.add(dbTest);
 			}
-			sequence.setSequenceHash(testUtils.getHexValueHash(testUtils.calculateMd5Hash(sequence.getSequenceContent().toString())));
+			sequence.setSequenceHash(testUtils.getHexValueHash(testUtils.calculateSecureHash(sequence.getSequenceContent().toString())));
 			if (!Strings.isNullOrEmpty(sequence.getId())) {
 				testSequenceRepository.update(sequence);
 				log.debug("Test sequence: {} has been updated", sequence.getName());

@@ -161,6 +161,8 @@ public class TestUtils {
 
 			if (isPortalTestOlder) {
 				currentPortalTest.setHash_value(test.getHash_value());
+				currentPortalTest.setName(test.getName());
+				currentPortalTest.setPodId(test.getPodId());
 				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 				currentPortalTest.setTest_content(test.getTest_content());
 				currentPortalTest.setActive(true);
@@ -171,7 +173,6 @@ public class TestUtils {
 			currentPortalTest.setHash_value(test.getHash_value());
 			currentPortalTest.setName(test.getName());
 			currentPortalTest.setPodId(test.getPodId());
-			currentPortalTest.setHostname(test.getHostname());
 			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 			currentPortalTest.setTest_content(test.getTest_content());
 			currentPortalTest.setActive(true);
@@ -377,7 +378,6 @@ public class TestUtils {
 
 		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
 			// new test
-			test.setHostname(testObjWeb.getHostname());
 			test.setLastChangedTimestamp(System.currentTimeMillis());
 			test.setName(testObjWeb.getName());
 			test.setPodId(testObjWeb.getPodId());
@@ -385,7 +385,7 @@ public class TestUtils {
 			test.setScheduledTime(testObjWeb.getScheduledTime());
 			test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 			test.setTest_content(testContent);
-			test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+			test.setHash_value(testUtils.getHexValueHash(testUtils.calculateSecureHash(testContent)));
 			test.setActive(true);
 
 		} else {
@@ -393,11 +393,12 @@ public class TestUtils {
 			test = testRepository.find(testObjWeb.getTestId());
 			if (test != null) {
 				test.setName(testObjWeb.getName());
+				test.setPodId(testObjWeb.getPodId());
 				test.setScheduled(testObjWeb.isScheduled());
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 				test.setTest_content(testContent);
-				test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+				test.setHash_value(testUtils.getHexValueHash(testUtils.calculateSecureHash(testContent)));
 				test.setLastChangedTimestamp(System.currentTimeMillis());
 			} else {
 				test = null;
@@ -415,8 +416,8 @@ public class TestUtils {
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	public byte[] calculateMd5Hash(String content) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
+	public byte[] calculateSecureHash(String content) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA3-512");
 		byte[] messageDigest = md.digest(content.getBytes());
 		return messageDigest;
 	}
@@ -424,11 +425,11 @@ public class TestUtils {
 	/**
 	 * This function converts the byte array with the calculated hash to the hex value represented as string
 	 *
-	 * @param md5hash
+	 * @param secureHash
 	 * @return
 	 */
-	public String getHexValueHash(byte[] md5hash) {
-		BigInteger no = new BigInteger(1, md5hash);
+	public String getHexValueHash(byte[] secureHash) {
+		BigInteger no = new BigInteger(1, secureHash);
 		String hashtext = no.toString(16);
 		while (hashtext.length() < 32) {
 			hashtext = "0" + hashtext;
@@ -468,7 +469,6 @@ public class TestUtils {
 				testObjWeb.setTest_content(testContent);
 				testObjWeb.setName(test.getName());
 				testObjWeb.setActive(test.isActive());
-				testObjWeb.setHostname(test.getHostname());
 				testObjWeb.setPodId(test.getPodId());
 				testObjWeb.setTestId(test.getId());
 				testObjWeb.setScheduled(test.isScheduled());

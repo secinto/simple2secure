@@ -1,5 +1,6 @@
 import json
 import logging
+import socket
 import time
 
 import requests
@@ -63,7 +64,6 @@ def update_tests(tests, app):
     for test in tests_json:
         current_test_name = test["name"]
         db_test = Test.query.filter_by(name=current_test_name).first()
-
         test_dump = json.dumps(test)
         test_hash = create_secure_hash(test_dump)
 

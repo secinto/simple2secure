@@ -4,7 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import json
 
 from src.db.database import TestResult
-from src.db.database_schema import TestSequenceSchema
+from src.db.database_schema import TestSequenceSchema, TestResultSchema
 from src.util.db_utils import clear_pod_status_auth
 from src.util.rest_utils import portal_get, send_notification, update_test_status, check_portal_alive, \
     update_sequence_status
@@ -48,7 +48,7 @@ def get_scheduled_tests(app_obj, celery_tasks):
     :param celery_tasks: The celery_tasks object as created during application setup
     """
     with app_obj.app_context():
-        request_test = portal_get(app_obj, app_obj.config['PORTAL_URL'] + "pod/scheduledTests/" +
+        request_test = portal_get(app_obj, app_obj.config['PORTAL_URL'] + "device/scheduledTests/" +
                                   app_obj.config['POD_ID'])
         if request_test is not None and request_test.status_code == 200:
             test_run_array = json.loads(request_test.text)
@@ -79,7 +79,9 @@ def get_test_results_from_db(app_obj, celery_tasks):
     with app_obj.app_context():
         test_results = TestResult.query.filter_by(isSent=False).all()
         for test_result in test_results:
-            celery_tasks.send_test_result.delay(test_result)
+            test_result_schema = TestResultSchema()
+            output = test_result_schema.dump(test_result)
+            celery_tasks.send_test_result.delay(output, test_result.id)
 
 
 def get_scheduled_sequence(app_obj, celery_tasks):
@@ -105,8 +107,7 @@ def get_scheduled_sequence(app_obj, celery_tasks):
                 for sequence_run in sequence_run_content:
                     curr_sequence = get_sequence_from_run(sequence_run)
                     sequence_to_provide = test_sequence_schema.dump(curr_sequence).data
-                    celery_tasks.schedule_sequence.delay(sequence_to_provide, sequence_run_id, sequence_id,
-                                                         app_obj.config['AUTH_TOKEN'])
+                    celery_tasks.schedule_sequence.delay(sequence_to_provide, sequence_run_id, sequence_id)
                     send_notification(
                         "Sequence " + curr_sequence.name + " has been scheduled for the execution in the pod",
                         app_obj)

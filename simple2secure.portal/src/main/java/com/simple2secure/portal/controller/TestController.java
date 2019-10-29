@@ -300,7 +300,7 @@ public class TestController {
 					String test_content = test.getTest_content().replace("\'", "\"");
 					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
 							TestStatus.PLANNED, System.currentTimeMillis());
-					testRun.setHostname(test.getHostname());
+					testRun.setHostname(license.getHostname());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(
@@ -326,42 +326,6 @@ public class TestController {
 	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @RequestHeader("Accept-Language") String locale) {
 		TestResult result = testUtils.saveTestResult(testResult, locale);
 		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/saveTestPod",
-			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<Test> updateSaveTestPod(@RequestBody Test test, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/syncTests",
-			method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(locale) && tests != null && !tests.isEmpty()) {
-			String podId = "";
-			for (Test test : tests) {
-				testUtils.synchronizeReceivedTest(test);
-				if (Strings.isNullOrEmpty(podId)) {
-					podId = test.getPodId();
-				}
-			}
-			List<Test> synchronizedTests = new ArrayList<>();
-			synchronizedTests = testRepository.getByPodId(podId);
-			return new ResponseEntity<>(synchronizedTests, HttpStatus.OK);
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
-				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

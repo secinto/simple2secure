@@ -105,7 +105,7 @@ public class TestRunScheduler {
 						if (group != null) {
 							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
 									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-							testRun.setHostname(test.getHostname());
+							testRun.setHostname(license.getHostname());
 
 							test.setLastExecution(currentTimestamp);
 							testRunRepository.save(testRun);

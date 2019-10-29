@@ -10,12 +10,10 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = ""
     POD_ID = ''
     PORTAL_URL = 'https://localhost:8443/api/'
-    PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
-    AUTH_TOKEN = ''
+    # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
     IS_CELERY = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CONNECTED_WITH_PORTAL = False
-    ACTIVATE_LICENSE = False
     LICENSE_FOLDER = 'static/license'
     LOG_FILE = 'logs/app.log'
     LOG_LEVEL_NAME = 'INFO'

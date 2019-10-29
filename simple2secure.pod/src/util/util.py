@@ -36,10 +36,11 @@ def get_date_from_string(date_string):
 def check_command_params(argv, app):
     with app.app_context():
         argumentsList = argv[1:]
-
+        log.info(argumentsList)
         try:
-            opts, args = getopt.getopt(argumentsList, "ha:", ["activate=", "docker"])
+            opts, args = getopt.getopt(argumentsList, "hd", ["help", "docker"])
         except getopt.GetoptError:
+            log.error("Some error")
             print('app.py -a <True/False>')
             sys.exit(2)
 
@@ -47,11 +48,10 @@ def check_command_params(argv, app):
             if opt == '-h':
                 print('app.py -a <True/False>')
                 sys.exit()
-            elif opt in ("-a", "-activate"):
-                app.config['ACTIVATE_LICENSE'] = True
-
-            elif opt == '--docker':
+            elif opt in ("-o", "--docker"):
                 app.config['USE_CELERY_IN_DOCKER'] = True
+            else:
+                log.info("Found unknown option {}".format(opt))
 
 
 def init_logger(app):

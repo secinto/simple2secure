@@ -57,7 +57,6 @@ def entrypoint(argv, mode='app'):
         check_command_params(argv, app)
         log = logging.getLogger('pod.init')
     else:
-        check_command_params(argv, app)
         log = logging.getLogger('celery.init')
 
     CORS(app)

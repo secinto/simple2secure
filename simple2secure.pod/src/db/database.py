@@ -1,7 +1,6 @@
-import json
+from enum import Enum
 
 from flask_sqlalchemy import SQLAlchemy
-from enum import Enum
 
 db = SQLAlchemy()
 

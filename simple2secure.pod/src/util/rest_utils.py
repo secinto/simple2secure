@@ -138,7 +138,7 @@ def send_notification(content, app):
     :param app: The application context
     :return:
     """
-    url = app.config['PORTAL_URL'] + "notification/pod/" + app.config['POD_ID']
+    url = app.config['PORTAL_URL'] + "notification/" + app.config['POD_ID']
 
     notification = Notification(content)
     return portal_post(app, url, json.dumps(notification.__dict__))

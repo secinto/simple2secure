@@ -35,7 +35,6 @@ public class Test extends GenericDBObject {
 	private String podId;
 	private String name;
 	private String test_content;
-	private String hostname;
 	private boolean active;
 	private boolean scheduled;
 	private long scheduledTime;
@@ -62,14 +61,6 @@ public class Test extends GenericDBObject {
 
 	public void setPodId(String podId) {
 		this.podId = podId;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
 	}
 
 	public long getLastScheduleTimestamp() {
