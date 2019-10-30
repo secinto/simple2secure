@@ -69,45 +69,43 @@ def run_sequence():
 
 @app.route("/services/run")
 def run_service():
-    with app.app_context():
+    test_schema = TestSchema()
+    response = file_utils.read_json_testfile()
+    update_tests(response, app)
 
-        test_schema = TestSchema()
-        response = file_utils.read_json_testfile()
-        update_tests(response, app)
+    response_text = "All available tests from services.json have been scheduled"
 
-        response_text = "All available tests from services.json have been scheduled"
+    if json_utils.is_blank(request.query_string) is True:
+        response_text = "Test ID not specified! Please write the url in the following form " \
+                        "{https://localhost:5000/services/run?test=test1}"
 
-        if json_utils.is_blank(request.query_string) is True:
-            response_text = "Test ID not specified! Please write the url in the following form " \
-                            "{https://localhost:5000/services/run?test=test1}"
+    else:
+        test_name_response = request.args.get("test")
 
+        db_test = Test.query.filter_by(name=test_name_response).first()
+
+        step = request.args.get("step")
+        precondition = request.args.get("precondition")
+        postcondition = request.args.get("postcondition")
+
+        if db_test is None:
+            response_text = "Test with provided test name cannot be found"
         else:
-            test_name_response = request.args.get("test")
+            current_test = json.loads(db_test.test_content)
 
-            db_test = Test.query.filter_by(name=test_name_response).first()
+            if not json_utils.is_blank(step):
+                step_param_value = json_utils.parse_query_test(step, "step")
+                current_test["test_definition"]["step"]["command"]["parameter"]["value"] = step_param_value
 
-            step = request.args.get("step")
-            precondition = request.args.get("precondition")
-            postcondition = request.args.get("postcondition")
+            if not json_utils.is_blank(precondition):
+                precondition_param_value = json_utils.parse_query_test(precondition, "precondition")
+                current_test["test_definition"]["precondition"]["command"]["parameter"][
+                    "value"] = precondition_param_value
 
-            if db_test is None:
-                response_text = "Test with provided test name cannot be found"
-            else:
-                current_test = json.loads(db_test.test_content)
-
-                if not json_utils.is_blank(step):
-                    step_param_value = json_utils.parse_query_test(step, "step")
-                    current_test["test_definition"]["step"]["command"]["parameter"]["value"] = step_param_value
-
-                if not json_utils.is_blank(precondition):
-                    precondition_param_value = json_utils.parse_query_test(precondition, "precondition")
-                    current_test["test_definition"]["precondition"]["command"]["parameter"][
-                        "value"] = precondition_param_value
-
-                if not json_utils.is_blank(postcondition):
-                    postcondition_param_value = json_utils.parse_query_test(postcondition, "postcondition")
-                    current_test["test_definition"]["postcondition"]["command"]["parameter"][
-                        "value"] = postcondition_param_value
+            if not json_utils.is_blank(postcondition):
+                postcondition_param_value = json_utils.parse_query_test(postcondition, "postcondition")
+                current_test["test_definition"]["postcondition"]["command"]["parameter"][
+                    "value"] = postcondition_param_value
 
             db_test.test_content = current_test
             print(db_test.test_content)
@@ -120,7 +118,7 @@ def run_service():
                 response_text = "Problem occured while scheduling test!"
                 clear_pod_status_auth(app)
 
-        return response_text
+    return response_text
 
 
 if __name__ == '__main__':

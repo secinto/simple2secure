@@ -52,14 +52,16 @@ def entrypoint(argv, mode='app'):
     # Check command line arguments and initialize logger, thereafter loggers can be used
     if mode != 'app':
         init_logger(app)
-
-    if mode == 'app':
+        log = logging.getLogger('celery.init')
+    else:
         check_command_params(argv, app)
         log = logging.getLogger('pod.init')
-    else:
-        log = logging.getLogger('celery.init')
 
     CORS(app)
+
+    log.info('===============================================================')
+    log.info('=====================      STARTING      ======================')
+    log.info('===============================================================')
 
     if not app.config['SQLALCHEMY_DATABASE_URI']:
         db_path = os.path.abspath(os.path.relpath('db'))
@@ -75,7 +77,7 @@ def entrypoint(argv, mode='app'):
         db.init_app(app)
         ma.init_app(app)
         log.info("Creating tables in the DB if not existent")
-        init_db()
+        init_db(app)
 
         if not app.config['POD_ID']:
             log.info('Obtaining the POD info')
