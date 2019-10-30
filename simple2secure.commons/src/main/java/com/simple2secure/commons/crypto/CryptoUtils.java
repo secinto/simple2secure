@@ -29,6 +29,9 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Base64;
 
+import org.bouncycastle.jcajce.provider.digest.SHA3.Digest512;
+import org.bouncycastle.jcajce.provider.digest.SHA3.DigestSHA3;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,5 +158,29 @@ public class CryptoUtils {
 		log.debug("Signature encoded {}", new String(signatureEncoded));
 
 		return signatureEncoded;
+	}
+
+	/**
+	 * Generates a SHA3-512 message digest from the provided content and returns the digest as byte array.
+	 *
+	 * @param content
+	 *          The content to be hashed
+	 * @return The hash value of the content.
+	 */
+	public static byte[] generateSecureHash(byte[] content) {
+		DigestSHA3 sha3 = new Digest512();
+		sha3.update(content);
+		return sha3.digest();
+	}
+
+	/**
+	 * Generates a SHA3-512 message digest from the provided content and returns the digest as string in HEX representation.
+	 *
+	 * @param content
+	 *          The content to be hashed
+	 * @return The hash value of the content.
+	 */
+	public static String generateSecureHashHexString(String content) {
+		return Hex.toHexString(generateSecureHash(content.getBytes()));
 	}
 }

@@ -22,8 +22,6 @@
 
 package com.simple2secure.portal.utils;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +45,7 @@ import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -385,7 +384,7 @@ public class TestUtils {
 			test.setScheduledTime(testObjWeb.getScheduledTime());
 			test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 			test.setTest_content(testContent);
-			test.setHash_value(testUtils.getHexValueHash(testUtils.calculateSecureHash(testContent)));
+			test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
 			test.setActive(true);
 
 		} else {
@@ -398,7 +397,7 @@ public class TestUtils {
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 				test.setTest_content(testContent);
-				test.setHash_value(testUtils.getHexValueHash(testUtils.calculateSecureHash(testContent)));
+				test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
 				test.setLastChangedTimestamp(System.currentTimeMillis());
 			} else {
 				test = null;
@@ -407,34 +406,6 @@ public class TestUtils {
 
 		return test;
 
-	}
-
-	/**
-	 * This function calculates the md5 hash of the provided string
-	 *
-	 * @param content
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 */
-	public byte[] calculateSecureHash(String content) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("SHA3-512");
-		byte[] messageDigest = md.digest(content.getBytes());
-		return messageDigest;
-	}
-
-	/**
-	 * This function converts the byte array with the calculated hash to the hex value represented as string
-	 *
-	 * @param secureHash
-	 * @return
-	 */
-	public String getHexValueHash(byte[] secureHash) {
-		BigInteger no = new BigInteger(1, secureHash);
-		String hashtext = no.toString(16);
-		while (hashtext.length() < 32) {
-			hashtext = "0" + hashtext;
-		}
-		return hashtext;
 	}
 
 	/**

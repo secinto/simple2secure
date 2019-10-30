@@ -29,6 +29,7 @@ import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -120,7 +121,7 @@ public class TestSequenceController {
 				Test dbTest = testRepository.getTestByName(testId);
 				testList.add(dbTest);
 			}
-			sequence.setSequenceHash(testUtils.getHexValueHash(testUtils.calculateSecureHash(sequence.getSequenceContent().toString())));
+			sequence.setSequenceHash(CryptoUtils.generateSecureHashHexString(sequence.getSequenceContent().toString()));
 			if (!Strings.isNullOrEmpty(sequence.getId())) {
 				testSequenceRepository.update(sequence);
 				log.debug("Test sequence: {} has been updated", sequence.getName());
