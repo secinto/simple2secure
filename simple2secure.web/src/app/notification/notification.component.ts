@@ -20,10 +20,10 @@
  *********************************************************************
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {DataService, HttpService} from '../_services';
-import {Notification} from '../_models';
+import {ContextDTO, Notification} from '../_models';
 
 @Component({
 	moduleId: module.id,
@@ -36,17 +36,20 @@ export class NotificationComponent {
 
 	notifications: Notification[];
 	url: string;
+	currentUser: any;
+	currentContext: ContextDTO;
+	dataRefresher: any;
 
 	constructor(private httpService: HttpService,
 	            private dataService: DataService){
 	}
 
-	ngDoCheck() {
+	ngOnInit() {
 		this.notifications = this.dataService.getNotifications();
+		this.refreshNotifications();
 	}
 
 	isRead(notification: Notification){
-
 		if (!notification.read){
 			// console.log('Notification ID ' + notification.id);
 			this.url = environment.apiEndpoint + 'notification/read';
@@ -58,5 +61,12 @@ export class NotificationComponent {
 				});
 		}
 
+	}
+
+	refreshNotifications(){
+		this.dataRefresher =
+			setInterval(() => {
+				this.notifications = this.dataService.getNotifications();
+			}, 5000);
 	}
 }
