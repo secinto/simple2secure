@@ -9,7 +9,7 @@ import src.config.config as config_module
 from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
-from src.util.db_utils import init_db, update, get_pod
+from src.util.db_utils import update, get_pod
 from src.util.util import print_error_message, shutdown_server, check_command_params, init_logger
 from src.util.auth_utils import authenticate
 from src.util.rest_utils import check_portal_alive
@@ -77,7 +77,8 @@ def entrypoint(argv, mode='app'):
         db.init_app(app)
         ma.init_app(app)
         log.info("Creating tables in the DB if not existent")
-        init_db(app)
+        db.create_all()
+        db.session.commit()
 
         if not app.config['POD_ID']:
             log.info('Obtaining the POD info')
