@@ -224,12 +224,12 @@ export class EmailOverviewComponent {
 			});
 	}
 
-	private openDialogShowRules()
+	public openDialogShowRules()
 	{
 		console.log("inside openDialogShowRules: not implemented yet");
 	}
 
-	private openDialogAddRule()
+	public openDialogAddRule()
 	{
 		console.log("inside openDialogAddRule: not implemented yet");
 	}

@@ -147,7 +147,7 @@ export class RuleOverviewComponent {
 		this.onDeleteDialog();
 	}
 
-	private openDialogAddRule(){
+	public openDialogAddRule(){
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
