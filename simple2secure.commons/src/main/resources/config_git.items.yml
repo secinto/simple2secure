@@ -1,7 +1,7 @@
 baseProtocol: https
-baseHost:  simple2secure.info
-basePort: 51001/s2s
-basePortWeb: 51003
+baseHost:  localhost
+basePort: 8443
+basePortWeb: 9000
 usersAPI: /api/users
 loginAPI: /api/login
 reportsAPI: /api/reports
