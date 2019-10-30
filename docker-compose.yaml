@@ -23,7 +23,7 @@ services:
         hostname: localhost
         volumes:
             - $HOME/mongo/data/db:/data/db
-        restart: always
+        restart: on-failure
         
     s2s-web:  
         build: ./simple2secure.web/.

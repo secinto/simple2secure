@@ -20,7 +20,7 @@ def shutdown_server():
 
 
 def create_secure_hash(content):
-    sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
+    sha3_hash = hashlib.sha3_256(content.encode('utf-8')).hexdigest()
     return sha3_hash
 
 

@@ -6,7 +6,7 @@ allprojects {
 			maven { url 'https://repo.spring.io/libs-snapshot' }
 		}
 	}
-	
+
 	apply plugin: 'java'
 	apply plugin: 'eclipse-wtp'
 	apply plugin: 'java-library'
@@ -54,7 +54,6 @@ project(':simple2secure.commons') {
 		compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
 		compile group: 'org.jeasy', name: 'easy-rules-core', version: '3.3.0'
 		compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.2'
-		compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
 	}
 }
 
@@ -117,29 +116,29 @@ project(':simple2secure.portal') {
 
 
 task cleanFiles(type: Delete) {
-		delete file('simple2secure.info')
-		delete file('simple2secure.portal/src/main/resources/keys')
-		delete file('simple2secure.portal/src/main/resources/probe')
-		delete file('simple2secure.probe/src/main/resources/keys')
+	delete file('simple2secure.info')
+	delete file('simple2secure.portal/src/main/resources/keys')
+	delete file('simple2secure.portal/src/main/resources/probe')
+	delete file('simple2secure.probe/src/main/resources/keys')
 }
 
 
 task overwriteTask{
-		dependsOn cleanFiles
-		description 'Overwrites the actual configuration according to the used profile'
-		doLast {
+	dependsOn cleanFiles
+	description 'Overwrites the actual configuration according to the used profile'
+	doLast {
 		println "Renaming and copying"
-				file("simple2secure.commons/src/main/resources/config_git.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config.items.yml"))
-				file("simple2secure.portal/src/main/resources/application_git.yml").renameTo(file("simple2secure.portal/src/main/resources/application.yml"))
-		}
+		file("simple2secure.commons/src/main/resources/config_git.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config.items.yml"))
+		file("simple2secure.portal/src/main/resources/application_git.yml").renameTo(file("simple2secure.portal/src/main/resources/application.yml"))
+	}
 }
 
 task deployment{
 	description 'Overwrites the current configuration with the one for deployment'
 	doLast {
-	println "Renaming and copying"
-			file("simple2secure.commons/src/main/resources/config_prod.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config.items.yml"))
-			file("simple2secure.portal/src/main/resources/application_prod.yml").renameTo(file("simple2secure.portal/src/main/resources/application.yml"))
+		println "Renaming and copying"
+		file("simple2secure.commons/src/main/resources/config_prod.items.yml").renameTo(file("simple2secure.commons/src/main/resources/config.items.yml"))
+		file("simple2secure.portal/src/main/resources/application_prod.yml").renameTo(file("simple2secure.portal/src/main/resources/application.yml"))
 	}
 }
 
