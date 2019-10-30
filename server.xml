@@ -101,7 +101,7 @@
     -->
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-			   keystoreFile="ssl/keystore.p12" keystorePass="Latinica.1"
+			   keystoreFile="ssl/keystore.p12" keystorePass="tomcat"
 			   truststoreFile="ssl/cacerts" truststorePasss="testtest" clientAuth="false"
 			   sslProtocol="TLS" allowUnsafeLegacyRenegotiation="true"/>
 
