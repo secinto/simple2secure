@@ -114,35 +114,39 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
     :return:
     """
     with app.app_context():
-        sequence = update_sequence(test_sequence)
+        sequence = update_sequence(json.loads(test_sequence))
 
         current_milli_time = get_current_timestamp()
 
         test_sequence_result_obj = {}
         firstRun = True
         nextResult = ""
-        for i, task in enumerate(json.loads(sequence.sequence_content), 0):
+        for i, task in enumerate(json.loads(sequence.sequenceContent), 0):
+            taskJson = json.loads(task)
             if firstRun:
-                test_content =  json.loads(task['test_content'])
+                test_content = json.loads(taskJson['test_content'])
                 test_command = test_content['test_definition']['step']['command']['executable']
                 test_parameter = test_content['test_definition']['step']['command']['parameter']['value']
                 scan = schedule_test_for_sequence(test_parameter, test_command)
                 nextResult = scan.strip()
-                test_sequence_result_obj[task['name']] = nextResult
+                test_sequence_result_obj[taskJson['name']] = nextResult
                 firstRun = False
             else:
-                test_content = json.loads(task['test_content'])
+                test_content = json.loads(taskJson['test_content'])
                 test_command = test_content['test_definition']['step']['command']['executable']
+                nextResult = nextResult.replace("\r", "")
+                nextResult = nextResult.replace("\n", "")
+                nextResult = nextResult.replace(" ", "")
                 scan = schedule_test_for_sequence(nextResult, test_command)
                 nextResult = scan.strip()
-                test_sequence_result_obj[task['name']] = nextResult
+                test_sequence_result_obj[taskJson['name']] = nextResult
  
         test_sequence_result_obj = json.dumps(test_sequence_result_obj)
         testSeqRes = TestSequenceResult(sequence_run_id, sequence_id, sequence.podId, sequence.name,
                                         test_sequence_result_obj, current_milli_time)
         test_result_schema = TestSequenceResultSchema()
-        output = test_result_schema.dump(testSeqRes).data
-        portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", output)
+        output = test_result_schema.dump(testSeqRes)
+        portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", json.dumps(output))
 
         update(testSeqRes)
         update(sequence)

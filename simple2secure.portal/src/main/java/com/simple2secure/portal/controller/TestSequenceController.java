@@ -84,9 +84,7 @@ public class TestSequenceController {
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{deviceId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{deviceId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequence>> getAllSequences(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -106,9 +104,7 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/add",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @RequestHeader("Accept-Language") String locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
@@ -137,9 +133,7 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/delete/{sequenceId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/delete/{sequenceId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestSequence> deleteSequence(@PathVariable("sequenceId") String sequenceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -158,10 +152,7 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/scheduledSequence/{deviceId}",
-			method = RequestMethod.GET,
-			consumes = "application/json")
+	@RequestMapping(value = "/scheduledSequence/{deviceId}", method = RequestMethod.GET, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -186,10 +177,7 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/scheduleSequence/{contextId}/{userId}",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/scheduleSequence/{contextId}/{userId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @PathVariable("contextId") String contextId,
 			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
@@ -220,10 +208,7 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/update/status/{sequenceRunId}",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/update/status/{sequenceRunId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
 			@PathVariable("sequenceRunId") String sequenceRunId, @RequestHeader("Accept-Language") String locale)
@@ -236,6 +221,7 @@ public class TestSequenceController {
 				SequenceRun currSequenceRun = sequenceRunrepository.find(sequenceRunId);
 				currSequenceRun.setSequenceStatus(TestStatus.valueOf(sequenceStatus));
 				sequenceRunrepository.update(currSequenceRun);
+				return new ResponseEntity<>(currSequenceRun, HttpStatus.OK);
 			}
 		}
 
@@ -244,26 +230,24 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/save/sequencerunresult",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/save/sequencerunresult", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<SequenceRun> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
+	public ResponseEntity<TestSequenceResult> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
 			@RequestHeader("Accept-Language") String locale) {
 		if (sequenceRunResult != null) {
 			testSequenceResultRepository.save(sequenceRunResult);
+			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	@RequestMapping(
-			value = "/sequenceresults/{podId}",
-			method = RequestMethod.GET)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/sequenceresults/{podId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String podId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String podId,
+			@RequestHeader("Accept-Language") String locale) {
 		if (podId != null) {
 			List<TestSequenceResult> result = testSequenceResultRepository.getByPodId(podId);
 			return new ResponseEntity<>(result, HttpStatus.OK);
@@ -272,13 +256,12 @@ public class TestSequenceController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
-	
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	@RequestMapping(
-			value = "/sequencerunresults/{seqId}",
-			method = RequestMethod.GET)
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/sequencerunresults/{seqId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable String seqId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable String seqId,
+			@RequestHeader("Accept-Language") String locale) {
 		if (seqId != null) {
 			List<TestSequenceResult> result = testSequenceResultRepository.getBySequenceId(seqId);
 			return new ResponseEntity<>(result, HttpStatus.OK);
