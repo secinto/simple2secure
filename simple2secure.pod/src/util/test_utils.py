@@ -81,6 +81,7 @@ def update_tests(tests, app):
 
 def sync_tests(app):
     """
+    TODO: Tests which are added in portal are not syncronized with the services.json
     Synchronizes the locally stored tests with the PORTAl and updates the services.json and the DB if updates from
     the PORTAL are available
 
@@ -89,6 +90,8 @@ def sync_tests(app):
     """
     with app.app_context():
         try:
+            response = read_json_testfile()
+            update_tests(response, app)
             tests = get_tests(app)
             if tests is not None:
                 sync_ok = False
