@@ -106,8 +106,8 @@ def get_scheduled_sequence(app_obj, celery_tasks):
 
                 for sequence_run in sequence_run_content:
                     curr_sequence = get_sequence_from_run(sequence_run)
-                    sequence_to_provide = test_sequence_schema.dump(curr_sequence).data
-                    celery_tasks.schedule_sequence.delay(sequence_to_provide, sequence_run_id, sequence_id)
+                    sequence_to_provide = test_sequence_schema.dump(curr_sequence)
+                    celery_tasks.schedule_sequence.delay(json.dumps(sequence_to_provide), sequence_run_id, sequence_id)
                     send_notification(
                         "Sequence " + curr_sequence.name + " has been scheduled for the execution in the pod",
                         app_obj)

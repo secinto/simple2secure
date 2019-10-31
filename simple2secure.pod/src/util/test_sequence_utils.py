@@ -54,10 +54,10 @@ def get_sequence_from_run(sequenceRun):
     test_schema = TestSchema()
     for name in test_names:
         test = Test.query.filter_by(name=name).first()
-        sequence_content.append(test_schema.dump(test).data)
+        sequence_content.append(json.dumps(test_schema.dump(test)))
     sequence_hash = create_secure_hash(json.dumps(sequence_content))
     test_sequence = TestSequence(sequenceRun['sequenceName'], json.dumps(sequence_content), sequence_hash,
-                                 current_milli_time, sequenceRun['podId'])
+                                 current_milli_time, sequenceRun['deviceId'])
     return test_sequence
 
 
