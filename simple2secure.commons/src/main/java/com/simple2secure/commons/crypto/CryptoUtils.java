@@ -168,7 +168,7 @@ public class CryptoUtils {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public static byte[] generateSecureHash(byte[] content) throws NoSuchAlgorithmException {
-		final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
+		final MessageDigest digest = MessageDigest.getInstance("SHA-256");
 		final byte[] hashbytes = digest.digest(content);
 		return hashbytes;
 	}
