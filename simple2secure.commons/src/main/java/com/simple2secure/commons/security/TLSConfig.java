@@ -19,7 +19,7 @@
  *
  *********************************************************************
  */
-package com.simple2secure.probe.security;
+package com.simple2secure.commons.security;
 
 import java.security.KeyStore;
 
@@ -56,7 +56,7 @@ public class TLSConfig {
 		try {
 
 			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, new TrustManager[] { new Simple2SecureTrustManager(acceptedSerialNumbers, sunJsseX509TrustManager) }, null);
+			sslContext.init(null, new TrustManager[] { new ConfigurableTrustManager(acceptedSerialNumbers, sunJsseX509TrustManager) }, null);
 			SSLContext.setDefault(sslContext);
 		} catch (Exception e) {
 			log.error("Couldn't initialize SSLContext for TLS. Reason {}", e.getLocalizedMessage());

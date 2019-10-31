@@ -33,12 +33,14 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.security.TLSConfig;
 import com.simple2secure.commons.service.ServiceCommand;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
-import com.simple2secure.probe.security.TLSConfig;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeCLI {
 	private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
@@ -60,8 +62,9 @@ public class ProbeCLI {
 
 		ProbeConfiguration.licensePath = importFilePath;
 
-		TLSConfig.initializeTLSConfiguration(
-				new String[] { "1009697567", "93791718698785438451096221151509119784", "132145755450301565074331139870923558714" });
+		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
+
+		ProbeUtils.isServerReachable();
 
 		LicenseController licenseController = new LicenseController();
 
@@ -138,7 +141,7 @@ public class ProbeCLI {
 
 		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
-		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).hasArg().argName("INSTRUMENTATION")
+		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
 				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
 		options.addOption(filePath);

@@ -29,10 +29,11 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.commons.network.NetUtils;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public final class ProbeUtils {
@@ -68,7 +69,14 @@ public final class ProbeUtils {
 	 * This function checks if the server is reachable
 	 */
 	public static void isServerReachable() {
-		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL() + "/api/service")) {
+		String response = null;
+		if (!Strings.isNullOrEmpty(ProbeConfiguration.probeId)) {
+			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/service/" + ProbeConfiguration.probeId, null,
+					null);
+		} else {
+			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + "/api/service/");
+		}
+		if (!Strings.isNullOrEmpty(response)) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
 		} else {

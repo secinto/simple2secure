@@ -244,6 +244,15 @@ public class DeviceController {
 	}
 
 	@RequestMapping(
+			value = "/status/",
+			method = RequestMethod.GET)
+	public ResponseEntity<Service> getStatus(@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
+		currentVersion.setId("1");
+		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
+	}
+
+	@RequestMapping(
 			value = "/status/{deviceId}",
 			method = RequestMethod.POST)
 	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)

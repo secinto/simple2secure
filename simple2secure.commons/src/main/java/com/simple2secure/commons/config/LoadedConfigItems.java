@@ -36,11 +36,13 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "https://localhost";
+	private String baseHost = "localhost";
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
 	private String version = "0.2.1";
+
+	private String[] trustedCertificates = new String[0];
 
 	private String usersAPI = "/api/user";
 	private String loginAPI = "/api/login";
@@ -175,4 +177,13 @@ public class LoadedConfigItems {
 	public String getVersion() {
 		return version;
 	}
+
+	public String[] getTrustedCertificates() {
+		return trustedCertificates;
+	}
+
+	public void setTrustedCertificates(String[] trustedCertificates) {
+		this.trustedCertificates = trustedCertificates;
+	}
+
 }

@@ -19,7 +19,7 @@
  *
  *********************************************************************
  */
-package com.simple2secure.probe.security;
+package com.simple2secure.commons.security;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -32,15 +32,15 @@ import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Simple2SecureTrustManager implements X509TrustManager {
+public class ConfigurableTrustManager implements X509TrustManager {
 
-	private static Logger log = LoggerFactory.getLogger(Simple2SecureTrustManager.class);
+	private static Logger log = LoggerFactory.getLogger(ConfigurableTrustManager.class);
 
 	private String[] acceptedSerialNumbers;
 	private X509TrustManager sunJsseX509TrustManager;
 	private List<X509Certificate> trustedIssuers;
 
-	public Simple2SecureTrustManager(String[] acceptedSerialNumbers, X509TrustManager sunJsseX509TrustManager) {
+	public ConfigurableTrustManager(String[] acceptedSerialNumbers, X509TrustManager sunJsseX509TrustManager) {
 		trustedIssuers = new ArrayList<>();
 		this.acceptedSerialNumbers = acceptedSerialNumbers;
 		this.sunJsseX509TrustManager = sunJsseX509TrustManager;
@@ -62,6 +62,20 @@ public class Simple2SecureTrustManager implements X509TrustManager {
 		try {
 			if (sunJsseX509TrustManager != null) {
 				sunJsseX509TrustManager.checkServerTrusted(chain, authType);
+				for (X509Certificate cert : chain) {
+					log.debug("Client Certificate Chain {}", cert.getSubjectX500Principal().toString());
+					log.debug("Client Certificate Serial Number {}", cert.getSerialNumber().toString());
+					log.debug("Client Certificate Issuer DN {}", cert.getIssuerX500Principal());
+					log.debug("Client Certificate Subject DN {}", cert.getSubjectX500Principal());
+					if (stringContainsItemFromList(cert.getSerialNumber().toString(), acceptedSerialNumbers)) {
+						if (!trustedIssuers.contains(cert)) {
+							trustedIssuers.add(cert);
+						}
+					} else {
+						throw new CertificateException(
+								"Not trusted certificate found. Currently only trusting certificate with serial " + acceptedSerialNumbers);
+					}
+				}
 			}
 		} catch (CertificateException excep) {
 			for (X509Certificate cert : chain) {

@@ -33,7 +33,7 @@
                     "parameter": {
                         "description": "File Name",
                         "prefix": "",
-                        "value": "result/result.json"
+                        "value": "./result/result.json"
                     }
                 }
             }
