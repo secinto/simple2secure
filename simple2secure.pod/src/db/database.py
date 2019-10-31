@@ -6,7 +6,8 @@ db = SQLAlchemy()
 
 
 class PodInfo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'pod_info'
+    id = db.Column(db.Integer, unique=True, primary_key=True)
     generated_id = db.Column(db.Text)
     authToken = db.Column(db.Text)
     connected = db.Column(db.Boolean)

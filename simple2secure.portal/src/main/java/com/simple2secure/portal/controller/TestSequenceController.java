@@ -169,8 +169,9 @@ public class TestSequenceController {
 
 		if (podLicense != null) {
 			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
-			licenseRepository.update(podLicense);
 			log.debug("Updating last online time for device {}", deviceId);
+			licenseRepository.update(podLicense);
+			log.debug("Updated last online time for device {}", deviceId);
 			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId, locale);
 			List<SequenceRun> allSeqRuns = respEntObj.getBody();
 			List<SequenceRun> filteredSeqRuns = allSeqRuns.stream().filter(sR -> sR.getSequenceStatus().equals(TestStatus.PLANNED))
