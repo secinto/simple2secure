@@ -25,16 +25,23 @@ public class TestSequenceResultRepositoryImpl extends TestSequenceResultReposito
 
     @Override
     public List<TestSequenceResult> getBySequenceId(String sequenceId) {
-        Query query = new Query(Criteria.where("sequenceId").is(sequenceId));
+        Query query = new Query(Criteria.where("sequence_id").is(sequenceId));
 		List<TestSequenceResult> testSequenceResults = mongoTemplate.find(query, TestSequenceResult.class);
 		return testSequenceResults;
     }
 
     @Override
     public TestSequenceResult getBySequenceRunId(String sequenceRunId) {
-        Query query = new Query(Criteria.where("sequenceRunId").is(sequenceRunId));
+        Query query = new Query(Criteria.where("sequence_run_id").is(sequenceRunId));
 		TestSequenceResult testSequenceResults = mongoTemplate.findOne(query, TestSequenceResult.class);
 		return testSequenceResults;
+    }
+
+    @Override
+    public List<TestSequenceResult> getByPodId(String podId) {
+        Query query = new Query(Criteria.where("pod_id").is(podId));
+        List<TestSequenceResult> result = mongoTemplate.find(query, TestSequenceResult.class);
+        return result;
     }
 
 }

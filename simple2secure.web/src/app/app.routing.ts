@@ -52,6 +52,8 @@ import {OsQueryReportDetailsComponent,
 	NetworkReportOverviewComponent} from './report';
 import {TestResultComponent} from './report/testResult.component';
 import {SearchComponent, SearchResultComponent} from './search';
+import { TestSequenceResultComponent } from './report/testSequenceResult.component';
+import { TestSequenceRunsComponent } from './report/testSequenceRuns.component';
 
 const appRoutes: Routes = [
 	{
@@ -78,6 +80,8 @@ const appRoutes: Routes = [
 					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
 					{path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
 					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
+					{path: 'testSequenceResult', component: TestSequenceResultComponent, data: {title: 'menu.testSequenceResults'}},
+					{path: 'testSequenceResult/:id', component: TestSequenceRunsComponent, data: {title: 'menu.testSequenceRuns'}}
 				]
 			},
 			{

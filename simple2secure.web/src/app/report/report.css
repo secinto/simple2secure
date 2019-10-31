@@ -1,0 +1,7 @@
+.ngx-json-viewer {
+    overflow: scroll !important;
+}
+
+#section {
+    overflow: scroll !important;
+}

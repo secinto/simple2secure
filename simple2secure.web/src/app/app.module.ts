@@ -52,7 +52,7 @@ import {
 	from './network';
 import {
 	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent
+	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent 
 } from './report';
 import {
 	EmailOverviewComponent,
@@ -164,6 +164,9 @@ import { AgmDirectionModule } from 'agm-direction';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
+import { TestSequenceResultComponent } from './report/testSequenceResult.component';
+import { TestSequenceRunsComponent } from './report/testSequenceRuns.component';
+import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
 
 
 
@@ -307,7 +310,10 @@ export const httpInterceptorProviders = [
 		NotificationDetailsComponent,
 		OrbiterToolTestSequenceListComponent,
 		TestSequenceDetailsComponent,
-		ResendComponent
+		ResendComponent,
+		TestSequenceResultComponent,
+		TestSequenceRunsComponent,
+		TestSequenceResultDetailsComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -331,6 +337,7 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
+		TestSequenceResultDetailsComponent
 	],
 	providers: [
 		AuthGuard,

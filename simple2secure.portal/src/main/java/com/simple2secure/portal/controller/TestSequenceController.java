@@ -256,4 +256,35 @@ public class TestSequenceController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@RequestMapping(
+			value = "/sequenceresults/{podId}",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String podId, @RequestHeader("Accept-Language") String locale) {
+		if (podId != null) {
+			List<TestSequenceResult> result = testSequenceResultRepository.getByPodId(podId);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+	
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@RequestMapping(
+			value = "/sequencerunresults/{seqId}",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable String seqId, @RequestHeader("Accept-Language") String locale) {
+		if (seqId != null) {
+			List<TestSequenceResult> result = testSequenceResultRepository.getBySequenceId(seqId);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
 }

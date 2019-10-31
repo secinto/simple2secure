@@ -30,7 +30,7 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class TestSequenceResultRepository extends MongoRepository<TestSequenceResult> {
 
 	public abstract List<TestSequenceResult> getBySequenceId(String sequenceId);
-
+	public abstract List<TestSequenceResult> getByPodId(String podId);
 	public abstract TestSequenceResult getBySequenceRunId(String sequenceRunId);
 
 }
