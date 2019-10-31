@@ -40,7 +40,7 @@ public class LoadedConfigItems {
 	private String basePort = "8443";
 	private String basePortWeb = "9000";
 
-	private String version = "0.2.0";
+	private String version = "0.2.1";
 
 	private String usersAPI = "/api/user";
 	private String loginAPI = "/api/login";

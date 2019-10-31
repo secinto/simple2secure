@@ -181,11 +181,9 @@ export class UserOverviewComponent {
 					for (let i = 0; i < this.myProfile.myDevices.length; i++) {
 						if (this.myProfile.myDevices[i].pod) {
 							pods.push(this.myProfile.myDevices[i]);
-							console.log('Found POD');
 						}
 						else {
 							probes.push(this.myProfile.myDevices[i]);
-							console.log('Found PROBE');
 						}
 					}
 					this.podDataSource.data = pods;
@@ -814,7 +812,8 @@ export class UserOverviewComponent {
 					this.loading = false;
 				},
 				error => {
-					this.alertService.error(error.errorMessage);
+					//this.alertService.error(error.errorMessage);
+					this.alertService.error("Error occured while downloading license");
 					this.loading = false;
 				});
 	}

@@ -21,7 +21,9 @@
  */
 package com.simple2secure.commons.crypto;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -29,9 +31,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Base64;
 
-import org.bouncycastle.jcajce.provider.digest.SHA3.Digest512;
-import org.bouncycastle.jcajce.provider.digest.SHA3.DigestSHA3;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,11 +165,12 @@ public class CryptoUtils {
 	 * @param content
 	 *          The content to be hashed
 	 * @return The hash value of the content.
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static byte[] generateSecureHash(byte[] content) {
-		DigestSHA3 sha3 = new Digest512();
-		sha3.update(content);
-		return sha3.digest();
+	public static byte[] generateSecureHash(byte[] content) throws NoSuchAlgorithmException {
+		final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
+		final byte[] hashbytes = digest.digest(content);
+		return hashbytes;
 	}
 
 	/**
@@ -179,8 +179,21 @@ public class CryptoUtils {
 	 * @param content
 	 *          The content to be hashed
 	 * @return The hash value of the content.
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static String generateSecureHashHexString(String content) {
-		return Hex.toHexString(generateSecureHash(content.getBytes()));
+	public static String generateSecureHashHexString(String content) throws NoSuchAlgorithmException {
+		return bytesToHex(generateSecureHash(content.getBytes(StandardCharsets.UTF_8)));
+	}
+
+	private static String bytesToHex(byte[] hash) {
+		StringBuffer hexString = new StringBuffer();
+		for (int i = 0; i < hash.length; i++) {
+			String hex = Integer.toHexString(0xff & hash[i]);
+			if (hex.length() == 1) {
+				hexString.append('0');
+			}
+			hexString.append(hex);
+		}
+		return hexString.toString();
 	}
 }

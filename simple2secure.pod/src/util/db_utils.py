@@ -17,11 +17,6 @@ HOSTNAME = socket.gethostname()
 log = logging.getLogger('pod.util.db_utils')
 
 
-def init_db():
-    db.create_all()
-    db.session.commit()
-
-
 def update(some_object):
     db.session.add(some_object)
     db.session.commit()
@@ -70,7 +65,7 @@ def update_pod_status_license(app, groupId, licenseId):
             podInfo = create_pod(app)
 
         if groupId and licenseId:
-            podInfo.authToken = groupId
+            podInfo.groupId = groupId
             podInfo.licenseId = licenseId
             log.info('Updating PodInfo with groupId and licenseId')
             update(podInfo)
@@ -178,5 +173,4 @@ def create_license(app):
 
         if groupId and licenseId:
             license_obj = CompanyLicensePublic(groupId, licenseId, podInfo.generated_id, expiration_date, HOSTNAME)
-            update(license_obj)
             return license_obj

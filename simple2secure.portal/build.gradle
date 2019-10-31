@@ -32,7 +32,7 @@ compileJava {
 }
 
 war {
-	baseName = 's2s-portal'
+	baseName = 'simple2secure.portal'
 }
 
 

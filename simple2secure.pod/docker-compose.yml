@@ -2,7 +2,8 @@ version: "3"
 services:  
     flask:
         build: .
-        command: "python3 app.py"
+        command: "python3 app.py --docker"
+        container_name: s2s-pod
         ports:
             - 5001:5000
         links:
@@ -12,5 +13,6 @@ services:
 
     redis:
         image: redis
+        container_name: redis
         ports:
             - 6379:6379

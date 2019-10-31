@@ -326,7 +326,7 @@ export class RuleAddComponent {
     /**
      * Saves the new/updated rule if all needed parameter are given by the user
      */
-	private saveRule() {
+	public saveRule() {
 
 	    // check if name is given
 	    if(this.isStringEmptyOrUndefined(this.ruleName)){
