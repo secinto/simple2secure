@@ -1,7 +1,4 @@
-.ngx-json-viewer {
-    overflow: scroll !important;
-}
-
-#section {
-    overflow: scroll !important;
+.json-viewer-class{
+    overflow: auto;
+    display: block;
 }

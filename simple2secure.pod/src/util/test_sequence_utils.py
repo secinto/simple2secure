@@ -64,24 +64,24 @@ def get_sequence_from_run(sequenceRun):
 def update_sequence(test_sequence):
     provided_sequence_name = test_sequence['name']
     provided_sequence_podid = test_sequence['podId']
-    provided_sequence_hash_value = test_sequence['hash_value']
-    provided_sequence_timestamp = test_sequence['lastChangedTimestamp']
-    provided_sequence_content_string = test_sequence['sequence_content']
+    provided_sequence_hash_value = test_sequence['sequenceHash']
+    provided_sequence_timestamp = test_sequence['lastChangedTimeStamp']
+    provided_sequence_content_string = test_sequence['sequenceContent']
     provided_sequence_content = json.loads(provided_sequence_content_string)
 
     task_seq_from_db = TestSequence.query.filter_by(name=provided_sequence_name).first()
     if task_seq_from_db:
         db_sequence_name = task_seq_from_db.name
         db_sequence_podid = task_seq_from_db.podId
-        db_sequence_content = json.loads(task_seq_from_db.sequence_content)
+        db_sequence_content = json.loads(task_seq_from_db.sequenceContent)
 
         if provided_sequence_name != db_sequence_name and provided_sequence_podid != db_sequence_podid \
                 and not is_same_sequence_content(provided_sequence_content, db_sequence_content):
             task_seq_from_db.name = test_sequence['name']
             task_seq_from_db.podId = test_sequence['podId']
-            task_seq_from_db.hash_value = test_sequence['hash_value']
+            task_seq_from_db.hash_value = test_sequence['sequenceHash']
             task_seq_from_db.lastChangedTimestamp = test_sequence['lastChangedTimestamp']
-            task_seq_from_db.sequence_content = test_sequence['sequence_content']
+            task_seq_from_db.sequence_content = test_sequence['sequenceContent']
             sequence = task_seq_from_db
         else:
             sequence = task_seq_from_db

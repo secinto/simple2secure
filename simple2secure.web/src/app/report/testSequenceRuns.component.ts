@@ -107,7 +107,7 @@ export class TestSequenceRunsComponent {
 	openDialogShowTestResult(): void {
 		const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
-        dialogConfig.height = '100%'
+        dialogConfig.height = '800px'
 		dialogConfig.data = {
 			seqResult: this.selectedRun,
 		};

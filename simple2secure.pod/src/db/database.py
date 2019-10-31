@@ -30,7 +30,7 @@ class Test(db.Model):
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
     hash_value = db.Column(db.Text)
-    lastChangedTimestamp = db.Column(db.BigInteger)
+    lastChangedTimestamp = db.Column(db.Text)
 
     def __init__(self, name, test_content, hash_value, last_changed_timestamp, pod_id):
         self.name = name
@@ -46,7 +46,7 @@ class TestSequence(db.Model):
     name = db.Column(db.Text)
     sequenceContent = db.Column(db.Text)
     sequenceHash = db.Column(db.Text)
-    lastChangedTimeStamp = db.Column(db.BigInteger)
+    lastChangedTimeStamp = db.Column(db.Float)
 
     def __init__(self, name, sequence_content, hash_value, last_changed_timestamp, pod_id):
         self.name = name
