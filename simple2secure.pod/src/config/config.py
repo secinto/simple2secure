@@ -25,11 +25,11 @@ class Config(object):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
-    DATABASE_URI = 'mysql://user@localhost/foo'
+    # DATABASE_URI = 'mysql://user@localhost/foo'
     CELERY_BROKER_URL = "redis://redis:6379"
     CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = False
     Testing = True

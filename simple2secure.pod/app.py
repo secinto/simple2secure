@@ -109,10 +109,10 @@ def run_service():
                     current_test["test_definition"]["postcondition"]["command"]["parameter"][
                         "value"] = postcondition_param_value
 
-            db_test.test_content = current_test
+            db_test.test_content = json.dumps(current_test)
             print(db_test.test_content)
             output = test_schema.dump(db_test)
-            resp = schedule_test_on_the_portal(output, app)
+            resp = schedule_test_on_the_portal(json.dumps(output), app)
 
             if resp.status_code == 200:
                 response_text = "Test " + test_name_response + " has been scheduled"
