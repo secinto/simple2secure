@@ -71,8 +71,7 @@ public final class ProbeUtils {
 	public static void isServerReachable() {
 		String response = null;
 		if (!Strings.isNullOrEmpty(ProbeConfiguration.probeId)) {
-			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/service/" + ProbeConfiguration.probeId, null,
-					null);
+			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/" + ProbeConfiguration.probeId, null, null);
 		} else {
 			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + "/api/service/");
 		}
