@@ -287,6 +287,7 @@
   "message.test.create": "Test erfolgreich erstellt!",
   "message.test.update": "Test erfolgreich aktualisiert!",
   "message.test.schedule": "Test wurde geplant!",
+  "message.testsequence.schedule": "Testsequenz wurde eingeplant!",
   "message.copy.config.dialog": "Mit einem Klick auf Ja wird Ihre aktuelle Probekonfiguration überschrieben!",
   "message.copy.osqueryconfig.dialog": "Mit einem Klick auf Ja wird Ihre aktuelle OSQuery Probekonfiguration überschrieben!",
   "message.copy.stepsAndProcessor.dialog": "Wenn Sie auf Ja klicken, werden Ihre aktuellen Schritte und Prozessoren überschrieben!",

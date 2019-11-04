@@ -112,6 +112,8 @@ def get_scheduled_sequence(app_obj, celery_tasks):
                         "Sequence " + curr_sequence.name + " has been scheduled for the execution in the pod",
                         app_obj)
                     update_sequence_status(app_obj, sequence_run_id, sequence_id, "SCHEDULED")
+            else:
+                log.info("There are no scheduled test sequences")
         else:
             clear_pod_status_auth(app_obj)
             if request_sequence is None:

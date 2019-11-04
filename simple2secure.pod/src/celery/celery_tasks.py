@@ -141,6 +141,8 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
                 nextResult = scan.strip()
                 test_sequence_result_obj[taskJson['name']] = nextResult
  
+
+
         test_sequence_result_obj = json.dumps(test_sequence_result_obj)
         testSeqRes = TestSequenceResult(sequence_run_id, sequence_id, sequence.podId, sequence.name,
                                         test_sequence_result_obj, current_milli_time)

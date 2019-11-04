@@ -289,6 +289,7 @@
   "message.test.create": "Test created successfully!",
   "message.test.update": "Test updated successfully!",
   "message.test.schedule": "Test has been scheduled!",
+  "message.testsequence.schedule": "Test Sequence has been scheduled!",
   "message.copy.config.dialog": "With clicking on yes, your current probe configuration will be overwritten!",
   "message.copy.osqueryconfig.dialog": "With clicking on yes, your current probe OSQuery configuration will be overwritten!",
   "message.copy.stepsAndProcessor.dialog": "With clicking on yes, your current Steps and Processors will be overwritten!",

@@ -7,7 +7,7 @@ log = logging.getLogger('pod.util.compare_utils')
 def is_same_sequence_content(prov_seq_cont, db_seq_cont):
     result = []
     for i, task in enumerate(prov_seq_cont, 0):
-        if is_same_test(task, db_seq_cont[i]):
+        if is_same_test(json.loads(task), json.loads(db_seq_cont[i])):
             result.append(True)
         else:
             result.append(False)

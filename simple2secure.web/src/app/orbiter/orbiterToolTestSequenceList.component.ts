@@ -148,7 +148,7 @@ export class OrbiterToolTestSequenceListComponent {
 		this.httpService.post(this.selectedSequence, this.url).subscribe(
 			data => {
 
-				this.alertService.success(this.translate.instant('message.test.schedule'));
+				this.alertService.success(this.translate.instant('message.testsequence.schedule'));
 			},
 			error => {
 				if (error.status == 0) {
