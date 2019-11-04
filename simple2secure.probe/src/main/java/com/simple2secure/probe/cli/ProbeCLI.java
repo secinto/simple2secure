@@ -21,6 +21,7 @@
  */
 package com.simple2secure.probe.cli;
 
+import java.net.InetAddress;
 import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
@@ -61,6 +62,12 @@ public class ProbeCLI {
 	public void init(String importFilePath) {
 
 		ProbeConfiguration.licensePath = importFilePath;
+
+		try {
+			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
+		} catch (Exception e) {
+			log.error("Couldn't obtain hostname for machine.");
+		}
 
 		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
 

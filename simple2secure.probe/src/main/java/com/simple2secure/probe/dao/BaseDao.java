@@ -64,10 +64,30 @@ public interface BaseDao<T> {
 
 	/**
 	 * Finds the object by the field name
-	 * 
+	 *
 	 * @param fieldName
 	 * @param value
 	 * @return
 	 */
 	public List<T> findByFieldName(String fieldName, Object value);
+
+	/**
+	 * Returns the specified page number for the field name.
+	 *
+	 * @param filedName
+	 * @param value
+	 * @param lastPageNumber
+	 * @return
+	 */
+	public List<T> findByFieldNamePaging(String filedName, Object value, int lastPageNumber);
+
+	/**
+	 * Returns the amount of pages required to obtain all results.
+	 *
+	 * @param filedName
+	 * @param value
+	 * @return
+	 */
+	public int getLastPageNumberByFieldName(String filedName, Object value);
+
 }

@@ -43,6 +43,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	protected Class<T> entityClass;
 
 	protected static String PERSISTENCE_UNIT_NAME = "s2s";
+	protected static int pageSize = 10;
 	private static EntityManagerFactory factory;
 
 	/**
@@ -161,6 +162,28 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	public List<T> findByFieldName(String fieldName, Object value) {
 		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
 		return query.getResultList();
+	}
+
+	/**
+	 * Find list by field name
+	 *
+	 * @param fieldName
+	 * @param value
+	 * @return
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByFieldNamePaging(String fieldName, Object value, int lastPageNumber) {
+		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
+		query.setFirstResult((lastPageNumber - 1) * pageSize);
+		query.setMaxResults(pageSize);
+		return query.getResultList();
+	}
+
+	public int getLastPageNumberByFieldName(String fieldName, Object value) {
+		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
+		int lastPageNumber = (int) (Math.ceil(query.getMaxResults() / pageSize));
+		return lastPageNumber;
 	}
 
 	/**
