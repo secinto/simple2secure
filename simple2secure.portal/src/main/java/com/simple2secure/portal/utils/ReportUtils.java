@@ -136,9 +136,10 @@ public class ReportUtils {
 						}
 					}
 				}
+				NetworkReportDTO reportDTO = new NetworkReportDTO(networkReports, 50);
 
-				NetworkReportDTO reportDTO = new NetworkReportDTO(coordinates, report.getId(), report.getGroupId(), report.getStartTime(),
-						report.getProcessorName());
+				// NetworkReportDTO reportDTO = new NetworkReportDTO(coordinates, report.getId(), report.getGroupId(), report.getStartTime(),
+				// report.getProcessorName());
 
 				preparedReports.add(reportDTO);
 

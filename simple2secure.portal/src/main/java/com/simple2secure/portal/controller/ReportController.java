@@ -21,7 +21,6 @@
  */
 package com.simple2secure.portal.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.NetworkReportDTO;
+import com.simple2secure.api.dto.ReportDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.GraphReport;
@@ -53,6 +53,8 @@ import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.GroupUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.ReportUtils;
 
 @RestController
@@ -81,6 +83,12 @@ public class ReportController {
 	ReportUtils reportUtils;
 
 	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
+	GroupUtils groupUtils;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	RestTemplate restTemplate = new RestTemplate();
@@ -88,10 +96,7 @@ public class ReportController {
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
 		if (report != null) {
@@ -104,24 +109,28 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> getReportsByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@PathVariable("contextId") String contextId,
+			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(contextId)) {
+
+			int limit = portalUtils.getPaginationLimit(size, page);
+
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 
 				if (groups != null) {
 					log.debug("Loading OSQuery reports for contextId {0}", contextId);
-					List<Report> reportsList = new ArrayList<>();
-					for (CompanyGroup group : groups) {
-						reportsList.addAll(reportsRepository.getReportsByGroupId(group.getId()));
-					}
-					return new ResponseEntity<>(reportsList, HttpStatus.OK);
+
+					List<String> groupIds = groupUtils.getGroupIdsFromGroupList(groups);
+
+					ReportDTO reportDto = new ReportDTO();
+
+					reportDto = reportsRepository.getReportsByGroupId(groupIds, limit);
+
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
 			}
 		}
@@ -131,9 +140,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/{id}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/report/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(id)) {
@@ -147,9 +154,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/name",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/report/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(name)) {
@@ -163,9 +168,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{id}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -181,10 +184,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/network",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/network", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@RequestHeader("Accept-Language") String locale) {
@@ -198,37 +198,38 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/network/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/network/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReport>> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
+			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 				if (groups != null) {
+
+					int limit = portalUtils.getPaginationLimit(size, page);
+
 					log.debug("Loading network reports for contextId {0}", contextId);
-					List<NetworkReport> reportsList = new ArrayList<>();
-					for (CompanyGroup group : groups) {
-						reportsList.addAll(networkReportRepository.getReportsByGroupId(group.getId()));
-					}
-					return new ResponseEntity<>(reportsList, HttpStatus.OK);
+
+					List<String> groupIds = groupUtils.getGroupIdsFromGroupList(groups);
+
+					NetworkReportDTO reportDto = new NetworkReportDTO();
+
+					reportDto = networkReportRepository.getReportsByGroupId(groupIds, limit);
+
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
 			}
 		}
-
 		log.error("Error occured while retrieving network reports for context id {}", contextId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/network/{id}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/network/{id}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -245,9 +246,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/network/name",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/report/network/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
 			@RequestHeader("Accept-Language") String locale) {
@@ -262,9 +261,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/network/geo",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/report/network/geo", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReportDTO>> getNetworkReportsForGeoLocation(@RequestHeader("Accept-Language") String locale) {
 		List<NetworkReportDTO> reports = reportUtils.prepareNetworkReports();

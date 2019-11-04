@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.dto.ReportDTO;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ReportRepository;
@@ -40,11 +41,25 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public List<Report> getReportsByGroupId(String groupId) {
+	public ReportDTO getReportsByGroupId(List<String> group_ids, int limit) {
 		List<Report> reports = new ArrayList<>();
-		Query query = new Query(Criteria.where("groupId").is(groupId));
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String groupId : group_ids) {
+			Criteria expression = new Criteria();
+			expression.and("groupId").is(groupId);
+			orExpression.add(expression);
+		}
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		long count = mongoTemplate.count(query, Report.class, collectionName);
+
+		query.limit(limit);
 		reports = mongoTemplate.find(query, Report.class, collectionName);
-		return reports;
+
+		ReportDTO reportDTO = new ReportDTO(reports, count);
+		return reportDTO;
 	}
 
 	@Override

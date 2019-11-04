@@ -549,4 +549,22 @@ public class GroupUtils {
 		return false;
 	}
 
+	/**
+	 * This functions extracts the groupId from the group object and adds it to the list of the strings which is returned
+	 * 
+	 * @param groups
+	 * @return
+	 */
+	public List<String> getGroupIdsFromGroupList(List<CompanyGroup> groups) {
+		List<String> groupIds = new ArrayList<>();
+		if (groups != null) {
+			for (CompanyGroup group : groups) {
+				if (!Strings.isNullOrEmpty(group.getId())) {
+					groupIds.add(group.getId());
+				}
+			}
+		}
+		return groupIds;
+	}
+
 }

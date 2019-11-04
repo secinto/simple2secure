@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
@@ -36,14 +37,6 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 		Query query = new Query(Criteria.where("probeId").is(probeId));
 		networkReports = mongoTemplate.find(query, NetworkReport.class, collectionName);
 		return networkReports;
-	}
-
-	@Override
-	public List<NetworkReport> getReportsByGroupId(String groupId) {
-		List<NetworkReport> reports = new ArrayList<>();
-		Query query = new Query(Criteria.where("groupId").is(groupId));
-		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
-		return reports;
 	}
 
 	@Override
@@ -72,6 +65,28 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 		query.addCriteria(Criteria.where("groupId").is(groupId));
 		List<NetworkReport> result = mongoTemplate.find(query, className, collectionName);
 		return result;
+	}
+
+	@Override
+	public NetworkReportDTO getReportsByGroupId(List<String> group_ids, int limit) {
+		List<NetworkReport> reports = new ArrayList<>();
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String groupId : group_ids) {
+			Criteria expression = new Criteria();
+			expression.and("groupId").is(groupId);
+			orExpression.add(expression);
+		}
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		long count = mongoTemplate.count(query, NetworkReport.class, collectionName);
+
+		query.limit(limit);
+		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
+
+		NetworkReportDTO reportDTO = new NetworkReportDTO(reports, count);
+		return reportDTO;
 	}
 
 }

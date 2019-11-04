@@ -69,5 +69,7 @@ public class ConfigItems {
 	public static final String QUERIES_JSON_LOCATION = "/configuration/queries.json";
 	public static final String PROCESSORS_JSON_LOCATION = "/configuration/processors.json";
 	public static final String STEPS_JSON_LOCATION = "/configuration/steps.json";
+	public static final int DEFAULT_VALUE_PAGE = 0;
+	public static final int DEFAULT_VALUE_SIZE = 10;
 
 }

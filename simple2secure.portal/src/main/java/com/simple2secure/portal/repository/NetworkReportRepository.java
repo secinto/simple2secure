@@ -23,6 +23,7 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.portal.dao.MongoRepository;
 
@@ -30,7 +31,7 @@ public abstract class NetworkReportRepository extends MongoRepository<NetworkRep
 
 	public abstract List<NetworkReport> getReportsByDeviceId(String deviceId);
 
-	public abstract List<NetworkReport> getReportsByGroupId(String groupId);
+	public abstract NetworkReportDTO getReportsByGroupId(List<String> group_ids, int limit);
 
 	public abstract void deleteByDeviceId(String deviceId);
 

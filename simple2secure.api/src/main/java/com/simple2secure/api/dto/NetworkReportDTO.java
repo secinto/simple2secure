@@ -21,39 +21,39 @@
  */
 package com.simple2secure.api.dto;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.simple2secure.api.model.Coordinates;
 import com.simple2secure.api.model.NetworkReport;
 
-public class NetworkReportDTO extends NetworkReport {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 2233458870207070618L;
+public class NetworkReportDTO {
 
-	private List<Coordinates> coordinates = new ArrayList<>();
+	private List<NetworkReport> report;
+
+	private long totalSize;
 
 	public NetworkReportDTO() {
 
 	}
 
-	public NetworkReportDTO(List<Coordinates> coordinates, String reportId, String groupId, Date startTime, String processorName) {
-		super.setId(reportId);
-		super.setGroupId(groupId);
-		super.setStartTime(startTime);
-		super.setProcessorName(processorName);
-		this.coordinates = coordinates;
+	public NetworkReportDTO(List<NetworkReport> report, long totalSize) {
+		super();
+		this.report = report;
+		this.totalSize = totalSize;
 	}
 
-	public List<Coordinates> getCoordinates() {
-		return coordinates;
+	public List<NetworkReport> getReport() {
+		return report;
 	}
 
-	public void setCoordinates(List<Coordinates> coordinates) {
-		this.coordinates = coordinates;
+	public void setReports(List<NetworkReport> report) {
+		this.report = report;
 	}
 
+	public long getTotalSize() {
+		return totalSize;
+	}
+
+	public void setTotalSize(long totalSize) {
+		this.totalSize = totalSize;
+	}
 }

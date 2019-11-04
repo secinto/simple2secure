@@ -30,6 +30,8 @@ import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {ContextDTO} from '../_models';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
+import {QueryReport} from '../_models/queryReport';
+import {ReportDTO} from '../_models/DTO/reportDTO';
 
 @Component({
 	moduleId: module.id,
@@ -38,12 +40,15 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 })
 
 export class OsQueryReportOverviewComponent {
-	reports: any[];
+	public reportDTO: ReportDTO;
 	context: ContextDTO;
 	selectedReport: any;
 	currentUser: any;
 	loading = false;
 	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -62,12 +67,11 @@ export class OsQueryReportOverviewComponent {
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadAllReports();
+		this.loadAllReports(0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -76,14 +80,27 @@ export class OsQueryReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	private loadAllReports() {
+	public handlePage(e: any) {
+		this.loadAllReports(e.pageIndex, e.pageSize);
+		this.totalSize = this.reportDTO.totalSize;
+		this.paginator.length = this.totalSize;
+		this.paginator.pageSize = this.pageSize;
+		this.paginator.pageIndex = this.currentPage;
+		//this.dataSource.paginator = this.paginator;
+	}
+
+	private loadAllReports(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id)
+		this.currentPage = page;
+		this.pageSize = size;
+		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.reports = data;
-					this.dataSource.data = this.reports;
-					if (data.length > 0) {
+					this.reportDTO = data;
+					this.dataSource.data = this.reportDTO.report;
+					this.totalSize = data.totalSize;
+					console.log(this.totalSize);
+					if (data.report.length > 0) {
 						this.alertService.success(this.translate.instant('message.report'));
 					}
 					else {
@@ -134,7 +151,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.delete(environment.apiEndpoint + 'reports/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports();
+				this.loadAllReports(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {

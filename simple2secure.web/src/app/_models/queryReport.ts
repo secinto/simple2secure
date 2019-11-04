@@ -20,9 +20,14 @@
  *********************************************************************
  */
 
-import {NetworkReport} from '../networkReport';
+import {Generic} from './generic';
 
-export class NetworkReportDTO{
-	public report: NetworkReport[];
-	public totalSize: number;
+export class QueryReport extends Generic {
+	groupId: string;
+	deviceId: string;
+	query: string;
+	hostname: string;
+	queryResult: string;
+	queryTimestamp: Date;
+	isSent: boolean;
 }

@@ -20,9 +20,9 @@
  *********************************************************************
  */
 
-import {NetworkReport} from '../networkReport';
+import {QueryReport} from '../queryReport';
 
-export class NetworkReportDTO{
-	public report: NetworkReport[];
+export class ReportDTO {
+	public report: QueryReport[];
 	public totalSize: number;
 }

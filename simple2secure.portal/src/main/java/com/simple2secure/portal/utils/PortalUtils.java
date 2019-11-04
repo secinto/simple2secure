@@ -42,6 +42,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
+import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -249,6 +250,20 @@ public class PortalUtils {
 				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
 
 		return podToken;
+	}
+
+	/**
+	 * This function returns the limit value for the pagination, according to the provided parameters (page and size)
+	 *
+	 * @param size
+	 * @param page
+	 * @return
+	 */
+	public int getPaginationLimit(int size, int page) {
+		if (size == 0) {
+			size = ConfigItems.DEFAULT_VALUE_SIZE;
+		}
+		return (page + 1) * size;
 	}
 
 }

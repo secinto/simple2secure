@@ -8,15 +8,18 @@
 
 package com.simple2secure.api.dto;
 
+import java.util.List;
+
 import com.simple2secure.api.model.Report;
 
-public class ReportDTO extends Report {
+public class ReportDTO {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 4813182193819532383L;
-	private String username;
+	private long totalSize;
+	private List<Report> report;
+
+	public ReportDTO() {
+
+	}
 
 	/**
 	 *
@@ -24,18 +27,25 @@ public class ReportDTO extends Report {
 	 * @param report_class
 	 * @param interval
 	 */
-	public ReportDTO(String username, Report report) {
-		super(report.getDeviceId(), report.getQuery(), report.getQueryResult(), report.getQueryTimestamp(), true);
-		this.username = username;
-		this.setHostname(report.getHostname());
+	public ReportDTO(List<Report> report, long totalSize) {
+		this.report = report;
+		this.totalSize = totalSize;
 	}
 
-	public String getUsername() {
-		return username;
+	public long getTotalSize() {
+		return totalSize;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setTotalSize(long totalSize) {
+		this.totalSize = totalSize;
+	}
+
+	public List<Report> getReport() {
+		return report;
+	}
+
+	public void setReport(List<Report> report) {
+		this.report = report;
 	}
 
 }
