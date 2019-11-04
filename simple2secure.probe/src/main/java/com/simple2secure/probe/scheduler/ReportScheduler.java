@@ -68,6 +68,9 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
 			}
+			if (Strings.isNullOrEmpty(report.getHostname())) {
+				report.setHostname(ProbeConfiguration.hostname);
+			}
 			log.debug("Sending query report {} with timestamp {} to the API.", report.getQuery(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
@@ -92,6 +95,10 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
 			}
+			if (Strings.isNullOrEmpty(report.getHostname())) {
+				report.setHostname(ProbeConfiguration.hostname);
+			}
+
 			log.info("Sending network report {} with timestamp {} to the API ", report.getId(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
@@ -108,11 +115,16 @@ public class ReportScheduler extends TimerTask {
 	 * This function retrieves all {@link Report} objects from the database where sent tag is false.
 	 */
 	private void sendReportsToServer() {
-		List<Report> reports = DBUtil.getInstance().findByFieldName("isSent", false, Report.class);
-		if (reports != null) {
-			for (Report report : reports) {
-				sendReport(report);
+		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("isSent", false, Report.class);
+		int currentPageNumber = 1;
+		while (currentPageNumber < lastPageNumber) {
+			List<Report> reports = DBUtil.getInstance().findByFieldNamePaging("isSent", false, Report.class, currentPageNumber);
+			if (reports != null) {
+				for (Report report : reports) {
+					sendReport(report);
+				}
 			}
+			currentPageNumber++;
 		}
 	}
 
@@ -120,11 +132,17 @@ public class ReportScheduler extends TimerTask {
 	 * This function retrieves all {@link NetworkReport} objects from the database where sent tag is false.
 	 */
 	private void sendNetworkReportsToServer() {
-		List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldName("sent", false, NetworkReport.class);
-		if (networkReports != null) {
-			for (NetworkReport networkReport : networkReports) {
-				sendNetworkReport(networkReport);
+		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("sent", false, NetworkReport.class);
+		int currentPageNumber = 1;
+		while (currentPageNumber < lastPageNumber) {
+			List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldNamePaging("sent", false, NetworkReport.class,
+					currentPageNumber);
+			if (networkReports != null) {
+				for (NetworkReport networkReport : networkReports) {
+					sendNetworkReport(networkReport);
+				}
 			}
+			currentPageNumber++;
 		}
 	}
 

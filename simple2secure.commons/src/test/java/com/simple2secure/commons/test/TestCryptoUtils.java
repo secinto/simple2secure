@@ -21,6 +21,7 @@
  */
 package com.simple2secure.commons.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -97,4 +98,11 @@ public class TestCryptoUtils {
 		assertFalse(CryptoUtils.verify("Das ist eine Nachrich", signature, keyPair.getPublic(), "SHA1withECDSA"));
 	}
 
+	@Test
+	public void testSecureHashHexString() throws Exception {
+		String content = "This is some content";
+		String hash = CryptoUtils.generateSecureHashHexString(content);
+		log.debug("hash value {}", hash);
+		assertEquals("d68e560efbe6f20c31504b2fc1c6d3afa1f58b8ee293ad3311939a5fd5059a12", hash);
+	}
 }

@@ -146,6 +146,29 @@ public class DBUtil {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public synchronized <T> List<T> findByFieldNamePaging(String fieldName, Object value, Object t, int lastPageNumber) {
+		List<T> queryObjects = new ArrayList<>();
+
+		BaseDao dao = getDao(t);
+		if (dao != null) {
+			queryObjects = dao.findByFieldNamePaging(fieldName, value, lastPageNumber);
+		}
+
+		return queryObjects;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public synchronized int getLastPageNumberByFieldName(String fieldName, Object value, Object t) {
+		BaseDao dao = getDao(t);
+		if (dao != null) {
+			return dao.getLastPageNumberByFieldName(fieldName, value);
+		}
+
+		return 0;
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public synchronized <T> List<T> findAll(Object t) {
 		List<T> queryObjects = new ArrayList<>();
 

@@ -78,5 +78,485 @@
                 }
             }
         }
+    },
+    {
+        "name": "burp-suite-pro normal",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "burp-suite-pro sql",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "burp-suite-pro aggresive",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "brute-force ssh",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "brute-force url",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "WAFW00F",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "wafw00f",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "get-session-cookie",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "connectLogin -u",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "commix testing level 3",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "commix",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "sqlmap",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "testssl",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "ident-user-enum",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "nikto",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
     }
 ]
