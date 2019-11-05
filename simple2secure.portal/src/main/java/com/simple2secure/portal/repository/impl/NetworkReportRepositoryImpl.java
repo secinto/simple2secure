@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -17,6 +18,7 @@ import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
@@ -24,6 +26,9 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 
 	@Autowired
 	LicenseRepository licenseRepository;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -68,7 +73,7 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 	}
 
 	@Override
-	public NetworkReportDTO getReportsByGroupId(List<String> group_ids, int limit) {
+	public NetworkReportDTO getReportsByGroupId(List<String> group_ids, int size, int page) {
 		List<NetworkReport> reports = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
@@ -82,7 +87,12 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 
 		long count = mongoTemplate.count(query, NetworkReport.class, collectionName);
 
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
 		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "startTime"));
 		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
 
 		NetworkReportDTO reportDTO = new NetworkReportDTO(reports, count);

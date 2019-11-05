@@ -115,8 +115,6 @@ public class ReportController {
 			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(contextId)) {
 
-			int limit = portalUtils.getPaginationLimit(size, page);
-
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
@@ -128,7 +126,7 @@ public class ReportController {
 
 					ReportDTO reportDto = new ReportDTO();
 
-					reportDto = reportsRepository.getReportsByGroupId(groupIds, limit);
+					reportDto = reportsRepository.getReportsByGroupId(groupIds, page, size);
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
@@ -209,15 +207,13 @@ public class ReportController {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 				if (groups != null) {
 
-					int limit = portalUtils.getPaginationLimit(size, page);
-
 					log.debug("Loading network reports for contextId {0}", contextId);
 
 					List<String> groupIds = groupUtils.getGroupIdsFromGroupList(groups);
 
 					NetworkReportDTO reportDto = new NetworkReportDTO();
 
-					reportDto = networkReportRepository.getReportsByGroupId(groupIds, limit);
+					reportDto = networkReportRepository.getReportsByGroupId(groupIds, size, page);
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}

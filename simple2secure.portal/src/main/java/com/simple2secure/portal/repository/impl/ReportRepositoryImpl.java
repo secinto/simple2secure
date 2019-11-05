@@ -18,6 +18,7 @@ import com.simple2secure.api.dto.ReportDTO;
 import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
@@ -25,6 +26,9 @@ public class ReportRepositoryImpl extends ReportRepository {
 
 	@Autowired
 	LicenseRepository licenseRepository;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -41,7 +45,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public ReportDTO getReportsByGroupId(List<String> group_ids, int limit) {
+	public ReportDTO getReportsByGroupId(List<String> group_ids, int page, int size) {
 		List<Report> reports = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
@@ -54,8 +58,12 @@ public class ReportRepositoryImpl extends ReportRepository {
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
 		long count = mongoTemplate.count(query, Report.class, collectionName);
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
 
 		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "queryTimestamp"));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 
 		ReportDTO reportDTO = new ReportDTO(reports, count);

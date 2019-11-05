@@ -31,7 +31,7 @@ public abstract class NetworkReportRepository extends MongoRepository<NetworkRep
 
 	public abstract List<NetworkReport> getReportsByDeviceId(String deviceId);
 
-	public abstract NetworkReportDTO getReportsByGroupId(List<String> group_ids, int limit);
+	public abstract NetworkReportDTO getReportsByGroupId(List<String> group_ids, int size, int page);
 
 	public abstract void deleteByDeviceId(String deviceId);
 

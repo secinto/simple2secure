@@ -48,6 +48,7 @@
     <mat-paginator #paginator
                    [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"
+                   [pageIndex]="currentPage$ | async"
                    [showFirstLastButtons]="true"
                    [length]="totalSize"
                    (page)="pageEvent = handlePage($event)">

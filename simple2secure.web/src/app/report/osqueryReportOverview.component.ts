@@ -32,6 +32,7 @@ import {ContextDTO} from '../_models';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 import {QueryReport} from '../_models/queryReport';
 import {ReportDTO} from '../_models/DTO/reportDTO';
+import {merge, tap} from 'rxjs/operators';
 
 @Component({
 	moduleId: module.id,
@@ -81,25 +82,19 @@ export class OsQueryReportOverviewComponent {
 	}
 
 	public handlePage(e: any) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);
-		this.totalSize = this.reportDTO.totalSize;
-		this.paginator.length = this.totalSize;
-		this.paginator.pageSize = this.pageSize;
-		this.paginator.pageIndex = this.currentPage;
-		//this.dataSource.paginator = this.paginator;
 	}
 
 	private loadAllReports(page: number, size: number) {
 		this.loading = true;
-		this.currentPage = page;
-		this.pageSize = size;
 		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id + '/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;
 					this.dataSource.data = this.reportDTO.report;
 					this.totalSize = data.totalSize;
-					console.log(this.totalSize);
 					if (data.report.length > 0) {
 						this.alertService.success(this.translate.instant('message.report'));
 					}

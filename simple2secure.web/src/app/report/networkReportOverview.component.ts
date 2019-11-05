@@ -72,7 +72,6 @@ export class NetworkReportOverviewComponent {
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		//this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -82,12 +81,9 @@ export class NetworkReportOverviewComponent {
 	}
 
 	public handlePage(e: any) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);
-		this.totalSize = this.reportDTO.totalSize;
-		this.paginator.length = this.totalSize;
-		this.paginator.pageSize = this.pageSize;
-		this.paginator.pageIndex = this.currentPage;
-		//this.dataSource.paginator = this.paginator;
 	}
 
 	private loadAllReports(page: number, size: number) {

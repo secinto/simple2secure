@@ -259,11 +259,26 @@ public class PortalUtils {
 	 * @param page
 	 * @return
 	 */
-	public int getPaginationLimit(int size, int page) {
+	public int getPaginationLimit(int size) {
 		if (size == 0) {
 			size = ConfigItems.DEFAULT_VALUE_SIZE;
 		}
-		return (page + 1) * size;
+		return size;
+	}
+
+	/**
+	 * This function returns the value of the documents which has to be skipped when querying from the database.
+	 *
+	 * @param size
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	public int getPaginationStart(int size, int page, int limit) {
+		if (size == 0) {
+			size = ConfigItems.DEFAULT_VALUE_SIZE;
+		}
+		return ((page + 1) * size) - limit;
 	}
 
 }
