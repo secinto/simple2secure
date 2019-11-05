@@ -1,52 +1,12 @@
 [
 	{
-		"name": "Users",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from users",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
 		"name": "Video card info",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
 		"sqlQuery": "select * from video_info",
 		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Uptime",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from uptime",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Running processes",
-		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from processes",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Pipes",
-		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from pipes",
-		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -54,9 +14,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from physical_disk_performance",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -64,9 +24,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from patches",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -74,9 +34,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
 		"sqlQuery": "select * from logical_drives",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -84,19 +44,9 @@
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
 		"sqlQuery": "select * from logged_in_users",
 		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Activer routes",
-		"always": true,
-		"analysisInterval": 10,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from routes",
-		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -104,9 +54,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from autoexec",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -114,9 +64,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from wmi_bios_info",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -124,9 +74,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from programs",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -134,9 +84,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from logon_sessions",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -144,9 +94,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from os_version",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -154,9 +104,9 @@
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
 		"sqlQuery": "select * from process_open_sockets",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -164,19 +114,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from platform_info",
 		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Processes memory map",
-		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from process_memory_map",
-		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -184,9 +124,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from scheduled_tasks",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -194,9 +134,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from shared resources",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -204,9 +144,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
 		"sqlQuery": "select * from startup_items",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -214,69 +154,9 @@
 		"always": true,
 		"analysisInterval": 10,
 		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
 		"sqlQuery": "select * from system_info",
 		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "System time",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "DAYS",
-		"sqlQuery": "select * from system time",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Windows crashes",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from windows_crashes",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Windows events",
-		"always": true,
-		"analysisInterval": 10,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from windows_events",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Windows registry",
-		"always": true,
-		"analysisInterval": 30,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from registry",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Windows services",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "HOURS",
-		"sqlQuery": "select * from services",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Listening ports",
-		"always": true,
-		"analysisInterval": 5,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from listening_ports",
-		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -284,9 +164,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from kernel_info",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -294,9 +174,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from interface_details",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -304,9 +184,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from interface_addresses",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -314,9 +194,9 @@
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from ie_extendsions",
 		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -324,49 +204,9 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from certificates",
 		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "CPU info",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "DAYS",
-		"sqlQuery": "select * from cpu_info",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "ARP cache",
-		"always": true,
-		"analysisInterval": 10,
-		"analysisIntervalUnit": "MINUTES",
-		"sqlQuery": "select * from arp_cache",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Hosts file",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "DAYS",
-		"sqlQuery": "select * from etc_hosts",
-		"active": 1,
-		"osquery": true,
-		"systemsAvailable": 1
-	},
-	{
-		"name": "Disk info",
-		"always": true,
-		"analysisInterval": 1,
-		"analysisIntervalUnit": "DAYS",
-		"sqlQuery": "select * from disk_info",
-		"active": 1,
-		"osquery": true,
 		"systemsAvailable": 1
 	},
 	{
@@ -374,9 +214,650 @@
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
 		"sqlQuery": "select * from chrome_extensions",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Processes memory map",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "select * from process_memory_map",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Pipes",
+		"always": true,
+		"analysisInterval": 5,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from pipes",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Listening ports",
+		"always": true,
+		"analysisInterval": 5,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from listening_ports",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Running processes",
+		"description": "List all running processes",
+		"always": true,
+		"analysisInterval": 5,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from processes",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Uptime",
+		"description": "Obtain how long the system is already running without a reboot",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from uptime",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Users",
+		"description": "List all users on system",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from users",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Active routes",
+		"description": "Obtain the currently active routes of the system",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "select * from routes",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "UAC disabled",
+		"description": "Controls UAC. A setting of 0 indicates that UAC is disabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "SELECT * FROM registry WHERE path='HKEY_LOCAL_MACHINE\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System\\\\EnableLUA' AND data=0",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Listening ports per processes",
+		"description": "Obtains the listening ports and to which processes they are associated",
+		"always": true,
+		"analysisInterval": 10,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select p.name, p.path, lp.port, lp.address, lp.protocol  from listening_ports lp LEFT JOIN processes p ON lp.pid = p.pid WHERE lp.port != 0 AND p.name != ''",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Most memory intensive processes",
+		"description": "Obtains the 10 most memory intensive processes",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "SELECT pid, name, ROUND((total_size * '10e-7'), 2) AS used FROM processes ORDER BY total_size DESC LIMIT 10;",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Listening connections per processes",
+		"description": "Obtains the listening connections and to which processes they are associated",
+		"always": true,
+		"analysisInterval": 10,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select DISTINCT p.name, p.path, pos.remote_address, pos.remote_port from process_open_sockets pos LEFT JOIN processes p ON pos.pid = p.pid WHERE pos.remote_port != 0 AND p.name != ''",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Weak_Crypto",
+		"description": "Protection Against Weak Crypto Algorithms",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where path like 'HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\OID\\\\EncodingType 0\\\\CertDllCreateCertificateChainEngine\\\\Config\\\\Default\\\\%' AND name IN ('WeakSha1ThirdPartyFlags','WeakMd5ThirdPartyFlags') AND type = 'REG_DWORD' AND data not like '-2%'",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Most CPU intensive processes since boot",
+		"description": "Obtains the 10 most CPU intensive processes which have been executed since boot",
+		"always": true,
+		"analysisInterval": 5,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "SELECT (SUM(user) + SUM(nice) + SUM(system) + SUM(idle) * 1.0) AS tsb, SUM(COALESCE(idle, 0)) + SUM(COALESCE(iowait, 0)) AS itsb FROM cpu_time;",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Most CPU intensive processes since boot 2",
+		"description": "Obtains a list of the 10 most CPU intensive processes since boot - second edition for verification",
+		"always": true,
+		"analysisInterval": 5,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "SELECT pid, uid, name, ROUND((   (user_time + system_time) / (cpu_time.tsb - cpu_time.itsb) ) * 100, 2) AS percentage FROM processes, ( SELECT (   SUM(user) + SUM(nice) + SUM(system) + SUM(idle) * 1.0) AS tsb,   SUM(COALESCE(idle, 0)) + SUM(COALESCE(iowait, 0)) AS itsb   FROM cpu_time ) AS cpu_time ORDER BY user_time+system_time DESC LIMIT 10;",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Recent User Processes",
+		"description": "Obtains the 10 most recent user processes which where executed",
+		"always": true,
+		"analysisInterval": 10,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "SELECT pid, username, name FROM processes p JOIN users u ON u.uid = p.uid ORDER BY start_time DESC LIMIT 10;",
+		"active": 1,
+		"systemsAvailable": 0
+	},
+	{
+		"name": "Hosts file",
+		"description": "Obtain the contains from the hosts file",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from etc_hosts;",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "ARP cache",
+		"description": "Obtain the contents of the ARP cache",
+		"always": true,
+		"analysisInterval": 10,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from arp_cache;",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disk info",
+		"description": "Obtains the current disk info",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from disk_info",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "CPU info",
+		"description": "Obtains the current CPU info from the monitored system",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from cpu_info",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "System time",
+		"description": "Obtains the current system time",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from system time",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows crashes",
+		"description": "Obtains the crashes reported for this windows system",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "select * from windows_crashes",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows events",
+		"description": "Obtains the events from the log of the monitored system",
+		"always": true,
+		"analysisInterval": 10,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from windows_events",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows registry",
+		"description": "Obtains everything from the registry",
+		"always": true,
+		"analysisInterval": 30,
+		"analysisIntervalUnit": "MINUTES",
+		"osquery": true,
+		"sqlQuery": "select * from registry",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Windows services",
+		"description": "Obtains the services which are  available on the monitored systems",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "HOURS",
+		"osquery": true,
+		"sqlQuery": "select * from services",
+		"active": 0,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Font Blocking",
+		"description": "Checks if FontBlocking is enabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows NT\\\\MitigationOptions\\\\MitigationOptions_FontBlocking'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Data Execution Prevention (DEP) enabled",
+		"description": "Checks if DEP is enabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\SystemStartOptions'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Data Exection Protection with Mitigation",
+		"description": "Checks if DEP with mitigation options is enabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\MitigationOptions'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Address Space Location Randomization (ASLR)",
+		"description": "Checks if ASLR is enabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Memory Management\\\\moveImages'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Structured Exception Handling Overwrite Protection",
+		"description": "Checks if SEHOP is enabled",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\KernelSEHOPEnabled",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Certification Padding",
+		"description": "Checks the state of certification padding",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Certification Padding 64 Bit",
+		"description": "Checks state of certification padding for 64 bit",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Wow6432Node\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Secure Search Path",
+		"description": "Checks secure search path check",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\CWDIllegalInDllSearch'",
+		"active": 1,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "DisabledExceptionChainValidation",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel\\DisableExceptionChainValidation'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check SEHOP state: DisabledExceptionChainValidation",
+		"always": true,
 		"active": 1,
 		"osquery": true,
 		"systemsAvailable": 1
+	},
+	{
+		"name": "EnableLowVaAccess",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableLowVaAccess'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Kernel Null page state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "ControlFlowGuard",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableCfg'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Control Flow Guard state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "App_ExecuteOptions",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\executeOptions'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applications opted in for DEP",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "App_MitigationOptions",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\MitigationOptions'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applications opted in for DEP",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "AppCompat",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applications opted in for DEP",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "App_disabledExceptionChainValidation",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\DisableExceptionChainValidation'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applications not supporting SEHOP",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "DefaultLevelMachine",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "DefaultLevelUser",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "PolicyScopeMachine",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "PolicyScopeUser",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "ExecutableTryMachine",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "ExecutableTryUser",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "TransparentEnabledMachine",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "TransparentEnabledUser",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Unrestricted",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: No SRP whitelist rules",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Unrestricted_Paths",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: No SRP path rules",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Unrestricted_Paths_ItemData",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths\\%\\ItemData'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: SRP whitelist rules is missing",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disallowed",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: No SRP blacklist rules",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disallowed_Paths",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: No SRP path rules",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Disallowed_Paths_ItemData",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths\\%\\ItemData'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: SRP blacklist rule is missing",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "SaferFlags",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\%\\%\\%\\SaferFlags'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Software Restriction Policies state: SRP rule is not enforcing",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "RuleSetEnforcementMode",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\EnforcementMode'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applocker rule set configuration",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "Rule",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\%\\Value'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Applocker rule set",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "AuditSpecialGroups",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\Audit'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Special Logon Audit configuration - https://blogs.technet.microsoft.com/jepayne/2015/11/26/tracking-lateral-movement-part-one-special-groups-and-specific-service-accounts/",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "SysmonConfig",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CCS\\Services\\SysmonDrv\\Parameters'",
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Microsoft Sysinternals Sysmon config",
+		"always": true,
+		"active": 1,
+		"osquery": true,
+		"systemsAvailable": 1
+	},
+	{
+		"name": "DeveloperMode",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock'",
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"description": "Check Developer Mode state"
 	}
 ]

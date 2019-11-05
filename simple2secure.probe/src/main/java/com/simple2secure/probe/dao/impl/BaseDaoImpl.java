@@ -29,6 +29,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +86,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 */
 	public EntityManager getEntityManager() {
 		return factory.createEntityManager();
+	}
+
+	public Session getHibernateSession() {
+		Session session = getEntityManager().unwrap(Session.class);
+		return session;
 	}
 
 	/**
@@ -180,9 +186,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 		return query.getResultList();
 	}
 
+	@Override
 	public int getLastPageNumberByFieldName(String fieldName, Object value) {
-		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
-		int lastPageNumber = (int) (Math.ceil(query.getMaxResults() / pageSize));
+		Query countQuery = getEntityManager().createQuery(getCountQuery(fieldName)).setParameter(fieldName, value);
+		Long countResults = (Long) countQuery.getSingleResult();
+		int lastPageNumber = (int) (Math.ceil(countResults / pageSize));
 		return lastPageNumber;
 	}
 
@@ -195,6 +203,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 */
 	private String getQuery(String fieldName) {
 		String query = "from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
+		return query;
+	}
+
+	private String getCountQuery(String fieldName) {
+		String query = "Select count (t.id) from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
 	}
 }

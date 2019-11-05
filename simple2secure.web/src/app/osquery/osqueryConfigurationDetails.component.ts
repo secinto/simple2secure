@@ -40,7 +40,7 @@ import {UserGroupComponent} from '../user';
 })
 
 export class OsqueryConfigurationDetailsComponent {
-	displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active', 'action'];
+	displayedColumns = ['name', 'runAlways', 'interval', 'active', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;

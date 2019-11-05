@@ -24,6 +24,7 @@ package com.simple2secure.api.model;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +41,7 @@ public class QueryRun extends GenericDBObject {
 	private static final long serialVersionUID = 4400048729580737036L;
 	private String groupId;
 	private String name;
+	private String description;
 
 	@JsonProperty
 	private boolean always;
@@ -47,6 +49,7 @@ public class QueryRun extends GenericDBObject {
 	private TimeUnit analysisIntervalUnit;
 	@JsonProperty
 	private boolean osquery;
+	@Lob
 	private String sqlQuery;
 	private int active;
 	private int systemsAvailable;
@@ -83,6 +86,14 @@ public class QueryRun extends GenericDBObject {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public boolean isAlways() {

@@ -244,7 +244,7 @@ public class DeviceController {
 	}
 
 	@RequestMapping(
-			value = "/status/",
+			value = "/status",
 			method = RequestMethod.GET)
 	public ResponseEntity<Service> getStatus(@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());

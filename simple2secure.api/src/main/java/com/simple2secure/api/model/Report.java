@@ -41,6 +41,7 @@ public class Report extends GenericDBObject {
 	private String groupId;
 	private String deviceId;
 	private String query;
+	private String name;
 	private String hostname;
 
 	@Lob
@@ -122,6 +123,14 @@ public class Report extends GenericDBObject {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
