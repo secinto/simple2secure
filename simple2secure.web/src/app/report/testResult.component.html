@@ -7,17 +7,22 @@
     <mat-table #table [dataSource]="dataSource" matSort>
 
         <!-- Position Column -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.testResult.name}}</mat-cell>
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.podId}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="license">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+        <ng-container matColumnDef="testname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.testName}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="group">
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.testResult.hostname}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{(element.testResult.timestamp) | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
         </ng-container>
@@ -37,9 +42,11 @@
                  (click)="openDialogShowTestResult(row)"></mat-row>
     </mat-table>
     <mat-paginator #paginator
-                   [pageSize]="10"
+                   [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"
-                   [showFirstLastButtons]="true">
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
     </mat-paginator>
     <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>

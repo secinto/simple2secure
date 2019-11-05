@@ -25,6 +25,7 @@ package com.simple2secure.portal.utils;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestResultDTO;
+import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
@@ -92,6 +93,9 @@ public class TestUtils {
 	@Autowired
 	TestUtils testUtils;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
 	 * the license which has been used for the activation.
@@ -114,38 +118,19 @@ public class TestUtils {
 	 * @param locale
 	 * @return
 	 */
-	public List<TestResultDTO> getTestResultByContextId(String contextId, String locale) {
-		List<TestResultDTO> results = new ArrayList<>();
+	public Map<String, Object> getTestResultByContextId(String contextId, String locale, int page, int size) {
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
-			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-			if (groups != null) {
-				for (CompanyGroup group : groups) {
 
-					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
-
-					if (licensesByGroup != null) {
-						for (CompanyLicensePrivate license : licensesByGroup) {
-							if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-
-								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getDeviceId());
-
-								if (testRunList != null) {
-									for (TestRun testRun : testRunList) {
-										TestResult testResult = testResultRepository.getByTestRunId(testRun.getId());
-
-										if (testResult != null) {
-											TestResultDTO testResultDTO = new TestResultDTO(testResult, group);
-											results.add(testResultDTO);
-										}
-									}
-								}
-							}
-						}
-					}
+			List<TestRun> testRunList = testRunRepository.getByContextId(contextId);
+			if (testRunList != null) {
+				List<String> testRunIds = portalUtils.extractIdsFromObjects(testRunList);
+				Map<String, Object> testResults = testResultRepository.getByTestRunIdWithPagination(testRunIds, page, size);
+				if (testResults != null) {
+					return testResults;
 				}
 			}
 		}
-		return results;
+		return null;
 	}
 
 	public Test synchronizeReceivedTest(Test test) {
@@ -450,6 +435,23 @@ public class TestUtils {
 		}
 
 		return testsWeb;
+	}
+
+	/**
+	 * This function generates the list of the TestRunDTO for the provided TestResults. For each test result, TestRun object is added.
+	 * 
+	 * @param results
+	 * @return
+	 */
+	public List<TestRunDTO> generateTestRunDTOByTestResults(List<TestResult> results) {
+		List<TestRunDTO> testRunDto = new ArrayList<>();
+		for (TestResult testResult : results) {
+			TestRun testRun = testRunRepository.find(testResult.getTestRunId());
+			if (testRun != null) {
+				testRunDto.add(new TestRunDTO(testRun, testResult));
+			}
+		}
+		return testRunDto;
 	}
 
 }

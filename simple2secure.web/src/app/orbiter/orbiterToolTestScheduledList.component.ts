@@ -49,6 +49,9 @@ export class OrbiterToolTestScheduledListComponent {
 	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -65,18 +68,23 @@ export class OrbiterToolTestScheduledListComponent {
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadScheduledTests();
+		this.loadScheduledTests(0 , 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
 		this.dataSource.filter = filterValue;
+	}
+
+	public handlePage(e: any) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadScheduledTests(e.pageIndex, e.pageSize);
 	}
 
 	public onMenuTriggerClick(test: TestRunDTO) {
@@ -89,15 +97,17 @@ export class OrbiterToolTestScheduledListComponent {
 		this.selectedTestRun = test;
 	}
 
-	public loadScheduledTests(){
+	public loadScheduledTests(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/getScheduledTests/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'test/getScheduledTests/' + this.context.context.id
+			+ '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.tests = data;
+					this.tests = data.tests;
 					this.dataSource.data = this.tests;
+					this.totalSize = data.totalSize;
 					if (!this.isTestChanged){
-						if (data.length > 0) {
+						if (data.tests.length > 0) {
 							this.alertService.success(this.translate.instant('message.data'));
 						}
 						else {
@@ -146,7 +156,7 @@ export class OrbiterToolTestScheduledListComponent {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
 				this.isTestChanged = true;
-				this.loadScheduledTests();
+				this.loadScheduledTests(this.currentPage, this.pageSize);
 			},
 			error => {
 				if (error.status == 0) {

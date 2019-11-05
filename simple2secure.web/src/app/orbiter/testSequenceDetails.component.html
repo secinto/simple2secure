@@ -11,12 +11,7 @@
                     </mat-form-field>
                  
 					<mat-card>
-					  <mat-card-content class="mat_card_content" >
-						  	<div class="backward-arrow-carousel">
-									<i class="material-icons" (click)="prev()">
-										arrow_back_ios
-									</i>
-							</div>
+						<mat-card-content class="mat_card_content" >	  	
 							<carousel-component [lockSlides]="true" class="carousel_component" #carousel>
 									<div class="item-carousel" [(ngModel)]="sequenceToShow" *ngFor="let test of sequenceToShow" name="test-carousel" ngDefaultControl>
 										<h4>{{test.name}}</h4>
@@ -32,15 +27,21 @@
 										</button>
 									</div>
 							</carousel-component>
+						</mat-card-content>
+						<div class="carousel-arrows">
+							<div class="backward-arrow-carousel">
+									<i class="material-icons" (click)="prev()">
+										arrow_back_ios
+									</i>
+							</div>
 							<div class="forward-arrow-carousel">
 									<i class="material-icons" (click)="next()">
 										arrow_forward_ios
 									</i>
 							</div>
-					  </mat-card-content>
-
+						</div>
 					</mat-card>
-					
+		
 					<mat-card>
 					  <mat-card-header>
 						Tests

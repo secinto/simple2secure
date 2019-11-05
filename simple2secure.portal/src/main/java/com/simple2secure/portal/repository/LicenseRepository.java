@@ -53,4 +53,6 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract void deleteByDeviceId(String probeId);
 
+	public abstract List<CompanyLicensePrivate> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod);
+
 }

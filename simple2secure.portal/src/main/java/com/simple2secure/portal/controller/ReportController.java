@@ -53,7 +53,6 @@ import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.ReportUtils;
 
@@ -84,9 +83,6 @@ public class ReportController {
 
 	@Autowired
 	PortalUtils portalUtils;
-
-	@Autowired
-	GroupUtils groupUtils;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -122,7 +118,7 @@ public class ReportController {
 				if (groups != null) {
 					log.debug("Loading OSQuery reports for contextId {0}", contextId);
 
-					List<String> groupIds = groupUtils.getGroupIdsFromGroupList(groups);
+					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
 					ReportDTO reportDto = new ReportDTO();
 
@@ -209,7 +205,7 @@ public class ReportController {
 
 					log.debug("Loading network reports for contextId {0}", contextId);
 
-					List<String> groupIds = groupUtils.getGroupIdsFromGroupList(groups);
+					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
 					NetworkReportDTO reportDto = new NetworkReportDTO();
 

@@ -22,14 +22,7 @@
         <!-- Position Column -->
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.sequence.timestamp' | translate }}</mat-header-cell>
-			<mat-cell *matCellDef="let element"> {{element.lastChangedTimeStamp}}</mat-cell>
-        </ng-container>
-
-        <!-- Name Column -->
-        <ng-container matColumnDef="version">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.sequence.hash' | translate }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.sequenceHash}}</mat-cell>
+			<mat-cell *matCellDef="let element"> {{element.lastChangedTimeStamp | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
