@@ -319,7 +319,7 @@ export class AnalysisComponent implements OnInit{
 
 	addLabels(networkReport: NetworkReportDTO){
 		this.markers = [];
-		this.coordinates = networkReport.coordinates;
+		/*this.coordinates = networkReport.coordinates;
 
 		for (const coord of this.coordinates){
 			// We are showing only 5000 ip pairs beacuse of the rendering time
@@ -335,7 +335,7 @@ export class AnalysisComponent implements OnInit{
 			else{
 				break;
 			}
-		}
+		}*/
 	}
 
 
