@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 	<persistence-unit name="s2s">
-		<description>Simple2Secure Probe</description>
+		<description>simple2secure Probe</description>
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>com.simple2secure.api.model.AccountCredential</class>
 		<class>com.simple2secure.api.model.Device</class>
@@ -28,7 +28,7 @@
 			<property name="hibernate.connection.driver_class"
 				value="org.h2.Driver" />
 			<property name="hibernate.connection.url"
-				value="jdbc:h2:file:./db/s2sProbeDB" />
+				value="jdbc:h2:file:./db/s2sProbeDB;MV_STORE=false" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
 			<property name="javax.persistence.jdbc.password"

@@ -75,8 +75,7 @@ public class ReportScheduler extends TimerTask {
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
-				report.setSent(true);
-				DBUtil.getInstance().merge(report);
+				DBUtil.getInstance().delete(report);
 			}
 		}
 	}
@@ -104,8 +103,7 @@ public class ReportScheduler extends TimerTask {
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
 					ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
-				report.setSent(true);
-				DBUtil.getInstance().merge(report);
+				DBUtil.getInstance().delete(report);
 			}
 		}
 
@@ -145,5 +143,4 @@ public class ReportScheduler extends TimerTask {
 			currentPageNumber++;
 		}
 	}
-
 }
