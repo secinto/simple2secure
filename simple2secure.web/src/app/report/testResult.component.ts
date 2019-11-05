@@ -29,6 +29,7 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestResultDetailsComponent} from './testResultDetails.component';
+import {TestRunDTO} from '../_models/DTO/testRunDTO';
 
 @Component({
 	moduleId: module.id,
@@ -38,12 +39,15 @@ import {TestResultDetailsComponent} from './testResultDetails.component';
 export class TestResultComponent {
 
 	currentUser: any;
-	testResults: TestResultDTO[];
-	selectedResult: TestResultDTO;
+	testResults: TestRunDTO[];
+	selectedResult: TestRunDTO;
 	loading = false;
 	context: ContextDTO;
-	displayedColumns = ['name', 'license', 'group', 'action'];
+	displayedColumns = ['podId', 'hostname', 'testname', 'timestamp', 'action'];
 	dataSource = new MatTableDataSource();
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -61,12 +65,11 @@ export class TestResultComponent {
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadTestResults();
+		this.loadTestResults(0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -75,14 +78,22 @@ export class TestResultComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	loadTestResults() {
+	public handlePage(e: any) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadTestResults(e.pageIndex, e.pageSize);
+	}
+
+	loadTestResults(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/testresult/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'test/testresult/' + this.context.context.id
+			+ '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.testResults = data;
+					this.testResults = data.tests;
 					this.dataSource.data = this.testResults;
-					if (data.length > 0) {
+					this.totalSize = data.totalSize;
+					if (data.tests.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
 					else {
@@ -112,7 +123,7 @@ export class TestResultComponent {
 
 	}
 
-	public onMenuTriggerClick(testResult: TestResultDTO) {
+	public onMenuTriggerClick(testResult: TestRunDTO) {
 		this.selectedResult = testResult;
 	}
 
@@ -143,7 +154,7 @@ export class TestResultComponent {
 			data => {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
-				this.loadTestResults();
+				this.loadTestResults(this.currentPage, this.pageSize);
 			},
 			error => {
 				if (error.status == 0) {

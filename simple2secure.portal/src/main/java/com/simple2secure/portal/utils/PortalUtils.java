@@ -44,7 +44,9 @@ import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
+import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.repository.GroupRepository;
 
 import io.jsonwebtoken.Claims;
@@ -279,6 +281,43 @@ public class PortalUtils {
 			size = ConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return ((page + 1) * size) - limit;
+	}
+
+	/**
+	 * This functions extracts the id from the list of objects and adds it to the list of the strings which is returned
+	 *
+	 * @param groups
+	 * @return
+	 */
+	public List<String> extractIdsFromObjects(List<?> objects) {
+		List<String> ids = new ArrayList<>();
+
+		if (objects != null) {
+			for (Object object : objects) {
+				if (object.getClass().equals(CompanyGroup.class)) {
+					CompanyGroup group = (CompanyGroup) object;
+					if (!Strings.isNullOrEmpty(group.getId())) {
+						ids.add(group.getId());
+					}
+				}
+
+				else if (object.getClass().equals(TestRun.class)) {
+					TestRun testRun = (TestRun) object;
+					if (!Strings.isNullOrEmpty(testRun.getId())) {
+						ids.add(testRun.getId());
+					}
+				}
+
+				else if (object.getClass().equals(CompanyLicensePrivate.class)) {
+					CompanyLicensePrivate license = (CompanyLicensePrivate) object;
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						ids.add(license.getDeviceId());
+					}
+				}
+			}
+		}
+
+		return ids;
 	}
 
 }

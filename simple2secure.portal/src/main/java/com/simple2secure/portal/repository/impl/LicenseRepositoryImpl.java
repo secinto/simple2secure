@@ -1,5 +1,6 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -117,5 +118,21 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	public CompanyLicensePrivate findByHostname(String hostname) {
 		Query query = new Query(Criteria.where("hostname").is(hostname));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
+	}
+
+	@Override
+	public List<CompanyLicensePrivate> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod) {
+		List<CompanyLicensePrivate> licenses = new ArrayList<>();
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String groupId : groupIds) {
+			Criteria expression = new Criteria();
+			expression.and("groupId").is(groupId);
+			orExpression.add(expression);
+		}
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+		licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+		return licenses;
 	}
 }

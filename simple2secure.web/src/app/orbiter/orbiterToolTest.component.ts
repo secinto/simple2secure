@@ -43,6 +43,9 @@ export class OrbiterToolTestComponent {
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -58,7 +61,7 @@ export class OrbiterToolTestComponent {
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadPods();
+		this.loadPods(0, 10);
 	}
 
 	ngAfterViewInit() {
@@ -72,13 +75,19 @@ export class OrbiterToolTestComponent {
 		this.dataSource.filter = filterValue;
 	}
 
+	public handlePage(e: any) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadPods(e.pageIndex, e.pageSize);
+	}
+
 	public onMenuTriggerClick(pod: PodDTO) {
 		this.selectedPod = pod;
 	}
 
-	loadPods() {
+	loadPods(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.pods = data;

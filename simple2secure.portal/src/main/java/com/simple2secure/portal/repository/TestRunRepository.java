@@ -23,6 +23,7 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.dao.MongoRepository;
@@ -33,5 +34,7 @@ public abstract class TestRunRepository extends MongoRepository<TestRun> {
 
 	public abstract List<TestRun> getByContextId(String contextId);
 
-	public abstract List<TestRun> getTestRunByPodId(String podId);
+	public abstract Map<String, Object> getByContextIdForPagination(String contextId, int page, int size);
+
+	public abstract List<TestRun> getTestRunByPodId(List<String> podId);
 }
