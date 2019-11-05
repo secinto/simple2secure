@@ -85,7 +85,7 @@ project(':simple2secure.probe') {
 
 			compile 'org.hibernate:hibernate-core:5.4.7.Final'
 			compile 'org.hibernate:hibernate-entitymanager:5.4.7.Final'
-			compile group: 'com.h2database', name: 'h2', version: '1.4.195'
+			compile group: 'com.h2database', name: 'h2', version: '1.4.200'
 
 			testCompile 'junit:junit:4.12'
 		}

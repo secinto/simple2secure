@@ -5,10 +5,13 @@
             "description": "Simple tool for running some tests",
             "version": "0.0.1",
             "precondition": {
+                "id": null,
                 "description": "Remove some file if exists",
                 "command": {
+                    "id": null,
                     "executable": "DELETE_RESULT",
                     "parameter": {
+                        "id": null,
                         "description": "File name",
                         "prefix": "",
                         "value": "./result/result.json"
@@ -16,10 +19,13 @@
                 }
             },
             "step": {
+                "id": null,
                 "description": "Execute nmap",
                 "command": {
+                    "id": null,
                     "executable": "nmap",
                     "parameter": {
+                        "id": null,
                         "description": "Some simple nmap execution",
                         "prefix": "-T4 -F",
                         "value": "www.secinto.com"
@@ -27,13 +33,16 @@
                 }
             },
             "postcondition": {
+                "id": null,
                 "description": "Save result to the file",
                 "command": {
+                    "id": null,
                     "executable": "SAVE_RESULT",
                     "parameter": {
+                        "id": null,
                         "description": "File Name",
                         "prefix": "",
-                        "value": "./result/result.json"
+                        "value": "result/result.json"
                     }
                 }
             }
