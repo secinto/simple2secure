@@ -28,6 +28,7 @@ export class QueryReport extends Generic {
 	query: string;
 	hostname: string;
 	queryResult: string;
+	name: string;
 	queryTimestamp: Date;
 	isSent: boolean;
 }

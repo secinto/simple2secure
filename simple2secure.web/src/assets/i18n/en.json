@@ -193,7 +193,7 @@
   "table.numoftestsresults": "Number of test results", 
   "table.runningtime": "Running time",
   "table.frequency": "Frequency",      
-  "table.query": "Queries",
+  "table.query": "Query",
   "table.queryresults": "Query Results",
   "table.priority": "Priority",
   "table.description": "Description",   

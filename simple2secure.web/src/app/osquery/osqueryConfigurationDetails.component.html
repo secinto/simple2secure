@@ -24,10 +24,10 @@
         </ng-container>
 
         <ng-container matColumnDef="runAlways">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'osquery.runalways' |
+            <mat-header-cell *matHeaderCellDef class="mat-column-left" mat-sort-header> {{ 'osquery.runalways' |
                 translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+            <mat-cell *matCellDef="let element" class="mat-cell-left" (click)="$event.stopPropagation()">
                 <button *ngIf="element.always === true" mat-raised-button color="primary" class="mat-green-button"> {{
                     'button.true' | translate }}
                 </button>
