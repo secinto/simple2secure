@@ -51,8 +51,6 @@ export * from './DTO/userRoleDTO';
 export * from './DTO/emailConfigurationDTO';
 export * from './graphReport';
 export * from './DTO/networkReportDTO';
-export * from './marker';
-export * from './coordinates';
 export  * from './testResult';
 export  * from './testResultObj';
 export * from './DTO/testResultDTO';

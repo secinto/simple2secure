@@ -26,7 +26,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport, Marker, NetworkReportDTO, Coordinates, NetworkReport} from '../_models';
+import {ContextDTO, GraphReport, NetworkReportDTO} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
@@ -43,7 +43,6 @@ export class AnalysisComponent implements OnInit{
 
 	reports: any[];
 	graphReports: GraphReport[];
-	networkReports: NetworkReportDTO[];
 	queries: any[];
 	context: ContextDTO;
 	currentUser: any;
@@ -52,9 +51,6 @@ export class AnalysisComponent implements OnInit{
 	chartOptions: any;
 	seriesOption: any;
 	loading = false;
-	markers: Marker[] = [];
-	selectedNetworkReport: NetworkReportDTO;
-	coordinates: Coordinates[] = [];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -69,27 +65,8 @@ export class AnalysisComponent implements OnInit{
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.selectedNetworkReport = new NetworkReportDTO();
 		this.loadAllQueries(true);
-		this.loadNetworkReports();
 	}
-
-	loadNetworkReports(){
-		this.httpService.get(environment.apiEndpoint + 'reports/report/network/geo')
-			.subscribe(
-				data => {
-					this.networkReports = data;
-					if (this.networkReports){
-						this.selectedNetworkReport = this.networkReports[0];
-						if(this.selectedNetworkReport){
-							this.addLabels(this.selectedNetworkReport);
-						}
-
-					}
-
-				});
-	}
-
 
 	loadAllQueries(defaultValue: boolean) {
 		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/true')
@@ -122,11 +99,6 @@ export class AnalysisComponent implements OnInit{
 
 	onQueryChange(value: any){
 		this.loadReportsByName(value.sqlQuery);
-	}
-
-	onQueryChangeNetworkRep(value: NetworkReportDTO){
-		this.selectedNetworkReport = value;
-		this.addLabels(this.selectedNetworkReport);
 	}
 
 	public openDialogShowReportDetails(event: any): void {
@@ -314,29 +286,6 @@ export class AnalysisComponent implements OnInit{
 		this.chart = new StockChart(this.chartOptions);
 	}
 
-
-	/// ###This part is used for maps###
-
-	addLabels(networkReport: NetworkReportDTO){
-		this.markers = [];
-		/*this.coordinates = networkReport.coordinates;
-
-		for (const coord of this.coordinates){
-			// We are showing only 5000 ip pairs beacuse of the rendering time
-			if (this.markers.length < 5000){
-				this.markers.push({
-					lat: coord.srclatitude,
-					lng: coord.srclongitude,
-					latDest: coord.destlatitude,
-					lngDest: coord.destlongitude,
-					draggable: false
-				});
-			}
-			else{
-				break;
-			}
-		}*/
-	}
 
 
 
