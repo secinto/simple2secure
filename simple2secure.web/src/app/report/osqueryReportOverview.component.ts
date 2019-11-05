@@ -48,7 +48,7 @@ export class OsQueryReportOverviewComponent {
 	currentUser: any;
 	loading = false;
 	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
-	pageEvent: PageEvent;
+	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;

@@ -50,7 +50,7 @@ export class OrbiterToolTestScheduledListComponent {
 	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
-	pageEvent: PageEvent;
+	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;

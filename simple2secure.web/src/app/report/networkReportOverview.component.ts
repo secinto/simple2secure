@@ -44,7 +44,7 @@ export class NetworkReportOverviewComponent {
 	context: ContextDTO;
 	selectedReport: any;
 	loading = false;
-	pageEvent: PageEvent;
+	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;

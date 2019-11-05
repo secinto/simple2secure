@@ -46,7 +46,7 @@ export class TestResultComponent {
 	context: ContextDTO;
 	displayedColumns = ['podId', 'hostname', 'testname', 'timestamp', 'action'];
 	dataSource = new MatTableDataSource();
-	pageEvent: PageEvent;
+	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
