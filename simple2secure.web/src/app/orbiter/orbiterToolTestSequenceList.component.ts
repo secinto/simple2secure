@@ -25,12 +25,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {PodDTO} from '../_models/DTO/podDTO';
 import {ContextDTO, Test, User} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
-import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {TestDetailsComponent} from './testDetails.component';
 import { TestSequence } from '../_models/testSequence';
 import { TestSequenceDetailsComponent } from './testSequenceDetails.component';
 
@@ -49,7 +47,7 @@ export class OrbiterToolTestSequenceListComponent {
 	testSequence: string[];
 	context: ContextDTO;
 	currentUser: any;
-	displayedColumns = ['testId', 'version', 'status', 'action'];
+	displayedColumns = ['testId', 'status', 'action'];
 	loading = false;
 	url: string;
 	dataSource = new MatTableDataSource();

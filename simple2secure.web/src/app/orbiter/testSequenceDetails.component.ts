@@ -88,6 +88,11 @@ export class TestSequenceDetailsComponent {
         this.getTestForSequenceToShow(this.sequence);
     }
 
+    ngDoCheck() {
+        this.topCarousel.update();
+    }
+
+
     getTestNamesFromObject(tests: TestObjWeb[]) {
         const testNames: string[] = [];
         for (const testObj of tests) {
@@ -112,22 +117,25 @@ export class TestSequenceDetailsComponent {
 
     prev() {
         this.topCarousel.slidePrev();
+        this.topCarousel.update();
     }
     next() {
         this.topCarousel.slideNext();
+        this.topCarousel.update();
     }
 
     addTestToSequence(item: TestObjWeb){
         if (this.sequence.sequenceContent){
             this.sequence.sequenceContent.push(item.name);
             this.sequenceToShow.push(item);
+            this.topCarousel.update();
+            this.topCarousel.slideNext();
         }else {
             this.sequence.sequenceContent = [];
             this.sequence.sequenceContent.push(item.name);
             this.sequenceToShow.push(item);
+            this.topCarousel.update();
         }
-        this.topCarousel.slideNext();
-        this.topCarousel.update();
     }
 
     removeTestFromSequence(item: TestObjWeb){
@@ -136,9 +144,9 @@ export class TestSequenceDetailsComponent {
         if (showIndex > -1) {
             this.sequence.sequenceContent.splice(showIndex, 1);
             this.sequenceToShow.splice(showIndex, 1);
+            this.topCarousel.slidePrev();
+            this.topCarousel.update();
         }
-        this.topCarousel.slidePrev();
-        this.topCarousel.update();
     }
 
     public loadTests(podId: string) {
