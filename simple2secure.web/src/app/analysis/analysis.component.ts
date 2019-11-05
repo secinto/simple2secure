@@ -69,7 +69,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadAllQueries(defaultValue: boolean) {
-		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/true')
+		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/false')
 			.subscribe(
 				data => {
 					this.queries = data;

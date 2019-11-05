@@ -71,7 +71,7 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getHostname())) {
 				report.setHostname(ProbeConfiguration.hostname);
 			}
-			log.debug("Sending query report {} with timestamp {} to the API.", report.getQuery(),
+			log.debug("Sending query report {} with timestamp {} to the API.", report.getName(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {

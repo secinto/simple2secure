@@ -74,7 +74,7 @@ public final class ProbeUtils {
 			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/status/" + ProbeConfiguration.probeId, null,
 					null);
 		} else {
-			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + "/api/service/");
+			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/status");
 		}
 		if (!Strings.isNullOrEmpty(response)) {
 			ProbeConfiguration.setAPIAvailablitity(true);

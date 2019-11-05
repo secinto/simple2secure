@@ -22,6 +22,7 @@
 package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -282,6 +283,8 @@ public class QueryController {
 							queryRunList.addAll(queryConfig);
 						}
 					}
+
+					queryRunList.sort(Comparator.comparing(QueryRun::getName));
 					return new ResponseEntity<>(queryRunList, HttpStatus.OK);
 				}
 
