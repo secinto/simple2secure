@@ -30,6 +30,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestResultDetailsComponent} from './testResultDetails.component';
 import {TestRunDTO} from '../_models/DTO/testRunDTO';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -45,6 +46,7 @@ export class TestResultComponent {
 	context: ContextDTO;
 	displayedColumns = ['podId', 'hostname', 'testname', 'timestamp', 'action'];
 	dataSource = new MatTableDataSource();
+	pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
@@ -78,7 +80,7 @@ export class TestResultComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e: any) {
+	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadTestResults(e.pageIndex, e.pageSize);

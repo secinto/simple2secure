@@ -33,6 +33,7 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 import {QueryReport} from '../_models/queryReport';
 import {ReportDTO} from '../_models/DTO/reportDTO';
 import {merge, tap} from 'rxjs/operators';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -47,6 +48,7 @@ export class OsQueryReportOverviewComponent {
 	currentUser: any;
 	loading = false;
 	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
+	pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
@@ -81,7 +83,7 @@ export class OsQueryReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e: any) {
+	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);

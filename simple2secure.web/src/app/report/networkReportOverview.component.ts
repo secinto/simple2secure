@@ -22,15 +22,15 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {NgxSpinnerService} from 'ngx-spinner';
-import {HttpService, AlertService, DataService} from '../_services/index';
+import {HttpService, AlertService, DataService} from '../_services';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO, NetworkReport, NetworkReportDTO} from '../_models/index';
+import {ContextDTO, NetworkReport, NetworkReportDTO} from '../_models';
 import {NetworkReportDetailsComponent} from './networkReportDetails.component';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -44,6 +44,7 @@ export class NetworkReportOverviewComponent {
 	context: ContextDTO;
 	selectedReport: any;
 	loading = false;
+	pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
@@ -80,7 +81,7 @@ export class NetworkReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e: any) {
+	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);

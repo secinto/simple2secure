@@ -77,36 +77,40 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 
 	@Override
 	public Map<String, Object> getByTestRunIdWithPagination(List<String> testRunIds, int page, int size) {
-		List<TestRunDTO> testRunDto = new ArrayList<>();
-
-		List<Criteria> orExpression = new ArrayList<>();
-		Criteria orCriteria = new Criteria();
-		Query query = new Query();
-		for (String testRunId : testRunIds) {
-			Criteria expression = new Criteria();
-			expression.and("testRunId").is(testRunId);
-			orExpression.add(expression);
-		}
-
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
-
-		long count = mongoTemplate.count(query, TestResult.class, collectionName);
-
-		int limit = portalUtils.getPaginationLimit(size);
-		int skip = portalUtils.getPaginationStart(size, page, limit);
-
-		query.limit(limit);
-		query.skip(skip);
-		query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
-
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class, collectionName);
-
-		testRunDto = testUtils.generateTestRunDTOByTestResults(testResults);
-
 		Map<String, Object> testResultMap = new HashMap<>();
-		testResultMap.put("tests", testRunDto);
-		testResultMap.put("totalSize", count);
+		if (testRunIds != null && testRunIds.size() > 0) {
+			List<TestRunDTO> testRunDto = new ArrayList<>();
 
+			List<Criteria> orExpression = new ArrayList<>();
+			Criteria orCriteria = new Criteria();
+			Query query = new Query();
+			for (String testRunId : testRunIds) {
+				Criteria expression = new Criteria();
+				expression.and("testRunId").is(testRunId);
+				orExpression.add(expression);
+			}
+
+			query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+			long count = mongoTemplate.count(query, TestResult.class, collectionName);
+
+			int limit = portalUtils.getPaginationLimit(size);
+			int skip = portalUtils.getPaginationStart(size, page, limit);
+
+			query.limit(limit);
+			query.skip(skip);
+			query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
+
+			List<TestResult> testResults = mongoTemplate.find(query, TestResult.class, collectionName);
+
+			testRunDto = testUtils.generateTestRunDTOByTestResults(testResults);
+
+			testResultMap.put("tests", testRunDto);
+			testResultMap.put("totalSize", count);
+		} else {
+			testResultMap.put("tests", new ArrayList<TestRunDTO>());
+			testResultMap.put("totalSize", 0);
+		}
 		return testResultMap;
 
 	}

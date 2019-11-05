@@ -31,6 +31,7 @@ import {AlertService, DataService, HttpService} from '../_services';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestResultDetailsComponent} from '../report/testResultDetails.component';
 import {HelperService} from '../_services/helper.service';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -49,6 +50,7 @@ export class OrbiterToolTestScheduledListComponent {
 	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
+	pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
@@ -81,7 +83,7 @@ export class OrbiterToolTestScheduledListComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e: any) {
+	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadScheduledTests(e.pageIndex, e.pageSize);

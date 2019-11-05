@@ -28,6 +28,7 @@ import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} f
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -43,6 +44,7 @@ export class OrbiterToolTestComponent {
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
+	pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
@@ -75,7 +77,7 @@ export class OrbiterToolTestComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e: any) {
+	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadPods(e.pageIndex, e.pageSize);
