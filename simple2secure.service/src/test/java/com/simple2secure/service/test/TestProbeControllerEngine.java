@@ -32,6 +32,7 @@ public class TestProbeControllerEngine {
 		ProbeControllerEngine engine = new ProbeControllerEngine(System.getProperty("user.dir") + "\\release\\libs\\simple2secure.probe.jar",
 				System.getProperty("user.dir") + "\\release\\license");
 		engine.start();
+		engine.sendStartCommand();
 		engine.stop();
 	}
 

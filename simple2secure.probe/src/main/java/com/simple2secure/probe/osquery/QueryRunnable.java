@@ -22,7 +22,6 @@
 package com.simple2secure.probe.osquery;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
@@ -82,15 +81,14 @@ public class QueryRunnable implements Runnable {
 		String result = "";
 		Process p;
 
-		File queryExec = new File("src/main/resources/osquery/os_win7" + File.separator + "osqueryi.exe");
-		String myCommand = queryExec.getAbsolutePath();
+		String myCommand = ProbeConfiguration.osQueryExecutablePath;
 		String myArgs0 = "--json";
-		String myArgs1 = "--config-path=./src/main/resources/osquery/os_win7" + File.separator + "osquery.conf";
+		String myArgs1 = "--config-path=" + ProbeConfiguration.osQueryConfigPath;
 		String myArgs2 = query;
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
 		// pb.directory(directory);
-
+		log.debug("Using command {} to execute query", pb.command());
 		try {
 			p = pb.start();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -103,7 +101,7 @@ public class QueryRunnable implements Runnable {
 			}
 			p.destroy();
 		} catch (Exception e) {
-			log.error("Execution during QSQuery. Reason {}", e.getMessage());
+			log.error("Exception during QSQuery. Reason {}", e.getMessage());
 		}
 		return result;
 	}

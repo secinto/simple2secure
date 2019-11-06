@@ -24,8 +24,8 @@ package com.simple2secure.probe.config;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,10 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
@@ -67,6 +70,8 @@ public class ProbeConfiguration {
 	public static String licenseId = "";
 	public static String osinfo = "";
 	public static String licensePath = "";
+	public static String osQueryExecutablePath = "";
+	public static String osQueryConfigPath = "";
 
 	public static boolean isLicenseValid = false;
 	public static boolean isCheckingLicense = false;
@@ -424,26 +429,27 @@ public class ProbeConfiguration {
 	 * This function reads RunQueries from file
 	 *
 	 * @return
+	 * @throws IOException
 	 */
 	private List<Processor> getProcessorsFromFile() {
 		File potentialProcessors;
 		List<Processor> processors = new ArrayList<>();
 
-		potentialProcessors = new File(StaticConfigItems.PROCESSORS_JSON_LOCATION);
+		String processorsContent = null;
+		try {
 
-		if (!potentialProcessors.exists()) {
-			try {
-				potentialProcessors = new File(ProbeConfiguration.class.getResource(StaticConfigItems.PROCESSORS_JSON_LOCATION).toURI());
-			} catch (URISyntaxException e) {
-				log.error("Provided file URI is not correct!" + potentialProcessors.getAbsolutePath());
-			}
+			potentialProcessors = new File(StaticConfigItems.PROCESSORS_JSON_LOCATION);
+
 			if (!potentialProcessors.exists()) {
-				log.error("The specified file couldn't be found! {}", StaticConfigItems.QUERIES_JSON_LOCATION);
-				throw new IllegalArgumentException("The specified file couldn't be found!");
+				processorsContent = IOUtils.toString(getClass().getResourceAsStream(StaticConfigItems.PROCESSORS_JSON_LOCATION), "UTF-8");
+			} else {
+				processorsContent = Files.toString(potentialProcessors, Charsets.UTF_8);
 			}
+		} catch (IOException e) {
+			log.error("Provided resource location {} is not correct!", StaticConfigItems.PROCESSORS_JSON_LOCATION);
 		}
 
-		processors = JsonUtils.readProcessorsFromFile(potentialProcessors);
+		processors = JsonUtils.readProcessorsFromString(processorsContent);
 
 		return processors;
 	}
@@ -485,27 +491,28 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-	private static List<Step> getStepsFromFile() {
+	private List<Step> getStepsFromFile() {
 		File potentialSteps;
-		List<Step> fileSteps = new ArrayList<>();
+		List<Step> steps = new ArrayList<>();
 
-		potentialSteps = new File(StaticConfigItems.STEPS_JSON_LOCATION);
+		String stepsContent = null;
+		try {
 
-		if (!potentialSteps.exists()) {
-			try {
-				potentialSteps = new File(ProbeConfiguration.class.getResource(StaticConfigItems.STEPS_JSON_LOCATION).toURI());
-			} catch (URISyntaxException e) {
-				log.error("Provided file URI is not correct!" + potentialSteps.getAbsolutePath());
-			}
+			potentialSteps = new File(StaticConfigItems.STEPS_JSON_LOCATION);
+
 			if (!potentialSteps.exists()) {
-				log.error("The specified file couldn't be found! {}" + StaticConfigItems.STEPS_JSON_LOCATION);
-				throw new IllegalArgumentException("The specified file couldn't be found!");
+				stepsContent = IOUtils.toString(getClass().getResourceAsStream(StaticConfigItems.STEPS_JSON_LOCATION), "UTF-8");
+			} else {
+				stepsContent = Files.toString(potentialSteps, Charsets.UTF_8);
 			}
+		} catch (IOException e) {
+			log.error("Provided resource location {} is not correct!", StaticConfigItems.STEPS_JSON_LOCATION);
 		}
 
-		fileSteps = JsonUtils.readStepsFromFile(potentialSteps);
+		steps = JsonUtils.readStepsFromString(stepsContent);
 
-		return fileSteps;
+		return steps;
+
 	}
 
 	/**
@@ -535,7 +542,7 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-	private static List<QueryRun> getQueriesFromDatabase() {
+	private List<QueryRun> getQueriesFromDatabase() {
 		return DBUtil.getInstance().findByFieldName("active", 1, new com.simple2secure.api.model.QueryRun());
 	}
 
@@ -544,27 +551,27 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-	private static List<QueryRun> getQueriesFromFile() {
-		File potentialRunQueries;
-		List<QueryRun> runQueries = new ArrayList<>();
+	private List<QueryRun> getQueriesFromFile() {
+		File potentialQueries;
+		List<QueryRun> queries = new ArrayList<>();
 
-		potentialRunQueries = new File(StaticConfigItems.QUERIES_JSON_LOCATION);
+		String queriesContent = null;
+		try {
 
-		if (!potentialRunQueries.exists()) {
-			try {
-				potentialRunQueries = new File(ProbeConfiguration.class.getResource(StaticConfigItems.QUERIES_JSON_LOCATION).toURI());
-			} catch (URISyntaxException e) {
-				log.error("Provided file URI is not correct!" + potentialRunQueries.getAbsolutePath());
+			potentialQueries = new File(StaticConfigItems.QUERIES_JSON_LOCATION);
+
+			if (!potentialQueries.exists()) {
+				queriesContent = IOUtils.toString(getClass().getResourceAsStream(StaticConfigItems.QUERIES_JSON_LOCATION), "UTF-8");
+			} else {
+				queriesContent = Files.toString(potentialQueries, Charsets.UTF_8);
 			}
-			if (!potentialRunQueries.exists()) {
-				log.error("The specified file couldn't be found! {}" + StaticConfigItems.QUERIES_JSON_LOCATION);
-				throw new IllegalArgumentException("The specified file couldn't be found!");
-			}
+		} catch (IOException e) {
+			log.error("Provided resource location {} is not correct!", StaticConfigItems.QUERIES_JSON_LOCATION);
 		}
 
-		runQueries = JsonUtils.readRunQueriesFromFile(potentialRunQueries);
+		queries = JsonUtils.readRunQueriesFromString(queriesContent);
 
-		return runQueries;
+		return queries;
 	}
 
 	/**

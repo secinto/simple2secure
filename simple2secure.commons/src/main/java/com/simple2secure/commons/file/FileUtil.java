@@ -46,10 +46,6 @@ public class FileUtil {
 	private static String workingDirectory = System.getProperty("user.dir");
 	private static String absoluteWorkingPath = new File(workingDirectory).getAbsolutePath();
 
-	static {
-		setWorkingDirectory(".");
-	}
-
 	/**
 	 * Sets the working directory which is used for internal processes to the specified directory. If nothing is specified or the specified
 	 * directory doesn't exist, <code>System.getProperty("user.dir")</code> is used as working directory.
@@ -63,7 +59,7 @@ public class FileUtil {
 		if (dir.exists()) {
 			absoluteWorkingPath = dir.getAbsolutePath();
 			absoluteWorkingPath = absoluteWorkingPath.replace("\\.", "\\");
-			FileUtil.workingDirectory = dir.getAbsolutePath();
+			workingDirectory = dir.getAbsolutePath();
 		} else {
 			workingDirectory = System.getProperty("user.dir");
 			absoluteWorkingPath = workingDirectory;
@@ -154,16 +150,34 @@ public class FileUtil {
 
 	/**
 	 * Creates the specified folder in the file system. If the folder has been created <code>true</code> is returned. The absolute path must
-	 * be specified otherwise it is supposed that it is a relative path from the directory where the application has been started.
+	 * be specified.
 	 *
 	 * @param folder
 	 *          The folder which should be created.
 	 * @return True if the folder is created.
 	 */
 	public static boolean createFolder(String folder) {
+		return createFolder(folder, false);
+	}
+
+	/**
+	 * Creates the specified folder in the file system. If the folder has been created <code>true</code> is returned. The absolute path must
+	 * be specified otherwise it is supposed that it is a relative path from the directory where the application has been started.
+	 *
+	 * @param folder
+	 *          The folder which should be created.
+	 * @param fromWorkingDir
+	 *          Specifies if the folder which should be created is relative to the working directory.
+	 * @return True if the folder is created.
+	 */
+	public static boolean createFolder(String folder, boolean fromWorkingDir) {
 		if (!Strings.isNullOrEmpty(folder)) {
 			try {
-				FileUtils.forceMkdir(new File(folder));
+				if (fromWorkingDir) {
+					FileUtils.forceMkdir(new File(workingDirectory + File.separator + folder));
+				} else {
+					FileUtils.forceMkdir(new File(folder));
+				}
 			} catch (Exception e) {
 				log.error("Couldn't create folder " + folder + ". Reason: " + e.getMessage());
 				return false;

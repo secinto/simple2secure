@@ -21,6 +21,8 @@
  */
 package com.simple2secure.probe.cli;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Scanner;
 
@@ -31,10 +33,13 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.security.TLSConfig;
 import com.simple2secure.commons.service.ServiceCommand;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -76,6 +81,12 @@ public class ProbeCLI {
 		LicenseController licenseController = new LicenseController();
 
 		StartConditions startConditions = licenseController.checkLicenseValidity();
+		try {
+			prepareOsQuery();
+		} catch (IOException e) {
+			log.error("OSQuery couldn't be prepared. Stopping execution");
+			System.exit(-1);
+		}
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:
@@ -100,6 +111,23 @@ public class ProbeCLI {
 
 	}
 
+	private void prepareOsQuery() throws IOException {
+		if (!FileUtil.fileOrFolderExists("tools")) {
+			FileUtil.createFolder("tools", true);
+		}
+		for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION) {
+			File newLocation = new File("./tools" + location);
+			if (!newLocation.exists()) {
+				FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+			}
+			if (location.endsWith("osqueryi.exe")) {
+				ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+			} else {
+				ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+			}
+		}
+	}
+
 	/**
 	 * Starts the Probe itself. Hope the best.
 	 */
@@ -111,7 +139,7 @@ public class ProbeCLI {
 		Scanner commandService = new Scanner(System.in);
 		try {
 			ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
-
+			log.info("Received command {} via instrumentation", command.getCommand().name());
 			while (running) {
 				switch (command.getCommand()) {
 				case START:
@@ -159,14 +187,19 @@ public class ProbeCLI {
 			ProbeCLI client = new ProbeCLI();
 
 			if (line.hasOption(filePath.getOpt())) {
-				client.init(line.getOptionValue(filePath.getOpt()));
+				String licensePath = line.getOptionValue(filePath.getOpt());
+				log.debug("Initializing PROBE with provided license path {}", licensePath);
+				client.init(licensePath);
 			} else {
+				log.debug("Initializing PROBE with default license path");
 				client.init("./license/");
 			}
 
 			if (line.hasOption(instrumentation.getOpt())) {
+				log.debug("Starting PROBE with instrumentation");
 				client.startInstrumentation();
 			} else {
+				log.debug("Starting PROBE in normal mode");
 				client.startWorkerThreads();
 			}
 

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
+import com.simple2secure.commons.service.ServiceCommand;
 import com.simple2secure.service.interfaces.ControllerEngine;
 import com.simple2secure.service.model.TriggerableEngineStates;
 import com.simple2secure.service.observer.SimpleLoggingObserver;
@@ -124,8 +125,16 @@ public class ProbeControllerEngine implements ControllerEngine {
 		if (probeProcess != null) {
 			try {
 				log.debug("Calling destroy on probe process handle");
-				probeProcess.getProcess().destroy();
-				log.debug("Destroyed Probe process.");
+				sendStopCommand();
+				TimeUnit.SECONDS.sleep(1);
+
+				if (probeProcess.getProcess().isAlive()) {
+					probeProcess.getProcess().destroy();
+					log.debug("Destroyed Probe process.");
+				} else {
+					log.debug("Probe process exited using STOP command.");
+				}
+
 				if (!probeProcess.getProcess().isAlive()) {
 					exitValue = probeProcess.getProcess().exitValue();
 					log.debug("Exit value was {}", exitValue);
@@ -139,9 +148,15 @@ public class ProbeControllerEngine implements ControllerEngine {
 		 */
 		log.debug("Shutting down internal monitor, watchdog and updater tasks");
 		try {
-			probeMonitor.cancel(false);
-			probeUpdater.cancel(true);
-			portalWatchdog.cancel(true);
+			if (probeMonitor != null) {
+				probeMonitor.cancel(false);
+			}
+			if (probeUpdater != null) {
+				probeUpdater.cancel(true);
+			}
+			if (portalWatchdog != null) {
+				portalWatchdog.cancel(true);
+			}
 
 			log.debug("Internal monitor, watchdog and updater tasks have been shut down");
 		} catch (Exception e) {
@@ -224,11 +239,31 @@ public class ProbeControllerEngine implements ControllerEngine {
 			probeProcess.getObservable().addObserver(observer);
 			probeProcess.startObserving();
 			log.debug("Added output observer to probe process.");
-			return true;
+			TimeUnit.SECONDS.sleep(5);
+			log.debug("Waited 5 seconds before sending instrumentation command");
+			sendStartCommand();
 		} catch (FileNotFoundException | InterruptedException ie) {
 			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
 		}
 		return false;
+	}
+
+	public void sendStartCommand() {
+		try {
+			log.debug("Sending START service command to PROBE");
+			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("START"));
+		} catch (Exception e) {
+			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
+		}
+	}
+
+	public void sendStopCommand() {
+		try {
+			log.debug("Sending START service command to PROBE");
+			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("STOP"));
+		} catch (Exception e) {
+			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
+		}
 	}
 
 }

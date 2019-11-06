@@ -24,7 +24,6 @@ package com.simple2secure.commons.service;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.security.InvalidKeyException;
@@ -38,8 +37,6 @@ import com.simple2secure.commons.license.License;
 
 public class ServiceInstrumentation {
 	public static final String AUTHENTICATED_TAG = "AUTHENTICATED";
-	private InputStream serviceOutput;
-
 	private OutputStream serviceInput;
 
 	private BufferedWriter serviceCommandWriter;
@@ -52,10 +49,9 @@ public class ServiceInstrumentation {
 	private String token;
 
 	private boolean useSignatureAuthentication = false;
-	private boolean useAuthentication = true;
+	private boolean useAuthentication = false;
 
-	public ServiceInstrumentation(InputStream output, OutputStream input) {
-		serviceOutput = output;
+	public ServiceInstrumentation(OutputStream input) {
 		serviceInput = input;
 		serviceCommandWriter = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream(serviceInput)));
 	}
@@ -139,14 +135,6 @@ public class ServiceInstrumentation {
 		this.token = token;
 	}
 
-	public InputStream getServiceOutput() {
-		return serviceOutput;
-	}
-
-	public void setServiceOutput(InputStream serviceOutput) {
-		this.serviceOutput = serviceOutput;
-	}
-
 	public OutputStream getServiceInput() {
 		return serviceInput;
 	}
@@ -175,7 +163,7 @@ public class ServiceInstrumentation {
 		/*
 		 * TODO: Add some authentication mechanism which allows to verify the sender authenticity of the sender at the service.
 		 */
-		String commandToSend = command.getCommand() + " " + String.join(" ", command.getArguments());
+		String commandToSend = command.getCommand() + " " + String.join(" ", command.getArguments()) + System.lineSeparator();
 		if (useAuthentication) {
 			if (useSignatureAuthentication && privateKey != null) {
 				byte[] signedCommand = CryptoUtils.sign(commandToSend, privateKey);
@@ -187,6 +175,6 @@ public class ServiceInstrumentation {
 		}
 
 		serviceCommandWriter.write(commandToSend);
-
+		serviceCommandWriter.flush();
 	}
 }

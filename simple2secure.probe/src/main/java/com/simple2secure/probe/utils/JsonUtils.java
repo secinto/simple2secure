@@ -21,10 +21,7 @@
  */
 package com.simple2secure.probe.utils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,32 +37,6 @@ import com.simple2secure.commons.json.JSONUtils;
  *
  */
 public class JsonUtils {
-	/**
-	 * This function reads JSON from the URL.
-	 *
-	 * @param urlString
-	 * @return
-	 * @throws Exception
-	 */
-	public static String readJsonFromUrl(String urlString) throws Exception {
-		BufferedReader reader = null;
-		try {
-			URL url = new URL(urlString);
-			reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			StringBuffer buffer = new StringBuffer();
-			int read;
-			char[] chars = new char[1024];
-			while ((read = reader.read(chars)) != -1) {
-				buffer.append(chars, 0, read);
-			}
-
-			return buffer.toString();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-	}
 
 	/**
 	 * This function reads runQueries from the file
@@ -76,6 +47,20 @@ public class JsonUtils {
 	public static List<QueryRun> readRunQueriesFromFile(File file) {
 
 		QueryRun[] queryRunArr = JSONUtils.fromFile(file, QueryRun[].class);
+		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
+		return queryRunList;
+
+	}
+
+	/**
+	 * This function reads runQueries from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<QueryRun> readRunQueriesFromString(String content) {
+
+		QueryRun[] queryRunArr = JSONUtils.fromString(content, QueryRun[].class);
 		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
 		return queryRunList;
 
@@ -95,6 +80,19 @@ public class JsonUtils {
 	}
 
 	/**
+	 * This function reads processors from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<Processor> readProcessorsFromString(String content) {
+		Processor[] processorArr = JSONUtils.fromString(content, Processor[].class);
+		List<Processor> processors = Arrays.asList(processorArr);
+		return processors;
+
+	}
+
+	/**
 	 * This function reads steps from the file
 	 *
 	 * @param file
@@ -102,6 +100,18 @@ public class JsonUtils {
 	 */
 	public static List<Step> readStepsFromFile(File file) {
 		Step[] stepArr = JSONUtils.fromFile(file, Step[].class);
+		List<Step> steps = Arrays.asList(stepArr);
+		return steps;
+	}
+
+	/**
+	 * This function reads steps from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<Step> readStepsFromString(String content) {
+		Step[] stepArr = JSONUtils.fromString(content, Step[].class);
 		List<Step> steps = Arrays.asList(stepArr);
 		return steps;
 	}
