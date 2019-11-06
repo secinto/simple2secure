@@ -1,7 +1,55 @@
 [
 	{
+		"name": "Expired Certificates (German)",
+		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\Vertrauens%' ORDER BY expiration_date ASC;",
+		"description":"Returns the list of certificates of CAs which have already expired",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"active": 1,
+		"systemsAvailable": 1,
+		"graphAble": false
+	},
+	{
+		"name": "Expired Certificates (English)",
+		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\Trusted%' ORDER BY expiration_date ASC;",
+		"description":"Returns the list of certificates of CAs which have already expired",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"active": 1,
+		"systemsAvailable": 1,
+		"graphAble": false
+	},
+	{
+		"name": "Outbound Traffic not HTTP(S)",
+		"sqlQuery": "select s.pid, p.name, local_address, remote_address, family, protocol, local_port, remote_port from process_open_sockets s join processes p on s.pid = p.pid where remote_port not in (80, 443) and family = 2;",
+		"description":"List all processes which have outbound traffic not to port 80 and 443",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"active": 1,
+		"systemsAvailable": 1,
+		"graphAble": false
+	},
+	{
+		"name": "Most active processes",
+		"sqlQuery": "select count(pid) as total, name from processes group by name order by total desc limit 10;",
+		"description":"Returns process count and name fo the top 10 most active processes",
+		"always": true,
+		"analysisInterval": 1,
+		"analysisIntervalUnit": "DAYS",
+		"osquery": true,
+		"active": 1,
+		"systemsAvailable": 1,
+		"graphAble": false
+	},
+	{
 		"name": "Video card info",
-		"sqlQuery": "select * from video_info",
+		"sqlQuery": "select * from video_info;",
 		"description":"Obtains relevant information about the used video card",
 		"always": true,
 		"analysisInterval": 1,
@@ -13,7 +61,7 @@
 	},
 	{
 		"name": "Disk performance",
-		"sqlQuery": "select * from physical_disk_performance",
+		"sqlQuery": "select * from physical_disk_performance;",
 		"description":"Obtains relevant information about the disk performance",
 		"always": true,
 		"analysisInterval": 1,
@@ -25,7 +73,7 @@
 	},
 	{
 		"name": "Patches",
-		"sqlQuery": "select * from patches",
+		"sqlQuery": "select * from patches;",
 		"description":"Obtains relevant information about the patches applied to the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -37,7 +85,7 @@
 	},
 	{
 		"name": "Logical drives",
-		"sqlQuery": "select * from logical_drives",
+		"sqlQuery": "select * from logical_drives;",
 		"description":"Obtains relevant information about the logical drives",
 		"always": true,
 		"analysisInterval": 1,
@@ -49,7 +97,7 @@
 	},
 	{
 		"name": "Logged in users",
-		"sqlQuery": "select * from logged_in_users",
+		"sqlQuery": "select * from logged_in_users;",
 		"description":"Obtains the logged in users",
 		"always": true,
 		"analysisInterval": 5,
@@ -60,7 +108,7 @@
 	},
 	{
 		"name": "Autoexec applications",
-		"sqlQuery": "select * from autoexec",
+		"sqlQuery": "select * from autoexec;",
 		"description":"Obtains all applications which are in automatically started",
 		"always": true,
 		"analysisInterval": 1,
@@ -72,7 +120,7 @@
 	},
 	{
 		"name": "Bios info - Windows",
-		"sqlQuery": "select * from wmi_bios_info",
+		"sqlQuery": "select * from wmi_bios_info;",
 		"description":"Obtains relevant information about BIOS of the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -84,7 +132,7 @@
 	},
 	{
 		"name": "Installed programs",
-		"sqlQuery": "select * from programs",
+		"sqlQuery": "select name, version, install_location, install_source, publisher, install_date from programs where name != '';",
 		"description":"Obtains relevant information about applications installed on the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -96,7 +144,7 @@
 	},
 	{
 		"name": "Logon sessions",
-		"sqlQuery": "select * from logon_sessions",
+		"sqlQuery": "select * from logon_sessions;",
 		"description":"Obtains relevant information about current logon sessions",
 		"always": true,
 		"analysisInterval": 1,
@@ -108,7 +156,7 @@
 	},
 	{
 		"name": "OS version",
-		"sqlQuery": "select * from os_version",
+		"sqlQuery": "select * from os_version;",
 		"description":"Obtains relevant information about the used operating system used on the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -120,7 +168,7 @@
 	},
 	{
 		"name": "Open sockets processes",
-		"sqlQuery": "select * from process_open_sockets",
+		"sqlQuery": "select * from process_open_sockets;",
 		"description":"Obtains the open sockets for each process",
 		"always": true,
 		"analysisInterval": 5,
@@ -132,7 +180,7 @@
 	},
 	{
 		"name": "Platform info",
-		"sqlQuery": "select * from platform_info",
+		"sqlQuery": "select * from platform_info;",
 		"description":"Obtains relevant information about the underlaying platform of the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -144,7 +192,7 @@
 	},
 	{
 		"name": "Scheduled tasks (Windows)",
-		"sqlQuery": "select * from scheduled_tasks",
+		"sqlQuery": "select * from scheduled_tasks;",
 		"description":"Obtains relevant information about the currently scheduled tasks",
 		"always": true,
 		"analysisInterval": 1,
@@ -156,7 +204,7 @@
 	},
 	{
 		"name": "Shared resources",
-		"sqlQuery": "select * from shared_resources",
+		"sqlQuery": "select * from shared_resources;",
 		"description":"Obtains relevant information about the resources shared on the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -168,7 +216,7 @@
 	},
 	{
 		"name": "Startup items",
-		"sqlQuery": "select * from startup_items",
+		"sqlQuery": "select * from startup_items;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "DAYS",
@@ -179,7 +227,7 @@
 	},
 	{
 		"name": "System info",
-		"sqlQuery": "select * from system_info",
+		"sqlQuery": "select * from system_info;",
 		"always": true,
 		"analysisInterval": 10,
 		"analysisIntervalUnit": "MINUTES",
@@ -190,7 +238,7 @@
 	},
 	{
 		"name": "Kernel info",
-		"sqlQuery": "select * from kernel_info",
+		"sqlQuery": "select * from kernel_info;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
@@ -201,7 +249,7 @@
 	},
 	{
 		"name": "Network interface details",
-		"sqlQuery": "select * from interface_details",
+		"sqlQuery": "select * from interface_details;",
 		"description": "Obtains the details for all network interfaces in the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -213,7 +261,7 @@
 	},
 	{
 		"name": "Network interface addresses",
-		"sqlQuery": "select * from interface_addresses",
+		"sqlQuery": "select * from interface_addresses;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
@@ -224,7 +272,7 @@
 	},
 	{
 		"name": "Internet Explorer extensions",
-		"sqlQuery": "select * from ie_extendsions",
+		"sqlQuery": "select * from ie_extensions;",
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "HOURS",
@@ -235,7 +283,7 @@
 	},
 	{
 		"name": "List of certificates",
-		"sqlQuery": "select * from certificates",
+		"sqlQuery": "select * from certificates;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
@@ -246,7 +294,7 @@
 	},
 	{
 		"name": "Chrome extensions",
-		"sqlQuery": "select * from chrome_extensions",
+		"sqlQuery": "select * from chrome_extensions;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
@@ -257,7 +305,7 @@
 	},
 	{
 		"name": "Processes memory map",
-		"sqlQuery": "select * from process_memory_map",
+		"sqlQuery": "select * from process_memory_map;",
 		"always": true,
 		"analysisInterval": 1,
 		"analysisIntervalUnit": "HOURS",
@@ -268,7 +316,7 @@
 	},
 	{
 		"name": "Pipes",
-		"sqlQuery": "select * from pipes",
+		"sqlQuery": "select * from pipes;",
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "MINUTES",
@@ -279,7 +327,7 @@
 	},
 	{
 		"name": "Listening ports",
-		"sqlQuery": "select * from listening_ports",
+		"sqlQuery": "select * from listening_ports;",
 		"always": true,
 		"analysisInterval": 5,
 		"analysisIntervalUnit": "MINUTES",
@@ -290,7 +338,7 @@
 	},
 	{
 		"name": "Running processes",
-		"sqlQuery": "select * from processes",
+		"sqlQuery": "select * from processes;",
 		"description": "List all running processes",
 		"always": true,
 		"analysisInterval": 5,
@@ -302,7 +350,7 @@
 	},
 	{
 		"name": "Uptime",
-		"sqlQuery": "select * from uptime",
+		"sqlQuery": "select * from uptime;",
 		"description": "Obtain how long the system is already running without a reboot",
 		"always": true,
 		"analysisInterval": 1,
@@ -314,7 +362,7 @@
 	},
 	{
 		"name": "Users",
-		"sqlQuery": "select * from users",
+		"sqlQuery": "select * from users;",
 		"description": "List all users on system",
 		"always": true,
 		"analysisInterval": 1,
@@ -326,7 +374,7 @@
 	},
 	{
 		"name": "Active routes",
-		"sqlQuery": "select * from routes",
+		"sqlQuery": "select * from routes;",
 		"description": "Obtain the currently active routes of the system",
 		"always": true,
 		"analysisInterval": 1,
@@ -338,7 +386,7 @@
 	},
 	{
 		"name": "UAC disabled",
-		"sqlQuery": "SELECT * FROM registry WHERE path='HKEY_LOCAL_MACHINE\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System\\\\EnableLUA' AND data=0",
+		"sqlQuery": "SELECT * FROM registry WHERE path='HKEY_LOCAL_MACHINE\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System\\\\EnableLUA' AND data=0;",
 		"description": "Controls UAC. A setting of 0 indicates that UAC is disabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -350,7 +398,7 @@
 	},
 	{
 		"name": "Listening ports per processes",
-		"sqlQuery": "select p.name, p.path, lp.port, lp.address, lp.protocol  from listening_ports lp LEFT JOIN processes p ON lp.pid = p.pid WHERE lp.port != 0 AND p.name != ''",
+		"sqlQuery": "select p.name, p.path, lp.port, lp.address, lp.protocol  from listening_ports lp LEFT JOIN processes p ON lp.pid = p.pid WHERE lp.port != 0 AND p.name != '';",
 		"description": "Obtains the listening ports and to which processes they are associated",
 		"always": true,
 		"analysisInterval": 10,
@@ -362,7 +410,7 @@
 	},
 	{
 		"name": "Most memory intensive processes",
-		"sqlQuery": "SELECT pid, name, ROUND((total_size * '10e-7'), 2) AS used FROM processes ORDER BY total_size DESC LIMIT 10",
+		"sqlQuery": "SELECT pid, name, ROUND((total_size * '10e-7'), 2) AS used FROM processes ORDER BY total_size DESC LIMIT 10;",
 		"description": "Obtains the 10 most memory intensive processes",
 		"always": true,
 		"analysisInterval": 1,
@@ -374,7 +422,7 @@
 	},
 	{
 		"name": "Listening connections per processes",
-		"sqlQuery": "select DISTINCT p.name, p.path, pos.remote_address, pos.remote_port from process_open_sockets pos LEFT JOIN processes p ON pos.pid = p.pid WHERE pos.remote_port != 0 AND p.name != ''",
+		"sqlQuery": "select DISTINCT p.name, p.path, pos.remote_address, pos.remote_port from process_open_sockets pos LEFT JOIN processes p ON pos.pid = p.pid WHERE pos.remote_port != 0 AND p.name != '';",
 		"description": "Obtains the listening connections and to which processes they are associated",
 		"always": true,
 		"analysisInterval": 10,
@@ -387,7 +435,7 @@
 	},
 	{
 		"name": "Weak_Crypto",
-		"sqlQuery": "select * from registry where path like 'HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\OID\\\\EncodingType 0\\\\CertDllCreateCertificateChainEngine\\\\Config\\\\Default\\\\%' AND name IN ('WeakSha1ThirdPartyFlags','WeakMd5ThirdPartyFlags') AND type = 'REG_DWORD' AND data not like '-2%'",
+		"sqlQuery": "select * from registry where path like 'HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\OID\\\\EncodingType 0\\\\CertDllCreateCertificateChainEngine\\\\Config\\\\Default\\\\%' AND name IN ('WeakSha1ThirdPartyFlags','WeakMd5ThirdPartyFlags') AND type = 'REG_DWORD' AND data not like '-2%';",
 		"description": "Protection Against Weak Crypto Algorithms",
 		"always": true,
 		"analysisInterval": 1,
@@ -399,7 +447,7 @@
 	},
 	{
 		"name": "Most CPU intensive processes since boot",
-		"sqlQuery": "SELECT (SUM(user) + SUM(nice) + SUM(system) + SUM(idle) * 1.0) AS tsb, SUM(COALESCE(idle, 0)) + SUM(COALESCE(iowait, 0)) AS itsb FROM cpu_time",
+		"sqlQuery": "SELECT (SUM(user) + SUM(nice) + SUM(system) + SUM(idle) * 1.0) AS tsb, SUM(COALESCE(idle, 0)) + SUM(COALESCE(iowait, 0)) AS itsb FROM cpu_time;",
 		"description": "Obtains the 10 most CPU intensive processes which have been executed since boot",
 		"always": true,
 		"analysisInterval": 5,
@@ -454,7 +502,7 @@
 	},
 	{
 		"name": "Disk info",
-		"sqlQuery": "select * from disk_info",
+		"sqlQuery": "select * from disk_info;",
 		"description": "Obtains the current disk info",
 		"always": true,
 		"analysisInterval": 1,
@@ -466,7 +514,7 @@
 	},
 	{
 		"name": "CPU info",
-		"sqlQuery": "select * from cpu_info",
+		"sqlQuery": "select * from cpu_info;",
 		"description": "Obtains the current CPU info from the monitored system",
 		"always": true,
 		"analysisInterval": 1,
@@ -478,7 +526,7 @@
 	},
 	{
 		"name": "System time",
-		"sqlQuery": "select * from system time",
+		"sqlQuery": "select * from system time;",
 		"description": "Obtains the current system time",
 		"always": true,
 		"analysisInterval": 1,
@@ -490,7 +538,7 @@
 	},
 	{
 		"name": "Windows crashes",
-		"sqlQuery": "select * from windows_crashes",
+		"sqlQuery": "select * from windows_crashes;",
 		"description": "Obtains the crashes reported for this windows system",
 		"always": true,
 		"analysisInterval": 1,
@@ -501,7 +549,7 @@
 	},
 	{
 		"name": "Windows events",
-		"sqlQuery": "select * from windows_events",
+		"sqlQuery": "select * from windows_events;",
 		"description": "Obtains the events from the log of the monitored system",
 		"always": true,
 		"analysisInterval": 10,
@@ -512,7 +560,7 @@
 	},
 	{
 		"name": "Windows registry",
-		"sqlQuery": "select * from registry",
+		"sqlQuery": "select * from registry;",
 		"description": "Obtains everything from the registry",
 		"always": true,
 		"analysisInterval": 30,
@@ -524,7 +572,7 @@
 	},
 	{
 		"name": "Windows services",
-		"sqlQuery": "select * from services",
+		"sqlQuery": "select * from services;",
 		"description": "Obtains the services which are  available on the monitored systems",
 		"always": true,
 		"analysisInterval": 1,
@@ -536,7 +584,7 @@
 	},
 	{
 		"name": "Font Blocking",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows NT\\\\MitigationOptions\\\\MitigationOptions_FontBlocking'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows NT\\\\MitigationOptions\\\\MitigationOptions_FontBlocking';",
 		"description": "Checks if FontBlocking is enabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -548,7 +596,7 @@
 	},
 	{
 		"name": "Data Execution Prevention (DEP) enabled",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\SystemStartOptions'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\SystemStartOptions';",
 		"description": "Checks if DEP is enabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -560,7 +608,7 @@
 	},
 	{
 		"name": "Data Exection Protection with Mitigation",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\MitigationOptions'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\MitigationOptions';",
 		"description": "Checks if DEP with mitigation options is enabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -572,7 +620,7 @@
 	},
 	{
 		"name": "Address Space Location Randomization (ASLR)",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Memory Management\\\\moveImages'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Memory Management\\\\moveImages';",
 		"description": "Checks if ASLR is enabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -584,7 +632,7 @@
 	},
 	{
 		"name": "Structured Exception Handling Overwrite Protection",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\KernelSEHOPEnabled'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Kernel\\\\KernelSEHOPEnabled';",
 		"description": "Checks if SEHOP is enabled",
 		"always": true,
 		"analysisInterval": 1,
@@ -596,7 +644,7 @@
 	},
 	{
 		"name": "Certification Padding",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck';",
 		"description": "Checks the state of certification padding",
 		"always": true,
 		"analysisInterval": 1,
@@ -608,7 +656,7 @@
 	},
 	{
 		"name": "Certification Padding 64 Bit",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Wow6432Node\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Wow6432Node\\\\Microsoft\\\\Cryptography\\\\WinTrust\\\\Config\\\\EnableCertPaddingCheck';",
 		"description": "Checks state of certification padding for 64 bit",
 		"always": true,
 		"analysisInterval": 1,
@@ -620,7 +668,7 @@
 	},
 	{
 		"name": "Secure Search Path",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\CWDIllegalInDllSearch'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\CWDIllegalInDllSearch';",
 		"description": "Checks secure search path check",
 		"always": true,
 		"analysisInterval": 1,
@@ -632,7 +680,7 @@
 	},
 	{
 		"name": "DisabledExceptionChainValidation",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel\\DisableExceptionChainValidation'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel\\DisableExceptionChainValidation';",
 		"description": "Check SEHOP state: DisabledExceptionChainValidation",
 		"always": true,
 		"analysisInterval": 1,
@@ -644,7 +692,7 @@
 	},
 	{
 		"name": "EnableLowVaAccess",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableLowVaAccess'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableLowVaAccess';",
 		"description": "Check Kernel Null page state",
 		"always": true,
 		"analysisInterval": 1,
@@ -656,7 +704,7 @@
 	},
 	{
 		"name": "ControlFlowGuard",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableCfg'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\EnableCfg';",
 		"description": "Check Control Flow Guard state",
 		"always": true,
 		"analysisInterval": 1,
@@ -668,7 +716,7 @@
 	},
 	{
 		"name": "App_ExecuteOptions",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\executeOptions'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\executeOptions';",
 		"description": "Check Applications opted in for DEP",
 		"always": true,
 		"analysisInterval": 1,
@@ -680,7 +728,7 @@
 	},
 	{
 		"name": "App_MitigationOptions",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\MitigationOptions'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\MitigationOptions';",
 		"description": "Check Applications opted in for DEP",
 		"always": true,
 		"analysisInterval": 1,
@@ -692,7 +740,7 @@
 	},
 	{
 		"name": "AppCompat",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers';",
 		"description": "Check Applications opted in for DEP",
 		"always": true,
 		"analysisInterval": 1,
@@ -704,7 +752,7 @@
 	},
 	{
 		"name": "App_disabledExceptionChainValidation",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\DisableExceptionChainValidation'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\%Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%\\DisableExceptionChainValidation';",
 		"description": "Check Applications not supporting SEHOP",
 		"always": true,
 		"analysisInterval": 1,
@@ -716,7 +764,7 @@
 	},
 	{
 		"name": "DefaultLevelMachine",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -728,7 +776,7 @@
 	},
 	{
 		"name": "DefaultLevelUser",
-		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel'",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\DefaultLevel';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -740,7 +788,7 @@
 	},
 	{
 		"name": "PolicyScopeMachine",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -752,7 +800,7 @@
 	},
 	{
 		"name": "PolicyScopeUser",
-		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope'",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\PolicyScope';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -764,7 +812,7 @@
 	},
 	{
 		"name": "ExecutableTryMachine",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -776,7 +824,7 @@
 	},
 	{
 		"name": "ExecutableTryUser",
-		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry'",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\ExecutableTry';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -788,7 +836,7 @@
 	},
 	{
 		"name": "TransparentEnabledMachine",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -800,7 +848,7 @@
 	},
 	{
 		"name": "TransparentEnabledUser",
-		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled'",
+		"sqlQuery": "select * from registry where key like 'HKEY_USERS\\%\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\TransparentEnabled';",
 		"description": "Check Software Restriction Policies state",
 		"always": true,
 		"analysisInterval": 1,
@@ -812,7 +860,7 @@
 	},
 	{
 		"name": "Unrestricted",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144';",
 		"description": "Check Software Restriction Policies state: No SRP whitelist rules",
 		"always": true,
 		"analysisInterval": 1,
@@ -824,7 +872,7 @@
 	},
 	{
 		"name": "Unrestricted_Paths",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths';",
 		"description": "Check Software Restriction Policies state: No SRP path rules",
 		"always": true,
 		"analysisInterval": 1,
@@ -836,7 +884,7 @@
 	},
 	{
 		"name": "Unrestricted_Paths_ItemData",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths\\%\\ItemData'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\262144\\Paths\\%\\ItemData';",
 		"description": "Check Software Restriction Policies state: SRP whitelist rules is missing",
 		"always": true,
 		"analysisInterval": 1,
@@ -848,7 +896,7 @@
 	},
 	{
 		"name": "Disallowed",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0';",
 		"description": "Check Software Restriction Policies state: No SRP blacklist rules",
 		"always": true,
 		"analysisInterval": 1,
@@ -860,7 +908,7 @@
 	},
 	{
 		"name": "Disallowed_Paths",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths';",
 		"description": "Check Software Restriction Policies state: No SRP path rules",
 		"always": true,
 		"analysisInterval": 1,
@@ -872,7 +920,7 @@
 	},
 	{
 		"name": "Disallowed_Paths_ItemData",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths\\%\\ItemData'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\0\\Paths\\%\\ItemData';",
 		"description": "Check Software Restriction Policies state: SRP blacklist rule is missing",
 		"always": true,
 		"analysisInterval": 1,
@@ -884,7 +932,7 @@
 	},
 	{
 		"name": "SaferFlags",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\%\\%\\%\\SaferFlags'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Safer\\CodeIdentifiers\\%\\%\\%\\SaferFlags';",
 		"description": "Check Software Restriction Policies state: SRP rule is not enforcing",
 		"always": true,
 		"analysisInterval": 1,
@@ -896,7 +944,7 @@
 	},
 	{
 		"name": "RuleSetEnforcementMode",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\EnforcementMode'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\EnforcementMode';",
 		"description": "Check Applocker rule set configuration",
 		"always": true,
 		"analysisInterval": 1,
@@ -908,7 +956,7 @@
 	},
 	{
 		"name": "Rule",
-		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\%\\Value'",
+		"sqlQuery": "select * from registry where key like 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2\\%\\%\\Value';",
 		"description": "Check Applocker rule set",
 		"always": true,
 		"analysisInterval": 1,
@@ -920,7 +968,7 @@
 	},
 	{
 		"name": "AuditSpecialGroups",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\Audit'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\Audit';",
 		"description": "Check Special Logon Audit configuration - https://blogs.technet.microsoft.com/jepayne/2015/11/26/tracking-lateral-movement-part-one-special-groups-and-specific-service-accounts/",
 		"always": true,
 		"analysisInterval": 1,
@@ -932,7 +980,7 @@
 	},
 	{
 		"name": "SysmonConfig",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CCS\\Services\\SysmonDrv\\Parameters'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SYSTEM\\CCS\\Services\\SysmonDrv\\Parameters';",
 		"description": "Check Microsoft Sysinternals Sysmon config",
 		"always": true,
 		"analysisInterval": 1,
@@ -944,7 +992,7 @@
 	},
 	{
 		"name": "DeveloperMode",
-		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock'",
+		"sqlQuery": "select * from registry where key='HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock';",
 		"description": "Check Developer Mode state",
 		"always": true,
 		"analysisInterval": 1,
