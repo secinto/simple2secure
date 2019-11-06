@@ -84,6 +84,7 @@ export class TestResultComponent {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadTestResults(e.pageIndex, e.pageSize);
+		return e;
 	}
 
 	loadTestResults(page: number, size: number) {

@@ -87,6 +87,7 @@ export class OsQueryReportOverviewComponent {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);
+		return e;
 	}
 
 	private loadAllReports(page: number, size: number) {

@@ -81,10 +81,11 @@ export class NetworkReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	public handlePage(e?: PageEvent) {
+	public handlePage(e: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);
+		return e;
 	}
 
 	private loadAllReports(page: number, size: number) {

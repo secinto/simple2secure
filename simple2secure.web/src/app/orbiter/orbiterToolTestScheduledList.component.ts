@@ -87,6 +87,7 @@ export class OrbiterToolTestScheduledListComponent {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadScheduledTests(e.pageIndex, e.pageSize);
+		return e;
 	}
 
 	public onMenuTriggerClick(test: TestRunDTO) {

@@ -81,6 +81,7 @@ export class OrbiterToolTestComponent {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		this.loadPods(e.pageIndex, e.pageSize);
+		return e;
 	}
 
 	public onMenuTriggerClick(pod: PodDTO) {
