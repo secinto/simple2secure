@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.TestSequenceRunDTO;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
@@ -219,7 +220,8 @@ public class TestSequenceController {
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
-			List<SequenceRun> scheduledSequenceRuns = sequenceRunrepository.getByContextIdWithPagination(contextId, page, size);
+			List<TestSequenceRunDTO> scheduledSequenceRuns = testUtils
+					.generateSequenceRunDTOBySequenceRun(sequenceRunrepository.getByContextIdWithPagination(contextId, page, size));
 			Map<String, Object> scheduledSequencesMap = new HashMap<>();
 			scheduledSequencesMap.put("sequences", scheduledSequenceRuns);
 			scheduledSequencesMap.put("totalSize", sequenceRunrepository.countByContextId(contextId));

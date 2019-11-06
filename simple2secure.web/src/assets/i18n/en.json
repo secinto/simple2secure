@@ -37,6 +37,7 @@
   "button.runSequence": "Run Test Sequence",
   "button.showSequences" : "Show Sequences",
   "button.showtestsresults": "Show Test Result",
+  "button.showsequenceresult": "Show Sequence Result",
   "button.runTestAgain": "Repeat Test",
   "button.select": "Select",
   "button.addTemplate": "Add Template",

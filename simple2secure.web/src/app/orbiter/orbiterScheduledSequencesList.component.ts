@@ -33,6 +33,8 @@ import {TestResultDetailsComponent} from '../report/testResultDetails.component'
 import {HelperService} from '../_services/helper.service';
 import {PageEvent} from '@angular/material/paginator';
 import { SequenceRun } from '../_models/sequenceRun';
+import {TestSequenceResultDetailsComponent} from '../report/testSequenceResultDetails.component';
+import {TestSequenceRunDTO} from '../_models/DTO/testSequenceRunDTO';
 
 @Component({
 	moduleId: module.id,
@@ -42,11 +44,11 @@ import { SequenceRun } from '../_models/sequenceRun';
 
 export class OrbiterScheduledSequencesListComponent {
 
-	selectedTestRun: TestRunDTO = new TestRunDTO();
+	selectedSequenceRun: TestSequenceRunDTO = new TestSequenceRunDTO();
 	podId: string;
 	isTestChanged: boolean;
 	showTestResult = false;
-	sequenceRuns: SequenceRun[] = [];
+	sequenceRuns: TestSequenceRunDTO[] = [];
 	context: ContextDTO;
 	displayedColumns = ['name', 'time', 'type', 'status', 'action'];
 	loading = false;
@@ -91,14 +93,14 @@ export class OrbiterScheduledSequencesListComponent {
 		return e;
 	}
 
-	public onMenuTriggerClick(test: TestRunDTO) {
+	public onMenuTriggerClick(sequenceRun: TestSequenceRunDTO) {
 		this.showTestResult = false;
-		if (test.testRun.testStatus == TestStatus.EXECUTED){
-			if (test.testResult != null){
+		if (sequenceRun.sequenceRun.sequenceStatus == TestStatus.EXECUTED){
+			if (sequenceRun.sequenceRun.sequenceContent != null){
 				this.showTestResult = true;
 			}
 		}
-		this.selectedTestRun = test;
+		this.selectedSequenceRun = sequenceRun;
 	}
 
 	public loadScheduledSequences(page: number, size: number){
@@ -132,57 +134,18 @@ export class OrbiterScheduledSequencesListComponent {
 
 				this.loading = false;
 	}
-	/*
-	public openDeleteDialog() {
-		const dialogConfig = new MatDialogConfig();
-
-		dialogConfig.disableClose = true;
-		dialogConfig.autoFocus = true;
-		dialogConfig.data = {
-			id: 1,
-			title: this.translate.instant('message.areyousure'),
-			content: this.translate.instant('message.test.dialog')
-		};
 
 
-		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
-
-		dialogRef.afterClosed().subscribe(data => {
-			if (data === true) {
-				this.deleteTestRun(this.selectedTestRun);
-			}
-		});
-	}
-
-	public deleteTestRun(testRun: TestRunDTO) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'test/testrun/delete/' + testRun.testRun.id).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.test.delete'));
-				this.loading = false;
-				this.isTestChanged = true;
-				this.loadScheduledTests(this.currentPage, this.pageSize);
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
-	}
-
-	public openDialogShowTestResult(): void {
+	public openDialogShowSequenceResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
+		console.log(this.selectedSequenceRun);
 		dialogConfig.data = {
-			result: this.selectedTestRun.testResult
+			result: this.selectedSequenceRun.sequenceResult
 		};
 
-		this.dialog.open(TestResultDetailsComponent, dialogConfig);
+		this.dialog.open(TestSequenceResultDetailsComponent, dialogConfig);
 
-	}*/
+	}
 
 }

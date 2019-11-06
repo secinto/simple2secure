@@ -38,12 +38,14 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
+import com.simple2secure.api.dto.TestSequenceRunDTO;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
@@ -55,6 +57,7 @@ import com.simple2secure.portal.repository.SequenceRunRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
+import com.simple2secure.portal.repository.TestSequenceResultRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @Component
@@ -85,6 +88,9 @@ public class TestUtils {
 
 	@Autowired
 	TestRunRepository testRunRepository;
+
+	@Autowired
+	TestSequenceResultRepository testSequenceResultRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -423,6 +429,25 @@ public class TestUtils {
 			}
 		}
 		return testRunDto;
+	}
+
+	/**
+	 * This function generates the list of the TestSequenceRunDTO for the provided sequenceRuns.
+	 *
+	 * @param sequenceRuns
+	 * @return
+	 */
+	public List<TestSequenceRunDTO> generateSequenceRunDTOBySequenceRun(List<SequenceRun> sequenceRuns) {
+		List<TestSequenceRunDTO> sequenceRunDTOs = new ArrayList<>();
+		if (sequenceRuns != null) {
+			for (SequenceRun sequenceRun : sequenceRuns) {
+				if (sequenceRun != null) {
+					TestSequenceResult sequenceResult = testSequenceResultRepository.getBySequenceRunId(sequenceRun.getId());
+					sequenceRunDTOs.add(new TestSequenceRunDTO(sequenceRun, sequenceResult));
+				}
+			}
+		}
+		return sequenceRunDTOs;
 	}
 
 }

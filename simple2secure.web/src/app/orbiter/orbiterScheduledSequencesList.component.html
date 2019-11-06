@@ -9,37 +9,37 @@
 
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.sequenceName}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.sequenceName}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="hostname">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.testRun.hostname}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.hostname}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="podId">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.sequenceId}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.sequenceId}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="time">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.timestamp | date : 'short' }}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.timestamp | date : 'short' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.executionType' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{utils.getEnumValue(element.sequenceRunType)}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getEnumValue(element.sequenceRun.sequenceRunType)}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{utils.getSequenceStatusBySequenceResult(element)}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getSequenceStatusBySequenceResult(element.sequenceRun)}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -67,19 +67,14 @@
 
 <mat-menu #menu="matMenu">
 
-    <button *ngIf="showTestResult" mat-menu-item (click)="openDialogShowTestResult()">
+    <button *ngIf="showTestResult" mat-menu-item (click)="openDialogShowSequenceResult()">
         <mat-icon>description</mat-icon>
-        {{ 'button.showtestsresults' | translate }}
+        {{ 'button.showsequenceresult' | translate }}
     </button>
 
-    <button *ngIf="!showTestResult" disabled mat-menu-item (click)="openDialogShowTestResult()">
+    <button *ngIf="!showTestResult" disabled mat-menu-item (click)="openDialogShowSequenceResult()">
         <mat-icon>description</mat-icon>
-        {{ 'button.showtestsresults' | translate }}
-    </button>
-
-    <button mat-menu-item (click)="openDeleteDialog()">
-        <mat-icon>delete</mat-icon>
-        {{ 'button.delete' | translate }}
+        {{ 'button.showsequenceresult' | translate }}
     </button>
 </mat-menu>
 
