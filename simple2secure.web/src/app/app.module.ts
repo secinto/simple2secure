@@ -52,7 +52,7 @@ import {
 	from './network';
 import {
 	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent 
+	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent
 } from './report';
 import {
 	EmailOverviewComponent,
