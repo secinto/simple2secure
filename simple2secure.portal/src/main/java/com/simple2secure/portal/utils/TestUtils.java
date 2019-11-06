@@ -24,6 +24,7 @@ package com.simple2secure.portal.utils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.TestResultDTO;
 import com.simple2secure.api.dto.TestRunDTO;
-import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
@@ -168,36 +167,6 @@ public class TestUtils {
 		return returnTest;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<TestResultDTO>> getTestResultsByPodId(String podId, String locale) {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
-			List<Test> tests = testRepository.getByPodId(podId);
-			List<TestResultDTO> testResults = new ArrayList<>();
-			if (tests != null) {
-				for (Test test : tests) {
-					List<TestResult> testResultByTest = testResultRepository.getByTestId(test.getId());
-
-					if (testResultByTest != null) {
-						for (TestResult testResult : testResultByTest) {
-
-							// TODO: check if CompanyGroup is necesarry
-							TestResultDTO trDto = new TestResultDTO(testResult, new CompanyGroup("test", null));
-							testResults.add(trDto);
-						}
-					}
-				}
-			}
-
-			if (testResults != null) {
-				return new ResponseEntity<>(testResults, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
-	}
-
 	/**
 	 * This function checks if the test result with the provided id exists, and deletes it accordingly.
 	 *
@@ -229,13 +198,15 @@ public class TestUtils {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<TestObjWeb>> getTestByPodId(String podId, String locale) {
+	public ResponseEntity<Map<String, Object>> getTestByPodId(String podId, int page, int size, boolean usePagination, String locale) {
 		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
-
-			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodId(podId));
+			Map<String, Object> testMap = new HashMap<>();
+			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodIdWithPagination(podId, page, size, usePagination));
 
 			if (testsWeb != null) {
-				return new ResponseEntity<>(testsWeb, HttpStatus.OK);
+				testMap.put("tests", testsWeb);
+				testMap.put("totalSize", testRepository.getCountOfTestsWithPodid(podId));
+				return new ResponseEntity<>(testMap, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
@@ -439,7 +410,7 @@ public class TestUtils {
 
 	/**
 	 * This function generates the list of the TestRunDTO for the provided TestResults. For each test result, TestRun object is added.
-	 * 
+	 *
 	 * @param results
 	 * @return
 	 */

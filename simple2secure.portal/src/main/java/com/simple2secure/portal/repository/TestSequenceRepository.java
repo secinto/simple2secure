@@ -7,14 +7,12 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestSequenceRepository extends MongoRepository<TestSequence> {
 
-	public abstract List<TestSequence> getByPodId(String podId);
-
-	// public abstract List<TestSequence> getByHostname(String hostname);
-
-	// public abstract List<Test> getScheduledTest();
+	public abstract List<TestSequence> getByPodId(String podId, int page, int size);
 
 	public abstract TestSequence getSequenceByName(String name);
 
 	public abstract TestSequence getSequenceByNameAndPodId(String name, String podId);
+
+	public abstract long getCountOfSequencesWithPodid(String podId);
 
 }

@@ -22,6 +22,7 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.dao.MongoRepository;
@@ -53,6 +54,6 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract void deleteByDeviceId(String probeId);
 
-	public abstract List<CompanyLicensePrivate> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod);
+	public abstract Map<String, Object> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod, int page, int size);
 
 }

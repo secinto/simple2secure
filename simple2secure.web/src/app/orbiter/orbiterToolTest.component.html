@@ -10,27 +10,27 @@
         <ng-container matColumnDef="podId">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.deviceId}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
         </ng-container>
 
         <!-- Pod Hostname Column -->
         <ng-container matColumnDef="hostname">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.hostname}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
         </ng-container>
 
         <!-- Status Column -->
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.status}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
         </ng-container>
 
         <!-- Group Column -->
         <ng-container matColumnDef="group">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.pod.group.name}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="action">

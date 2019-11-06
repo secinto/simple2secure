@@ -23,7 +23,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO} from '../_models/index';
+import {ContextDTO, Device} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
@@ -38,8 +38,8 @@ import {PageEvent} from '@angular/material/paginator';
 
 export class OrbiterToolTestComponent {
 
-	selectedPod: PodDTO;
-	pods: PodDTO[];
+	selectedPod: Device;
+	pods: Device[];
 	context: ContextDTO;
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
@@ -68,7 +68,6 @@ export class OrbiterToolTestComponent {
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -84,7 +83,7 @@ export class OrbiterToolTestComponent {
 		return e;
 	}
 
-	public onMenuTriggerClick(pod: PodDTO) {
+	public onMenuTriggerClick(pod: Device) {
 		this.selectedPod = pod;
 	}
 
@@ -93,9 +92,10 @@ export class OrbiterToolTestComponent {
 		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.pods = data;
+					this.pods = data.devices;
 					this.dataSource.data = this.pods;
-					if (data.length > 0) {
+					this.totalSize = data.totalSize;
+					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
 					else {
@@ -115,12 +115,10 @@ export class OrbiterToolTestComponent {
 	}
 
 	public showPodTests() {
-		this.dataService.setPods(this.selectedPod);
-		this.router.navigate([this.selectedPod.pod.deviceId], {relativeTo: this.route});
+		this.router.navigate([this.selectedPod.deviceId], {relativeTo: this.route});
 	}
 
 	public showSequences() {
-		this.dataService.setPods(this.selectedPod);
-		this.router.navigate(['sequences/' + this.selectedPod.pod.deviceId], {relativeTo: this.route});
+		this.router.navigate(['sequences/' + this.selectedPod.deviceId], {relativeTo: this.route});
 	}
 }
