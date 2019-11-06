@@ -22,6 +22,7 @@
 
 import {Injectable} from '@angular/core';
 import {TestRunDTO} from '../_models/DTO/testRunDTO';
+import { SequenceRun } from '../_models/sequenceRun';
 
 @Injectable()
 export class HelperService {
@@ -51,4 +52,10 @@ export class HelperService {
 			return testRunDTO.testRun.testStatus;
 		}
 	}
+
+	getSequenceStatusBySequenceResult(sequenceRun: SequenceRun){
+        if(sequenceRun !== null){
+            return sequenceRun.sequenceStatus;
+        }
+    }
 }

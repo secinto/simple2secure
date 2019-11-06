@@ -54,6 +54,7 @@ import {TestResultComponent} from './report/testResult.component';
 import {SearchComponent, SearchResultComponent} from './search';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { TestSequenceRunsComponent } from './report/testSequenceRuns.component';
+import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 
 const appRoutes: Routes = [
 	{
@@ -94,6 +95,7 @@ const appRoutes: Routes = [
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
+					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequences.scheduled'}},
 				]
 			},
 			{

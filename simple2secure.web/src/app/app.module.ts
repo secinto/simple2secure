@@ -167,6 +167,7 @@ import {CarouselModule} from 'ngx-carousel-lib';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { TestSequenceRunsComponent } from './report/testSequenceRuns.component';
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
+import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 
 
 
@@ -303,6 +304,7 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
 		OrbiterToolTestScheduledListComponent,
+		OrbiterScheduledSequencesListComponent,
 		OrbiterToolTestSequenceListComponent,
 		SearchComponent,
 		SearchResultComponent,

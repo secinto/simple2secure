@@ -114,6 +114,7 @@ export class OrbiterScheduledSequencesListComponent {
 					}
 					this.dataSource.data = this.sequenceRuns;
 					this.totalSize = data.totalSize;
+					/*
 					if (!this.isTestChanged){
 						if (data.tests.length > 0) {
 							this.alertService.success(this.translate.instant('message.data'));
@@ -121,7 +122,7 @@ export class OrbiterScheduledSequencesListComponent {
 						else {
 							this.alertService.error(this.translate.instant('message.data.notProvided'));
 						}
-					}
+					}*/
 				},
 				error => {
 					if (error.status == 0) {
