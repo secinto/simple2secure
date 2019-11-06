@@ -89,6 +89,166 @@
         }
     },
     {
+        "name": "longNmap-secinto-new",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "netstat_all",
+        "test_definition": {
+            "description": "Show both listening and non-listening (for TCP this means established connections) sockets. Include information related to networking timers.",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "netstat -n",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-n",
+                        "value": ""
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "filter_netstat_output",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "python.exe adapters/filterNetstatOutput1.py",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "traceroute",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove file if exist",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "scan ip for os",
+                "command": {
+                    "executable": "tracert",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "",
+                        "value": "filterNetstatOutput1.py"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
         "name": "burp-suite-pro normal",
         "test_definition": {
             "description": "Simple tool for running some tests",
@@ -530,6 +690,46 @@
     },
     {
         "name": "nikto",
+        "test_definition": {
+            "description": "Simple tool for running some tests",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "Remove some file if exists",
+                "command": {
+                    "executable": "DELETE_RESULT",
+                    "parameter": {
+                        "description": "File name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            },
+            "step": {
+                "description": "Execute nmap",
+                "command": {
+                    "executable": "nmap",
+                    "parameter": {
+                        "description": "Some simple nmap execution",
+                        "prefix": "-T4 -F",
+                        "value": "www.secinto.com"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "Save result to the file",
+                "command": {
+                    "executable": "SAVE_RESULT",
+                    "parameter": {
+                        "description": "File Name",
+                        "prefix": "",
+                        "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "nikto2222",
         "test_definition": {
             "description": "Simple tool for running some tests",
             "version": "0.0.1",

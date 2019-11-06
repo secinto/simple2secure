@@ -21,7 +21,7 @@
  */
 
 import {Component, Inject, ElementRef, ViewChild} from '@angular/core';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, PageEvent} from '@angular/material';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
@@ -53,7 +53,15 @@ export class TestSequenceDetailsComponent {
     url: string;
     id: string;
     pod: PodDTO;
+    public pageEvent: PageEvent;
+    public pageSize = 5;
+    public currentPage = 0;
+    public totalSize = 0;
     testNamesCurrent: string[] = [];
+    dataSource = new MatTableDataSource();
+    displayedColumns = ['test', 'action'];
+    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild('carousel') topCarousel: CarouselComponent;
 
     constructor(
@@ -78,12 +86,23 @@ export class TestSequenceDetailsComponent {
     }
 
     ngOnInit() {
-        this.loadTests(this.id, 0, 0);
+        this.loadTests(this.id, 0, 5);
         this.topCarousel.perspective = 800;
     }
 
     ngDoCheck() {
         this.topCarousel.update();
+    }
+
+    ngAfterViewInit() {
+        this.dataSource.sort = this.sort;
+    }
+
+    public handlePage(e?: PageEvent) {
+        this.currentPage = e.pageIndex;
+        this.pageSize = e.pageSize;
+        this.loadTests(this.id, e.pageIndex, e.pageSize);
+        return e;
     }
 
 
@@ -119,6 +138,7 @@ export class TestSequenceDetailsComponent {
     }
 
     addTestToSequence(item: TestObjWeb){
+        console.log("hereeeeeeee");
         if (this.sequence.sequenceContent){
             this.sequence.sequenceContent.push(item.name);
             this.sequenceToShow.push(item);
@@ -145,10 +165,12 @@ export class TestSequenceDetailsComponent {
 
     public loadTests(podId: string, page: number, size: number){
         this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + false)
+        this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + true)
             .subscribe(
                 data => {
                     this.tests = data.tests;
+                    this.dataSource.data = this.tests;
+                    this.totalSize = data.totalSize;
                     this.testNamesCurrent = this.getTestNamesFromObject(this.tests);
                     this.getTestForSequenceToShow(this.sequence);
                     if (!this.isTestChanged) {

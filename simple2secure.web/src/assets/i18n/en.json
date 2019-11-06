@@ -385,6 +385,7 @@
   "orbiter.toolsconfig": "Edit tools configuration",
   "orbiter.edittests": "Edit test",
   "orbiter.editsequence" : "Edit Sequence",
+  "orbiter.sequenceLength": "Sequence length: ",
 
   "group.details": "Group details",
   "group.name.placeholder": "Please enter the group name",

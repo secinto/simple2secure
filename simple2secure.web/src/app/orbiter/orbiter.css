@@ -92,10 +92,12 @@ button.pull-right.mat-green-button.minus {
   max-height: 75vh;
 }
 
+.mat-card-content{
+  margin: 0px !important;
+}
+
 .mat-card {
   flex-direction: row !important;
-  max-height: 400px;
-  margin-top: 15px;
 }
 
 .mat-header-cell:first-child,.mat-cell:first-child{
