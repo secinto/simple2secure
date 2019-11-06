@@ -2,7 +2,9 @@ package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -84,23 +86,21 @@ public class TestSequenceController {
 	TestUtils testUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{deviceId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{deviceId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequence>> getAllSequences(@PathVariable("deviceId") String deviceId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable("deviceId") String deviceId, @PathVariable("page") int page,
+			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(deviceId)) {
-			List<TestSequence> allSeqFromDb = testSequenceRepository.getByPodId(deviceId);
-
-			if (allSeqFromDb != null && allSeqFromDb.size() != 0) {
-				return new ResponseEntity<>(allSeqFromDb, HttpStatus.OK);
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
-						HttpStatus.NOT_FOUND);
+			List<TestSequence> allSeqFromDb = testSequenceRepository.getByPodId(deviceId, page, size);
+			Map<String, Object> sequencesMap = new HashMap<>();
+			if (allSeqFromDb != null) {
+				sequencesMap.put("sequences", allSeqFromDb);
+				sequencesMap.put("totalSize", testSequenceRepository.getCountOfSequencesWithPodid(deviceId));
+				return new ResponseEntity<>(sequencesMap, HttpStatus.OK);
 			}
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
-					HttpStatus.NOT_FOUND);
 		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

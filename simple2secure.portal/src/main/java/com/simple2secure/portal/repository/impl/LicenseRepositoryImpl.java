@@ -1,10 +1,14 @@
 package com.simple2secure.portal.repository.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -12,11 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.repository.LicenseRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class LicenseRepositoryImpl extends LicenseRepository {
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -121,7 +130,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod) {
+	public Map<String, Object> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod, int page, int size) {
 		List<CompanyLicensePrivate> licenses = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
@@ -132,7 +141,21 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 			orExpression.add(expression);
 		}
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		long count = mongoTemplate.count(query, Report.class, collectionName);
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "lastOnlineTimestamp"));
+
 		licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
-		return licenses;
+
+		Map<String, Object> licensesMap = new HashMap<>();
+		licensesMap.put("licenses", licenses);
+		licensesMap.put("totalSize", count);
+
+		return licensesMap;
 	}
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -11,10 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.TestSequence;
 import com.simple2secure.portal.repository.TestSequenceRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class TestSequenceRepositoryImpl extends TestSequenceRepository {
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -23,9 +29,14 @@ public class TestSequenceRepositoryImpl extends TestSequenceRepository {
 	}
 
 	@Override
-	public List<TestSequence> getByPodId(String podId) {
+	public List<TestSequence> getByPodId(String podId, int page, int size) {
 		Query query = new Query(Criteria.where("podId").is(podId));
-		List<TestSequence> testSequences = mongoTemplate.find(query, TestSequence.class);
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "lastChangedTimeStamp"));
+		List<TestSequence> testSequences = mongoTemplate.find(query, TestSequence.class, collectionName);
 		return testSequences;
 	}
 
@@ -41,6 +52,13 @@ public class TestSequenceRepositoryImpl extends TestSequenceRepository {
 		Query query = new Query(Criteria.where("podId").is(podId).and("name").is(name));
 		TestSequence sequence = mongoTemplate.findOne(query, TestSequence.class);
 		return sequence;
+	}
+
+	@Override
+	public long getCountOfSequencesWithPodid(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId));
+		long count = mongoTemplate.count(query, TestSequence.class, collectionName);
+		return count;
 	}
 
 }

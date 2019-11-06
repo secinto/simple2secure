@@ -99,4 +99,18 @@ public class QueryRepositoryImpl extends QueryRepository {
 			}
 		}
 	}
+
+	@Override
+	public List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll) {
+		Query query = new Query();
+
+		if (selectAll) {
+			query = new Query(Criteria.where("groupId").is(groupId).and("graphAble").is(true));
+
+		} else {
+			query = new Query(Criteria.where("groupId").is(groupId).and("graphAble").is(true).and("active").is(1));
+		}
+
+		return mongoTemplate.find(query, QueryRun.class, collectionName);
+	}
 }

@@ -31,6 +31,8 @@ public abstract class QueryRepository extends MongoRepository<QueryRun> {
 
 	public abstract List<QueryRun> findByGroupId(String groupId, boolean selectAll);
 
+	public abstract List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll);
+
 	public abstract QueryRun findByName(String name);
 
 	public abstract List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osinfo, boolean selectAll);

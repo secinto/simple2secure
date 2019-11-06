@@ -23,7 +23,6 @@
 package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,11 +114,12 @@ public class TestController {
 	 * @param locale
 	 * @return
 	 */
-	@RequestMapping(value = "/{podId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{podId}/{page}/{size}/{usePagination}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<TestObjWeb>> getTestByPodId(@PathVariable("podId") String podId,
+	public ResponseEntity<Map<String, Object>> getTestByPodId(@PathVariable("podId") String podId, @PathVariable("page") int page,
+			@PathVariable("size") int size, @PathVariable("usePagination") boolean usePagination,
 			@RequestHeader("Accept-Language") String locale) {
-		return testUtils.getTestByPodId(podId, locale);
+		return testUtils.getTestByPodId(podId, page, size, usePagination, locale);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

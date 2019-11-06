@@ -69,19 +69,20 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadAllQueries(defaultValue: boolean) {
-		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/false')
+		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/false/true')
 			.subscribe(
 				data => {
 					this.queries = data;
 					if (defaultValue){
-						this.selectedQuery = this.queries[2];
-						this.loadReportsByName(this.selectedQuery.sqlQuery);
+						this.selectedQuery = this.queries[0];
+						this.loadReportsByName(this.selectedQuery.name);
 					}
 
 				});
 	}
 
 	loadReportsByName(name: string){
+		console.log(name);
 		this.httpService.post(name, environment.apiEndpoint + 'reports/report/name')
 			.subscribe(
 				data => {
@@ -98,7 +99,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	onQueryChange(value: any){
-		this.loadReportsByName(value.sqlQuery);
+		this.loadReportsByName(value.name);
 	}
 
 	public openDialogShowReportDetails(event: any): void {

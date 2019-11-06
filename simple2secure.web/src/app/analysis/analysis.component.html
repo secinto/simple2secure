@@ -1,7 +1,5 @@
 
 <div class="container">
-    <mat-tab-group>
-        <mat-tab label="{{ 'osquery.reports.charts' | translate }}">
             <mat-card>
                 <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery"
                             name="query" (selectionChange)="onQueryChange($event.value)" required>
@@ -21,6 +19,4 @@
                 <div [chart]="chart"></div>
             </mat-card>
 
-        </mat-tab>
-    </mat-tab-group>
 </div>

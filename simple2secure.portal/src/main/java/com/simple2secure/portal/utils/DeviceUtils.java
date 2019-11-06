@@ -23,7 +23,9 @@
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
-import com.simple2secure.api.model.TestObjWeb;
-import com.simple2secure.api.model.TestSequence;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -91,6 +90,9 @@ public class DeviceUtils {
 	@Autowired
 	TestUtils testUtils;
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	/**
 	 * This function returns all probes from the current context
 	 *
@@ -128,30 +130,37 @@ public class DeviceUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<DeviceDTO> getAllDevicesFromCurrentContextWithTests(Context context) {
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size) {
 		log.debug("Retrieving pods for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
-		List<DeviceDTO> myDevices = new ArrayList<>();
+		List<Device> myDevices = new ArrayList<>();
+		Map<String, Object> deviceMap = new HashMap<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
-		for (CompanyGroup group : assignedGroups) {
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
+		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+
+		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, true, page, size);
+
+		if (licenseMap != null) {
+
+			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
+
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String deviceStatus = getDeviceStatus(license);
-							Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
-							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(device.getDeviceId()));
-							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(device.getDeviceId());
-							DeviceDTO deviceDTO = new DeviceDTO(device, tests, test_sequences);
-							myDevices.add(deviceDTO);
-						}
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						String deviceStatus = getDeviceStatus(license);
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+						Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
+						myDevices.add(device);
 					}
 				}
 			}
+
+			deviceMap.put("devices", myDevices);
+			deviceMap.put("totalSize", licenseMap.get("totalSize"));
 		}
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
-		return myDevices;
+		return deviceMap;
 	}
 
 	/**

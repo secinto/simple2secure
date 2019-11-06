@@ -23,6 +23,7 @@
 package com.simple2secure.portal.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
@@ -98,13 +98,13 @@ public class DeviceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<DeviceDTO>> getPodsByContextId(@PathVariable("contextId") String contextId, @PathVariable("page") int page,
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@PathVariable("contextId") String contextId, @PathVariable("page") int page,
 			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
 			if (context != null) {
-				List<DeviceDTO> pods = deviceUtils.getAllDevicesFromCurrentContextWithTests(context);
+				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page, size);
 
 				if (pods != null) {
 					return new ResponseEntity<>(pods, HttpStatus.OK);

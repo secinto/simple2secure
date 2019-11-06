@@ -33,6 +33,7 @@ import { TestSequence } from '../_models/testSequence';
 import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDropList, DragRef} from '@angular/cdk/drag-drop';
 import { CarouselComponent } from 'ngx-carousel-lib';
 import { some } from 'highcharts/highcharts.src';
+import {ActivatedRoute} from '@angular/router';
 
 
 @Component({
@@ -50,6 +51,7 @@ export class TestSequenceDetailsComponent {
     isTestChanged = false;
     isNewTest = false;
     url: string;
+    id: string;
     pod: PodDTO;
     testNamesCurrent: string[] = [];
     @ViewChild('carousel') topCarousel: CarouselComponent;
@@ -61,31 +63,23 @@ export class TestSequenceDetailsComponent {
         private dialog: MatDialog,
         private httpService: HttpService,
         private translate: TranslateService,
+        private route: ActivatedRoute,
         @Inject(MAT_DIALOG_DATA) data) {
 
         this.type = data.type;
+        this.id = data.deviceId;
         if (this.type == 'new') {
             this.isNewTest = true;
         }
         else if (this.type == 'edit') {
             this.isNewTest = false;
             this.sequence = data.sequence;
-            this.sequence.sequenceContent = this.sequence.sequenceContent;
-        } else {
-
         }
     }
 
     ngOnInit() {
-        this.pod = this.dataService.getPods();
-        this.tests = this.pod.test;
-        this.testNamesCurrent = this.getTestNamesFromObject(this.tests);
+        this.loadTests(this.id, 0, 0);
         this.topCarousel.perspective = 800;
-        this.loadTests(this.pod.pod.deviceId);
-    }
-
-    ngAfterViewInit(){
-        this.getTestForSequenceToShow(this.sequence);
     }
 
     ngDoCheck() {
@@ -149,14 +143,16 @@ export class TestSequenceDetailsComponent {
         }
     }
 
-    public loadTests(podId: string) {
+    public loadTests(podId: string, page: number, size: number){
         this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'test/' + podId)
+        this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + false)
             .subscribe(
                 data => {
-                    this.tests = data;
+                    this.tests = data.tests;
+                    this.testNamesCurrent = this.getTestNamesFromObject(this.tests);
+                    this.getTestForSequenceToShow(this.sequence);
                     if (!this.isTestChanged) {
-                        if (data.length > 0) {
+                        if (data.tests.length > 0) {
                             this.alertService.success(this.translate.instant('message.data'));
                         }
                         else {
@@ -182,11 +178,7 @@ export class TestSequenceDetailsComponent {
         this.loading = true;
 
         if (!this.sequence.podId) {
-            this.sequence.podId = this.pod.pod.deviceId;
-        }
-
-        if (!(this.sequence.sequenceContent.length == 0)) {
-            this.sequence.sequenceContent = this.sequence.sequenceContent;
+            this.sequence.podId = this.id;
         }
 
         this.url = environment.apiEndpoint + 'sequence/add';

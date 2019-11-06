@@ -31,6 +31,8 @@ public abstract class TestRepository extends MongoRepository<Test> {
 
 	public abstract List<Test> getByPodId(String podId);
 
+	public abstract List<Test> getByPodIdWithPagination(String podId, int page, int size, boolean usePagination);
+
 	public abstract List<Test> getByHostname(String hostname);
 
 	public abstract List<Test> getScheduledTest();
@@ -38,5 +40,7 @@ public abstract class TestRepository extends MongoRepository<Test> {
 	public abstract Test getTestByName(String name);
 
 	public abstract Test getTestByNameAndPodId(String name, String podId);
+
+	public abstract long getCountOfTestsWithPodid(String podId);
 
 }
