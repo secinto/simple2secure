@@ -4,51 +4,36 @@
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
     </div>
-    <mat-table #table [dataSource]="testSequences" matSort>
+    <mat-table #table [dataSource]="testSequenceResults" matSort>
 
         <!-- Position Column -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequence_name}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="license">
+        <ng-container matColumnDef="podId">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.podId}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod_id}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="group">
+        <ng-container matColumnDef="timestamp">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{(element.lastChangedTimeStamp) | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
-        </ng-container>
-    
-        <ng-container matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
-                        (click)="onMenuTriggerClick(element)">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </mat-cell>
+            <mat-cell *matCellDef="let element"> {{(element.time_stamp) | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
-                 (click)="openDialogShowTestResult(row)"></mat-row>
+                 (click)="openDialogShowTestSequenceResult(row)"></mat-row>
     </mat-table>
     <mat-paginator #paginator
-                   [pageSize]="10"
+                   [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"
-                   [showFirstLastButtons]="true">
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
     </mat-paginator>
     <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>
-
-<mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="navigateTo('testSequenceRuns')">
-        <!--<mat-icon>delete</mat-icon>-->
-        {{ 'button.showSeqRuns' | translate }}
-    </button>
-</mat-menu>
 
 

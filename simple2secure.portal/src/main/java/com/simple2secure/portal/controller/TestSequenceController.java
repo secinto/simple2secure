@@ -44,6 +44,7 @@ import com.simple2secure.portal.repository.TestSequenceResultRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
@@ -84,6 +85,9 @@ public class TestSequenceController {
 
 	@Autowired
 	TestUtils testUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{deviceId}/{page}/{size}", method = RequestMethod.GET)
@@ -268,6 +272,30 @@ public class TestSequenceController {
 		}
 
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/result/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@PathVariable("contextId") String contextId,
+			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
+		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
+			List<SequenceRun> sequenceRuns = sequenceRunrepository.getByContextId(contextId);
+			List<String> sequenceIds = portalUtils.extractIdsFromObjects(sequenceRuns);
+
+			if (sequenceIds != null) {
+				List<TestSequenceResult> sequenceResults = testSequenceResultRepository.getBySequenceRunIds(sequenceIds, page, size);
+
+				Map<String, Object> sequenceResultMap = new HashMap<>();
+				sequenceResultMap.put("results", sequenceResults);
+				sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
+				return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
+
+			}
+
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

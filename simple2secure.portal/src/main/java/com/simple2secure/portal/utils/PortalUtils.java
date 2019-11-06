@@ -46,6 +46,7 @@ import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
+import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.repository.GroupRepository;
 
@@ -312,6 +313,13 @@ public class PortalUtils {
 					CompanyLicensePrivate license = (CompanyLicensePrivate) object;
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 						ids.add(license.getDeviceId());
+					}
+				}
+
+				else if (object.getClass().equals(SequenceRun.class)) {
+					SequenceRun sequenceRun = (SequenceRun) object;
+					if (!Strings.isNullOrEmpty(sequenceRun.getId())) {
+						ids.add(sequenceRun.getId());
 					}
 				}
 			}

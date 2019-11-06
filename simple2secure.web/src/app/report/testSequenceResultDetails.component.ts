@@ -41,8 +41,7 @@ export class TestSequenceResultDetailsComponent {
 		private dialogRef: MatDialogRef<TestSequenceResultDetailsComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-        this.selectedRunResult = JSON.parse(data.seqResult.sequence_result);
-        console.log(this.selectedRunResult);
+        this.selectedRunResult = JSON.parse(data.result.sequence_result);
 	}
 
 }

@@ -22,7 +22,7 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, PageEvent} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextDTO, TestResultDTO} from '../_models';
 import {environment} from '../../environments/environment';
@@ -32,6 +32,7 @@ import {TestResultDetailsComponent} from './testResultDetails.component';
 import { TestSequenceResult } from '../_models/testSequenceResult';
 import { PodDTO } from '../_models/DTO/podDTO';
 import { TestSequence } from '../_models/testSequence';
+import {TestSequenceResultDetailsComponent} from './testSequenceResultDetails.component';
 
 @Component({
 	moduleId: module.id,
@@ -39,15 +40,15 @@ import { TestSequence } from '../_models/testSequence';
 })
 
 export class TestSequenceResultComponent {
-
-    currentUser: any;
+	context: ContextDTO;
     testSequenceResults: TestSequenceResult[] = [];
-    testSequences: TestSequence[] = [];
-	selectedSequence: TestSequence;
 	loading = false;
-	pod: PodDTO;
-	displayedColumns = ['name', 'license', 'group', 'action'];
+	displayedColumns = ['name', 'podId', 'timestamp'];
 	dataSource = new MatTableDataSource();
+	public pageEvent: PageEvent;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -63,15 +64,12 @@ export class TestSequenceResultComponent {
 	{}
 
 	ngOnInit() {
-        this.pod = JSON.parse(localStorage.getItem('pod'));
-        
-        this.loadSequenceResults();
-        this.loadSequences();
+		this.context = JSON.parse(localStorage.getItem('context'));
+        this.loadSequenceResults(0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -80,37 +78,22 @@ export class TestSequenceResultComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	loadSequenceResults() {
-		this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'sequence/sequenceresults/' + this.pod.pod.deviceId)
-			.subscribe(
-				data => {
-                    this.testSequenceResults = data;
-					if (data.length > 0) {
-						this.alertService.success(this.translate.instant('message.data'));
-					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
-					this.loading = false;
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-                });
-    }
-    
-    loadSequences() {
-        this.httpService.get(environment.apiEndpoint + 'sequence/' + this.pod.pod.deviceId)
+	public handlePage(e?: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadSequenceResults(e.pageIndex, e.pageSize);
+		return e;
+	}
+
+
+    loadSequenceResults(page: number, size: number) {
+        this.httpService.get(environment.apiEndpoint + 'sequence/result/' + this.context.context.id + '/' + page + '/' + size)
         .subscribe(
             data => {
-                this.testSequences = data;
-                if (data.length > 0) {
+                this.testSequenceResults = data.results;
+                console.log(data.results);
+				this.totalSize = data.totalSize;
+                if (data.results.length > 0) {
                     this.alertService.success(this.translate.instant('message.data'));
                 }
                 else {
@@ -129,11 +112,13 @@ export class TestSequenceResultComponent {
             });
     }
 
-    navigateTo(path: string) {
-        this.router.navigate([this.selectedSequence.id], {relativeTo: this.route});
-	}
+	public openDialogShowTestSequenceResult(testSequenceResult: TestSequenceResult){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			result: testSequenceResult,
+		};
 
-	public onMenuTriggerClick(sequence: TestSequence) {
-		this.selectedSequence = sequence;
+		this.dialog.open(TestSequenceResultDetailsComponent, dialogConfig);
 	}
 }

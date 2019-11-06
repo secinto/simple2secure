@@ -165,7 +165,6 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
-import { TestSequenceRunsComponent } from './report/testSequenceRuns.component';
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
 
 
@@ -312,7 +311,6 @@ export const httpInterceptorProviders = [
 		TestSequenceDetailsComponent,
 		ResendComponent,
 		TestSequenceResultComponent,
-		TestSequenceRunsComponent,
 		TestSequenceResultDetailsComponent
 	],
 	entryComponents: [

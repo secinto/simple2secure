@@ -1,7 +1,8 @@
 <h3 mat-dialog-title>{{ 'sequenceRun.result' | translate }}</h3>
 
-<ngx-json-viewer [json]="selectedRunResult" [expanded]="false" class="json-viewer-class"></ngx-json-viewer>
-
+<div mat-dialog-content>
+    <ngx-json-viewer [json]="selectedRunResult" [expanded]="false" class="json-viewer-class"></ngx-json-viewer>
+</div>
 
 <div mat-dialog-actions>
     <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="selectedRunResult"
