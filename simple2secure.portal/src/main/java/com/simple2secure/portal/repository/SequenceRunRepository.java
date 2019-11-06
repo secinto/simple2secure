@@ -34,4 +34,6 @@ public abstract class SequenceRunRepository extends MongoRepository<SequenceRun>
 	public abstract List<SequenceRun> getByContextId(String contextId);
 
 	public abstract List<SequenceRun> getSequenceRunByDeviceId(String deviceId);
+
+	public abstract List<SequenceRun> getByDeviceIdForPagination(String deviceId, int page, int size);
 }

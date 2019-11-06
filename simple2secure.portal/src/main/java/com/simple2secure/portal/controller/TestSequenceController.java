@@ -212,6 +212,28 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/scheduledSequence/{deviceId}/{page}/{size}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<SequenceRun>> getScheduledSequenceWithPag(@PathVariable("deviceId") String deviceId, @PathVariable("page") int page, @PathVariable("size") int size,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId);
+
+		if (podLicense != null) {
+			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
+			log.debug("Updating last online time for device {}", deviceId);
+			licenseRepository.update(podLicense);
+			log.debug("Updated last online time for device {}", deviceId);
+			List<SequenceRun> scheduledSequenceRuns = sequenceRunrepository.getByDeviceIdForPagination(deviceId, page, size);
+			return new ResponseEntity<>(scheduledSequenceRuns, HttpStatus.OK);
+		}
+
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/update/status/{sequenceRunId}", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,

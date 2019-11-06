@@ -166,6 +166,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
+import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 
 
 
@@ -302,6 +303,7 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
 		OrbiterToolTestScheduledListComponent,
+		OrbiterScheduledSequencesListComponent,
 		OrbiterToolTestSequenceListComponent,
 		SearchComponent,
 		SearchResultComponent,

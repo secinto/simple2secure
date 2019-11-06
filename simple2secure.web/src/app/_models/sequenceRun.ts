@@ -20,42 +20,17 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {TestRunDTO} from '../_models/DTO/testRunDTO';
-import { SequenceRun } from '../_models/sequenceRun';
+import {Base} from './base';
+import {TestRunType} from './testRunType';
+import {TestStatus} from './testStatus';
 
-@Injectable()
-export class HelperService {
-
-	getEnumValue(value: any){
-		if (value == 'MANUAL_POD'){
-			return 'MANUAL POD';
-		}
-		else if (value == 'MANUAL_PORTAL'){
-			return 'MANUAL PORTAL';
-		}
-		else{
-			return 'AUTOMATIC PORTAL';
-		}
-	}
-
-	getTestStatusByTestResult(testRunDTO: TestRunDTO){
-		if(testRunDTO.testResult == null){
-			if(testRunDTO.testRun !== null) {
-				return testRunDTO.testRun.testStatus;
-			}
-			else {
-				return 'UNKNOWN';
-			}
-		}
-		else{
-			return testRunDTO.testRun.testStatus;
-		}
-	}
-
-	getSequenceStatusBySequenceResult(sequenceRun: SequenceRun){
-        if(sequenceRun !== null){
-            return sequenceRun.sequenceStatus;
-        }
-    }
+export class SequenceRun extends Base {
+	sequenceId: string;
+	sequenceName: string;
+	deviceId: string;
+	contextId: string;
+	sequenceRunType: TestRunType;
+	sequenceContent: string[];
+	sequenceStatus: TestStatus;
+	timestamp: number;
 }

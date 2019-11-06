@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -12,10 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.portal.repository.SequenceRunRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class SequenceRunRepositoryImpl extends SequenceRunRepository {
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -42,6 +48,23 @@ public class SequenceRunRepositoryImpl extends SequenceRunRepository {
 		Query query = new Query(Criteria.where("deviceId").is(deviceId));
 		List<SequenceRun> sequences = mongoTemplate.find(query, SequenceRun.class);
 		return sequences;
+	}
+
+	@Override
+	public List<SequenceRun> getByDeviceIdForPagination(String deviceId, int page, int size) {
+
+		Query query = new Query(Criteria.where("deviceId").is(deviceId));
+		long count = mongoTemplate.count(query, SequenceRun.class, collectionName);
+
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
+		List<SequenceRun> sequenceRuns = mongoTemplate.find(query, SequenceRun.class, collectionName);
+
+		return sequenceRuns;
 	}
 
 }
