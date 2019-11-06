@@ -51,10 +51,9 @@ public class SequenceRunRepositoryImpl extends SequenceRunRepository {
 	}
 
 	@Override
-	public List<SequenceRun> getByDeviceIdForPagination(String deviceId, int page, int size) {
+	public List<SequenceRun> getByContextIdWithPagination(String contextId, int page, int size) {
 
-		Query query = new Query(Criteria.where("deviceId").is(deviceId));
-		long count = mongoTemplate.count(query, SequenceRun.class, collectionName);
+		Query query = new Query(Criteria.where("contextId").is(contextId));
 
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);
@@ -65,6 +64,13 @@ public class SequenceRunRepositoryImpl extends SequenceRunRepository {
 		List<SequenceRun> sequenceRuns = mongoTemplate.find(query, SequenceRun.class, collectionName);
 
 		return sequenceRuns;
+	}
+
+	@Override
+	public long countByContextId(String contextId) {
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		long count = mongoTemplate.count(query, SequenceRun.class, collectionName);
+		return count;
 	}
 
 }

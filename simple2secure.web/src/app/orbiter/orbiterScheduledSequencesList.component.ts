@@ -71,8 +71,6 @@ export class OrbiterScheduledSequencesListComponent {
 
 	ngOnInit() {
 		this.context = JSON.parse(localStorage.getItem('context'));
-		let pod = JSON.parse(localStorage.getItem('pod'));
-		this.podId = pod.pod.deviceId;
 		this.loadScheduledSequences(0 , 10);
 	}
 
@@ -105,24 +103,22 @@ export class OrbiterScheduledSequencesListComponent {
 
 	public loadScheduledSequences(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sequence/scheduledSequence/' + this.podId
+		this.httpService.get(environment.apiEndpoint + 'sequence/scheduledSequence/' + this.context.context.id
 			+ '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					for(let sequenceRun of data){
-						this.sequenceRuns.push(sequenceRun);
-					}
+					this.sequenceRuns = data.sequences;
 					this.dataSource.data = this.sequenceRuns;
 					this.totalSize = data.totalSize;
-					/*
+
 					if (!this.isTestChanged){
-						if (data.tests.length > 0) {
+						if (data.sequences.length > 0) {
 							this.alertService.success(this.translate.instant('message.data'));
 						}
 						else {
 							this.alertService.error(this.translate.instant('message.data.notProvided'));
 						}
-					}*/
+					}
 				},
 				error => {
 					if (error.status == 0) {
