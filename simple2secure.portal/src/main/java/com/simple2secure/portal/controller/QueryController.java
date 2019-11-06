@@ -260,11 +260,12 @@ public class QueryController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(
-			value = "/context/{contextId}/{select_all}",
+			value = "/context/{contextId}/{select_all}/{graph_able}",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
-			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
+			@PathVariable("select_all") boolean select_all, @PathVariable("graph_able") boolean graph_able,
+			@RequestHeader("Accept-Language") String locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 
@@ -277,8 +278,13 @@ public class QueryController {
 				if (groups != null) {
 
 					List<QueryRun> queryRunList = new ArrayList();
+					List<QueryRun> queryConfig = new ArrayList();
 					for (CompanyGroup group : groups) {
-						List<QueryRun> queryConfig = queryRepository.findByGroupId(group.getId(), select_all);
+						if (graph_able) {
+							queryConfig = queryRepository.findByGroupIdGraphable(group.getId(), select_all);
+						} else {
+							queryConfig = queryRepository.findByGroupId(group.getId(), select_all);
+						}
 						if (queryConfig != null) {
 							queryRunList.addAll(queryConfig);
 						}
