@@ -91,7 +91,6 @@ export class TestSequenceResultComponent {
         .subscribe(
             data => {
                 this.testSequenceResults = data.results;
-                console.log(data.results);
 				this.totalSize = data.totalSize;
                 if (data.results.length > 0) {
                     this.alertService.success(this.translate.instant('message.data'));

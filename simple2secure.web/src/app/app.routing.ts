@@ -79,7 +79,7 @@ const appRoutes: Routes = [
 					{path: 'network/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
 					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
 					{path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
-					{path: 'testResult', component: TestResultComponent, data: {title: 'button.testresults'}},
+					{path: 'testResult', component: TestResultComponent, data: {title: 'menu.testResults'}},
 					{path: 'testSequenceResult', component: TestSequenceResultComponent, data: {title: 'menu.testSequenceResults'}},
 				]
 			},
@@ -93,7 +93,7 @@ const appRoutes: Routes = [
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
-					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequences.scheduled'}},
+					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled'}},
 				]
 			},
 			{
