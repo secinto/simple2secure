@@ -52,7 +52,7 @@ public class QueryRunnable implements Runnable {
 	@Override
 	public void run() {
 		String queryString = query.getSqlQuery();
-		String queryResult = executeQuery(queryString);
+		String queryResult = executeQuery(queryString, query.getName());
 		if (!Strings.isNullOrEmpty(queryResult)) {
 			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
 			result.setGroupId(ProbeConfiguration.groupId);
@@ -78,7 +78,7 @@ public class QueryRunnable implements Runnable {
 	 * @param query
 	 * @return
 	 */
-	public String executeQuery(String query) {
+	public String executeQuery(String query, String name) {
 		String result = "";
 		Process p;
 
@@ -96,7 +96,7 @@ public class QueryRunnable implements Runnable {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			result = IOUtils.toString(reader);
-			log.debug("OSQuery {} resulted {}", query, result);
+			log.debug("OSQuery {} resulted {}", name, result);
 			result = StringUtils.substringBetween(result, "[", "]").trim();
 			if (!Strings.isNullOrEmpty(result)) {
 				result = "[" + result + "]";

@@ -30,6 +30,12 @@
 			<property name="hibernate.connection.url"
 				value="jdbc:h2:file:./db/s2sProbeDB;MV_STORE=false" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
+			<property name="hibernate.c3p0.min_size" value="5" />
+			<property name="hibernate.c3p0.max_size" value="20" />
+			<property name="hibernate.c3p0.timeout" value="300" />
+			<property name="hibernate.c3p0.max_statements" value="50" />
+			<property name="hibernate.c3p0.idle_test_period"
+				value="3000" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
 			<property name="javax.persistence.jdbc.password"
 				value="admin" />

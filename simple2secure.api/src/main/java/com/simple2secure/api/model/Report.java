@@ -40,6 +40,7 @@ public class Report extends GenericDBObject {
 	private static final long serialVersionUID = -7217360147886001090L;
 	private String groupId;
 	private String deviceId;
+	@Lob
 	private String query;
 	private String name;
 	private String hostname;
