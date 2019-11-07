@@ -23,6 +23,8 @@
 package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +133,8 @@ public class TestController {
 		if (!Strings.isNullOrEmpty(testId)) {
 			Test test = testRepository.find(testId);
 			if (test != null) {
-				testRepository.delete(test);
+				test.setDeleted(true);
+				testRepository.update(test);
 				return new ResponseEntity<>(test, HttpStatus.OK);
 			}
 		}
@@ -314,6 +317,39 @@ public class TestController {
 			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
 			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
 		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/syncTests/{podId}", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('DEVICE')")
+	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable("podId") String podId,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		List<Test> syncronizedTestList = new ArrayList<>();
+		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(podId)) {
+			if (tests != null) {
+				for (Test test : tests) {
+					if (test != null) {
+						Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
+						if (synchronizedTest != null) {
+							syncronizedTestList.add(synchronizedTest);
+						}
+					}
+				}
+			}
+
+			List<Test> newPortalTests = testUtils.getNewPortalTests(podId);
+			if (newPortalTests != null && newPortalTests.size() > 0) {
+				syncronizedTestList.addAll(newPortalTests);
+			}
+
+			testUtils.deleteTaggedPortalTests(podId);
+
+			return new ResponseEntity<>(syncronizedTestList, HttpStatus.OK);
+
+		}
+
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
 				HttpStatus.NOT_FOUND);
 	}

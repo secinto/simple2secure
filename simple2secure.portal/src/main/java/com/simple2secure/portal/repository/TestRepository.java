@@ -43,4 +43,8 @@ public abstract class TestRepository extends MongoRepository<Test> {
 
 	public abstract long getCountOfTestsWithPodid(String podId);
 
+	public abstract List<Test> getNewPortalTestsByPodId(String podId);
+
+	public abstract List<Test> getDeletedTestsByPodId(String podId);
+
 }

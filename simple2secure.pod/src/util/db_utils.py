@@ -3,7 +3,7 @@ import logging
 import secrets
 import socket
 
-from src.db.database import db, PodInfo, CompanyLicensePublic
+from src.db.database import db, PodInfo, CompanyLicensePublic, Test
 from src.util.file_utils import get_license_file
 from src.util.util import get_date_from_string
 
@@ -20,6 +20,18 @@ log = logging.getLogger('pod.util.db_utils')
 def update(some_object):
     db.session.add(some_object)
     db.session.commit()
+
+
+def delete_all_entries_from_table(some_model):
+    db.session.query(some_model).delete()
+    db.session.commit()
+
+
+def delete_test_by_name(test_name):
+    test = Test.query.filter_by(name=test_name).one()
+    if test is not None:
+        db.session.delete(test)
+        db.session.commit()
 
 
 def get_pod(app):

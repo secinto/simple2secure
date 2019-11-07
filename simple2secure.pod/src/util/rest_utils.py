@@ -203,6 +203,25 @@ def sync_test_with_portal(test, app):
     return portal_post(app, app.config['PORTAL_URL'] + "test/syncTest", json.dumps(test_json))
 
 
+def sync_tests_with_portal(tests, app):
+    """
+    Synchronizes the list of all tests with the PORTAL.
+
+    :param test: The test to be synchronized
+    :param app: The application context
+    :return:
+    """
+    tests_array = []
+
+    if tests is not None:
+        for test in tests:
+            test_schema = TestSchema()
+            test_json = test_schema.dump(test)
+            tests_array.append(test_json)
+
+    return portal_post(app, app.config['PORTAL_URL'] + "test/syncTests/" + app.config['POD_ID'], json.dumps(tests_array))
+
+
 # ----------------------------------------
 # Helper functions
 # ----------------------------------------

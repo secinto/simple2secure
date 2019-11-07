@@ -30,6 +30,7 @@ class Test(db.Model):
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
     hash_value = db.Column(db.Text)
+    deleted = db.Column(db.Boolean)
     lastChangedTimestamp = db.Column(db.Text)
 
     def __init__(self, name, test_content, hash_value, last_changed_timestamp, pod_id):
@@ -38,6 +39,7 @@ class Test(db.Model):
         self.test_content = test_content
         self.hash_value = hash_value
         self.lastChangedTimestamp = last_changed_timestamp
+        self.deleted = False
 
 
 class TestSequence(db.Model):

@@ -65,7 +65,7 @@ public class TestRepositoryImpl extends TestRepository {
 
 	@Override
 	public List<Test> getByPodIdWithPagination(String podId, int page, int size, boolean usePagination) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(false));
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);
 		if (usePagination) {
@@ -79,9 +79,23 @@ public class TestRepositoryImpl extends TestRepository {
 
 	@Override
 	public long getCountOfTestsWithPodid(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(false));
 		long count = mongoTemplate.count(query, Test.class, collectionName);
 		return count;
+	}
+
+	@Override
+	public List<Test> getNewPortalTestsByPodId(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId).and("newTest").is(true));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
+	@Override
+	public List<Test> getDeletedTestsByPodId(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(true));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
 	}
 
 }

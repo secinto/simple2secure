@@ -42,6 +42,8 @@ public class Test extends GenericDBObject {
 	private long lastScheduleTimestamp;
 	private long lastChangedTimestamp;
 	private String hash_value;
+	private boolean newTest;
+	private boolean deleted;
 
 	public Test() {
 
@@ -135,4 +137,19 @@ public class Test extends GenericDBObject {
 		lastScheduleTimestamp = lastExecution;
 	}
 
+	public boolean isNewTest() {
+		return newTest;
+	}
+
+	public void setNewTest(boolean newTest) {
+		this.newTest = newTest;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

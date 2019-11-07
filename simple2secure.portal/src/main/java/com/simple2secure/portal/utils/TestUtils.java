@@ -348,6 +348,7 @@ public class TestUtils {
 			test.setTest_content(testContent);
 			test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
 			test.setActive(true);
+			test.setNewTest(true);
 
 		} else {
 			// test should exist in the database, update the existing one
@@ -448,6 +449,45 @@ public class TestUtils {
 			}
 		}
 		return sequenceRunDTOs;
+	}
+
+	/**
+	 * This function adds new portal test to the list which will be returned to the pod. Before returning the flag newTest is set to false and
+	 * updated in the database accordingly
+	 *
+	 * @param podId
+	 * @return
+	 */
+	public List<Test> getNewPortalTests(String podId) {
+		List<Test> newPortalTests = new ArrayList<>();
+		newPortalTests = testRepository.getNewPortalTestsByPodId(podId);
+
+		for (Test test : newPortalTests) {
+			test.setNewTest(false);
+			try {
+				testRepository.update(test);
+			} catch (ItemNotFoundRepositoryException e) {
+				log.error(e.getMessage());
+			}
+		}
+
+		return newPortalTests;
+	}
+
+	/**
+	 * This function iterates over all tests which are tagged to be deleted, and deletes them from the database.
+	 *
+	 * @param syncTests
+	 * @param podId
+	 * @return
+	 */
+	public void deleteTaggedPortalTests(String podId) {
+		List<Test> testsToBeDeleted = testRepository.getDeletedTestsByPodId(podId);
+		if (testsToBeDeleted != null) {
+			for (Test test : testsToBeDeleted) {
+				testRepository.delete(test);
+			}
+		}
 	}
 
 }
