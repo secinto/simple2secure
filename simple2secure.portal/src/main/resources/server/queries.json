@@ -469,7 +469,7 @@
 	},
 	{
 		"name": "Recent User Processes",
-		"sqlQuery": "SELECT pid, username, name FROM processes p JOIN users u ON u.uid = p.uid ORDER BY start_time DESC LIMIT 10;",
+		"sqlQuery": "SELECT pid, username, name FROM processes p JOIN users u ON u.uid = p.uid AND name != 'osqueryi.exe' ORDER BY start_time DESC LIMIT 10;",
 		"description": "Obtains the 10 most recent user processes which where executed",
 		"always": true,
 		"analysisInterval": 10,

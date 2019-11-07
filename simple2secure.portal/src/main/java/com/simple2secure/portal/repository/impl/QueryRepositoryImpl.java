@@ -42,41 +42,12 @@ public class QueryRepositoryImpl extends QueryRepository {
 	public List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osInfo, boolean selectAll) {
 		Query query = new Query();
 
-		if (selectAll) {
-			List<Integer> possibleValues = new ArrayList<>();
-			switch (osInfo) {
-			case WINDOWS:
-				possibleValues.add(1);
-				possibleValues.add(3);
-				possibleValues.add(5);
-				possibleValues.add(7);
-				break;
-			case LINUX:
-				possibleValues.add(2);
-				possibleValues.add(3);
-				possibleValues.add(6);
-				possibleValues.add(7);
-				break;
-			case OSX:
-				possibleValues.add(4);
-				possibleValues.add(5);
-				possibleValues.add(6);
-				possibleValues.add(7);
-				break;
-			default:
-				possibleValues.add(1);
-				possibleValues.add(2);
-				possibleValues.add(3);
-				possibleValues.add(4);
-				possibleValues.add(5);
-				possibleValues.add(6);
-				possibleValues.add(7);
-				break;
-			}
-			query = new Query(Criteria.where("groupId").is(groupId).and("systemsAvailable").in(possibleValues));
+		List<Integer> possibleValues = getPossibleValues(osInfo);
 
+		if (selectAll) {
+			query = new Query(Criteria.where("groupId").is(groupId).and("systemsAvailable").in(possibleValues));
 		} else {
-			query = new Query(Criteria.where("groupId").is(groupId).and("active").is(1));
+			query = new Query(Criteria.where("groupId").is(groupId).and("systemsAvailable").in(possibleValues).and("active").is(1));
 		}
 
 		return mongoTemplate.find(query, QueryRun.class, collectionName);
@@ -113,4 +84,39 @@ public class QueryRepositoryImpl extends QueryRepository {
 
 		return mongoTemplate.find(query, QueryRun.class, collectionName);
 	}
+
+	private List<Integer> getPossibleValues(OSInfo osInfo) {
+		List<Integer> possibleValues = new ArrayList<>();
+		switch (osInfo) {
+		case WINDOWS:
+			possibleValues.add(1);
+			possibleValues.add(3);
+			possibleValues.add(5);
+			possibleValues.add(7);
+			break;
+		case LINUX:
+			possibleValues.add(2);
+			possibleValues.add(3);
+			possibleValues.add(6);
+			possibleValues.add(7);
+			break;
+		case OSX:
+			possibleValues.add(4);
+			possibleValues.add(5);
+			possibleValues.add(6);
+			possibleValues.add(7);
+			break;
+		default:
+			possibleValues.add(1);
+			possibleValues.add(2);
+			possibleValues.add(3);
+			possibleValues.add(4);
+			possibleValues.add(5);
+			possibleValues.add(6);
+			possibleValues.add(7);
+			break;
+		}
+		return possibleValues;
+	}
+
 }

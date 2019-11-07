@@ -91,6 +91,10 @@ public class JsonUtils {
 		return processors;
 
 	}
+	//
+	// public static List<T> T readFromString(String content, Class<T> type) {
+	// T[] array = JSONUtils.fromString(content, T[]);
+	// }
 
 	/**
 	 * This function reads steps from the file

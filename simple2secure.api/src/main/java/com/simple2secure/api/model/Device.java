@@ -31,7 +31,7 @@ public class Device {
 	@JsonProperty
 	private boolean activated;
 	private String hostname;
-	private String status;
+	private DeviceStatus status;
 	@JsonProperty
 	private boolean pod;
 
@@ -39,7 +39,7 @@ public class Device {
 
 	}
 
-	public Device(String deviceId, CompanyGroup group, boolean activated, String hostname, String status, boolean pod) {
+	public Device(String deviceId, CompanyGroup group, boolean activated, String hostname, DeviceStatus status, boolean pod) {
 		super();
 
 		this.deviceId = deviceId;
@@ -82,11 +82,11 @@ public class Device {
 		this.hostname = hostname;
 	}
 
-	public String getStatus() {
+	public DeviceStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(DeviceStatus status) {
 		this.status = status;
 	}
 

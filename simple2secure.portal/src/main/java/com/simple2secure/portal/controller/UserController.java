@@ -198,7 +198,7 @@ public class UserController {
 				List<String> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Device> myDevices = deviceUtils.getAllDevicesFromCurrentContext(context);
+				List<Device> myDevices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
 				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
 				log.debug("Found {} devices, {} groups, {} users, and {} contexts", myDevices.size(), groups.size(), myUsers.size(),

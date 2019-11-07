@@ -42,3 +42,14 @@ simple2secure.probe/src/test/resources/licenses/1/license.dat
 simple2secure.docker/simple2secure/
 simple2secure.pod/db/pod.db
 simple2secure.pod/static/license/license1572339717510.8267.zip
+simple2secure.service/release/license/
+simple2secure.service/release/db/
+simple2secure.service/release/tools/
+simple2secure.service/release/stdout.log
+simple2secure.service/release/public.key
+simple2secure.service/release/license.dat
+simple2secure.service/release/ProbeService.2019-11-07.log
+simple2secure.service/license/public.key
+simple2secure.service/license/private.key
+simple2secure.probe/tools/
+simple2secure.probe/license/

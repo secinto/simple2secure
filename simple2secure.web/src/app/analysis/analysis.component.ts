@@ -47,6 +47,8 @@ export class AnalysisComponent implements OnInit{
 	context: ContextDTO;
 	currentUser: any;
 	selectedQuery: any;
+	probes: any[];
+	selectedProbe: any;
 	chart: StockChart;
 	chartOptions: any;
 	seriesOption: any;
@@ -65,19 +67,35 @@ export class AnalysisComponent implements OnInit{
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadAllQueries(true);
+		this.loadAllProbes(true);
+		// this.loadAllQueries(true);
 	}
 
-	loadAllQueries(defaultValue: boolean) {
-		this.httpService.get(environment.apiEndpoint + 'query/context/' + this.context.context.id + '/false/true')
+	loadAllProbes(defaultValue: boolean) {
+		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/false')
+			.subscribe(
+				data => {
+					this.probes = data;
+					if (defaultValue){
+						if (this.probes.length > 0) {
+							this.selectedProbe = this.probes[0];
+							console.log(this.selectedProbe);
+							this.loadQueriesByProbe(this.selectedProbe.deviceId);
+						}
+					}
+
+				});
+	}
+
+	loadQueriesByProbe(probeId: string) {
+		this.httpService.get(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN/true')
 			.subscribe(
 				data => {
 					this.queries = data;
-					if (defaultValue){
+					if (this.probes.length > 0) {
 						this.selectedQuery = this.queries[0];
 						this.loadReportsByName(this.selectedQuery.name);
 					}
-
 				});
 	}
 
@@ -100,6 +118,10 @@ export class AnalysisComponent implements OnInit{
 
 	onQueryChange(value: any){
 		this.loadReportsByName(value.name);
+	}
+
+	onProbeChange(value: any){
+		this.loadQueriesByProbe(value.deviceId);
 	}
 
 	public openDialogShowReportDetails(event: any): void {

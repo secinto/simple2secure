@@ -71,7 +71,7 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getHostname())) {
 				report.setHostname(ProbeConfiguration.hostname);
 			}
-			log.debug("Sending query report {} with timestamp {} to the API.", report.getName(),
+			log.info("Sending query report {} with timestamp {} to the API.", report.getName(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
@@ -98,8 +98,8 @@ public class ReportScheduler extends TimerTask {
 				report.setHostname(ProbeConfiguration.hostname);
 			}
 
-			log.info("Sending network report {} with timestamp {} to the API ", report.getId(),
-					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
+			log.info("Sending network report with id {} for processor {} with timestamp {} to the API ", report.getId(),
+					report.getProcessorName(), TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
 					ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {

@@ -41,14 +41,21 @@
 		</encoder>
 	</appender>
 
+	<logger name="com.simple2secure" level="info" />
 	<logger name="com.simple2secure.probe" level="debug" />
-	<logger name="org.pcap4j" level="info" />
-	<logger name="org.hibernate" level="info" />
+	<logger name="com.simple2secure.probe.osquery" level="info" />
+	<logger name="com.simple2secure.probe.network" level="info" />
+	<logger name="com.simple2secure.probe.utils" level="info" />
+	<logger name="org.jboss" level="error" />
+	<logger name="org.pcap4j" level="error" />
+	<logger name="org.hibernate" level="error" />
+	<logger name="com.mchange" level="error" />
 
 	<root level="error">
 		<appender-ref ref="STDOUT" />
-		<appender-ref ref="FILE" />
-		<!-- <appender-ref ref="GUI"/> -->
 	</root>
 
+	<root level="debug">
+		<appender-ref ref="FILE" />
+	</root>
 </configuration>

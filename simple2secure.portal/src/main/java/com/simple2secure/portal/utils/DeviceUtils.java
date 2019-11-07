@@ -37,6 +37,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -99,7 +100,7 @@ public class DeviceUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<Device> getAllDevicesFromCurrentContext(Context context) {
+	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
 		List<Device> myDevices = new ArrayList<>();
@@ -110,7 +111,13 @@ public class DeviceUtils {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String deviceStatus = getDeviceStatus(license);
+							DeviceStatus status = license.getStatus();
+
+							DeviceStatus deviceStatus = getDeviceStatus(license);
+							if (status != deviceStatus) {
+								license.setStatus(deviceStatus);
+								licenseRepository.save(license);
+							}
 
 							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus,
 									license.isDevicePod());
@@ -148,7 +155,13 @@ public class DeviceUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						String deviceStatus = getDeviceStatus(license);
+						DeviceStatus status = license.getStatus();
+
+						DeviceStatus deviceStatus = getDeviceStatus(license);
+						if (status != deviceStatus) {
+							license.setStatus(deviceStatus);
+							licenseRepository.save(license);
+						}
 						CompanyGroup group = groupRepository.find(license.getGroupId());
 						Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
 						myDevices.add(device);
@@ -183,18 +196,17 @@ public class DeviceUtils {
 	 * @param deviceLicense
 	 * @return
 	 */
-	private String getDeviceStatus(CompanyLicensePrivate deviceLicense) {
+	private DeviceStatus getDeviceStatus(CompanyLicensePrivate deviceLicense) {
 		// make it multilingual
 		if (deviceLicense.getLastOnlineTimestamp() == 0) {
-			return "Unknown";
+			return DeviceStatus.UNKNOWN;
 		} else {
 			long timeDiff = System.currentTimeMillis() - deviceLicense.getLastOnlineTimestamp();
 			if (timeDiff > 60000) {
-				return "Offline";
+				return DeviceStatus.OFFLINE;
 			} else {
-				return "Online";
+				return DeviceStatus.ONLINE;
 			}
 		}
 	}
-
 }

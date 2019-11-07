@@ -242,6 +242,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 			TimeUnit.SECONDS.sleep(5);
 			log.debug("Waited 5 seconds before sending instrumentation command");
 			sendStartCommand();
+			return true;
 		} catch (FileNotFoundException | InterruptedException ie) {
 			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
 		}
