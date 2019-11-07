@@ -79,7 +79,6 @@ export class AnalysisComponent implements OnInit{
 					if (defaultValue){
 						if (this.probes.length > 0) {
 							this.selectedProbe = this.probes[0];
-							console.log(this.selectedProbe);
 							this.loadQueriesByProbe(this.selectedProbe.deviceId);
 						}
 					}
@@ -100,7 +99,6 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadReportsByName(name: string){
-		console.log(name);
 		this.httpService.post(name, environment.apiEndpoint + 'reports/report/name')
 			.subscribe(
 				data => {

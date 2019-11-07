@@ -423,7 +423,8 @@
 
   "actions.notavailable": "Keine verfügbaren Aktionen",
 
-  "chart.query.select": "Abfragezeichenfolge ausWählen",
+  "chart.probe.select": "Probe ausWählen",
+  "chart.query.select": "Abfrage ausWählen",
   "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu",
 
   "notifications.empty": "Benachrichtigungen nicht bereitgestellt",

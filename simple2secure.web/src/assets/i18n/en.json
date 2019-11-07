@@ -423,7 +423,8 @@
 
   "actions.notavailable": "No available actions",
 
-  "chart.query.select": "Select query string",
+  "chart.probe.select": "Select probe",
+  "chart.query.select": "Select query",
   "chart.additional.query": "Add additional query to the chart",
 
   "notifications.empty": "Notifications not provided",
