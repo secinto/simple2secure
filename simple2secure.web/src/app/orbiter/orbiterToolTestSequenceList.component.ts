@@ -49,6 +49,7 @@ export class OrbiterToolTestSequenceListComponent {
 	loading = false;
 	url: string;
 	id: string;
+	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
