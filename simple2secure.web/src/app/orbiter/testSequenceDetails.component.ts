@@ -115,12 +115,11 @@ export class TestSequenceDetailsComponent {
     }
 
     getTestForSequenceToShow(sequence: TestSequence) {
-        const someContent = sequence.sequenceContent;
-        // console.log(this.tests);
-        if (Array.isArray(someContent) && someContent.length > 0) {
-            for (let i = 0; i < someContent.length; i++) {
+        const origSeqContent = sequence.sequenceContent;
+        if (Array.isArray(origSeqContent) && origSeqContent.length > 0 && origSeqContent.length != this.sequenceToShow.length) {
+            for (let i = 0; i < origSeqContent.length; i++) {
                 for (const test of this.tests) {
-                    if (test.name === someContent[i]) {
+                    if (test.name === origSeqContent[i]) {
                         this.sequenceToShow.push(test);
                     }
                 }
@@ -138,7 +137,6 @@ export class TestSequenceDetailsComponent {
     }
 
     addTestToSequence(item: TestObjWeb){
-        console.log("hereeeeeeee");
         if (this.sequence.sequenceContent){
             this.sequence.sequenceContent.push(item.name);
             this.sequenceToShow.push(item);

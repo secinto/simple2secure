@@ -11,7 +11,7 @@ from src.db.database_schema import TestResultSchema, TestSequenceResultSchema
 from src.util import json_utils
 from src.util import rest_utils
 from src.util.db_utils import update
-from src.util.rest_utils import portal_post
+from src.util.rest_utils import portal_post, update_sequence_status
 from src.util.test_sequence_utils import update_sequence
 from src.util.util import get_current_timestamp
 
@@ -115,6 +115,8 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
     """
     with app.app_context():
         sequence = update_sequence(json.loads(test_sequence))
+        update_sequence_status(app, sequence_run_id, sequence_id, "RUNNING")
+        rest_utils.send_notification("Sequence " + sequence.name + " has been started by the pod " + socket.gethostname(), app)
 
         current_milli_time = get_current_timestamp()
 
@@ -149,6 +151,8 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
         test_result_schema = TestSequenceResultSchema()
         output = test_result_schema.dump(testSeqRes)
         portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", json.dumps(output))
+        update_sequence_status(app, sequence_run_id, sequence_id, "EXECUTED")
+        rest_utils.send_notification("Sequence " + sequence.name + " has been executed by the pod " + socket.gethostname(), app)
 
         update(testSeqRes)
         update(sequence)
