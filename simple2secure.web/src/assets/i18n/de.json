@@ -34,7 +34,7 @@
   "button.false": "Falsch",
   "button.runtests": "Test ausführen",
   "button.showtests": "Tests anzeigen",
-  "button.runsequence": "Sequenz ausführen",
+  "button.runSequence": "Sequenz ausführen",
   "button.showSequences": "Sequenz anzeigen",
   "button.showtestsresults": "Testergebniss anzeigen",
   "button.showsequenceresult": "Sequenzergebnis anzeigen",

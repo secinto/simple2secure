@@ -26,7 +26,7 @@
         </ng-container>
 
         <ng-container matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{'table.action' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
                 <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
                         (click)="onMenuTriggerClick(element)">

@@ -151,7 +151,7 @@ public class TestSequenceController {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sequence", locale)),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -176,7 +176,7 @@ public class TestSequenceController {
 		}
 
 		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale)),
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale)),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -208,7 +208,7 @@ public class TestSequenceController {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_sequence", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -229,7 +229,7 @@ public class TestSequenceController {
 		}
 
 		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale)),
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale)),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -252,7 +252,7 @@ public class TestSequenceController {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -266,7 +266,7 @@ public class TestSequenceController {
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -280,7 +280,7 @@ public class TestSequenceController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -294,7 +294,7 @@ public class TestSequenceController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -309,16 +309,17 @@ public class TestSequenceController {
 
 			if (sequenceIds != null) {
 				List<TestSequenceResult> sequenceResults = testSequenceResultRepository.getBySequenceRunIds(sequenceIds, page, size);
-
 				Map<String, Object> sequenceResultMap = new HashMap<>();
-				sequenceResultMap.put("results", sequenceResults);
-				sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
-				return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
-
+				if(!sequenceResults.isEmpty()){
+					sequenceResultMap.put("results", sequenceResults);
+					sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
+					return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
+				}else {
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)), HttpStatus.NOT_FOUND);
+				}
 			}
-
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

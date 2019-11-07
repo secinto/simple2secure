@@ -55,29 +55,28 @@ public class TestSequenceResultRepositoryImpl extends TestSequenceResultReposito
 
 	@Override
 	public List<TestSequenceResult> getBySequenceRunIds(List<String> sequenceRunIds, int page, int size) {
-
 		List<TestSequenceResult> results = new ArrayList<>();
-		List<Criteria> orExpression = new ArrayList<>();
-		Criteria orCriteria = new Criteria();
-		Query query = new Query();
-		for (String sequenceRunId : sequenceRunIds) {
-			Criteria expression = new Criteria();
-			expression.and("sequence_run_id").is(sequenceRunId);
-			orExpression.add(expression);
+		if(!sequenceRunIds.isEmpty()){
+			List<Criteria> orExpression = new ArrayList<>();
+			Criteria orCriteria = new Criteria();
+			Query query = new Query();
+			for (String sequenceRunId : sequenceRunIds) {
+				Criteria expression = new Criteria();
+				expression.and("sequence_run_id").is(sequenceRunId);
+				orExpression.add(expression);
+			}
+			query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+			int limit = portalUtils.getPaginationLimit(size);
+			int skip = portalUtils.getPaginationStart(size, page, limit);
+
+			query.limit(limit);
+			query.skip(skip);
+			query.with(Sort.by(Sort.Direction.DESC, "time_stamp"));
+
+			results = mongoTemplate.find(query, TestSequenceResult.class, collectionName);
 		}
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
-
-		int limit = portalUtils.getPaginationLimit(size);
-		int skip = portalUtils.getPaginationStart(size, page, limit);
-
-		query.limit(limit);
-		query.skip(skip);
-		query.with(Sort.by(Sort.Direction.DESC, "time_stamp"));
-
-		results = mongoTemplate.find(query, TestSequenceResult.class, collectionName);
-
 		return results;
-
 	}
 
 	@Override
