@@ -464,8 +464,6 @@ export class UserOverviewComponent {
 
 	checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup) {
 
-		console.log(JSON.stringify(this.myProfile.assignedGroups));
-
 		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
 			return true;
 		}

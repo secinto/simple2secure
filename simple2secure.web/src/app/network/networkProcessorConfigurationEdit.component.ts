@@ -76,7 +76,6 @@ export class NetworkProcessorConfigurationEditComponent {
 			this.processor.groupId = this.groupId;
 		}
 
-		console.log('HEREEEEEEEEEEE');
 		this.httpService.post(this.processor, environment.apiEndpoint + 'processors').subscribe(
 			data => {
 				this.dialogRef.close(true);

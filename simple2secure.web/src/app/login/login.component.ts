@@ -141,7 +141,6 @@ export class LoginComponent implements OnInit {
 		}
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
-			console.log('Updating context automatically, selected context ' + JSON.stringify(contexts[0]));
 			localStorage.setItem('context', JSON.stringify(contexts[0]));
 			this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 

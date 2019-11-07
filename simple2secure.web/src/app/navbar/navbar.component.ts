@@ -91,7 +91,6 @@ export class NavbarComponent {
 						this.countunreadNotifications(this.notifications);
 					},
 					error => {
-						console.log(error);
 					});
 		}
 	}

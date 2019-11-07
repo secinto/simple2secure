@@ -139,7 +139,6 @@ export class OrbiterScheduledSequencesListComponent {
 	public openDialogShowSequenceResult(): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
-		console.log(this.selectedSequenceRun);
 		dialogConfig.data = {
 			result: this.selectedSequenceRun.sequenceResult
 		};
