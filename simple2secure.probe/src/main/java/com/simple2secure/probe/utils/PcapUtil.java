@@ -164,7 +164,7 @@ public class PcapUtil {
 
 					if (address.getAddress() instanceof Inet4Address && address.getAddress().equals(inet)) {
 						socket.bind(new InetSocketAddress(address.getAddress(), 0));
-						socket.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
+						socket.connect(new InetSocketAddress(InetAddress.getByName("simple2secure.info"), 51003));
 						socket.close();
 						return true;
 					}

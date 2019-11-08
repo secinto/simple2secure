@@ -41,11 +41,11 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.simple2secure" level="info" />
+	<logger name="com.simple2secure" level="debug" />
 	<logger name="com.simple2secure.probe" level="debug" />
-	<logger name="com.simple2secure.probe.osquery" level="info" />
-	<logger name="com.simple2secure.probe.network" level="info" />
-	<logger name="com.simple2secure.probe.utils" level="info" />
+	<logger name="com.simple2secure.probe.osquery" level="debug" />
+	<logger name="com.simple2secure.probe.network" level="debug" />
+	<logger name="com.simple2secure.probe.utils" level="debug" />
 	<logger name="org.jboss" level="error" />
 	<logger name="org.pcap4j" level="error" />
 	<logger name="org.hibernate" level="error" />
