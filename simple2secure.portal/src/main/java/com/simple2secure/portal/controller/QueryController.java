@@ -206,6 +206,7 @@ public class QueryController {
 						// Take only the query runs of this group, because this is root group!
 						queryConfig = queryRepository.findByGroupIdAndOSInfo(license.getGroupId(), OSInfo.valueOf(osinfo), select_all);
 						if (queryConfig != null) {
+							queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
 							return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 						}
 
@@ -222,8 +223,10 @@ public class QueryController {
 								}
 							}
 						}
-
-						return new ResponseEntity<>(queryConfig, HttpStatus.OK);
+						if (queryConfig != null) {
+							queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
+							return new ResponseEntity<>(queryConfig, HttpStatus.OK);
+						}
 					}
 				}
 			}
@@ -290,7 +293,7 @@ public class QueryController {
 						}
 					}
 
-					queryRunList.sort(Comparator.comparing(QueryRun::getName));
+					queryRunList.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
 					return new ResponseEntity<>(queryRunList, HttpStatus.OK);
 				}
 

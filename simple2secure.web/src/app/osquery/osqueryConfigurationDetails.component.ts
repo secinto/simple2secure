@@ -87,6 +87,16 @@ export class OsqueryConfigurationDetailsComponent {
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
+		this.dataSource.sortingDataAccessor = (item, property) => {
+			console.log(property);
+			console.log(item);
+			if (property === 'interval') {
+				return (item['analysisIntervalUnit'] + ' ' + item['analysisInterval']);
+			} else {
+				return item[property];
+			}
+		}
+
 		this.dataSource.paginator = this.paginator;
 	}
 
@@ -95,6 +105,7 @@ export class OsqueryConfigurationDetailsComponent {
 		filterValue = filterValue.toLowerCase();
 		this.dataSource.filter = filterValue;
 	}
+
 
 	loadQueries() {
 		this.loading = true;
