@@ -44,6 +44,7 @@ public class Test extends GenericDBObject {
 	private String hash_value;
 	private boolean newTest;
 	private boolean deleted;
+	private boolean synced;
 
 	public Test() {
 
@@ -151,5 +152,13 @@ public class Test extends GenericDBObject {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public boolean isSynced() {
+		return synced;
+	}
+
+	public void setSynced(boolean synced) {
+		this.synced = synced;
 	}
 }

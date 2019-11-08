@@ -98,4 +98,11 @@ public class TestRepositoryImpl extends TestRepository {
 		return tests;
 	}
 
+	@Override
+	public List<Test> getUnsyncedTestsByPodId(String podId) {
+		Query query = new Query(Criteria.where("podId").is(podId).and("synced").is(false));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
 }

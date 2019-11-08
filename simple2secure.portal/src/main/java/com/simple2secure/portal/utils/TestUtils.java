@@ -155,6 +155,7 @@ public class TestUtils {
 				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 				currentPortalTest.setTest_content(test.getTest_content());
 				currentPortalTest.setActive(true);
+				currentPortalTest.setSynced(true);
 				testRepository.save(currentPortalTest);
 			}
 		} else {
@@ -165,6 +166,7 @@ public class TestUtils {
 			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 			currentPortalTest.setTest_content(test.getTest_content());
 			currentPortalTest.setActive(true);
+			currentPortalTest.setSynced(true);
 
 			testRepository.save(currentPortalTest);
 
@@ -464,6 +466,7 @@ public class TestUtils {
 
 		for (Test test : newPortalTests) {
 			test.setNewTest(false);
+			test.setSynced(true);
 			try {
 				testRepository.update(test);
 			} catch (ItemNotFoundRepositoryException e) {
@@ -486,6 +489,41 @@ public class TestUtils {
 		if (testsToBeDeleted != null) {
 			for (Test test : testsToBeDeleted) {
 				testRepository.delete(test);
+			}
+		}
+	}
+
+	/**
+	 * This function iterates over all tests which are not syncronized, and deletes them from the database.
+	 *
+	 * @param syncTests
+	 * @param podId
+	 * @return
+	 */
+	public void deleteUnsyncedTests(String podId) {
+		List<Test> testsToBeDeleted = testRepository.getUnsyncedTestsByPodId(podId);
+		if (testsToBeDeleted != null) {
+			for (Test test : testsToBeDeleted) {
+				testRepository.delete(test);
+			}
+		}
+	}
+
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * 
+	 * @param podId
+	 */
+	public void setAllPodTestToUnsyncronized(String podId) {
+		List<Test> tests = testRepository.getByPodId(podId);
+		for (Test test : tests) {
+			if (test != null) {
+				test.setSynced(false);
+				try {
+					testRepository.update(test);
+				} catch (ItemNotFoundRepositoryException e) {
+					log.debug(e.getMessage());
+				}
 			}
 		}
 	}
