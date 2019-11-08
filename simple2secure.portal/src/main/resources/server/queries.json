@@ -1,7 +1,7 @@
 [
 	{
 		"name": "Expired Certificates (German)",
-		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\Vertrauens%' ORDER BY expiration_date ASC;",
+		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\\Vertrauens%' ORDER BY expiration_date ASC;",
 		"description":"Returns the list of certificates of CAs which have already expired",
 		"always": true,
 		"analysisInterval": 1,
@@ -13,7 +13,7 @@
 	},
 	{
 		"name": "Expired Certificates (English)",
-		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\Trusted%' ORDER BY expiration_date ASC;",
+		"sqlQuery": "select common_name, datetime(not_valid_after, 'unixepoch') as expiration_date from certificates where path like 'CurrentUser\\Trusted%' ORDER BY expiration_date ASC;",
 		"description":"Returns the list of certificates of CAs which have already expired",
 		"always": true,
 		"analysisInterval": 1,
