@@ -328,6 +328,7 @@ public class TestController {
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		List<Test> syncronizedTestList = new ArrayList<>();
 		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(podId)) {
+			testUtils.setAllPodTestToUnsyncronized(podId);
 			if (tests != null) {
 				for (Test test : tests) {
 					if (test != null) {
@@ -345,6 +346,7 @@ public class TestController {
 			}
 
 			testUtils.deleteTaggedPortalTests(podId);
+			testUtils.deleteUnsyncedTests(podId);
 
 			return new ResponseEntity<>(syncronizedTestList, HttpStatus.OK);
 
