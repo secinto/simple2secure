@@ -53,6 +53,7 @@
   "button.show": "Show",
   "button.showRules": "Show Rules",
   "button.addSequence": "Add Sequence",
+  "button.add.sut" : "Add SuT",
   "button.default.config": "Apply group config",
   "button.osquery.config": "Apply group OSQuery config",
   "button.steps.processors.config" : "Apply group steps and processors",

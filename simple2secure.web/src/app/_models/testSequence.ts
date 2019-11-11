@@ -21,7 +21,6 @@
  */
 
 import {Base} from './base';
-import {Test} from './test';
 
 export class TestSequence extends Base {
 	podId = '';

@@ -29,7 +29,8 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
 
-    public abstract List<SystemUnderTest> getByGroupId(String groupId);
+    public abstract List<SystemUnderTest> getByGroupId(String groupId, int page, int size);
     public abstract SystemUnderTest getByName(String name);
+    public abstract long getCountOfSUTWithGroupId(String groupId);
     
 }

@@ -1,6 +1,3 @@
-import { Component } from "@angular/core";
-import { MatDialogConfig } from '@angular/material';
-
 /**
  *********************************************************************
  *   simple2secure is a cyber risk and information security platform.
@@ -22,38 +19,14 @@ import { MatDialogConfig } from '@angular/material';
  *
  *********************************************************************
  */
+import {Base} from './base';
 
-
- @Component({
-     moduleId: module.id,
-     templateUrl: 'orbiterSystemsUnderTestList.component.html'
- })
-
-export class OrbiterSystemsUnderTestListComponent {
-
-    displayedColumns = ['name', 'groupId', 'endDevice', 'version', 'action'];
-
-
-    openDialogShowSuT(type: string): void {
-
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '750px';
-		dialogConfig.data = {
-			//sequence: this.selectedSequence,
-			//type: type,
-			//deviceId: this.id
-		};
-
-		//const dialogRef = this.dialog.open(TestSequenceDetailsComponent, dialogConfig);
-
-        /*
-		dialogRef.afterClosed().subscribe(data => {
-			if (data === true) {
-				this.isSequenceChanged = true;
-				this.loadSequences(this.id, this.currentPage, this.pageSize);
-			}
-		});*/
-
-	}
-
+export class SystemUnderTest extends Base {
+    groupId: string;
+    endDeviceName: string;
+    endDeviceType: string;
+    endDeviceLocation: string;
+    name: string;
+	version: string;
+	timestamp: number;
 }
