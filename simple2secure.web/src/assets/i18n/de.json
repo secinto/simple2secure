@@ -53,6 +53,7 @@
   "button.show": "Anzeigen",
   "button.showRules": "Regeln anzeigen",
   "button.addSequence": "Sequenz hinzufügen",
+  "button.add.sut" : "SiT hinzufügen",
   "button.default.config": "Gruppenkonfiguration übernehmen",
   "button.osquery.config": "OSQuery Gruppenkonfiguration übernehmen",
   "button.steps.processors.config": "Gruppenschritte und Prozessoren übernehmen",
