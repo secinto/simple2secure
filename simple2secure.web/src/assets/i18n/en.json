@@ -217,6 +217,8 @@
   "table.mygroups": "My Groups",
   "table.owner": "Owner",
   "table.group": "Group",
+  "table.groupId" : "Group ID",
+  "table.endDevice" : "End Device",
   "table.of": "of",
   "table.usedLicenses": "Number of the used licenses",
   "table.executable": "Executable",
@@ -390,6 +392,8 @@
   "orbiter.edittests": "Edit test",
   "orbiter.editsequence" : "Edit Sequence",
   "orbiter.sequenceLength": "Sequence length: ",
+  "orbiter.sut" : "Systems Under Test",
+  "orbiter.sut.info" : "Show Systems Under Test",
 
   "group.details": "Group details",
   "group.name.placeholder": "Please enter the group name",

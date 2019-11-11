@@ -80,6 +80,7 @@ import {ConfirmationDialog} from './dialog/confirmation-dialog';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
+import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
 
 
 /**
@@ -170,6 +171,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
+
 
 
 
@@ -319,7 +321,8 @@ export const httpInterceptorProviders = [
 		TestSequenceDetailsComponent,
 		ResendComponent,
 		TestSequenceResultComponent,
-		TestSequenceResultDetailsComponent
+		TestSequenceResultDetailsComponent,
+		OrbiterSystemsUnderTestListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
