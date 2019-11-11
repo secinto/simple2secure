@@ -40,7 +40,7 @@ import {NotificationComponent, NotificationDetailsComponent} from './notificatio
 import {ConfigurationDetailsComponent} from './configuration';
 import {
 	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
-	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
+	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent, UserModalComponent
 } from './user';
 import {
 	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
@@ -89,6 +89,7 @@ import {AlertService, AuthenticationService, DataService, HelperService, HttpSer
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
 import {LoginLayoutComponent} from './_layouts/loginLayout';
 import {NavbarComponent} from './navbar';
+import {SidenavbarComponent} from './navbar';
 
 /**
  * Internal framework components
@@ -128,6 +129,7 @@ import {
 	MatMenuModule,
 	MatIconModule,
 	MatSidenavModule,
+	MatToolbarModule,
 	MatButtonToggleModule,
 	MatTableModule,
 	MatTabsModule,
@@ -256,6 +258,7 @@ export const httpInterceptorProviders = [
 		DashboardLayoutComponent,
 		LoginLayoutComponent,
 		NavbarComponent,
+		SidenavbarComponent,
 		ConfigurationDetailsComponent,
 		NetworkReportOverviewComponent,
 		NetworkConfigurationStepDetailsComponent,
@@ -292,6 +295,7 @@ export const httpInterceptorProviders = [
 		ActivationComponent,
 		ActivatedComponent,
 		NotificationComponent,
+		UserModalComponent,
 		RuleComponent,
 		RuleOverviewComponent,
 		RuleAddComponent,

@@ -28,3 +28,4 @@ export * from './userGroupDialog.component';
 export * from './userGroupApplyConfig.component';
 export * from './user-device-change-group.component';
 export * from './userContextAddDialog.component';
+export * from './userModal.component';
