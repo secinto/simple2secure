@@ -21,6 +21,7 @@
  */
 package com.simple2secure.portal.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import com.simple2secure.api.dto.ReportDTO;
@@ -30,7 +31,13 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class ReportRepository extends MongoRepository<Report> {
 	public abstract List<Report> getReportsByProbeId(String probeId);
 
-	public abstract List<Report> getReportsByName(String name);
+	// public abstract List<Report> getReportsByName(String name);
+
+	public abstract List<Report> getReportsByName(String name, int page, int size);
+
+	public abstract List<Report> getLastReportsFromTimeStampAndName(Date timestamp, String name);
+
+	public abstract long getPagesForReportsByName(String name);
 
 	public abstract ReportDTO getReportsByGroupId(List<String> group_ids, int page, int size);
 

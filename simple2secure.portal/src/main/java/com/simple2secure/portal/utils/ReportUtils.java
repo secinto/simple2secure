@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.maxmind.geoip2.model.CityResponse;
+import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.Coordinates;
 import com.simple2secure.api.model.GraphReport;
@@ -63,30 +64,34 @@ public class ReportUtils {
 	 * @return
 	 */
 	public List<GraphReport> prepareReportsForGraph(String queryName) {
-
-		List<Report> reports = reportRepository.getReportsByName(queryName);
+		int currentPage = 0;
+		int size = ConfigItems.DEFAULT_VALUE_SIZE;
+		long maxPages = reportRepository.getPagesForReportsByName(queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
+		while (currentPage < maxPages) {
+			List<Report> reports = reportRepository.getReportsByName(queryName, currentPage, size);
+			if (reports != null) {
+				for (Report report : reports) {
+					if (report != null) {
+						if (report.getQueryResult() != null) {
+							try {
+								JsonNode node = JSONUtils.fromString(report.getQueryResult());
 
-		if (reports != null) {
-			for (Report report : reports) {
-				if (report != null) {
-					if (report.getQueryResult() != null) {
-						try {
-							JsonNode node = JSONUtils.fromString(report.getQueryResult());
+								int length = report.getQueryResult().length();
+								if (node != null) {
+									length = node.size();
+								}
+								graphReports.add(new GraphReport(report.getId(), report.getQuery(), length, report.getQueryTimestamp().getTime()));
 
-							int length = report.getQueryResult().length();
-							if (node != null) {
-								length = node.size();
+							} catch (Exception e) {
+								log.error("Error occured while trying to parse string to jsonArray: {}", e);
+								e.printStackTrace();
 							}
-							graphReports.add(new GraphReport(report.getId(), report.getQuery(), length, report.getQueryTimestamp().getTime()));
-
-						} catch (Exception e) {
-							log.error("Error occured while trying to parse string to jsonArray: {}", e);
-							e.printStackTrace();
 						}
 					}
 				}
 			}
+			currentPage++;
 		}
 
 		return graphReports;
@@ -146,5 +151,12 @@ public class ReportUtils {
 			}
 		}
 		return preparedReports;
+	}
+
+	public Report getDifferencesForIdWithPrevious(String id) {
+		Report report = reportRepository.find(id);
+		if (report != null) {
+			List<Report> lastReports = reportRepository.getLastReportsFromTimeStampAndName(report.getQueryTimestamp(), report.getName());
+		}
 	}
 }

@@ -88,7 +88,7 @@ public class QueryRunnable implements Runnable {
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
 		// pb.directory(directory);
-		log.debug("Using command {} to execute query", pb.command());
+		log.info("Using command {} to execute query", pb.command());
 		try {
 			p = pb.start();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
