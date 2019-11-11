@@ -36,6 +36,7 @@
     "@types/google.visualization": "0.0.46",
     "A": "0.0.1",
     "agm-direction": "^0.7.5",
+    "angular-admin-lte": "^2.0.1",
     "angular-highcharts": "^7.1.0",
     "angular-material-tree": "^0.2.1",
     "angular-tree-component": "^8.2.0",

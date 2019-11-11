@@ -171,6 +171,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
+import { BoxModule } from 'angular-admin-lte';
 
 
 
@@ -246,7 +247,8 @@ export const httpInterceptorProviders = [
 		NgMatSearchBarModule,
 		Ng4LoadingSpinnerModule.forRoot(),
 		DragDropModule,
-		NgxWidgetGridModule
+		NgxWidgetGridModule,
+		BoxModule
 
 	],
 	declarations: [

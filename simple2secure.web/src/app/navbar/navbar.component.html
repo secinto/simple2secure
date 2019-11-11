@@ -5,27 +5,30 @@
         <ul class="nav navbar-nav centered-nav">
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li>
-                <mat-form-field id="nav-right-custom-language-switcher">
-                    <mat-select id="nav-right-custom-language-switcher-select" [(ngModel)]="currentLang"
-                                (selectionChange)="setLocale($event.value)">
-                        <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages"
-                                    [value]="language.value">
-                            {{language.localeVal}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+
+            <li class="nav-item dropdown dropdown-language" ngbDropdown>
+                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                    <i class="fa fa-language"></i> {{ 'menu.language' | translate }} <b class="caret"></b>
+                </a>
+                <div class="dropdown-menu-right" ngbDropdownMenu>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="setLocale('en')">
+                        {{ 'menu.english' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="setLocale('de')">
+                        {{ 'menu.german' | translate }}
+                    </a>
+                </div>
             </li>
             <li *ngIf="loggedIn">
-                <button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-2x"
+                <button mat-icon-button routerLink="/user" color="white"><i class="fa fa-user fa-lg"
                                                                             aria-hidden="true"></i></button>
             </li>
             <li *ngIf="loggedIn" (click)="openNotificationModal()">
-                <button mat-icon-button color="white"><i class="fa fa-bell fa-2x"
+                <button mat-icon-button color="white"><i class="fa fa-bell fa-lg "
                                                          aria-hidden="true" matBadge="{{this.numOfUnreadNotification}}" matBadgeColor="warn" matBadgePosition="above after"></i></button>
             </li>
             <li *ngIf="loggedIn">
-                <button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-2x"
+                <button mat-icon-button routerLink="/login" color="white"><i class="fas fa-sign-out-alt fa-lg"
                                                                              aria-hidden="true"></i></button>
             </li>
         </ul>

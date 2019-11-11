@@ -160,6 +160,9 @@
   "menu.search": "Search",
   "menu.navigation": "Main Navigation",
   "menu.scheduledTests": "Scheduled Tests",
+  "menu.german": "German",
+  "menu.english": "English",
+  "menu.language": "Language",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",
