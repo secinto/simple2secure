@@ -1,0 +1,54 @@
+<mat-sidenav-container fullscreen>
+    <mat-sidenav mode="side" opened="true">
+        <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
+        <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: {{currentContext.context.name}}</p>
+        <mat-nav-list>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="/report"><img class="img-sidenav" src="assets/icons/communication.png"> {{ 'menu.reports' | translate }}</a>
+                    <ul class="nav-child-list">
+                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/network">{{ 'menu.networkreports' | translate }}</a></li>
+                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/osquery">{{ 'menu.queryReport' | translate }}</a></li>
+                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/testResult">{{ 'menu.testResults' | translate }}</a></li>
+                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/testSequenceResult">{{ 'menu.testSequenceResults' | translate }}</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="/analysis"><img class="img-sidenav" src="assets/icons/analysis.png"> {{ 'menu.analysis' | translate }}</a></li>
+            </ul>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="/email"><img class="img-sidenav" src="assets/icons/email.png"> {{ 'menu.email' | translate }}</a></li>
+                <ul class="nav-child-list">
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/email/rules">{{ 'menu.rules' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/email/config">{{ 'menu.emailConfig' | translate }}</a></li>
+                </ul>
+            </ul>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter"><img class="img-sidenav" src="assets/icons/orbiter.png"> {{ 'menu.orbiter' | translate }}</a></li>
+                <ul class="nav-child-list">
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/test">{{ 'menu.templates' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledTests">{{ 'test.scheduled' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledSequences">{{ 'menu.scheduledSequences' | translate }}</a></li>
+                </ul>
+            </ul>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn && showSettings" mat-list-item routerLink="/settings">
+                    <img class="img-sidenav" src="assets/icons/configuration.png"> {{ 'menu.settings' | translate }}</a></li>
+            </ul>
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <navbar></navbar>
+        <div>
+            <div class="container page-wrap">
+                        <div class="row jumbotron-row">
+                            <div *ngIf="showTitle" class="jumbotron jumbotron-top">
+                                <h2>{{pageTitle}}</h2>
+                            </div>
+                            <alert></alert>
+                            <router-outlet></router-outlet>
+                        </div>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>
