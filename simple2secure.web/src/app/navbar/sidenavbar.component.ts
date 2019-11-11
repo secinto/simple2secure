@@ -48,6 +48,7 @@ export class SidenavbarComponent {
 	showSettings: boolean;
 	returnUrl: string;
 	showTitle: boolean;
+	searchValue: string;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -144,6 +145,12 @@ export class SidenavbarComponent {
 		else {
 			this.alertService.error(this.translate.instant('server.notresponding'));
 			this.authenticationService.logout();
+		}
+	}
+
+	navigateToTheSearchPage() {
+		if (this.searchValue.trim()){
+			this.router.navigate(['search', this.searchValue]);
 		}
 	}
 }

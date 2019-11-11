@@ -59,7 +59,6 @@ export class NavbarComponent {
 	private timer;
 	showNotifications: boolean;
 	showUserModal: boolean;
-	searchBarControl: FormControl = new FormControl('');
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -159,12 +158,6 @@ export class NavbarComponent {
 		}
 		else{
 			this.showUserModal = true;
-		}
-	}
-
-	navigateToTheSearchPage(searchString: any) {
-		if (searchString.trim()){
-			this.router.navigate(['search', searchString]);
 		}
 	}
 

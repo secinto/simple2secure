@@ -502,3 +502,7 @@ tree-viewport{
 .mat-expansion-panel-header-description{
     flex-basis: 0 !important;
 }
+
+mat-sidenav-content{
+    margin-left: 0px !important;
+}

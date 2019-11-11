@@ -157,6 +157,9 @@
   "menu.emailConfig": "Email Configuration",
   "menu.addRule": "Add rule",
   "menu.scheduledSequences": "Scheduled Sequences",
+  "menu.search": "Search",
+  "menu.navigation": "Main Navigation",
+  "menu.scheduledTests": "Scheduled Tests",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",

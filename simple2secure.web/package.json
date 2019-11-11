@@ -75,6 +75,7 @@
     "ngx-stepper": "^1.1.6",
     "ngx-tree-select": "^0.13.3",
     "ngx-treeview": "^6.0.2",
+    "ngx-widget-grid": "^6.0.2",
     "nl2br-pipe": "^1.0.3",
     "npm": "^6.6.0",
     "popper.js": "^1.14.6",
