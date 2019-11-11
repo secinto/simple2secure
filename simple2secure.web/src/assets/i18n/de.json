@@ -214,6 +214,8 @@
   "table.owner": "Besitzer",
   "table.of": "von",
   "table.group": "Gruppe",
+  "table.groupId" : "Gruppe ID",
+  "table.endDevice" : "Endgerät",
   "table.usedLicenses": "Anzahl der verwendeten Lizenzen",
   "table.executable": "Ausführbar",
   "table.prefix": "Prefix",
@@ -386,6 +388,8 @@
   "orbiter.edittests": "Tests bearbeiten",
   "orbiter.editsequence": "Sequenz bearbeiten",
   "orbiter.sequenceLength": "Sequenzlänge: ",
+  "orbiter.sut" : "Systeme im Test",
+  "orbiter.sut.info" : "Systeme im Test anzeigen",
 
   "group.details": "Gruppendetails",
   "group.name.placeholder": "Bitte geben Sie den Gruppennamen ein",

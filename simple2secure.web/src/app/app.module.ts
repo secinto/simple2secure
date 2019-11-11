@@ -167,6 +167,7 @@ import {CarouselModule} from 'ngx-carousel-lib';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
+import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
 
 
 
@@ -313,7 +314,8 @@ export const httpInterceptorProviders = [
 		TestSequenceDetailsComponent,
 		ResendComponent,
 		TestSequenceResultComponent,
-		TestSequenceResultDetailsComponent
+		TestSequenceResultDetailsComponent,
+		OrbiterSystemsUnderTestListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
