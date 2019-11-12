@@ -59,6 +59,7 @@ public class QueryScheduler extends TimerTask {
 	@Override
 	public void run() {
 		try {
+			log.debug("Checking scheduled queries");
 			/*
 			 * Check if one of the currently running ones is not contained in the currentQueries anymore. All not available ones are canceled.
 			 */

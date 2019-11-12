@@ -33,18 +33,8 @@
     padding: 15px 0px 0px 0px;
 }
 
-.navbar-right li {
-    height: auto;
-    width: auto;
-}
-
 .navbar-right a {
     color: white;
-}
-
-#nav-right-custom-language-switcher {
-    max-width: 50px;
-    font-weight: bold;
 }
 
 #current-context-id {
@@ -59,26 +49,19 @@
 
 /* ############### onHover effects ###############
 		 Navigation item on hover effect */
-.navbar-nav li:hover {
-    -webkit-transform: scale(1.1); /* Safari and Chrome */
-    -moz-transform: scale(1.1); /* Firefox */
-    -ms-transform: scale(1.1); /* IE 9 */
-    -o-transform: scale(1.1); /* Opera */
-    transform: scale(1.1);
-    cursor: pointer;
-}
-
-.navbar-right li:hover {
-    -webkit-transform: scale(1.1); /* Safari and Chrome */
-    -moz-transform: scale(1.1); /* Firefox */
-    -ms-transform: scale(1.1); /* IE 9 */
-    -o-transform: scale(1.1); /* Opera */
-    transform: scale(1.1);
-}
 
 #search-bar{
     padding-top: 18px;
     padding-right: 10px;
+}
+
+.dropdown-language a{
+    color: #A7BD26 !important;
+    background: rgba(0,0,0,0);
+}
+
+.dropdown-language a:hover{
+    background: rgba(0,0,0,0);
 }
 
 

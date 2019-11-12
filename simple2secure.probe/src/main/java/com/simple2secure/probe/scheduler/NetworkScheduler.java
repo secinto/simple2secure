@@ -42,6 +42,7 @@ public class NetworkScheduler extends TimerTask {
 
 	private static Logger log = LoggerFactory.getLogger(NetworkScheduler.class);
 	private NetworkMonitor monitor;
+	private boolean filterApplied = false;
 
 	public NetworkScheduler(NetworkMonitor monitor) {
 		this.monitor = monitor;
@@ -59,6 +60,7 @@ public class NetworkScheduler extends TimerTask {
 	 */
 	private void getNetworkStatistics() {
 		try {
+			log.debug("Obtaining current network statistics from Pcap driver");
 			PcapStat statistics = monitor.getReceiverHandle().getStats();
 			NetworkReport report = new NetworkReport();
 			report.setStartTime(new Date());
@@ -84,7 +86,12 @@ public class NetworkScheduler extends TimerTask {
 			/*
 			 * TODO: Verification of BPF expression must be made online during the creation. We assume that they are correct.
 			 */
-			monitor.getReceiverHandle().setFilter("not (host 127.0.0.1 and port (8080 or 8443 or 9000))", BpfCompileMode.OPTIMIZE);
+			if (!filterApplied) {
+				log.debug("Applying network filter");
+				monitor.getReceiverHandle().setFilter(
+						"not (host 127.0.0.1 and host simple2secure.info and port (8080 or 8443 or 9000 or 51003 or 51001))", BpfCompileMode.OPTIMIZE);
+				filterApplied = true;
+			}
 		} catch (Exception e) {
 			log.error("Couldn't apply filter for reason {}", e.getCause());
 		}

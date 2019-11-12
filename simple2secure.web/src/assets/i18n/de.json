@@ -161,6 +161,9 @@
   "menu.search": "Suchen",
   "menu.navigation": "Hauptnavigation",
   "menu.scheduledTests": "Geplannte Tests",
+  "menu.german": "Deutsch",
+  "menu.english": "Englisch",
+  "menu.language": "Sprache",
 
   "account.activated": "Ihr Konto wurde bereits aktiviert!",
   "account.login": "Melden Sie sich mit dem folgenden Button im Portal an.",
