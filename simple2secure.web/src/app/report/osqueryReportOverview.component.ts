@@ -34,6 +34,7 @@ import {QueryReport} from '../_models/queryReport';
 import {ReportDTO} from '../_models/DTO/reportDTO';
 import {merge, tap} from 'rxjs/operators';
 import {PageEvent} from '@angular/material/paginator';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
 	moduleId: module.id,
@@ -47,7 +48,7 @@ export class OsQueryReportOverviewComponent {
 	selectedReport: any;
 	currentUser: any;
 	loading = false;
-	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
+	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
 	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -55,6 +56,9 @@ export class OsQueryReportOverviewComponent {
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
+	selection = new SelectionModel<any>(true, []);
+	showDeleteButton = false;
+	numSelected = 0;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -172,5 +176,55 @@ export class OsQueryReportOverviewComponent {
 
 		this.dialog.open(OsQueryReportDetailsComponent, dialogConfig);
 
+	}
+
+	/** Whether the number of selected elements matches the total number of rows. */
+	isAllSelected() {
+		this.numSelected = this.selection.selected.length;
+		const numRows = this.dataSource.data.length;
+
+		if (this.numSelected > 0){
+			this.showDeleteButton = true;
+		}
+		else{
+			this.showDeleteButton = false;
+		}
+
+		return this.numSelected === numRows;
+	}
+
+	/** Selects all rows if they are not all selected; otherwise clear selection. */
+	masterToggle() {
+		this.isAllSelected() ?
+			this.selection.clear() :
+			this.dataSource.data.forEach(row => this.selection.select(row));
+	}
+
+	/** The label for the checkbox on the passed row */
+	checkboxLabel(row?: any): string {
+		if (!row) {
+			return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+		}
+		return `${this.selection.isSelected(row) ? 'deselect' : 'select'}`;
+	}
+
+	deleteSelectedReports(){
+		this.loading = true;
+		this.httpService.post(this.selection.selected, environment.apiEndpoint + 'reports/delete/selected').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.report.delete'));
+				this.loadAllReports(this.currentPage, this.pageSize);
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+		this.selection.clear();
 	}
 }

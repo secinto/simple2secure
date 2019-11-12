@@ -263,4 +263,22 @@ public class ReportController {
 		log.error("Error occured while retrieving reports for geolocation");
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/selected", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports,
+			@RequestHeader("Accept-Language") String locale) {
+		if (queryReports != null) {
+			for (Report queryReport : queryReports) {
+				Report dbReport = reportsRepository.find(queryReport.getId());
+				if (dbReport != null) {
+					reportsRepository.delete(dbReport);
+				}
+			}
+			return new ResponseEntity<>(queryReports, HttpStatus.OK);
+		}
+		log.error("Error occured while deleting selected network reports!");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
+	}
 }

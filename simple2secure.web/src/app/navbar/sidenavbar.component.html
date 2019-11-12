@@ -2,17 +2,13 @@
     <mat-sidenav mode="side" opened="true">
         <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
         <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: {{currentContext.context.name}}</p>
-        <mat-form-field class="search-bar-input">
-            <input matInput placeholder="{{'menu.search' | translate}}" (keyup.enter)="navigateToTheSearchPage()" [(ngModel)]="searchValue">
-            <span matSuffix><i class="material-icons mat-icon-sidenav">search</i></span>
-        </mat-form-field>
         <mat-divider></mat-divider>
         <p class="main-navigation-header">{{"menu.navigation" | translate}}</p>
         <mat-nav-list>
             <ul class="nav-parent-list">
                 <li><a *ngIf="loggedIn" mat-list-item routerLink="/report"><img class="img-sidenav" src="assets/icons/communication.png"> {{ 'menu.reports' | translate }}</a>
                     <ul class="nav-child-list">
-                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/network">{{ 'menu.networkreports' | translate }}</a></li>
+                        <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/network/">{{ 'menu.networkreports' | translate }}</a></li>
                         <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/osquery">{{ 'menu.queryReport' | translate }}</a></li>
                         <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/testResult">{{ 'menu.testResults' | translate }}</a></li>
                         <li><a *ngIf="loggedIn" mat-list-item routerLink="/report/testSequenceResult">{{ 'menu.testSequenceResults' | translate }}</a></li>
@@ -48,13 +44,10 @@
         <navbar></navbar>
         <div>
             <div class="container page-wrap">
-                        <div class="row jumbotron-row">
-                            <div *ngIf="showTitle" class="jumbotron jumbotron-top">
-                                <h2>{{pageTitle}}</h2>
-                            </div>
-                            <alert></alert>
-                            <router-outlet></router-outlet>
-                        </div>
+                <div class="row jumbotron-row">
+                    <alert></alert>
+                    <router-outlet></router-outlet>
+                </div>
             </div>
         </div>
     </mat-sidenav-content>

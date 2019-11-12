@@ -68,40 +68,40 @@ const appRoutes: Routes = [
 			{
 				path: 'analysis',
 				component: AnalysisComponent,
-				data: {title: 'menu.analysis'}
+				data: {title: 'menu.analysis', breadcrumb: 'Analysis'}
 			},
 			{
 				path: 'report',
 				component: ReportComponent,
-				data: {title: 'menu.reports'},
+				data: {title: 'menu.reports', breadcrumb: 'Reports'},
 				children: [
-					{path: '', component: ReportOverviewComponent, data: {title: 'menu.reports'}},
-					{path: 'network', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports'}},
+					{path: '', component: ReportOverviewComponent, data: {title: 'menu.reports', breadcrumb: 'Dashboard'}},
+					{path: 'network', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports', breadcrumb: 'Network'}},
 					{path: 'network/:id', component: NetworkReportDetailsComponent, data: {title: 'networkreport.details'}},
-					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport'}},
+					{path: 'osquery', component: OsQueryReportOverviewComponent, data: {title: 'menu.queryReport', breadcrumb: 'OsQuery'}},
 					{path: 'osquery/:id', component: OsQueryReportDetailsComponent, data: {title: 'menu.queryReportDetails'}},
-					{path: 'testResult', component: TestResultComponent, data: {title: 'menu.testResults'}},
-					{path: 'testSequenceResult', component: TestSequenceResultComponent, data: {title: 'menu.testSequenceResults'}},
+					{path: 'testResult', component: TestResultComponent, data: {title: 'menu.testResults', breadcrumb: 'Test Results'}},
+					{path: 'testSequenceResult', component: TestSequenceResultComponent, data: {title: 'menu.testSequenceResults', breadcrumb: 'Sequence Results'}},
 				]
 			},
 			{
 				path: 'orbiter',
 				component: OrbiterComponent,
-				data: {title: 'menu.orbiter'},
+				data: {title: 'menu.orbiter', breadcrumb: 'Orbiter'},
 				children: [
-					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter'}},
-					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests'}},
+					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter', breadcrumb: 'Dashboard'}},
+					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Tests'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
-					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled'}},
+					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled', breadcrumb: 'Scheduled Tests'}},
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
-					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled'}},
-					{path: 'sut', component: OrbiterSystemsUnderTestListComponent, data : {title: 'orbiter.sut'}},
+					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled', breadcrumb: 'Scheduled Sequences'}},
+					{path: 'sut', component: OrbiterSystemsUnderTestListComponent, data : {title: 'orbiter.sut', breadcrumb: 'System Under Test'}},
 				]
 			},
 			{
 				path: 'user',
 				component: UserComponent,
-				data: {title: 'menu.users'},
+				data: {title: 'menu.users', breadcrumb: 'User'},
 				children: [
 					{path: '', component: UserOverviewComponent},
 					{path: ':id', component: UserDetailsComponent},
@@ -111,25 +111,25 @@ const appRoutes: Routes = [
 			{
 				path: 'email',
 				component: EmailComponent,
-				data: {title: 'menu.email'},
+				data: {title: 'menu.email', breadcrumb: 'Email'},
 				children: [
-					{path: '', component: EmailRuleOverviewComponent, data: {title: 'menu.email'}},
-					{path: 'config', component: EmailOverviewComponent, data: {title: 'menu.emailConfig'}},
-					{path: 'rules', component: RuleOverviewComponent, data: {title: 'menu.rules'}},
+					{path: '', component: EmailRuleOverviewComponent, data: {title: 'menu.email', breadcrumb: 'Dashboard'}},
+					{path: 'config', component: EmailOverviewComponent, data: {title: 'menu.emailConfig', breadcrumb: 'Configuration'}},
+					{path: 'rules', component: RuleOverviewComponent, data: {title: 'menu.rules', breadcrumb: 'Rules'}},
 				]
 			},
 			{
 				path: 'settings',
 				component: SettingsComponent,
 				canActivate: [AuthGuard, RoleGuard],
-				data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN},
+				data: {title: 'menu.settings', expectedRole: UserRole.SUPERADMIN, breadcrumb: 'Settings'},
 			},
 			{
 				path: 'search',
 				component: SearchComponent,
-				data: {title: 'menu.searchResults'},
+				data: {title: 'menu.searchResults', breadcrumb: 'Search'},
 				children: [
-					{path: ':searchquery', component: SearchResultComponent, data: {title: 'menu.searchResults'}},
+					{path: ':searchquery', component: SearchResultComponent, data: {title: 'menu.searchResults', breadcrumb: 'Results'}},
 				]
 			}
 		]

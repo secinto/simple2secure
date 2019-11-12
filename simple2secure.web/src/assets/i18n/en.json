@@ -120,7 +120,7 @@
   "menu.emails": "Emails",
   "menu.users": "Users",
   "menu.overview": "Overview",
-  "menu.logout": "LOGOUT",
+  "menu.logout": "Logout",
   "menu.group": "Group",
   "menu.generalConfig": "General Configuration", 
   "menu.updateConfig": "Update Configuration",  
@@ -442,5 +442,7 @@
   "notifications.empty": "Notifications not provided",
 
   "title.hits": "hits",
-  "title.notification": "Notification"
+  "title.notification": "Notification",
+
+  "button.deleteSelected": "Delete {{count}} selected"
 }

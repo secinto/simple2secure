@@ -3,6 +3,7 @@
     color: #A7BD26;
     border-bottom: 1px solid #A7BD26;
     max-height: 64px;
+    left: 8%;
 }
 
 .navbar .navbar-nav {
@@ -29,8 +30,7 @@
     float: right;
     display: inline-block;
     max-width: 20%;
-    margin-right: 0px;
-    padding: 15px 0px 0px 0px;
+    margin-right: 8%;
 }
 
 .navbar-right a {
@@ -63,6 +63,43 @@
 .dropdown-language a:hover{
     background: rgba(0,0,0,0);
 }
+
+.dropdown-user a{
+    color: #A7BD26 !important;
+    background: rgba(0,0,0,0);
+    text-align: center;
+}
+
+.dropdown-user a:hover{
+    background: rgba(0,0,0,0);
+}
+
+.dropdown-user p{
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.dropdown-user ul{
+    padding-inline-start: 10px !important;
+}
+
+.notification-icon{
+    margin-top: 5px;
+}
+
+.navbar-header{
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+.breadcrumb-item{
+    color: #A7BD26 !important;
+}
+
+a{
+    color: #a7bd26 !important;
+}
+
 
 
 

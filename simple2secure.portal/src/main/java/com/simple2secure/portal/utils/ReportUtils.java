@@ -158,5 +158,6 @@ public class ReportUtils {
 		if (report != null) {
 			List<Report> lastReports = reportRepository.getLastReportsFromTimeStampAndName(report.getQueryTimestamp(), report.getName());
 		}
+		return report;
 	}
 }

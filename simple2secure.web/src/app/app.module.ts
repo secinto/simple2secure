@@ -172,9 +172,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
-
-
-
+import {BreadcrumbsModule} from "ng6-breadcrumbs";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -248,7 +246,8 @@ export const httpInterceptorProviders = [
 		Ng4LoadingSpinnerModule.forRoot(),
 		DragDropModule,
 		NgxWidgetGridModule,
-		BoxModule
+		BoxModule,
+		BreadcrumbsModule
 
 	],
 	declarations: [

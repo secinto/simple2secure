@@ -48,7 +48,6 @@ export class SidenavbarComponent {
 	showSettings: boolean;
 	returnUrl: string;
 	showTitle: boolean;
-	searchValue: string;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -67,13 +66,6 @@ export class SidenavbarComponent {
 		this.pageTitle = this.titleService.getTitle();
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.currentContext = JSON.parse(localStorage.getItem('context'));
-
-		if (this.pageTitle == 'simple2secure Portal'){
-			this.showTitle = false;
-		}
-		else{
-			this.showTitle = true;
-		}
 
 		if (this.currentUser && this.currentContext) {
 			this.loggedIn = true;
@@ -145,12 +137,6 @@ export class SidenavbarComponent {
 		else {
 			this.alertService.error(this.translate.instant('server.notresponding'));
 			this.authenticationService.logout();
-		}
-	}
-
-	navigateToTheSearchPage() {
-		if (this.searchValue.trim()){
-			this.router.navigate(['search', this.searchValue]);
 		}
 	}
 }
