@@ -48,6 +48,9 @@ export class SidenavbarComponent {
 	showSettings: boolean;
 	returnUrl: string;
 	showTitle: boolean;
+	showReportsSubmenu: boolean;
+	showEmailsSubmenu: boolean;
+	showOrbiterSubmenu: boolean;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -60,6 +63,9 @@ export class SidenavbarComponent {
 	            private dialog: MatDialog)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+		this.showReportsSubmenu = false;
+		this.showEmailsSubmenu = false;
+		this.showOrbiterSubmenu = false;
 	}
 
 	ngDoCheck() {
@@ -137,6 +143,24 @@ export class SidenavbarComponent {
 		else {
 			this.alertService.error(this.translate.instant('server.notresponding'));
 			this.authenticationService.logout();
+		}
+	}
+
+	collapseMenu(parent: string){
+		if (parent == 'menu-reports'){
+			this.showReportsSubmenu = true;
+			this.showEmailsSubmenu = false;
+			this.showOrbiterSubmenu = false;
+		}
+		else if (parent == 'menu-emails'){
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = true;
+			this.showOrbiterSubmenu = false;
+		}
+		else if (parent == 'menu-orbiter'){
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = false;
+			this.showOrbiterSubmenu = true;
 		}
 	}
 }

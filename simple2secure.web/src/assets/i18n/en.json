@@ -414,6 +414,7 @@
   "pod.change.group": "Change group",
   "pod.notfound": "Pods not found",
   "pod.notfound.info": "Only activated pods are listed",
+  "pod.active": "Active pods",
 
   "user.notfound": "User not found",
   "user.notfound.info": "Click on the button above to add new user",

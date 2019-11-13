@@ -1,3 +1,17 @@
-<div class="container">
-
+<div class="example-container">
+    <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
+                     [showGrid]="false" (widgetPositionChange)="onWidgetChange($event)">
+        <ngx-widget [position]="{top: 1,left: 1,height: 1,width: 1}"
+                    [movable]="true" [resizable]="false">
+            <app-stat [bgClass]="'info'" [icon]="'fa-server'" [count]="1" [label]="'Active Probes'"></app-stat>
+        </ngx-widget>
+        <ngx-widget [position]="{top: 1,left: 3,height: 1,width: 1}"
+                    [movable]="true" [resizable]="false">
+            <app-stat [bgClass]="'secinto'" [icon]="'fa-satellite'" [count]="13" [label]="'Active Pods'"></app-stat>
+        </ngx-widget>
+        <ngx-widget [position]="{top: 1,left: 5,height: 1,width: 1}"
+                    [movable]="true" [resizable]="false">
+            <app-stat [bgClass]="'info'" [icon]="'fa-user'" [count]="1" [label]="'Active users'"></app-stat>
+        </ngx-widget>
+    </ngx-widget-grid>
 </div>

@@ -414,6 +414,7 @@
   "pod.change.group": "Gruppe wechseln",
   "pod.notfound": "Pods nicht gefunden",
   "pod.notfound.info": "Klicken Sie auf die Schaltfläche oben, um das Probe herunterzuladen",
+  "pod.active": "Aktive Pods",
 
   "user.notfound": "Benutzer nicht gefunden",
   "user.notfound.info": "Klicken Sie auf die Schaltfläche oben, um einen neuen Benutzer hinzuzufügen",

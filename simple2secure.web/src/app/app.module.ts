@@ -173,6 +173,7 @@ import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
 import {BreadcrumbsModule} from "ng6-breadcrumbs";
+import {StatComponent} from './widgets/stat.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -323,7 +324,8 @@ export const httpInterceptorProviders = [
 		ResendComponent,
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
-		OrbiterSystemsUnderTestListComponent
+		OrbiterSystemsUnderTestListComponent,
+		StatComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
