@@ -172,6 +172,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
+import { SUTDetailsComponent } from './orbiter/sutDetails.component';
 
 
 
@@ -324,7 +325,8 @@ export const httpInterceptorProviders = [
 		ResendComponent,
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
-		OrbiterSystemsUnderTestListComponent
+		OrbiterSystemsUnderTestListComponent,
+		SUTDetailsComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -348,7 +350,8 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
-		TestSequenceResultDetailsComponent
+		TestSequenceResultDetailsComponent,
+		SUTDetailsComponent
 	],
 	providers: [
 		AuthGuard,

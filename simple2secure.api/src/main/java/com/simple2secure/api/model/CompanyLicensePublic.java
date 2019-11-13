@@ -21,6 +21,7 @@
  */
 package com.simple2secure.api.model;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -55,7 +56,8 @@ public class CompanyLicensePublic extends GenericDBObject {
 	@JsonProperty
 	protected boolean deviceIsPod = false;
 
-	protected String hostname;
+	@Embedded
+	protected DeviceInfo deviceInfo;
 
 	protected DeviceStatus status = DeviceStatus.UNKNOWN;
 
@@ -79,14 +81,14 @@ public class CompanyLicensePublic extends GenericDBObject {
 		this.deviceId = deviceId;
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, String hostname) {
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, DeviceInfo deviceInfo) {
 		this(groupId, licenseId, expirationDate, deviceId);
-		this.hostname = hostname;
+		this.deviceInfo = deviceInfo;
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, String hostname,
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, DeviceInfo deviceInfo,
 			String accessToken) {
-		this(groupId, licenseId, expirationDate, deviceId, hostname);
+		this(groupId, licenseId, expirationDate, deviceId, deviceInfo);
 		this.accessToken = accessToken;
 	}
 
@@ -145,13 +147,13 @@ public class CompanyLicensePublic extends GenericDBObject {
 	public void setExpirationDate(String expirationDate) {
 		this.expirationDate = expirationDate;
 	}
-
-	public String getHostname() {
-		return hostname;
+	
+	public DeviceInfo getDeviceInfo() {
+		return deviceInfo;
 	}
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setDeviceInfo(DeviceInfo deviceInfo) {
+		this.deviceInfo = deviceInfo;
 	}
 
 	public DeviceStatus getStatus() {

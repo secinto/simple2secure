@@ -119,7 +119,7 @@ public class DeviceUtils {
 								licenseRepository.save(license);
 							}
 
-							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus,
+							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getDeviceInfo().getHostname(), deviceStatus,
 									license.isDevicePod());
 							myDevices.add(probe);
 						}
@@ -163,7 +163,7 @@ public class DeviceUtils {
 							licenseRepository.save(license);
 						}
 						CompanyGroup group = groupRepository.find(license.getGroupId());
-						Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
+						Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getDeviceInfo().getHostname(), deviceStatus, true);
 						myDevices.add(device);
 					}
 				}

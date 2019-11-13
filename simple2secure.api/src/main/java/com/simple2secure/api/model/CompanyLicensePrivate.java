@@ -62,7 +62,7 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, deviceId);
 		publicLicense.setActivated(activated);
 		publicLicense.setAccessToken(accessToken);
-		publicLicense.setHostname(hostname);
+		publicLicense.setDeviceInfo(deviceInfo);
 		publicLicense.setStatus(status);
 		return publicLicense;
 	}

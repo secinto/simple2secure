@@ -282,11 +282,11 @@ public class TestController {
 					String test_content = test.getTest_content().replace("\'", "\"");
 					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
 							TestStatus.PLANNED, System.currentTimeMillis());
-					testRun.setHostname(license.getHostname());
+					testRun.setHostname(license.getDeviceInfo().getHostname());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(
-							test.getName() + " has been scheduled for the execution manually using the pod " + license.getHostname(),
+							test.getName() + " has been scheduled for the execution manually using the pod " + license.getDeviceInfo().getHostname(),
 							group.getContextId());
 
 					return new ResponseEntity<>(testRun, HttpStatus.OK);

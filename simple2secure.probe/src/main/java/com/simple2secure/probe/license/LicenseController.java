@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.file.FileUtil;
@@ -254,7 +255,10 @@ public class LicenseController {
 			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, ProbeConfiguration.probeId);
 		}
 		storedLicense.setStatus(DeviceStatus.ONLINE);
-		storedLicense.setHostname(ProbeConfiguration.hostname);
+		
+		DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.ipAddress, ProbeConfiguration.netmask);
+		
+		storedLicense.setDeviceInfo(deviceInfo);
 		/*
 		 * Update the license in the local DB.
 		 */

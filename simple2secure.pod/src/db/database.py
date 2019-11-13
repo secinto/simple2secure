@@ -24,6 +24,17 @@ class PodInfo(db.Model):
         self.hash_value_service = ""
 
 
+class DeviceInfo(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    hostName = db.Column(db.Text)
+    ipAddress = db.Column(db.Text)
+    netMask = db.Column(db.Text)
+
+    def __init__(self, hostName, ipAddress, netMask):
+        self.hostName = hostName
+        self.ipAddress = ipAddress
+        self.netMask = netMask
+
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     podId = db.Column(db.Text)
@@ -104,17 +115,17 @@ class CompanyLicensePublic(db.Model):
     licenseId = db.Column(db.Text)
     deviceId = db.Column(db.Text)
     accessToken = db.Column(db.Text)
-    hostname = db.Column(db.Text)
+    db.Column('deviceInfo', db.ForeignKey('DeviceInfo.id'))
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
     deviceIsPod = db.Column(db.Boolean)
 
-    def __init__(self, group_id, license_id, pod_id, expiration_date, hostname):
+    def __init__(self, group_id, license_id, pod_id, expiration_date, deviceInfo):
         self.groupId = group_id
         self.licenseId = license_id
         self.deviceId = pod_id
         self.expirationDate = expiration_date
-        self.hostname = hostname
+        self.deviceInfo = deviceInfo
         self.activated = False
         self.accessToken = ""
         self.deviceIsPod = True
