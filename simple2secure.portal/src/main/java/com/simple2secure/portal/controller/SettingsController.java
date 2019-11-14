@@ -41,11 +41,13 @@ import com.simple2secure.api.dto.SettingsDTO;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
+import com.simple2secure.api.model.Widget;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TestMacroRepository;
+import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
@@ -64,20 +66,22 @@ public class SettingsController {
 	TestMacroRepository testMacroRepository;
 
 	@Autowired
+	WidgetRepository widgetRepository;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<SettingsDTO> getSettings(@RequestHeader("Accept-Language") String locale) {
 		List<Settings> settings = settingsRepository.findAll();
 		List<LicensePlan> licensePlans = licensePlanRepository.findAll();
 		List<TestMacro> testMacros = testMacroRepository.findAll();
+		List<Widget> widgets = widgetRepository.findAll();
 		if (settings != null) {
 			if (settings.size() == 1) {
-				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros), HttpStatus.OK);
+				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros, widgets), HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving settings");
@@ -87,10 +91,7 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -104,10 +105,7 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/licensePlan",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -125,9 +123,7 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/licensePlan/{licensePlanId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/licensePlan/{licensePlanId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable("licensePlanId") String licensePlanId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -146,9 +142,7 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/testmacro/{testMacroId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/testmacro/{testMacroId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable("testMacroId") String testMacroId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -167,10 +161,7 @@ public class SettingsController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/testmacro",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/testmacro", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {

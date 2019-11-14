@@ -506,3 +506,26 @@ tree-viewport{
 mat-sidenav-content{
     margin-left: 0px !important;
 }
+
+.mat-table-cb-header{
+    width: 5%;
+}
+
+.mat-table-cb-content{
+    width: 5%;
+}
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background{
+    background-color: #a7bd26 !important;
+}
+
+.delete-button-table{
+    width: 20%;
+    margin-top: 5px !important;
+    margin-left: 5px !important;
+}
+
+ngx-widget-grid{
+    width: 70% !important;
+    height: 80% !important;
+}

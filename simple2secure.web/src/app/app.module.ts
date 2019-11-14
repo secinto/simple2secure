@@ -173,9 +173,9 @@ import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
 import { SUTDetailsComponent } from './orbiter/sutDetails.component';
-
-
-
+import {BreadcrumbsModule} from "ng6-breadcrumbs";
+import {StatComponent} from './widgets/stat.component';
+import {NotificationCardComponent} from './widgets/notification-card.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -249,7 +249,8 @@ export const httpInterceptorProviders = [
 		Ng4LoadingSpinnerModule.forRoot(),
 		DragDropModule,
 		NgxWidgetGridModule,
-		BoxModule
+		BoxModule,
+		BreadcrumbsModule
 
 	],
 	declarations: [
@@ -327,6 +328,8 @@ export const httpInterceptorProviders = [
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
 		SUTDetailsComponent
+		StatComponent,
+		NotificationCardComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -350,8 +353,8 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
-		TestSequenceResultDetailsComponent,
 		SUTDetailsComponent
+		TestSequenceResultDetailsComponent
 	],
 	providers: [
 		AuthGuard,

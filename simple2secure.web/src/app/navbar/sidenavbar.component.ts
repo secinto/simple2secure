@@ -48,7 +48,9 @@ export class SidenavbarComponent {
 	showSettings: boolean;
 	returnUrl: string;
 	showTitle: boolean;
-	searchValue: string;
+	showReportsSubmenu: boolean;
+	showEmailsSubmenu: boolean;
+	showOrbiterSubmenu: boolean;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -61,19 +63,15 @@ export class SidenavbarComponent {
 	            private dialog: MatDialog)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+		this.showReportsSubmenu = false;
+		this.showEmailsSubmenu = false;
+		this.showOrbiterSubmenu = false;
 	}
 
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.currentContext = JSON.parse(localStorage.getItem('context'));
-
-		if (this.pageTitle == 'simple2secure Portal'){
-			this.showTitle = false;
-		}
-		else{
-			this.showTitle = true;
-		}
 
 		if (this.currentUser && this.currentContext) {
 			this.loggedIn = true;
@@ -148,9 +146,21 @@ export class SidenavbarComponent {
 		}
 	}
 
-	navigateToTheSearchPage() {
-		if (this.searchValue.trim()){
-			this.router.navigate(['search', this.searchValue]);
+	collapseMenu(parent: string){
+		if (parent == 'menu-reports'){
+			this.showReportsSubmenu = true;
+			this.showEmailsSubmenu = false;
+			this.showOrbiterSubmenu = false;
+		}
+		else if (parent == 'menu-emails'){
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = true;
+			this.showOrbiterSubmenu = false;
+		}
+		else if (parent == 'menu-orbiter'){
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = false;
+			this.showOrbiterSubmenu = true;
 		}
 	}
 }

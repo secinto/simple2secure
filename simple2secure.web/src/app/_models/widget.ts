@@ -20,38 +20,13 @@
  *********************************************************************
  */
 
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {User} from '../_models/index';
-import {NgxWidgetGridComponent, WidgetPositionChange} from 'ngx-widget-grid';
+import {Base} from './base';
 
-@Component({
-	styleUrls: ['home.component.scss'],
-	moduleId: module.id,
-	templateUrl: 'home.component.html'
-})
-
-export class HomeComponent implements OnInit {
-	currentUser: User;
-	users: User[] = [];
-	@ViewChild('grid') grid: NgxWidgetGridComponent;
-
-	constructor() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-	}
-
-	ngOnInit() {
-		console.log(this.grid.getNextPosition());
-	}
-
-	ngAfterViewInit(){
-		console.log(this.grid.getNextPosition());
-	}
-
-	onWidgetChange(event: WidgetPositionChange) {
-		console.log(event);
-	}
-
-	addWidget(){
-		console.log("Adding new widget");
-	}
+export class Widget extends Base {
+	name: string;
+	description: string;
+	tag: string;
+	bgClass: string;
+	icon: string;
+	label: string;
 }

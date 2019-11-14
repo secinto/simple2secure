@@ -113,9 +113,20 @@
     background-color: rgb(140, 198, 0);
 }
 
-.first-widget{
-    top: 2;
-    left: 2;
-    height: 1;
-    width: 1;
+.dashboard-container {
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 100%;
+    .dashboard-page {
+        flex: 1 1 auto;
+        position: relative;
+    }
+}
+
+ngx-widget-grid{
+    margin-top: 50px;
+}
+
+.btn-add-widget{
+    max-width: 180px;
 }

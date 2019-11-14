@@ -38,7 +38,6 @@ export class AppComponent implements OnInit {
 			.filter((route) => route.outlet === 'primary')
 			.mergeMap((route) => route.data)
 			.subscribe((event) => {
-
 				if (event['title']){
 					this.translate.get(event['title']).subscribe((translated: string) => {
 						this.titleService.setTitle(translated);
@@ -47,7 +46,6 @@ export class AppComponent implements OnInit {
 				else{
 					this.titleService.setTitle(this.translatedTitle);
 				}
-
 			});
 	}
 }

@@ -74,7 +74,7 @@ export class SearchResultComponent implements OnInit{
                 private dialog: MatDialog,
                 private spinnerService: Ng4LoadingSpinnerService){
 
-        this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
 
     ngOnInit() {

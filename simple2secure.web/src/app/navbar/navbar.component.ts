@@ -59,6 +59,7 @@ export class NavbarComponent {
 	private timer;
 	showNotifications: boolean;
 	showUserModal: boolean;
+	searchValue: string;
 
 	languages: Language[] = [
 		{value: 'en', viewValue: 'English', localeVal: 'EN'},
@@ -161,5 +162,9 @@ export class NavbarComponent {
 		}
 	}
 
-
+	navigateToTheSearchPage() {
+		if (this.searchValue.trim()){
+			this.router.navigate(['search', this.searchValue]);
+		}
+	}
 }

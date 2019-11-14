@@ -165,6 +165,7 @@
   "menu.german": "Deutsch",
   "menu.english": "Englisch",
   "menu.language": "Sprache",
+  "menu.widgets": "Widgets",
 
   "account.activated": "Ihr Konto wurde bereits aktiviert!",
   "account.login": "Melden Sie sich mit dem folgenden Button im Portal an.",
@@ -421,6 +422,7 @@
   "pod.change.group": "Gruppe wechseln",
   "pod.notfound": "Pods nicht gefunden",
   "pod.notfound.info": "Klicken Sie auf die Schaltfläche oben, um das Probe herunterzuladen",
+  "pod.active": "Aktive Pods",
 
   "user.notfound": "Benutzer nicht gefunden",
   "user.notfound.info": "Klicken Sie auf die Schaltfläche oben, um einen neuen Benutzer hinzuzufügen",
@@ -442,12 +444,21 @@
 
   "actions.notavailable": "Keine verfügbaren Aktionen",
 
-  "chart.probe.select": "Probe ausWählen",
-  "chart.query.select": "Abfrage ausWählen",
+  "chart.probe.select": "Probe auswählen",
+  "chart.query.select": "Abfrage auswählen",
   "chart.additional.query": "Fügen Sie dem Diagramm eine zusätzliche Abfrage hinzu",
 
   "notifications.empty": "Benachrichtigungen nicht bereitgestellt",
 
   "title.hits": "Treffer",
-  "title.notification": "Benachrichtigung"
+  "title.notification": "Benachrichtigung",
+
+  "button.deleteSelected": "{{count}} ausgewählte löschen",
+
+  "widget.add": "Neues Widget hinzufügen",
+  "widget.name.placeholder": "Bitte geben Sie den Namen des Widgets ein",
+  "widget.tag": "Tag",
+  "widget.bgColor": "Hintergrundsfarbe",
+  "widget.icon": "Icon",
+  "widget.label": "Label"
 }

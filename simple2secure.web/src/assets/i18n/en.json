@@ -121,7 +121,7 @@
   "menu.emails": "Emails",
   "menu.users": "Users",
   "menu.overview": "Overview",
-  "menu.logout": "LOGOUT",
+  "menu.logout": "Logout",
   "menu.group": "Group",
   "menu.generalConfig": "General Configuration", 
   "menu.updateConfig": "Update Configuration",  
@@ -165,6 +165,7 @@
   "menu.german": "German",
   "menu.english": "English",
   "menu.language": "Language",
+  "menu.widgets": "Widgets",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",
@@ -421,6 +422,7 @@
   "pod.change.group": "Change group",
   "pod.notfound": "Pods not found",
   "pod.notfound.info": "Only activated pods are listed",
+  "pod.active": "Active pods",
 
   "user.notfound": "User not found",
   "user.notfound.info": "Click on the button above to add new user",
@@ -449,5 +451,14 @@
   "notifications.empty": "Notifications not provided",
 
   "title.hits": "hits",
-  "title.notification": "Notification"
+  "title.notification": "Notification",
+
+  "button.deleteSelected": "Delete {{count}} selected",
+
+  "widget.add": "Add new widget",
+  "widget.name.placeholder": "Please enter the widget name",
+  "widget.tag": "Tag",
+  "widget.bgColor": "Background color",
+  "widget.icon": "Icon",
+  "widget.label": "Label"
 }
