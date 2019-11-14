@@ -23,8 +23,8 @@ public class WidgetUserRelRepositoryImpl extends WidgetUserRelRepository {
 	}
 
 	@Override
-	public List<WidgetUserRelation> getPropertiesByUserId(String userId) {
-		Query query = new Query(Criteria.where("userId").is(userId));
+	public List<WidgetUserRelation> getPropertiesByUserIdAndContextId(String userId, String contextId) {
+		Query query = new Query(Criteria.where("userId").is(userId).and("contextId").is(contextId));
 
 		List<WidgetUserRelation> widgetUserRelations = mongoTemplate.find(query, className, collectionName);
 

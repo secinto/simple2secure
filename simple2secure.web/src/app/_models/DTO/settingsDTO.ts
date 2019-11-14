@@ -23,9 +23,11 @@
 import {Settings} from '../settings';
 import {LicensePlan} from '../LicensePlan';
 import {TestMacro} from '../TestMacro';
+import {Widget} from '../widget';
 
 export class SettingsDTO {
 	public settings: Settings;
 	public licensePlan: LicensePlan[];
 	public testMacroList: TestMacro[];
+	public widgetList: Widget[];
 }

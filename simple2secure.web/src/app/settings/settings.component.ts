@@ -29,6 +29,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Settings, SettingsDTO, Timeunit} from '../_models';
 import {environment} from '../../environments/environment';
 import {LicensePlan} from '../_models/LicensePlan';
+import {Widget} from '../_models/widget';
 
 @Component({
 	moduleId: module.id,
@@ -194,6 +195,54 @@ export class SettingsComponent {
 	saveTestMacro(testMacro: TestMacro) {
 		this.loading = true;
 		this.httpService.post(testMacro, environment.apiEndpoint + 'settings/testmacro').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.settings.update'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	addNewWidget(){
+		if (this.settingsObj.widgetList){
+			this.settingsObj.widgetList.push(new Widget());
+		}
+		else{
+			this.settingsObj.widgetList = [];
+			this.settingsObj.widgetList.push(new Widget());
+		}
+	}
+
+	deleteWidget(widget: Widget) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'widget/delete/' + widget.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.user.delete'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	saveWidget(widget: Widget) {
+		this.loading = true;
+		this.httpService.post(widget, environment.apiEndpoint + 'widget/add').subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.settings.update'));
 				this.loading = false;

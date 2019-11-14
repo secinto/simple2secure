@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 @Component({
     selector: 'app-stat',
     templateUrl: './stat.component.html',
-    styleUrls: ['./stat.component.scss']
+    styleUrls: ['./widgets.scss']
 })
 export class StatComponent implements OnInit {
     @Input() bgClass: string;

@@ -23,6 +23,8 @@ package com.simple2secure.portal.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,12 +34,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.WidgetRepository;
+import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
 @RequestMapping("/api/widget")
 public class WidgetController {
+
+	@Autowired
+	WidgetRepository widgetRepository;
+
+	@Autowired
+	MessageByLocaleService messageByLocaleService;
 
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
 
@@ -47,5 +60,42 @@ public class WidgetController {
 			@PathVariable("userId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		return null;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/{widgetId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAuthority('SUPERADMIN')")
+	public ResponseEntity<Widget> deleteWidget(@PathVariable("widgetId") String widgetId, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(widgetId)) {
+			Widget widget = widgetRepository.find(widgetId);
+			if (widget != null) {
+				widgetRepository.delete(widget);
+				return new ResponseEntity<>(widget, HttpStatus.OK);
+			}
+		}
+		log.error("Problem occured while deleting widget with id {}", widgetId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_widget", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAuthority('SUPERADMIN')")
+	public ResponseEntity<Widget> saveWidget(@RequestBody Widget widget, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		if (widget != null) {
+			if (Strings.isNullOrEmpty(widget.getId())) {
+				widgetRepository.save(widget);
+			} else {
+				widgetRepository.update(widget);
+			}
+			return new ResponseEntity<>(widget, HttpStatus.OK);
+		}
+		log.error("Problem occured while saving widget");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 }

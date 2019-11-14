@@ -164,6 +164,7 @@
   "menu.german": "German",
   "menu.english": "English",
   "menu.language": "Language",
+  "menu.widgets": "Widgets",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",
@@ -445,5 +446,12 @@
   "title.hits": "hits",
   "title.notification": "Notification",
 
-  "button.deleteSelected": "Delete {{count}} selected"
+  "button.deleteSelected": "Delete {{count}} selected",
+
+  "widget.add": "Add new widget",
+  "widget.name.placeholder": "Please enter the widget name",
+  "widget.tag": "Tag",
+  "widget.bgColor": "Background color",
+  "widget.icon": "Icon",
+  "widget.label": "Label"
 }

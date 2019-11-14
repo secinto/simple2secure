@@ -174,6 +174,7 @@ import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
 import {BreadcrumbsModule} from "ng6-breadcrumbs";
 import {StatComponent} from './widgets/stat.component';
+import {NotificationCardComponent} from './widgets/notification-card.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -325,7 +326,8 @@ export const httpInterceptorProviders = [
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
-		StatComponent
+		StatComponent,
+		NotificationCardComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
