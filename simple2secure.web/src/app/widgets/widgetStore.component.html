@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>{{ 'widget.store' | translate }}</h1>
+<div mat-dialog-content>
+    <ng-template #container>
+        <p>Test</p>
+    </ng-template>
+</div>
+<div mat-dialog-actions>
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="widgets"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>
+

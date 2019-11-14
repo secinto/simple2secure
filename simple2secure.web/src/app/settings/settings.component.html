@@ -258,8 +258,16 @@
                                         <mat-form-field class="full_width_input">
                                             <input type="text" matInput
                                                    placeholder="{{ 'widget.tag' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].tag"
-                                                   name="tag{{in}}">
+                                                   [(ngModel)]="settingsObj.widgetList[in].startTag"
+                                                   name="startTag{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="text" matInput
+                                                   placeholder="{{ 'widget.tag' | translate }}"
+                                                   [(ngModel)]="settingsObj.widgetList[in].closingTag"
+                                                   name="closingTag{{in}}">
                                         </mat-form-field>
                                     </td>
                                     <td>

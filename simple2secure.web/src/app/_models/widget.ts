@@ -25,7 +25,8 @@ import {Base} from './base';
 export class Widget extends Base {
 	name: string;
 	description: string;
-	tag: string;
+	startTag: string;
+	closingTag: string;
 	bgClass: string;
 	icon: string;
 	label: string;

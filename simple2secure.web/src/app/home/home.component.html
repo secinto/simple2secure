@@ -1,5 +1,5 @@
 <div class="example-container">
-    <button class="btn btn-sm btn-add-widget" (click)="addWidget()">{{"widget.add" | translate}}</button>
+    <button class="btn btn-sm btn-add-widget" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
     <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
                      [showGrid]="true" (widgetPositionChange)="onWidgetChange($event)" #grid>
         <ngx-widget [position]="{top: 1,left: 1,height: 1,width: 1}"

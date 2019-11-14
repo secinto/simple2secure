@@ -23,6 +23,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {User} from '../_models/index';
 import {NgxWidgetGridComponent, WidgetPositionChange} from 'ngx-widget-grid';
+import {MatDialog, MatDialogConfig} from '@angular/material';
+import {UserContextAddDialogComponent} from '../user';
+import {HttpErrorResponse} from '@angular/common/http';
+import {WidgetStoreComponent} from '../widgets/widgetStore.component';
+import {TranslateService} from '@ngx-translate/core';
+import {AlertService} from '../_services';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -35,7 +41,9 @@ export class HomeComponent implements OnInit {
 	users: User[] = [];
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
 
-	constructor() {
+	constructor(private dialog: MatDialog,
+				private alertService: AlertService,
+				private translate: TranslateService) {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 	}
 
@@ -51,7 +59,29 @@ export class HomeComponent implements OnInit {
 		console.log(event);
 	}
 
-	addWidget(){
-		console.log("Adding new widget");
+	openDialogAddWidget(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '350px';
+
+		dialogConfig.data = {
+			widgets: null
+		};
+		const dialogRef = this.dialog.open(WidgetStoreComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.context.add'));
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
 	}
 }

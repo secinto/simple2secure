@@ -347,6 +347,7 @@ $font-weight-bold: 700 !default;
   background-color: $card-bg;
   background-clip: border-box;
   border: $card-border-width solid $card-border-color;
+  margin-bottom: 5px;
   @include border-radius($card-border-radius);
 
   > hr {

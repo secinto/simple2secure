@@ -175,6 +175,7 @@ import { BoxModule } from 'angular-admin-lte';
 import {BreadcrumbsModule} from "ng6-breadcrumbs";
 import {StatComponent} from './widgets/stat.component';
 import {NotificationCardComponent} from './widgets/notification-card.component';
+import {WidgetStoreComponent} from './widgets/widgetStore.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -327,7 +328,8 @@ export const httpInterceptorProviders = [
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
 		StatComponent,
-		NotificationCardComponent
+		NotificationCardComponent,
+		WidgetStoreComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -351,7 +353,9 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
-		TestSequenceResultDetailsComponent
+		TestSequenceResultDetailsComponent,
+		WidgetStoreComponent,
+		StatComponent
 	],
 	providers: [
 		AuthGuard,

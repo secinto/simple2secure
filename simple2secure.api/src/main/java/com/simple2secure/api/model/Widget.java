@@ -11,7 +11,8 @@ public class Widget extends GenericDBObject{
 	
 	private String name;
 	private String description;
-	private String tag;
+	private String startTag;
+	private String closingTag;
 	private String bgClass;
 	private String icon;
 	private String label;
@@ -20,11 +21,12 @@ public class Widget extends GenericDBObject{
 		
 	}
 	
-	public Widget(String name, String description, String tag, String bgClass, String icon, String label) {
+	public Widget(String name, String description, String startTag, String closingTag, String bgClass, String icon, String label) {
 		super();
 		this.name = name;
 		this.description = description;
-		this.tag = tag;
+		this.startTag = startTag;
+		this.closingTag = closingTag;
 		this.bgClass = bgClass;
 		this.icon = icon;
 		this.label = label;
@@ -46,12 +48,20 @@ public class Widget extends GenericDBObject{
 		this.description = description;
 	}
 
-	public String getTag() {
-		return tag;
+	public String getStartTag() {
+		return startTag;
 	}
 
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setStartTag(String startTag) {
+		this.startTag = startTag;
+	}
+
+	public String getClosingTag() {
+		return closingTag;
+	}
+
+	public void setClosingTag(String closingTag) {
+		this.closingTag = closingTag;
 	}
 
 	public String getBgClass() {

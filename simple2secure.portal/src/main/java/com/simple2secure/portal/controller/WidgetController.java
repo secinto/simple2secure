@@ -21,6 +21,8 @@
  */
 package com.simple2secure.portal.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Widget;
-import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.WidgetRepository;
@@ -54,12 +55,18 @@ public class WidgetController {
 
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
 
-	@RequestMapping(value = "/{userId}", method = RequestMethod.POST)
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<WidgetProperties> copyGroupConfiguration(@RequestBody WidgetProperties widgetProperties,
-			@PathVariable("userId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<List<Widget>> getAllWidgets(@RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
-		return null;
+		if (!Strings.isNullOrEmpty(locale)) {
+			List<Widget> widgets = widgetRepository.findAll();
+			return new ResponseEntity<>(widgets, HttpStatus.OK);
+		}
+		log.error("Problem occured while retrieving widgets");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale)),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

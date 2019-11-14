@@ -453,5 +453,6 @@
   "widget.tag": "Tag",
   "widget.bgColor": "Background color",
   "widget.icon": "Icon",
-  "widget.label": "Label"
+  "widget.label": "Label",
+  "widget.store": "Widget Store"
 }
