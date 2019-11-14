@@ -25,14 +25,11 @@ import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, P
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import {Timeunit, Test} from '../_models';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import { PodDTO } from '../_models/DTO/podDTO';
 import { TestSequence } from '../_models/testSequence';
-import {CdkDragDrop, moveItemInArray, transferArrayItem, CdkDropList, DragRef} from '@angular/cdk/drag-drop';
 import { CarouselComponent } from 'ngx-carousel-lib';
-import { some } from 'highcharts/highcharts.src';
 import {ActivatedRoute} from '@angular/router';
 
 

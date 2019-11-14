@@ -34,6 +34,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.pcap4j.core.PcapNetworkInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
+import com.simple2secure.probe.utils.PcapUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeCLI {
@@ -66,12 +68,16 @@ public class ProbeCLI {
 	 */
 	public void init(String importFilePath) {
 
-		ProbeConfiguration.licensePath = importFilePath;
+		ProbeConfiguration.licensePath = importFilePath;		
 
 		try {
+			PcapNetworkInterface netwInt = PcapUtil.getNetworkInterfaceByInetAddr(PcapUtil.getIpAddrOfNetworkInterface());
 			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
+			ProbeConfiguration.netmask = netwInt.getAddresses().get(1).getNetmask().toString();
+			ProbeConfiguration.ipAddress = netwInt.getAddresses().get(1).getAddress().toString();
+			
 		} catch (Exception e) {
-			log.error("Couldn't obtain hostname for machine.");
+			log.error("Couldn't obtain network information for machine.");
 		}
 
 		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
@@ -185,6 +191,7 @@ public class ProbeCLI {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);
 			ProbeCLI client = new ProbeCLI();
+			
 
 			if (line.hasOption(filePath.getOpt())) {
 				String licensePath = line.getOptionValue(filePath.getOpt());

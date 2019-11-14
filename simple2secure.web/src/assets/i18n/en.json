@@ -64,6 +64,7 @@
   "button.invitation.reject": "Reject",
   "button.editContext": "Edit Context",
   "button.addTest": "Add Test",
+  "button.add.sut.text" : "Add System Under Test",
   "button.addContext": "Add context",
 
   "login.email": "Email",
@@ -236,6 +237,10 @@
   "table.licensePlans": "License Plans",
   "table.mycontexts": "My Contexts",
   "table.licenseDownloads": "License Downloads",
+  "table.sut.groupId" : "Group ID",
+  "table.sut.endDeviceName" : "End Device Name",
+  "table.sut.endDevicetype" : "End Device Type",
+  "table.sut.endDeviceLocation" : "End Device Location",
 
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",
@@ -314,6 +319,8 @@
   "message.contextDialogDashboard": "In order to work with another context, you have to select it from the box below.",
   "message.contextChangeError": "You are part of only one context, cannot select another one!",
   "message.context.edit": "Context updated successfully!",
+  "message.sut.create" : "System Under Test created successfully!",
+  "message.sut.update" : "System Under Test updated successfully!",
 
   "config.configSupplier": "Config Supplier",
   "config.taskSupplier": "Task Supplier",

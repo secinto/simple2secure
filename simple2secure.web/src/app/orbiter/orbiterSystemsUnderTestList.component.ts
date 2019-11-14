@@ -1,5 +1,9 @@
 import { Component } from "@angular/core";
-import { MatDialogConfig } from '@angular/material';
+import { MatDialogConfig, MatDialog } from '@angular/material';
+import { AlertService, HttpService, DataService } from '../_services';
+import { TranslateService } from '@ngx-translate/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { SUTDetailsComponent } from './sutDetails.component';
 
 /**
  *********************************************************************
@@ -31,7 +35,23 @@ import { MatDialogConfig } from '@angular/material';
 
 export class OrbiterSystemsUnderTestListComponent {
 
-    displayedColumns = ['name', 'groupId', 'endDevice', 'version', 'action'];
+	displayedColumns = ['name', 'groupId', 'endDevice', 'version', 'action'];
+	groupId: string;
+
+	constructor(
+		private alertService: AlertService,
+		private httpService: HttpService,
+		private dataService: DataService,
+		private dialog: MatDialog,
+		private translate: TranslateService,
+		private router: Router,
+		private route: ActivatedRoute
+	) {}
+
+	ngOnInit() {
+		let groups = JSON.parse(localStorage.getItem('groups'));
+		this.groupId = groups[0].id;
+	}
 
 
     openDialogShowSuT(type: string): void {
@@ -39,12 +59,11 @@ export class OrbiterSystemsUnderTestListComponent {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '750px';
 		dialogConfig.data = {
-			//sequence: this.selectedSequence,
-			//type: type,
-			//deviceId: this.id
+			type: type,
+			groupId: this.groupId
 		};
 
-		//const dialogRef = this.dialog.open(TestSequenceDetailsComponent, dialogConfig);
+		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
 
         /*
 		dialogRef.afterClosed().subscribe(data => {

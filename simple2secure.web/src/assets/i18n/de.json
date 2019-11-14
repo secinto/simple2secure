@@ -64,6 +64,7 @@
   "button.invitation.reject": "Ablehnen",
   "button.editContext": "Kontext bearbeiten",
   "button.addTest": "Test hinzufügen",
+  "button.add.sut.text" : "System im Test hinzufügen",
   "button.addContext": "Kontext hinzufügen",
 
   "login.email": "E-Mail",
@@ -235,6 +236,10 @@
   "table.licensePlans": "Lizenzpläne",
   "table.mycontexts": "Meine Kontexte",
   "table.licenseDownloads": "Lizenz-Downloads",
+  "table.sut.groupId" : "Gruppe ID",
+  "table.sut.endDeviceName" : "Endgerät Name",
+  "table.sut.endDevicetype" : "Endgerät Typ",
+  "table.sut.endDeviceLocation" : "Endgerät Ort",
 
   "message.configuration": "Konfiguration erfolgreich geladen!",
   "message.configuration.save": "Konfiguration erfolgreich aktualisiert!",
@@ -313,6 +318,8 @@
   "message.contextDialogDashboard": "Um mit einem anderen Kontext arbeiten zu können, müssen Sie ihn aus dem Feld unten ausWählen.",
   "message.contextChangeError": "Sie sind nur Teil eines Kontexts, können keinen anderen ausWählen!",
   "message.context.edit": "Kontext wurde erfolgreich aktualisiert!",
+  "message.sut.create" : "System im Test erfolgreich erstellt!",
+  "message.sut.update" : "System im Test erfolgreich aktualisiert!",
 
   "config.configSupplier": "Konfig. Lieferant",
   "config.taskSupplier": "Aufgabenlieferant",

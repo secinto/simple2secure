@@ -27,34 +27,31 @@ import com.simple2secure.api.dbo.GenericDBObject;
 public class SystemUnderTest extends GenericDBObject {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 2513743235055655600L;
-    
+	 * 
+	 */
+	private static final long serialVersionUID = 5020907897089097628L;
+
     private String groupId;
     private String endDeviceName;
     private String endDeviceType;
     private String endDeviceLocation;
     private String name;
-    private String version;
-    private long timestamp;
-
+	private String ipAdress;
+    private String netMask;
+    
 
     public SystemUnderTest(){
     }
 
-    public SystemUnderTest(String groupId, String endDeviceName, String endDeviceType, String endDeviceLocation, String name, String version, long timestamp){
+    public SystemUnderTest(String groupId, String endDeviceName, String endDeviceType, String endDeviceLocation, 
+    		String name,  String ipAdress, String netMask){
         setGroupId(groupId);
         setEndDeviceName(endDeviceName);
         setEndDeviceType(endDeviceType);
         setEndDeviceLocation(endDeviceLocation);
         setName(name);
-        setVersion(version);
-        setTimestamp(timestamp);
-    }
-
-    public static long getSerialversionuid() {
-        return serialVersionUID;
+        setIpAdress(ipAdress);
+        setNetMask(netMask);
     }
 
     public String getGroupId() {
@@ -97,19 +94,19 @@ public class SystemUnderTest extends GenericDBObject {
         this.name = name;
     }
 
-    public String getVersion() {
-        return version;
-    }
+    public String getIpAdress() {
+		return ipAdress;
+	}
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+	public void setIpAdress(String ipAdress) {
+		this.ipAdress = ipAdress;
+	}
 
-    public long getTimestamp() {
-        return timestamp;
-    }
+	public String getNetMask() {
+		return netMask;
+	}
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
+	public void setNetMask(String netMask) {
+		this.netMask = netMask;
+	}
 }

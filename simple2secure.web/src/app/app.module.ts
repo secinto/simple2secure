@@ -172,6 +172,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
+import { SUTDetailsComponent } from './orbiter/sutDetails.component';
 import {BreadcrumbsModule} from "ng6-breadcrumbs";
 import {StatComponent} from './widgets/stat.component';
 import {NotificationCardComponent} from './widgets/notification-card.component';
@@ -327,6 +328,7 @@ export const httpInterceptorProviders = [
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
+		SUTDetailsComponent,
 		StatComponent,
 		NotificationCardComponent,
 		WidgetStoreComponent
@@ -355,7 +357,8 @@ export const httpInterceptorProviders = [
 		TestSequenceDetailsComponent,
 		TestSequenceResultDetailsComponent,
 		WidgetStoreComponent,
-		StatComponent
+		StatComponent,
+		SUTDetailsComponent
 	],
 	providers: [
 		AuthGuard,

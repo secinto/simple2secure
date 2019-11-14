@@ -1,0 +1,50 @@
+<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+<h3 *ngIf="isNewSUT" mat-dialog-title>{{ 'button.add.sut.text' | translate }}</h3>
+
+
+<div mat-dialog-content>
+    <form id="cfgForm" #configForm="ngForm">
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+                        [(ngModel)]="sut.name" name="name">
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.sut.groupId' | translate }}"
+                        [(ngModel)]="sut.groupId" name="groupId">
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.sut.endDeviceName' | translate }}"
+                        [(ngModel)]="sut.endDeviceName" name="endDeviceName">
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.sut.endDevicetype' | translate }}"
+                        [(ngModel)]="sut.endDeviceType" name="endDeviceType">
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.sut.endDeviceLocation' | translate }}"
+                        [(ngModel)]="sut.endDeviceLocation" name="endDeviceLocation">
+            </mat-form-field>
+        </div>
+    </form>
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveTest()">{{ 'button.save' | translate }}
+    </button>
+</div>

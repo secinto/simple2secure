@@ -67,6 +67,8 @@ public class ProbeConfiguration {
 	public static String groupId = "";
 	public static String probeId = "";
 	public static String hostname = "";
+	public static String netmask = "";
+	public static String ipAddress = "";
 	public static String licenseId = "";
 	public static String osinfo = "";
 	public static String licensePath = "";

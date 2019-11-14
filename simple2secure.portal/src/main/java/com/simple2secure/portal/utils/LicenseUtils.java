@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.json.JSONUtils;
@@ -75,7 +76,7 @@ public class LicenseUtils {
 			String groupId = licensePublic.getGroupId();
 			String licenseId = licensePublic.getLicenseId();
 			String deviceId = licensePublic.getDeviceId();
-			String hostname = licensePublic.getHostname();
+			DeviceInfo deviceInfo = licensePublic.getDeviceInfo();
 
 			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(deviceId)) {
 				CompanyGroup group = groupRepository.find(groupId);
@@ -91,7 +92,7 @@ public class LicenseUtils {
 				if (license == null) {
 					List<CompanyLicensePrivate> licenses = licenseRepository.findByLicenseId(licenseId);
 					if (licenses != null && licenses.size() > 0) {
-						CompanyLicensePrivate tempLicense = licenses.get(0);
+						CompanyLicensePrivate tempLicense = licenses.get(licenses.size() - 1);
 						if (!Strings.isNullOrEmpty(tempLicense.getDeviceId())) {
 							license = tempLicense.copyLicense();
 						} else {
@@ -117,7 +118,7 @@ public class LicenseUtils {
 							license.setDeviceId(deviceId);
 						}
 						license.setAccessToken(accessToken);
-						license.setHostname(hostname);
+						license.setDeviceInfo(deviceInfo);
 						license.setLastOnlineTimestamp(System.currentTimeMillis());
 						license.setDevicePod(podActivation);
 						license.setStatus(DeviceStatus.ONLINE);
