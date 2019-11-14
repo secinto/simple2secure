@@ -327,7 +327,7 @@ export const httpInterceptorProviders = [
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
-		SUTDetailsComponent
+		SUTDetailsComponent,
 		StatComponent,
 		NotificationCardComponent
 	],
@@ -353,7 +353,7 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
-		SUTDetailsComponent
+		SUTDetailsComponent,
 		TestSequenceResultDetailsComponent
 	],
 	providers: [
