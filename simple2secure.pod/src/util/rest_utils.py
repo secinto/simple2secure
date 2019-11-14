@@ -107,15 +107,20 @@ def send_license(app, licensePublic=None):
         licensePublic = get_license(app)
 
     license_schema = CompanyLicensePublicSchema()
+    if isinstance(licensePublic.deviceInfo, str):
+        licensePublic.deviceInfo = json.loads(licensePublic.deviceInfo)
+
     license_json = json.dumps(license_schema.dump(licensePublic))
 
     resp_data = portal_post(app, url, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
         accessToken = json.loads(resp_data.text)['accessToken']
+        licenseObject = json.loads(resp_data.text)
         if accessToken:
             licensePublic.accessToken = accessToken
             licensePublic.activated = True
+            licensePublic.deviceInfo = json.dumps(licenseObject['deviceInfo'])
             update(licensePublic)
             update_pod_status_auth(app, accessToken)
             log.info('Obtained new access token from portal')

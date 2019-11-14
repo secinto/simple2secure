@@ -115,7 +115,7 @@ class CompanyLicensePublic(db.Model):
     licenseId = db.Column(db.Text)
     deviceId = db.Column(db.Text)
     accessToken = db.Column(db.Text)
-    db.Column('deviceInfo', db.ForeignKey('DeviceInfo.id'))
+    deviceInfo = db.Column(db.Text)
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
     deviceIsPod = db.Column(db.Boolean)
