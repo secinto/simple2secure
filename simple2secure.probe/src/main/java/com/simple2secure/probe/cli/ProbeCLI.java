@@ -58,6 +58,7 @@ public class ProbeCLI {
 
 	private static String OPTION_INSTRUMENTATION_SHORT = "i";
 	private static String OPTION_INSTRUMENTATION = "instrumentation";
+	private ProbeWorkerThread workerThread;
 
 	/**
 	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
@@ -68,14 +69,14 @@ public class ProbeCLI {
 	 */
 	public void init(String importFilePath) {
 
-		ProbeConfiguration.licensePath = importFilePath;		
+		ProbeConfiguration.licensePath = importFilePath;
 
 		try {
 			PcapNetworkInterface netwInt = PcapUtil.getNetworkInterfaceByInetAddr(PcapUtil.getIpAddrOfNetworkInterface());
 			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
 			ProbeConfiguration.netmask = netwInt.getAddresses().get(1).getNetmask().toString();
 			ProbeConfiguration.ipAddress = netwInt.getAddresses().get(1).getAddress().toString();
-			
+
 		} catch (Exception e) {
 			log.error("Couldn't obtain network information for machine.");
 		}
@@ -102,6 +103,8 @@ public class ProbeCLI {
 			log.info("A valid license is available");
 			break;
 		}
+
+		workerThread = new ProbeWorkerThread();
 	}
 
 	private void stopWorkerThreads() {
@@ -112,8 +115,17 @@ public class ProbeCLI {
 		/*
 		 * Starting background worker threads.
 		 */
-		ProbeWorkerThread workerThread = new ProbeWorkerThread();
 		workerThread.run();
+
+	}
+
+	private void checkStatus() {
+
+		if (workerThread != null && workerThread.isRunning()) {
+			System.out.println("PROBE_STATUS: OK");
+		} else {
+			System.out.println("PROBE_STATUS: NOK");
+		}
 
 	}
 
@@ -158,6 +170,9 @@ public class ProbeCLI {
 					break;
 				case STOP:
 				case TERMINATE:
+				case CHECK_STATUS:
+					checkStatus();
+					break;
 				case OTHER:
 					log.debug("Obtained not recognized command {}", command);
 					stopWorkerThreads();
@@ -191,7 +206,6 @@ public class ProbeCLI {
 			CommandLineParser parser = new DefaultParser();
 			CommandLine line = parser.parse(options, args);
 			ProbeCLI client = new ProbeCLI();
-			
 
 			if (line.hasOption(filePath.getOpt())) {
 				String licensePath = line.getOptionValue(filePath.getOpt());

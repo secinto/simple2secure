@@ -41,18 +41,56 @@ public class ProbeWorkerThread extends Thread {
 
 	static Timer time;
 
+	private ConfigScheduler configScheduler;
+	private ReportScheduler reportScheduler;
+	private QueryScheduler queryScheduler;
+	private NetworkScheduler networkScheduler;
+
+	public ProbeWorkerThread() {
+		configScheduler = new ConfigScheduler();
+		reportScheduler = new ReportScheduler();
+		queryScheduler = new QueryScheduler();
+		networkScheduler = new NetworkScheduler(networkMonitor);
+		time = new Timer();
+
+	}
+
 	@Override
 	public void run() {
 		log.debug("ProbeWorkerThread running");
-
+		log.debug("Starting network monitor");
 		networkMonitor = NetworkMonitor.startMonitor();
-
-		time = new Timer();
-
-		time.schedule(new ConfigScheduler(), 0, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(new ReportScheduler(), 0, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(new NetworkScheduler(networkMonitor), 0, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(new QueryScheduler(), 0, TimeUnit.MINUTES.toMillis(1));
-
+		log.debug("Scheduling the different tasks");
+		time.schedule(networkScheduler, 0, TimeUnit.MINUTES.toMillis(1));
+		time.schedule(configScheduler, 0, TimeUnit.MINUTES.toMillis(1));
+		time.schedule(queryScheduler, 100, TimeUnit.MINUTES.toMillis(1));
+		time.schedule(reportScheduler, 500, TimeUnit.MINUTES.toMillis(1));
 	}
+
+	public ConfigScheduler getConfigScheduler() {
+		return configScheduler;
+	}
+
+	public ReportScheduler getReportScheduler() {
+		return reportScheduler;
+	}
+
+	public QueryScheduler getQueryScheduler() {
+		return queryScheduler;
+	}
+
+	public NetworkScheduler getNetworkScheduler() {
+		return networkScheduler;
+	}
+
+	public boolean isRunning() {
+		if (networkMonitor != null && networkScheduler != null && configScheduler != null && queryScheduler != null
+				&& reportScheduler != null) {
+			if (networkMonitor.isRunning()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

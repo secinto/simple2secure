@@ -45,6 +45,8 @@ public class ServiceCommand {
 			return new ServiceCommand(ServiceCommands.GET_VERSION, Arrays.copyOfRange(possibleCommandParts, 1, possibleCommandParts.length));
 		} else if (possibleCommandParts[0].equalsIgnoreCase("Terminate")) {
 			return new ServiceCommand(ServiceCommands.TERMINATE, Arrays.copyOfRange(possibleCommandParts, 1, possibleCommandParts.length));
+		} else if (possibleCommandParts[0].equalsIgnoreCase("CheckStatus")) {
+			return new ServiceCommand(ServiceCommands.CHECK_STATUS, Arrays.copyOfRange(possibleCommandParts, 1, possibleCommandParts.length));
 		} else {
 			return new ServiceCommand(ServiceCommands.OTHER, possibleCommandParts);
 		}

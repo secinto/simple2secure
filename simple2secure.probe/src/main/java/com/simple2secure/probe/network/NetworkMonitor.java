@@ -150,4 +150,14 @@ public class NetworkMonitor {
 		return receiverHandle;
 	}
 
+	public boolean isRunning() {
+		if (packetProcessor != null && receiver != null) {
+			if (packetProcessor.isRunning() && receiver.isRunning()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }

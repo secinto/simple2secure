@@ -92,7 +92,10 @@ public class ReportController {
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
 		if (report != null) {
@@ -105,7 +108,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/{contextId}/{page}/{size}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@PathVariable("contextId") String contextId,
 			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
@@ -134,7 +139,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/{id}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/report/{id}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(id)) {
@@ -148,7 +155,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/name", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/report/name",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(name)) {
@@ -162,7 +171,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/{id}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -178,7 +189,10 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/network", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(
+			value = "/network",
+			method = RequestMethod.POST,
+			consumes = "application/json")
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@RequestHeader("Accept-Language") String locale) {
@@ -192,7 +206,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/network/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@RequestMapping(
+			value = "/network/{contextId}/{page}/{size}",
+			method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
 			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
@@ -221,7 +237,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/network/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(
+			value = "/network/{id}",
+			method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -238,7 +256,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/network/name", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/report/network/name",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
 			@RequestHeader("Accept-Language") String locale) {
@@ -253,19 +273,9 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/network/geo", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReportDTO>> getNetworkReportsForGeoLocation(@RequestHeader("Accept-Language") String locale) {
-		List<NetworkReportDTO> reports = reportUtils.prepareNetworkReports();
-		if (reports != null) {
-			return new ResponseEntity<>(reports, HttpStatus.OK);
-		}
-		log.error("Error occured while retrieving reports for geolocation");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/selected", method = RequestMethod.POST)
+	@RequestMapping(
+			value = "/delete/selected",
+			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports,
 			@RequestHeader("Accept-Language") String locale) {
