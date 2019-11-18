@@ -2,22 +2,12 @@
     <button class="btn btn-sm btn-add-widget" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
     <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
                      [showGrid]="true" (widgetPositionChange)="onWidgetChange($event)" #grid>
-        <ngx-widget [position]="{top: 1,left: 1,height: 1,width: 1}"
-                    [movable]="true" [resizable]="false">
-            <app-stat [bgClass]="'info'" [icon]="'fa-server'" [count]="1" [label]="'Active Probes'"></app-stat>
-        </ngx-widget>
-        <ngx-widget [position]="{top: 1,left: 3,height: 1,width: 1}"
-                    [movable]="true" [resizable]="false">
-            <app-stat [bgClass]="'secinto'" [icon]="'fa-satellite'" [count]="13" [label]="'Active Pods'"></app-stat>
-        </ngx-widget>
-        <ngx-widget [position]="{top: 1,left: 5,height: 1,width: 1}"
-                    [movable]="true" [resizable]="false">
-            <app-stat [bgClass]="'info'" [icon]="'fa-user'" [count]="1" [label]="'Active users'"></app-stat>
-        </ngx-widget>
-
-        <ngx-widget [position]="{top: 2,left: 1,height: 2,width: 1}"
-                    [movable]="true" [resizable]="false">
-            <app-notification></app-notification>
+        <ngx-widget *ngFor="let widget of widgets;let $index = index; "
+                    [position]="getRectangle(widget)"
+                    [movable]="true"
+                    [resizable]="true">
+            <app-stat *ngIf="widget.widget.startTag === '<app-stat>'" [bgClass]="widget.widget.bgClass"
+                      [icon]="widget.widget.icon" [count]="10" [label]="widget.widget.label"></app-stat>
         </ngx-widget>
     </ngx-widget-grid>
 </div>

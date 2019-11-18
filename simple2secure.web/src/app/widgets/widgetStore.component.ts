@@ -29,6 +29,7 @@ import {Location} from '@angular/common';
 import {Widget} from '../_models/widget';
 import {StatComponent} from './stat.component';
 import {MatDialogRef} from '@angular/material';
+import {StatItemComponent} from './stat-item.component';
 
 @Component({
 	moduleId: module.id,
@@ -38,9 +39,11 @@ import {MatDialogRef} from '@angular/material';
 })
 
 export class WidgetStoreComponent {
+	currentWidgets = [];
 	loading = false;
 	currentUser: any;
 	widgets: Widget[];
+
 	@ViewChild('container', {read: ViewContainerRef}) container: ViewContainerRef;
 
 	constructor(
@@ -61,6 +64,7 @@ export class WidgetStoreComponent {
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+		this.dataService.clearWidgets();
 		this.loadWidgets();
 	}
 
@@ -85,17 +89,19 @@ export class WidgetStoreComponent {
 	loadComponents(widgets: Widget[]){
 		for (const widget of widgets) {
 			if (widget.startTag == '<app-stat>'){
-				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(StatComponent);
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(StatItemComponent);
 				const component = this.container.createComponent(componentFactory);
-				(<StatComponent>component.instance).bgClass = widget.bgClass;
-				(<StatComponent>component.instance).icon = widget.icon;
-				(<StatComponent>component.instance).count = 10;
-				(<StatComponent>component.instance).label = widget.label;
+
+				(<StatItemComponent>component.instance).id = widget.id;
+				(<StatItemComponent>component.instance).name = widget.name;
+				(<StatItemComponent>component.instance).startTag = widget.startTag;
+				(<StatItemComponent>component.instance).closingTag = widget.closingTag;
+				(<StatItemComponent>component.instance).description = widget.description;
+				(<StatItemComponent>component.instance).bgClass = widget.bgClass;
+				(<StatItemComponent>component.instance).icon = widget.icon;
+				(<StatItemComponent>component.instance).count = 10;
+				(<StatItemComponent>component.instance).label = widget.label;
 			}
 		}
-	}
-
-	cancel() {
-		this.location.back();
 	}
 }

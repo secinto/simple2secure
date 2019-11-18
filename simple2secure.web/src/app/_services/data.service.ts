@@ -23,6 +23,7 @@
 import {Injectable} from '@angular/core';
 import {CompanyGroup, Notification} from '../_models';
 import {PodDTO} from '../_models/DTO/podDTO';
+import {Widget} from '../_models/widget';
 
 @Injectable()
 export class DataService {
@@ -95,6 +96,18 @@ export class DataService {
 
 	getNotifications(){
 		return JSON.parse(localStorage.getItem('notifications'));
+	}
+
+	getSelectedWidget(){
+		return JSON.parse(localStorage.getItem('selectedWidget'));
+	}
+
+	addWidgetToLS(widget: Widget) {
+		localStorage.setItem('selectedWidget', JSON.stringify(widget));
+	}
+
+	clearWidgets(){
+		localStorage.removeItem('selectedWidgets');
 	}
 
 }

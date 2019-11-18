@@ -35,27 +35,18 @@ public class WidgetProperties extends GenericDBObject{
 	private int left;
 	private int height;
 	private int width;
-	private String bgClass;
-	private String icon;
-	private String count;
-	private String label;
 	
 	public WidgetProperties() {
 		
 	}
 	
-	public WidgetProperties(String widgetId, int top, int left, int height, int width, String bgClass, String icon, String count,
-			String label) {
+	public WidgetProperties(String widgetId, int top, int left, int height, int width) {
 		super();
 		this.widgetId = widgetId;
 		this.top = top;
 		this.left = left;
 		this.height = height;
 		this.width = width;
-		this.bgClass = bgClass;
-		this.icon = icon;
-		this.count = count;
-		this.label = label;
 	}
 	
 	public String getWidgetId() {
@@ -89,29 +80,5 @@ public class WidgetProperties extends GenericDBObject{
 	}
 	public void setWidth(int width) {
 		this.width = width;
-	}
-	public String getBgClass() {
-		return bgClass;
-	}
-	public void setBgClass(String bgClass) {
-		this.bgClass = bgClass;
-	}
-	public String getIcon() {
-		return icon;
-	}
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-	public String getCount() {
-		return count;
-	}
-	public void setCount(String count) {
-		this.count = count;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
 	}
 }
