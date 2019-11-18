@@ -23,6 +23,7 @@ package com.simple2secure.portal.controller;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.WidgetUtils;
 
 @RestController
 @RequestMapping("/api/widget")
@@ -49,6 +54,12 @@ public class WidgetController {
 
 	@Autowired
 	WidgetRepository widgetRepository;
+
+	@Autowired
+	WidgetPropertiesRepository widgetPropertiesRepository;
+
+	@Autowired
+	WidgetUtils widgetUtils;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -105,4 +116,37 @@ public class WidgetController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
 				HttpStatus.NOT_FOUND);
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/updatePosition", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		if (widgetDTO != null) {
+			if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getId())) {
+				ObjectId widgetPropertiesId = widgetPropertiesRepository.saveAndReturnId(widgetDTO.getWidgetProperties());
+				widgetDTO.getWidgetProperties().setId(widgetPropertiesId.toString());
+			} else {
+				widgetPropertiesRepository.update(widgetDTO.getWidgetProperties());
+			}
+			return new ResponseEntity<>(widgetDTO.getWidgetProperties(), HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/get/{userId}/{contextId}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@PathVariable("userId") String userId,
+			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
+			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextId(userId, contextId);
+			return new ResponseEntity<>(widgets, HttpStatus.OK);
+		}
+		log.error("Problem occured while retrieving widgets");
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale)),
+				HttpStatus.NOT_FOUND);
+	}
+
 }

@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
-import com.simple2secure.api.model.WidgetUserRelation;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.repository.WidgetUserRelRepository;
@@ -53,13 +52,12 @@ public class WidgetUtils {
 
 	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
-		List<WidgetUserRelation> relations = widgetUserRelRepository.getPropertiesByUserIdAndContextId(userId, contextId);
-		if (relations != null) {
-			for (WidgetUserRelation relation : relations) {
-				if (relation != null) {
-					WidgetProperties properties = widgetPropertiesRepository.find(relation.getWidgetPropertiesId());
-					Widget widget = widgetRepository.find(relation.getWidgetId());
-					widgetDTOList.add(new WidgetDTO(widget, properties));
+		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextId(userId, contextId);
+		if (properties != null) {
+			for (WidgetProperties property : properties) {
+				if (property != null) {
+					Widget widget = widgetRepository.find(property.getWidgetId());
+					widgetDTOList.add(new WidgetDTO(widget, property));
 				}
 			}
 		}

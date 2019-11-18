@@ -24,6 +24,8 @@ import {Base} from './base';
 
 export class WidgetProperties extends Base {
 	widgetId: string;
+	userId: string;
+	contextId: string;
 	top: number;
 	left: number;
 	height: number;

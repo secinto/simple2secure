@@ -31,6 +31,8 @@ public class WidgetProperties extends GenericDBObject{
 	private static final long serialVersionUID = 6253109541875693926L;
 	
 	private String widgetId;
+	private String userId;
+	private String contextId;
 	private int top;
 	private int left;
 	private int height;
@@ -40,9 +42,11 @@ public class WidgetProperties extends GenericDBObject{
 		
 	}
 	
-	public WidgetProperties(String widgetId, int top, int left, int height, int width) {
+	public WidgetProperties(String widgetId, String userId, String contextId, int top, int left, int height, int width) {
 		super();
 		this.widgetId = widgetId;
+		this.userId = userId;
+		this.contextId = contextId;
 		this.top = top;
 		this.left = left;
 		this.height = height;
@@ -55,6 +59,22 @@ public class WidgetProperties extends GenericDBObject{
 
 	public void setWidgetId(String widgetId) {
 		this.widgetId = widgetId;
+	}
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 
 	public int getTop() {

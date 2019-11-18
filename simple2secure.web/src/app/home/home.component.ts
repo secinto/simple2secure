@@ -29,17 +29,18 @@ import {
 	ViewChildren,
 	ViewContainerRef
 } from '@angular/core';
-import {User} from '../_models/index';
+import {ContextDTO, User} from '../_models/index';
 import {NgxWidgetComponent, NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import {WidgetStoreComponent} from '../widgets/widgetStore.component';
 import {TranslateService} from '@ngx-translate/core';
-import {AlertService, DataService} from '../_services';
+import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {StatItemComponent} from '../widgets/stat-item.component';
 import {Widget} from '../_models/widget';
 import {container} from '@angular/core/src/render3';
 import {NgTemplateOutlet} from '@angular/common';
+import {environment} from '../../environments/environment';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -52,13 +53,37 @@ export class HomeComponent implements OnInit {
 	users: User[] = [];
 	widgets: WidgetDTO[] = [];
 	widgetDTO: WidgetDTO;
+	context: ContextDTO;
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
 	constructor(private dialog: MatDialog,
 				private alertService: AlertService,
 				private translate: TranslateService,
 				private dataService: DataService,
-				private componentFactoryResolver: ComponentFactoryResolver) {
+				private httpService: HttpService) {
+	}
+
+	ngOnInit(): void {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+		this.context = JSON.parse(localStorage.getItem('context'));
+		this.loadAllWidgetsByUserId();
+	}
+
+	loadAllWidgetsByUserId() {
+		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.currentUser['userID'] + '/'
+			+ this.context.context.id)
+			.subscribe(
+				data => {
+					this.widgets = data;
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
 	}
 
 	onWidgetChange(event: WidgetPositionChange) {
@@ -66,6 +91,27 @@ export class HomeComponent implements OnInit {
 		this.widgets[event.index].widgetProperties.height = event.newPosition.height;
 		this.widgets[event.index].widgetProperties.left = event.newPosition.left;
 		this.widgets[event.index].widgetProperties.top = event.newPosition.top;
+
+		this.updateSaveWidgetPosition(this.widgets[event.index]);
+
+	}
+
+
+	updateSaveWidgetPosition(widget: WidgetDTO){
+		this.httpService.post(widget, environment.apiEndpoint + 'widget/updatePosition')
+			.subscribe(
+				data => {
+					widget.widgetProperties = data;
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
 	}
 
 	openDialogAddWidget(): void {
@@ -93,6 +139,9 @@ export class HomeComponent implements OnInit {
 				this.widgetDTO.widgetProperties.top = position.top;
 				this.widgetDTO.widgetProperties.width = 1;
 				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
+				this.widgetDTO.widgetProperties.userId = this.currentUser['userID'];
+				this.widgetDTO.widgetProperties.contextId = this.context.context.id;
+
 				this.widgets.push(this.widgetDTO);
 			}
 			else{
