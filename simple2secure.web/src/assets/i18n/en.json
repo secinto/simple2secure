@@ -225,6 +225,7 @@
   "table.group": "Group",
   "table.groupId" : "Group ID",
   "table.endDevice" : "End Device",
+  "table.ipAdress" : "IP Address",
   "table.of": "of",
   "table.usedLicenses": "Number of the used licenses",
   "table.executable": "Executable",

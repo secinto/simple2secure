@@ -1,9 +1,11 @@
 import { Component } from "@angular/core";
-import { MatDialogConfig, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatDialogConfig, MatDialog } from '@angular/material';
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import {environment} from '../../environments/environment';
 import { SUTDetailsComponent } from './sutDetails.component';
+import { SystemUnderTest } from '../_models/systemUnderTest';
 
 /**
  *********************************************************************
@@ -35,8 +37,14 @@ import { SUTDetailsComponent } from './sutDetails.component';
 
 export class OrbiterSystemsUnderTestListComponent {
 
-	displayedColumns = ['name', 'groupId', 'endDevice', 'version', 'action'];
+	displayedColumns = ['name', 'groupId', 'endDevice', 'ipAdress', 'action'];
 	groupId: string;
+	sutList: SystemUnderTest[];
+	loading = false;
+	public totalSize = 0;
+	dataSource = new MatTableDataSource();
+
+
 
 	constructor(
 		private alertService: AlertService,
@@ -51,6 +59,7 @@ export class OrbiterSystemsUnderTestListComponent {
 	ngOnInit() {
 		let groups = JSON.parse(localStorage.getItem('groups'));
 		this.groupId = groups[0].id;
+		this.loadSUTList(this.groupId, 0, 10);
 	}
 
 
@@ -73,6 +82,34 @@ export class OrbiterSystemsUnderTestListComponent {
 			}
 		});*/
 
+	}
+	
+	public loadSUTList(groupId: string, page: number, size: number){
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + page + '/' + size)
+			.subscribe(
+				data => {
+					this.sutList = data.sutList;
+					this.totalSize = data.totalSize;
+					this.dataSource.data = this.sutList;
+					if (data.sutList.length > 0) {
+						this.alertService.success(this.translate.instant('message.data'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.data.notProvided'));
+					}
+
+					this.loading = false;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
 	}
 
 }

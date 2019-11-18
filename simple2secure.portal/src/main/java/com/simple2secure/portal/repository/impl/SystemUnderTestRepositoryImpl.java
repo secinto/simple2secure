@@ -54,4 +54,25 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 		return count;
 	}
 
+	@Override
+	public List<SystemUnderTest> getByDeviceType(String endDeviceType) {
+		Query query = new Query(Criteria.where("endDeviceType").is(endDeviceType));
+		List<SystemUnderTest> sutList = mongoTemplate.find(query, SystemUnderTest.class);
+		return sutList;
+	}
+
+	@Override
+	public List<SystemUnderTest> getByGroupIdAndDeviceType(String groupId, String endDeviceType) {
+		Query query = new Query(Criteria.where("groupId").is(groupId).and("endDeviceType").is(endDeviceType));
+		List<SystemUnderTest> sutList = mongoTemplate.find(query, SystemUnderTest.class);
+		return sutList;
+	}
+
+	@Override
+	public SystemUnderTest getByEndDeviceId(String endDeviceId) {
+		Query query = new Query(Criteria.where("endDeviceId").is(endDeviceId));
+		SystemUnderTest sut = mongoTemplate.findOne(query, SystemUnderTest.class);
+		return sut;
+	}
+
 }

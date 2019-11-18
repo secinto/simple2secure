@@ -30,7 +30,10 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
 
     public abstract List<SystemUnderTest> getByGroupId(String groupId, int page, int size);
+    public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
     public abstract SystemUnderTest getByName(String name);
+    public abstract List<SystemUnderTest> getByDeviceType(String endDeviceType);
     public abstract long getCountOfSUTWithGroupId(String groupId);
+    public abstract List<SystemUnderTest> getByGroupIdAndDeviceType(String groupId, String endDeviceType);
     
 }
