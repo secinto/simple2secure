@@ -71,6 +71,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.LicenseUtils;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.SUTUtils;
 
 @RestController
 @RequestMapping("/api/license")
@@ -130,6 +131,9 @@ public class LicenseController {
 
 	@Autowired
 	LicenseUtils licenseUtils;
+	
+	@Autowired
+	SUTUtils sutUtils;
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -185,6 +189,9 @@ public class LicenseController {
 
 			if (!licensePublic.isActivated()) {
 				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale);
+				if(!licensePublic.isDevicePod()) {
+					sutUtils.addProbeAsSUT(licensePublic);
+				}
 			} else {
 				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale);
 			}

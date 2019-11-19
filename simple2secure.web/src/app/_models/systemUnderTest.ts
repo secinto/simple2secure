@@ -23,10 +23,11 @@ import {Base} from './base';
 
 export class SystemUnderTest extends Base {
     groupId: string;
+	endDeviceId: string;
     endDeviceName: string;
     endDeviceType: string;
     endDeviceLocation: string;
     name: string;
-	version: string;
-	timestamp: number;
+	ipAdress: string;
+	netMask: string;
 }

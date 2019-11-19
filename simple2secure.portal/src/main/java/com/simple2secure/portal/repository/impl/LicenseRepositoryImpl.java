@@ -140,6 +140,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 			expression.and("groupId").is(groupId);
 			orExpression.add(expression);
 		}
+		query.addCriteria(Criteria.where("deviceIsPod").is(deviceIsPod));
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
 		long count = mongoTemplate.count(query, Report.class, collectionName);

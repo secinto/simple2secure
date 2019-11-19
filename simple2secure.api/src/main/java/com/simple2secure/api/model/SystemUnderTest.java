@@ -32,7 +32,8 @@ public class SystemUnderTest extends GenericDBObject {
 	private static final long serialVersionUID = 5020907897089097628L;
 
     private String groupId;
-    private String endDeviceName;
+    private String endDeviceId;
+	private String endDeviceName;
     private String endDeviceType;
     private String endDeviceLocation;
     private String name;
@@ -43,9 +44,10 @@ public class SystemUnderTest extends GenericDBObject {
     public SystemUnderTest(){
     }
 
-    public SystemUnderTest(String groupId, String endDeviceName, String endDeviceType, String endDeviceLocation, 
+    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceName, String endDeviceType, String endDeviceLocation, 
     		String name,  String ipAdress, String netMask){
         setGroupId(groupId);
+        setEndDeviceId(endDeviceId);
         setEndDeviceName(endDeviceName);
         setEndDeviceType(endDeviceType);
         setEndDeviceLocation(endDeviceLocation);
@@ -61,6 +63,14 @@ public class SystemUnderTest extends GenericDBObject {
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
+    
+    public String getEndDeviceId() {
+		return endDeviceId;
+	}
+
+	public void setEndDeviceId(String endDeviceId) {
+		this.endDeviceId = endDeviceId;
+	}
 
     public String getEndDeviceName() {
         return endDeviceName;

@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
@@ -40,6 +42,9 @@ public class SystemUnderTestController {
 
     @Autowired
     NotificationUtils notificationUtils;
+    
+    @Autowired
+	LicenseRepository licenseRepository;
 
     @Autowired
     MessageByLocaleService messageByLocaleService;
@@ -99,5 +104,4 @@ public class SystemUnderTestController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sut", locale)),
 				HttpStatus.NOT_FOUND);
 	}
-    
 }

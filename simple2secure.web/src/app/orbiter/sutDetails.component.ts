@@ -64,9 +64,8 @@ export class SUTDetailsComponent {
     }
 
 
-    public updateSaveTest() {
+    public updateSaveSUT() {
 		this.loading = true;
-        this.sut.timestamp = Date.now();
 		this.url = environment.apiEndpoint + 'sut/add';
 		this.httpService.post(this.sut, this.url).subscribe(
 			data => {
