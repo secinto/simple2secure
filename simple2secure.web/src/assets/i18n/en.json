@@ -226,6 +226,7 @@
   "table.groupId" : "Group ID",
   "table.endDevice" : "End Device",
   "table.ipAdress" : "IP Address",
+  "table.netmask" : "Netmask",
   "table.of": "of",
   "table.usedLicenses": "Number of the used licenses",
   "table.executable": "Executable",

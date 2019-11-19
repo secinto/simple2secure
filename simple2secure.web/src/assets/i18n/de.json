@@ -227,6 +227,7 @@
   "table.groupId" : "Gruppe ID",
   "table.endDevice" : "Endgerät",
   "table.ipAdress" : "IP Adresse",
+  "table.netmask" : "Netzwerkmaske",
   "table.usedLicenses": "Anzahl der verwendeten Lizenzen",
   "table.executable": "Ausführbar",
   "table.prefix": "Prefix",

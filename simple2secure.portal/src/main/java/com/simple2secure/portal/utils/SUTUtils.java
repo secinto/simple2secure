@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 
@@ -20,8 +21,8 @@ public class SUTUtils {
 		SystemUnderTest sut = sutRepository.getByEndDeviceId(license.getDeviceId());
 		
 		if(sut == null) {
-			SystemUnderTest newSut = new SystemUnderTest(license.getGroupId(), license.getDeviceId(), license.getDeviceInfo().getHostname(), "PROBE", 
-					null, null, license.getDeviceInfo().getIpAddress(), license.getDeviceInfo().getNetMask());
+			SystemUnderTest newSut = new SystemUnderTest(license.getGroupId(), license.getDeviceId(), DeviceType.PROBE, 
+					null, license.getDeviceInfo().getHostname(), license.getDeviceInfo().getIpAddress(), license.getDeviceInfo().getNetMask());
 			
 			sutRepository.save(newSut);
 			log.info("New SUT has been stored in the db!");
