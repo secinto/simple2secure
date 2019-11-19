@@ -60,7 +60,7 @@ export class HomeComponent implements OnInit {
 		this.loadAllWidgetsByUserId();
 	}
 
-	loadAllWidgetsByUserId() {
+	public loadAllWidgetsByUserId() {
 		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.currentUser['userID'] + '/'
 			+ this.context.context.id)
 			.subscribe(
@@ -139,6 +139,8 @@ export class HomeComponent implements OnInit {
 			else{
 				this.alertService.error(this.translate.instant('widget.noplace'));
 			}
+
+			this.dataService.clearWidgets();
 		}
 	}
 

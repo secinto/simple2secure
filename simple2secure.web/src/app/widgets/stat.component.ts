@@ -4,6 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
 import {Location } from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
+import {HomeComponent} from '../home';
 
 @Component({
     selector: 'app-stat',
@@ -25,7 +26,8 @@ export class StatComponent implements OnInit {
                 private translate: TranslateService,
                 private location: Location,
                 private router: Router,
-                private route: ActivatedRoute) {}
+                private route: ActivatedRoute,
+                private homeComponent: HomeComponent ) {}
 
     ngOnInit() {
     }
@@ -36,7 +38,7 @@ export class StatComponent implements OnInit {
             data => {
                 this.alertService.success(this.translate.instant('widget.deleted'));
                 this.loading = false;
-                this.refreshPage();
+                this.homeComponent.loadAllWidgetsByUserId();
             },
             error => {
                 if (error.status == 0) {
@@ -50,6 +52,7 @@ export class StatComponent implements OnInit {
     }
 
     refreshPage(){
-        this.router.navigate([this.router.url]);
+        this.router.navigateByUrl('/DummyComponent', {skipLocationChange: true}).then(() =>
+            this.router.navigate([this.router.url]));
     }
 }
