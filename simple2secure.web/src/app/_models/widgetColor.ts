@@ -20,13 +20,12 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-
-export class Widget extends Base {
-	name: string;
-	description: string;
-	tag: string;
-	bgClass: string;
-	icon: string;
-	label: string;
+export enum WidgetColor {
+	SUCCESS = 'success',
+	INFO = 'info',
+	WARNING = 'warning',
+	DANGER = 'danger',
+	LIGHT = 'light',
+	DARK = 'dark',
+	SECINTO = 'secinto'
 }

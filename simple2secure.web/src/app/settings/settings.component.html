@@ -258,34 +258,30 @@
                                         <mat-form-field class="full_width_input">
                                             <input type="text" matInput
                                                    placeholder="{{ 'widget.tag' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].startTag"
-                                                   name="startTag{{in}}">
+                                                   [(ngModel)]="settingsObj.widgetList[in].tag"
+                                                   name="tag{{in}}">
                                         </mat-form-field>
                                     </td>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.tag' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].closingTag"
-                                                   name="closingTag{{in}}">
-                                        </mat-form-field>
-                                    </td>
-                                    <td>
-                                        <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.bgColor' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].bgClass"
-                                                   name="bgClass{{in}}">
+                                            <mat-select placeholder="{{ 'widget.bgColor' | translate }}" [(ngModel)]="settingsObj.widgetList[in].bgClass"
+                                                        name="bgClass{{in}}" required>
+                                                <mat-option *ngFor="let color of colors" [value]="color">
+                                                    {{color}}
+                                                </mat-option>
+                                            </mat-select>
                                         </mat-form-field>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.icon' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].icon"
-                                                   name="icon{{in}}">
+                                            <mat-select placeholder="{{ 'widget.icon' | translate }}" [(ngModel)]="settingsObj.widgetList[in].icon"
+                                                        name="icon{{in}}" required>
+                                                <mat-option *ngFor="let icon of icons" [value]="icon">
+                                                    <span class="fa {{icon}}"> {{icon}}</span>
+                                                </mat-option>
+                                            </mat-select>
                                         </mat-form-field>
                                     </td>
                                     <td>

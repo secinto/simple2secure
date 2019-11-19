@@ -6,7 +6,7 @@
                     [position]="getRectangle(widget)"
                     [movable]="true"
                     [resizable]="false">
-            <app-stat *ngIf="widget.widget.startTag === '<app-stat>'" [bgClass]="widget.widget.bgClass"
+            <app-stat *ngIf="widget.widget.tag === 'app-stat'" [bgClass]="widget.widget.bgClass"
                       [icon]="widget.widget.icon" [count]="10" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id"></app-stat>
         </ngx-widget>
     </ngx-widget-grid>

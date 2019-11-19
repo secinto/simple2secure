@@ -13,8 +13,7 @@ export class StatItemComponent implements OnInit {
 
     @Input() id: string;
     @Input() name: string;
-    @Input() startTag: string;
-    @Input() closingTag: string;
+    @Input() tag: string;
     @Input() description: string;
     @Input() bgClass: string;
     @Input() icon: string;
@@ -30,11 +29,10 @@ export class StatItemComponent implements OnInit {
     addWidget(){
         this.widget = new Widget();
         this.widget.id = this.id;
-        this.widget.startTag = this.startTag;
+        this.widget.tag = this.tag;
         this.widget.description = this.description;
         this.widget.label = this.label;
         this.widget.bgClass = this.bgClass;
-        this.widget.closingTag = this.closingTag;
         this.widget.icon = this.icon;
         this.widget.name = this.name;
 

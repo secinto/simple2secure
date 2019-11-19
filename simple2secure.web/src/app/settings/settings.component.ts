@@ -23,13 +23,14 @@
 import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material';
 import {TestMacro} from '../_models/TestMacro';
-import {AlertService, HttpService, DataService} from '../_services/index';
-import {Router, ActivatedRoute} from '@angular/router';
+import {AlertService, DataService, HttpService} from '../_services/index';
+import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Settings, SettingsDTO, Timeunit} from '../_models';
 import {environment} from '../../environments/environment';
 import {LicensePlan} from '../_models/LicensePlan';
 import {Widget} from '../_models/widget';
+import {WidgetColor} from '../_models/widgetColor';
 
 @Component({
 	moduleId: module.id,
@@ -44,6 +45,8 @@ export class SettingsComponent {
 	settingsObj: SettingsDTO;
 	timeUnits = Timeunit;
 	updated = false;
+	colors: WidgetColor[];
+	icons: string[];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -57,6 +60,9 @@ export class SettingsComponent {
 		this.settingsObj = new SettingsDTO();
 		this.settingsObj.licensePlan = [];
 		this.settingsObj.settings = new Settings();
+		this.colors = [WidgetColor.DANGER, WidgetColor.DARK, WidgetColor.INFO, WidgetColor.LIGHT, WidgetColor.SUCCESS,
+					   WidgetColor.WARNING, WidgetColor.SECINTO];
+		this.icons = ['fa-server', 'fa-user', 'fa-satellite'];
 	}
 
 	ngOnInit() {

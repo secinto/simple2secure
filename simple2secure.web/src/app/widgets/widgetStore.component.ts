@@ -88,14 +88,13 @@ export class WidgetStoreComponent {
 
 	loadComponents(widgets: Widget[]){
 		for (const widget of widgets) {
-			if (widget.startTag == '<app-stat>'){
+			if (widget.tag == 'app-stat'){
 				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(StatItemComponent);
 				const component = this.container.createComponent(componentFactory);
 
 				(<StatItemComponent>component.instance).id = widget.id;
 				(<StatItemComponent>component.instance).name = widget.name;
-				(<StatItemComponent>component.instance).startTag = widget.startTag;
-				(<StatItemComponent>component.instance).closingTag = widget.closingTag;
+				(<StatItemComponent>component.instance).tag = widget.tag;
 				(<StatItemComponent>component.instance).description = widget.description;
 				(<StatItemComponent>component.instance).bgClass = widget.bgClass;
 				(<StatItemComponent>component.instance).icon = widget.icon;

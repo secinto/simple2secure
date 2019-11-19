@@ -50,9 +50,4 @@ export class StatComponent implements OnInit {
                 this.loading = false;
             });
     }
-
-    refreshPage(){
-        this.router.navigateByUrl('/DummyComponent', {skipLocationChange: true}).then(() =>
-            this.router.navigate([this.router.url]));
-    }
 }
