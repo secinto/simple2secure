@@ -769,3 +769,18 @@ $font-weight-bold: 700 !default;
     .float#{$infix}-none  { @include float-none; }
   }
 }
+
+.add-widget-button{
+  margin-bottom: 5px;
+  float: right;
+  margin-top: 44px;
+  margin-left: 3px;
+}
+
+.widget-delete-btn{
+  width: 10px;
+  height: 10px;
+  margin-left: -20px;
+  margin-top: -10px;
+  z-index: 21;
+}

@@ -107,7 +107,7 @@ export class DataService {
 	}
 
 	clearWidgets(){
-		localStorage.removeItem('selectedWidgets');
+		localStorage.removeItem('selectedWidget');
 	}
 
 }

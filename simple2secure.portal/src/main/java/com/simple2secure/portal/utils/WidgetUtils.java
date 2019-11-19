@@ -34,15 +34,11 @@ import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
-import com.simple2secure.portal.repository.WidgetUserRelRepository;
 
 @Component
 public class WidgetUtils {
 
 	private static Logger log = LoggerFactory.getLogger(WidgetUtils.class);
-
-	@Autowired
-	WidgetUserRelRepository widgetUserRelRepository;
 
 	@Autowired
 	WidgetPropertiesRepository widgetPropertiesRepository;

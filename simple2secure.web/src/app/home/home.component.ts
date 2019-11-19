@@ -22,13 +22,8 @@
 
 import {
 	Component,
-	ComponentFactoryResolver, ElementRef,
 	OnInit,
-	QueryList, TemplateRef,
-	ViewChild,
-	ViewChildren,
-	ViewContainerRef
-} from '@angular/core';
+	ViewChild} from '@angular/core';
 import {ContextDTO, User} from '../_models/index';
 import {NgxWidgetComponent, NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
 import {MatDialog, MatDialogConfig} from '@angular/material';
@@ -36,11 +31,8 @@ import {WidgetStoreComponent} from '../widgets/widgetStore.component';
 import {TranslateService} from '@ngx-translate/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
-import {StatItemComponent} from '../widgets/stat-item.component';
-import {Widget} from '../_models/widget';
-import {container} from '@angular/core/src/render3';
-import {NgTemplateOutlet} from '@angular/common';
 import {environment} from '../../environments/environment';
+import {Router} from '@angular/router';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -122,7 +114,7 @@ export class HomeComponent implements OnInit {
 			widgets: null
 		};
 		const dialogRef = this.dialog.open(WidgetStoreComponent, dialogConfig);
-
+		this.dataService.clearWidgets();
 		dialogRef.afterClosed().subscribe(result => {
 			this.addWidgetsToTheList();
 		});
@@ -145,7 +137,7 @@ export class HomeComponent implements OnInit {
 				this.widgets.push(this.widgetDTO);
 			}
 			else{
-				this.alertService.error('No Space Available!');
+				this.alertService.error(this.translate.instant('widget.noplace'));
 			}
 		}
 	}

@@ -149,4 +149,23 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/delete/prop/{widgetPropId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAuthority('SUPERADMIN')")
+	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable("widgetPropId") String widgetPropId,
+			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(widgetPropId)) {
+			WidgetProperties widgetProp = widgetPropertiesRepository.find(widgetPropId);
+			if (widgetProp != null) {
+				widgetPropertiesRepository.delete(widgetProp);
+				return new ResponseEntity<>(widgetProp, HttpStatus.OK);
+			}
+		}
+		log.error("Problem occured while deleting widget with id {}", widgetPropId);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_widget", locale)),
+				HttpStatus.NOT_FOUND);
+
+	}
+
 }
