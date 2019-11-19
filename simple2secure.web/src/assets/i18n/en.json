@@ -461,5 +461,7 @@
   "widget.bgColor": "Background color",
   "widget.icon": "Icon",
   "widget.label": "Label",
-  "widget.store": "Widget Store"
+  "widget.store": "Widget Store",
+  "widget.noplace": "No space available on the dashboard!",
+  "widget.deleted": "Widget deleted successfully!"
 }

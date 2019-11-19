@@ -359,8 +359,8 @@ export const httpInterceptorProviders = [
 		TestSequenceDetailsComponent,
 		TestSequenceResultDetailsComponent,
 		WidgetStoreComponent,
-		StatComponent,
 		StatItemComponent,
+		StatComponent,
 		SUTDetailsComponent
 	],
 	providers: [

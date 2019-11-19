@@ -1,13 +1,13 @@
 <div class="example-container">
-    <button class="btn btn-sm btn-add-widget" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
+    <button class="btn btn-sm btn-add-widget mat-green-button" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
     <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
-                     [showGrid]="true" (widgetPositionChange)="onWidgetChange($event)" #grid>
+                     [showGrid]="false" (widgetPositionChange)="onWidgetChange($event)" #grid>
         <ngx-widget *ngFor="let widget of widgets;let $index = index; "
                     [position]="getRectangle(widget)"
                     [movable]="true"
-                    [resizable]="true">
+                    [resizable]="false">
             <app-stat *ngIf="widget.widget.startTag === '<app-stat>'" [bgClass]="widget.widget.bgClass"
-                      [icon]="widget.widget.icon" [count]="10" [label]="widget.widget.label"></app-stat>
+                      [icon]="widget.widget.icon" [count]="10" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id"></app-stat>
         </ngx-widget>
     </ngx-widget-grid>
 </div>
