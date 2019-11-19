@@ -22,6 +22,8 @@
 
 package com.simple2secure.api.model;
 
+import javax.persistence.Embedded;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class SystemUnderTest extends GenericDBObject {
@@ -33,8 +35,8 @@ public class SystemUnderTest extends GenericDBObject {
 
     private String groupId;
     private String endDeviceId;
-	private String endDeviceName;
-    private String endDeviceType;
+    @Embedded
+    private DeviceType endDeviceType;
     private String endDeviceLocation;
     private String name;
 	private String ipAdress;
@@ -44,11 +46,10 @@ public class SystemUnderTest extends GenericDBObject {
     public SystemUnderTest(){
     }
 
-    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceName, String endDeviceType, String endDeviceLocation, 
+    public SystemUnderTest(String groupId, String endDeviceId, DeviceType endDeviceType, String endDeviceLocation, 
     		String name,  String ipAdress, String netMask){
         setGroupId(groupId);
         setEndDeviceId(endDeviceId);
-        setEndDeviceName(endDeviceName);
         setEndDeviceType(endDeviceType);
         setEndDeviceLocation(endDeviceLocation);
         setName(name);
@@ -72,19 +73,11 @@ public class SystemUnderTest extends GenericDBObject {
 		this.endDeviceId = endDeviceId;
 	}
 
-    public String getEndDeviceName() {
-        return endDeviceName;
-    }
-
-    public void setEndDeviceName(String endDeviceName) {
-        this.endDeviceName = endDeviceName;
-    }
-
-    public String getEndDeviceType() {
+    public DeviceType getEndDeviceType() {
         return endDeviceType;
     }
 
-    public void setEndDeviceType(String endDeviceType) {
+    public void setEndDeviceType(DeviceType endDeviceType) {
         this.endDeviceType = endDeviceType;
     }
 

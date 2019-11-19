@@ -40,7 +40,10 @@ export class OrbiterSystemsUnderTestListComponent {
 	displayedColumns = ['name', 'groupId', 'endDevice', 'ipAdress', 'action'];
 	groupId: string;
 	sutList: SystemUnderTest[];
+	selectedSUT: SystemUnderTest;
 	loading = false;
+	public pageSize = 10;
+	public currentPage = 0;
 	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 
@@ -110,6 +113,10 @@ export class OrbiterSystemsUnderTestListComponent {
 					}
 					this.loading = false;
 				});
+	}
+	
+	public onMenuTriggerClick(sut: SystemUnderTest) {
+		this.selectedSUT = sut;
 	}
 
 }

@@ -19,15 +19,9 @@
  *
  *********************************************************************
  */
-import {Base} from './base';
-import { DeviceType } from '../_models/deviceType';
 
-export class SystemUnderTest extends Base {
-    groupId: string;
-	endDeviceId: string;
-    endDeviceType: DeviceType;
-    endDeviceLocation: string;
-    name: string;
-	ipAdress: string;
-	netMask: string;
+export enum DeviceType {
+	PROBE = 'PROBE',
+	WWW = 'WWW',
+	UNKNOWN = 'UNKNOWN',
 }

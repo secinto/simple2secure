@@ -20,18 +20,12 @@
  *********************************************************************
 */
 
-package com.simple2secure.portal.repository;
+package com.simple2secure.api.model;
 
-import java.util.List;
+import javax.persistence.Embeddable;
 
-import com.simple2secure.api.model.SystemUnderTest;
-import com.simple2secure.portal.dao.MongoRepository;
-
-public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
-
-    public abstract List<SystemUnderTest> getByGroupId(String groupId, int page, int size);
-    public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
-    public abstract SystemUnderTest getByName(String name);
-    public abstract long getCountOfSUTWithGroupId(String groupId);
-    
+@Embeddable
+public enum DeviceType {
+	PROBE, WWW, UNKNOWN
 }
+
