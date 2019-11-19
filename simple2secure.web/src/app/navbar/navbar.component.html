@@ -5,7 +5,7 @@
         </div>
         <ul class="nav navbar-nav centered-nav">
 
-            <mat-form-field class="search-bar-input">
+            <mat-form-field *ngIf="loggedIn" class="search-bar-input">
                 <input matInput placeholder="{{'menu.search' | translate}}" (keyup.enter)="navigateToTheSearchPage()" [(ngModel)]="searchValue">
                 <span matSuffix><i class="material-icons mat-icon-sidenav">search</i></span>
             </mat-form-field>
