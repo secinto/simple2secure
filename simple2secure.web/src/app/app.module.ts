@@ -174,6 +174,7 @@ import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
 import { SUTDetailsComponent } from './orbiter/sutDetails.component';
 import {BreadcrumbsModule} from 'ng6-breadcrumbs';
+import {StatComponent} from './widgets/stat.component';
 import {NotificationCardComponent} from './widgets/notification-card.component';
 import {WidgetStoreComponent} from './widgets/widgetStore.component';
 import {StatItemComponent} from './widgets/stat-item.component';
@@ -329,6 +330,7 @@ export const httpInterceptorProviders = [
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
 		SUTDetailsComponent,
+		StatComponent,
 		StatItemComponent,
 		NotificationCardComponent,
 		WidgetStoreComponent
@@ -358,6 +360,7 @@ export const httpInterceptorProviders = [
 		TestSequenceResultDetailsComponent,
 		WidgetStoreComponent,
 		StatItemComponent,
+		StatComponent,
 		SUTDetailsComponent
 	],
 	providers: [
