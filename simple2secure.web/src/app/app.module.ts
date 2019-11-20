@@ -40,7 +40,7 @@ import {NotificationComponent, NotificationDetailsComponent} from './notificatio
 import {ConfigurationDetailsComponent} from './configuration';
 import {
 	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
-	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent, UserModalComponent
+	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
 import {
 	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
@@ -304,7 +304,6 @@ export const httpInterceptorProviders = [
 		ActivationComponent,
 		ActivatedComponent,
 		NotificationComponent,
-		UserModalComponent,
 		RuleComponent,
 		RuleOverviewComponent,
 		RuleAddComponent,

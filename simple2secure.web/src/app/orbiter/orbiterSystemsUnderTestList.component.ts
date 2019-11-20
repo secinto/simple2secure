@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { MatTableDataSource, MatDialogConfig, MatDialog } from '@angular/material';
+import {Component, ViewChild} from '@angular/core';
+import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, PageEvent} from '@angular/material';
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -45,24 +45,40 @@ export class OrbiterSystemsUnderTestListComponent {
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
+	public pageEvent: PageEvent;
 	dataSource = new MatTableDataSource();
-
-
+	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	constructor(
 		private alertService: AlertService,
 		private httpService: HttpService,
 		private dataService: DataService,
 		private dialog: MatDialog,
-		private translate: TranslateService,
-		private router: Router,
-		private route: ActivatedRoute
+		private translate: TranslateService
 	) {}
 
 	ngOnInit() {
-		let groups = JSON.parse(localStorage.getItem('groups'));
+		const groups = JSON.parse(localStorage.getItem('groups'));
 		this.groupId = groups[0].id;
 		this.loadSUTList(this.groupId, 0, 10);
+	}
+
+	ngAfterViewInit() {
+		this.dataSource.sort = this.sort;
+	}
+
+	applyFilter(filterValue: string) {
+		filterValue = filterValue.trim(); // Remove whitespace
+		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+		this.dataSource.filter = filterValue;
+	}
+
+	public handlePage(e?: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadSUTList(this.groupId, e.pageIndex, e.pageSize);
+		return e;
 	}
 
 
@@ -77,16 +93,8 @@ export class OrbiterSystemsUnderTestListComponent {
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
 
-        /*
-		dialogRef.afterClosed().subscribe(data => {
-			if (data === true) {
-				this.isSequenceChanged = true;
-				this.loadSequences(this.id, this.currentPage, this.pageSize);
-			}
-		});*/
-
 	}
-	
+
 	public loadSUTList(groupId: string, page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + page + '/' + size)
@@ -114,7 +122,7 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.loading = false;
 				});
 	}
-	
+
 	public onMenuTriggerClick(sut: SystemUnderTest) {
 		this.selectedSUT = sut;
 	}

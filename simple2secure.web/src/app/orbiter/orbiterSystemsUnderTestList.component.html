@@ -62,15 +62,6 @@
 
 <mat-menu #menu="matMenu">
 
-    <button *ngIf="showTestResult" mat-menu-item (click)="openDialogShowSequenceResult()">
-        <mat-icon>description</mat-icon>
-        {{ 'button.showsequenceresult' | translate }}
-    </button>
-
-    <button *ngIf="!showTestResult" disabled mat-menu-item (click)="openDialogShowSequenceResult()">
-        <mat-icon>description</mat-icon>
-        {{ 'button.showsequenceresult' | translate }}
-    </button>
 </mat-menu>
 
 
