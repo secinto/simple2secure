@@ -40,7 +40,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,6 +81,7 @@ import com.simple2secure.portal.utils.LicenseUtils;
 import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.UserUtils;
+import com.simple2secure.portal.validator.Locale;
 
 @RestController
 @RequestMapping("/api/user")
@@ -164,11 +164,9 @@ public class UserController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<User>> getUsers(@Locale String locale) {
 		List<User> userList = userRepository.findAll();
 		return new ResponseEntity<>(userList, HttpStatus.OK);
 	}
@@ -177,12 +175,9 @@ public class UserController {
 	 * This function finds and returns user according to the user id
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/{userId}/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<UserDTO> getUserByID(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<UserDTO> getUserByID(@PathVariable String userId, @PathVariable String contextId, @Locale String locale) {
 
 		User user = userRepository.find(userId);
 
@@ -229,10 +224,8 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @Locale String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (user != null) {
@@ -258,11 +251,8 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/register",
-			method = RequestMethod.POST,
-			consumes = "application/json")
-	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
+	@RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @Locale String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
 			return userUtils.addNewUser(user, locale);
@@ -282,10 +272,8 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/resendActivation",
-			method = RequestMethod.POST)
-	public ResponseEntity<User> resendActivation(@RequestBody String email, @RequestHeader("Accept-Language") String locale)
+	@RequestMapping(value = "/resendActivation", method = RequestMethod.POST)
+	public ResponseEntity<User> resendActivation(@RequestBody String email, @Locale String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (!Strings.isNullOrEmpty(email)) {
 			User user = userRepository.findByEmail(email);
@@ -311,10 +299,8 @@ public class UserController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(
-			value = "/update",
-			method = RequestMethod.POST)
-	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @RequestHeader("Accept-Language") String locale)
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @Locale String locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (userInfo != null) {
@@ -340,12 +326,9 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/activate/updatePassword/{authenticationToken}",
-			method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable("authenticationToken") String authenticationToken,
-			@RequestBody String password, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+	@RequestMapping(value = "/activate/updatePassword/{authenticationToken}", method = RequestMethod.POST)
+	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable String authenticationToken, @RequestBody String password,
+			@Locale String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(authenticationToken)) {
 			User user = userRepository.findByActivationToken(authenticationToken);
@@ -394,11 +377,9 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/activate/{activationToken}",
-			method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> activateUser(@PathVariable("activationToken") String activationToken,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+	@RequestMapping(value = "/activate/{activationToken}", method = RequestMethod.GET)
+	public ResponseEntity<InputStreamResource> activateUser(@PathVariable String activationToken, @Locale String locale)
+			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(activationToken);
 
 		if (user != null) {
@@ -440,10 +421,8 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/sendResetPasswordEmail",
-			method = RequestMethod.POST)
-	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @RequestHeader("Accept-Language") String locale)
+	@RequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
+	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @Locale String locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
 		if (!Strings.isNullOrEmpty(email)) {
@@ -482,10 +461,9 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 
-	@RequestMapping(
-			value = "/resetPassword/{token}")
+	@RequestMapping(value = "/resetPassword/{token}")
 	@PermitAll
-	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable("token") String token) throws URISyntaxException {
+	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable String token) throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);
@@ -499,11 +477,9 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(
-			value = "/invite/{invitationToken}",
-			method = RequestMethod.GET)
-	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable("invitationToken") String invitationToken,
-			@RequestHeader("Accept-Language") String locale) throws URISyntaxException {
+	@RequestMapping(value = "/invite/{invitationToken}", method = RequestMethod.GET)
+	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable String invitationToken, @Locale String locale)
+			throws URISyntaxException {
 
 		// TODO - check if token exists
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/invitation/" + invitationToken);
@@ -517,12 +493,9 @@ public class UserController {
 	 *
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/invite/process/{invitationToken}/{isAccepted}",
-			method = RequestMethod.GET)
-	public ResponseEntity<UserInvitation> processInvitation(@PathVariable("invitationToken") String invitationToken,
-			@PathVariable("isAccepted") boolean isAccepted, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
+	@RequestMapping(value = "/invite/process/{invitationToken}/{isAccepted}", method = RequestMethod.GET)
+	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String invitationToken, @PathVariable boolean isAccepted,
+			@Locale String locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(invitationToken)) {
 			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(invitationToken);
 			if (userInvitation != null) {
@@ -577,11 +550,9 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/updatePassword/{token}",
-			method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserPassword(@PathVariable("token") String token, @RequestBody String password,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+	@RequestMapping(value = "/updatePassword/{token}", method = RequestMethod.POST)
+	public ResponseEntity<User> updateUserPassword(@PathVariable String token, @RequestBody String password, @Locale String locale)
+			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token)) {
 			User user = userRepository.findByPasswordResetToken(token);
@@ -632,12 +603,10 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{userId}/{contextId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable("userId") String userId,
-			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
+			@Locale String locale) throws ItemNotFoundRepositoryException {
 		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
 		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 

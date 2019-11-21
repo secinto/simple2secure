@@ -97,12 +97,10 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}/{page}/{size}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@PathVariable("contextId") String contextId, @PathVariable("page") int page,
-			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@PathVariable String contextId, @PathVariable int page,
+			@PathVariable int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 			Context context = contextRepository.find(contextId);
@@ -129,9 +127,7 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}/{active}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{contextId}/{active}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@PathVariable("contextId") String contextId,
 			@PathVariable("active") boolean active, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -164,9 +160,7 @@ public class DeviceController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(
-			value = "/config/{deviceId}/{hostname}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/config/{deviceId}/{hostname}", method = RequestMethod.GET)
 	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("deviceId") String deviceId, @PathVariable("hostname") String hostname)
 			throws ItemNotFoundRepositoryException {
 
@@ -195,10 +189,7 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/scheduledTests/{deviceId}",
-			method = RequestMethod.GET,
-			consumes = "application/json")
+	@RequestMapping(value = "/scheduledTests/{deviceId}", method = RequestMethod.GET, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -220,9 +211,7 @@ public class DeviceController {
 	 * This function deletes the specified the POD with the specified ID if it exists
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/delete/{deviceId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/delete/{deviceId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -249,9 +238,7 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/changeGroup/{deviceId}",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/changeGroup/{deviceId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("deviceId") String deviceId, @RequestBody CompanyGroup group,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -276,18 +263,14 @@ public class DeviceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(
-			value = "/status",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/status", method = RequestMethod.GET)
 	public ResponseEntity<Service> getStatus(@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
-	@RequestMapping(
-			value = "/status/{deviceId}",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/status/{deviceId}", method = RequestMethod.POST)
 	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId)) {

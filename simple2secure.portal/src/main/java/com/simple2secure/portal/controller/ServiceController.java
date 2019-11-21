@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +39,7 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.validator.Locale;
 
 @RestController
 @RequestMapping("/api/service")
@@ -54,19 +54,14 @@ public class ServiceController {
 	@Autowired
 	LoadedConfigItems loadedConfigItems;
 
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.GET)
-	public ResponseEntity<Service> getServiceVersion(@RequestHeader("Accept-Language") String locale) {
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<Service> getServiceVersion(@Locale String locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{versionId}",
-			method = RequestMethod.GET)
-	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable("version") String version,
-			@RequestHeader("Accept-Language") String locale) {
+	@RequestMapping(value = "/{version}", method = RequestMethod.GET)
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable String version, @Locale String locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);
 
 		try {
