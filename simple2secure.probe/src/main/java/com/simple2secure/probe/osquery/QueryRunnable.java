@@ -51,6 +51,7 @@ public class QueryRunnable implements Runnable {
 	@Override
 	public void run() {
 		String queryString = query.getSqlQuery();
+		log.info("Executing query {} ", query.getName());
 		String queryResult = executeQuery(queryString, query.getName());
 		if (!Strings.isNullOrEmpty(queryResult)) {
 			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
@@ -88,7 +89,7 @@ public class QueryRunnable implements Runnable {
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
 		// pb.directory(directory);
-		log.info("Using command {} to execute query", pb.command());
+		log.debug("Using command {} to execute query", pb.command());
 		try {
 			p = pb.start();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
