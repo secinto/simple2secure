@@ -1507,7 +1507,7 @@
 		"graphAble": false
 	},
 	{
-		"name": " Sophos_Anti-Virus_Services_1",
+		"name": "Sophos_Anti-Virus_Services_1",
 		"sqlQuery": "SELECT * FROM services WHERE name = 'SAVAdminService' AND status != 'RUNNING';",
 		"description": "Symantec Endpoint Protection service Status change",
 		"always": true,

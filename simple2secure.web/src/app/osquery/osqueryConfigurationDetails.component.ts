@@ -88,8 +88,6 @@ export class OsqueryConfigurationDetailsComponent {
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
 		this.dataSource.sortingDataAccessor = (item, property) => {
-			console.log(property);
-			console.log(item);
 			if (property === 'interval') {
 				return (item['analysisIntervalUnit'] + ' ' + item['analysisInterval']);
 			} else {
