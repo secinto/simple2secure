@@ -44,6 +44,7 @@ import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.RuleActionsRepository;
@@ -61,7 +62,7 @@ import com.simple2secure.portal.utils.RuleUtils;
  *
  */
 @RestController
-@RequestMapping("/api/rule")
+@RequestMapping(StaticConfigItems.RULE_API)
 public class RuleController {
 
 	private static Logger log = LoggerFactory.getLogger(RuleController.class);

@@ -73,5 +73,28 @@ public class StaticConfigItems {
 	
 	public static final String USER_ANNOTATION_TAG = "/{userId}";
 	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
+	
+	public static final String CONFIG_API = "/api/config";
+	public static final String CONTEXT_API = "/api/context";
+	public static final String DASH_API = "/api/dash";
+	public static final String DEVICE_API = "/api/device";
+	public static final String DOWNLOAD_API = "/api/download";
+	public static final String EMAIL_API = "/api/email";
+	public static final String GROUP_API = "/api/group";
+	public static final String LICENSE_API = "/api/license";
+	public static final String NOTIFICATION_API = "/api/notification";
+	public static final String PROCESSOR_API = "/api/processors";
+	public static final String QUERY_API = "/api/query";
+	public static final String REPORT_API = "/api/reports";
+	public static final String RULE_API = "/api/rule";
+	public static final String SEARCH_API = "/api/search";
+	public static final String SERVICE_API = "/api/service";
+	public static final String SETTINGS_API = "/api/settings";
+	public static final String STEP_API = "/api/steps";
+	public static final String SUT_API = "/api/sut";
+	public static final String TEST_API = "/api/test";
+	public static final String SEQUENCE_API = "/api/sequence";
+	public static final String USER_API = "/api/user";
+	public static final String WIDGET_API = "/api/widget";
 
 }

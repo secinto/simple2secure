@@ -64,7 +64,7 @@ import com.simple2secure.portal.validator.ValidInput;
 import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
-@RequestMapping("/api/context")
+@RequestMapping(StaticConfigItems.CONTEXT_API)
 public class ContextController {
 
 	public static final Logger log = LoggerFactory.getLogger(ContextController.class);

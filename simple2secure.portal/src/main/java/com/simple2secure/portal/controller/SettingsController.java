@@ -42,6 +42,7 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.LicensePlanRepository;
@@ -51,7 +52,7 @@ import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
 @RestController
-@RequestMapping("/api/settings")
+@RequestMapping(StaticConfigItems.SETTINGS_API)
 public class SettingsController {
 
 	static final Logger log = LoggerFactory.getLogger(SettingsController.class);

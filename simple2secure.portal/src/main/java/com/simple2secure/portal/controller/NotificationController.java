@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.NotificationRepository;
@@ -45,7 +46,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 
 @RestController
-@RequestMapping("/api/notification")
+@RequestMapping(StaticConfigItems.NOTIFICATION_API)
 public class NotificationController {
 
 	static final Logger log = LoggerFactory.getLogger(NotificationController.class);

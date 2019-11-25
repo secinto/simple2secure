@@ -49,6 +49,7 @@ import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -62,7 +63,7 @@ import com.simple2secure.portal.utils.TestUtils;
 import com.simple2secure.portal.validator.ValidInput;
 
 @RestController
-@RequestMapping("/api/device")
+@RequestMapping(StaticConfigItems.DEVICE_API)
 public class DeviceController {
 
 	public static final Logger log = LoggerFactory.getLogger(DeviceController.class);

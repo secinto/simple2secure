@@ -46,6 +46,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -60,7 +61,7 @@ import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
-@RequestMapping("/api/query")
+@RequestMapping(StaticConfigItems.QUERY_API)
 public class QueryController {
 
 	@Autowired
@@ -103,9 +104,7 @@ public class QueryController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -138,9 +137,7 @@ public class QueryController {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{id}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
 
@@ -157,9 +154,7 @@ public class QueryController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(
-			value = "/{queryId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{queryId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteQuery(@PathVariable("queryId") String queryId, @RequestHeader("Accept-Language") String locale) {
 
@@ -182,9 +177,7 @@ public class QueryController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	@RequestMapping(
-			value = "/{deviceId}/{osinfo}/{select_all}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{deviceId}/{osinfo}/{select_all}", method = RequestMethod.GET)
 	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable("deviceId") String deviceId,
 			@PathVariable("osinfo") String osinfo, @PathVariable("select_all") boolean select_all,
 			@RequestHeader("Accept-Language") String locale) {
@@ -240,9 +233,7 @@ public class QueryController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/group/{groupId}/{select_all}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -262,9 +253,7 @@ public class QueryController {
 	 * This function returns query config by the id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/context/{contextId}/{select_all}/{graph_able}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/context/{contextId}/{select_all}/{graph_able}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
 			@PathVariable("select_all") boolean select_all, @PathVariable("graph_able") boolean graph_able,

@@ -89,7 +89,7 @@ import com.simple2secure.portal.validator.ValidInput;
 import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping(StaticConfigItems.USER_API)
 public class UserController {
 
 	static final Logger log = LoggerFactory.getLogger(UserController.class);

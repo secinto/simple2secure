@@ -50,6 +50,7 @@ import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -64,7 +65,7 @@ import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping(StaticConfigItems.TEST_API)
 public class TestController {
 
 	@Autowired

@@ -26,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simple2secure.commons.config.StaticConfigItems;
+
 @RestController
-@RequestMapping("/api/dash")
+@RequestMapping(StaticConfigItems.DASH_API)
 public class DashController {
 
 	static final Logger log = LoggerFactory.getLogger(DashController.class);

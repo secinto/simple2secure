@@ -37,6 +37,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -44,7 +45,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 
 @RestController
-@RequestMapping("/api/config")
+@RequestMapping(StaticConfigItems.CONFIG_API)
 public class ConfigController {
 
 	@Autowired
@@ -61,9 +62,7 @@ public class ConfigController {
 	static final Logger log = LoggerFactory.getLogger(ConfigController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/copy/{sourceGroupId}",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/copy/{sourceGroupId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup,
 			@PathVariable("sourceGroupId") String sourceGroupId, @RequestHeader("Accept-Language") String locale)

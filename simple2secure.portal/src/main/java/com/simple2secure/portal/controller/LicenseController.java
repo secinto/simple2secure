@@ -51,6 +51,7 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.LicensePlan;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -74,7 +75,7 @@ import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.SUTUtils;
 
 @RestController
-@RequestMapping("/api/license")
+@RequestMapping(StaticConfigItems.LICENSE_API)
 public class LicenseController {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
@@ -131,7 +132,7 @@ public class LicenseController {
 
 	@Autowired
 	LicenseUtils licenseUtils;
-	
+
 	@Autowired
 	SUTUtils sutUtils;
 
@@ -167,10 +168,7 @@ public class LicenseController {
 	 * @throws UnsupportedEncodingException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/authenticate",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
@@ -189,7 +187,7 @@ public class LicenseController {
 
 			if (!licensePublic.isActivated()) {
 				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale);
-				if(!licensePublic.isDevicePod()) {
+				if (!licensePublic.isDevicePod()) {
 					sutUtils.addProbeAsSUT(licensePublic);
 				}
 			} else {
@@ -222,9 +220,7 @@ public class LicenseController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/{groupId}/{userId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
 			@RequestHeader("Accept-Language") String locale) throws Exception {
@@ -279,9 +275,7 @@ public class LicenseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(
-			value = "/downloadLicenseForScript",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @RequestHeader("Accept-Language") String locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {

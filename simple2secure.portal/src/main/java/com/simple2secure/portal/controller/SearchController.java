@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
@@ -43,7 +44,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.SearchUtils;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping(StaticConfigItems.SEARCH_API)
 public class SearchController {
 
 	@Autowired
@@ -59,9 +60,7 @@ public class SearchController {
 	SearchUtils searchUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{searchQuery}/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{searchQuery}/{contextId}", method = RequestMethod.GET)
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable("searchQuery") String searchQuery,
 			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) {
 

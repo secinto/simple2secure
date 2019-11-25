@@ -43,6 +43,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -53,7 +54,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
-@RequestMapping("/api/processors")
+@RequestMapping(StaticConfigItems.PROCESSOR_API)
 public class ProcessorController {
 
 	static final Logger log = LoggerFactory.getLogger(ProcessorController.class);
@@ -77,10 +78,7 @@ public class ProcessorController {
 	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -110,9 +108,7 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{probeId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{probeId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -156,9 +152,7 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/group/{groupId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/group/{groupId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable("groupId") String groupId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -176,9 +170,7 @@ public class ProcessorController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(
-			value = "/{processorId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{processorId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteProcessor(@PathVariable("processorId") String processorId,
 			@RequestHeader("Accept-Language") String locale) {

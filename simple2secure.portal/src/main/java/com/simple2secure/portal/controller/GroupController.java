@@ -46,6 +46,7 @@ import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -57,7 +58,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 
 @RestController
-@RequestMapping("/api/group")
+@RequestMapping(StaticConfigItems.GROUP_API)
 public class GroupController {
 
 	static final Logger log = LoggerFactory.getLogger(GroupController.class);
@@ -95,9 +96,7 @@ public class GroupController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{userId}/{parentGroupId}/{contextId}",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/{userId}/{parentGroupId}/{contextId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @PathVariable("userId") String userId,
 			@PathVariable("parentGroupId") String parentGroupId, @PathVariable("contextId") String contextId,
@@ -171,9 +170,7 @@ public class GroupController {
 	 * This function returns the group according to the group id
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{groupID}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{groupID}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 		if (!Strings.isNullOrEmpty(groupId)) {
@@ -192,9 +189,7 @@ public class GroupController {
 	 * This function returns all groups according to the contextId
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/context/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/context/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@PathVariable("contextId") String contextId,
 			@RequestHeader("Accept-Language") String locale) {
@@ -217,9 +212,7 @@ public class GroupController {
 	 * This function returns all groups according to the contextId
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{userId}/{contextId}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@PathVariable("contextId") String contextId,
 			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
@@ -248,9 +241,7 @@ public class GroupController {
 	 * This function returns all users from the user repository
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{groupID}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{groupID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @RequestHeader("Accept-Language") String locale) {
 
@@ -279,9 +270,7 @@ public class GroupController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/move/{sourceGroupId}/{destGroupId}/{userId}",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/move/{sourceGroupId}/{destGroupId}/{userId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable("sourceGroupId") String sourceGroupId,
 			@PathVariable("destGroupId") String destGroupId, @PathVariable("userId") String userId,

@@ -32,6 +32,7 @@ import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -49,7 +50,7 @@ import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
-@RequestMapping("/api/sequence")
+@RequestMapping(StaticConfigItems.SEQUENCE_API)
 public class TestSequenceController {
 
 	private static Logger log = LoggerFactory.getLogger(TestSequenceController.class);
@@ -252,7 +253,8 @@ public class TestSequenceController {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -266,7 +268,8 @@ public class TestSequenceController {
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -280,7 +283,8 @@ public class TestSequenceController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -294,7 +298,8 @@ public class TestSequenceController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -310,16 +315,19 @@ public class TestSequenceController {
 			if (sequenceIds != null) {
 				List<TestSequenceResult> sequenceResults = testSequenceResultRepository.getBySequenceRunIds(sequenceIds, page, size);
 				Map<String, Object> sequenceResultMap = new HashMap<>();
-				if(!sequenceResults.isEmpty()){
+				if (!sequenceResults.isEmpty()) {
 					sequenceResultMap.put("results", sequenceResults);
 					sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
 					return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
-				}else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)), HttpStatus.NOT_FOUND);
+				} else {
+					return new ResponseEntity(
+							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+							HttpStatus.NOT_FOUND);
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
 				HttpStatus.NOT_FOUND);
 	}
 

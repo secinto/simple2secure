@@ -41,6 +41,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -50,7 +51,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @RestController
-@RequestMapping("/api/steps")
+@RequestMapping(StaticConfigItems.STEP_API)
 public class StepController {
 
 	@Autowired
@@ -71,9 +72,7 @@ public class StepController {
 	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{probeId}/{select_all}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/{probeId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -113,9 +112,7 @@ public class StepController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/group/{groupId}/{select_all}",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable("groupId") String groupId,
 			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
@@ -132,10 +129,7 @@ public class StepController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
@@ -166,9 +160,7 @@ public class StepController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{stepId}",
-			method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{stepId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
