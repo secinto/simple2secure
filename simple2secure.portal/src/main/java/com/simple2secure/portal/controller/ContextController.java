@@ -189,7 +189,7 @@ public class ContextController {
 				return new ResponseEntity<>(contextList, HttpStatus.OK);
 			}
 		}
-		log.error("Problem occured while retrieving contexts for user ID {}" + userId);
+		log.error("Problem occured while retrieving contexts for user ID {}" + userId.getValue());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

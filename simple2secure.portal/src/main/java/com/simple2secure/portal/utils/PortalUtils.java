@@ -55,6 +55,7 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputParamType;
+import com.simple2secure.api.model.ValidInputGroupId;
 import com.simple2secure.api.model.ValidInputUser;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -349,6 +350,8 @@ public class PortalUtils {
 			return true;
 		} else if (param.getType().equals(ValidInputUser.class)) {
 			return true;
+		} else if (param.getType().equals(ValidInputGroupId.class)) {
+			return true;
 		}
 		return false;
 	}
@@ -364,6 +367,8 @@ public class PortalUtils {
 			return StaticConfigItems.CONTEXT_ANNOTATION_TAG;
 		} else if (param.getType().equals(ValidInputUser.class)) {
 			return StaticConfigItems.USER_ANNOTATION_TAG;
+		} else if (param.getType().equals(ValidInputGroupId.class)) {
+			return StaticConfigItems.SRC_GRP_ANNOTATION_TAG;
 		}
 		return "";
 	}

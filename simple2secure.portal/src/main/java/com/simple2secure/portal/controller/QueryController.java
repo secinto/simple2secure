@@ -34,7 +34,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +45,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -59,6 +59,7 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.validator.ValidInput;
 
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
@@ -106,7 +107,7 @@ public class QueryController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (query != null) {
@@ -122,7 +123,7 @@ public class QueryController {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -139,7 +140,7 @@ public class QueryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(id)) {
 			QueryRun queryConfig = queryRepository.find(id);
@@ -148,7 +149,8 @@ public class QueryController {
 			}
 		}
 		log.error("Query configuration not found for the query ID {}", id);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -156,7 +158,7 @@ public class QueryController {
 	 */
 	@RequestMapping(value = "/{queryId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteQuery(@PathVariable("queryId") String queryId, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<?> deleteQuery(@PathVariable("queryId") String queryId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId)) {
 			QueryRun queryRun = queryRepository.find(queryId);
@@ -166,10 +168,8 @@ public class QueryController {
 			}
 		}
 		log.error("Problem occured while deleting query run with id {}", queryId);
-		return new ResponseEntity<>(
-				new CustomErrorType(
-						messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun", ObjectUtils.toObjectArray(queryId), locale)),
-				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun",
+				ObjectUtils.toObjectArray(queryId), locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -179,8 +179,7 @@ public class QueryController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	@RequestMapping(value = "/{deviceId}/{osinfo}/{select_all}", method = RequestMethod.GET)
 	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable("deviceId") String deviceId,
-			@PathVariable("osinfo") String osinfo, @PathVariable("select_all") boolean select_all,
-			@RequestHeader("Accept-Language") String locale) {
+			@PathVariable("osinfo") String osinfo, @PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
 
 		if (Strings.isNullOrEmpty(osinfo)) {
 			osinfo = OSInfo.UNKNOWN.name();
@@ -225,7 +224,7 @@ public class QueryController {
 			}
 		}
 		log.error("Error while getting query run for the probe id {}", deviceId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -236,7 +235,7 @@ public class QueryController {
 	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
-			@PathVariable("select_all") boolean select_all, @RequestHeader("Accept-Language") String locale) {
+			@PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId)) {
 			List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId, select_all);
@@ -246,7 +245,8 @@ public class QueryController {
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -256,8 +256,7 @@ public class QueryController {
 	@RequestMapping(value = "/context/{contextId}/{select_all}/{graph_able}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
-			@PathVariable("select_all") boolean select_all, @PathVariable("graph_able") boolean graph_able,
-			@RequestHeader("Accept-Language") String locale) {
+			@PathVariable("select_all") boolean select_all, @PathVariable("graph_able") boolean graph_able, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId)) {
 
@@ -290,6 +289,7 @@ public class QueryController {
 
 		}
 		log.error("Query configuration not found for the context ID {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale)), HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 }

@@ -38,7 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +50,7 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.LicensePlan;
+import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
@@ -73,6 +73,7 @@ import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.LicenseUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.SUTUtils;
+import com.simple2secure.portal.validator.ValidInput;
 
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
@@ -169,8 +170,8 @@ public class LicenseController {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
+	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
 			boolean podAuthentication = false;
@@ -180,18 +181,18 @@ public class LicenseController {
 				podAuthentication = false;
 			} else {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 			LicenseActivation activation = null;
 
 			if (!licensePublic.isActivated()) {
-				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale);
+				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale.getValue());
 				if (!licensePublic.isDevicePod()) {
 					sutUtils.addProbeAsSUT(licensePublic);
 				}
 			} else {
-				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale);
+				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale.getValue());
 			}
 			if (activation.isSuccess()) {
 				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
@@ -204,7 +205,7 @@ public class LicenseController {
 				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -223,7 +224,7 @@ public class LicenseController {
 	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
-			@RequestHeader("Accept-Language") String locale) throws Exception {
+			@ValidInput ValidInputLocale locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -264,7 +265,7 @@ public class LicenseController {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale)),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -276,8 +277,7 @@ public class LicenseController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
-	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @RequestHeader("Accept-Language") String locale)
-			throws Exception {
+	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ValidInput ValidInputLocale locale) throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
 
 			String payload = licenseUtils.getPayloadFromTheToken(authToken);

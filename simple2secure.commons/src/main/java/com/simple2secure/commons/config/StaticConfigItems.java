@@ -73,6 +73,7 @@ public class StaticConfigItems {
 	
 	public static final String USER_ANNOTATION_TAG = "/{userId}";
 	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
+	public static final String SRC_GRP_ANNOTATION_TAG = "/{sourceGroupId}";
 	
 	public static final String CONFIG_API = "/api/config";
 	public static final String CONTEXT_API = "/api/context";

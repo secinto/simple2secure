@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,7 +96,7 @@ public class ReportController {
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @ValidInput ValidInputLocale locale) {
 		if (report != null) {
@@ -167,16 +168,16 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/network/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId,
 			@PathVariable("page") int page, @PathVariable("size") int size, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+				List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
 				if (groups != null) {
 
-					log.debug("Loading network reports for contextId {0}", contextId);
+					log.debug("Loading network reports for contextId {0}", contextId.getValue());
 
 					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 

@@ -86,7 +86,7 @@ export class UserGroupApplyConfigComponent {
 	}
 
 	applyConfig() {
-		this.url = environment.apiEndpoint + 'config/copy/' + this.sourceGroup.id;
+		this.url = environment.apiEndpoint + 'group/copy/' + this.sourceGroup.id;
 		this.httpService.post(this.destGroup, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);
