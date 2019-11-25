@@ -35,11 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
+import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.validator.Locale;
+import com.simple2secure.portal.validator.ValidInput;
 
 @RestController
 @RequestMapping("/api/service")
@@ -55,13 +56,13 @@ public class ServiceController {
 	LoadedConfigItems loadedConfigItems;
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	public ResponseEntity<Service> getServiceVersion(@Locale String locale) {
+	public ResponseEntity<Service> getServiceVersion(@ValidInput ValidInputLocale locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{version}", method = RequestMethod.GET)
-	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable String version, @Locale String locale) {
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable String version, @ValidInput ValidInputLocale locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);
 
 		try {
@@ -73,7 +74,8 @@ public class ServiceController {
 		if (library != null) {
 			return new ResponseEntity<>(library, HttpStatus.OK);
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale)), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
+					HttpStatus.NOT_FOUND);
 
 		}
 	}

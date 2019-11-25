@@ -46,6 +46,8 @@ import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.ValidInputContext;
+import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -57,6 +59,7 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.TestUtils;
+import com.simple2secure.portal.validator.ValidInput;
 
 @RestController
 @RequestMapping("/api/device")
@@ -99,11 +102,11 @@ public class DeviceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@PathVariable String contextId, @PathVariable int page,
-			@PathVariable int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ValidInput ValidInputContext contextId, @PathVariable int page,
+			@PathVariable int size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
 				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page, size);
 
@@ -113,10 +116,10 @@ public class DeviceController {
 			}
 		}
 
-		log.error("Problem occured while retrieving pods for contextId {}", contextId);
+		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
 
 		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}

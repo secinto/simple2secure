@@ -24,6 +24,9 @@ package com.simple2secure.portal.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -39,16 +42,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.ValidInputContext;
+import com.simple2secure.api.model.ValidInputParamType;
+import com.simple2secure.api.model.ValidInputUser;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -264,7 +274,7 @@ public class PortalUtils {
 	 */
 	public int getPaginationLimit(int size) {
 		if (size == 0) {
-			size = ConfigItems.DEFAULT_VALUE_SIZE;
+			size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return size;
 	}
@@ -279,7 +289,7 @@ public class PortalUtils {
 	 */
 	public int getPaginationStart(int size, int page, int limit) {
 		if (size == 0) {
-			size = ConfigItems.DEFAULT_VALUE_SIZE;
+			size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return ((page + 1) * size) - limit;
 	}
@@ -328,4 +338,133 @@ public class PortalUtils {
 		return ids;
 	}
 
+	/**
+	 * This method checks if the provided parameter should be part of the generated method url
+	 *
+	 * @param param
+	 * @return
+	 */
+	private boolean isParamPathVariable(Parameter param) {
+		if (param.getType().equals(ValidInputContext.class)) {
+			return true;
+		} else if (param.getType().equals(ValidInputUser.class)) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * This method generates the method url string from the provided parameter type
+	 *
+	 * @param param
+	 * @return
+	 */
+	private String getRequestMethodTag(Parameter param) {
+		if (param.getType().equals(ValidInputContext.class)) {
+			return StaticConfigItems.CONTEXT_ANNOTATION_TAG;
+		} else if (param.getType().equals(ValidInputUser.class)) {
+			return StaticConfigItems.USER_ANNOTATION_TAG;
+		}
+		return "";
+	}
+
+	/**
+	 * This method generates the complete method url from the provided parameters.
+	 *
+	 * @param params
+	 * @param beanName
+	 * @param m
+	 * @return
+	 */
+	private StringBuilder createMethodUrl(String beanName, Method m) {
+		StringBuilder sb = new StringBuilder();
+		Parameter[] params = m.getParameters();
+		if (params.length > 0) {
+			for (Parameter param : params) {
+				boolean isParamPathVariable = isParamPathVariable(param);
+				if (isParamPathVariable) {
+					log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
+					sb.append(getRequestMethodTag(param));
+				}
+			}
+		}
+
+		if (!Strings.isNullOrEmpty(sb.toString())) {
+			log.info("New request method value {} has been created for method {}.{}", sb.toString(), beanName, m.getName());
+		}
+
+		return sb;
+	}
+
+	/**
+	 * This Method returns the provided annotation value variable according to the Parameter Type.
+	 *
+	 * @param m
+	 * @return
+	 */
+	private Object getValueFromAnnotation(Method m, ValidInputParamType parameterType) {
+		ValidRequestMapping[] vrm = m.getAnnotationsByType(ValidRequestMapping.class);
+
+		if (vrm.length > 0) {
+			if (parameterType.equals(ValidInputParamType.METHOD)) {
+				return vrm[0].method();
+			} else if (parameterType.equals(ValidInputParamType.VALUE)) {
+				return vrm[0].value();
+			} else if (parameterType.equals(ValidInputParamType.CONSUMES)) {
+				return vrm[0].consumes();
+			} else if (parameterType.equals(ValidInputParamType.PRODUCES)) {
+				return vrm[0].produces();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * This method returns the class url from the class RequestMethod annotation.
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	public String[] getClassUrlFromAnnotation(Class<?> clazz) {
+
+		String rmList[] = { "" };
+		Annotation[] rm = clazz.getAnnotationsByType(RequestMapping.class);
+
+		for (Annotation anno : rm) {
+			RequestMapping rmnew = (RequestMapping) anno;
+			rmList = rmnew.value();
+			return rmList;
+		}
+		return rmList;
+	}
+
+	/**
+	 * This method returns the full method. It combines clazz and method urls
+	 *
+	 * @param clazz_url
+	 * @param method_url
+	 * @return
+	 */
+	private String generateUrl(String[] clazz_url, String annotated_value, StringBuilder method_url) {
+
+		return String.join("", clazz_url) + annotated_value + method_url.toString();
+	}
+
+	/**
+	 * This function generates the RequestMappingInfo from the provided parameters for each annotated method
+	 *
+	 * @param beanName
+	 * @param m
+	 * @param clazz_url
+	 * @return
+	 */
+	public RequestMappingInfo createRequestMappingInfo(String beanName, Method m, String[] clazz_url) {
+		StringBuilder method_url = createMethodUrl(beanName, m);
+		RequestMethod rm = (RequestMethod) getValueFromAnnotation(m, ValidInputParamType.METHOD);
+		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
+		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
+		String[] produces_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.PRODUCES);
+		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
+	}
 }

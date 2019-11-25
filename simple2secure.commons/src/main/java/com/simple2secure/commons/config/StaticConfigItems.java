@@ -23,6 +23,8 @@ package com.simple2secure.commons.config;
 
 import java.nio.charset.Charset;
 
+import com.simple2secure.api.model.LocaleLanguage;
+
 public class StaticConfigItems {
 	public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -66,5 +68,10 @@ public class StaticConfigItems {
 	public static final String PROFILE_PRODUCTION = "prod";
 	public static final String PROFILE_DEFAULT = "default";
 	public static final String PROFILE_TEST = "test";
+	public static final int DEFAULT_VALUE_SIZE = 10;
+	public static final LocaleLanguage DEFAULT_LOCALE = LocaleLanguage.ENGLISH;
+	
+	public static final String USER_ANNOTATION_TAG = "/{userId}";
+	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
 
 }
