@@ -39,11 +39,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputLocale;
-import com.simple2secure.api.model.ValidInputUser;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
+import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputUser;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;

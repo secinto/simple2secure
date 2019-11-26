@@ -32,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +42,10 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Step;
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputDevice;
+import com.simple2secure.api.model.validation.ValidInputGroup;
+import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputProcessor;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -54,6 +56,7 @@ import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.PROCESSOR_API)
@@ -80,7 +83,7 @@ public class ProcessorController {
 	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -110,12 +113,12 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{deviceId}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Processor>> getProcessorsByDeviceId(@PathVariable String deviceId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<Processor>> getProcessorsByDeviceId(ValidInputDevice deviceId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(deviceId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {
@@ -148,22 +151,22 @@ public class ProcessorController {
 
 			}
 		}
-		log.error("Error while retrieving processors for probe with id {}", deviceId);
+		log.error("Error while retrieving processors for probe with id {}", deviceId.getValue());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/group/{groupId}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable String groupId, @ValidInput ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(groupId)) {
-			List<Processor> processors = repository.getProcessorsByGroupId(groupId);
+	public ResponseEntity<List<Processor>> getProcessorsByGroupId(ValidInputGroup groupId, @ValidInput ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+			List<Processor> processors = repository.getProcessorsByGroupId(groupId.getValue());
 			if (processors != null) {
 				return new ResponseEntity<>(processors, HttpStatus.OK);
 			}
 		}
-		log.error("Error while retrieving processors for group with id {}", groupId);
+		log.error("Error while retrieving processors for group with id {}", groupId.getValue());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -171,12 +174,12 @@ public class ProcessorController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(value = "/{processorId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteProcessor(@PathVariable String processorId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteProcessor(ValidInputProcessor processorId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(processorId)) {
-			Processor processor = repository.find(processorId);
+		if (!Strings.isNullOrEmpty(processorId.getValue())) {
+			Processor processor = repository.find(processorId.getValue());
 			if (processor != null) {
 				// Check according to the processor name if the same step exists
 				Step step = null;
@@ -194,7 +197,7 @@ public class ProcessorController {
 				return new ResponseEntity<>(processor, HttpStatus.OK);
 			}
 		}
-		log.error("Error occured while deleting processor with id {}", processorId);
+		log.error("Error occured while deleting processor with id {}", processorId.getValue());
 		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_processor",
 				ObjectUtils.toObjectArray(processorId), locale.getValue())), HttpStatus.NOT_FOUND);
 

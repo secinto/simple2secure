@@ -32,15 +32,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.DOWNLOAD_API)
@@ -63,7 +63,7 @@ public class DownloadController {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@ValidRequestMapping
 	public ResponseEntity<byte[]> downloadProbe(@ValidInput ValidInputLocale locale) throws IOException, URISyntaxException {
 
 		HttpHeaders httpHeaders = new HttpHeaders();

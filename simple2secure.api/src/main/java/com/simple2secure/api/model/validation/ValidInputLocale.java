@@ -1,8 +1,12 @@
-package com.simple2secure.api.model;
+package com.simple2secure.api.model.validation;
 
-public class ValidInputLocale extends ValidatedInput{
+public class ValidInputLocale extends ValidatedInput<String>{
 	
 	private String locale;
+	
+	public ValidInputLocale() {
+		
+	}
 	
 	public ValidInputLocale(String locale) {
 		this.locale = locale;
@@ -19,9 +23,8 @@ public class ValidInputLocale extends ValidatedInput{
 	}
 
 	@Override
-	public Object validate() {
+	public String getTag() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
+	}	
 }

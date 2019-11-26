@@ -71,10 +71,6 @@ public class StaticConfigItems {
 	public static final int DEFAULT_VALUE_SIZE = 10;
 	public static final LocaleLanguage DEFAULT_LOCALE = LocaleLanguage.ENGLISH;
 	
-	public static final String USER_ANNOTATION_TAG = "/{userId}";
-	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
-	public static final String SRC_GRP_ANNOTATION_TAG = "/{sourceGroupId}";
-	
 	public static final String CONFIG_API = "/api/config";
 	public static final String CONTEXT_API = "/api/context";
 	public static final String DASH_API = "/api/dash";

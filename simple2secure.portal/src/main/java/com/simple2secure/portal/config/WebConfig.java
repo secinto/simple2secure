@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.simple2secure.portal.validator.InputValidation;
+import com.simple2secure.portal.validator.StringToValidInputConverterFactory;
 
 @Configuration
 @Component
@@ -42,6 +44,11 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
 		argumentResolvers.add(consistentContextValidation);
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverterFactory(new StringToValidInputConverterFactory());
 	}
 
 }

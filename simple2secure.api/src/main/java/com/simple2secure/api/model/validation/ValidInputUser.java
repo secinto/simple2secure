@@ -1,8 +1,13 @@
-package com.simple2secure.api.model;
+package com.simple2secure.api.model.validation;
 
-public class ValidInputUser extends ValidatedInput{
+public class ValidInputUser extends ValidatedInput<String>{
 	
 	private String userId;
+	private String tag = "/{userId}";
+	
+	public ValidInputUser() {
+		
+	}
 	
 	public ValidInputUser(String userId) {
 		this.userId = userId;
@@ -19,11 +24,7 @@ public class ValidInputUser extends ValidatedInput{
 	}
 
 	@Override
-	public Object validate() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getTag() {
+		return tag;
 	}
-	
-	
-	
 }

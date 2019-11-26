@@ -1,8 +1,13 @@
-package com.simple2secure.api.model;
+package com.simple2secure.api.model.validation;
 
-public class ValidInputContext extends ValidatedInput{
+public class ValidInputContext extends ValidatedInput<String>{
 	
 	private String contextId;
+	private String tag = "/{contextId}";
+	
+	public ValidInputContext() {
+		
+	}
 	
 	public ValidInputContext(String contextId) {
 		this.contextId = contextId;
@@ -19,9 +24,7 @@ public class ValidInputContext extends ValidatedInput{
 	}
 
 	@Override
-	public Object validate() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getTag() {
+		return tag;
 	}
-	
 }

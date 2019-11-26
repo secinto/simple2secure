@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,8 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputDevice;
+import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -47,6 +47,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.NOTIFICATION_API)
@@ -64,12 +65,12 @@ public class NotificationController {
 	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{deviceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable String deviceId,
+	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, ValidInputDevice deviceId,
 			@ValidInput ValidInputLocale locale) {
-		if (notification != null && !Strings.isNullOrEmpty(deviceId)) {
-			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId)) {
+		if (notification != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId.getValue())) {
 				return new ResponseEntity<>(notification, HttpStatus.OK);
 			}
 		}
@@ -79,7 +80,7 @@ public class NotificationController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputLocale locale) {
@@ -97,7 +98,7 @@ public class NotificationController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "read", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/read", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {

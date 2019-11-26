@@ -44,9 +44,9 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputLocale;
-import com.simple2secure.api.model.ValidInputUser;
+import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputUser;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -170,7 +170,7 @@ public class ContextController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@ValidRequestMapping(method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
 

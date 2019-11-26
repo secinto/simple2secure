@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,8 +44,11 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Report;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputPage;
+import com.simple2secure.api.model.validation.ValidInputReport;
+import com.simple2secure.api.model.validation.ValidInputSize;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -59,6 +61,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.ReportUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.REPORT_API)
@@ -96,7 +99,7 @@ public class ReportController {
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @ValidInput ValidInputLocale locale) {
 		if (report != null) {
@@ -109,10 +112,10 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@ValidInput ValidInputContext contextId, @PathVariable int page,
-			@PathVariable int size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@ValidInput ValidInputContext contextId, ValidInputPage page,
+			ValidInputSize size, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
 			Context context = contextRepository.find(contextId.getValue());
@@ -126,7 +129,7 @@ public class ReportController {
 
 					ReportDTO reportDto = new ReportDTO();
 
-					reportDto = reportsRepository.getReportsByGroupId(groupIds, page, size);
+					reportDto = reportsRepository.getReportsByGroupId(groupIds, page.getValue(), size.getValue());
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
@@ -138,7 +141,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/name", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/report/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(name)) {
@@ -153,7 +156,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/network", method = RequestMethod.POST, consumes = "application/json")
+	@ValidRequestMapping(value = "/network", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport, @ValidInput ValidInputLocale locale) {
 		if (networkReport != null) {
@@ -166,10 +169,10 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/network/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId, @PathVariable int page,
-			@PathVariable int size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId, ValidInputPage page,
+			ValidInputSize size, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -183,7 +186,7 @@ public class ReportController {
 
 					NetworkReportDTO reportDto = new NetworkReportDTO();
 
-					reportDto = networkReportRepository.getReportsByGroupId(groupIds, size, page);
+					reportDto = networkReportRepository.getReportsByGroupId(groupIds, size.getValue(), page.getValue());
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
@@ -195,13 +198,13 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/network/{reportId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/network", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable String reportId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReport> deleteNetworkReport(ValidInputReport reportId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(reportId)) {
+		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 
-			NetworkReport report = networkReportRepository.find(reportId);
+			NetworkReport report = networkReportRepository.find(reportId.getValue());
 			if (report != null) {
 				networkReportRepository.delete(report);
 				return new ResponseEntity<>(report, HttpStatus.OK);
@@ -213,7 +216,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/report/network/name", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/report/network/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(name)) {
@@ -228,7 +231,7 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/selected", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/delete/selected", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports, @ValidInput ValidInputLocale locale) {
 		if (queryReports != null) {

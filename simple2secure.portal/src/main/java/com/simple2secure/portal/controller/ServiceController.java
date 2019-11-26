@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;

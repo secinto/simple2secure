@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,8 +38,9 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputEmailConfig;
+import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -50,6 +50,7 @@ import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.EMAIL_API)
@@ -75,7 +76,7 @@ public class EmailController {
 	public static final Logger logger = LoggerFactory.getLogger(EmailController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -95,7 +96,7 @@ public class EmailController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
+	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputLocale locale) {
@@ -124,11 +125,11 @@ public class EmailController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/{emailConfigId}", method = RequestMethod.DELETE)
-	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable String emailConfigId, @ValidInput ValidInputLocale locale) {
+	@ValidRequestMapping(method = RequestMethod.DELETE)
+	public ResponseEntity<EmailConfiguration> deleteEmailConfig(ValidInputEmailConfig emailConfigId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(emailConfigId)) {
-			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId);
+		if (!Strings.isNullOrEmpty(emailConfigId.getValue())) {
+			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId.getValue());
 
 			if (emailConfig != null) {
 				mailUtils.deleteEmailConfiguration(emailConfig);

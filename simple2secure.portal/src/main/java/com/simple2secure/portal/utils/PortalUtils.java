@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URISyntaxException;
@@ -53,9 +54,9 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
-import com.simple2secure.api.model.ValidInputContext;
-import com.simple2secure.api.model.ValidInputParamType;
-import com.simple2secure.api.model.ValidInputUser;
+import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputParamType;
+import com.simple2secure.api.model.validation.ValidatedInput;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.validator.ValidRequestMapping;
@@ -345,10 +346,10 @@ public class PortalUtils {
 	 * @return
 	 */
 	private boolean isParamPathVariable(Parameter param) {
-		if (param.getType().equals(ValidInputContext.class)) {
-			return true;
-		} else if (param.getType().equals(ValidInputUser.class)) {
-			return true;
+		if (param.getType().getSuperclass().equals(ValidatedInput.class)) {
+			if (!param.getType().equals(ValidInputLocale.class)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -358,12 +359,22 @@ public class PortalUtils {
 	 *
 	 * @param param
 	 * @return
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
-	private String getRequestMethodTag(Parameter param) {
-		if (param.getType().equals(ValidInputContext.class)) {
-			return StaticConfigItems.CONTEXT_ANNOTATION_TAG;
-		} else if (param.getType().equals(ValidInputUser.class)) {
-			return StaticConfigItems.USER_ANNOTATION_TAG;
+	private String getRequestMethodTag(Parameter param) throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+			SecurityException, IllegalArgumentException, InvocationTargetException {
+
+		if (param.getType().getSuperclass().equals(ValidatedInput.class)) {
+			Class<?> clazz = param.getType();
+			Object method_object = clazz.newInstance();
+			Method method = param.getType().getDeclaredMethod("getTag");
+			String tag = (String) method.invoke(method_object);
+			return tag;
 		}
 		return "";
 	}
@@ -384,15 +395,16 @@ public class PortalUtils {
 				boolean isParamPathVariable = isParamPathVariable(param);
 				if (isParamPathVariable) {
 					log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
-					sb.append(getRequestMethodTag(param));
+					try {
+						sb.append(getRequestMethodTag(param));
+					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
+							| InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}
-
-		if (!Strings.isNullOrEmpty(sb.toString())) {
-			log.info("New request method value {} has been created for method {}.{}", sb.toString(), beanName, m.getName());
-		}
-
 		return sb;
 	}
 
@@ -465,6 +477,7 @@ public class PortalUtils {
 		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
 		String[] produces_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.PRODUCES);
 		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+		log.info("New mapping added ({}): {}", rm, complete_url);
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
 }
