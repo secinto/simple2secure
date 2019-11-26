@@ -29,15 +29,19 @@ import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class ReportRepository extends MongoRepository<Report> {
-	public abstract List<Report> getReportsByProbeId(String probeId);
+	public abstract List<Report> getReportsByDeviceId(String deviceId);
 
 	// public abstract List<Report> getReportsByName(String name);
 
 	public abstract List<Report> getReportsByName(String name, int page, int size);
 
+	public abstract List<Report> getReportsByDeviceAndName(String deviceId, String name, int page, int size);
+
 	public abstract List<Report> getLastReportsFromTimeStampAndName(Date timestamp, String name);
 
 	public abstract long getPagesForReportsByName(String name);
+
+	public abstract long getPagesForReportsByDeviceAndName(String deviceId, String name);
 
 	public abstract ReportDTO getReportsByGroupId(List<String> group_ids, int page, int size);
 

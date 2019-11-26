@@ -1207,8 +1207,8 @@
 		"graphAble": false
 	},
 	{
-		"name": "List running services",
-		"sqlQuery": "select processes.pid, processes.name, users.username, processes.path, processes.cmdline from processes LEFT JOIN users ON processes.uid = users.uid WHERE processes.path != '';",
+		"name": "List of running services",
+		"sqlQuery": "select processes.pid, processes.name, users.username, processes.path, processes.cmdline from processes LEFT JOIN users ON processes.uid = users.uid AND processes.name != 'osqueryi.exe' WHERE processes.path != '';",
 		"description": "List Windows System running processes.",
 		"always": true,
 		"analysisInterval": 1,

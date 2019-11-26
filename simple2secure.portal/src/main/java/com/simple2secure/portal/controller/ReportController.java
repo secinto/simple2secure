@@ -156,6 +156,23 @@ public class ReportController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(
+			value = "/{deviceId}/{name}",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable("deviceId") String deviceId, @PathVariable("name") String name,
+			@RequestHeader("Accept-Language") String locale) {
+		if (!Strings.isNullOrEmpty(name) && !Strings.isNullOrEmpty(deviceId)) {
+			List<GraphReport> reports = reportUtils.prepareReportsForGraph(deviceId, name);
+			if (reports != null) {
+				return new ResponseEntity<>(reports, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving report with name {}", name);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(
 			value = "/report/name",
 			method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
