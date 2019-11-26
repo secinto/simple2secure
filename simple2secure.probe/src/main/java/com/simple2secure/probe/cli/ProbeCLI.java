@@ -38,6 +38,8 @@ import org.pcap4j.core.PcapNetworkInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.file.FileUtil;
@@ -88,6 +90,9 @@ public class ProbeCLI {
 		LicenseController licenseController = new LicenseController();
 
 		StartConditions startConditions = licenseController.checkLicenseValidity();
+		
+		ProbeUtils.saveDeviceInfo(new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, ProbeConfiguration.ipAddress, ProbeConfiguration.netmask, DeviceStatus.ONLINE));
+		
 		try {
 			prepareOsQuery();
 		} catch (IOException e) {

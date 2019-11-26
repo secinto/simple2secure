@@ -42,6 +42,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
@@ -52,6 +53,7 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
@@ -93,6 +95,9 @@ public class TestController {
 
 	@Autowired
 	GroupRepository groupRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	TestUtils testUtils;
@@ -274,6 +279,7 @@ public class TestController {
 
 		if (test != null && !Strings.isNullOrEmpty(podId)) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -282,11 +288,11 @@ public class TestController {
 					String test_content = test.getTest_content().replace("\'", "\"");
 					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
 							TestStatus.PLANNED, System.currentTimeMillis());
-					testRun.setHostname(license.getDeviceInfo().getHostname());
+					testRun.setHostname(deviceInfo.getHostName());
 					testRunRepository.save(testRun);
 
 					notificationUtils.addNewNotificationPortal(
-							test.getName() + " has been scheduled for the execution manually using the pod " + license.getDeviceInfo().getHostname(),
+							test.getName() + " has been scheduled for the execution manually using the pod " + deviceInfo.getHostName(),
 							group.getContextId());
 
 					return new ResponseEntity<>(testRun, HttpStatus.OK);

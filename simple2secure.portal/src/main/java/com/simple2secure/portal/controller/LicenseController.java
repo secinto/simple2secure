@@ -189,9 +189,6 @@ public class LicenseController {
 
 			if (!licensePublic.isActivated()) {
 				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale);
-				if(!licensePublic.isDevicePod()) {
-					sutUtils.addProbeAsSUT(licensePublic);
-				}
 			} else {
 				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale);
 			}

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRunType;
@@ -36,6 +37,7 @@ import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SequenceRunRepository;
@@ -83,6 +85,9 @@ public class TestSequenceController {
 
 	@Autowired
 	GroupRepository groupRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	TestUtils testUtils;
@@ -161,12 +166,12 @@ public class TestSequenceController {
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId);
+		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId);
 
-		if (podLicense != null) {
-			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
+		if (deviceInfo != null) {
+			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 			log.debug("Updating last online time for device {}", deviceId);
-			licenseRepository.update(podLicense);
+			deviceInfoRepository.update(deviceInfo);
 			log.debug("Updated last online time for device {}", deviceId);
 			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId, locale);
 			List<SequenceRun> allSeqRuns = respEntObj.getBody();

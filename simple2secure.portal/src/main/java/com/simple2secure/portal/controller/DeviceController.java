@@ -41,8 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
@@ -50,12 +52,14 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DeviceUtils;
+import com.simple2secure.portal.utils.SUTUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
 @RestController
@@ -75,6 +79,9 @@ public class DeviceController {
 
 	@Autowired
 	LicenseRepository licenseRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	TestRepository testRepository;
@@ -90,6 +97,9 @@ public class DeviceController {
 
 	@Autowired
 	TestUtils testUtils;
+	
+	@Autowired
+	SUTUtils sutUtils;
 
 	/**
 	 * This function returns all pods according to the contextId
@@ -171,11 +181,10 @@ public class DeviceController {
 			throws ItemNotFoundRepositoryException {
 
 		List<Test> test = testRepository.getByPodId(deviceId);
-		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId);
-
-		if (podLicense != null) {
-			podLicense.setLastOnlineTimestamp(System.currentTimeMillis());
-			licenseRepository.update(podLicense);
+		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+		if (devInfo != null) {
+			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+			deviceInfoRepository.update(devInfo);
 		}
 
 		if (test == null || test.isEmpty()) {
@@ -202,11 +211,10 @@ public class DeviceController {
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
-
-		if (license != null) {
-			license.setLastOnlineTimestamp(System.currentTimeMillis());
-			licenseRepository.update(license);
+		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+		if (devInfo != null) {
+			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+			deviceInfoRepository.update(devInfo);
 			return testUtils.getScheduledTestsByDeviceId(deviceId, locale);
 		}
 
@@ -291,12 +299,31 @@ public class DeviceController {
 	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
-			if (license != null) {
-				license.setLastOnlineTimestamp(System.currentTimeMillis());
-				licenseRepository.update(license);
+			DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+			if (devInfo != null) {
+				devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+				deviceInfoRepository.update(devInfo);
 			}
 		}
+		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
+	}
+	
+	@RequestMapping(
+			value = "/save",
+			method = RequestMethod.POST)
+	public ResponseEntity<Service> saveDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
+			throws ItemNotFoundRepositoryException {
+		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
+		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());
+		if (deviceInfo != null && deviceInfoFromDB == null) {
+			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+			deviceInfoRepository.save(deviceInfo);
+			sutUtils.addProbeAsSUT(license);
+		}else if(deviceInfo != null && deviceInfoFromDB != null) {
+			deviceInfoFromDB.setLastOnlineTimestamp(System.currentTimeMillis());
+			deviceInfoRepository.update(deviceInfoFromDB);
+		}
+		
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 

@@ -24,6 +24,7 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.LicenseActivation;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
@@ -46,6 +47,9 @@ public class LicenseUtils {
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	TokenAuthenticationService tokenAuthenticationService;
@@ -76,7 +80,6 @@ public class LicenseUtils {
 			String groupId = licensePublic.getGroupId();
 			String licenseId = licensePublic.getLicenseId();
 			String deviceId = licensePublic.getDeviceId();
-			DeviceInfo deviceInfo = licensePublic.getDeviceInfo();
 
 			if (!Strings.isNullOrEmpty(groupId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(deviceId)) {
 				CompanyGroup group = groupRepository.find(groupId);
@@ -118,10 +121,7 @@ public class LicenseUtils {
 							license.setDeviceId(deviceId);
 						}
 						license.setAccessToken(accessToken);
-						license.setDeviceInfo(deviceInfo);
-						license.setLastOnlineTimestamp(System.currentTimeMillis());
-						license.setDevicePod(podActivation);
-						license.setStatus(DeviceStatus.ONLINE);
+						license.setDeviceIsPod(podActivation);
 						if (!license.isActivated()) {
 							license.setActivated(true);
 						}
@@ -154,6 +154,7 @@ public class LicenseUtils {
 			String deviceId = licensePublic.getDeviceId();
 			String licenseId = licensePublic.getLicenseId();
 			String groupId = licensePublic.getGroupId();
+			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId);
 
 			if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(groupId)) {
 				licensePrivate = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId, checkForPod);
@@ -184,9 +185,7 @@ public class LicenseUtils {
 								CompanyGroup group = groupRepository.find(groupId);
 
 								accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
-								licensePrivate.setLastOnlineTimestamp(System.currentTimeMillis());
 								licensePrivate.setAccessToken(accessToken);
-								licensePrivate.setStatus(DeviceStatus.ONLINE);
 								licenseRepository.update(licensePrivate);
 
 								log.debug("Access token is still valid.");
@@ -213,9 +212,7 @@ public class LicenseUtils {
 						if (group != null) {
 
 							accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, licensePrivate);
-							licensePrivate.setLastOnlineTimestamp(System.currentTimeMillis());
 							licensePrivate.setAccessToken(accessToken);
-							licensePrivate.setStatus(DeviceStatus.ONLINE);
 							licenseRepository.save(licensePrivate);
 							/*
 							 * IMPORANT: Always use getPublicLicense if sending data to the PROBE or POD because only than the private sensitive data is
