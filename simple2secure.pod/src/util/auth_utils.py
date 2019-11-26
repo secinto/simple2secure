@@ -15,6 +15,7 @@ def authenticate(app):
             update_pod_status_license(app, stored_license.groupId, stored_license.licenseId)
             log.info('POD will be authenticated on the PORTAL, obtaining an auth token')
             send_license(app, stored_license)
+            #send_device_info(app, stored_license)
         else:
             log.info('No license available either from the DB or the file system')
 

@@ -5,6 +5,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class DeviceStatus(str, Enum):
+    ONLINE = 'ONLINE'
+    OFFLINE = 'OFFLINE'
+    UNKNOWN = 'UNKNOWN'
+
+
 class PodInfo(db.Model):
     __tablename__ = 'pod_info'
     id = db.Column(db.Integer, unique=True, primary_key=True)
@@ -26,14 +32,21 @@ class PodInfo(db.Model):
 
 class DeviceInfo(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
+    deviceId = db.Column(db.Text)
     hostName = db.Column(db.Text)
     ipAddress = db.Column(db.Text)
     netMask = db.Column(db.Text)
+    deviceStatus = db.Column(db.Enum(DeviceStatus))
+    lastOnlineTimestamp = db.Column(db.Float)
 
-    def __init__(self, hostName, ipAddress, netMask):
+    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN):
+        self.deviceId = deviceId
         self.hostName = hostName
         self.ipAddress = ipAddress
         self.netMask = netMask
+        self.deviceStatus = deviceStatus
+        self.lastOnlineTimestamp = lastOnlineTimestamp
+
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -115,17 +128,15 @@ class CompanyLicensePublic(db.Model):
     licenseId = db.Column(db.Text)
     deviceId = db.Column(db.Text)
     accessToken = db.Column(db.Text)
-    deviceInfo = db.Column(db.Text)
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
     deviceIsPod = db.Column(db.Boolean)
 
-    def __init__(self, group_id, license_id, pod_id, expiration_date, deviceInfo):
+    def __init__(self, group_id, license_id, pod_id, expiration_date):
         self.groupId = group_id
         self.licenseId = license_id
         self.deviceId = pod_id
         self.expirationDate = expiration_date
-        self.deviceInfo = deviceInfo
         self.activated = False
         self.accessToken = ""
         self.deviceIsPod = True
