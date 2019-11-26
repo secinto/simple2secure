@@ -88,7 +88,7 @@ public class WidgetController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/delete/{widgetId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<Widget> deleteWidget(@PathVariable("widgetId") String widgetId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Widget> deleteWidget(@PathVariable String widgetId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(widgetId)) {
@@ -161,8 +161,8 @@ public class WidgetController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/delete/prop/{widgetPropId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable("widgetPropId") String widgetPropId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable String widgetPropId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(widgetPropId)) {
 			WidgetProperties widgetProp = widgetPropertiesRepository.find(widgetPropId);

@@ -135,7 +135,7 @@ public class RuleController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -170,12 +170,12 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/templaterule/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
-			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
+			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
 
 			if (templateRules != null) {
 				return new ResponseEntity<>(templateRules, HttpStatus.OK);
@@ -289,8 +289,7 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/rulewithsource/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable("ruleId") String ruleId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable String ruleId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale.getValue())) {
 			RuleWithSourcecode ruleWithSourcecode = ruleWithSourcecodeRepository.find(ruleId);
@@ -319,7 +318,7 @@ public class RuleController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/templaterule/{ruleId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable("ruleId") String ruleId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable String ruleId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale.getValue())) {
 			TemplateRule templateRule = templateRuleRepository.find(ruleId);

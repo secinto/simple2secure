@@ -29,7 +29,7 @@ import com.simple2secure.api.model.Report;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class ReportRepository extends MongoRepository<Report> {
-	public abstract List<Report> getReportsByProbeId(String probeId);
+	public abstract List<Report> getReportsByDeviceId(String deviceId);
 
 	// public abstract List<Report> getReportsByName(String name);
 

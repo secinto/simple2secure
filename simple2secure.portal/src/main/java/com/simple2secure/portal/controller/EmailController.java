@@ -125,8 +125,7 @@ public class EmailController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@RequestMapping(value = "/{emailConfigId}", method = RequestMethod.DELETE)
-	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable("emailConfigId") String emailConfigId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable String emailConfigId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(emailConfigId)) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId);

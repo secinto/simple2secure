@@ -29,7 +29,7 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class SequenceRunRepository extends MongoRepository<SequenceRun> {
 
-	public abstract List<SequenceRun> getPlannedSequence(String podId);
+	public abstract List<SequenceRun> getPlannedSequence(String deviceId);
 
 	public abstract List<SequenceRun> getByContextId(String contextId);
 

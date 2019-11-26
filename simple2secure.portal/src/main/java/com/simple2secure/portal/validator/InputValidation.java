@@ -20,7 +20,6 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.api.model.ValidInputReport;
-import com.simple2secure.api.model.ValidInputGroupId;
 import com.simple2secure.api.model.ValidInputUser;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
@@ -65,8 +64,6 @@ public class InputValidation implements HandlerMethodArgumentResolver {
 			return validateUserInputParameter(auth, methodParameter);
 		} else if (methodParameter.getGenericParameterType().equals(ValidInputLocale.class)) {
 			return validateLocaleHeader(request);
-		} else if (methodParameter.getGenericParameterType().equals(ValidInputGroupId.class)) {
-			return validateSrcGroupInputParameter(request, methodParameter);
 		}
 
 		return null;
@@ -137,18 +134,6 @@ public class InputValidation implements HandlerMethodArgumentResolver {
 		}
 
 		return new ValidInputLocale(lang.label);
-	}
-
-	public ValidInputGroupId validateSrcGroupInputParameter(HttpServletRequest request, MethodParameter methodParameter) {
-		String original_path = request.getServletPath();
-		String path = original_path.replace(StaticConfigItems.GROUP_API + "/", "").trim();
-		String[] pathArray = path.split("/");
-		String srcGrpParam = pathArray[methodParameter.getParameterIndex()];
-
-		// TODO: Validate this groupID
-
-		return new ValidInputGroupId(srcGrpParam);
-
 	}
 
 }

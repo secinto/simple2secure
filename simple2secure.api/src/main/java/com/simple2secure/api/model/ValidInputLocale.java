@@ -17,5 +17,11 @@ public class ValidInputLocale extends ValidatedInput{
 	public void setValue(String locale) {
 		this.locale = locale;
 	}
+
+	@Override
+	public Object validate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

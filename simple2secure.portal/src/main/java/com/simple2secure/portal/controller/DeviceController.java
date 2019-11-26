@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -155,7 +156,7 @@ public class DeviceController {
 	}
 
 	/**
-	 * This function retrieves the tests according to the podId, if no tests are found then it checks if there are tests according to the
+	 * This function retrieves the tests according to the deviceId, if no tests are found then it checks if there are tests according to the
 	 * hostname.
 	 *
 	 * @param deviceId
@@ -164,10 +165,10 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@RequestMapping(value = "/config/{deviceId}/{hostname}", method = RequestMethod.GET)
-	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("deviceId") String deviceId, @PathVariable("hostname") String hostname)
+	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable String deviceId, @PathVariable String hostname)
 			throws ItemNotFoundRepositoryException {
 
-		List<Test> test = testRepository.getByPodId(deviceId);
+		List<Test> test = testRepository.getByDeviceId(deviceId);
 		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId);
 
 		if (podLicense != null) {
@@ -192,9 +193,9 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduledTests/{deviceId}", method = RequestMethod.GET, consumes = "application/json")
+	@RequestMapping(value = "/scheduledTests/{deviceId}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("deviceId") String deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable String deviceId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
 
@@ -216,7 +217,7 @@ public class DeviceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/delete/{deviceId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable("deviceId") String deviceId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable String deviceId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(deviceId)) {
 
@@ -243,7 +244,7 @@ public class DeviceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/changeGroup/{deviceId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("deviceId") String deviceId, @RequestBody CompanyGroup group,
+	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable String deviceId, @RequestBody CompanyGroup group,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(deviceId) && group != null) {
@@ -275,7 +276,7 @@ public class DeviceController {
 	}
 
 	@RequestMapping(value = "/status/{deviceId}", method = RequestMethod.POST)
-	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Service> postStatus(@PathVariable String deviceId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId)) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);

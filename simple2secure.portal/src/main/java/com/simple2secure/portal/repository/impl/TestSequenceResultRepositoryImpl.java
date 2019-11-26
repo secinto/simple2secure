@@ -47,8 +47,8 @@ public class TestSequenceResultRepositoryImpl extends TestSequenceResultReposito
 	}
 
 	@Override
-	public List<TestSequenceResult> getByPodId(String podId) {
-		Query query = new Query(Criteria.where("pod_id").is(podId));
+	public List<TestSequenceResult> getByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("pod_id").is(deviceId));
 		List<TestSequenceResult> result = mongoTemplate.find(query, TestSequenceResult.class);
 		return result;
 	}

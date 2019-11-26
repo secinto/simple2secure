@@ -45,6 +45,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -138,17 +139,17 @@ public class QueryController {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{queryId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> getQueryByID(@PathVariable("id") String id, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<QueryRun> getQueryByID(@PathVariable String queryId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(id)) {
-			QueryRun queryConfig = queryRepository.find(id);
+		if (!Strings.isNullOrEmpty(queryId)) {
+			QueryRun queryConfig = queryRepository.find(queryId);
 			if (queryConfig != null) {
 				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 			}
 		}
-		log.error("Query configuration not found for the query ID {}", id);
+		log.error("Query configuration not found for the query ID {}", queryId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -158,7 +159,7 @@ public class QueryController {
 	 */
 	@RequestMapping(value = "/{queryId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteQuery(@PathVariable("queryId") String queryId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteQuery(@PathVariable String queryId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId)) {
 			QueryRun queryRun = queryRepository.find(queryId);
@@ -178,8 +179,8 @@ public class QueryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	@RequestMapping(value = "/{deviceId}/{osinfo}/{select_all}", method = RequestMethod.GET)
-	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable("deviceId") String deviceId,
-			@PathVariable("osinfo") String osinfo, @PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable String deviceId, @PathVariable String osinfo,
+			@PathVariable boolean select_all, @ValidInput ValidInputLocale locale) {
 
 		if (Strings.isNullOrEmpty(osinfo)) {
 			osinfo = OSInfo.UNKNOWN.name();
@@ -234,8 +235,8 @@ public class QueryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable("groupId") String groupId,
-			@PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable String groupId, @PathVariable boolean select_all,
+			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId)) {
 			List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId, select_all);
@@ -255,12 +256,12 @@ public class QueryController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/context/{contextId}/{select_all}/{graph_able}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@PathVariable("contextId") String contextId,
-			@PathVariable("select_all") boolean select_all, @PathVariable("graph_able") boolean graph_able, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<QueryRun>> getQueriesByContextId(@ValidInput ValidInputContext contextId, @PathVariable boolean select_all,
+			@PathVariable boolean graph_able, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
-			Context context = contextRepository.find(contextId);
+			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
 
@@ -288,7 +289,7 @@ public class QueryController {
 			}
 
 		}
-		log.error("Query configuration not found for the context ID {}", contextId);
+		log.error("Query configuration not found for the context ID {}", contextId.getValue());
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

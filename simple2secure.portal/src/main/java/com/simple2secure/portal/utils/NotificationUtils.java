@@ -54,9 +54,9 @@ public class NotificationUtils {
 		log.info("New notification has been added");
 	}
 
-	public boolean addNewNotificationPod(String data, String podId) {
+	public boolean addNewNotificationPod(String data, String deviceId) {
 
-		CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
 
 		if (license != null) {
 

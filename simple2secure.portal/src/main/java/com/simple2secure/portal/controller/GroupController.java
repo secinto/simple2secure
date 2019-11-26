@@ -44,8 +44,9 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.api.model.ValidInputGroupId;
+import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputLocale;
+import com.simple2secure.api.model.ValidInputUser;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -101,15 +102,16 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{userId}/{parentGroupId}/{contextId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @PathVariable("userId") String userId,
-			@PathVariable("parentGroupId") String parentGroupId, @PathVariable("contextId") String contextId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ValidInput ValidInputUser userId,
+			@PathVariable String parentGroupId, @ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (group != null && !Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
-			User user = userRepository.find(userId);
-			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+		if (group != null && !Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
+			User user = userRepository.find(userId.getValue());
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId.getValue(),
+					userId.getValue());
 			if (Strings.isNullOrEmpty(group.getId()) && user != null && contextUserAuthentication != null) {
-				if (groupUtils.checkIfGroupNameIsAllowed(group.getName(), contextId)) {
+				if (groupUtils.checkIfGroupNameIsAllowed(group.getName(), contextId.getValue())) {
 					if (!parentGroupId.equals("null")) {
 						// THERE IS A PARENT GROUP!!
 						CompanyGroup parentGroup = groupRepository.find(parentGroupId);
@@ -134,7 +136,7 @@ public class GroupController {
 					} else {
 						// NEW PARENT GROUP!
 						//
-						Context context = contextRepository.find(contextId);
+						Context context = contextRepository.find(contextId.getValue());
 						if (context != null) {
 
 							group.setContextId(context.getId());
@@ -177,7 +179,7 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{groupID}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> getGroup(@PathVariable("groupID") String groupId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<CompanyGroup> getGroup(@PathVariable String groupId, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(groupId)) {
 			CompanyGroup group = groupRepository.find(groupId);
 			if (group != null) {
@@ -197,11 +199,11 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/context/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
 				List<CompanyGroup> groups = groupRepository.findByContextId(context.getId());
 				if (groups != null) {
@@ -221,18 +223,19 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@PathVariable("contextId") String contextId,
-			@PathVariable("userId") String userId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@ValidInput ValidInputContext contextId,
+			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
-			Context context = contextRepository.find(contextId);
-			User user = userRepository.find(userId);
+		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
+			User user = userRepository.find(userId.getValue());
 			if (context != null && user != null) {
-				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId, userId);
+				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId.getValue(),
+						userId.getValue());
 				if (contextUserAuthentication != null) {
 
 					// TODO: check according to the user role which groups will be visible to the user
-					List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+					List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
 					if (groups != null) {
 						return new ResponseEntity<>(groups, HttpStatus.OK);
 					}
@@ -251,7 +254,7 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{groupID}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<?> deleteGroup(@PathVariable("groupID") String groupId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteGroup(@PathVariable String groupId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId)) {
 			CompanyGroup group = groupRepository.find(groupId);
@@ -280,12 +283,11 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/move/{sourceGroupId}/{destGroupId}/{userId}", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable("sourceGroupId") String sourceGroupId,
-			@PathVariable("destGroupId") String destGroupId, @PathVariable("userId") String userId, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable String sourceGroupId, @PathVariable String destGroupId,
+			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
 		CompanyGroup toGroup = groupRepository.find(destGroupId);
-		User user = userRepository.find(userId);
+		User user = userRepository.find(userId.getValue());
 
 		if (sourceGroup != null && user != null) {
 			return groupUtils.checkIfGroupCanBeMoved(sourceGroup, toGroup, user, locale.getValue());
@@ -300,17 +302,17 @@ public class GroupController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/copy", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup,
-			@ValidInput ValidInputGroupId sourceGroupId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (destGroup != null && !Strings.isNullOrEmpty(sourceGroupId.getValue())) {
+	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup, @PathVariable String sourceGroupId,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (destGroup != null && !Strings.isNullOrEmpty(sourceGroupId)) {
 
-			CompanyGroup sourceGroup = groupRepository.find(sourceGroupId.getValue());
+			CompanyGroup sourceGroup = groupRepository.find(sourceGroupId);
 
 			if (sourceGroup != null && destGroup != null) {
 				if (!Strings.isNullOrEmpty(destGroup.getId())) {
 
 					// Cannot copy if both group IDs are same
-					if (!sourceGroupId.getValue().equals(destGroup.getId())) {
+					if (!sourceGroupId.equals(destGroup.getId())) {
 
 						// Delete all configuration from destGroup
 						groupUtils.deleteGroup(destGroup.getId(), false);

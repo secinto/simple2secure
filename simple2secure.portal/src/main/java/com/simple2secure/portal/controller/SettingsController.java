@@ -131,8 +131,8 @@ public class SettingsController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/licensePlan/{licensePlanId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable("licensePlanId") String licensePlanId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable String licensePlanId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(licensePlanId)) {
 			LicensePlan licensePlan = licensePlanRepository.find(licensePlanId);
@@ -151,7 +151,7 @@ public class SettingsController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/testmacro/{testMacroId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable("testMacroId") String testMacroId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable String testMacroId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(testMacroId)) {

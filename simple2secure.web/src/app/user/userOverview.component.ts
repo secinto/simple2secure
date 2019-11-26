@@ -803,15 +803,14 @@ export class UserOverviewComponent {
 
 	public onDownloadClick() {
 		this.loading = true;
-		this.httpService.getFile(environment.apiEndpoint + 'license/' + this.selectedItem.id + '/' + this.currentUser.userID)
+		this.httpService.getFile(environment.apiEndpoint + 'license/' + this.selectedItem.id)
 			.subscribe(
 				data => {
 					importedSaveAs(data, 'license-' + this.selectedItem.id + '.zip');
 					this.loading = false;
 				},
 				error => {
-					//this.alertService.error(error.errorMessage);
-					this.alertService.error("Error occured while downloading license");
+					this.alertService.error('Error occured while downloading license');
 					this.loading = false;
 				});
 	}

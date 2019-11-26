@@ -69,7 +69,7 @@ public class SystemUnderTestController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/delete/{sutId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable("sutId") String sutId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable String sutId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(sutId)) {
@@ -88,8 +88,8 @@ public class SystemUnderTestController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{groupId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable("groupId") String groupId, @PathVariable("page") int page,
-			@PathVariable("size") int size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable String groupId, @PathVariable int page, @PathVariable int size,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(groupId)) {
 			List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId, page, size);
 			Map<String, Object> sutMap = new HashMap<>();

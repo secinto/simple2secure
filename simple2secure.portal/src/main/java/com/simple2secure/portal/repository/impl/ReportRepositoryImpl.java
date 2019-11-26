@@ -39,9 +39,9 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public List<Report> getReportsByProbeId(String probeId) {
+	public List<Report> getReportsByDeviceId(String deviceId) {
 		List<Report> reports = new ArrayList<>();
-		Query query = new Query(Criteria.where("probeId").is(probeId));
+		Query query = new Query(Criteria.where("probeId").is(deviceId));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 		return reports;
 	}
@@ -73,8 +73,8 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public void deleteByDeviceId(String probeId) {
-		List<Report> reports = getReportsByProbeId(probeId);
+	public void deleteByDeviceId(String deviceId) {
+		List<Report> reports = getReportsByDeviceId(deviceId);
 
 		if (reports != null) {
 			for (Report report : reports) {

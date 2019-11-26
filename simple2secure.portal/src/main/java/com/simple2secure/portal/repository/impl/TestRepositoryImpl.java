@@ -29,8 +29,8 @@ public class TestRepositoryImpl extends TestRepository {
 	}
 
 	@Override
-	public List<Test> getByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+	public List<Test> getByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId));
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}
@@ -57,15 +57,15 @@ public class TestRepositoryImpl extends TestRepository {
 	}
 
 	@Override
-	public Test getTestByNameAndPodId(String name, String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("name").is(name));
+	public Test getTestByNameAndDeviceId(String name, String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("name").is(name));
 		Test test = mongoTemplate.findOne(query, Test.class);
 		return test;
 	}
 
 	@Override
-	public List<Test> getByPodIdWithPagination(String podId, int page, int size, boolean usePagination) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(false));
+	public List<Test> getByDeviceIdWithPagination(String deviceId, int page, int size, boolean usePagination) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(false));
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);
 		if (usePagination) {
@@ -78,29 +78,29 @@ public class TestRepositoryImpl extends TestRepository {
 	}
 
 	@Override
-	public long getCountOfTestsWithPodid(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(false));
+	public long getCountOfTestsWithDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(false));
 		long count = mongoTemplate.count(query, Test.class, collectionName);
 		return count;
 	}
 
 	@Override
-	public List<Test> getNewPortalTestsByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("newTest").is(true));
+	public List<Test> getNewPortalTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("newTest").is(true));
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}
 
 	@Override
-	public List<Test> getDeletedTestsByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("deleted").is(true));
+	public List<Test> getDeletedTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(true));
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}
 
 	@Override
-	public List<Test> getUnsyncedTestsByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("synced").is(false));
+	public List<Test> getUnsyncedTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("synced").is(false));
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}

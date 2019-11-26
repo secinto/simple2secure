@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
+import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -63,12 +64,12 @@ public class NotificationController {
 	MessageByLocaleService messageByLocaleService;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{podId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{deviceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable("podId") String podId,
+	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable String deviceId,
 			@ValidInput ValidInputLocale locale) {
-		if (notification != null && !Strings.isNullOrEmpty(podId)) {
-			if (notificationUtils.addNewNotificationPod(notification.getContent(), podId)) {
+		if (notification != null && !Strings.isNullOrEmpty(deviceId)) {
+			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId)) {
 				return new ResponseEntity<>(notification, HttpStatus.OK);
 			}
 		}
@@ -80,16 +81,16 @@ public class NotificationController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Notification>> getNotificationsByContextId(@PathVariable("contextId") String contextId,
+	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			List<Notification> notifications = repository.findAllSortDescending(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			List<Notification> notifications = repository.findAllSortDescending(contextId.getValue());
 			if (notifications != null) {
 				return new ResponseEntity<>(notifications, HttpStatus.OK);
 			}
 		}
-		log.error("Problem occured while retrieving notifications for context id {}", contextId);
+		log.error("Problem occured while retrieving notifications for context id {}", contextId.getValue());
 		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);

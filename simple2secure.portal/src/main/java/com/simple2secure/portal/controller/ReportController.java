@@ -168,8 +168,8 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/network/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId,
-			@PathVariable("page") int page, @PathVariable("size") int size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId, @PathVariable int page,
+			@PathVariable int size, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -195,19 +195,19 @@ public class ReportController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/network/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/network/{reportId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable String reportId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(id)) {
+		if (!Strings.isNullOrEmpty(reportId)) {
 
-			NetworkReport report = networkReportRepository.find(id);
+			NetworkReport report = networkReportRepository.find(reportId);
 			if (report != null) {
 				networkReportRepository.delete(report);
 				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
-		log.error("Error occured while deleting network report with id {}", id);
+		log.error("Error occured while deleting network report with id {}", reportId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

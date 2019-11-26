@@ -37,8 +37,8 @@ public class SequenceRunRepositoryImpl extends SequenceRunRepository {
 	}
 
 	@Override
-	public List<SequenceRun> getPlannedSequence(String podId) {
-		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(podId));
+	public List<SequenceRun> getPlannedSequence(String deviceId) {
+		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(deviceId));
 		List<SequenceRun> sequences = mongoTemplate.find(query, SequenceRun.class);
 		return sequences;
 	}

@@ -223,8 +223,7 @@ public class LicenseController {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "/{groupId}/{userId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<byte[]> getLicense(@PathVariable("groupId") String groupId, @PathVariable("userId") String userId,
-			@ValidInput ValidInputLocale locale) throws Exception {
+	public ResponseEntity<byte[]> getLicense(@PathVariable String groupId, @ValidInput ValidInputLocale locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -282,6 +281,7 @@ public class LicenseController {
 
 			String payload = licenseUtils.getPayloadFromTheToken(authToken);
 			String userID = licenseUtils.getFieldFromPayload(payload, "userID");
+
 			if (userID != null) {
 				List<ContextUserAuthentication> user_contexts = contextUserRepository.getByUserId(userID);
 				if (user_contexts != null) {
@@ -289,7 +289,7 @@ public class LicenseController {
 						if (context.isOwnContext()) {
 							CompanyGroup group = groupRepository.findStandardGroupByContextId(context.getContextId());
 							if (group != null) {
-								return getLicense(group.getId(), userID, locale);
+								return getLicense(group.getId(), locale);
 							}
 						}
 					}

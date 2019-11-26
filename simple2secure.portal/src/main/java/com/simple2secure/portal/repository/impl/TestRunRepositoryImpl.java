@@ -67,21 +67,21 @@ public class TestRunRepositoryImpl extends TestRunRepository {
 	}
 
 	@Override
-	public List<TestRun> getPlannedTests(String podId) {
-		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(podId));
+	public List<TestRun> getPlannedTests(String deviceId) {
+		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(deviceId));
 		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);
 		return tests;
 	}
 
 	@Override
-	public List<TestRun> getTestRunByPodId(List<String> podIds) {
+	public List<TestRun> getTestRunByDeviceId(List<String> deviceIds) {
 		List<TestRun> tests = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
 		Query query = new Query();
-		for (String podId : podIds) {
+		for (String deviceId : deviceIds) {
 			Criteria expression = new Criteria();
-			expression.and("podId").is(podId);
+			expression.and("podId").is(deviceId);
 			orExpression.add(expression);
 		}
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));

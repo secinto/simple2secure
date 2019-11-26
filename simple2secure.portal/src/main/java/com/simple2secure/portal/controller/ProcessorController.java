@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
@@ -79,7 +80,7 @@ public class ProcessorController {
 	PortalUtils portalUtils;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -109,13 +110,12 @@ public class ProcessorController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{probeId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{deviceId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<Processor>> getProcessorsByDeviceId(@PathVariable String deviceId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {
@@ -148,7 +148,7 @@ public class ProcessorController {
 
 			}
 		}
-		log.error("Error while retrieving processors for probe with id {}", probeId);
+		log.error("Error while retrieving processors for probe with id {}", deviceId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -156,8 +156,7 @@ public class ProcessorController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/group/{groupId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable("groupId") String groupId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable String groupId, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(groupId)) {
 			List<Processor> processors = repository.getProcessorsByGroupId(groupId);
 			if (processors != null) {
@@ -174,7 +173,7 @@ public class ProcessorController {
 	 */
 	@RequestMapping(value = "/{processorId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteProcessor(@PathVariable("processorId") String processorId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteProcessor(@PathVariable String processorId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(processorId)) {
 			Processor processor = repository.find(processorId);

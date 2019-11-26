@@ -55,7 +55,6 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.ValidInputContext;
 import com.simple2secure.api.model.ValidInputParamType;
-import com.simple2secure.api.model.ValidInputGroupId;
 import com.simple2secure.api.model.ValidInputUser;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -255,10 +254,10 @@ public class PortalUtils {
 	 *
 	 * @return
 	 */
-	public String generatePodToken(String podId, String tokenSecret) {
+	public String generatePodToken(String deviceId, String tokenSecret) {
 
 		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-		claims.put(CLAIM_POD, podId);
+		claims.put(CLAIM_POD, deviceId);
 
 		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
 				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
@@ -350,8 +349,6 @@ public class PortalUtils {
 			return true;
 		} else if (param.getType().equals(ValidInputUser.class)) {
 			return true;
-		} else if (param.getType().equals(ValidInputGroupId.class)) {
-			return true;
 		}
 		return false;
 	}
@@ -367,8 +364,6 @@ public class PortalUtils {
 			return StaticConfigItems.CONTEXT_ANNOTATION_TAG;
 		} else if (param.getType().equals(ValidInputUser.class)) {
 			return StaticConfigItems.USER_ANNOTATION_TAG;
-		} else if (param.getType().equals(ValidInputGroupId.class)) {
-			return StaticConfigItems.SRC_GRP_ANNOTATION_TAG;
 		}
 		return "";
 	}

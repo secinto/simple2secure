@@ -17,5 +17,11 @@ public class ValidInputReport extends ValidatedInput{
 	public void setValue(String value) {
 		this.reportId = value;
 	}
+
+	@Override
+	public Object validate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

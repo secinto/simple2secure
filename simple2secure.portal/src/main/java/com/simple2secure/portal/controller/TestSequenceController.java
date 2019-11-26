@@ -98,14 +98,14 @@ public class TestSequenceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{deviceId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable("deviceId") String deviceId, @PathVariable("page") int page,
-			@PathVariable("size") int size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable String deviceId, @PathVariable int page, @PathVariable int size,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId)) {
-			List<TestSequence> allSeqFromDb = testSequenceRepository.getByPodId(deviceId, page, size);
+			List<TestSequence> allSeqFromDb = testSequenceRepository.getByDeviceId(deviceId, page, size);
 			Map<String, Object> sequencesMap = new HashMap<>();
 			if (allSeqFromDb != null) {
 				sequencesMap.put("sequences", allSeqFromDb);
-				sequencesMap.put("totalSize", testSequenceRepository.getCountOfSequencesWithPodid(deviceId));
+				sequencesMap.put("totalSize", testSequenceRepository.getCountOfSequencesWithDeviceid(deviceId));
 				return new ResponseEntity<>(sequencesMap, HttpStatus.OK);
 			}
 		}
@@ -147,7 +147,7 @@ public class TestSequenceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/delete/{sequenceId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestSequence> deleteSequence(@PathVariable("sequenceId") String sequenceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(sequenceId)) {
@@ -167,8 +167,8 @@ public class TestSequenceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/scheduledSequence/{deviceId}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable("deviceId") String deviceId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable String deviceId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId);
 
 		if (podLicense != null) {
@@ -224,9 +224,8 @@ public class TestSequenceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/scheduledSequence/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ValidInput ValidInputContext contextId,
-			@PathVariable("page") int page, @PathVariable("size") int size, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ValidInput ValidInputContext contextId, @PathVariable int page,
+			@PathVariable int size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			List<TestSequenceRunDTO> scheduledSequenceRuns = testUtils
@@ -246,8 +245,8 @@ public class TestSequenceController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/update/status/{sequenceRunId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
-			@PathVariable("sequenceRunId") String sequenceRunId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo, @PathVariable String sequenceRunId,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (sequenceRunInfo != null && !Strings.isNullOrEmpty(sequenceRunId)) {
 			JsonNode obj = JSONUtils.fromString(sequenceRunInfo);
 			String sequenceStatus = obj.findValue("status").asText();
@@ -281,11 +280,11 @@ public class TestSequenceController {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/sequenceresults/{podId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/sequenceresults/{deviceId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String podId, @ValidInput ValidInputLocale locale) {
-		if (podId != null) {
-			List<TestSequenceResult> result = testSequenceResultRepository.getByPodId(podId);
+	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String deviceId, @ValidInput ValidInputLocale locale) {
+		if (deviceId != null) {
+			List<TestSequenceResult> result = testSequenceResultRepository.getByDeviceId(deviceId);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
@@ -312,7 +311,7 @@ public class TestSequenceController {
 	@RequestMapping(value = "/result/{contextId}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ValidInput ValidInputContext contextId,
-			@PathVariable("page") int page, @PathVariable("size") int size, @ValidInput ValidInputLocale locale) {
+			@PathVariable int page, @PathVariable int size, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 			List<SequenceRun> sequenceRuns = sequenceRunrepository.getByContextId(contextId.getValue());
 			List<String> sequenceIds = portalUtils.extractIdsFromObjects(sequenceRuns);

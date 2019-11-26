@@ -17,5 +17,11 @@ public class ValidInputContext extends ValidatedInput{
 	public void setValue(String value) {
 		this.contextId = value;
 	}
+
+	@Override
+	public Object validate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

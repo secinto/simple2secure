@@ -5,4 +5,6 @@ public abstract class ValidatedInput {
 	public abstract String getValue();
 	
 	public abstract void setValue(String value);
+	
+	public abstract Object validate();
 }

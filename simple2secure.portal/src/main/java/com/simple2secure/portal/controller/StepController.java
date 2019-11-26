@@ -74,13 +74,13 @@ public class StepController {
 	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{probeId}/{select_all}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{deviceId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Step>> getStepsByProbeId(@PathVariable("probeId") String probeId,
-			@PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
-		log.debug("Retrieving steps for probe id {}", probeId);
-		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
+	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable String deviceId, @PathVariable boolean select_all,
+			@ValidInput ValidInputLocale locale) {
+		log.debug("Retrieving steps for probe id {}", deviceId);
+		if (!Strings.isNullOrEmpty(deviceId)) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
 
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -108,7 +108,7 @@ public class StepController {
 				}
 			}
 		}
-		log.error("Error while retrieving steps for probe id {}", probeId);
+		log.error("Error while retrieving steps for probe id {}", deviceId);
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -116,8 +116,8 @@ public class StepController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable("groupId") String groupId,
-			@PathVariable("select_all") boolean select_all, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable String groupId, @PathVariable boolean select_all,
+			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId)) {
 			List<Step> steps = repository.getStepsByGroupId(groupId, select_all);
@@ -164,7 +164,7 @@ public class StepController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{stepId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteStep(@PathVariable("stepId") String stepId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<?> deleteStep(@PathVariable String stepId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(stepId)) {

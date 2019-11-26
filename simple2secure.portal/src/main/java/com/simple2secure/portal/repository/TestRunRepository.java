@@ -30,11 +30,11 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestRunRepository extends MongoRepository<TestRun> {
 
-	public abstract List<TestRun> getPlannedTests(String podId);
+	public abstract List<TestRun> getPlannedTests(String deviceId);
 
 	public abstract List<TestRun> getByContextId(String contextId);
 
 	public abstract Map<String, Object> getByContextIdForPagination(String contextId, int page, int size);
 
-	public abstract List<TestRun> getTestRunByPodId(List<String> podId);
+	public abstract List<TestRun> getTestRunByDeviceId(List<String> deviceIds);
 }

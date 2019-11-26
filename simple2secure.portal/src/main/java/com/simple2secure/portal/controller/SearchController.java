@@ -63,8 +63,8 @@ public class SearchController {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{searchQuery}/{contextId}", method = RequestMethod.GET)
-	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable("searchQuery") String searchQuery,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable String searchQuery, @ValidInput ValidInputContext contextId,
+			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(searchQuery) && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 

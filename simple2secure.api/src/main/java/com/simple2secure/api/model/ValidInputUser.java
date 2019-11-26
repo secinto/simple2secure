@@ -17,5 +17,13 @@ public class ValidInputUser extends ValidatedInput{
 	public void setValue(String value) {
 		this.userId = value;
 	}
+
+	@Override
+	public Object validate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 	
 }
