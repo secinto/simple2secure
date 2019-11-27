@@ -4,7 +4,5 @@ public abstract class ValidatedInput<T> {
 	
 	public abstract T getValue();
 	
-	public abstract void setValue(T value);
-	
 	public abstract String getTag();
 }

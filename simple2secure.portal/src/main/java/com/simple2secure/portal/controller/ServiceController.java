@@ -30,18 +30,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputVersion;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.SERVICE_API)
@@ -56,15 +57,14 @@ public class ServiceController {
 	@Autowired
 	LoadedConfigItems loadedConfigItems;
 
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@ValidRequestMapping
 	public ResponseEntity<Service> getServiceVersion(@ValidInput ValidInputLocale locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{version}", method = RequestMethod.GET)
-	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable String version, @ValidInput ValidInputLocale locale) {
-		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version);
+	@ValidRequestMapping
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable ValidInputVersion version, @ValidInput ValidInputLocale locale) {
+		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version.getValue());
 
 		try {
 			library.setLibraryData(Files.readAllBytes(new File(library.getFilename()).toPath()));
@@ -75,7 +75,7 @@ public class ServiceController {
 		if (library != null) {
 			return new ResponseEntity<>(library, HttpStatus.OK);
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
+			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 
 		}

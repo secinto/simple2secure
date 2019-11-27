@@ -6,7 +6,6 @@ public class ValidInputQuery extends ValidatedInput<String>{
 	private String tag = "/{queryId}";
 	
 	public ValidInputQuery() {
-		
 	}
 	
 	public ValidInputQuery(String queryId) {
@@ -16,11 +15,6 @@ public class ValidInputQuery extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return queryId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.queryId = value;
 	}
 
 	@Override

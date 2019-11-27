@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -75,7 +76,6 @@ public class EmailController {
 
 	public static final Logger logger = LoggerFactory.getLogger(EmailController.class);
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
@@ -91,11 +91,10 @@ public class EmailController {
 			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@ValidInput ValidInputContext contextId,
@@ -112,7 +111,7 @@ public class EmailController {
 		}
 
 		log.error("Error occured while getting email config for user with id {}", contextId.getValue());
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -123,10 +122,10 @@ public class EmailController {
 	 * @param id
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(method = RequestMethod.DELETE)
-	public ResponseEntity<EmailConfiguration> deleteEmailConfig(ValidInputEmailConfig emailConfigId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable ValidInputEmailConfig emailConfigId,
+			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(emailConfigId.getValue())) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId.getValue());
@@ -138,7 +137,7 @@ public class EmailController {
 			}
 		}
 		log.error("Error occured while deleting email configuration with id {}", emailConfigId);
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

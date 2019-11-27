@@ -6,7 +6,6 @@ public class ValidInputHostname extends ValidatedInput<String>{
 	private String tag = "/{hostname}";
 	
 	public ValidInputHostname() {
-		
 	}
 	
 	public ValidInputHostname(String hostname) {
@@ -16,11 +15,6 @@ public class ValidInputHostname extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return hostname;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.hostname = value;
 	}
 
 	@Override

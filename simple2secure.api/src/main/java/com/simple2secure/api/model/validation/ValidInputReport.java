@@ -6,7 +6,6 @@ public class ValidInputReport extends ValidatedInput<String>{
 	private String tag = "/{reportId}";
 	
 	public ValidInputReport() {
-		
 	}
 	
 	public ValidInputReport(String reportId) {
@@ -18,10 +17,6 @@ public class ValidInputReport extends ValidatedInput<String>{
 		return reportId;
 	}
 
-	@Override
-	public void setValue(String value) {
-		this.reportId = value;
-	}
 
 	@Override
 	public String getTag() {

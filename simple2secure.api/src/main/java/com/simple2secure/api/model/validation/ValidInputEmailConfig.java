@@ -6,7 +6,6 @@ public class ValidInputEmailConfig extends ValidatedInput<String>{
 	private String tag = "/{emailConfigId}";
 	
 	public ValidInputEmailConfig() {
-		
 	}
 	
 	public ValidInputEmailConfig(String emailConfigId) {
@@ -16,11 +15,6 @@ public class ValidInputEmailConfig extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return emailConfigId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.emailConfigId = value;
 	}
 
 	@Override

@@ -5,7 +5,6 @@ public class ValidInputLocale extends ValidatedInput<String>{
 	private String locale;
 	
 	public ValidInputLocale() {
-		
 	}
 	
 	public ValidInputLocale(String locale) {
@@ -15,11 +14,6 @@ public class ValidInputLocale extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return locale;
-	}
-
-	@Override
-	public void setValue(String locale) {
-		this.locale = locale;
 	}
 
 	@Override

@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.SystemUnderTest;
+import com.simple2secure.api.model.validation.ValidInputGroup;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputPage;
+import com.simple2secure.api.model.validation.ValidInputSize;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -28,6 +31,7 @@ import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
@@ -50,11 +54,9 @@ public class SystemUnderTestController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ValidInput ValidInputLocale locale)
-			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, ItemNotFoundRepositoryException {
+	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ValidInput ValidInputLocale locale) {
 		if (sut != null) {
 			sutRepository.save(sut);
 			log.debug("System Under Test: {} has been saved", sut.getName());
@@ -62,45 +64,26 @@ public class SystemUnderTestController {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{sutId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable String sutId, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(sutId)) {
-			SystemUnderTest sut = sutRepository.find(sutId);
-			if (sut != null) {
-				sutRepository.delete(sut);
-				return new ResponseEntity<>(sut, HttpStatus.OK);
-			}
-			log.debug("Successfully deleted Systems Under Test!");
-		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sut", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{groupId}/{page}/{size}", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable String groupId, @PathVariable int page, @PathVariable int size,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(groupId)) {
-			List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId, page, size);
+	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable ValidInputGroup groupId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(groupId.getValue())) {
+			List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId.getValue(), page.getValue(), size.getValue());
 			Map<String, Object> sutMap = new HashMap<>();
 			if (allSUTFromDb != null) {
 				sutMap.put("sutList", allSUTFromDb);
-				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupId(groupId));
+				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupId(groupId.getValue()));
 				return new ResponseEntity<>(sutMap, HttpStatus.OK);
 			}
 			log.debug("Successfully loaded Systems Under Test!");
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

@@ -6,7 +6,6 @@ public class ValidInputRule extends ValidatedInput<String>{
 	private String tag = "/{ruleId}";
 	
 	public ValidInputRule() {
-		
 	}
 	
 	public ValidInputRule(String ruleId) {
@@ -16,11 +15,6 @@ public class ValidInputRule extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return ruleId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.ruleId = value;
 	}
 
 	@Override

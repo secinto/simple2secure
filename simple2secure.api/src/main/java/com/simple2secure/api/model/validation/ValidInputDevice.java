@@ -6,7 +6,6 @@ public class ValidInputDevice extends ValidatedInput<String>{
 	private String tag = "/{deviceId}";
 	
 	public ValidInputDevice() {
-		
 	}
 	
 	public ValidInputDevice(String deviceId) {
@@ -16,11 +15,6 @@ public class ValidInputDevice extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return deviceId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.deviceId = value;
 	}
 
 	@Override

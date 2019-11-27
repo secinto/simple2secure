@@ -42,7 +42,9 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.validation.ValidInputLicensePlan;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputTestMacro;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -52,6 +54,7 @@ import com.simple2secure.portal.repository.TestMacroRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.SETTINGS_API)
@@ -74,8 +77,7 @@ public class SettingsController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<SettingsDTO> getSettings(@ValidInput ValidInputLocale locale) {
 		List<Settings> settings = settingsRepository.findAll();
@@ -88,14 +90,13 @@ public class SettingsController {
 			}
 		}
 		log.error("Problem occured while retrieving settings");
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -104,13 +105,12 @@ public class SettingsController {
 			return new ResponseEntity<>(settings, HttpStatus.OK);
 		}
 		log.error("Problem occured while updating settings");
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -123,53 +123,50 @@ public class SettingsController {
 			return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving license plan");
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/licensePlan/{licensePlanId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable String licensePlanId, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable ValidInputLicensePlan licensePlanId,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(licensePlanId)) {
-			LicensePlan licensePlan = licensePlanRepository.find(licensePlanId);
+		if (!Strings.isNullOrEmpty(licensePlanId.getValue())) {
+			LicensePlan licensePlan = licensePlanRepository.find(licensePlanId.getValue());
 			if (licensePlan != null) {
 				licensePlanRepository.delete(licensePlan);
 				return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while deleting license plan with id {}", licensePlanId);
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_license_plan", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testmacro/{testMacroId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/testmacro", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable String testMacroId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(testMacroId)) {
-			TestMacro testMacro = testMacroRepository.find(testMacroId);
+		if (!Strings.isNullOrEmpty(testMacroId.getValue())) {
+			TestMacro testMacro = testMacroRepository.find(testMacroId.getValue());
 			if (testMacro != null) {
 				testMacroRepository.delete(testMacro);
 				return new ResponseEntity<>(testMacro, HttpStatus.OK);
 			}
 		}
-		log.error("Problem occured while deleting test macro with id {}", testMacroId);
-		return new ResponseEntity(
+		log.error("Problem occured while deleting test macro with id {}", testMacroId.getValue());
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_macro", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testmacro", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -182,7 +179,7 @@ public class SettingsController {
 			return new ResponseEntity<>(testMacro, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving test macro");
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

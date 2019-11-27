@@ -6,7 +6,6 @@ public class ValidInputProcessor extends ValidatedInput<String>{
 	private String tag = "/{processorId}";
 	
 	public ValidInputProcessor() {
-		
 	}
 	
 	public ValidInputProcessor(String processorId) {
@@ -16,11 +15,6 @@ public class ValidInputProcessor extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return processorId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.processorId = value;
 	}
 
 	@Override

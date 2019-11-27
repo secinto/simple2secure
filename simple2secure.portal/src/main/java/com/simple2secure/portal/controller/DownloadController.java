@@ -62,7 +62,6 @@ public class DownloadController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping
 	public ResponseEntity<byte[]> downloadProbe(@ValidInput ValidInputLocale locale) throws IOException, URISyntaxException {
 
@@ -75,7 +74,7 @@ public class DownloadController {
 			return new ResponseEntity<>(downloadData, httpHeaders, HttpStatus.OK);
 		} else {
 			log.error("File for download not found!");
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
+			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}

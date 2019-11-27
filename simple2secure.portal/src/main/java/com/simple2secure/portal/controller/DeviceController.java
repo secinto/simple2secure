@@ -105,11 +105,10 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ValidInput ValidInputContext contextId, ValidInputPage page,
-			ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ValidInput ValidInputContext contextId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -124,7 +123,7 @@ public class DeviceController {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -135,7 +134,6 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{contextId}/{active}")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ValidInput ValidInputContext contextId, @PathVariable boolean active,
@@ -154,7 +152,7 @@ public class DeviceController {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId);
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -170,7 +168,7 @@ public class DeviceController {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@ValidRequestMapping(value = "/config")
-	public ResponseEntity<List<Test>> checkConfiguration(ValidInputDevice deviceId, ValidInputHostname hostname)
+	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
 			throws ItemNotFoundRepositoryException {
 
 		List<Test> test = testRepository.getByDeviceId(deviceId.getValue());
@@ -197,10 +195,9 @@ public class DeviceController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<TestRun>> getScheduledTests(ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 
@@ -210,7 +207,7 @@ public class DeviceController {
 			return testUtils.getScheduledTestsByDeviceId(deviceId.getValue(), locale.getValue());
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -219,10 +216,9 @@ public class DeviceController {
 	/**
 	 * This function deletes the specified the POD with the specified ID if it exists
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deletePod(ValidInputDevice deviceId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 
@@ -236,7 +232,7 @@ public class DeviceController {
 		}
 
 		log.error("Problem occured while deleting device with id {}", deviceId);
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_device", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -246,10 +242,9 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/changeGroup", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(ValidInputDevice deviceId, @RequestBody CompanyGroup group,
+	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable ValidInputDevice deviceId, @RequestBody CompanyGroup group,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue()) && group != null) {
@@ -268,7 +263,7 @@ public class DeviceController {
 
 		log.error("Problem occured while updating group for device id {}", deviceId.getValue());
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_device_group", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -281,7 +276,7 @@ public class DeviceController {
 	}
 
 	@ValidRequestMapping(value = "/status", method = RequestMethod.POST)
-	public ResponseEntity<Service> postStatus(ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());

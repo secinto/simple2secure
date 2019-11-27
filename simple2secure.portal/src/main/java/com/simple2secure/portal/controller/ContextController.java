@@ -104,7 +104,6 @@ public class ContextController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping(value = "/add", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
@@ -143,7 +142,7 @@ public class ContextController {
 									return new ResponseEntity<>(context, HttpStatus.OK);
 								} catch (IOException e) {
 									log.error(e.getMessage());
-									return new ResponseEntity(
+									return new ResponseEntity<>(
 											new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 											HttpStatus.NOT_FOUND);
 								}
@@ -153,14 +152,14 @@ public class ContextController {
 					}
 				} else {
 					log.error("Context {} already exist", context.getName());
-					return new ResponseEntity(
+					return new ResponseEntity<>(
 							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 			}
 		}
 		log.error("Problem occured while adding context");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -169,7 +168,6 @@ public class ContextController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
@@ -190,7 +188,7 @@ public class ContextController {
 			}
 		}
 		log.error("Problem occured while retrieving contexts for user ID {}" + userId.getValue());
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -201,7 +199,6 @@ public class ContextController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Context> deleteContext(@ValidInput ValidInputUser userId, @ValidInput ValidInputContext contextId,
@@ -219,7 +216,7 @@ public class ContextController {
 				} else {
 					// User not allowed to delete
 					log.error("{} not allowed to delete this default context {}", user.getEmail(), context.getName());
-					return new ResponseEntity(
+					return new ResponseEntity<>(
 							new CustomErrorType(messageByLocaleService.getMessage("not_allowed_to_delete_this_context", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
@@ -228,7 +225,7 @@ public class ContextController {
 
 		}
 		log.error("Problem occured while deleting context {}" + contextId);
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_context", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -238,7 +235,6 @@ public class ContextController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
@@ -264,8 +260,8 @@ public class ContextController {
 			}
 		}
 		log.error("Problem occured while updating/creating context");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 
 }

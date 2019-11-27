@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,7 +99,6 @@ public class ReportController {
 
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<Report> saveReport(@RequestBody Report report, @ValidInput ValidInputLocale locale) {
@@ -107,15 +107,14 @@ public class ReportController {
 			return new ResponseEntity<>(report, HttpStatus.OK);
 		}
 		log.error("Error occured while saving report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@ValidInput ValidInputContext contextId, ValidInputPage page,
-			ValidInputSize size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@ValidInput ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
 			Context context = contextRepository.find(contextId.getValue());
@@ -136,7 +135,7 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -171,8 +170,8 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId, ValidInputPage page,
-			ValidInputSize size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -200,7 +199,7 @@ public class ReportController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/network", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReport> deleteNetworkReport(ValidInputReport reportId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 

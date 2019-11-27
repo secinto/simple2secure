@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -169,7 +170,6 @@ public class LicenseController {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
@@ -182,7 +182,7 @@ public class LicenseController {
 				podAuthentication = false;
 			} else {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
+				return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 			LicenseActivation activation = null;
@@ -201,12 +201,12 @@ public class LicenseController {
 					licensePublic = licensePrivate.getPublicLicense();
 				}
 
-				return new ResponseEntity(licensePublic, HttpStatus.OK);
+				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -221,10 +221,9 @@ public class LicenseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<byte[]> getLicense(ValidInputGroup groupId, @ValidInput ValidInputLocale locale) throws Exception {
+	public ResponseEntity<byte[]> getLicense(@PathVariable ValidInputGroup groupId, @ValidInput ValidInputLocale locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -261,11 +260,11 @@ public class LicenseController {
 					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
 					contextRepository.update(context);
 
-					return new ResponseEntity(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
+					return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 

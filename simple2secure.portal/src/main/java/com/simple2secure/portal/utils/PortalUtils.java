@@ -346,9 +346,15 @@ public class PortalUtils {
 	 * @return
 	 */
 	private boolean isParamPathVariable(Parameter param) {
-		if (param.getType().getSuperclass().equals(ValidatedInput.class)) {
-			if (!param.getType().equals(ValidInputLocale.class)) {
-				return true;
+		Class<?> clazz = param.getType();
+		if (clazz != null) {
+			Class<?> super_clazz = clazz.getSuperclass();
+			if (super_clazz != null) {
+				if (super_clazz.equals(ValidatedInput.class)) {
+					if (!clazz.equals(ValidInputLocale.class)) {
+						return true;
+					}
+				}
 			}
 		}
 		return false;
@@ -369,12 +375,19 @@ public class PortalUtils {
 	private String getRequestMethodTag(Parameter param) throws InstantiationException, IllegalAccessException, NoSuchMethodException,
 			SecurityException, IllegalArgumentException, InvocationTargetException {
 
-		if (param.getType().getSuperclass().equals(ValidatedInput.class)) {
-			Class<?> clazz = param.getType();
-			Object method_object = clazz.newInstance();
-			Method method = param.getType().getDeclaredMethod("getTag");
-			String tag = (String) method.invoke(method_object);
-			return tag;
+		Class<?> clazz = param.getType();
+		if (clazz != null) {
+			Class<?> superClazz = clazz.getSuperclass();
+			if (superClazz != null) {
+				if (superClazz.equals(ValidatedInput.class)) {
+					if (!clazz.equals(ValidInputLocale.class)) {
+						Object method_object = clazz.newInstance();
+						Method method = param.getType().getDeclaredMethod("getTag");
+						String tag = (String) method.invoke(method_object);
+						return tag;
+					}
+				}
+			}
 		}
 		return "";
 	}

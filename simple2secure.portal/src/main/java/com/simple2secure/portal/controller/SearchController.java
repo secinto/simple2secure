@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -37,6 +36,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.api.model.validation.ValidInputContext;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputSearchQuery;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -44,6 +44,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.SearchUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
@@ -61,24 +62,24 @@ public class SearchController {
 	@Autowired
 	SearchUtils searchUtils;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{searchQuery}/{contextId}", method = RequestMethod.GET)
-	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable String searchQuery, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	@ValidRequestMapping
+	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable ValidInputSearchQuery searchQuery,
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(searchQuery) && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
+		if (!Strings.isNullOrEmpty(searchQuery.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())
+				&& !Strings.isNullOrEmpty(locale.getValue())) {
 
 			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
-				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery, contextId.getValue());
+				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery.getValue(), contextId.getValue());
 
 				if (srList != null) {
 					return new ResponseEntity<>(srList, HttpStatus.OK);
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 

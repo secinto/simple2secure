@@ -6,7 +6,6 @@ public class ValidInputUser extends ValidatedInput<String>{
 	private String tag = "/{userId}";
 	
 	public ValidInputUser() {
-		
 	}
 	
 	public ValidInputUser(String userId) {
@@ -16,11 +15,6 @@ public class ValidInputUser extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return userId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.userId = value;
 	}
 
 	@Override

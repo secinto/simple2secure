@@ -2,27 +2,21 @@ package com.simple2secure.api.model.validation;
 
 public class ValidInputDestGroup extends ValidatedInput<String>{
 	
-	private String groupId;
+	private String destGroupId;
 	private String tag = "/{destGroupId}";
 	
 	public ValidInputDestGroup() {
-		
 	}
 	
-	public ValidInputDestGroup(String groupId) {
-		this.groupId = groupId;
+	public ValidInputDestGroup(String destGroupId) {
+		this.destGroupId = destGroupId;
 	}
 
 	@Override
 	public String getValue() {
-		return groupId;
+		return destGroupId;
 	}
-
-	@Override
-	public void setValue(String value) {
-		this.groupId = value;
-	}
-
+	
 	@Override
 	public String getTag() {
 		return tag;

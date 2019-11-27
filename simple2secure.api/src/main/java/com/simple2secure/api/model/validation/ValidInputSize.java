@@ -6,21 +6,15 @@ public class ValidInputSize extends ValidatedInput<Integer>{
 	private String tag = "/{size}";
 	
 	public ValidInputSize() {
-		
 	}
 	
-	public ValidInputSize(int deviceId) {
-		this.size = deviceId;
+	public ValidInputSize(int size) {
+		this.size = size;
 	}
 
 	@Override
 	public Integer getValue() {
 		return size;
-	}
-
-	@Override
-	public void setValue(Integer value) {
-		this.size = value;
 	}
 
 	@Override

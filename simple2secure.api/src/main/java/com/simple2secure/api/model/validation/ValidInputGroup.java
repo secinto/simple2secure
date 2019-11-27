@@ -6,7 +6,6 @@ public class ValidInputGroup extends ValidatedInput<String>{
 	private String tag = "/{groupId}";
 	
 	public ValidInputGroup() {
-		
 	}
 	
 	public ValidInputGroup(String groupId) {
@@ -16,11 +15,6 @@ public class ValidInputGroup extends ValidatedInput<String>{
 	@Override
 	public String getValue() {
 		return groupId;
-	}
-
-	@Override
-	public void setValue(String value) {
-		this.groupId = value;
 	}
 
 	@Override

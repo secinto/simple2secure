@@ -41,7 +41,10 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.api.model.validation.ValidInputDevice;
+import com.simple2secure.api.model.validation.ValidInputGroup;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputStep;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -51,6 +54,7 @@ import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.STEP_API)
@@ -73,14 +77,13 @@ public class StepController {
 
 	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/{deviceId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable String deviceId, @PathVariable boolean select_all,
+	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable boolean select_all,
 			@ValidInput ValidInputLocale locale) {
-		log.debug("Retrieving steps for probe id {}", deviceId);
-		if (!Strings.isNullOrEmpty(deviceId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+		log.debug("Retrieving steps for probe id {}", deviceId.getValue());
+		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -108,30 +111,28 @@ public class StepController {
 				}
 			}
 		}
-		log.error("Error while retrieving steps for probe id {}", deviceId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
+		log.error("Error while retrieving steps for probe id {}", deviceId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable String groupId, @PathVariable boolean select_all,
+	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable ValidInputGroup groupId, @PathVariable boolean select_all,
 			@ValidInput ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(groupId)) {
-			List<Step> steps = repository.getStepsByGroupId(groupId, select_all);
+		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+			List<Step> steps = repository.getStepsByGroupId(groupId.getValue(), select_all);
 			if (steps != null) {
 				return new ResponseEntity<>(steps, HttpStatus.OK);
 			}
 		}
-		log.error("Error while retrieving steps for group id {}", groupId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
+		log.error("Error while retrieving steps for group id {}", groupId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -152,7 +153,7 @@ public class StepController {
 			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 		log.error("Error while updating step");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -161,14 +162,13 @@ public class StepController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{stepId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteStep(@PathVariable String stepId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<?> deleteStep(@PathVariable ValidInputStep stepId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(stepId)) {
-			Step step = repository.find(stepId);
+		if (!Strings.isNullOrEmpty(stepId.getValue())) {
+			Step step = repository.find(stepId.getValue());
 			List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber(), step.getGroupId());
 			{
 				repository.delete(step);
@@ -181,8 +181,8 @@ public class StepController {
 				return new ResponseEntity<>(step, HttpStatus.OK);
 			}
 		}
-		log.error("Error while deleting step with id {}", stepId);
-		return new ResponseEntity(
+		log.error("Error while deleting step with id {}", stepId.getValue());
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

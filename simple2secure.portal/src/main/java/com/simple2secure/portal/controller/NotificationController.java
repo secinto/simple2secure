@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,10 +65,9 @@ public class NotificationController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, ValidInputDevice deviceId,
+	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable ValidInputDevice deviceId,
 			@ValidInput ValidInputLocale locale) {
 		if (notification != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
 			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId.getValue())) {
@@ -75,11 +75,10 @@ public class NotificationController {
 			}
 		}
 		log.error("Problem occured while saving notification");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ValidInput ValidInputContext contextId,
@@ -92,12 +91,11 @@ public class NotificationController {
 			}
 		}
 		log.error("Problem occured while retrieving notifications for context id {}", contextId.getValue());
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/read", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification, @ValidInput ValidInputLocale locale)
@@ -110,7 +108,7 @@ public class NotificationController {
 		}
 
 		log.error("Problem occured while updating read parameter");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 }

@@ -66,7 +66,7 @@ export class SUTDetailsComponent {
 
     public updateSaveSUT() {
 		this.loading = true;
-		this.url = environment.apiEndpoint + 'sut/add';
+		this.url = environment.apiEndpoint + 'sut';
 		this.httpService.post(this.sut, this.url).subscribe(
 			data => {
 				if (this.type === 'new') {

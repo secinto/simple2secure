@@ -6,21 +6,15 @@ public class ValidInputPage extends ValidatedInput<Integer>{
 	private String tag = "/{page}";
 	
 	public ValidInputPage() {
-		
 	}
 	
-	public ValidInputPage(int deviceId) {
-		this.page = deviceId;
+	public ValidInputPage(int page) {
+		this.page = page;
 	}
 
 	@Override
 	public Integer getValue() {
 		return page;
-	}
-
-	@Override
-	public void setValue(Integer value) {
-		this.page = value;
 	}
 
 	@Override

@@ -8,12 +8,17 @@ import com.simple2secure.api.model.validation.ValidInputDevice;
 import com.simple2secure.api.model.validation.ValidInputEmailConfig;
 import com.simple2secure.api.model.validation.ValidInputGroup;
 import com.simple2secure.api.model.validation.ValidInputHostname;
+import com.simple2secure.api.model.validation.ValidInputLicensePlan;
 import com.simple2secure.api.model.validation.ValidInputPage;
 import com.simple2secure.api.model.validation.ValidInputProcessor;
 import com.simple2secure.api.model.validation.ValidInputQuery;
 import com.simple2secure.api.model.validation.ValidInputReport;
 import com.simple2secure.api.model.validation.ValidInputRule;
+import com.simple2secure.api.model.validation.ValidInputSearchQuery;
 import com.simple2secure.api.model.validation.ValidInputSize;
+import com.simple2secure.api.model.validation.ValidInputStep;
+import com.simple2secure.api.model.validation.ValidInputSut;
+import com.simple2secure.api.model.validation.ValidInputTestMacro;
 import com.simple2secure.api.model.validation.ValidatedInput;
 
 public class StringToValidInputConverterFactory implements ConverterFactory<String, ValidatedInput<?>> {
@@ -58,6 +63,16 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputReport(source);
 			} else if (this.targetClass == ValidInputRule.class) {
 				return (T) new ValidInputRule(source);
+			} else if (this.targetClass == ValidInputSearchQuery.class) {
+				return (T) new ValidInputSearchQuery(source);
+			} else if (this.targetClass == ValidInputLicensePlan.class) {
+				return (T) new ValidInputLicensePlan(source);
+			} else if (this.targetClass == ValidInputTestMacro.class) {
+				return (T) new ValidInputTestMacro(source);
+			} else if (this.targetClass == ValidInputStep.class) {
+				return (T) new ValidInputStep(source);
+			} else if (this.targetClass == ValidInputSut.class) {
+				return (T) new ValidInputSut(source);
 			} else {
 				return null;
 			}
