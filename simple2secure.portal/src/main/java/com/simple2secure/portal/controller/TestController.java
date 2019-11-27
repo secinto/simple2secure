@@ -50,7 +50,13 @@ import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.validation.ValidInputContext;
+import com.simple2secure.api.model.validation.ValidInputDevice;
 import com.simple2secure.api.model.validation.ValidInputLocale;
+import com.simple2secure.api.model.validation.ValidInputPage;
+import com.simple2secure.api.model.validation.ValidInputSize;
+import com.simple2secure.api.model.validation.ValidInputTest;
+import com.simple2secure.api.model.validation.ValidInputTestResult;
+import com.simple2secure.api.model.validation.ValidInputTestRun;
 import com.simple2secure.api.model.validation.ValidInputUser;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -67,6 +73,7 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 import com.simple2secure.portal.validator.ValidInput;
+import com.simple2secure.portal.validator.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.TEST_API)
@@ -123,19 +130,18 @@ public class TestController {
 	 */
 	@RequestMapping(value = "/{deviceId}/{page}/{size}/{usePagination}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Map<String, Object>> getTestByDeviceId(@PathVariable String deviceId, @PathVariable int page, @PathVariable int size,
-			@PathVariable boolean usePagination, @ValidInput ValidInputLocale locale) {
-		return testUtils.getTestByDeviceId(deviceId, page, size, usePagination, locale.getValue());
+	public ResponseEntity<Map<String, Object>> getTestByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @PathVariable boolean usePagination, @ValidInput ValidInputLocale locale) {
+		return testUtils.getTestByDeviceId(deviceId.getValue(), page.getValue(), size.getValue(), usePagination, locale.getValue());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{testId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Test> deleteTest(@PathVariable String testId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Test> deleteTest(@PathVariable ValidInputTest testId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(testId)) {
-			Test test = testRepository.find(testId);
+		if (!Strings.isNullOrEmpty(testId.getValue())) {
+			Test test = testRepository.find(testId.getValue());
 			if (test != null) {
 				test.setDeleted(true);
 				testRepository.update(test);
@@ -143,14 +149,13 @@ public class TestController {
 			}
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTest/{contextId}/{userId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleTest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ValidInput ValidInputContext contextId,
 			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
@@ -177,73 +182,70 @@ public class TestController {
 			}
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/getScheduledTests/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/getScheduledTests")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ValidInput ValidInputContext contextId, @PathVariable int page,
-			@PathVariable int size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ValidInput ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 
-			Map<String, Object> tests = testRunRepository.getByContextIdForPagination(contextId.getValue(), page, size);
+			Map<String, Object> tests = testRunRepository.getByContextIdForPagination(contextId.getValue(), page.getValue(), size.getValue());
 
 			return new ResponseEntity<>(tests, HttpStatus.OK);
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testresult/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/testresult")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Map<String, Object>> getTestResultByContextId(@ValidInput ValidInputContext contextId, @PathVariable int page,
-			@PathVariable int size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Map<String, Object>> getTestResultByContextId(@ValidInput ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
-			Map<String, Object> results = testUtils.getTestResultByContextId(contextId.getValue(), locale.getValue(), page, size);
+			Map<String, Object> results = testUtils.getTestResultByContextId(contextId.getValue(), locale.getValue(), page.getValue(),
+					size.getValue());
 			if (results != null) {
 				return new ResponseEntity<>(results, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_tests", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/testresult/delete/{testResultId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/testresult", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestResult> deleteTestResult(@PathVariable String testResultId, @ValidInput ValidInputLocale locale) {
-		return testUtils.deleteTestResult(testResultId, locale.getValue());
+	public ResponseEntity<TestResult> deleteTestResult(@PathVariable ValidInputTestResult testResultId, @ValidInput ValidInputLocale locale) {
+		return testUtils.deleteTestResult(testResultId.getValue(), locale.getValue());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/testrun/delete/{testRunId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/testrun/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestRun> deleteTestRun(@PathVariable String testRunId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestRun> deleteTestRun(@PathVariable ValidInputTestRun testRunId, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(testRunId)) {
-			TestRun testRun = testRunRepository.find(testRunId);
+		if (!Strings.isNullOrEmpty(testRunId.getValue())) {
+			TestRun testRun = testRunRepository.find(testRunId.getValue());
 			if (testRun != null) {
 				testRunRepository.delete(testRun);
 				return new ResponseEntity<>(testRun, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/save", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
@@ -256,12 +258,12 @@ public class TestController {
 				testRepository.save(convertedTest);
 				return new ResponseEntity<>(convertedTest, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(
+				return new ResponseEntity<>(
 						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -274,22 +276,21 @@ public class TestController {
 	 * -------------------------------------------------------------------------------------------------------------------------------------
 	 */
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleTestPod/{deviceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleTestPod", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable String deviceId,
+	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable ValidInputDevice deviceId,
 			@ValidInput ValidInputLocale locale) {
 
-		if (test != null && !Strings.isNullOrEmpty(deviceId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+		if (test != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 
 				if (group != null) {
 					String test_content = test.getTest_content().replace("\'", "\"");
-					TestRun testRun = new TestRun(test.getId(), test.getName(), deviceId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
-							TestStatus.PLANNED, System.currentTimeMillis());
+					TestRun testRun = new TestRun(test.getId(), test.getName(), deviceId.getValue(), group.getContextId(), TestRunType.MANUAL_POD,
+							test_content, TestStatus.PLANNED, System.currentTimeMillis());
 					testRun.setHostname(license.getDeviceInfo().getHostname());
 					testRunRepository.save(testRun);
 
@@ -303,21 +304,20 @@ public class TestController {
 
 			}
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@RequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @ValidInput ValidInputLocale locale) {
 		TestResult result = testUtils.saveTestResult(testResult, locale.getValue());
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/syncTest", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/syncTest", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -326,19 +326,18 @@ public class TestController {
 			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
 			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
 		}
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/syncTests/{deviceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/syncTest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable String deviceId,
+	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable ValidInputDevice deviceId,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		List<Test> syncronizedTestList = new ArrayList<>();
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId)) {
-			testUtils.setAllPodTestToUnsyncronized(deviceId);
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			testUtils.setAllPodTestToUnsyncronized(deviceId.getValue());
 			if (tests != null) {
 				for (Test test : tests) {
 					if (test != null) {
@@ -350,25 +349,24 @@ public class TestController {
 				}
 			}
 
-			List<Test> newPortalTests = testUtils.getNewPortalTests(deviceId);
+			List<Test> newPortalTests = testUtils.getNewPortalTests(deviceId.getValue());
 			if (newPortalTests != null && newPortalTests.size() > 0) {
 				syncronizedTestList.addAll(newPortalTests);
 			}
 
-			testUtils.deleteTaggedPortalTests(deviceId);
-			testUtils.deleteUnsyncedTests(deviceId);
+			testUtils.deleteTaggedPortalTests(deviceId.getValue());
+			testUtils.deleteUnsyncedTests(deviceId.getValue());
 
 			return new ResponseEntity<>(syncronizedTestList, HttpStatus.OK);
 
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO, @ValidInput ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -387,7 +385,7 @@ public class TestController {
 
 		}
 
-		return new ResponseEntity(
+		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

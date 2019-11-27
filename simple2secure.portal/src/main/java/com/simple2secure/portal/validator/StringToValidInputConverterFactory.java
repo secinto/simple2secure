@@ -15,10 +15,17 @@ import com.simple2secure.api.model.validation.ValidInputQuery;
 import com.simple2secure.api.model.validation.ValidInputReport;
 import com.simple2secure.api.model.validation.ValidInputRule;
 import com.simple2secure.api.model.validation.ValidInputSearchQuery;
+import com.simple2secure.api.model.validation.ValidInputSequence;
 import com.simple2secure.api.model.validation.ValidInputSize;
 import com.simple2secure.api.model.validation.ValidInputStep;
 import com.simple2secure.api.model.validation.ValidInputSut;
+import com.simple2secure.api.model.validation.ValidInputTest;
 import com.simple2secure.api.model.validation.ValidInputTestMacro;
+import com.simple2secure.api.model.validation.ValidInputTestResult;
+import com.simple2secure.api.model.validation.ValidInputTestRun;
+import com.simple2secure.api.model.validation.ValidInputToken;
+import com.simple2secure.api.model.validation.ValidInputWidget;
+import com.simple2secure.api.model.validation.ValidInputWidgetProp;
 import com.simple2secure.api.model.validation.ValidatedInput;
 
 public class StringToValidInputConverterFactory implements ConverterFactory<String, ValidatedInput<?>> {
@@ -73,6 +80,20 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputStep(source);
 			} else if (this.targetClass == ValidInputSut.class) {
 				return (T) new ValidInputSut(source);
+			} else if (this.targetClass == ValidInputTest.class) {
+				return (T) new ValidInputTest(source);
+			} else if (this.targetClass == ValidInputTestResult.class) {
+				return (T) new ValidInputTestResult(source);
+			} else if (this.targetClass == ValidInputTestRun.class) {
+				return (T) new ValidInputTestRun(source);
+			} else if (this.targetClass == ValidInputSequence.class) {
+				return (T) new ValidInputSequence(source);
+			} else if (this.targetClass == ValidInputToken.class) {
+				return (T) new ValidInputToken(source);
+			} else if (this.targetClass == ValidInputWidget.class) {
+				return (T) new ValidInputWidget(source);
+			} else if (this.targetClass == ValidInputWidgetProp.class) {
+				return (T) new ValidInputWidgetProp(source);
 			} else {
 				return null;
 			}
