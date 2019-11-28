@@ -21,7 +21,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -52,6 +52,12 @@ export class HttpService {
 		const headers = this.getHeaders(true);
 
 		return this.httpClient.get<any>(url, {headers});
+	}
+
+	public getWithParams(url: string, params: HttpParams): Observable<any> {
+		const headers = this.getHeaders(true);
+
+		return this.httpClient.get<any>(url, {headers, params});
 	}
 
 	public post(item: any, url: string): Observable<any> {

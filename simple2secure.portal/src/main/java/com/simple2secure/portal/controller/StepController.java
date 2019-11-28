@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -78,9 +79,9 @@ public class StepController {
 
 	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
-	@RequestMapping(value = "/{deviceId}/{select_all}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable boolean select_all,
+	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable ValidInputDevice deviceId, @RequestParam boolean select_all,
 			@ValidInput ValidInputLocale locale) {
 		log.debug("Retrieving steps for probe id {}", deviceId.getValue());
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
@@ -117,9 +118,9 @@ public class StepController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(value = "/group/{groupId}/{select_all}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable ValidInputGroup groupId, @PathVariable boolean select_all,
+	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
 			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {

@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -496,9 +497,8 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 *
 	 */
-
-	@RequestMapping(value = "/invite/process/{invitationToken}/{isAccepted}", method = RequestMethod.GET)
-	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @PathVariable boolean isAccepted,
+	@ValidRequestMapping(value = "/invite/process")
+	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(token)) {
 			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(token);

@@ -31,6 +31,7 @@ import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {AddQueryDialog} from './addQueryDialog';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
 	moduleId: module.id,
@@ -72,7 +73,9 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadAllProbes(defaultValue: boolean) {
-		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/false')
+		const params = new HttpParams()
+			.set('active', String(false));
+		this.httpService.getWithParams(environment.apiEndpoint + 'device/' + this.context.context.id, params)
 			.subscribe(
 				data => {
 					this.probes = data;
@@ -87,7 +90,9 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadQueriesByProbe(probeId: string) {
-		this.httpService.get(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN/false')
+		const params = new HttpParams()
+			.set('select_all', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN', params)
 			.subscribe(
 				data => {
 					this.queries = data;

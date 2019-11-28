@@ -9,6 +9,7 @@ import simple2secure.validator.model.ValidInputEmailConfig;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputHostname;
 import simple2secure.validator.model.ValidInputLicensePlan;
+import simple2secure.validator.model.ValidInputOsinfo;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputProcessor;
 import simple2secure.validator.model.ValidInputQuery;
@@ -94,6 +95,8 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputWidget(source);
 			} else if (this.targetClass == ValidInputWidgetProp.class) {
 				return (T) new ValidInputWidgetProp(source);
+			} else if (this.targetClass == ValidInputOsinfo.class) {
+				return (T) new ValidInputOsinfo(source);
 			} else {
 				return null;
 			}

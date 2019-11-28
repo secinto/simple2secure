@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -135,9 +136,9 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(value = "/{contextId}/{active}")
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ValidInput ValidInputContext contextId, @PathVariable boolean active,
+	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ValidInput ValidInputContext contextId, @RequestParam boolean active,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
