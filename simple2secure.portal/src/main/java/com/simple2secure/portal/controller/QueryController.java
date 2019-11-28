@@ -45,11 +45,6 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputDevice;
-import com.simple2secure.api.model.validation.ValidInputGroup;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputQuery;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -63,8 +58,14 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputGroup;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputQuery;
 
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)

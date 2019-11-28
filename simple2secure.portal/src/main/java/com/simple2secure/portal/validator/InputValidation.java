@@ -13,17 +13,17 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
-import com.simple2secure.api.model.LocaleLanguage;
 import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputUser;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputUser;
 
 @Component
 public class InputValidation implements HandlerMethodArgumentResolver {
@@ -58,9 +58,9 @@ public class InputValidation implements HandlerMethodArgumentResolver {
 		if (methodParameter.getGenericParameterType().equals(ValidInputContext.class)) {
 			return validateContextInputParameter(auth, methodParameter);
 		} else if (methodParameter.getGenericParameterType().equals(ValidInputUser.class)) {
-			return validateUserInputParameter(auth, methodParameter);
+			return new ValidInputUser().validate(auth, methodParameter, request);
 		} else if (methodParameter.getGenericParameterType().equals(ValidInputLocale.class)) {
-			return validateLocaleHeader(request);
+			return new ValidInputLocale().validate(auth, methodParameter, request);
 		}
 
 		return null;
@@ -82,27 +82,6 @@ public class InputValidation implements HandlerMethodArgumentResolver {
 		}
 		// TODO: Throw an exception that user is not authenticated
 		return null;
-	}
-
-	public ValidInputUser validateUserInputParameter(Authentication auth, MethodParameter methodParameter) {
-		if (auth.isAuthenticated()) {
-			if (auth.getPrincipal() != null) {
-				User currentUser = (User) auth.getPrincipal();
-				return new ValidInputUser(currentUser.getId());
-			}
-		}
-		// TODO: Throw an exception that user is not authenticated
-		return null;
-	}
-
-	public ValidInputLocale validateLocaleHeader(HttpServletRequest request) {
-		LocaleLanguage lang = LocaleLanguage.valueOfLabel(request.getHeader("Accept-Language"));
-
-		if (lang == null) {
-			lang = StaticConfigItems.DEFAULT_LOCALE;
-		}
-
-		return new ValidInputLocale(lang.label);
 	}
 
 }

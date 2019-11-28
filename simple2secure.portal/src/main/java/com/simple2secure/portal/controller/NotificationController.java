@@ -38,17 +38,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputDevice;
-import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputLocale;
 
 @RestController
 @RequestMapping(StaticConfigItems.NOTIFICATION_API)

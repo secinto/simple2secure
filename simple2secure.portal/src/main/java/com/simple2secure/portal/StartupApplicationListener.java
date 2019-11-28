@@ -38,7 +38,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidRequestMapping;
 
 @Component
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {

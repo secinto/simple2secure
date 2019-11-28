@@ -39,9 +39,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputEmailConfig;
-import com.simple2secure.api.model.validation.ValidInputLocale;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -50,8 +47,12 @@ import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.MailUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputEmailConfig;
+import simple2secure.validator.model.ValidInputLocale;
 
 @RestController
 @RequestMapping(StaticConfigItems.EMAIL_API)

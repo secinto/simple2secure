@@ -44,11 +44,6 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputDestGroup;
-import com.simple2secure.api.model.validation.ValidInputGroup;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputUser;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -60,8 +55,14 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDestGroup;
+import simple2secure.validator.model.ValidInputGroup;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputUser;
 
 @RestController
 @RequestMapping(StaticConfigItems.GROUP_API)

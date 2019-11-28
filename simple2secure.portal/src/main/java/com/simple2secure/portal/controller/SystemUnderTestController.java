@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.SystemUnderTest;
-import com.simple2secure.api.model.validation.ValidInputGroup;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputPage;
-import com.simple2secure.api.model.validation.ValidInputSize;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -30,8 +26,13 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputGroup;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputPage;
+import simple2secure.validator.model.ValidInputSize;
 
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)

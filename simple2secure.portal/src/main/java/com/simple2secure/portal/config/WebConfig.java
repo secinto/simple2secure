@@ -16,7 +16,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.simple2secure.portal.validator.InputValidation;
-import com.simple2secure.portal.validator.StringToValidInputConverterFactory;
+
+import simple2secure.validator.factory.StringToValidInputConverterFactory;
 
 @Configuration
 @Component

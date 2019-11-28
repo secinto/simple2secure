@@ -54,16 +54,16 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputParamType;
-import com.simple2secure.api.model.validation.ValidatedInput;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.validator.ValidRequestMapping;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputParamType;
+import simple2secure.validator.model.ValidatedInput;
 
 @Component
 public class PortalUtils {

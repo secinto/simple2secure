@@ -49,15 +49,6 @@ import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.validation.ValidInputContext;
-import com.simple2secure.api.model.validation.ValidInputDevice;
-import com.simple2secure.api.model.validation.ValidInputLocale;
-import com.simple2secure.api.model.validation.ValidInputPage;
-import com.simple2secure.api.model.validation.ValidInputSize;
-import com.simple2secure.api.model.validation.ValidInputTest;
-import com.simple2secure.api.model.validation.ValidInputTestResult;
-import com.simple2secure.api.model.validation.ValidInputTestRun;
-import com.simple2secure.api.model.validation.ValidInputUser;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -72,8 +63,18 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
-import com.simple2secure.portal.validator.ValidInput;
-import com.simple2secure.portal.validator.ValidRequestMapping;
+
+import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputPage;
+import simple2secure.validator.model.ValidInputSize;
+import simple2secure.validator.model.ValidInputTest;
+import simple2secure.validator.model.ValidInputTestResult;
+import simple2secure.validator.model.ValidInputTestRun;
+import simple2secure.validator.model.ValidInputUser;
 
 @RestController
 @RequestMapping(StaticConfigItems.TEST_API)
