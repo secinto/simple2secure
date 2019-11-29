@@ -39,7 +39,11 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public List<Report> getReportsByDeviceId(String deviceId) {
+=======
+	public List<Report> getReportsByDeviceId(String probeId) {
+>>>>>>> a6d8b789c4621d30030c3337c6ff5ac30741f396
 		List<Report> reports = new ArrayList<>();
 		Query query = new Query(Criteria.where("probeId").is(deviceId));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
@@ -73,8 +77,13 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public void deleteByDeviceId(String deviceId) {
 		List<Report> reports = getReportsByDeviceId(deviceId);
+=======
+	public void deleteByDeviceId(String probeId) {
+		List<Report> reports = getReportsByDeviceId(probeId);
+>>>>>>> a6d8b789c4621d30030c3337c6ff5ac30741f396
 
 		if (reports != null) {
 			for (Report report : reports) {
@@ -102,9 +111,33 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
+	public List<Report> getReportsByDeviceAndName(String deviceId, String name, int page, int size) {
+
+		List<Report> reports = new ArrayList<>();
+
+		Query query = new Query(Criteria.where("deviceId").is(deviceId).and("name").is(name));
+
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.ASC, "queryTimestamp"));
+		reports = mongoTemplate.find(query, Report.class, collectionName);
+		return reports;
+	}
+
+	@Override
 	public long getPagesForReportsByName(String name) {
 		Query query = new Query(Criteria.where("name").is(name));
 		long count = mongoTemplate.count(query, Report.class, collectionName) / StaticConfigItems.DEFAULT_VALUE_SIZE;
+		return count;
+	}
+
+	@Override
+	public long getPagesForReportsByDeviceAndName(String deviceId, String name) {
+		Query query = new Query(Criteria.where("deviceId").is(deviceId).and("name").is(name));
+		long count = mongoTemplate.count(query, Report.class, collectionName) / ConfigItems.DEFAULT_VALUE_SIZE;
 		return count;
 	}
 

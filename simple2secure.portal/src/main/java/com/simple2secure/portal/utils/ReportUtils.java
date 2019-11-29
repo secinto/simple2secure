@@ -57,6 +57,46 @@ public class ReportUtils {
 	 * @param queryName
 	 * @return
 	 */
+	public List<GraphReport> prepareReportsForGraph(String deviceId, String queryName) {
+		int currentPage = 0;
+		int size = ConfigItems.DEFAULT_VALUE_SIZE;
+		long maxPages = reportRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
+		List<GraphReport> graphReports = new ArrayList<>();
+		while (currentPage <= maxPages) {
+			List<Report> reports = reportRepository.getReportsByDeviceAndName(deviceId, queryName, currentPage, size);
+			if (reports != null) {
+				for (Report report : reports) {
+					if (report != null) {
+						if (report.getQueryResult() != null) {
+							try {
+								JsonNode node = JSONUtils.fromString(report.getQueryResult());
+
+								int length = report.getQueryResult().length();
+								if (node != null) {
+									length = node.size();
+								}
+								graphReports.add(new GraphReport(report.getId(), report.getQuery(), length, report.getQueryTimestamp().getTime()));
+
+							} catch (Exception e) {
+								log.error("Error occured while trying to parse string to jsonArray: {}", e);
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+			currentPage++;
+		}
+
+		return graphReports;
+	}
+
+	/**
+	 * This function prepares the Report for the graph in the web. It parses only the necessary information so that we ignore the long queues.
+	 *
+	 * @param queryName
+	 * @return
+	 */
 	public List<GraphReport> prepareReportsForGraph(String queryName) {
 		int currentPage = 0;
 		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;

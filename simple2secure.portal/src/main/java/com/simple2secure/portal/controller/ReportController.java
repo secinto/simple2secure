@@ -60,6 +60,7 @@ import com.simple2secure.portal.utils.ReportUtils;
 import simple2secure.validator.annotation.ValidInput;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputReport;
@@ -140,18 +141,18 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@ValidRequestMapping(value = "/report/name", method = RequestMethod.POST)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @ValidInput ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(name)) {
-			List<GraphReport> reports = reportUtils.prepareReportsForGraph(name);
+	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable("name") String name,
+			@ValidInput ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(name) && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			List<GraphReport> reports = reportUtils.prepareReportsForGraph(deviceId.getValue(), name);
 			if (reports != null) {
 				return new ResponseEntity<>(reports, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -168,7 +169,6 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ValidInput ValidInputContext contextId,
@@ -193,11 +193,10 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while retrieving network reports for context id {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/network", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId, @ValidInput ValidInputLocale locale) {
@@ -211,11 +210,10 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while deleting network report with id {}", reportId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/report/network/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name, @ValidInput ValidInputLocale locale) {
@@ -226,11 +224,10 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@ValidRequestMapping(value = "/delete/selected", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports, @ValidInput ValidInputLocale locale) {
@@ -244,7 +241,7 @@ public class ReportController {
 			return new ResponseEntity<>(queryReports, HttpStatus.OK);
 		}
 		log.error("Error occured while deleting selected network reports!");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }
