@@ -62,6 +62,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
 import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputName;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputReport;
 import simple2secure.validator.model.ValidInputSize;
@@ -143,10 +144,10 @@ public class ReportController {
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable("name") String name,
+	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputName name,
 			@ValidInput ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(name) && !Strings.isNullOrEmpty(deviceId.getValue())) {
-			List<GraphReport> reports = reportUtils.prepareReportsForGraph(deviceId.getValue(), name);
+		if (!Strings.isNullOrEmpty(name.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			List<GraphReport> reports = reportUtils.prepareReportsForGraph(deviceId.getValue(), name.getValue());
 			if (reports != null) {
 				return new ResponseEntity<>(reports, HttpStatus.OK);
 			}
