@@ -59,7 +59,7 @@ public class ReportUtils {
 	 */
 	public List<GraphReport> prepareReportsForGraph(String deviceId, String queryName) {
 		int currentPage = 0;
-		int size = ConfigItems.DEFAULT_VALUE_SIZE;
+		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		long maxPages = reportRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage <= maxPages) {
