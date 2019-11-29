@@ -332,7 +332,7 @@ public class TestController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/syncTest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/syncTests", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable ValidInputDevice deviceId,
 			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {

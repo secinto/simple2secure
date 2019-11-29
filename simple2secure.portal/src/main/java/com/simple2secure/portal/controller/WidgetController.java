@@ -21,7 +21,10 @@
  */
 package com.simple2secure.portal.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -39,18 +42,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
+import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.WidgetUtils;
 
 import simple2secure.validator.annotation.ValidInput;
 import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.annotation.WidgetFunction;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputUser;
@@ -71,9 +79,22 @@ public class WidgetController {
 	WidgetUtils widgetUtils;
 
 	@Autowired
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	ContextRepository contextRepository;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
+	List<String> widgetFunctions = new ArrayList<>();
+
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
+
+	@PostConstruct
+	public void initialize() {
+
+	}
 
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
@@ -173,7 +194,24 @@ public class WidgetController {
 		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_widget", locale.getValue())),
 				HttpStatus.NOT_FOUND);
+	}
 
+	@WidgetFunction
+	@ValidRequestMapping(value = "/devActive")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Integer> countActiveDevices(@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
+			if (context != null) {
+				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, true);
+				return new ResponseEntity<>(devices.size(), HttpStatus.OK);
+			}
+		}
+		log.error("Problem occured while retrieving widgets");
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
 }

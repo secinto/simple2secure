@@ -51,6 +51,7 @@ export class SidenavbarComponent {
 	showReportsSubmenu: boolean;
 	showEmailsSubmenu: boolean;
 	showOrbiterSubmenu: boolean;
+	showDevicesSubmenu: boolean;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -66,6 +67,7 @@ export class SidenavbarComponent {
 		this.showReportsSubmenu = false;
 		this.showEmailsSubmenu = false;
 		this.showOrbiterSubmenu = false;
+		this.showDevicesSubmenu = false;
 	}
 
 	ngDoCheck() {
@@ -148,32 +150,26 @@ export class SidenavbarComponent {
 
 	collapseMenu(parent: string){
 		if (parent == 'menu-reports'){
-			if (this.showReportsSubmenu == false){
-				this.showReportsSubmenu = true;
-			}
-			else{
-				this.showReportsSubmenu = false;
-			}
+			this.showReportsSubmenu = true;
 			this.showEmailsSubmenu = false;
 			this.showOrbiterSubmenu = false;
+			this.showDevicesSubmenu = false;
 		}
 		else if (parent == 'menu-emails'){
-			if (this.showEmailsSubmenu == false){
-				this.showEmailsSubmenu = true;
-			}
-			else{
-				this.showEmailsSubmenu = false;
-			}
+			this.showEmailsSubmenu = true;
 			this.showReportsSubmenu = false;
 			this.showOrbiterSubmenu = false;
+			this.showDevicesSubmenu = false;
 		}
 		else if (parent == 'menu-orbiter'){
-			if (this.showOrbiterSubmenu == false){
-				this.showOrbiterSubmenu = true;
-			}
-			else{
-				this.showOrbiterSubmenu = false;
-			}
+			this.showOrbiterSubmenu = true;
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = false;
+			this.showDevicesSubmenu = false;
+		}
+		else if (parent == 'menu-devices'){
+			this.showDevicesSubmenu = true;
+			this.showOrbiterSubmenu = false;
 			this.showReportsSubmenu = false;
 			this.showEmailsSubmenu = false;
 		}

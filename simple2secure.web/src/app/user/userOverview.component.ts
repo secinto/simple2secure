@@ -50,8 +50,6 @@ export class UserOverviewComponent {
 	loading = false;
 	userDeleted = false;
 	groupDeleted = false;
-	probeDeleted = false;
-	podDeleted = false;
 	contextDeleted = false;
 	groupAdded = false;
 	contextAdded = false;
@@ -71,32 +69,22 @@ export class UserOverviewComponent {
 	addNewContext: boolean;
 	showGroupTable: boolean;
 	showUserTable: boolean;
-	showProbeTable: boolean;
-	showPodTable: boolean;
 	showContextTable: boolean;
 	showEditAndDelete: boolean;
 	isGroupDeletable = false;
 
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
-	displayedColumnsDevices = ['probeId', 'hostname', 'group', 'status', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
-	displayedColumnsPods = ['podId', 'hostname', 'group', 'status', 'action'];
 
 	userDataSource = new MatTableDataSource();
-	probeDataSource = new MatTableDataSource();
 	groupDataSource = new MatTableDataSource();
 	contextDataSource = new MatTableDataSource();
-	podDataSource = new MatTableDataSource();
 	options = {focused: true, allowDrag: true};
 
 	@ViewChild('userPaginator') userPaginator: MatPaginator;
-	@ViewChild('probePaginator') probePaginator: MatPaginator;
 	@ViewChild('contextPaginator') contextPaginator: MatPaginator;
-	@ViewChild('podPaginator') podPaginator: MatPaginator;
 	@ViewChild('sortUser') sortUser: MatSort;
-	@ViewChild('sortProbe') sortProbe: MatSort;
 	@ViewChild('sortContext ') sortContext: MatSort;
-	@ViewChild('sortPod') sortPod: MatSort;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -138,31 +126,15 @@ export class UserOverviewComponent {
 
 	ngAfterViewInit() {
 		this.userDataSource.paginator = this.userPaginator;
-		this.probeDataSource.paginator = this.probePaginator;
 		this.contextDataSource.paginator = this.contextPaginator;
-		this.podDataSource.paginator = this.podPaginator;
 		this.userDataSource.sort = this.sortUser;
-		this.probeDataSource.sort = this.sortProbe;
 		this.contextDataSource.sort = this.sortContext;
-		this.podDataSource.sort = this.sortPod;
 	}
 
 	applyFilterUser(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
 		this.userDataSource.filter = filterValue;
-	}
-
-	applyFilterProbe(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.probeDataSource.filter = filterValue;
-	}
-
-	applyFilterPod(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.podDataSource.filter = filterValue;
 	}
 
 	private loadMyProfile() {
@@ -175,39 +147,21 @@ export class UserOverviewComponent {
 					this.groupDataSource.data = this.myProfile.myGroups;
 					this.contextDataSource.data = this.myProfile.myContexts;
 
-					const probes: Array<Device> = [];
-					const pods: Array<Device> = [];
-
-					for (let i = 0; i < this.myProfile.myDevices.length; i++) {
-						if (this.myProfile.myDevices[i].pod) {
-							pods.push(this.myProfile.myDevices[i]);
-						}
-						else {
-							probes.push(this.myProfile.myDevices[i]);
-						}
-					}
-					this.podDataSource.data = pods;
-					this.probeDataSource.data = probes;
-
 					this.checkMyGroupSize(this.myProfile.myGroups);
 					this.checkMyUsersSize(this.myProfile.myUsersList);
-					this.checkMyProbesSize(probes);
 					this.checkMyContextsSize(this.myProfile.myContexts);
-					this.checkMyPodsSize(pods);
 
 					this.dataService.setGroups(this.myProfile.myGroups);
-					if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.contextDeleted &&
-						!this.podDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible &&
+					if (!this.userDeleted && !this.groupDeleted &&
+						!this.contextDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible &&
 						!this.contextAdded) {
 						this.alertService.success(this.translate.instant('message.user'));
 					}
 
 					this.moveNotPossible = false;
 					this.groupDeleted = false;
-					this.probeDeleted = false;
 					this.contextDeleted = false;
 					this.groupAdded = false;
-					this.podDeleted = false;
 					this.contextAdded = false;
 					this.userAdded = false;
 					this.userDeleted = false;
@@ -267,23 +221,6 @@ export class UserOverviewComponent {
 		}
 	}
 
-	checkMyProbesSize(probes: any) {
-		if (probes.length > 0) {
-			this.showProbeTable = true;
-		} else {
-		this.showProbeTable = false;
-		}
-	}
-
-	checkMyPodsSize(pods: any) {
-		if (pods.length > 0) {
-				this.showPodTable = true;
-		}
-		else {
-			this.showPodTable = false;
-		}
-	}
-
 	checkMyContextsSize(contexts: any) {
 		if (contexts.length > 0) {
 			this.showContextTable = true;
@@ -291,20 +228,6 @@ export class UserOverviewComponent {
 		else {
 			this.showContextTable = false;
 		}
-	}
-
-	public download() {
-		this.loading = true;
-		this.httpService.getFile(environment.apiEndpoint + 'download')
-			.subscribe(
-				data => {
-					importedSaveAs(data, 's2s_setup.exe');
-					this.loading = false;
-				},
-				error => {
-					this.alertService.error(error.errorMessage);
-					this.loading = false;
-				});
 	}
 
 	updateUserInfo() {
@@ -363,26 +286,6 @@ export class UserOverviewComponent {
 				this.alertService.success(this.translate.instant('message.group.delete'));
 				this.loadMyProfile();
 				this.groupDeleted = true;
-				this.loading = false;
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
-	}
-
-	public deleteDevice(device: any) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'device/delete/' + device.deviceId).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.probe.delete'));
-				this.loadMyProfile();
-				this.probeDeleted = true;
 				this.loading = false;
 			},
 			error => {
@@ -724,31 +627,6 @@ export class UserOverviewComponent {
 		});
 	}
 
-	openDialogChangeDeviceGroup(): void {
-		const dialogRef = this.dialog2.open(UserDeviceChangeGroupComponent, {
-			width: '350px',
-			data: this.selectedItem
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.group.add'));
-				this.groupAdded = true;
-				this.loadMyProfile();
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
-	}
-
 	openDialogRootGroup(): void {
 		const dialogRef = this.dialog.open(UserGroupDialogComponent, {
 			width: '250px',
@@ -840,13 +718,6 @@ export class UserOverviewComponent {
 				content: this.translate.instant('message.user.dialog')
 			};
 		}
-		else if (type == 'probe') {
-			dialogConfig.data = {
-				id: 1,
-				title: this.translate.instant('message.areyousure'),
-				content: this.translate.instant('message.probe.dialog')
-			};
-		}
 		else if (type == 'context') {
 			dialogConfig.data = {
 				id: 1,
@@ -860,15 +731,7 @@ export class UserOverviewComponent {
 				title: this.translate.instant('message.areyousure'),
 				content: this.translate.instant('message.group.dialog')
 			};
-		} else if (type == 'pod') {
-			dialogConfig.data = {
-				id: 1,
-				title: this.translate.instant('message.areyousure'),
-				content: this.translate.instant('message.pod.dialog')
-			};
 		}
-
-
 		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(data => {
@@ -878,12 +741,6 @@ export class UserOverviewComponent {
 				}
 				else if (type == 'group') {
 					this.deleteGroup(this.selectedItem);
-				}
-				else if (type == 'probe') {
-					this.deleteDevice(this.selectedItem);
-				}
-				else if (type == 'pod') {
-					this.deleteDevice(this.selectedItem);
 				}
 				else if (type == 'context') {
 					this.deleteContext(this.selectedItem);
@@ -903,12 +760,6 @@ export class UserOverviewComponent {
 					!this.contextDataSource.paginator ? this.contextDataSource.paginator = this.contextPaginator : null;
 					!this.contextDataSource.sort ? this.contextDataSource.sort = this.sortContext : null;
 					break;
-				case 4:
-					!this.probeDataSource.paginator ? this.probeDataSource.paginator = this.probePaginator : null;
-					!this.probeDataSource.sort ? this.probeDataSource.sort = this.sortProbe : null;
-				case 5:
-					!this.podDataSource.paginator ? this.podDataSource.paginator = this.podPaginator : null;
-					!this.podDataSource.sort ? this.podDataSource.sort = this.sortPod : null;
 			}
 		});
 	}

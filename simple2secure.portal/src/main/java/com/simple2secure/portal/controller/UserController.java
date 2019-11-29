@@ -52,7 +52,6 @@ import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInfo;
 import com.simple2secure.api.model.UserInvitation;
@@ -201,18 +200,16 @@ public class UserController {
 				List<String> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Device> myDevices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
 				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
-				log.debug("Found {} devices, {} groups, {} users, and {} contexts", myDevices.size(), groups.size(), myUsers.size(),
-						myContexts.size());
+				log.debug("Found {} groups, {} users, and {} contexts", groups.size(), myUsers.size(), myContexts.size());
 				if (contextUserAuth != null) {
 					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
 						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, user);
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myDevices, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myContexts, assignedGroups);
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}

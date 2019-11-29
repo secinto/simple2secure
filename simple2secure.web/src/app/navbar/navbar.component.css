@@ -100,6 +100,14 @@ a{
     color: #a7bd26 !important;
 }
 
+#nav-right-custom-language-switcher {
+    max-width: 50px;
+    font-weight: bold;
+}
+
+.search-bar-input{
+    width:500px !important;
+}
 
 
 
