@@ -124,6 +124,11 @@ export class SidenavbarComponent {
 
 			dialogRef.afterClosed().subscribe(result => {
 				if (result == true) {
+
+					this.router.routeReuseStrategy.shouldReuseRoute = function(){
+						return false;
+					}
+					this.router.navigated = false;
 					this.router.navigate([this.returnUrl]);
 				}
 				else {

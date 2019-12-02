@@ -126,16 +126,6 @@ export class NavbarComponent {
 		}
 	}
 
-	openUserModal(){
-		this.showNotifications = false;
-		if (this.showUserModal == true){
-			this.showUserModal = false;
-		}
-		else{
-			this.showUserModal = true;
-		}
-	}
-
 	navigateToTheSearchPage() {
 		if (this.searchValue.trim()){
 			this.router.navigate(['search', this.searchValue]);
