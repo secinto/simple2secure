@@ -72,7 +72,6 @@ export class LoginComponent implements OnInit {
 				response => {
 					const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
 					const userId = decodedToken.userID;
-					localStorage.setItem('token', response.headers.get('Authorization'));
 					localStorage.setItem('currentUser', JSON.stringify({
 						firstName: this.model.username,
 						token: response.headers.get('Authorization'), userID: userId
