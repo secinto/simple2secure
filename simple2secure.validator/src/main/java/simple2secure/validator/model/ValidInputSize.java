@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 
+import com.simple2secure.commons.config.StaticConfigItems;
+
 public class ValidInputSize extends ValidatedInput<Integer>{
 	
 	private int size;
@@ -35,8 +37,8 @@ public class ValidInputSize extends ValidatedInput<Integer>{
 	
 	@Override
 	public Object validatePathVariable(Integer value) {
-		if(value > 20) {
-			value = 20;
+		if(value > StaticConfigItems.MAX_VALUE_SIZE) {
+			value = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return new ValidInputSize(value);
 	}

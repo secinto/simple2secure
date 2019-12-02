@@ -69,6 +69,7 @@ public class StaticConfigItems {
 	public static final String PROFILE_DEFAULT = "default";
 	public static final String PROFILE_TEST = "test";
 	public static final int DEFAULT_VALUE_SIZE = 10;
+	public static final int MAX_VALUE_SIZE = 10;
 	public static final LocaleLanguage DEFAULT_LOCALE = LocaleLanguage.ENGLISH;
 	
 	public static final String CONFIG_API = "/api/config";
