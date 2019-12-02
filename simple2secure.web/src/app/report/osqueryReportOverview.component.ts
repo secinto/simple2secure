@@ -42,7 +42,6 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class OsQueryReportOverviewComponent {
 	public reportDTO: ReportDTO;
 	selectedReport: any;
-	currentUser: any;
 	loading = false;
 	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
 	public pageEvent: PageEvent;
@@ -68,7 +67,6 @@ export class OsQueryReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadAllReports(0, 10);
 	}
 

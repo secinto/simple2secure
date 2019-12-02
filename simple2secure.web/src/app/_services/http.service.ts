@@ -26,7 +26,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Context, User, UserRegistration} from '../_models';
-import {catchError} from 'rxjs/operators';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthenticationService} from './authentication.service';
 import { Location } from '@angular/common';
@@ -115,9 +114,9 @@ export class HttpService {
 			authenticationToken, password, {observe: 'response', headers});
 	}
 
-	public updateContext(context: Context, userId: string) {
+	public updateContext(context: Context) {
 
-		this.post(context, environment.apiEndpoint + 'context/' + userId).subscribe(
+		this.post(context, environment.apiEndpoint + 'context').subscribe(
 			() => {
 				// Navigate to the home route
 				this.router.navigate([this.returnUrl]);

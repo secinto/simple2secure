@@ -42,7 +42,6 @@ export class LoginComponent implements OnInit {
 	loading = false;
 	returnUrl: string;
 	hide: boolean;
-	currentUser: any;
 	jwtHelper: JwtHelper = new JwtHelper();
 
 	constructor(
@@ -141,9 +140,7 @@ export class LoginComponent implements OnInit {
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
 			localStorage.setItem('role', contexts[0].userRole);
-			this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-			this.httpService.updateContext(contexts[0].context, this.currentUser.userID);
+			this.httpService.updateContext(contexts[0].context);
 		}
 
 		// In this case some error occured and user needs to be redirect again to login page, call logout function

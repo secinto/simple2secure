@@ -160,13 +160,12 @@ public class WidgetController {
 
 	@ValidRequestMapping(value = "/updatePosition", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ValidInput ValidInputUser userId,
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (widgetDTO != null) {
 			if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getId())) {
-				if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getContextId())) {
-					widgetDTO.getWidgetProperties().setContextId(contextId.getValue());
-				}
+				widgetDTO.getWidgetProperties().setContextId(contextId.getValue());
+				widgetDTO.getWidgetProperties().setUserId(userId.getValue());
 				ObjectId widgetPropertiesId = widgetPropertiesRepository.saveAndReturnId(widgetDTO.getWidgetProperties());
 				widgetDTO.getWidgetProperties().setId(widgetPropertiesId.toString());
 			} else {

@@ -45,7 +45,6 @@ export class AnalysisComponent implements OnInit{
 	reports: any[];
 	graphReports: GraphReport[];
 	queries: any[];
-	currentUser: any;
 	probes: any[];
 	selectedQuery: any;
 	selectedProbe: any;
@@ -65,7 +64,6 @@ export class AnalysisComponent implements OnInit{
 
 	ngOnInit() {
 
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadAllProbes(true);
 		// this.loadAllQueries(true);
 	}

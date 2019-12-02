@@ -64,6 +64,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputParamType;
+import simple2secure.validator.model.ValidInputUser;
 import simple2secure.validator.model.ValidatedInput;
 
 @Component
@@ -352,7 +353,7 @@ public class PortalUtils {
 			Class<?> super_clazz = clazz.getSuperclass();
 			if (super_clazz != null) {
 				if (super_clazz.equals(ValidatedInput.class)) {
-					if (!clazz.equals(ValidInputLocale.class) && !clazz.equals(ValidInputContext.class)) {
+					if (!clazz.equals(ValidInputLocale.class) && !clazz.equals(ValidInputContext.class) && !clazz.equals(ValidInputUser.class)) {
 						return true;
 					}
 				}

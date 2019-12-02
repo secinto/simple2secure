@@ -39,7 +39,6 @@ import {Title} from '@angular/platform-browser';
 
 export class SidenavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
-	currentUser: any;
 	pageTitle: string;
 	loggedIn: boolean;
 	showSettings: boolean;
@@ -69,10 +68,9 @@ export class SidenavbarComponent {
 
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.userRole = localStorage.getItem('role');
 
-		if (this.currentUser && this.userRole) {
+		if (this.userRole) {
 			this.loggedIn = true;
 			this.showSettings = false;
 			if (this.userRole == UserRole.SUPERADMIN) {
@@ -86,11 +84,11 @@ export class SidenavbarComponent {
 
 	changeContext() {
 		// if number of contexts is greater than 1 open dialog to change context
-		this.getContexts(this.currentUser.userID);
+		this.getContexts();
 	}
 
-	private getContexts(userId: string) {
-		this.httpService.get(environment.apiEndpoint + 'context/' + userId)
+	private getContexts() {
+		this.httpService.get(environment.apiEndpoint + 'context')
 			.subscribe(
 				data => {
 					this.openSelectContextModal(data);

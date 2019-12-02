@@ -43,7 +43,6 @@ export class UserGroupDialogComponent {
 	id: string;
 	private sub: any;
 	url: string;
-	currentUser: any;
 	parentGroup: CompanyGroup;
 	parentGroupId: string;
 
@@ -67,8 +66,6 @@ export class UserGroupDialogComponent {
 		this.sub = this.route.params.subscribe(params => {
 			this.id = params['id'];
 		});
-
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 	}
 
 	saveGroup() {
@@ -80,7 +77,7 @@ export class UserGroupDialogComponent {
 			this.parentGroupId = this.parentGroup.id;
 		}
 
-		this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + this.parentGroupId;
+		this.url = environment.apiEndpoint + 'group/' + this.parentGroupId;
 		this.httpService.post(this.group, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);

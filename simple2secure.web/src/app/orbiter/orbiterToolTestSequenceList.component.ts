@@ -41,7 +41,6 @@ export class OrbiterToolTestSequenceListComponent {
 	podId: string;
 	isSequenceChanged: boolean;
 	sequences: TestSequence[];
-	currentUser: any;
 	displayedColumns = ['testId', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -65,7 +64,6 @@ export class OrbiterToolTestSequenceListComponent {
 	) {}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isSequenceChanged = false;
 		this.id = this.route.snapshot.paramMap.get('id');
 		this.loadSequences(this.id, 0, 10);
@@ -148,7 +146,7 @@ export class OrbiterToolTestSequenceListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'sequence/scheduleSequence/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'sequence/scheduleSequence';
 		this.httpService.post(this.selectedSequence, this.url).subscribe(
 			data => {
 

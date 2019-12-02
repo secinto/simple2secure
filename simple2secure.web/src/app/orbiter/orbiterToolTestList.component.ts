@@ -41,7 +41,6 @@ export class OrbiterToolTestListComponent {
 	podId: string;
 	isTestChanged: boolean;
 	tests: TestObjWeb[];
-	currentUser: any;
 	displayedColumns = ['testId', 'version', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -65,7 +64,6 @@ export class OrbiterToolTestListComponent {
 	) {}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isTestChanged = false;
 		this.id = this.route.snapshot.paramMap.get('id');
 		this.loadTests(this.id, 0, 10);
@@ -148,7 +146,7 @@ export class OrbiterToolTestListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'test/scheduleTest';
 		this.httpService.post(this.selectedTest, this.url).subscribe(
 			data => {
 

@@ -39,7 +39,6 @@ import {NetworkStepConfigurationEditComponent} from './networkStepConfigurationE
 
 export class NetworkConfigurationStepDetailsComponent {
 
-	currentUser: any;
 	private sub: any;
 	steps: Step[];
 	selectedItem: Step;
@@ -66,7 +65,6 @@ export class NetworkConfigurationStepDetailsComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 		this.sub = this.route.params.subscribe(params => {
 			this.groupId = params['id'];

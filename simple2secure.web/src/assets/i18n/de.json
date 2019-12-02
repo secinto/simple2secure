@@ -245,6 +245,7 @@
   "table.sut.endDevicetype" : "Endgerät Typ",
   "table.sut.endDeviceLocation" : "Endgerät Ort",
   "table.type": "Typ",
+  "table.probe": "Probe",
 
   "message.configuration": "Konfiguration erfolgreich geladen!",
   "message.configuration.save": "Konfiguration erfolgreich aktualisiert!",

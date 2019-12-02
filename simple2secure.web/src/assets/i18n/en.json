@@ -246,6 +246,7 @@
   "table.sut.endDevicetype" : "End Device Type",
   "table.sut.endDeviceLocation" : "End Device Location",
   "table.type": "Type",
+  "table.probe": "Probe",
 
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",

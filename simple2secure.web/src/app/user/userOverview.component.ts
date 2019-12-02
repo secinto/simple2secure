@@ -61,7 +61,6 @@ export class UserOverviewComponent {
 	id: string;
 	public user: User;
 	private sub: any;
-	currentUser: any;
 	showMyUsers: boolean;
 	addNewGroup: boolean;
 	addNewContext: boolean;
@@ -100,7 +99,6 @@ export class UserOverviewComponent {
 
 	ngOnInit() {
 		this.selectedItem = new CompanyGroup();
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.userRole = localStorage.getItem('role');
 		this.loadMyProfile();
 		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN ||
@@ -137,7 +135,7 @@ export class UserOverviewComponent {
 
 	private loadMyProfile() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'user/' + this.currentUser.userID)
+		this.httpService.get(environment.apiEndpoint + 'user')
 			.subscribe(
 				data => {
 					this.myProfile = data;
@@ -298,7 +296,7 @@ export class UserOverviewComponent {
 
 	public deleteContext(context: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'context/delete/' + this.currentUser.userID + '/' + context.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'context/delete/' + context.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.context.delete'));
 				this.loadMyProfile();
@@ -651,7 +649,7 @@ export class UserOverviewComponent {
 
 	onMoveGroupNode($event) {
 		if (this.checkIfUserCanMoveGroup($event.node, $event.to.parent)) {
-			this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id + '/' + this.currentUser.userID;
+			this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id;
 			this.httpService.post(null, this.url).subscribe(
 				data => {
 					this.alertService.success(this.translate.instant('group.move.success'));

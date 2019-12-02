@@ -45,7 +45,6 @@ export class OsqueryConfigurationDetailsComponent {
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
-	currentUser: any;
 	queries: any[];
 	selectedItem: QueryRun;
 	loading = false;
@@ -70,7 +69,6 @@ export class OsqueryConfigurationDetailsComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 		this.sub = this.route.params.subscribe(params => {
 			this.groupId = params['id'];

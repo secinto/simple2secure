@@ -42,7 +42,6 @@ export class UserGroupComponent implements OnInit {
 	id: string;
 	private sub: any;
 	url: string;
-	currentUser: any;
 	groupEditable: boolean;
 
 	constructor(
@@ -61,8 +60,6 @@ export class UserGroupComponent implements OnInit {
 		this.sub = this.route.params.subscribe(params => {
 			this.id = params['id'];
 		});
-
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 		this.groupEditable = this.dataService.isGroupEditable();
 		this.loadGroup();
@@ -97,7 +94,7 @@ export class UserGroupComponent implements OnInit {
 	saveGroup() {
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + 'null';
+		this.url = environment.apiEndpoint + 'group/' + 'null';
 		this.httpService.post(this.group, this.url).subscribe(
 			data => {
 				this.group = data;

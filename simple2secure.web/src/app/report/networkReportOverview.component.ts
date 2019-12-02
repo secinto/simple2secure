@@ -39,7 +39,6 @@ import {PageEvent} from '@angular/material/paginator';
 })
 
 export class NetworkReportOverviewComponent {
-	currentUser: any;
 	reportDTO: NetworkReportDTO;
 	selectedReport: any;
 	loading = false;
@@ -65,7 +64,6 @@ export class NetworkReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadAllReports(0, 10);
 	}
 

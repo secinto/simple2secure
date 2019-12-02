@@ -23,7 +23,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {DataService, HttpService} from '../_services';
-import {ContextDTO, Notification} from '../_models';
+import {Notification} from '../_models';
 
 @Component({
 	moduleId: module.id,
@@ -36,8 +36,6 @@ export class NotificationComponent {
 
 	notifications: Notification[];
 	url: string;
-	currentUser: any;
-	currentContext: ContextDTO;
 	dataRefresher: any;
 
 	constructor(private httpService: HttpService,

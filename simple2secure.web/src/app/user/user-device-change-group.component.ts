@@ -39,7 +39,6 @@ export class UserDeviceChangeGroupComponent {
 	loading = false;
 	id: string;
 	url: string;
-	currentUser: any;
 	groups: CompanyGroup[];
 	device: Device;
 	selectedGroup: CompanyGroup;
@@ -60,7 +59,6 @@ export class UserDeviceChangeGroupComponent {
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadGroups();
 
 	}

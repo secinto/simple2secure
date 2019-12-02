@@ -46,10 +46,10 @@ export interface Language {
 
 export class NavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
-	currentUser: any;
 	notifications: Notification[];
 	numOfUnreadNotification: number;
 	loggedIn: boolean;
+	userRole: string;
 	currentLang: string;
 	returnUrl: string;
 	private timer;
@@ -98,10 +98,9 @@ export class NavbarComponent {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+		this.userRole = localStorage.getItem('role');
 
-
-		if (this.currentUser) {
+		if (this.userRole) {
 			this.loggedIn = true;
 		}
 		else {

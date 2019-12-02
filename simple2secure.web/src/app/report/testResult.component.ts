@@ -39,7 +39,6 @@ import {PageEvent} from '@angular/material/paginator';
 
 export class TestResultComponent {
 
-	currentUser: any;
 	testResults: TestRunDTO[];
 	selectedResult: TestRunDTO;
 	loading = false;
@@ -64,7 +63,6 @@ export class TestResultComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadTestResults(0, 10);
 	}
 

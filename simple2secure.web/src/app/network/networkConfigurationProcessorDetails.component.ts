@@ -38,8 +38,6 @@ import {HttpErrorResponse} from '@angular/common/http';
 })
 
 export class NetworkConfigurationProcessorDetailsComponent {
-
-	currentUser: any;
 	processors: Processor[];
 	private sub: any;
 	loading = false;
@@ -66,8 +64,6 @@ export class NetworkConfigurationProcessorDetailsComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
 		this.sub = this.route.params.subscribe(params => {
 			this.groupId = params['id'];
 		});

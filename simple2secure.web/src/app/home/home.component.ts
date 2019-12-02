@@ -24,7 +24,6 @@ import {
 	Component,
 	OnInit,
 	ViewChild} from '@angular/core';
-import {User} from '../_models/index';
 import {NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import {WidgetStoreComponent} from '../widgets/widgetStore.component';
@@ -40,8 +39,6 @@ import {environment} from '../../environments/environment';
 })
 
 export class HomeComponent implements OnInit {
-	currentUser: User;
-	users: User[] = [];
 	widgets: WidgetDTO[] = [];
 	widgetDTO: WidgetDTO;
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
@@ -53,12 +50,11 @@ export class HomeComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadAllWidgetsByUserId();
 	}
 
 	public loadAllWidgetsByUserId() {
-		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.currentUser['userID'])
+		this.httpService.get(environment.apiEndpoint + 'widget/get')
 			.subscribe(
 				data => {
 					this.widgets = data;
@@ -127,7 +123,6 @@ export class HomeComponent implements OnInit {
 				this.widgetDTO.widgetProperties.top = position.top;
 				this.widgetDTO.widgetProperties.width = 1;
 				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
-				this.widgetDTO.widgetProperties.userId = this.currentUser['userID'];
 
 				this.widgets.push(this.widgetDTO);
 			}

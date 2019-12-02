@@ -43,7 +43,6 @@ export class UserGroupApplyConfigComponent {
 	sourceGroup: CompanyGroup;
 	url: string;
 	loading = false;
-	currentUser: any;
 
 	constructor(
 		private router: Router,
@@ -61,12 +60,11 @@ export class UserGroupApplyConfigComponent {
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadGroups();
 	}
 
 	private loadGroups() {
-		this.httpService.get(environment.apiEndpoint + 'group/' + this.currentUser.userID)
+		this.httpService.get(environment.apiEndpoint + 'group')
 			.subscribe(
 				data => {
 					this.extractGroups(data);

@@ -38,7 +38,6 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 export class UserDetailsComponent {
 	public user: UserRegistration;
 	url: string;
-	currentUser: any;
 	showGroupSelectBox: boolean;
 	rolesArray: UserRole[];
 	groups: CompanyGroup[];
@@ -77,7 +76,6 @@ export class UserDetailsComponent {
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.loadGroups();
 	}
 
@@ -125,7 +123,6 @@ export class UserDetailsComponent {
 
 	saveUser() {
 		this.url = environment.apiEndpoint + 'user';
-		this.user.addedByUserId = this.currentUser.userID;
 		if (this.action === UrlParameter.NEW) {
 			this.user.registrationType = UserRegistrationType.ADDED_BY_USER;
 		}

@@ -169,16 +169,6 @@ public class UserController {
 	LicenseUtils licenseUtils;
 
 	/**
-	 * This function returns all users from the user repository
-	 */
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@ValidRequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<User>> getUsers(@ValidInput ValidInputLocale locale) {
-		List<User> userList = userRepository.findAll();
-		return new ResponseEntity<>(userList, HttpStatus.OK);
-	}
-
-	/**
 	 * This function finds and returns user according to the user id
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -229,15 +219,14 @@ public class UserController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	@ValidRequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ValidInput ValidInputUser userId,
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (user != null) {
 			if (user.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
-
-				if (Strings.isNullOrEmpty(user.getCurrentContextId())) {
-					user.setCurrentContextId(contextId.getValue());
-				}
+				user.setCurrentContextId(contextId.getValue());
+				user.setAddedByUserId(userId.getValue());
 
 				return userUtils.addNewUser(user, locale.getValue());
 			} else {
