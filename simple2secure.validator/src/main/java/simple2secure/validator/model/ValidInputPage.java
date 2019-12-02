@@ -32,4 +32,9 @@ public class ValidInputPage extends ValidatedInput<Integer>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Object validatePathVariable(Integer value) {
+		return new ValidInputPage(value);
+	}
 }

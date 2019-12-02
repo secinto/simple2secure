@@ -5,10 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 
-import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.CurrentContext;
-import com.simple2secure.api.model.User;
-
 public class ValidInputContext extends ValidatedInput<String>{
 
 	private String contextId;
@@ -34,6 +30,12 @@ public class ValidInputContext extends ValidatedInput<String>{
 	@Override
 	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
 		//TODO: check how to use the repository
+		return null;
+	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

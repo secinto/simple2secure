@@ -32,4 +32,14 @@ public class ValidInputSize extends ValidatedInput<Integer>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public Object validatePathVariable(Integer value) {
+		if(value > 20) {
+			value = 20;
+		}
+		return new ValidInputSize(value);
+	}
 }
+
+

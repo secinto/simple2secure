@@ -12,4 +12,6 @@ public abstract class ValidatedInput<T> {
 	public abstract String getTag();
 	
 	public abstract Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request);
+	
+	public abstract Object validatePathVariable(T value);
 }

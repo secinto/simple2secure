@@ -40,4 +40,10 @@ public class ValidInputUser extends ValidatedInput<String>{
 		// TODO: Throw an exception that user is not authenticated
 		return null;
 	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

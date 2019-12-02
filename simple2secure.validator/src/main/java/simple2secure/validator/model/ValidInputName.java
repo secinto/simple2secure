@@ -31,4 +31,9 @@ public class ValidInputName extends ValidatedInput<String>{
 		//TODO: check how to use the repository
 		return null;
 	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		return new ValidInputName(value);
+	}
 }

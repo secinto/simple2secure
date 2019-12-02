@@ -32,4 +32,9 @@ public class ValidInputRule extends ValidatedInput<String>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		return new ValidInputRule(value);
+	}
 }

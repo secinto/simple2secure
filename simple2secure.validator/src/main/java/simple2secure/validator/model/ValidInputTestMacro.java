@@ -32,4 +32,9 @@ public class ValidInputTestMacro extends ValidatedInput<String>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		return new ValidInputTestMacro(value);
+	}
 }

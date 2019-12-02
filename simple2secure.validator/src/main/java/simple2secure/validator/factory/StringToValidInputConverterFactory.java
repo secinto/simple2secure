@@ -49,57 +49,55 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 		@Override
 		public T convert(String source) {
 			if (this.targetClass == ValidInputSize.class) {
-				int id = Integer.parseInt(source);
-				return (T) new ValidInputSize(id);
+				return (T) new ValidInputSize().validatePathVariable(Integer.parseInt(source));
 			} else if (this.targetClass == ValidInputPage.class) {
-				int id = Integer.parseInt(source);
-				return (T) new ValidInputPage(id);
+				return (T) new ValidInputPage().validatePathVariable(Integer.parseInt(source));
 			} else if (this.targetClass == ValidInputDevice.class) {
-				return (T) new ValidInputDevice(source);
+				return (T) new ValidInputDevice().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputHostname.class) {
-				return (T) new ValidInputHostname(source);
+				return (T) new ValidInputHostname().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputEmailConfig.class) {
-				return (T) new ValidInputEmailConfig(source);
+				return (T) new ValidInputEmailConfig().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputGroup.class) {
-				return (T) new ValidInputGroup(source);
+				return (T) new ValidInputGroup().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputDestGroup.class) {
-				return (T) new ValidInputDestGroup(source);
+				return (T) new ValidInputDestGroup().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputProcessor.class) {
-				return (T) new ValidInputProcessor(source);
+				return (T) new ValidInputProcessor().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputQuery.class) {
-				return (T) new ValidInputQuery(source);
+				return (T) new ValidInputQuery().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputReport.class) {
-				return (T) new ValidInputReport(source);
+				return (T) new ValidInputReport().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputRule.class) {
-				return (T) new ValidInputRule(source);
+				return (T) new ValidInputRule().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputSearchQuery.class) {
-				return (T) new ValidInputSearchQuery(source);
+				return (T) new ValidInputSearchQuery().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputLicensePlan.class) {
-				return (T) new ValidInputLicensePlan(source);
+				return (T) new ValidInputLicensePlan().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputTestMacro.class) {
-				return (T) new ValidInputTestMacro(source);
+				return (T) new ValidInputTestMacro().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputStep.class) {
-				return (T) new ValidInputStep(source);
+				return (T) new ValidInputStep().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputSut.class) {
-				return (T) new ValidInputSut(source);
+				return (T) new ValidInputSut().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputTest.class) {
-				return (T) new ValidInputTest(source);
+				return (T) new ValidInputTest().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputTestResult.class) {
-				return (T) new ValidInputTestResult(source);
+				return (T) new ValidInputTestResult().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputTestRun.class) {
-				return (T) new ValidInputTestRun(source);
+				return (T) new ValidInputTestRun().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputSequence.class) {
-				return (T) new ValidInputSequence(source);
+				return (T) new ValidInputSequence().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputToken.class) {
-				return (T) new ValidInputToken(source);
+				return (T) new ValidInputToken().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputWidget.class) {
-				return (T) new ValidInputWidget(source);
+				return (T) new ValidInputWidget().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputWidgetProp.class) {
-				return (T) new ValidInputWidgetProp(source);
+				return (T) new ValidInputWidgetProp().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputOsinfo.class) {
-				return (T) new ValidInputOsinfo(source);
+				return (T) new ValidInputOsinfo().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputName.class) {
-				return (T) new ValidInputName(source);
+				return (T) new ValidInputName().validatePathVariable(source);
 			} else {
 				return null;
 			}

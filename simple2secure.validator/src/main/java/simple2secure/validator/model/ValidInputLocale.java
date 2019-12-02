@@ -38,5 +38,11 @@ public class ValidInputLocale extends ValidatedInput<String>{
 		}
 
 		return new ValidInputLocale(lang.label);
+	}
+
+	@Override
+	public Object validatePathVariable(String value) {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }
