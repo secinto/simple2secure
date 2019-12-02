@@ -11,13 +11,13 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
+        <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
+        <!-- Query -->
         <ng-container matColumnDef="query">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.sql' | translate }}</mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.sqlQuery}}</mat-cell>

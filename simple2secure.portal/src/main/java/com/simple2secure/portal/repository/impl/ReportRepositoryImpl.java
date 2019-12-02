@@ -39,7 +39,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public List<Report> getReportsByProbeId(String probeId) {
+	public List<Report> getReportsByDeviceId(String probeId) {
 		List<Report> reports = new ArrayList<>();
 		Query query = new Query(Criteria.where("probeId").is(probeId));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
@@ -74,7 +74,7 @@ public class ReportRepositoryImpl extends ReportRepository {
 
 	@Override
 	public void deleteByDeviceId(String probeId) {
-		List<Report> reports = getReportsByProbeId(probeId);
+		List<Report> reports = getReportsByDeviceId(probeId);
 
 		if (reports != null) {
 			for (Report report : reports) {
@@ -102,8 +102,32 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
+	public List<Report> getReportsByDeviceAndName(String deviceId, String name, int page, int size) {
+
+		List<Report> reports = new ArrayList<>();
+
+		Query query = new Query(Criteria.where("deviceId").is(deviceId).and("name").is(name));
+
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.ASC, "queryTimestamp"));
+		reports = mongoTemplate.find(query, Report.class, collectionName);
+		return reports;
+	}
+
+	@Override
 	public long getPagesForReportsByName(String name) {
 		Query query = new Query(Criteria.where("name").is(name));
+		long count = mongoTemplate.count(query, Report.class, collectionName) / ConfigItems.DEFAULT_VALUE_SIZE;
+		return count;
+	}
+
+	@Override
+	public long getPagesForReportsByDeviceAndName(String deviceId, String name) {
+		Query query = new Query(Criteria.where("deviceId").is(deviceId).and("name").is(name));
 		long count = mongoTemplate.count(query, Report.class, collectionName) / ConfigItems.DEFAULT_VALUE_SIZE;
 		return count;
 	}

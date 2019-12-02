@@ -46,8 +46,8 @@ export class AnalysisComponent implements OnInit{
 	queries: any[];
 	context: ContextDTO;
 	currentUser: any;
-	selectedQuery: any;
 	probes: any[];
+	selectedQuery: any;
 	selectedProbe: any;
 	chart: StockChart;
 	chartOptions: any;
@@ -93,13 +93,13 @@ export class AnalysisComponent implements OnInit{
 					this.queries = data;
 					if (this.probes.length > 0) {
 						this.selectedQuery = this.queries[0];
-						this.loadReportsByName(this.selectedQuery.name);
+						this.loadReportsByNameAndDevice(probeId, this.selectedQuery.name);
 					}
 				});
 	}
 
-	loadReportsByName(name: string){
-		this.httpService.post(name, environment.apiEndpoint + 'reports/report/name')
+	loadReportsByNameAndDevice(probeId: string, name: string){
+		this.httpService.get(environment.apiEndpoint + 'reports/' + probeId + '/' + name)
 			.subscribe(
 				data => {
 					this.graphReports = data;
@@ -115,7 +115,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	onQueryChange(value: any){
-		this.loadReportsByName(value.name);
+		this.loadReportsByNameAndDevice(this.selectedProbe.deviceId, value.name);
 	}
 
 	onProbeChange(value: any){
