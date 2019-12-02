@@ -154,7 +154,6 @@ public class LicenseUtils {
 			String deviceId = licensePublic.getDeviceId();
 			String licenseId = licensePublic.getLicenseId();
 			String groupId = licensePublic.getGroupId();
-			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId);
 
 			if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(licenseId) && !Strings.isNullOrEmpty(groupId)) {
 				licensePrivate = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId, checkForPod);

@@ -311,20 +311,27 @@ public class DeviceController {
 	@RequestMapping(
 			value = "/save",
 			method = RequestMethod.POST)
-	public ResponseEntity<Service> saveDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<DeviceInfo> saveDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());
 		if (deviceInfo != null && deviceInfoFromDB == null) {
-			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-			deviceInfoRepository.save(deviceInfo);
-			sutUtils.addProbeAsSUT(license);
+			if(!license.isDevicePod()) {
+				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+				deviceInfoRepository.save(deviceInfo);
+				sutUtils.addProbeAsSUT(license);
+				deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
+			}else {
+				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+				deviceInfoRepository.save(deviceInfo);
+				deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
+			}
 		}else if(deviceInfo != null && deviceInfoFromDB != null) {
 			deviceInfoFromDB.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(deviceInfoFromDB);
+			deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
+			sutUtils.updateSUTLastOnlineTtimestamp(deviceInfoFromDB.getDeviceId(), System.currentTimeMillis());
 		}
-		
-		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
+		return new ResponseEntity<>(deviceInfoFromDB, HttpStatus.OK);
 	}
-
 }

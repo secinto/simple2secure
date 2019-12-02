@@ -41,6 +41,8 @@ public class SystemUnderTest extends GenericDBObject {
     private String name;
 	private String ipAdress;
     private String netMask;
+    private DeviceStatus deviceStatus;
+    private long lastOnlineTimestamp;
     
 
     public SystemUnderTest(){
@@ -55,6 +57,13 @@ public class SystemUnderTest extends GenericDBObject {
         setName(name);
         setIpAdress(ipAdress);
         setNetMask(netMask);
+    }
+    
+    public SystemUnderTest(String groupId, String endDeviceId, DeviceType endDeviceType, String endDeviceLocation, 
+    		String name,  String ipAdress, String netMask, DeviceStatus deviceStatus, long lastOnlineTimestamp){
+    	this(groupId, endDeviceId, endDeviceType, endDeviceLocation, name, ipAdress, netMask);
+        setDeviceStatus(deviceStatus);
+        setLastOnlineTimestamp(lastOnlineTimestamp);
     }
 
     public String getGroupId() {
@@ -111,5 +120,21 @@ public class SystemUnderTest extends GenericDBObject {
 
 	public void setNetMask(String netMask) {
 		this.netMask = netMask;
+	}
+
+	public DeviceStatus getDeviceStatus() {
+		return deviceStatus;
+	}
+
+	public void setDeviceStatus(DeviceStatus deviceStatus) {
+		this.deviceStatus = deviceStatus;
+	}
+
+	public long getLastOnlineTimestamp() {
+		return lastOnlineTimestamp;
+	}
+
+	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
+		this.lastOnlineTimestamp = lastOnlineTimestamp;
 	}
 }

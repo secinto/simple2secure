@@ -19,18 +19,9 @@
  *
  *********************************************************************
  */
-import {Base} from './base';
-import { DeviceType } from '../_models/deviceType';
-import { DeviceStatus } from '../_models/deviceStatus';
 
-export class SystemUnderTest extends Base {
-    groupId: string;
-	endDeviceId: string;
-    endDeviceType: DeviceType;
-    endDeviceLocation: string;
-    name: string;
-	ipAdress: string;
-	netMask: string;
-	deviceStatus: DeviceStatus;
-	lastOnlineTimestamp: number;
+export enum DeviceStatus {
+	ONLINE = 'ONLINE',
+	OFFLINE = 'OFFLINE',
+	UNKNOWN = 'UNKNOWN',
 }

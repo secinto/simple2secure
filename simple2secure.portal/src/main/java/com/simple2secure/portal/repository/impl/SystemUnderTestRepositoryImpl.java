@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -48,8 +49,8 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 	}
 
 	@Override
-	public long getCountOfSUTWithGroupId(String groupId) {
-		Query query = new Query(Criteria.where("groupId").is(groupId));
+	public long getCountOfSUTWithGroupIdAndType(String groupId, DeviceType deviceType) {
+		Query query = new Query(Criteria.where("groupId").is(groupId).and("endDeviceType").is("deviceType"));
 		long count = mongoTemplate.count(query, SystemUnderTest.class, collectionName);
 		return count;
 	}
@@ -59,6 +60,13 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 		Query query = new Query(Criteria.where("endDeviceId").is(endDeviceId));
 		SystemUnderTest sut = mongoTemplate.findOne(query, SystemUnderTest.class);
 		return sut;
+	}
+
+	@Override
+	public List<SystemUnderTest> getByGroupIdAndType(String groupId, DeviceType deviceType) {
+		Query query = new Query(Criteria.where("groupId").is(groupId).and("endDeviceType").is(deviceType));
+		List<SystemUnderTest> sutList = mongoTemplate.find(query, SystemUnderTest.class);
+		return sutList;
 	}
 
 }

@@ -200,7 +200,7 @@ public class DeviceUtils {
 	/**
 	 * This method checks the current status (online, offline, unknown) of the pod according to the lastOnlineTimestamp
 	 *
-	 * @param deviceLicense
+	 * @param deviceInfo
 	 * @return
 	 */
 	private DeviceStatus getDeviceStatus(DeviceInfo devInfo) {

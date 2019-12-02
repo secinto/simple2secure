@@ -5,7 +5,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {environment} from '../../environments/environment';
 import { SUTDetailsComponent } from './sutDetails.component';
-import { SystemUnderTest } from '../_models/systemUnderTest';
+import { SystemUnderTest } from '../_models/SystemUnderTest';
+import { DeviceType } from '../_models/DeviceType';
 
 /**
  *********************************************************************
@@ -37,16 +38,19 @@ import { SystemUnderTest } from '../_models/systemUnderTest';
 
 export class OrbiterSystemsUnderTestListComponent {
 
-	displayedColumns = ['name', 'groupId', 'endDevice', 'ipAdress', 'action'];
+	displayedColumnsMonitored = ['name', 'groupId', 'endDevice', 'ipAdress', 'deviceStatus'];
+	displayedColumnsTargeted = ['name', 'groupId', 'endDevice', 'ipAdress', 'action'];
 	groupId: string;
-	sutList: SystemUnderTest[];
+	monitoredSUT: SystemUnderTest[];
+	otherSUT: SystemUnderTest[];
 	selectedSUT: SystemUnderTest;
 	loading = false;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
 	public pageEvent: PageEvent;
-	dataSource = new MatTableDataSource();
+	dataSourceMonitored = new MatTableDataSource();
+	dataSourceOther = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -61,23 +65,23 @@ export class OrbiterSystemsUnderTestListComponent {
 	ngOnInit() {
 		const groups = JSON.parse(localStorage.getItem('groups'));
 		this.groupId = groups[0].id;
-		this.loadSUTList(this.groupId, 0, 10);
+		this.loadMonitoredSUTList(this.groupId, 0, 10);
+		this.loadOtherSUTList(this.groupId, 0, 10);
 	}
 
 	ngAfterViewInit() {
-		this.dataSource.sort = this.sort;
 	}
 
 	applyFilter(filterValue: string) {
 		filterValue = filterValue.trim(); // Remove whitespace
 		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.dataSource.filter = filterValue;
 	}
 
 	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadSUTList(this.groupId, e.pageIndex, e.pageSize);
+		this.loadMonitoredSUTList(this.groupId, e.pageIndex, e.pageSize);
+		this.loadOtherSUTList(this.groupId, e.pageIndex, e.pageSize);
 		return e;
 	}
 
@@ -95,21 +99,47 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	}
 
-	public loadSUTList(groupId: string, page: number, size: number){
+	public loadMonitoredSUTList(groupId: string, page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + DeviceType.PROBE + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.sutList = data.sutList;
+					this.monitoredSUT = data.sutList;
+					this.dataSourceMonitored = data.sutList;
 					this.totalSize = data.totalSize;
-					this.dataSource.data = this.sutList;
 					if (data.sutList.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
 					else {
 						this.alertService.error(this.translate.instant('message.data.notProvided'));
 					}
-
+					this.loading = false;
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
+	
+	public loadOtherSUTList(groupId: string, page: number, size: number){
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + DeviceType.WWW + '/' + page + '/' + size)
+			.subscribe(
+				data => {
+					this.otherSUT = data.sutList;
+					this.dataSourceOther = data.sutList;
+					this.totalSize = data.totalSize;
+					if (data.sutList.length > 0) {
+						this.alertService.success(this.translate.instant('message.data'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.data.notProvided'));
+					}
 					this.loading = false;
 				},
 				error => {

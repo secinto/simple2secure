@@ -33,6 +33,7 @@ import {TestDetailsComponent} from './testDetails.component';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['toolTestList.css'],
 	templateUrl: 'orbiterToolTestList.component.html'
 })
 

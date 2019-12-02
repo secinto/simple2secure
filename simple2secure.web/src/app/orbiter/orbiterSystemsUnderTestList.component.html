@@ -1,17 +1,70 @@
-<button mat-raised-button color="primary" id="addButton" type="button"
-        (click)="openDialogShowSuT('new')"
-        class="pull-right mat-green-button">
-    <i class="glyphicon glyphicon-plus"></i> {{ 'button.add.sut' | translate }}
-</button>
-
+<h1> Monitored Systems </h1>
 <div class="example-container mat-elevation-z8 table table-striped">
-
     <div class="header-filter-table">
         <mat-form-field class="header-filter-field">
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
         </mat-form-field>
     </div>
-    <mat-table #table [dataSource]="dataSource" matSort>
+	
+	<mat-table #table [dataSource]="dataSourceMonitored" matSort>
+
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="groupId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.groupId}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="endDevice">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.endDevice' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.endDeviceType}}</mat-cell>
+        </ng-container>
+		
+		<ng-container matColumnDef="ipAdress">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAdress' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.ipAdress}}</mat-cell>
+        </ng-container>
+		
+		<ng-container matColumnDef="deviceStatus">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.deviceStatus}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumnsMonitored"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsMonitored;"></mat-row>
+    </mat-table>
+	
+    <mat-paginator #paginator
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<button mat-raised-button color="primary" id="addButton" type="button"
+        (click)="openDialogShowSuT('new')"
+        class="pull-right mat-green-button">
+    <i class="glyphicon glyphicon-plus"></i> {{ 'button.add.sut' | translate }}
+</button>
+<h1> Targeted Systems </h1>
+<div class="example-container mat-elevation-z8 table table-striped">
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+	
+	<mat-table #table [dataSource]="dataSourceOther" matSort>
 
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
@@ -47,9 +100,10 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-header-row *matHeaderRowDef="displayedColumnsTargeted"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsTargeted;"></mat-row>
     </mat-table>
+	
     <mat-paginator #paginator
                    [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"

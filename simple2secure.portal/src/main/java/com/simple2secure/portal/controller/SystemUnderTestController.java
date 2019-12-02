@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -14,6 +16,7 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
+import com.simple2secure.portal.utils.SUTUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,9 @@ public class SystemUnderTestController {
     
     @Autowired
 	LicenseRepository licenseRepository;
+    
+    @Autowired
+    SUTUtils sutUtils;
 
     @Autowired
     MessageByLocaleService messageByLocaleService;
@@ -65,38 +71,28 @@ public class SystemUnderTestController {
 		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale)),
 				HttpStatus.NOT_FOUND);
     }
-    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{sutId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable("sutId") String sutId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(sutId)) {
-            SystemUnderTest sut = sutRepository.find(sutId);
-			if (sut != null) {
-				sutRepository.delete(sut);
-                return new 
-                ResponseEntity<>(sut, HttpStatus.OK);
-            }
-            log.debug("Successfully deleted Systems Under Test!");
-		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sut", locale)),
-				HttpStatus.NOT_FOUND);
-	}
 
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{groupId}/{page}/{size}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{groupId}/{endDeviceType}/{page}/{size}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable("groupId") String groupId, @PathVariable("page") int page,
+	public ResponseEntity<Map<String, Object>> getSUTList(@PathVariable("groupId") String groupId, @PathVariable("endDeviceType") DeviceType deviceType, @PathVariable("page") int page,
 			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(groupId)) {
-            List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId, page, size);
+		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(groupId) && deviceType != null) {
+            List<SystemUnderTest> sutList = sutRepository.getByGroupIdAndType(groupId, deviceType);
+            if(deviceType.equals(DeviceType.PROBE)) {
+            	for(SystemUnderTest sut : sutList) {
+            		DeviceStatus status = sut.getDeviceStatus();
+            		DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+					if (status != deviceStatus) {
+						sut.setDeviceStatus(deviceStatus);
+					}
+                }
+            }
 			Map<String, Object> sutMap = new HashMap<>();
-			if (allSUTFromDb != null) {
-				sutMap.put("sutList", allSUTFromDb);
-				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupId(groupId));
+			if (sutList != null) {
+				sutMap.put("sutList", sutList);
+				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupIdAndType(groupId, deviceType));
 				return new ResponseEntity<>(sutMap, HttpStatus.OK);
             }
             log.debug("Successfully loaded Systems Under Test!");
