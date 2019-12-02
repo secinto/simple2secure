@@ -66,7 +66,7 @@ export class LoginComponent implements OnInit {
 
 	login() {
 		this.loading = true;
-		this.httpService.postLogin(this.model.username, this.model.password)
+		this.httpService.postLogin(this.model.username, this.model.password).shareReplay()
 			.subscribe(
 				response => {
 					const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit {
 						token: response.headers.get('Authorization'), userID: userId
 					}));
 					// after successful login choose the context
-					this.getContexts(userId);
+					this.getContexts();
 				},
 				error => {
 					if (error.status == 0) {
@@ -91,9 +91,9 @@ export class LoginComponent implements OnInit {
 				});
 	}
 
-	private getContexts(userId: string) {
+	private getContexts() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'context/' + userId)
+		this.httpService.get(environment.apiEndpoint + 'context')
 			.subscribe(
 				data => {
 					this.openSelectContextModal(data);
