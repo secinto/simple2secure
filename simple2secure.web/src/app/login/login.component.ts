@@ -140,7 +140,7 @@ export class LoginComponent implements OnInit {
 		}
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
-			localStorage.setItem('role', JSON.stringify(contexts[0].userRole));
+			localStorage.setItem('role', contexts[0].userRole);
 			this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 			this.httpService.updateContext(contexts[0].context, this.currentUser.userID);

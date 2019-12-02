@@ -82,4 +82,12 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 
 		return mongoTemplate.find(query, Notification.class);
 	}
+
+	@Override
+	public List<Notification> getNotificationByReadValue(String contextId, boolean isRead) {
+		Query query = new Query(Criteria.where("contextId").is(contextId).and("read").is(isRead));
+		query = query.with(Sort.by(Sort.Direction.DESC, "_id"));
+
+		return mongoTemplate.find(query, Notification.class);
+	}
 }

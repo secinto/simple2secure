@@ -44,7 +44,7 @@ export class SelectContextDialog {
 	}
 
 	updateContext() {
-		localStorage.setItem('role', JSON.stringify(this.context.userRole));
+		localStorage.setItem('role', this.context.userRole);
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.httpService.updateContext(this.context.context, this.currentUser.userID);
 		this.dialogRef.close(true);

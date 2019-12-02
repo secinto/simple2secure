@@ -45,8 +45,18 @@ export class NotificationComponent {
 	}
 
 	ngOnInit() {
-		this.notifications = this.dataService.getNotifications();
+		this.getNotifications();
 		this.refreshNotifications();
+	}
+
+	public getNotifications() {
+		this.httpService.get(environment.apiEndpoint + 'notification')
+			.subscribe(
+				data => {
+					this.notifications = data;
+				},
+				error => {
+				});
 	}
 
 	isRead(notification: Notification){
@@ -65,7 +75,7 @@ export class NotificationComponent {
 	refreshNotifications(){
 		this.dataRefresher =
 			setInterval(() => {
-				this.notifications = this.dataService.getNotifications();
+				this.getNotifications();
 			}, 5000);
 	}
 }

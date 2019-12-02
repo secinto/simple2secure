@@ -58,7 +58,7 @@ public class NotificationController {
 	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
 
 	@Autowired
-	private NotificationRepository repository;
+	private NotificationRepository notificationRepository;
 
 	@Autowired
 	private NotificationUtils notificationUtils;
@@ -86,7 +86,7 @@ public class NotificationController {
 			@ValidInput ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
-			List<Notification> notifications = repository.findAllSortDescending(contextId.getValue());
+			List<Notification> notifications = notificationRepository.findAllSortDescending(contextId.getValue());
 			if (notifications != null) {
 				return new ResponseEntity<>(notifications, HttpStatus.OK);
 			}
@@ -104,12 +104,28 @@ public class NotificationController {
 
 		if (notification != null) {
 			notification.setRead(true);
-			repository.update(notification);
+			notificationRepository.update(notification);
 			return new ResponseEntity<>(notification, HttpStatus.OK);
 		}
 
 		log.error("Problem occured while updating read parameter");
 		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
+	}
+
+	@ValidRequestMapping(value = "/read")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Integer> getCountOfUnreadNotifications(@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			List<Notification> unreadNotifications = notificationRepository.getNotificationByReadValue(contextId.getValue(), false);
+			return new ResponseEntity<>(unreadNotifications.size(), HttpStatus.OK);
+		}
+
+		log.error("Problem occured while retrieving number of unread notifications");
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 }

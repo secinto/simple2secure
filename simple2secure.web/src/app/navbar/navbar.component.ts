@@ -76,30 +76,18 @@ export class NavbarComponent {
 		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 		this.timer = Observable.timer(0, 10000);
-		this.timer.subscribe((t) => this.getNotifications());
+		this.timer.subscribe((t) => this.getNumOfUnreadNotifications());
 	}
 
-	public getNotifications() {
+	public getNumOfUnreadNotifications() {
 		if (this.loggedIn){
-			this.httpService.get(environment.apiEndpoint + 'notification')
+			this.httpService.get(environment.apiEndpoint + 'notification/read')
 				.subscribe(
 					data => {
-						this.notifications = data;
-						this.dataService.setNotifications(this.notifications);
-						this.countunreadNotifications(this.notifications);
+						this.numOfUnreadNotification = data;
 					},
 					error => {
 					});
-		}
-	}
-
-	public countunreadNotifications(notifications: Notification[]){
-		this.numOfUnreadNotification = 0;
-
-		for (let i = 0; i < notifications.length; i++) {
-			if (!notifications[i].read){
-				this.numOfUnreadNotification++;
-			}
 		}
 	}
 

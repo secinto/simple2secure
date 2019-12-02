@@ -45,14 +45,6 @@ export class DataService {
 		return JSON.parse(localStorage.getItem('isGroupEditable'));
 	}
 
-	setNotifications(notifications: Notification[]) {
-		localStorage.setItem('notifications', JSON.stringify(notifications));
-	}
-
-	getNotifications(){
-		return JSON.parse(localStorage.getItem('notifications'));
-	}
-
 	getSelectedWidget(){
 		return JSON.parse(localStorage.getItem('selectedWidget'));
 	}
