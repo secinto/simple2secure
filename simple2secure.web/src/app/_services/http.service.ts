@@ -139,8 +139,8 @@ export class HttpService {
 		}
 
 		if (withAuth) {
-			const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-			return new HttpHeaders().set('Authorization', currentUser.token)
+			const token = localStorage.getItem('auth_token');
+			return new HttpHeaders().set('Authorization', token)
 				.set('Accept-Language', this.currentLang)
 				.set('Access-Control-Allow-Origin', '*')
 				.set('Access-Control-Allow-Credentials', 'true');

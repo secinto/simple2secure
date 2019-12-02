@@ -42,7 +42,6 @@ export class LoginComponent implements OnInit {
 	loading = false;
 	returnUrl: string;
 	hide: boolean;
-	jwtHelper: JwtHelper = new JwtHelper();
 
 	constructor(
 		private route: ActivatedRoute,
@@ -69,12 +68,7 @@ export class LoginComponent implements OnInit {
 		this.httpService.postLogin(this.model.username, this.model.password).shareReplay()
 			.subscribe(
 				response => {
-					const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
-					const userId = decodedToken.userID;
-					localStorage.setItem('currentUser', JSON.stringify({
-						firstName: this.model.username,
-						token: response.headers.get('Authorization'), userID: userId
-					}));
+					localStorage.setItem('auth_token', response.headers.get('Authorization'));
 					// after successful login choose the context
 					this.getContexts();
 				},
