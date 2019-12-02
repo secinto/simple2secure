@@ -229,11 +229,16 @@ public class UserController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	@ValidRequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ValidInput ValidInputContext contextId,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (user != null) {
 			if (user.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
+
+				if (Strings.isNullOrEmpty(user.getCurrentContextId())) {
+					user.setCurrentContextId(contextId.getValue());
+				}
+
 				return userUtils.addNewUser(user, locale.getValue());
 			} else {
 				return userUtils.updateUser(user, locale.getValue());

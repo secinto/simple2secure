@@ -22,7 +22,6 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, Test, User} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, PageEvent} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
@@ -42,8 +41,6 @@ export class OrbiterToolTestSequenceListComponent {
 	podId: string;
 	isSequenceChanged: boolean;
 	sequences: TestSequence[];
-	testSequence: string[];
-	context: ContextDTO;
 	currentUser: any;
 	displayedColumns = ['testId', 'status', 'action'];
 	loading = false;
@@ -70,7 +67,6 @@ export class OrbiterToolTestSequenceListComponent {
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isSequenceChanged = false;
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.id = this.route.snapshot.paramMap.get('id');
 		this.loadSequences(this.id, 0, 10);
 	}
@@ -152,8 +148,7 @@ export class OrbiterToolTestSequenceListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'sequence/scheduleSequence/' +
-			this.context.context.id + '/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'sequence/scheduleSequence/' + this.currentUser.userID;
 		this.httpService.post(this.selectedSequence, this.url).subscribe(
 			data => {
 

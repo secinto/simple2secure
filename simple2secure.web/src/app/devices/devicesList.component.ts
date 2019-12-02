@@ -27,7 +27,7 @@ import {UserDeviceChangeGroupComponent} from '../user';
 import {HttpErrorResponse} from '@angular/common/http';
 import {AlertService, HttpService} from '../_services';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO, Device} from '../_models';
+import {Device} from '../_models';
 import {environment} from '../../environments/environment';
 import {saveAs as importedSaveAs} from 'file-saver';
 
@@ -46,7 +46,6 @@ export class DevicesListComponent {
 	@ViewChild('paginator') paginator: MatPaginator;
 	@ViewChild('sort') sort: MatSort;
 	displayedColumnsDevices = ['probeId', 'group', 'hostname', 'type', 'status', 'action'];
-	context: ContextDTO;
 	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -63,7 +62,6 @@ export class DevicesListComponent {
 	}
 
 	ngOnInit(){
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadDevices(0, 10);
 	}
 
@@ -86,7 +84,7 @@ export class DevicesListComponent {
 
 	loadDevices(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'device/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.devices = data.devices;

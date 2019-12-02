@@ -46,7 +46,6 @@ export class UserGroupDialogComponent {
 	currentUser: any;
 	parentGroup: CompanyGroup;
 	parentGroupId: string;
-	context: ContextDTO;
 
 	constructor(
 		private router: Router,
@@ -70,7 +69,6 @@ export class UserGroupDialogComponent {
 		});
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 	}
 
 	saveGroup() {
@@ -82,8 +80,7 @@ export class UserGroupDialogComponent {
 			this.parentGroupId = this.parentGroup.id;
 		}
 
-		this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + this.parentGroupId + '/'
-			+ this.context.context.id;
+		this.url = environment.apiEndpoint + 'group/' + this.currentUser.userID + '/' + this.parentGroupId;
 		this.httpService.post(this.group, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);

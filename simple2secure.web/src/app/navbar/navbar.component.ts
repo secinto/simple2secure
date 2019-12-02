@@ -21,15 +21,13 @@
  */
 
 import {ViewChild, Component} from '@angular/core';
-import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
+import {MatDialog, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs';
-import {ContextDTO, UserRole, Notification} from '../_models';
+import {Notification} from '../_models';
 import {environment} from '../../environments/environment';
-import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
-import {FormControl} from '@angular/forms';
 
 declare var $: any;
 
@@ -49,12 +47,10 @@ export interface Language {
 export class NavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: any;
-	currentContext: ContextDTO;
 	notifications: Notification[];
 	numOfUnreadNotification: number;
 	loggedIn: boolean;
 	currentLang: string;
-	showSettings: boolean;
 	returnUrl: string;
 	private timer;
 	showNotifications: boolean;
@@ -85,7 +81,7 @@ export class NavbarComponent {
 
 	public getNotifications() {
 		if (this.loggedIn){
-			this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
+			this.httpService.get(environment.apiEndpoint + 'notification')
 				.subscribe(
 					data => {
 						this.notifications = data;
@@ -115,19 +111,10 @@ export class NavbarComponent {
 		}
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.currentContext = JSON.parse(localStorage.getItem('context'));
 
 
-		if (this.currentUser && this.currentContext) {
+		if (this.currentUser) {
 			this.loggedIn = true;
-
-			if (this.currentContext.userRole == UserRole.SUPERADMIN) {
-				this.showSettings = true;
-
-			}
-			else {
-				this.showSettings = false;
-			}
 		}
 		else {
 			this.loggedIn = false;

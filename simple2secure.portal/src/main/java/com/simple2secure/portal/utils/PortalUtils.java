@@ -61,6 +61,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputParamType;
 import simple2secure.validator.model.ValidatedInput;
@@ -351,7 +352,7 @@ public class PortalUtils {
 			Class<?> super_clazz = clazz.getSuperclass();
 			if (super_clazz != null) {
 				if (super_clazz.equals(ValidatedInput.class)) {
-					if (!clazz.equals(ValidInputLocale.class)) {
+					if (!clazz.equals(ValidInputLocale.class) && !clazz.equals(ValidInputContext.class)) {
 						return true;
 					}
 				}
@@ -407,7 +408,7 @@ public class PortalUtils {
 			for (Parameter param : params) {
 				boolean isParamPathVariable = isParamPathVariable(param);
 				if (isParamPathVariable) {
-					log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
+					// log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
 					try {
 						sb.append(getRequestMethodTag(param));
 					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException

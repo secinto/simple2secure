@@ -24,14 +24,9 @@ import {Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig, PageEvent} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, TestResultDTO} from '../_models';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
-import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {TestResultDetailsComponent} from './testResultDetails.component';
 import { TestSequenceResult } from '../_models/testSequenceResult';
-import { PodDTO } from '../_models/DTO/podDTO';
-import { TestSequence } from '../_models/testSequence';
 import {TestSequenceResultDetailsComponent} from './testSequenceResultDetails.component';
 
 @Component({
@@ -40,7 +35,6 @@ import {TestSequenceResultDetailsComponent} from './testSequenceResultDetails.co
 })
 
 export class TestSequenceResultComponent {
-	context: ContextDTO;
     testSequenceResults: TestSequenceResult[] = [];
 	loading = false;
 	displayedColumns = ['name', 'podId', 'timestamp'];
@@ -64,7 +58,6 @@ export class TestSequenceResultComponent {
 	{}
 
 	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
         this.loadSequenceResults(0, 10);
 	}
 
@@ -87,7 +80,7 @@ export class TestSequenceResultComponent {
 
 
     loadSequenceResults(page: number, size: number) {
-        this.httpService.get(environment.apiEndpoint + 'sequence/result/' + this.context.context.id + '/' + page + '/' + size)
+        this.httpService.get(environment.apiEndpoint + 'sequence/result/' + page + '/' + size)
         .subscribe(
             data => {
                 this.testSequenceResults = data.results;

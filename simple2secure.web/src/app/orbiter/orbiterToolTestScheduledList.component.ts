@@ -25,7 +25,6 @@ import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} f
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
 import {TestRunDTO} from '../_models/DTO/testRunDTO';
-import {ContextDTO} from '../_models/index';
 import {TestStatus} from '../_models/testStatus';
 import {AlertService, DataService, HttpService} from '../_services';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -46,7 +45,6 @@ export class OrbiterToolTestScheduledListComponent {
 	isTestChanged: boolean;
 	showTestResult = false;
 	tests: TestRunDTO[];
-	context: ContextDTO;
 	displayedColumns = ['podId', 'name', 'hostname', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -69,7 +67,6 @@ export class OrbiterToolTestScheduledListComponent {
 	}
 
 	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadScheduledTests(0 , 10);
 	}
 
@@ -102,8 +99,7 @@ export class OrbiterToolTestScheduledListComponent {
 
 	public loadScheduledTests(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/getScheduledTests/' + this.context.context.id
-			+ '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'test/getScheduledTests/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.tests = data.tests;

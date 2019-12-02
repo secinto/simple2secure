@@ -217,36 +217,6 @@ public class GroupController {
 	}
 
 	/**
-	 * This function returns all groups according to the contextId
-	 */
-	@ValidRequestMapping
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<CompanyGroup>> getGroupsByContextAndUserId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
-
-		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
-			Context context = contextRepository.find(contextId.getValue());
-			User user = userRepository.find(userId.getValue());
-			if (context != null && user != null) {
-				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(contextId.getValue(),
-						userId.getValue());
-				if (contextUserAuthentication != null) {
-
-					// TODO: check according to the user role which groups will be visible to the user
-					List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
-					if (groups != null) {
-						return new ResponseEntity<>(groups, HttpStatus.OK);
-					}
-				}
-			}
-		}
-		log.error("Problem occured while retrieving group for context with id {}", contextId);
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-	}
-
-	/**
 	 * This function returns all users from the user repository
 	 */
 	@ValidRequestMapping(method = RequestMethod.DELETE)

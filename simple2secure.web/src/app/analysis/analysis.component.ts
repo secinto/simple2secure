@@ -26,7 +26,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport, NetworkReportDTO} from '../_models';
+import {GraphReport, NetworkReportDTO} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
@@ -45,7 +45,6 @@ export class AnalysisComponent implements OnInit{
 	reports: any[];
 	graphReports: GraphReport[];
 	queries: any[];
-	context: ContextDTO;
 	currentUser: any;
 	probes: any[];
 	selectedQuery: any;
@@ -67,7 +66,6 @@ export class AnalysisComponent implements OnInit{
 	ngOnInit() {
 
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllProbes(true);
 		// this.loadAllQueries(true);
 	}
@@ -75,7 +73,7 @@ export class AnalysisComponent implements OnInit{
 	loadAllProbes(defaultValue: boolean) {
 		const params = new HttpParams()
 			.set('active', String(false));
-		this.httpService.getWithParams(environment.apiEndpoint + 'device/' + this.context.context.id, params)
+		this.httpService.getWithParams(environment.apiEndpoint + 'device', params)
 			.subscribe(
 				data => {
 					this.probes = data;
@@ -104,7 +102,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadReportsByNameAndDevice(probeId: string, name: string){
-		this.httpService.get(environment.apiEndpoint + 'reports/' + probeId + '/' + name)
+		this.httpService.get(environment.apiEndpoint + 'reports/device/' + probeId + '/' + name)
 			.subscribe(
 				data => {
 					this.graphReports = data;

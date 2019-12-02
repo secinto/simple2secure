@@ -44,15 +44,9 @@ export class SelectContextDialog {
 	}
 
 	updateContext() {
-		localStorage.setItem('context', JSON.stringify(this.context));
+		localStorage.setItem('role', JSON.stringify(this.context.userRole));
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.httpService.updateContext(this.context.context, this.currentUser.userID);
-
-		if (localStorage.getItem('context')) {
-			this.dialogRef.close(true);
-		}
-		else {
-			this.dialogRef.close(false);
-		}
+		this.dialogRef.close(true);
 	}
 }

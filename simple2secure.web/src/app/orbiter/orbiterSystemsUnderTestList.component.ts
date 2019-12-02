@@ -59,9 +59,8 @@ export class OrbiterSystemsUnderTestListComponent {
 	) {}
 
 	ngOnInit() {
-		const groups = JSON.parse(localStorage.getItem('groups'));
-		this.groupId = groups[0].id;
-		this.loadSUTList(this.groupId, 0, 10);
+		// TODO: Benjamin: change this function to work with contextId
+		this.loadSUTList("contextId", 0, 10);
 	}
 
 	ngAfterViewInit() {

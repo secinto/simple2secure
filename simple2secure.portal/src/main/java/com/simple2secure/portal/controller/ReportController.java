@@ -125,7 +125,7 @@ public class ReportController {
 				List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
 
 				if (groups != null) {
-					log.debug("Loading OSQuery reports for contextId {0}", contextId);
+					log.debug("Loading OSQuery reports for contextId {}", contextId.getValue());
 
 					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
@@ -142,7 +142,7 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping
+	@ValidRequestMapping(value = "/device")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputName name,
 			@ValidInput ValidInputLocale locale) {

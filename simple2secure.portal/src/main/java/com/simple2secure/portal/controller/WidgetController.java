@@ -21,7 +21,9 @@
  */
 package com.simple2secure.portal.controller;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
@@ -87,6 +90,9 @@ public class WidgetController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
+	@Autowired
+	private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
 	List<String> widgetFunctions = new ArrayList<>();
 
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
@@ -94,6 +100,12 @@ public class WidgetController {
 	@PostConstruct
 	public void initialize() {
 
+		final List<Method> allMethods = new ArrayList<>(Arrays.asList(WidgetController.class.getDeclaredMethods()));
+
+		for (final Method method : allMethods) {
+			if (method.isAnnotationPresent(WidgetFunction.class)) {
+			}
+		}
 	}
 
 	@ValidRequestMapping()
@@ -148,10 +160,13 @@ public class WidgetController {
 
 	@ValidRequestMapping(value = "/updatePosition", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ValidInput ValidInputContext contextId,
+			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (widgetDTO != null) {
 			if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getId())) {
+				if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getContextId())) {
+					widgetDTO.getWidgetProperties().setContextId(contextId.getValue());
+				}
 				ObjectId widgetPropertiesId = widgetPropertiesRepository.saveAndReturnId(widgetDTO.getWidgetProperties());
 				widgetDTO.getWidgetProperties().setId(widgetPropertiesId.toString());
 			} else {

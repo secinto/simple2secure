@@ -24,6 +24,8 @@ package com.simple2secure.portal;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +63,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		initializeData();
-		initializeMethodHeaders();
+		try {
+			initializeMethodHeaders();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -88,8 +95,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	/**
 	 * This function initializes the method headers and maps each header to the provided function. Only headers with the
 	 * ValidatedRequestMapping annotation will be registered.
+	 *
+	 * @throws Exception
 	 */
-	private void initializeMethodHeaders() {
+	private void initializeMethodHeaders() throws Exception {
+		List<RequestMappingInfo> requestMappingList = new ArrayList<>();
 		for (String beanName : context.getBeanDefinitionNames()) {
 			Object bean = context.getBean(beanName);
 			Class<?> clazz = AopUtils.getTargetClass(bean);
@@ -98,11 +108,16 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
 			for (Method m : methods) {
 				if (m.isAnnotationPresent(ValidRequestMapping.class)) {
-					log.debug("Annotated method found: {}.{}", beanName, m.getName());
+					// log.debug("Annotated method found: {}.{}", beanName, m.getName());
 
 					RequestMappingInfo requestMappingInfo = portalUtils.createRequestMappingInfo(beanName, m, clazz_url);
-
-					requestMappingHandlerMapping.registerMapping(requestMappingInfo, bean, m);
+					if (!requestMappingList.contains(requestMappingInfo)) {
+						requestMappingList.add(requestMappingInfo);
+						requestMappingHandlerMapping.registerMapping(requestMappingInfo, bean, m);
+					} else {
+						log.error("This request mapping {} has been already registered", requestMappingInfo);
+						throw new RuntimeException("This request mapping has been already registered");
+					}
 				}
 			}
 		}

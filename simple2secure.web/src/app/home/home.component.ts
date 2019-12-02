@@ -24,15 +24,14 @@ import {
 	Component,
 	OnInit,
 	ViewChild} from '@angular/core';
-import {ContextDTO, User} from '../_models/index';
-import {NgxWidgetComponent, NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
+import {User} from '../_models/index';
+import {NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import {WidgetStoreComponent} from '../widgets/widgetStore.component';
 import {TranslateService} from '@ngx-translate/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {environment} from '../../environments/environment';
-import {Router} from '@angular/router';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -45,7 +44,6 @@ export class HomeComponent implements OnInit {
 	users: User[] = [];
 	widgets: WidgetDTO[] = [];
 	widgetDTO: WidgetDTO;
-	context: ContextDTO;
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
 	constructor(private dialog: MatDialog,
 				private alertService: AlertService,
@@ -56,13 +54,11 @@ export class HomeComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllWidgetsByUserId();
 	}
 
 	public loadAllWidgetsByUserId() {
-		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.currentUser['userID'] + '/'
-			+ this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.currentUser['userID'])
 			.subscribe(
 				data => {
 					this.widgets = data;
@@ -132,7 +128,6 @@ export class HomeComponent implements OnInit {
 				this.widgetDTO.widgetProperties.width = 1;
 				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
 				this.widgetDTO.widgetProperties.userId = this.currentUser['userID'];
-				this.widgetDTO.widgetProperties.contextId = this.context.context.id;
 
 				this.widgets.push(this.widgetDTO);
 			}

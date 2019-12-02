@@ -21,7 +21,7 @@
  */
 
 import {Component, Inject} from '@angular/core';
-import {CompanyGroup, UrlParameter, UserRegistration, UserRegistrationType, UserRole, ContextDTO} from '../_models/index';
+import {CompanyGroup, UrlParameter, UserRegistration, UserRegistrationType, UserRole} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -43,8 +43,8 @@ export class UserDetailsComponent {
 	rolesArray: UserRole[];
 	groups: CompanyGroup[];
 	action: string;
-	context: ContextDTO;
 	isEmailFieldDisabled = false;
+	userRole: string;
 
 	constructor(
 		private router: Router,
@@ -57,7 +57,7 @@ export class UserDetailsComponent {
 		@Inject(MAT_DIALOG_DATA) data,
 		private translate: TranslateService)
 	{
-		this.context = JSON.parse(localStorage.getItem('context'));
+		this.userRole = localStorage.getItem('role');
 		if (data.user == null) {
 			this.action = UrlParameter.NEW;
 			this.user = new UserRegistration();
@@ -82,12 +82,12 @@ export class UserDetailsComponent {
 	}
 
 	userRoleKeys(): Array<string> {
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			// Return ADMIN, SUPERUSER and USER
 			this.rolesArray = [UserRole.ADMIN, UserRole.SUPERUSER, UserRole.USER];
 			return this.rolesArray;
 		}
-		else if (this.context.userRole == UserRole.SUPERUSER) {
+		else if (this.userRole == UserRole.SUPERUSER) {
 			// Return USER
 			this.rolesArray = [UserRole.USER];
 			return this.rolesArray;
@@ -107,8 +107,7 @@ export class UserDetailsComponent {
 	}
 
 	private loadGroups() {
-		this.httpService.get(environment.apiEndpoint + 'group/context/' +
-			this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'group/context')
 			.subscribe(
 				data => {
 					this.groups = data;
@@ -126,7 +125,6 @@ export class UserDetailsComponent {
 
 	saveUser() {
 		this.url = environment.apiEndpoint + 'user';
-		this.user.currentContextId = this.context.context.id;
 		this.user.addedByUserId = this.currentUser.userID;
 		if (this.action === UrlParameter.NEW) {
 			this.user.registrationType = UserRegistrationType.ADDED_BY_USER;

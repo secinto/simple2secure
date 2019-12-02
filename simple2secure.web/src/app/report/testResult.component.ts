@@ -24,7 +24,7 @@ import {Component, ViewChild} from '@angular/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO, TestResultDTO} from '../_models';
+import {TestResultDTO} from '../_models';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -43,7 +43,6 @@ export class TestResultComponent {
 	testResults: TestRunDTO[];
 	selectedResult: TestRunDTO;
 	loading = false;
-	context: ContextDTO;
 	displayedColumns = ['podId', 'hostname', 'testname', 'timestamp', 'action'];
 	dataSource = new MatTableDataSource();
 	public pageEvent: PageEvent;
@@ -66,7 +65,6 @@ export class TestResultComponent {
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadTestResults(0, 10);
 	}
 
@@ -89,8 +87,7 @@ export class TestResultComponent {
 
 	loadTestResults(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/testresult/' + this.context.context.id
-			+ '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'test/testresult/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.testResults = data.tests;

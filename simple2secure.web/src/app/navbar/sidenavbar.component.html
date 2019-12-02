@@ -1,7 +1,7 @@
 <mat-sidenav-container fullscreen>
     <mat-sidenav mode="side" opened>
         <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
-        <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: {{currentContext.context.name}}</p>
+        <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Change context</p>
         <mat-divider></mat-divider>
         <p class="main-navigation-header">{{"menu.navigation" | translate}}</p>
         <mat-nav-list>

@@ -106,13 +106,16 @@ public class RuleController {
 	@ValidRequestMapping(value = "/rulewithsource", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (ruleWithSourcecode != null) {
 
 			if (!Strings.isNullOrEmpty(ruleWithSourcecode.getId())) {
 				ruleWithSourcecodeRepository.update(ruleWithSourcecode);
 			} else {
+				if (Strings.isNullOrEmpty(ruleWithSourcecode.getContextID())) {
+					ruleWithSourcecode.setContextID(contextId.getValue());
+				}
 				ruleWithSourcecodeRepository.save(ruleWithSourcecode);
 			}
 
@@ -138,14 +141,17 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/templaterule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (templateRule != null) {
 
 			if (!Strings.isNullOrEmpty(templateRule.getId())) {
 				templateRuleRepository.update(templateRule);
 			} else {
+				if (Strings.isNullOrEmpty(templateRule.getContextID())) {
+					templateRule.setContextID(contextId.getValue());
+				}
 				templateRuleRepository.save(templateRule);
 			}
 

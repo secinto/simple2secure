@@ -24,12 +24,10 @@ import {ViewChild, Component} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs';
-import {ContextDTO, UserRole, Notification} from '../_models';
+import {ContextDTO, UserRole} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
-import {FormControl} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
 
 @Component({
@@ -42,16 +40,15 @@ import {Title} from '@angular/platform-browser';
 export class SidenavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
 	currentUser: any;
-	currentContext: ContextDTO;
 	pageTitle: string;
 	loggedIn: boolean;
 	showSettings: boolean;
 	returnUrl: string;
-	showTitle: boolean;
 	showReportsSubmenu: boolean;
 	showEmailsSubmenu: boolean;
 	showOrbiterSubmenu: boolean;
 	showDevicesSubmenu: boolean;
+	userRole: string;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -73,12 +70,12 @@ export class SidenavbarComponent {
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.currentContext = JSON.parse(localStorage.getItem('context'));
+		this.userRole = localStorage.getItem('role');
 
-		if (this.currentUser && this.currentContext) {
+		if (this.currentUser && this.userRole) {
 			this.loggedIn = true;
 			this.showSettings = false;
-			if (this.currentContext.userRole == UserRole.SUPERADMIN) {
+			if (this.userRole == UserRole.SUPERADMIN) {
 				this.showSettings = true;
 			}
 		}

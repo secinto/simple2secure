@@ -28,11 +28,8 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO} from '../_models';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
-import {QueryReport} from '../_models/queryReport';
 import {ReportDTO} from '../_models/DTO/reportDTO';
-import {merge, tap} from 'rxjs/operators';
 import {PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
 
@@ -44,7 +41,6 @@ import {SelectionModel} from '@angular/cdk/collections';
 
 export class OsQueryReportOverviewComponent {
 	public reportDTO: ReportDTO;
-	context: ContextDTO;
 	selectedReport: any;
 	currentUser: any;
 	loading = false;
@@ -73,7 +69,6 @@ export class OsQueryReportOverviewComponent {
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllReports(0, 10);
 	}
 
@@ -96,7 +91,7 @@ export class OsQueryReportOverviewComponent {
 
 	private loadAllReports(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'reports/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;

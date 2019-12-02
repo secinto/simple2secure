@@ -21,7 +21,7 @@
  */
 
 import {Component, Inject} from '@angular/core';
-import {CompanyGroup, Device, ContextDTO} from '../_models';
+import {CompanyGroup, Device} from '../_models';
 import {AlertService, DataService, HttpService} from '../_services';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -43,7 +43,6 @@ export class UserDeviceChangeGroupComponent {
 	groups: CompanyGroup[];
 	device: Device;
 	selectedGroup: CompanyGroup;
-	context: ContextDTO;
 
 	constructor(
 		private router: Router,
@@ -62,13 +61,12 @@ export class UserDeviceChangeGroupComponent {
 
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadGroups();
 
 	}
 
 	private loadGroups() {
-		this.httpService.get(environment.apiEndpoint + 'group/context/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'group/context')
 			.subscribe(
 				data => {
 					this.extractGroups(data);

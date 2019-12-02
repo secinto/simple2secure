@@ -80,13 +80,14 @@ public class EmailController {
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (config != null) {
 			String configId = mailUtils.checkIfEmailConfigExists(config);
 			if (!Strings.isNullOrEmpty(configId)) {
 				config.setId(configId);
 				emailConfigRepository.update(config);
 			} else {
+				config.setContextId(contextId.getValue());
 				emailConfigRepository.save(config);
 			}
 			return new ResponseEntity<>(config, HttpStatus.OK);

@@ -24,7 +24,7 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {AlertService, DataService, HttpService} from '../_services';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {CompanyGroup, ContextDTO, User, UserDTO, UserRole, Device} from '../_models';
+import {CompanyGroup, User, UserDTO, UserRole} from '../_models';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -34,7 +34,6 @@ import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
-import {UserDeviceChangeGroupComponent} from './user-device-change-group.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 import {UserInfo} from '../_models/userInfo';
 
@@ -46,7 +45,7 @@ import {UserInfo} from '../_models/userInfo';
 })
 
 export class UserOverviewComponent {
-	users: any[];
+	userRole: string;
 	loading = false;
 	userDeleted = false;
 	groupDeleted = false;
@@ -63,7 +62,6 @@ export class UserOverviewComponent {
 	public user: User;
 	private sub: any;
 	currentUser: any;
-	context: ContextDTO;
 	showMyUsers: boolean;
 	addNewGroup: boolean;
 	addNewContext: boolean;
@@ -103,10 +101,10 @@ export class UserOverviewComponent {
 	ngOnInit() {
 		this.selectedItem = new CompanyGroup();
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
+		this.userRole = localStorage.getItem('role');
 		this.loadMyProfile();
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN ||
-			this.context.userRole == UserRole.SUPERUSER)
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN ||
+			this.userRole == UserRole.SUPERUSER)
 		{
 			this.showMyUsers = true;
 			this.addNewGroup = true;
@@ -116,7 +114,7 @@ export class UserOverviewComponent {
 			this.addNewGroup = false;
 		}
 
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			this.addNewContext = true;
 		}
 		else {
@@ -139,7 +137,7 @@ export class UserOverviewComponent {
 
 	private loadMyProfile() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'user/' + this.currentUser.userID + '/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'user/' + this.currentUser.userID)
 			.subscribe(
 				data => {
 					this.myProfile = data;
@@ -151,7 +149,6 @@ export class UserOverviewComponent {
 					this.checkMyUsersSize(this.myProfile.myUsersList);
 					this.checkMyContextsSize(this.myProfile.myContexts);
 
-					this.dataService.setGroups(this.myProfile.myGroups);
 					if (!this.userDeleted && !this.groupDeleted &&
 						!this.contextDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible &&
 						!this.contextAdded) {
@@ -261,7 +258,7 @@ export class UserOverviewComponent {
 
 	public deleteUser(user: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id + '/' + this.context.context.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.user.delete'));
 				this.userDeleted = true;
@@ -322,12 +319,12 @@ export class UserOverviewComponent {
 	public onMenuTriggerClick(item: any) {
 		this.selectedItem = item;
 
-		if (this.context.userRole === UserRole.SUPERADMIN || this.context.userRole === UserRole.ADMIN) {
+		if (this.userRole === UserRole.SUPERADMIN || this.userRole === UserRole.ADMIN) {
 			this.showEditAndDelete = true;
 			this.dataService.setGroupEditable(this.showEditAndDelete);
 		}
 		else {
-			if (this.context.userRole === UserRole.SUPERUSER) {
+			if (this.userRole === UserRole.SUPERUSER) {
 				this.showEditAndDelete = this.checkIfUserCanEditGroup(item);
 				this.dataService.setGroupEditable(this.showEditAndDelete);
 			}
@@ -344,10 +341,10 @@ export class UserOverviewComponent {
 			this.isGroupDeletable = true;
 		}
 
-		if (this.context.userRole === UserRole.SUPERADMIN) {
+		if (this.userRole === UserRole.SUPERADMIN) {
 			this.canDeleteAndEditUser = true;
 		}
-		else if (this.context.userRole === UserRole.ADMIN) {
+		else if (this.userRole === UserRole.ADMIN) {
 			if (item.userRole === UserRole.SUPERADMIN) {
 				this.canDeleteAndEditUser = false;
 			}
@@ -355,7 +352,7 @@ export class UserOverviewComponent {
 				this.canDeleteAndEditUser = true;
 			}
 		}
-		else if (this.context.userRole === UserRole.SUPERUSER) {
+		else if (this.userRole === UserRole.SUPERUSER) {
 			if (item.userRole === UserRole.SUPERUSER || item.userRole === UserRole.USER) {
 				this.canDeleteAndEditUser = true;
 			}
@@ -367,10 +364,10 @@ export class UserOverviewComponent {
 
 	checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup) {
 
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			return true;
 		}
-		else if (this.context.userRole == UserRole.SUPERUSER) {
+		else if (this.userRole == UserRole.SUPERUSER) {
 			if (fromGroup && toGroup) {
 				if (this.myProfile.assignedGroups) {
 					if (this.myProfile.assignedGroups.indexOf(fromGroup.id) > -1 && this.myProfile.assignedGroups.indexOf(toGroup.id) > -1) {
@@ -409,10 +406,10 @@ export class UserOverviewComponent {
 	}
 
 	checkIfUserCanEditGroup(group: CompanyGroup) {
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			return true;
 		}
-		else if (this.context.userRole == UserRole.SUPERUSER) {
+		else if (this.userRole == UserRole.SUPERUSER) {
 			if (group) {
 				if (this.myProfile.assignedGroups) {
 					if (this.myProfile.assignedGroups.indexOf(group.id) > -1) {
