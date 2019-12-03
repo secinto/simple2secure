@@ -24,15 +24,10 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import {TestRunDTO} from '../_models/DTO/testRunDTO';
-import {ContextDTO} from '../_models/index';
 import {TestStatus} from '../_models/testStatus';
 import {AlertService, DataService, HttpService} from '../_services';
-import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {TestResultDetailsComponent} from '../report/testResultDetails.component';
 import {HelperService} from '../_services/helper.service';
 import {PageEvent} from '@angular/material/paginator';
-import { SequenceRun } from '../_models/sequenceRun';
 import {TestSequenceResultDetailsComponent} from '../report/testSequenceResultDetails.component';
 import {TestSequenceRunDTO} from '../_models/DTO/testSequenceRunDTO';
 
@@ -49,7 +44,6 @@ export class OrbiterScheduledSequencesListComponent {
 	isTestChanged: boolean;
 	showTestResult = false;
 	sequenceRuns: TestSequenceRunDTO[] = [];
-	context: ContextDTO;
 	displayedColumns = ['name', 'time', 'type', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -72,7 +66,6 @@ export class OrbiterScheduledSequencesListComponent {
 	}
 
 	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadScheduledSequences(0 , 10);
 	}
 
@@ -105,8 +98,7 @@ export class OrbiterScheduledSequencesListComponent {
 
 	public loadScheduledSequences(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sequence/scheduledSequence/' + this.context.context.id
-			+ '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'sequence/scheduledSequence/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.sequenceRuns = data.sequences;

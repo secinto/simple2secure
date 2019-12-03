@@ -28,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +43,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Step;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.GroupRepository;
@@ -52,8 +53,15 @@ import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputGroup;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputProcessor;
+
 @RestController
-@RequestMapping("/api/processors")
+@RequestMapping(StaticConfigItems.PROCESSOR_API)
 public class ProcessorController {
 
 	static final Logger log = LoggerFactory.getLogger(ProcessorController.class);
@@ -76,13 +84,9 @@ public class ProcessorController {
 	@Autowired
 	PortalUtils portalUtils;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		// TODO - implement a method to check it the processor with the provided id exists in the update case and check if probe or group id are
@@ -94,8 +98,8 @@ public class ProcessorController {
 					List<Processor> processors = repository.getProcessorsByGroupId(processor.getGroupId());
 
 					if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale)),
-								HttpStatus.NOT_FOUND);
+						return new ResponseEntity<>(
+								new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale.getValue())), HttpStatus.NOT_FOUND);
 					}
 				}
 				repository.save(processor);
@@ -105,20 +109,17 @@ public class ProcessorController {
 			return new ResponseEntity<>(processor, HttpStatus.OK);
 		}
 		log.error("Error occured while saving/updating processor");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale)),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{probeId}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Processor>> getProcessorsByProbeId(@PathVariable("probeId") String probeId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<Processor>> getProcessorsByDeviceId(@PathVariable ValidInputDevice deviceId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(probeId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(probeId);
+		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {
@@ -129,7 +130,8 @@ public class ProcessorController {
 						if (processors != null) {
 							return new ResponseEntity<>(processors, HttpStatus.OK);
 						} else {
-							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale)),
+							return new ResponseEntity<>(
+									new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 									HttpStatus.NOT_FOUND);
 						}
 					} else {
@@ -150,41 +152,35 @@ public class ProcessorController {
 
 			}
 		}
-		log.error("Error while retrieving processors for probe with id {}", probeId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale)),
+		log.error("Error while retrieving processors for probe with id {}", deviceId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/group/{groupId}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable("groupId") String groupId,
-			@RequestHeader("Accept-Language") String locale) {
-		if (!Strings.isNullOrEmpty(groupId)) {
-			List<Processor> processors = repository.getProcessorsByGroupId(groupId);
+	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable ValidInputGroup groupId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+			List<Processor> processors = repository.getProcessorsByGroupId(groupId.getValue());
 			if (processors != null) {
 				return new ResponseEntity<>(processors, HttpStatus.OK);
 			}
 		}
-		log.error("Error while retrieving processors for group with id {}", groupId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale)),
+		log.error("Error while retrieving processors for group with id {}", groupId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@RequestMapping(
-			value = "/{processorId}",
-			method = RequestMethod.DELETE)
+	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteProcessor(@PathVariable("processorId") String processorId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(processorId)) {
-			Processor processor = repository.find(processorId);
+		if (!Strings.isNullOrEmpty(processorId.getValue())) {
+			Processor processor = repository.find(processorId.getValue());
 			if (processor != null) {
 				// Check according to the processor name if the same step exists
 				Step step = null;
@@ -202,11 +198,9 @@ public class ProcessorController {
 				return new ResponseEntity<>(processor, HttpStatus.OK);
 			}
 		}
-		log.error("Error occured while deleting processor with id {}", processorId);
-		return new ResponseEntity<>(
-				new CustomErrorType(
-						messageByLocaleService.getMessage("problem_occured_while_deleting_processor", ObjectUtils.toObjectArray(processorId), locale)),
-				HttpStatus.NOT_FOUND);
+		log.error("Error occured while deleting processor with id {}", processorId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_processor",
+				ObjectUtils.toObjectArray(processorId), locale.getValue())), HttpStatus.NOT_FOUND);
 
 	}
 }

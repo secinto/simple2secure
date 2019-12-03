@@ -23,7 +23,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {DataService, HttpService} from '../_services';
-import {ContextDTO, Notification} from '../_models';
+import {Notification} from '../_models';
 
 @Component({
 	moduleId: module.id,
@@ -36,8 +36,6 @@ export class NotificationComponent {
 
 	notifications: Notification[];
 	url: string;
-	currentUser: any;
-	currentContext: ContextDTO;
 	dataRefresher: any;
 
 	constructor(private httpService: HttpService,
@@ -45,8 +43,18 @@ export class NotificationComponent {
 	}
 
 	ngOnInit() {
-		this.notifications = this.dataService.getNotifications();
+		this.getNotifications();
 		this.refreshNotifications();
+	}
+
+	public getNotifications() {
+		this.httpService.get(environment.apiEndpoint + 'notification')
+			.subscribe(
+				data => {
+					this.notifications = data;
+				},
+				error => {
+				});
 	}
 
 	isRead(notification: Notification){
@@ -65,7 +73,7 @@ export class NotificationComponent {
 	refreshNotifications(){
 		this.dataRefresher =
 			setInterval(() => {
-				this.notifications = this.dataService.getNotifications();
+				this.getNotifications();
 			}, 5000);
 	}
 }

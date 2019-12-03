@@ -198,7 +198,7 @@ export class TestSequenceDetailsComponent {
             this.sequence.podId = this.id;
         }
 
-        this.url = environment.apiEndpoint + 'sequence/add';
+        this.url = environment.apiEndpoint + 'sequence';
         this.httpService.post(this.sequence, this.url).subscribe(
             data => {
                 if (this.type === 'new') {

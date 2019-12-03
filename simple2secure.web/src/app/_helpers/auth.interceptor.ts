@@ -34,8 +34,9 @@ export class AuthInterceptor implements HttpInterceptor {
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		return next.handle(req).pipe(tap(event => {}, err => {
 			if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403) {
-				localStorage.removeItem('token');
-				localStorage.removeItem('currentUser');
+				localStorage.removeItem('auth_token');
+				localStorage.removeItem('role');
+				localStorage.removeItem('isGroupEditable');
 				this.router.navigate(['/login']);
 			}
 		}));

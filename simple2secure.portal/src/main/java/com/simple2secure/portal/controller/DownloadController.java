@@ -31,17 +31,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputLocale;
+
 @RestController
-@RequestMapping("/api/download")
+@RequestMapping(StaticConfigItems.DOWNLOAD_API)
 public class DownloadController {
 
 	private static Logger log = LoggerFactory.getLogger(DownloadController.class);
@@ -60,11 +63,8 @@ public class DownloadController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.GET)
-	public ResponseEntity<byte[]> downloadProbe(@RequestHeader("Accept-Language") String locale) throws IOException, URISyntaxException {
+	@ValidRequestMapping
+	public ResponseEntity<byte[]> downloadProbe(@ServerProvidedValue ValidInputLocale locale) throws IOException, URISyntaxException {
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -75,7 +75,7 @@ public class DownloadController {
 			return new ResponseEntity<>(downloadData, httpHeaders, HttpStatus.OK);
 		} else {
 			log.error("File for download not found!");
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale)),
+			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}

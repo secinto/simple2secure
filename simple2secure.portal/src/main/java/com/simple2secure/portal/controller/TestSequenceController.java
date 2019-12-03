@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +33,7 @@ import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -50,8 +51,18 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputPage;
+import simple2secure.validator.model.ValidInputSequence;
+import simple2secure.validator.model.ValidInputSize;
+import simple2secure.validator.model.ValidInputUser;
+
 @RestController
-@RequestMapping("/api/sequence")
+@RequestMapping(StaticConfigItems.SEQUENCE_API)
 public class TestSequenceController {
 
 	private static Logger log = LoggerFactory.getLogger(TestSequenceController.class);
@@ -95,28 +106,27 @@ public class TestSequenceController {
 	@Autowired
 	PortalUtils portalUtils;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{deviceId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable("deviceId") String deviceId, @PathVariable("page") int page,
-			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(deviceId)) {
-			List<TestSequence> allSeqFromDb = testSequenceRepository.getByPodId(deviceId, page, size);
+	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			List<TestSequence> allSeqFromDb = testSequenceRepository.getByDeviceId(deviceId.getValue(), page.getValue(), size.getValue());
 			Map<String, Object> sequencesMap = new HashMap<>();
 			if (allSeqFromDb != null) {
 				sequencesMap.put("sequences", allSeqFromDb);
-				sequencesMap.put("totalSize", testSequenceRepository.getCountOfSequencesWithPodid(deviceId));
+				sequencesMap.put("totalSize", testSequenceRepository.getCountOfSequencesWithDeviceid(deviceId.getValue()));
 				return new ResponseEntity<>(sequencesMap, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputLocale locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
 			ItemNotFoundRepositoryException {
 		if (sequence != null) {
@@ -138,15 +148,15 @@ public class TestSequenceController {
 			return new ResponseEntity<>(sequence, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/delete/{sequenceId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestSequence> deleteSequence(@PathVariable("sequenceId") String sequenceId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(sequenceId)) {
 			TestSequence sequence = testSequenceRepository.find(sequenceId);
@@ -156,14 +166,15 @@ public class TestSequenceController {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sequence", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduledSequence/{deviceId}", method = RequestMethod.GET, consumes = "application/json")
+	@ValidRequestMapping(value = "/scheduledSequence", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
+
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId);
@@ -173,158 +184,158 @@ public class TestSequenceController {
 			log.debug("Updating last online time for device {}", deviceId);
 			deviceInfoRepository.update(deviceInfo);
 			log.debug("Updated last online time for device {}", deviceId);
-			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId, locale);
+			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId.getValue(), locale.getValue());
 			List<SequenceRun> allSeqRuns = respEntObj.getBody();
 			List<SequenceRun> filteredSeqRuns = allSeqRuns.stream().filter(sR -> sR.getSequenceStatus().equals(TestStatus.PLANNED))
 					.collect(Collectors.toList());
 			return new ResponseEntity<>(filteredSeqRuns, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduleSequence/{contextId}/{userId}", method = RequestMethod.POST, consumes = "application/json")
+	@ValidRequestMapping(value = "/scheduleSequence", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @PathVariable("contextId") String contextId,
-			@PathVariable("userId") String userId, @RequestHeader("Accept-Language") String locale) {
-		if (sequence != null && !Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(userId)) {
+	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sequence != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 
-			User user = userRepository.find(userId);
+			User user = userRepository.find(userId.getValue());
 
 			if (user != null) {
 
 				TestSequence currSequence = testSequenceRepository.find(sequence.getId());
 
 				if (currSequence != null) {
-					SequenceRun seqRun = new SequenceRun(sequence.getId(), sequence.getName(), sequence.getPodId(), contextId,
+					SequenceRun seqRun = new SequenceRun(sequence.getId(), sequence.getName(), sequence.getPodId(), contextId.getValue(),
 							TestRunType.MANUAL_PORTAL, currSequence.getSequenceContent(), TestStatus.PLANNED, System.currentTimeMillis());
 
 					sequenceRunrepository.save(seqRun);
 
 					notificationUtils.addNewNotificationPortal(sequence.getName() + " has been scheduled using the portal by " + user.getEmail(),
-							contextId);
+							contextId.getValue());
 
 					return new ResponseEntity<>(seqRun, HttpStatus.OK);
 				}
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_sequence", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/scheduledSequence/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/scheduledSequence")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@PathVariable("contextId") String contextId,
-			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			List<TestSequenceRunDTO> scheduledSequenceRuns = testUtils
-					.generateSequenceRunDTOBySequenceRun(sequenceRunrepository.getByContextIdWithPagination(contextId, page, size));
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			List<TestSequenceRunDTO> scheduledSequenceRuns = testUtils.generateSequenceRunDTOBySequenceRun(
+					sequenceRunrepository.getByContextIdWithPagination(contextId.getValue(), page.getValue(), size.getValue()));
 			Map<String, Object> scheduledSequencesMap = new HashMap<>();
 			scheduledSequencesMap.put("sequences", scheduledSequenceRuns);
-			scheduledSequencesMap.put("totalSize", sequenceRunrepository.countByContextId(contextId));
+			scheduledSequencesMap.put("totalSize", sequenceRunrepository.countByContextId(contextId.getValue()));
 			return new ResponseEntity<>(scheduledSequencesMap, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/update/status/{sequenceRunId}", method = RequestMethod.POST, consumes = "application/json")
+	@ValidRequestMapping(value = "/update/status", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
-			@PathVariable("sequenceRunId") String sequenceRunId, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (sequenceRunInfo != null && !Strings.isNullOrEmpty(sequenceRunId)) {
+			@PathVariable ValidInputSequence sequenceId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (sequenceRunInfo != null && !Strings.isNullOrEmpty(sequenceId.getValue())) {
 			JsonNode obj = JSONUtils.fromString(sequenceRunInfo);
 			String sequenceStatus = obj.findValue("status").asText();
-			if (sequenceRunId != null) {
-
-				SequenceRun currSequenceRun = sequenceRunrepository.find(sequenceRunId);
+			SequenceRun currSequenceRun = sequenceRunrepository.find(sequenceId.getValue());
+			if (currSequenceRun != null) {
 				currSequenceRun.setSequenceStatus(TestStatus.valueOf(sequenceStatus));
 				sequenceRunrepository.update(currSequenceRun);
 				return new ResponseEntity<>(currSequenceRun, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/save/sequencerunresult", method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/save/sequencerunresult", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestSequenceResult> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
-			@RequestHeader("Accept-Language") String locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (sequenceRunResult != null) {
 			testSequenceResultRepository.save(sequenceRunResult);
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/sequenceresults/{podId}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/sequenceresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable String podId,
-			@RequestHeader("Accept-Language") String locale) {
-		if (podId != null) {
-			List<TestSequenceResult> result = testSequenceResultRepository.getByPodId(podId);
+	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable ValidInputDevice deviceId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (deviceId != null) {
+			List<TestSequenceResult> result = testSequenceResultRepository.getByDeviceId(deviceId.getValue());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/sequencerunresults/{seqId}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/sequencerunresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable String seqId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable ValidInputSequence seqId,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (seqId != null) {
-			List<TestSequenceResult> result = testSequenceResultRepository.getBySequenceId(seqId);
+			List<TestSequenceResult> result = testSequenceResultRepository.getBySequenceId(seqId.getValue());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/result/{contextId}/{page}/{size}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/result")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@PathVariable("contextId") String contextId,
-			@PathVariable("page") int page, @PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) {
-		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
-			List<SequenceRun> sequenceRuns = sequenceRunrepository.getByContextId(contextId);
+	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
+			List<SequenceRun> sequenceRuns = sequenceRunrepository.getByContextId(contextId.getValue());
 			List<String> sequenceIds = portalUtils.extractIdsFromObjects(sequenceRuns);
 
 			if (sequenceIds != null) {
-				List<TestSequenceResult> sequenceResults = testSequenceResultRepository.getBySequenceRunIds(sequenceIds, page, size);
+				List<TestSequenceResult> sequenceResults = testSequenceResultRepository.getBySequenceRunIds(sequenceIds, page.getValue(),
+						size.getValue());
 				Map<String, Object> sequenceResultMap = new HashMap<>();
-				if(!sequenceResults.isEmpty()){
+				if (!sequenceResults.isEmpty()) {
 					sequenceResultMap.put("results", sequenceResults);
 					sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
 					return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
-				}else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)), HttpStatus.NOT_FOUND);
+				} else {
+					return new ResponseEntity<>(
+							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
+							HttpStatus.NOT_FOUND);
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 

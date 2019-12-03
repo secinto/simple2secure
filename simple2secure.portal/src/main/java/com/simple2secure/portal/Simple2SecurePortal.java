@@ -39,9 +39,8 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.MongoRepository;
 
 @EnableScheduling
-@SpringBootApplication(
-		scanBasePackages = { "com.simple2secure.portal" },
-		exclude = { EmbeddedMongoAutoConfiguration.class, MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
+@SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
+		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 public class Simple2SecurePortal extends SpringBootServletInitializer {
 
 	private static Logger log = LoggerFactory.getLogger(Simple2SecurePortal.class);

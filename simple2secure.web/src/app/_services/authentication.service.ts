@@ -32,20 +32,16 @@ export class AuthenticationService {
 
 	logout() {
 		// remove user from local storage to log user out
-		localStorage.removeItem('token');
-		localStorage.removeItem('currentUser');
-		localStorage.removeItem('context');
+		localStorage.removeItem('auth_token');
+		localStorage.removeItem('isGroupEditable');
+		localStorage.removeItem('role');
 	}
 
 	public isAuthenticated(): boolean {
-		const context = localStorage.getItem('context');
-		const token = localStorage.getItem('token');
-		if (token && context) {
+		const token = localStorage.getItem('auth_token');
+		if (token) {
 			return !this.jwtHelper.isTokenExpired(token);
 		}
-		else {
-			return false;
-		}
-
+		return false;
 	}
 }

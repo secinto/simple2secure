@@ -21,15 +21,13 @@
  */
 
 import {ViewChild, Component} from '@angular/core';
-import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
+import {MatDialog, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs';
-import {ContextDTO, UserRole, Notification} from '../_models';
+import {Notification} from '../_models';
 import {environment} from '../../environments/environment';
-import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
-import {FormControl} from '@angular/forms';
 
 declare var $: any;
 
@@ -48,13 +46,11 @@ export interface Language {
 
 export class NavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
-	currentUser: any;
-	currentContext: ContextDTO;
 	notifications: Notification[];
 	numOfUnreadNotification: number;
 	loggedIn: boolean;
+	userRole: string;
 	currentLang: string;
-	showSettings: boolean;
 	returnUrl: string;
 	private timer;
 	showNotifications: boolean;
@@ -80,30 +76,18 @@ export class NavbarComponent {
 		this.notifications = [];
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 		this.timer = Observable.timer(0, 10000);
-		this.timer.subscribe((t) => this.getNotifications());
+		this.timer.subscribe((t) => this.getNumOfUnreadNotifications());
 	}
 
-	public getNotifications() {
+	public getNumOfUnreadNotifications() {
 		if (this.loggedIn){
-			this.httpService.get(environment.apiEndpoint + 'notification/' + this.currentContext.context.id)
+			this.httpService.get(environment.apiEndpoint + 'notification/read')
 				.subscribe(
 					data => {
-						this.notifications = data;
-						this.dataService.setNotifications(this.notifications);
-						this.countunreadNotifications(this.notifications);
+						this.numOfUnreadNotification = data;
 					},
 					error => {
 					});
-		}
-	}
-
-	public countunreadNotifications(notifications: Notification[]){
-		this.numOfUnreadNotification = 0;
-
-		for (let i = 0; i < notifications.length; i++) {
-			if (!notifications[i].read){
-				this.numOfUnreadNotification++;
-			}
 		}
 	}
 
@@ -114,20 +98,10 @@ export class NavbarComponent {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.currentContext = JSON.parse(localStorage.getItem('context'));
+		this.userRole = localStorage.getItem('role');
 
-
-		if (this.currentUser && this.currentContext) {
+		if (this.userRole) {
 			this.loggedIn = true;
-
-			if (this.currentContext.userRole == UserRole.SUPERADMIN) {
-				this.showSettings = true;
-
-			}
-			else {
-				this.showSettings = false;
-			}
 		}
 		else {
 			this.loggedIn = false;
@@ -149,16 +123,6 @@ export class NavbarComponent {
 		}
 		else{
 			this.showNotifications = true;
-		}
-	}
-
-	openUserModal(){
-		this.showNotifications = false;
-		if (this.showUserModal == true){
-			this.showUserModal = false;
-		}
-		else{
-			this.showUserModal = true;
 		}
 	}
 

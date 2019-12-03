@@ -27,31 +27,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputLocale;
+
 @RestController
-@RequestMapping("/api/notification")
+@RequestMapping(StaticConfigItems.NOTIFICATION_API)
 public class NotificationController {
 
 	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
 
 	@Autowired
-	private NotificationRepository repository;
+	private NotificationRepository notificationRepository;
 
 	@Autowired
 	private NotificationUtils notificationUtils;
@@ -59,59 +66,66 @@ public class NotificationController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/{podId}",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable("podId") String podId,
-			@RequestHeader("Accept-Language") String locale) {
-		if (notification != null && !Strings.isNullOrEmpty(podId)) {
-			if (notificationUtils.addNewNotificationPod(notification.getContent(), podId)) {
+	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable ValidInputDevice deviceId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (notification != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId.getValue())) {
 				return new ResponseEntity<>(notification, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while saving notification");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale)),
-				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Notification>> getNotificationsByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			List<Notification> notifications = repository.findAllSortDescending(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			List<Notification> notifications = notificationRepository.findAllSortDescending(contextId.getValue());
 			if (notifications != null) {
 				return new ResponseEntity<>(notifications, HttpStatus.OK);
 			}
 		}
-		log.error("Problem occured while retrieving notifications for context id {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale)),
+		log.error("Problem occured while retrieving notifications for context id {}", contextId.getValue());
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "read",
-			method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/read", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (notification != null) {
 			notification.setRead(true);
-			repository.update(notification);
+			notificationRepository.update(notification);
 			return new ResponseEntity<>(notification, HttpStatus.OK);
 		}
 
 		log.error("Problem occured while updating read parameter");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
+	}
+
+	@ValidRequestMapping(value = "/read")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Integer> getCountOfUnreadNotifications(@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			List<Notification> unreadNotifications = notificationRepository.getNotificationByReadValue(contextId.getValue(), false);
+			return new ResponseEntity<>(unreadNotifications.size(), HttpStatus.OK);
+		}
+
+		log.error("Problem occured while retrieving number of unread notifications");
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }

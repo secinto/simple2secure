@@ -24,6 +24,10 @@ package com.simple2secure.portal.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -39,20 +43,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.GroupRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputParamType;
+import simple2secure.validator.model.ValidInputUser;
+import simple2secure.validator.model.ValidatedInput;
 
 @Component
 public class PortalUtils {
@@ -244,10 +257,10 @@ public class PortalUtils {
 	 *
 	 * @return
 	 */
-	public String generatePodToken(String podId, String tokenSecret) {
+	public String generatePodToken(String deviceId, String tokenSecret) {
 
 		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-		claims.put(CLAIM_POD, podId);
+		claims.put(CLAIM_POD, deviceId);
 
 		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
 				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
@@ -264,7 +277,7 @@ public class PortalUtils {
 	 */
 	public int getPaginationLimit(int size) {
 		if (size == 0) {
-			size = ConfigItems.DEFAULT_VALUE_SIZE;
+			size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return size;
 	}
@@ -279,7 +292,7 @@ public class PortalUtils {
 	 */
 	public int getPaginationStart(int size, int page, int limit) {
 		if (size == 0) {
-			size = ConfigItems.DEFAULT_VALUE_SIZE;
+			size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return ((page + 1) * size) - limit;
 	}
@@ -328,4 +341,158 @@ public class PortalUtils {
 		return ids;
 	}
 
+	/**
+	 * This method checks if the provided parameter should be part of the generated method url
+	 *
+	 * @param param
+	 * @return
+	 */
+	private boolean isParamPathVariable(Parameter param) {
+		Class<?> clazz = param.getType();
+		if (clazz != null) {
+			Class<?> super_clazz = clazz.getSuperclass();
+			if (super_clazz != null) {
+				if (super_clazz.equals(ValidatedInput.class)) {
+					if (!clazz.equals(ValidInputLocale.class) && !clazz.equals(ValidInputContext.class) && !clazz.equals(ValidInputUser.class)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This method generates the method url string from the provided parameter type
+	 *
+	 * @param param
+	 * @return
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
+	 */
+	private String getRequestMethodTag(Parameter param) throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+			SecurityException, IllegalArgumentException, InvocationTargetException {
+
+		Class<?> clazz = param.getType();
+		if (clazz != null) {
+			Class<?> superClazz = clazz.getSuperclass();
+			if (superClazz != null) {
+				if (superClazz.equals(ValidatedInput.class)) {
+					if (!clazz.equals(ValidInputLocale.class)) {
+						Object method_object = clazz.newInstance();
+						Method method = param.getType().getDeclaredMethod("getTag");
+						String tag = (String) method.invoke(method_object);
+						return tag;
+					}
+				}
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * This method generates the complete method url from the provided parameters.
+	 *
+	 * @param params
+	 * @param beanName
+	 * @param m
+	 * @return
+	 */
+	private StringBuilder createMethodUrl(String beanName, Method m) {
+		StringBuilder sb = new StringBuilder();
+		Parameter[] params = m.getParameters();
+		if (params.length > 0) {
+			for (Parameter param : params) {
+				boolean isParamPathVariable = isParamPathVariable(param);
+				if (isParamPathVariable) {
+					// log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
+					try {
+						sb.append(getRequestMethodTag(param));
+					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
+							| InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return sb;
+	}
+
+	/**
+	 * This Method returns the provided annotation value variable according to the Parameter Type.
+	 *
+	 * @param m
+	 * @return
+	 */
+	private Object getValueFromAnnotation(Method m, ValidInputParamType parameterType) {
+		ValidRequestMapping[] vrm = m.getAnnotationsByType(ValidRequestMapping.class);
+
+		if (vrm.length > 0) {
+			if (parameterType.equals(ValidInputParamType.METHOD)) {
+				return vrm[0].method();
+			} else if (parameterType.equals(ValidInputParamType.VALUE)) {
+				return vrm[0].value();
+			} else if (parameterType.equals(ValidInputParamType.CONSUMES)) {
+				return vrm[0].consumes();
+			} else if (parameterType.equals(ValidInputParamType.PRODUCES)) {
+				return vrm[0].produces();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * This method returns the class url from the class RequestMethod annotation.
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	public String[] getClassUrlFromAnnotation(Class<?> clazz) {
+
+		String rmList[] = { "" };
+		Annotation[] rm = clazz.getAnnotationsByType(RequestMapping.class);
+
+		for (Annotation anno : rm) {
+			RequestMapping rmnew = (RequestMapping) anno;
+			rmList = rmnew.value();
+			return rmList;
+		}
+		return rmList;
+	}
+
+	/**
+	 * This method returns the full method. It combines clazz and method urls
+	 *
+	 * @param clazz_url
+	 * @param method_url
+	 * @return
+	 */
+	private String generateUrl(String[] clazz_url, String annotated_value, StringBuilder method_url) {
+
+		return String.join("", clazz_url) + annotated_value + method_url.toString();
+	}
+
+	/**
+	 * This function generates the RequestMappingInfo from the provided parameters for each annotated method
+	 *
+	 * @param beanName
+	 * @param m
+	 * @param clazz_url
+	 * @return
+	 */
+	public RequestMappingInfo createRequestMappingInfo(String beanName, Method m, String[] clazz_url) {
+		StringBuilder method_url = createMethodUrl(beanName, m);
+		RequestMethod rm = (RequestMethod) getValueFromAnnotation(m, ValidInputParamType.METHOD);
+		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
+		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
+		String[] produces_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.PRODUCES);
+		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+		log.info("New mapping added ({}): {}", rm, complete_url);
+		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
+	}
 }

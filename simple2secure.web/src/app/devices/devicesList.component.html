@@ -1,0 +1,79 @@
+<div class="example-container mat-elevation-z8 table table-striped">
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="probeId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="group">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.type' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"><p *ngIf="element.pod">POD</p><p *ngIf="!element.pod">PROBE</p></mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.status}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="activated">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.activated' | translate }}
+            </mat-header-cell>
+            <mat-cell center *matCellDef="let element"><i *ngIf="element.activated" style="color: #A7BD26"
+                                                          class="fas fa-check-circle fa-2x"></i> <i
+                    *ngIf="!element.activated" style="color: #AA3939"
+                    class="fas fa-times-circle fa-2x"></i></mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
+                translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menuProbe"
+                        (click)="onMenuTriggerClick(element)">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;"
+                          mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<mat-menu #menuProbe="matMenu">
+    <button mat-menu-item (click)="openDialogChangeDeviceGroup()">
+        <mat-icon>edit</mat-icon>
+        {{ 'probe.change.group' | translate }}
+    </button>
+</mat-menu>

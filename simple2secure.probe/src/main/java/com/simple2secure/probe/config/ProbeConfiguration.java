@@ -462,7 +462,7 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "/false",
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "?select_all=false",
 				ProbeConfiguration.authKey);
 
 		if (!Strings.isNullOrEmpty(response)) {

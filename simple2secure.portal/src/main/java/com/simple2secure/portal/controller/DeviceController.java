@@ -29,13 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -49,6 +50,7 @@ import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
@@ -62,8 +64,17 @@ import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.SUTUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputHostname;
+import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidInputPage;
+import simple2secure.validator.model.ValidInputSize;
+
 @RestController
-@RequestMapping("/api/device")
+@RequestMapping(StaticConfigItems.DEVICE_API)
 public class DeviceController {
 
 	public static final Logger log = LoggerFactory.getLogger(DeviceController.class);
@@ -106,18 +117,15 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}/{page}/{size}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@PathVariable("contextId") String contextId, @PathVariable("page") int page,
-			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page, size);
+				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page.getValue(), size.getValue());
 
 				if (pods != null) {
 					return new ResponseEntity<>(pods, HttpStatus.OK);
@@ -125,10 +133,10 @@ public class DeviceController {
 			}
 		}
 
-		log.error("Problem occured while retrieving pods for contextId {}", contextId);
+		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -138,16 +146,13 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}/{active}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@PathVariable("contextId") String contextId,
-			@PathVariable("active") boolean active, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ServerProvidedValue ValidInputContext contextId, @RequestParam boolean active,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
 				List<Device> pods = deviceUtils.getAllDevicesFromCurrentContext(context, active);
 
@@ -159,14 +164,14 @@ public class DeviceController {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId);
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
 	/**
-	 * This function retrieves the tests according to the podId, if no tests are found then it checks if there are tests according to the
+	 * This function retrieves the tests according to the deviceId, if no tests are found then it checks if there are tests according to the
 	 * hostname.
 	 *
 	 * @param deviceId
@@ -174,21 +179,18 @@ public class DeviceController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@RequestMapping(
-			value = "/config/{deviceId}/{hostname}",
-			method = RequestMethod.GET)
-	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable("deviceId") String deviceId, @PathVariable("hostname") String hostname)
+	@ValidRequestMapping(value = "/config")
+	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
 			throws ItemNotFoundRepositoryException {
 
-		List<Test> test = testRepository.getByPodId(deviceId);
+		List<Test> test = testRepository.getByDeviceId(deviceId);
 		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
 		if (devInfo != null) {
 			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(devInfo);
-		}
 
 		if (test == null || test.isEmpty()) {
-			test = testRepository.getByHostname(hostname);
+			test = testRepository.getByHostname(hostname.getValue());
 		}
 
 		return new ResponseEntity<>(test, HttpStatus.OK);
@@ -203,11 +205,7 @@ public class DeviceController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/scheduledTests/{deviceId}",
-			method = RequestMethod.GET,
-			consumes = "application/json")
+	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("deviceId") String deviceId,
 			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
@@ -218,8 +216,8 @@ public class DeviceController {
 			return testUtils.getScheduledTestsByDeviceId(deviceId, locale);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -227,27 +225,24 @@ public class DeviceController {
 	/**
 	 * This function deletes the specified the POD with the specified ID if it exists
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/delete/{deviceId}",
-			method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable("deviceId") String deviceId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(deviceId)) {
+		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 
 			if (license != null) {
 				// delete all device dependencies
-				deviceUtils.deleteDependencies(deviceId);
+				deviceUtils.deleteDependencies(deviceId.getValue());
 				return new ResponseEntity<>(license, HttpStatus.OK);
 			}
 		}
 
 		log.error("Problem occured while deleting device with id {}", deviceId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_device", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_device", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -256,17 +251,14 @@ public class DeviceController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/changeGroup/{deviceId}",
-			method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/changeGroup", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable("deviceId") String deviceId, @RequestBody CompanyGroup group,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable ValidInputDevice deviceId, @RequestBody CompanyGroup group,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(deviceId) && group != null) {
+		if (!Strings.isNullOrEmpty(deviceId.getValue()) && group != null) {
 			// retrieve license from database
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 			CompanyGroup dbGroup = groupRepository.find(group.getId());
 			if (license != null && dbGroup != null) {
 
@@ -278,25 +270,22 @@ public class DeviceController {
 			}
 		}
 
-		log.error("Problem occured while updating group for device id {}", deviceId);
+		log.error("Problem occured while updating group for device id {}", deviceId.getValue());
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_device_group", locale)),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_device_group", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@RequestMapping(
-			value = "/status",
-			method = RequestMethod.GET)
-	public ResponseEntity<Service> getStatus(@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+	@ValidRequestMapping(value = "/status")
+	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
-	@RequestMapping(
-			value = "/status/{deviceId}",
-			method = RequestMethod.POST)
-	public ResponseEntity<Service> postStatus(@PathVariable("deviceId") String deviceId, @RequestHeader("Accept-Language") String locale)
+	@ValidRequestMapping(value = "/status", method = RequestMethod.POST)
+	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId)) {
 			DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);

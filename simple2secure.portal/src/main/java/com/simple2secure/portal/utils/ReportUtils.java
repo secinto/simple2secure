@@ -30,9 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.Report;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ReportRepository;
@@ -59,7 +59,7 @@ public class ReportUtils {
 	 */
 	public List<GraphReport> prepareReportsForGraph(String deviceId, String queryName) {
 		int currentPage = 0;
-		int size = ConfigItems.DEFAULT_VALUE_SIZE;
+		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		long maxPages = reportRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage <= maxPages) {
@@ -99,7 +99,7 @@ public class ReportUtils {
 	 */
 	public List<GraphReport> prepareReportsForGraph(String queryName) {
 		int currentPage = 0;
-		int size = ConfigItems.DEFAULT_VALUE_SIZE;
+		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		long maxPages = reportRepository.getPagesForReportsByName(queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage < maxPages) {

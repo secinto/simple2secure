@@ -81,6 +81,7 @@ import { TestSequenceResultComponent } from './report/testSequenceResult.compone
 import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
+import {DevicesComponent, DevicesListComponent} from './devices/index';
 
 
 /**
@@ -178,6 +179,8 @@ import {StatComponent} from './widgets/stat.component';
 import {NotificationCardComponent} from './widgets/notification-card.component';
 import {WidgetStoreComponent} from './widgets/widgetStore.component';
 import {StatItemComponent} from './widgets/stat-item.component';
+import {DevicesOverviewComponent} from './devices/devicesOverview.component';
+import {NavbarLoginComponent} from './navbar/navbarlogin.component';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -267,6 +270,7 @@ export const httpInterceptorProviders = [
 		DashboardLayoutComponent,
 		LoginLayoutComponent,
 		NavbarComponent,
+		NavbarLoginComponent,
 		SidenavbarComponent,
 		ConfigurationDetailsComponent,
 		NetworkReportOverviewComponent,
@@ -332,7 +336,10 @@ export const httpInterceptorProviders = [
 		StatComponent,
 		StatItemComponent,
 		NotificationCardComponent,
-		WidgetStoreComponent
+		WidgetStoreComponent,
+		DevicesComponent,
+		DevicesOverviewComponent,
+		DevicesListComponent,
 	],
 	entryComponents: [
 		ConfirmationDialog,

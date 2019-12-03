@@ -62,7 +62,7 @@ public class RuleWithSourcecode extends GenericDBObject {
 		this.description = description;
 	}
 
-	public String getCondextID() {
+	public String getContextID() {
 		return contextID;
 	}
 

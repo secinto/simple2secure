@@ -27,8 +27,8 @@ public class TokenRepositoryImpl extends TokenRepository {
 	}
 
 	@Override
-	public Token findByProbeId(String probeId) {
-		Query query = new Query(Criteria.where("probeId").is(probeId));
+	public Token findByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("probeId").is(deviceId));
 		return this.mongoTemplate.findOne(query, Token.class);
 	}
 

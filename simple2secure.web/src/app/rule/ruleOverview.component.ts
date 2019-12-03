@@ -29,7 +29,7 @@ import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {HttpErrorResponse} from '@angular/common/http';
-import {ContextDTO, TemplateRule} from '../_models';
+import {TemplateRule} from '../_models';
 import {RuleAddComponent} from './ruleAdd.component';
 
 @Component({
@@ -46,7 +46,6 @@ export class RuleOverviewComponent {
 	templateRules: TemplateRule[];
 	// rule which has been selected in the table, can be TemplateRule or RuleWithSourcecode
 	selectedRule;
-	context: ContextDTO;
 	loading = false;
 
 	// columns for the table where rules will be displayed
@@ -70,8 +69,6 @@ export class RuleOverviewComponent {
 	}
 
 	ngOnInit() {
-
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadRules();
 	}
 
@@ -93,7 +90,7 @@ export class RuleOverviewComponent {
 		this.loading = true;
 
 		// fetching the rules with source code
-		this.httpService.get(environment.apiEndpoint + 'rule/rulewithsource/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'rule/rulewithsource')
 			.subscribe(
 				data => {
 					this.expertRules = data;
@@ -112,7 +109,7 @@ export class RuleOverviewComponent {
 				});
 
 		// fetching the template rules
-		this.httpService.get(environment.apiEndpoint + 'rule/templaterule/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'rule/templaterule')
 			.subscribe(
 				data => {
 					this.templateRules = data;

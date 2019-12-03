@@ -29,8 +29,8 @@ public class TestSequenceRepositoryImpl extends TestSequenceRepository {
 	}
 
 	@Override
-	public List<TestSequence> getByPodId(String podId, int page, int size) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+	public List<TestSequence> getByDeviceId(String deviceId, int page, int size) {
+		Query query = new Query(Criteria.where("podId").is(deviceId));
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);
 		query.limit(limit);
@@ -48,15 +48,15 @@ public class TestSequenceRepositoryImpl extends TestSequenceRepository {
 	}
 
 	@Override
-	public TestSequence getSequenceByNameAndPodId(String name, String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("name").is(name));
+	public TestSequence getSequenceByNameAndDeviceId(String name, String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("name").is(name));
 		TestSequence sequence = mongoTemplate.findOne(query, TestSequence.class);
 		return sequence;
 	}
 
 	@Override
-	public long getCountOfSequencesWithPodid(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+	public long getCountOfSequencesWithDeviceid(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId));
 		long count = mongoTemplate.count(query, TestSequence.class, collectionName);
 		return count;
 	}

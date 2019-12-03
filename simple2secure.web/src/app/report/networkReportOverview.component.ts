@@ -28,7 +28,7 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO, NetworkReport, NetworkReportDTO} from '../_models';
+import {NetworkReportDTO} from '../_models';
 import {NetworkReportDetailsComponent} from './networkReportDetails.component';
 import {PageEvent} from '@angular/material/paginator';
 
@@ -39,9 +39,7 @@ import {PageEvent} from '@angular/material/paginator';
 })
 
 export class NetworkReportOverviewComponent {
-	currentUser: any;
 	reportDTO: NetworkReportDTO;
-	context: ContextDTO;
 	selectedReport: any;
 	loading = false;
 	public pageEvent: PageEvent;
@@ -66,8 +64,6 @@ export class NetworkReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllReports(0, 10);
 	}
 
@@ -92,7 +88,7 @@ export class NetworkReportOverviewComponent {
 		this.loading = true;
 		this.currentPage = page;
 		this.pageSize = size;
-		this.httpService.get(environment.apiEndpoint + 'reports/network/' + this.context.context.id + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'reports/network/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;

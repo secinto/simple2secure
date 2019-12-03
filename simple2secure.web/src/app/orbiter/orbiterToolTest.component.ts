@@ -22,8 +22,7 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO, Device} from '../_models/index';
+import {Device} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
@@ -40,7 +39,6 @@ export class OrbiterToolTestComponent {
 
 	selectedPod: Device;
 	pods: Device[];
-	context: ContextDTO;
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
@@ -62,7 +60,6 @@ export class OrbiterToolTestComponent {
 	) {}
 
 	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadPods(0, 10);
 	}
 
@@ -89,7 +86,7 @@ export class OrbiterToolTestComponent {
 
 	loadPods(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'device/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.pods = data.devices;

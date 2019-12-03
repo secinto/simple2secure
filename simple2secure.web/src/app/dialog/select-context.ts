@@ -34,7 +34,6 @@ import {HttpService} from '../_services';
 export class SelectContextDialog {
 
 	context: ContextDTO;
-	currentUser: any;
 
 	constructor(private dialogRef: MatDialogRef<SelectContextDialog>,
 	            private httpService: HttpService,
@@ -44,15 +43,8 @@ export class SelectContextDialog {
 	}
 
 	updateContext() {
-		localStorage.setItem('context', JSON.stringify(this.context));
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.httpService.updateContext(this.context.context, this.currentUser.userID);
-
-		if (localStorage.getItem('context')) {
-			this.dialogRef.close(true);
-		}
-		else {
-			this.dialogRef.close(false);
-		}
+		localStorage.setItem('role', this.context.userRole);
+		this.httpService.updateContext(this.context.context);
+		this.dialogRef.close(true);
 	}
 }

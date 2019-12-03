@@ -27,7 +27,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {HttpErrorResponse} from '@angular/common/http';
+import {HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {QueryRun} from '../_models';
 import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.component';
 import {UserGroupComponent} from '../user';
@@ -45,7 +45,6 @@ export class OsqueryConfigurationDetailsComponent {
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
-	currentUser: any;
 	queries: any[];
 	selectedItem: QueryRun;
 	loading = false;
@@ -70,7 +69,6 @@ export class OsqueryConfigurationDetailsComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 		this.sub = this.route.params.subscribe(params => {
 			this.groupId = params['id'];
@@ -107,7 +105,9 @@ export class OsqueryConfigurationDetailsComponent {
 
 	loadQueries() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'query/group/' + this.groupId + '/true')
+		const params = new HttpParams()
+			.set('select_all', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'query/group/' + this.groupId, params)
 			.subscribe(
 				data => {
 					this.queries = data;

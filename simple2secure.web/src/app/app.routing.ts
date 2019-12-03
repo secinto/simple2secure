@@ -55,6 +55,7 @@ import {SearchComponent, SearchResultComponent} from './search';
 import { TestSequenceResultComponent } from './report/testSequenceResult.component';
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
+import {DevicesComponent, DevicesOverviewComponent, DevicesListComponent} from './devices';
 
 const appRoutes: Routes = [
 	{
@@ -97,6 +98,15 @@ const appRoutes: Routes = [
 					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled', breadcrumb: 'Scheduled Sequences'}},
 					{path: 'sut', component: OrbiterSystemsUnderTestListComponent, data : {title: 'orbiter.sut', breadcrumb: 'System Under Test'}},
 				]
+			},
+			{
+				path: 'devices',
+				component: DevicesComponent,
+				data: {title: 'menu.mydevices', breadcrumb: 'Devices'},
+				children: [
+					{path: '', component: DevicesOverviewComponent, data: {title: 'menu.dashboard', breadcrumb: 'Dashboard'}},
+					{path: 'list', component: DevicesListComponent, data: {title: 'menu.deviceList', breadcrumb: 'Device List'}},
+					]
 			},
 			{
 				path: 'user',
