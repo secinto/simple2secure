@@ -60,8 +60,10 @@ public class SUTUtils {
 	
 	public void updateSUTLastOnlineTtimestamp(String deviceId, long lastOnlineTimestamp) throws ItemNotFoundRepositoryException {
 		SystemUnderTest sut = sutRepository.getByEndDeviceId(deviceId);
-		sut.setLastOnlineTimestamp(lastOnlineTimestamp);
-		sutRepository.update(sut);
+		if(sut != null) {
+			sut.setLastOnlineTimestamp(lastOnlineTimestamp);
+			sutRepository.update(sut);
+		}
 	}
 }
  

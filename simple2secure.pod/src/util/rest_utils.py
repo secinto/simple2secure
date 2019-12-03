@@ -134,7 +134,7 @@ def send_license(app, licensePublic=None):
 
 
 def send_device_info(app, license):
-    url = app.config['PORTAL_URL'] + "device/save"
+    url = app.config['PORTAL_URL'] + "device/update"
     lastOnlineTimestamp = datetime.now().timestamp() * 1000
     license_obj = json.loads(license)
     deviceId = license_obj['deviceId']

@@ -303,15 +303,16 @@ public class DeviceController {
 			if (devInfo != null) {
 				devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 				deviceInfoRepository.update(devInfo);
+				sutUtils.updateSUTLastOnlineTtimestamp(devInfo.getDeviceId(), System.currentTimeMillis());
 			}
 		}
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 	
 	@RequestMapping(
-			value = "/save",
+			value = "/update",
 			method = RequestMethod.POST)
-	public ResponseEntity<DeviceInfo> saveDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
+	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());

@@ -90,7 +90,7 @@ public final class ProbeUtils {
 	public static void saveDeviceInfo(DeviceInfo deviceInfo) {
 		String response = null;
 		deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/save", deviceInfo);
+		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/update", deviceInfo);
 		if(!Strings.isNullOrEmpty(response)) {
 			log.info("Device Information has been sent to portal!");
 		}else {

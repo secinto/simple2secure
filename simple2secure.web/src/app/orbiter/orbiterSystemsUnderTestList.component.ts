@@ -33,6 +33,7 @@ import { DeviceType } from '../_models/DeviceType';
 
  @Component({
      moduleId: module.id,
+	 styleUrls: ['sutList.css'],
      templateUrl: 'orbiterSystemsUnderTestList.component.html'
  })
 
