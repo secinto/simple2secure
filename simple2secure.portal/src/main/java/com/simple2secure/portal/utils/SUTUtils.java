@@ -29,7 +29,7 @@ public class SUTUtils {
 		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 		
 		if(sut == null && deviceInfo != null && license != null) {
-			SystemUnderTest newSut = new SystemUnderTest(license.getGroupId(), license.getDeviceId(), DeviceType.PROBE, 
+			SystemUnderTest newSut = new SystemUnderTest(license.getGroupId(), license.getDeviceId(), DeviceType.PROBE.toString(), 
 					null, deviceInfo.getHostName(), deviceInfo.getIpAddress(), deviceInfo.getNetMask(), deviceInfo.getDeviceStatus(), deviceInfo.getLastOnlineTimestamp());
 			
 			sutRepository.save(newSut);

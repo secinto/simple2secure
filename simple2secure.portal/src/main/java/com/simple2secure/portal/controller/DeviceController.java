@@ -183,11 +183,12 @@ public class DeviceController {
 	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
 			throws ItemNotFoundRepositoryException {
 
-		List<Test> test = testRepository.getByDeviceId(deviceId);
-		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+		List<Test> test = testRepository.getByDeviceId(deviceId.getValue());
+		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId.getValue());
 		if (devInfo != null) {
 			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(devInfo);
+		}
 
 		if (test == null || test.isEmpty()) {
 			test = testRepository.getByHostname(hostname.getValue());
@@ -207,13 +208,13 @@ public class DeviceController {
 	 */
 	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable("deviceId") String deviceId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId.getValue());
 		if (devInfo != null) {
 			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(devInfo);
-			return testUtils.getScheduledTestsByDeviceId(deviceId, locale);
+			return testUtils.getScheduledTestsByDeviceId(deviceId.getValue(), locale.getValue());
 		}
 
 		return new ResponseEntity<>(
@@ -287,8 +288,8 @@ public class DeviceController {
 	@ValidRequestMapping(value = "/status", method = RequestMethod.POST)
 	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(deviceId)) {
-			DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId);
+		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
+			DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId.getValue());
 			if (devInfo != null) {
 				devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 				deviceInfoRepository.update(devInfo);
@@ -298,10 +299,8 @@ public class DeviceController {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 	
-	@RequestMapping(
-			value = "/update",
-			method = RequestMethod.POST)
-	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @RequestHeader("Accept-Language") String locale)
+	@ValidRequestMapping(value = "/update", method = RequestMethod.POST)
+	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());

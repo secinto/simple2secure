@@ -288,8 +288,8 @@ public class TestController {
 	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (test != null && !Strings.isNullOrEmpty(podId)) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+		if (test != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 			if (license != null) {
@@ -298,7 +298,7 @@ public class TestController {
 				if (group != null) {
 					String test_content = test.getTest_content().replace("\'", "\"");
 					
-					TestRun testRun = new TestRun(test.getId(), test.getName(), podId, group.getContextId(), TestRunType.MANUAL_POD, test_content,
+					TestRun testRun = new TestRun(test.getId(), test.getName(), deviceId.getValue(), group.getContextId(), TestRunType.MANUAL_POD, test_content,
 							TestStatus.PLANNED, System.currentTimeMillis());
 					testRun.setHostname(deviceInfo.getHostName());
 

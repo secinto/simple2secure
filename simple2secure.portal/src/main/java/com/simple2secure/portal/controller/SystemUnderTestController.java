@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.portal.utils.SUTUtils;
@@ -26,15 +27,19 @@ import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputGroup;
+import simple2secure.validator.model.ValidInputContext;
+import simple2secure.validator.model.ValidInputDeviceType;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputSize;
@@ -58,7 +63,16 @@ public class SystemUnderTestController {
 	LicenseRepository licenseRepository;
     
     @Autowired
+    ContextRepository contextRepository;
+    
+    @Autowired
     SUTUtils sutUtils;
+    
+    @Autowired
+    GroupUtils groupUtils;
+    
+    @Autowired
+    PortalUtils portalUtils;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -73,53 +87,33 @@ public class SystemUnderTestController {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale)),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
     }
 
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{groupId}/{endDeviceType}/{page}/{size}", method = RequestMethod.GET)
+    @ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getSUTList(@PathVariable("groupId") String groupId, @PathVariable("endDeviceType") DeviceType deviceType, @PathVariable("page") int page,
-			@PathVariable("size") int size, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale) && !Strings.isNullOrEmpty(groupId) && deviceType != null) {
-            List<SystemUnderTest> sutList = sutRepository.getByGroupIdAndType(groupId, deviceType);
-            if(deviceType.equals(DeviceType.PROBE)) {
-            	for(SystemUnderTest sut : sutList) {
-            		DeviceStatus status = sut.getDeviceStatus();
-            		DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
-					if (status != deviceStatus) {
-						sut.setDeviceStatus(deviceStatus);
-					}
-                }
-            }
-			Map<String, Object> sutMap = new HashMap<>();
-			if (sutList != null) {
-				sutMap.put("sutList", sutList);
-				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupIdAndType(groupId, deviceType));
+	public ResponseEntity<Map<String, Object>> getSUTList(@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && deviceType != null) {
+			
+			Context context = contextRepository.find(contextId.getValue());
+			
+			if(context != null) {
+				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				
+				if(groups != null) {
+					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+					
+					Map<String, Object> sutMap = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(), deviceType.getValue());
+					
+					return new ResponseEntity<>(sutMap, HttpStatus.OK); 
+				}
+			}
+					
+		}		
 		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@ValidRequestMapping
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable ValidInputGroup groupId, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(groupId.getValue())) {
-			List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId.getValue(), page.getValue(), size.getValue());
-			Map<String, Object> sutMap = new HashMap<>();
-			if (allSUTFromDb != null) {
-				sutMap.put("sutList", allSUTFromDb);
-				sutMap.put("totalSize", sutRepository.getCountOfSUTWithGroupId(groupId.getValue()));
-				return new ResponseEntity<>(sutMap, HttpStatus.OK);
-			}
-			log.debug("Successfully loaded Systems Under Test!");
-		}
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }

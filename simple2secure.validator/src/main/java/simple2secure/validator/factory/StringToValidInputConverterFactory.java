@@ -5,6 +5,7 @@ import org.springframework.core.convert.converter.ConverterFactory;
 
 import simple2secure.validator.model.ValidInputDestGroup;
 import simple2secure.validator.model.ValidInputDevice;
+import simple2secure.validator.model.ValidInputDeviceType;
 import simple2secure.validator.model.ValidInputEmailConfig;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputHostname;
@@ -98,6 +99,8 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputOsinfo().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputName.class) {
 				return (T) new ValidInputName().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputDeviceType.class) {
+				return (T) new ValidInputDeviceType().validatePathVariable(source);
 			} else {
 				return null;
 			}

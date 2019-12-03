@@ -65,7 +65,8 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	ngOnInit() {
 		// TODO: Benjamin: change this function to work with contextId
-		this.loadSUTList("contextId", 0, 10);
+		this.loadMonitoredSUTList(0, 10);
+		this.loadOtherSUTList(0, 10);
 	}
 
 	ngAfterViewInit() {
@@ -79,8 +80,8 @@ export class OrbiterSystemsUnderTestListComponent {
 	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadMonitoredSUTList(this.groupId, e.pageIndex, e.pageSize);
-		this.loadOtherSUTList(this.groupId, e.pageIndex, e.pageSize);
+		this.loadMonitoredSUTList(e.pageIndex, e.pageSize);
+		this.loadOtherSUTList(e.pageIndex, e.pageSize);
 		return e;
 	}
 
@@ -98,9 +99,9 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	}
 
-	public loadMonitoredSUTList(groupId: string, page: number, size: number){
+	public loadMonitoredSUTList(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + DeviceType.PROBE + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'sut/' + DeviceType.PROBE + '/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.monitoredSUT = data.sutList;
@@ -125,9 +126,9 @@ export class OrbiterSystemsUnderTestListComponent {
 				});
 	}
 	
-	public loadOtherSUTList(groupId: string, page: number, size: number){
+	public loadOtherSUTList(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sut/' + groupId + '/' + DeviceType.WWW + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'sut/' + DeviceType.WWW + '/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.otherSUT = data.sutList;

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
-import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
@@ -174,10 +173,9 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(value = "/scheduledSequence", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-
-	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable("deviceId") String deviceId,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId);
+	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable ValidInputDevice deviceId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(deviceId.getValue());
 
 		if (deviceInfo != null) {
 			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());

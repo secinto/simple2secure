@@ -36,7 +36,7 @@ public class SystemUnderTest extends GenericDBObject {
     private String groupId;
     private String endDeviceId;
     @Embedded
-    private DeviceType endDeviceType;
+    private String endDeviceType;
     private String endDeviceLocation;
     private String name;
 	private String ipAdress;
@@ -48,7 +48,7 @@ public class SystemUnderTest extends GenericDBObject {
     public SystemUnderTest(){
     }
 
-    public SystemUnderTest(String groupId, String endDeviceId, DeviceType endDeviceType, String endDeviceLocation, 
+    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
     		String name,  String ipAdress, String netMask){
         setGroupId(groupId);
         setEndDeviceId(endDeviceId);
@@ -59,7 +59,7 @@ public class SystemUnderTest extends GenericDBObject {
         setNetMask(netMask);
     }
     
-    public SystemUnderTest(String groupId, String endDeviceId, DeviceType endDeviceType, String endDeviceLocation, 
+    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
     		String name,  String ipAdress, String netMask, DeviceStatus deviceStatus, long lastOnlineTimestamp){
     	this(groupId, endDeviceId, endDeviceType, endDeviceLocation, name, ipAdress, netMask);
         setDeviceStatus(deviceStatus);
@@ -82,11 +82,11 @@ public class SystemUnderTest extends GenericDBObject {
 		this.endDeviceId = endDeviceId;
 	}
 
-    public DeviceType getEndDeviceType() {
+    public String getEndDeviceType() {
         return endDeviceType;
     }
 
-    public void setEndDeviceType(DeviceType endDeviceType) {
+    public void setEndDeviceType(String endDeviceType) {
         this.endDeviceType = endDeviceType;
     }
 
