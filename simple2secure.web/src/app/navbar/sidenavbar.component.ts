@@ -68,7 +68,7 @@ export class SidenavbarComponent {
 
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
-		this.userRole = sessionStorage.getItem('role');
+		this.userRole = this.dataService.getRole();
 
 		if (this.userRole) {
 			this.loggedIn = true;

@@ -22,7 +22,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {AlertService, AuthenticationService, HttpService} from '../_services/index';
+import {AlertService, AuthenticationService, DataService, HttpService} from '../_services/index';
 import {TranslateService} from '@ngx-translate/core';
 import {JwtHelper} from 'angular2-jwt';
 import {environment} from '../../environments/environment';
@@ -50,7 +50,8 @@ export class LoginComponent implements OnInit {
 		private authenticationService: AuthenticationService,
 		private httpService: HttpService,
 		private dialog: MatDialog,
-		private alertService: AlertService)
+		private alertService: AlertService,
+		private dataService: DataService)
 	{}
 
 	ngOnInit() {
@@ -68,7 +69,7 @@ export class LoginComponent implements OnInit {
 		this.httpService.postLogin(this.model.username, this.model.password).shareReplay()
 			.subscribe(
 				response => {
-					sessionStorage.setItem('auth_token', response.headers.get('Authorization'));
+					this.dataService.setAuthToken(response.headers.get('Authorization'));
 					// after successful login choose the context
 					this.getContexts();
 				},
@@ -133,7 +134,7 @@ export class LoginComponent implements OnInit {
 		}
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
-			sessionStorage.setItem('role', contexts[0].userRole);
+			this.dataService.setRole(contexts[0].userRole);
 			this.httpService.updateContext(contexts[0].context);
 		}
 

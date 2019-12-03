@@ -29,6 +29,7 @@ import {Context, User, UserRegistration} from '../_models';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthenticationService} from './authentication.service';
 import { Location } from '@angular/common';
+import {DataService} from "./data.service";
 
 @Injectable()
 export class HttpService {
@@ -40,7 +41,8 @@ export class HttpService {
 	            private translate: TranslateService,
 	            private router: Router,
 	            private authenticationService: AuthenticationService,
-	            private location: Location)
+	            private location: Location,
+				private dataService: DataService)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 	}
@@ -139,7 +141,7 @@ export class HttpService {
 		}
 
 		if (withAuth) {
-			const token = sessionStorage.getItem('auth_token');
+			const token = this.dataService.getAuthToken();
 			return new HttpHeaders().set('Authorization', token)
 				.set('Accept-Language', this.currentLang)
 				.set('Access-Control-Allow-Origin', '*')

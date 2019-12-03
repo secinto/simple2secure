@@ -99,7 +99,7 @@ export class UserOverviewComponent {
 
 	ngOnInit() {
 		this.selectedItem = new CompanyGroup();
-		this.userRole = sessionStorage.getItem('role');
+		this.userRole = this.dataService.getRole();
 		this.loadMyProfile();
 		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN ||
 			this.userRole == UserRole.SUPERUSER)
@@ -250,6 +250,7 @@ export class UserOverviewComponent {
 
 
 	public editGroup(groupItem: any) {
+		this.dataService.set(groupItem);
 		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
 	}
 

@@ -23,7 +23,7 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {ContextDTO} from '../_models';
-import {HttpService} from '../_services';
+import {DataService, HttpService} from '../_services';
 
 @Component({
 	selector: 'select-context-dialog',
@@ -37,13 +37,14 @@ export class SelectContextDialog {
 
 	constructor(private dialogRef: MatDialogRef<SelectContextDialog>,
 	            private httpService: HttpService,
+	            private dataService: DataService,
 	            @Inject(MAT_DIALOG_DATA) public data: any)
 	{
 
 	}
 
 	updateContext() {
-		sessionStorage.setItem('role', this.context.userRole);
+		this.dataService.setRole(this.context.userRole);
 		this.httpService.updateContext(this.context.context);
 		this.dialogRef.close(true);
 	}
