@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
 		this.httpService.postLogin(this.model.username, this.model.password).shareReplay()
 			.subscribe(
 				response => {
-					localStorage.setItem('auth_token', response.headers.get('Authorization'));
+					sessionStorage.setItem('auth_token', response.headers.get('Authorization'));
 					// after successful login choose the context
 					this.getContexts();
 				},
@@ -133,7 +133,7 @@ export class LoginComponent implements OnInit {
 		}
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
-			localStorage.setItem('role', contexts[0].userRole);
+			sessionStorage.setItem('role', contexts[0].userRole);
 			this.httpService.updateContext(contexts[0].context);
 		}
 

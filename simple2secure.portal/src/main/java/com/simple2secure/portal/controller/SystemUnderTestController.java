@@ -1,14 +1,7 @@
 package com.simple2secure.portal.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.DeviceStatus;
-import com.simple2secure.api.model.DeviceType;
-import com.simple2secure.portal.utils.SUTUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -35,6 +30,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.SUTUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -56,23 +52,23 @@ public class SystemUnderTestController {
 	@Autowired
 	GroupRepository groupRepository;
 
-    @Autowired
-    NotificationUtils notificationUtils;
-    
-    @Autowired
+	@Autowired
+	NotificationUtils notificationUtils;
+
+	@Autowired
 	LicenseRepository licenseRepository;
-    
-    @Autowired
-    ContextRepository contextRepository;
-    
-    @Autowired
-    SUTUtils sutUtils;
-    
-    @Autowired
-    GroupUtils groupUtils;
-    
-    @Autowired
-    PortalUtils portalUtils;
+
+	@Autowired
+	ContextRepository contextRepository;
+
+	@Autowired
+	SUTUtils sutUtils;
+
+	@Autowired
+	GroupUtils groupUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -87,31 +83,34 @@ public class SystemUnderTestController {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
-    }
+	}
 
-    @ValidRequestMapping
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getSUTList(@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getSUTList(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && deviceType != null) {
-			
+
 			Context context = contextRepository.find(contextId.getValue());
-			
-			if(context != null) {
+
+			if (context != null) {
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
-				
-				if(groups != null) {
+
+				if (groups != null) {
 					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
-					
-					Map<String, Object> sutMap = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(), deviceType.getValue());
-					
-					return new ResponseEntity<>(sutMap, HttpStatus.OK); 
+
+					Map<String, Object> sutMap = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(),
+							deviceType.getValue());
+
+					return new ResponseEntity<>(sutMap, HttpStatus.OK);
 				}
 			}
-					
-		}		
+
+		}
 		return new ResponseEntity<>(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);

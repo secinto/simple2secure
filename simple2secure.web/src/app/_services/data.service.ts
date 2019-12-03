@@ -21,40 +21,29 @@
  */
 
 import {Injectable} from '@angular/core';
-import {CompanyGroup, Notification} from '../_models';
-import {PodDTO} from '../_models/DTO/podDTO';
 import {Widget} from '../_models/widget';
 
 @Injectable()
 export class DataService {
-	data: any;
-
-	get() {
-		return JSON.parse(localStorage.getItem('data'));
-	}
-
-	set(data: any) {
-		localStorage.setItem('data', JSON.stringify(data));
-	}
 
 	setGroupEditable(value: boolean) {
-		localStorage.setItem('isGroupEditable', JSON.stringify(value));
+		sessionStorage.setItem('isGroupEditable', JSON.stringify(value));
 	}
 
 	isGroupEditable() {
-		return JSON.parse(localStorage.getItem('isGroupEditable'));
+		return JSON.parse(sessionStorage.getItem('isGroupEditable'));
 	}
 
 	getSelectedWidget(){
-		return JSON.parse(localStorage.getItem('selectedWidget'));
+		return JSON.parse(sessionStorage.getItem('selectedWidget'));
 	}
 
 	addWidgetToLS(widget: Widget) {
-		localStorage.setItem('selectedWidget', JSON.stringify(widget));
+		sessionStorage.setItem('selectedWidget', JSON.stringify(widget));
 	}
 
 	clearWidgets(){
-		localStorage.removeItem('selectedWidget');
+		sessionStorage.removeItem('selectedWidget');
 	}
 
 }

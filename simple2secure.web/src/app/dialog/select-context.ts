@@ -43,7 +43,7 @@ export class SelectContextDialog {
 	}
 
 	updateContext() {
-		localStorage.setItem('role', this.context.userRole);
+		sessionStorage.setItem('role', this.context.userRole);
 		this.httpService.updateContext(this.context.context);
 		this.dialogRef.close(true);
 	}

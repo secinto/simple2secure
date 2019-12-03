@@ -56,7 +56,7 @@ export class UserDetailsComponent {
 		@Inject(MAT_DIALOG_DATA) data,
 		private translate: TranslateService)
 	{
-		this.userRole = localStorage.getItem('role');
+		this.userRole = sessionStorage.getItem('role');
 		if (data.user == null) {
 			this.action = UrlParameter.NEW;
 			this.user = new UserRegistration();

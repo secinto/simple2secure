@@ -32,7 +32,7 @@ export class RoleGuard implements CanActivate {
 	canActivate(route: ActivatedRouteSnapshot): boolean {
 		const expectedRole = route.data.expectedRole;
 
-		this.userRole = localStorage.getItem('role');
+		this.userRole = sessionStorage.getItem('role');
 
 		if (this.userRole !== expectedRole) {
 			this.router.navigate(['']);

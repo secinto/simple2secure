@@ -139,7 +139,7 @@ export class HttpService {
 		}
 
 		if (withAuth) {
-			const token = localStorage.getItem('auth_token');
+			const token = sessionStorage.getItem('auth_token');
 			return new HttpHeaders().set('Authorization', token)
 				.set('Accept-Language', this.currentLang)
 				.set('Access-Control-Allow-Origin', '*')

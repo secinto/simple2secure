@@ -98,7 +98,7 @@ export class NavbarComponent {
 			this.currentLang = this.translate.defaultLang;
 		}
 
-		this.userRole = localStorage.getItem('role');
+		this.userRole = sessionStorage.getItem('role');
 
 		if (this.userRole) {
 			this.loggedIn = true;

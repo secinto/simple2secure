@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
@@ -89,9 +88,6 @@ public class WidgetController {
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
 	List<String> widgetFunctions = new ArrayList<>();
 
@@ -161,7 +157,8 @@ public class WidgetController {
 	@ValidRequestMapping(value = "/updatePosition", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ServerProvidedValue ValidInputUser userId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 		if (widgetDTO != null) {
 			if (Strings.isNullOrEmpty(widgetDTO.getWidgetProperties().getId())) {
 				widgetDTO.getWidgetProperties().setContextId(contextId.getValue());
@@ -180,8 +177,9 @@ public class WidgetController {
 
 	@ValidRequestMapping(value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
 			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextId(userId.getValue(), contextId.getValue());
 			return new ResponseEntity<>(widgets, HttpStatus.OK);
@@ -213,8 +211,8 @@ public class WidgetController {
 	@WidgetFunction
 	@ValidRequestMapping(value = "/devActive")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {

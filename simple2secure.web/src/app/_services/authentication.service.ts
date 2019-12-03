@@ -31,14 +31,12 @@ export class AuthenticationService {
 	constructor() { }
 
 	logout() {
-		// remove user from local storage to log user out
-		localStorage.removeItem('auth_token');
-		localStorage.removeItem('isGroupEditable');
-		localStorage.removeItem('role');
+		// clear the sessionStorage
+		sessionStorage.clear();
 	}
 
 	public isAuthenticated(): boolean {
-		const token = localStorage.getItem('auth_token');
+		const token = sessionStorage.getItem('auth_token');
 		if (token) {
 			return !this.jwtHelper.isTokenExpired(token);
 		}
