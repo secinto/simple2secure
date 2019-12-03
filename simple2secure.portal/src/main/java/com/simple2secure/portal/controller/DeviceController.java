@@ -60,7 +60,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
@@ -109,8 +109,8 @@ public class DeviceController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ValidInput ValidInputContext contextId, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputPage page,
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -138,8 +138,8 @@ public class DeviceController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ValidInput ValidInputContext contextId, @RequestParam boolean active,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ServerProvidedValue ValidInputContext contextId, @RequestParam boolean active,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -199,7 +199,7 @@ public class DeviceController {
 	 */
 	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 
@@ -220,7 +220,7 @@ public class DeviceController {
 	 */
 	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 
@@ -247,7 +247,7 @@ public class DeviceController {
 	@ValidRequestMapping(value = "/changeGroup", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable ValidInputDevice deviceId, @RequestBody CompanyGroup group,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue()) && group != null) {
 			// retrieve license from database
@@ -271,14 +271,14 @@ public class DeviceController {
 	}
 
 	@ValidRequestMapping(value = "/status")
-	public ResponseEntity<Service> getStatus(@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
 	@ValidRequestMapping(value = "/status", method = RequestMethod.POST)
-	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());

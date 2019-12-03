@@ -54,7 +54,7 @@ import com.simple2secure.portal.repository.TemplateRuleRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.RuleUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
@@ -106,7 +106,7 @@ public class RuleController {
 	@ValidRequestMapping(value = "/rulewithsource", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (ruleWithSourcecode != null) {
 
@@ -142,7 +142,7 @@ public class RuleController {
 	@ValidRequestMapping(value = "/templaterule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (templateRule != null) {
 
@@ -176,8 +176,8 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/templaterule")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
@@ -206,8 +206,8 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/rulewithsource")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
@@ -234,7 +234,7 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/template_conditions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates, @ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateCondition> conditions;
 		try {
 			conditions = ruleConditionsRepository.findAll();
@@ -262,7 +262,7 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/template_actions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates, @ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateAction> actions;
 		try {
 			actions = ruleActionsRepository.findAll();
@@ -292,7 +292,7 @@ public class RuleController {
 	@ValidRequestMapping(value = "/rulewithsource", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable ValidInputRule ruleId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(ruleId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 			RuleWithSourcecode ruleWithSourcecode = ruleWithSourcecodeRepository.find(ruleId.getValue());
@@ -320,7 +320,7 @@ public class RuleController {
 	 */
 	@ValidRequestMapping(value = "/templaterule", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(ruleId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 			TemplateRule templateRule = templateRuleRepository.find(ruleId.getValue());

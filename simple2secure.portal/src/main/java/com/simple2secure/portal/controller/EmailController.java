@@ -48,7 +48,7 @@ import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.MailUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputEmailConfig;
@@ -80,7 +80,7 @@ public class EmailController {
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (config != null) {
 			String configId = mailUtils.checkIfEmailConfigExists(config);
 			if (!Strings.isNullOrEmpty(configId)) {
@@ -99,8 +99,8 @@ public class EmailController {
 
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -127,7 +127,7 @@ public class EmailController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable ValidInputEmailConfig emailConfigId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(emailConfigId.getValue())) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId.getValue());

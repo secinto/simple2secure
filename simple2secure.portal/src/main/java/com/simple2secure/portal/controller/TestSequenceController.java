@@ -49,7 +49,7 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
@@ -104,7 +104,7 @@ public class TestSequenceController {
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getAllSequences(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
 			List<TestSequence> allSeqFromDb = testSequenceRepository.getByDeviceId(deviceId.getValue(), page.getValue(), size.getValue());
 			Map<String, Object> sequencesMap = new HashMap<>();
@@ -121,7 +121,7 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputLocale locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
 			ItemNotFoundRepositoryException {
 		if (sequence != null) {
@@ -150,7 +150,7 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(sequenceId)) {
@@ -170,7 +170,7 @@ public class TestSequenceController {
 	@ValidRequestMapping(value = "/scheduledSequence", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		CompanyLicensePrivate podLicense = licenseRepository.findByDeviceId(deviceId.getValue());
 
 		if (podLicense != null) {
@@ -193,8 +193,8 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(value = "/scheduleSequence", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 		if (sequence != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 
 			User user = userRepository.find(userId.getValue());
@@ -224,8 +224,8 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(value = "/scheduledSequence")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ValidInput ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
@@ -246,7 +246,7 @@ public class TestSequenceController {
 	@ValidRequestMapping(value = "/update/status", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
-			@PathVariable ValidInputSequence sequenceId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@PathVariable ValidInputSequence sequenceId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (sequenceRunInfo != null && !Strings.isNullOrEmpty(sequenceId.getValue())) {
 			JsonNode obj = JSONUtils.fromString(sequenceRunInfo);
 			String sequenceStatus = obj.findValue("status").asText();
@@ -266,7 +266,7 @@ public class TestSequenceController {
 	@ValidRequestMapping(value = "/save/sequencerunresult", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestSequenceResult> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (sequenceRunResult != null) {
 			testSequenceResultRepository.save(sequenceRunResult);
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
@@ -280,7 +280,7 @@ public class TestSequenceController {
 	@ValidRequestMapping(value = "/sequenceresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (deviceId != null) {
 			List<TestSequenceResult> result = testSequenceResultRepository.getByDeviceId(deviceId.getValue());
 			return new ResponseEntity<>(result, HttpStatus.OK);
@@ -294,7 +294,7 @@ public class TestSequenceController {
 	@ValidRequestMapping(value = "/sequencerunresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable ValidInputSequence seqId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (seqId != null) {
 			List<TestSequenceResult> result = testSequenceResultRepository.getBySequenceId(seqId.getValue());
 			return new ResponseEntity<>(result, HttpStatus.OK);
@@ -307,8 +307,8 @@ public class TestSequenceController {
 
 	@ValidRequestMapping(value = "/result")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ValidInput ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 			List<SequenceRun> sequenceRuns = sequenceRunrepository.getByContextId(contextId.getValue());
 			List<String> sequenceIds = portalUtils.extractIdsFromObjects(sequenceRuns);

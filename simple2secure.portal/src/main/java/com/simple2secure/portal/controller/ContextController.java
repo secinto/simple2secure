@@ -58,7 +58,7 @@ import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.UserUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
@@ -108,8 +108,8 @@ public class ContextController {
 	@ValidRequestMapping(value = "/add", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
-	public ResponseEntity<Context> addContext(@ValidInput ValidInputUser userId, @ValidInput ValidInputContext contextId,
-			@RequestBody Context context, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Context> addContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
+			@RequestBody Context context, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && context != null) {
 
@@ -171,7 +171,7 @@ public class ContextController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
-	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(userId.getValue())) {
 			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId.getValue());
@@ -202,8 +202,8 @@ public class ContextController {
 	 */
 	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Context> deleteContext(@ValidInput ValidInputUser userId, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Context> deleteContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -239,8 +239,8 @@ public class ContextController {
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
-	public ResponseEntity<CurrentContext> selectUserContext(@ValidInput ValidInputUser userId, @RequestBody Context context,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CurrentContext> selectUserContext(@ServerProvidedValue ValidInputUser userId, @RequestBody Context context,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(userId.getValue()) && context != null) {
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),

@@ -51,8 +51,9 @@ import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
@@ -82,7 +83,7 @@ public class StepController {
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable ValidInputDevice deviceId, @RequestParam boolean select_all,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		log.debug("Retrieving steps for probe id {}", deviceId.getValue());
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
@@ -121,7 +122,7 @@ public class StepController {
 	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
 			List<Step> steps = repository.getStepsByGroupId(groupId.getValue(), select_all);
@@ -136,8 +137,8 @@ public class StepController {
 
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @ValidInput ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @ServerProvidedValue ValidInputLocale locale,
+			@ServerProvidedValue ValidInputContext context) throws ItemNotFoundRepositoryException {
 
 		if (step != null) {
 			if (Strings.isNullOrEmpty(step.getId())) {
@@ -166,7 +167,7 @@ public class StepController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteStep(@PathVariable ValidInputStep stepId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<?> deleteStep(@PathVariable ValidInputStep stepId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(stepId.getValue())) {

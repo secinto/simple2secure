@@ -40,7 +40,7 @@ import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputVersion;
@@ -59,12 +59,12 @@ public class ServiceController {
 	LoadedConfigItems loadedConfigItems;
 
 	@ValidRequestMapping
-	public ResponseEntity<Service> getServiceVersion(@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Service> getServiceVersion(@ServerProvidedValue ValidInputLocale locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
 	@ValidRequestMapping
-	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable ValidInputVersion version, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable ValidInputVersion version, @ServerProvidedValue ValidInputLocale locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version.getValue());
 
 		try {

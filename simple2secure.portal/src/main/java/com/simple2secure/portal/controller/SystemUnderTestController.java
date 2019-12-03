@@ -27,7 +27,7 @@ import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
@@ -57,7 +57,7 @@ public class SystemUnderTestController {
 
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputLocale locale) {
 		if (sut != null) {
 			sutRepository.save(sut);
 			log.debug("System Under Test: {} has been saved", sut.getName());
@@ -73,7 +73,7 @@ public class SystemUnderTestController {
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getAllSUT(@PathVariable ValidInputGroup groupId, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(groupId.getValue())) {
 			List<SystemUnderTest> allSUTFromDb = sutRepository.getByGroupId(groupId.getValue(), page.getValue(), size.getValue());
 			Map<String, Object> sutMap = new HashMap<>();

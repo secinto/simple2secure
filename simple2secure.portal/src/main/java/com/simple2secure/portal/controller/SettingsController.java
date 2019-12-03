@@ -51,7 +51,7 @@ import com.simple2secure.portal.repository.TestMacroRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputLicensePlan;
 import simple2secure.validator.model.ValidInputLocale;
@@ -80,7 +80,7 @@ public class SettingsController {
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<SettingsDTO> getSettings(@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<SettingsDTO> getSettings(@ServerProvidedValue ValidInputLocale locale) {
 		List<Settings> settings = settingsRepository.findAll();
 		List<LicensePlan> licensePlans = licensePlanRepository.findAll();
 		List<TestMacro> testMacros = testMacroRepository.findAll();
@@ -99,7 +99,7 @@ public class SettingsController {
 
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (settings != null) {
 			settingsRepository.update(settings);
@@ -113,7 +113,7 @@ public class SettingsController {
 
 	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (licensePlan != null) {
 			if (Strings.isNullOrEmpty(licensePlan.getId())) {
@@ -132,7 +132,7 @@ public class SettingsController {
 	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable ValidInputLicensePlan licensePlanId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(licensePlanId.getValue())) {
 			LicensePlan licensePlan = licensePlanRepository.find(licensePlanId.getValue());
@@ -150,7 +150,7 @@ public class SettingsController {
 
 	@ValidRequestMapping(value = "/testmacro", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(testMacroId.getValue())) {
@@ -169,7 +169,7 @@ public class SettingsController {
 
 	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (testMacro != null) {
 			if (Strings.isNullOrEmpty(testMacro.getId())) {

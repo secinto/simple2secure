@@ -53,7 +53,7 @@ import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputDevice;
 import simple2secure.validator.model.ValidInputGroup;
@@ -86,7 +86,7 @@ public class ProcessorController {
 
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		// TODO - implement a method to check it the processor with the provided id exists in the update case and check if probe or group id are
@@ -116,7 +116,7 @@ public class ProcessorController {
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessorsByDeviceId(@PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
@@ -160,7 +160,7 @@ public class ProcessorController {
 	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Processor>> getProcessorsByGroupId(@PathVariable ValidInputGroup groupId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
 			List<Processor> processors = repository.getProcessorsByGroupId(groupId.getValue());
 			if (processors != null) {
@@ -177,7 +177,7 @@ public class ProcessorController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(processorId.getValue())) {
 			Processor processor = repository.find(processorId.getValue());

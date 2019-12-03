@@ -56,7 +56,7 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDestGroup;
@@ -104,8 +104,8 @@ public class GroupController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ValidInput ValidInputUser userId, ValidInputGroup groupId,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ServerProvidedValue ValidInputUser userId, ValidInputGroup groupId,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (group != null && !Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
 			User user = userRepository.find(userId.getValue());
@@ -179,7 +179,7 @@ public class GroupController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> getGroup(@PathVariable ValidInputGroup groupId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<CompanyGroup> getGroup(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
 			CompanyGroup group = groupRepository.find(groupId.getValue());
 			if (group != null) {
@@ -198,8 +198,8 @@ public class GroupController {
 	 */
 	@ValidRequestMapping(value = "/context")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
@@ -221,7 +221,7 @@ public class GroupController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<?> deleteGroup(@PathVariable ValidInputGroup groupId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteGroup(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
 			CompanyGroup group = groupRepository.find(groupId.getValue());
@@ -249,7 +249,7 @@ public class GroupController {
 	@ValidRequestMapping(value = "/move", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable ValidInputGroup groupId, @PathVariable ValidInputDestGroup destGroupId,
-			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		CompanyGroup sourceGroup = groupRepository.find(groupId.getValue());
 		CompanyGroup toGroup = groupRepository.find(destGroupId.getValue());
 		User user = userRepository.find(userId.getValue());
@@ -267,7 +267,7 @@ public class GroupController {
 	@ValidRequestMapping(value = "/copy", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup, @PathVariable ValidInputGroup groupId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (destGroup != null && !Strings.isNullOrEmpty(groupId.getValue())) {
 
 			CompanyGroup sourceGroup = groupRepository.find(groupId.getValue());

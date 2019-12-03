@@ -73,7 +73,7 @@ import com.simple2secure.portal.utils.LicenseUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.SUTUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
@@ -172,7 +172,7 @@ public class LicenseController {
 	 * @throws UnsupportedEncodingException
 	 */
 	@ValidRequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
@@ -224,7 +224,7 @@ public class LicenseController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<byte[]> getLicense(@PathVariable ValidInputGroup groupId, @ValidInput ValidInputLocale locale) throws Exception {
+	public ResponseEntity<byte[]> getLicense(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale) throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -277,7 +277,7 @@ public class LicenseController {
 	 * @throws Exception
 	 */
 	@ValidRequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
-	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ValidInput ValidInputLocale locale) throws Exception {
+	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale) throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
 
 			String payload = licenseUtils.getPayloadFromTheToken(authToken);

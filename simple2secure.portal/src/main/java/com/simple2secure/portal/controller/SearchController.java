@@ -41,7 +41,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.SearchUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
@@ -65,7 +65,7 @@ public class SearchController {
 
 	@ValidRequestMapping
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable ValidInputSearchQuery searchQuery,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(searchQuery.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())
 				&& !Strings.isNullOrEmpty(locale.getValue())) {

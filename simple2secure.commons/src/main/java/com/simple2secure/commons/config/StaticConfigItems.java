@@ -94,6 +94,7 @@ public class StaticConfigItems {
 	public static final String SEQUENCE_API = "/api/sequence";
 	public static final String USER_API = "/api/user";
 	public static final String WIDGET_API = "/api/widget";
+	public static final String ERROR_API = "/api/error";
 	
 	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
 	public static final String DESTGROUP_ANNOTATION_TAG = "/{destGroupId}";

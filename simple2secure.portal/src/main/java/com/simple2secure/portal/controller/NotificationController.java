@@ -45,7 +45,7 @@ import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.NotificationUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
@@ -69,7 +69,7 @@ public class NotificationController {
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (notification != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
 			if (notificationUtils.addNewNotificationPod(notification.getContent(), deviceId.getValue())) {
 				return new ResponseEntity<>(notification, HttpStatus.OK);
@@ -82,8 +82,8 @@ public class NotificationController {
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<List<Notification>> getNotificationsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			List<Notification> notifications = notificationRepository.findAllSortDescending(contextId.getValue());
@@ -99,7 +99,7 @@ public class NotificationController {
 
 	@ValidRequestMapping(value = "/read", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (notification != null) {
@@ -115,7 +115,7 @@ public class NotificationController {
 
 	@ValidRequestMapping(value = "/read")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Integer> getCountOfUnreadNotifications(@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Integer> getCountOfUnreadNotifications(@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {

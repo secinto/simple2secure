@@ -39,7 +39,7 @@ import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputLocale;
 
@@ -64,7 +64,7 @@ public class DownloadController {
 	 * @throws URISyntaxException
 	 */
 	@ValidRequestMapping
-	public ResponseEntity<byte[]> downloadProbe(@ValidInput ValidInputLocale locale) throws IOException, URISyntaxException {
+	public ResponseEntity<byte[]> downloadProbe(@ServerProvidedValue ValidInputLocale locale) throws IOException, URISyntaxException {
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);

@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -64,7 +65,7 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputDevice;
@@ -129,16 +130,16 @@ public class TestController {
 	 * @param locale
 	 * @return
 	 */
-	@RequestMapping(value = "/{deviceId}/{page}/{size}/{usePagination}", method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Map<String, Object>> getTestByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputPage page,
-			@PathVariable ValidInputSize size, @PathVariable boolean usePagination, @ValidInput ValidInputLocale locale) {
+			@PathVariable ValidInputSize size, @RequestParam boolean usePagination, @ServerProvidedValue ValidInputLocale locale) {
 		return testUtils.getTestByDeviceId(deviceId.getValue(), page.getValue(), size.getValue(), usePagination, locale.getValue());
 	}
 
 	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Test> deleteTest(@PathVariable ValidInputTest testId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Test> deleteTest(@PathVariable ValidInputTest testId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(testId.getValue())) {
@@ -158,8 +159,8 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/scheduleTest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputUser userId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 		if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 
 			User user = userRepository.find(userId.getValue());
@@ -190,8 +191,8 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/getScheduledTests")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ValidInput ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 
@@ -206,8 +207,8 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/testresult")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Map<String, Object>> getTestResultByContextId(@ValidInput ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<Map<String, Object>> getTestResultByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Map<String, Object> results = testUtils.getTestResultByContextId(contextId.getValue(), locale.getValue(), page.getValue(),
@@ -223,13 +224,13 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/testresult", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestResult> deleteTestResult(@PathVariable ValidInputTestResult testResultId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<TestResult> deleteTestResult(@PathVariable ValidInputTestResult testResultId, @ServerProvidedValue ValidInputLocale locale) {
 		return testUtils.deleteTestResult(testResultId.getValue(), locale.getValue());
 	}
 
 	@ValidRequestMapping(value = "/testrun/delete", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestRun> deleteTestRun(@PathVariable ValidInputTestRun testRunId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestRun> deleteTestRun(@PathVariable ValidInputTestRun testRunId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(testRunId.getValue())) {
@@ -248,7 +249,7 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/save", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && test != null) {
 
@@ -280,7 +281,7 @@ public class TestController {
 	@ValidRequestMapping(value = "/scheduleTestPod", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (test != null && !Strings.isNullOrEmpty(deviceId.getValue())) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
@@ -313,14 +314,14 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/saveTestResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @ServerProvidedValue ValidInputLocale locale) {
 		TestResult result = testUtils.saveTestResult(testResult, locale.getValue());
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	@ValidRequestMapping(value = "/syncTest", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(locale.getValue()) && test != null) {
@@ -335,7 +336,7 @@ public class TestController {
 	@ValidRequestMapping(value = "/syncTests", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable ValidInputDevice deviceId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		List<Test> syncronizedTestList = new ArrayList<>();
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
 			testUtils.setAllPodTestToUnsyncronized(deviceId.getValue());
@@ -369,7 +370,7 @@ public class TestController {
 
 	@ValidRequestMapping(value = "/updateTestStatus", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
-	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(locale.getValue()) && testRunDTO != null) {

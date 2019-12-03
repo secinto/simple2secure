@@ -29,6 +29,7 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	moduleId: module.id,
@@ -93,7 +94,9 @@ export class OrbiterToolTestListComponent {
 
 	public loadTests(podId: string, page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + true)
+		const params = new HttpParams()
+			.set('usePagination', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size, params)
 			.subscribe(
 				data => {
 					this.tests = data.tests;

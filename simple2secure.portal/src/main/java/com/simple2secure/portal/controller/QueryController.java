@@ -59,7 +59,7 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputDevice;
 import simple2secure.validator.model.ValidInputGroup;
@@ -112,7 +112,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (query != null) {
@@ -144,7 +144,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> getQueryByID(@PathVariable ValidInputQuery queryId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<QueryRun> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId.getValue())) {
 			QueryRun queryConfig = queryRepository.find(queryId.getValue());
@@ -162,7 +162,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ValidInput ValidInputLocale locale) {
+	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId.getValue())) {
 			QueryRun queryRun = queryRepository.find(queryId.getValue());
@@ -182,7 +182,7 @@ public class QueryController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	@ValidRequestMapping
 	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputOsinfo osinfo,
-			@RequestParam boolean select_all, @ValidInput ValidInputLocale locale) {
+			@RequestParam boolean select_all, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (Strings.isNullOrEmpty(osinfo.getValue())) {
 			osinfo.setValue(OSInfo.UNKNOWN.name());
@@ -237,7 +237,7 @@ public class QueryController {
 	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
-			@ValidInput ValidInputLocale locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
 			List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId.getValue(), select_all);

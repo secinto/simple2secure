@@ -83,7 +83,7 @@ import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.UserUtils;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
@@ -173,8 +173,8 @@ public class UserController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<UserDTO> getUserByID(@ValidInput ValidInputUser userId, @ValidInput ValidInputContext contextId,
-			@ValidInput ValidInputLocale locale) {
+	public ResponseEntity<UserDTO> getUserByID(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		User user = userRepository.find(userId.getValue());
 
@@ -219,8 +219,8 @@ public class UserController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	@ValidRequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ValidInput ValidInputUser userId,
-			@ValidInput ValidInputContext contextId, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (user != null) {
@@ -250,7 +250,7 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@ValidRequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
 			return userUtils.addNewUser(user, locale.getValue());
@@ -271,7 +271,7 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@ValidRequestMapping(value = "/resendActivation", method = RequestMethod.POST)
-	public ResponseEntity<User> resendActivation(@RequestBody String email, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<User> resendActivation(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (!Strings.isNullOrEmpty(email)) {
 			User user = userRepository.findByEmail(email);
@@ -297,7 +297,7 @@ public class UserController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(value = "/update", method = RequestMethod.POST)
-	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (userInfo != null) {
@@ -324,7 +324,7 @@ public class UserController {
 	 */
 	@ValidRequestMapping(value = "/activate/updatePassword", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable ValidInputToken token, @RequestBody String password,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
 			User user = userRepository.findByActivationToken(token.getValue());
@@ -374,7 +374,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@ValidRequestMapping(value = "/activate", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(token.getValue());
 
@@ -417,7 +417,7 @@ public class UserController {
 	 * @throws IOException
 	 */
 	@ValidRequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
-	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
 		if (!Strings.isNullOrEmpty(email)) {
@@ -474,7 +474,7 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@ValidRequestMapping(value = "/invite")
-	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ValidInput ValidInputLocale locale)
+	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws URISyntaxException {
 
 		// TODO - check if token exists
@@ -490,7 +490,7 @@ public class UserController {
 	 */
 	@ValidRequestMapping(value = "/invite/process")
 	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(token)) {
 			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(token);
 			if (userInvitation != null) {
@@ -547,7 +547,7 @@ public class UserController {
 	 */
 	@ValidRequestMapping(value = "/updatePassword", method = RequestMethod.POST)
 	public ResponseEntity<User> updateUserPassword(@PathVariable ValidInputToken token, @RequestBody String password,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
 		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
 			User user = userRepository.findByPasswordResetToken(token.getValue());
@@ -601,7 +601,7 @@ public class UserController {
 	@ValidRequestMapping(method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
-			@ValidInput ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
 		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
 

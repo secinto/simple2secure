@@ -20,13 +20,13 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 
-import simple2secure.validator.annotation.ValidInput;
+import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputUser;
 
 @Component
-public class InputValidation implements HandlerMethodArgumentResolver {
+public class ServerProvidedValueValidation implements HandlerMethodArgumentResolver {
 
 	@Autowired
 	TokenAuthenticationService tokenAuthenticationService;
@@ -45,7 +45,7 @@ public class InputValidation implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter methodParameter) {
-		return methodParameter.getParameterAnnotation(ValidInput.class) != null;
+		return methodParameter.getParameterAnnotation(ServerProvidedValue.class) != null;
 	}
 
 	@Override
