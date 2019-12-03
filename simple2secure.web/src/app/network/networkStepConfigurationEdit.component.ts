@@ -86,7 +86,7 @@ export class NetworkStepConfigurationEditComponent {
 	}
 
 	getProcessorsByGroupId() {
-		this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+		this.httpService.get(environment.apiEndpoint + 'processors')
 			.subscribe(
 				data => {
 					this.processors = data;

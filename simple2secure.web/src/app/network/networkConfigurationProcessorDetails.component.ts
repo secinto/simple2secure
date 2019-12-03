@@ -79,7 +79,7 @@ export class NetworkConfigurationProcessorDetailsComponent {
 
 	loadProcessors() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+		this.httpService.get(environment.apiEndpoint + 'processors')
 			.subscribe(
 				data => {
 					this.processors = data;

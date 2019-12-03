@@ -82,6 +82,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 				dataInitializer.addDefaultSettings();
 				dataInitializer.addDefaultLicensePlan();
 				dataInitializer.addDefaultUsers();
+				dataInitializer.addDefaultProcessors();
+				dataInitializer.addDefaultSteps();
 				log.info("------------------ DATA INITIALIZATION SUCCESS ---------------------");
 			} catch (IOException e) {
 				log.error(e.getMessage());

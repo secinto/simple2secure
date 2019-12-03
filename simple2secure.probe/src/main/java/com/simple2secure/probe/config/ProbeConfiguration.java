@@ -402,7 +402,7 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI() + "/" + ProbeConfiguration.probeId,
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI(),
 				ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
 			Processor[] processorArray = JSONUtils.fromString(response, Processor[].class);
@@ -462,7 +462,7 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "/" + ProbeConfiguration.probeId + "?select_all=false",
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "?select_all=false",
 				ProbeConfiguration.authKey);
 
 		if (!Strings.isNullOrEmpty(response)) {
