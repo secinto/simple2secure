@@ -38,8 +38,7 @@ export class NotificationComponent {
 	url: string;
 	dataRefresher: any;
 
-	constructor(private httpService: HttpService,
-	            private dataService: DataService){
+	constructor(private httpService: HttpService){
 	}
 
 	ngOnInit() {
