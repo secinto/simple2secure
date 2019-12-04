@@ -38,7 +38,6 @@ export class NetworkProcessorConfigurationEditComponent {
 
 	processor: Processor;
 	action: string;
-	groupId: string;
 	timeUnits = Timeunit;
 
 	constructor(
@@ -56,12 +55,10 @@ export class NetworkProcessorConfigurationEditComponent {
 		if (data.processor == null) {
 			this.action = UrlParameter.NEW;
 			this.processor = new Processor();
-			this.groupId = data.groupId;
 		}
 		else {
 			this.action = UrlParameter.EDIT;
 			this.processor = data.processor;
-			this.groupId = data.groupId;
 		}
 	}
 
@@ -71,10 +68,6 @@ export class NetworkProcessorConfigurationEditComponent {
 	}
 
 	saveProcessor() {
-
-		if (this.action == UrlParameter.NEW) {
-			this.processor.groupId = this.groupId;
-		}
 
 		this.httpService.post(this.processor, environment.apiEndpoint + 'processors').subscribe(
 			data => {
