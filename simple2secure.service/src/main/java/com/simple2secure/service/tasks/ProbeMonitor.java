@@ -41,10 +41,9 @@ public class ProbeMonitor extends ServiceTask {
 
 	@Override
 	public void run() {
-		boolean restart = false;
 		log.debug("Executing {}", ProbeMonitor.class);
+		boolean restart = false;
 		log.debug("Probe process is alive {}", probeProcess.getProcess().isAlive());
-
 		if (probeProcess == null) {
 			restart = true;
 		} else {
@@ -67,5 +66,4 @@ public class ProbeMonitor extends ServiceTask {
 			}
 		}
 	}
-
 }

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
 import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
 import com.simple2secure.service.interfaces.ControllerEngine;
 import com.simple2secure.service.model.TriggerableEngineStates;
 import com.simple2secure.service.observer.SimpleLoggingObserver;
@@ -252,7 +253,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 	public void sendStartCommand() {
 		try {
 			log.debug("Sending START service command to PROBE");
-			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("START"));
+			probeProcess.instrumentService().sendCommand(new ServiceCommand(ServiceCommands.START));
 		} catch (Exception e) {
 			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
 		}
@@ -261,7 +262,16 @@ public class ProbeControllerEngine implements ControllerEngine {
 	public void sendStopCommand() {
 		try {
 			log.debug("Sending START service command to PROBE");
-			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("STOP"));
+			probeProcess.instrumentService().sendCommand(new ServiceCommand(ServiceCommands.STOP));
+		} catch (Exception e) {
+			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
+		}
+	}
+
+	public void sendCheckStatusCommand() {
+		try {
+			log.debug("Sending CHECK_STATUS service command to PROBE");
+			probeProcess.instrumentService().sendCommand(new ServiceCommand(ServiceCommands.CHECK_STATUS));
 		} catch (Exception e) {
 			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
 		}

@@ -43,8 +43,11 @@ export class OsqueryConfigurationEditComponent {
 	action: string;
 	probeId: string;
 	groupId: string;
-	alwaysFalseButton = false;
+	windows: boolean;
+	linux: boolean;
+	macos: boolean;
 	timeUnits = Timeunit;
+
 
 	constructor(
 		private alertService: AlertService,
@@ -58,6 +61,9 @@ export class OsqueryConfigurationEditComponent {
 		@Inject(MAT_DIALOG_DATA) data
 	)
 	{
+		this.windows = false;
+		this.linux = false;
+		this.macos = false;
 		if (data.queryRun == null) {
 			this.action = UrlParameter.NEW;
 			this.queryRun = new QueryRun();
@@ -67,8 +73,17 @@ export class OsqueryConfigurationEditComponent {
 			this.action = UrlParameter.EDIT;
 			this.queryRun = data.queryRun;
 			this.groupId = data.groupId;
+			if (data.systemsAvailable === 1 || data.systemsAvailable === 3 || data.systemsAvailable === 5 || data.systemsAvailable === 7) {
+				this.windows = true;
+			}
+			if (data.systemsAvailable === 2 || data.systemsAvailable === 3 || data.systemsAvailable === 6 || data.systemsAvailable === 7) {
+				this.linux = true;
+			}
+			if (data.systemsAvailable === 4 || data.systemsAvailable === 5 || data.systemsAvailable === 6 || data.systemsAvailable === 7) {
+				this.macos = true;
+			}
 		}
-		this.alwaysFalseButton = false;
+
 	}
 
 	extractTimeUnits(): Array<string> {
@@ -82,6 +97,8 @@ export class OsqueryConfigurationEditComponent {
 			this.queryRun.groupId = this.groupId;
 		}
 
+		this.systemsValue();
+
 		this.httpService.post(this.queryRun, environment.apiEndpoint + 'query').subscribe(
 			data => {
 				this.dialogRef.close(true);
@@ -91,11 +108,20 @@ export class OsqueryConfigurationEditComponent {
 			});
 	}
 
-	setCheckedStatus(value) {
-		if (value == 0) {
-			this.alwaysFalseButton = true;
-		} else {
-			this.alwaysFalseButton = false;
+	systemsValue() {
+		let test = 0;
+
+		if (this.windows) {
+			test = test + 1;
 		}
+		if(this.linux) {
+			test = test + 2;
+		}
+		if(this.macos) {
+			test = test + 4;
+		}
+
+		this.queryRun.systemsAvailable = test;
+
 	}
 }

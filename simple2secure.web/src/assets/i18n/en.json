@@ -243,6 +243,12 @@
   "table.sut.endDeviceName" : "End Device Name",
   "table.sut.endDevicetype" : "End Device Type",
   "table.sut.endDeviceLocation" : "End Device Location",
+  "table.graphAble" : "Depictable",
+  "table.systemsAvailable": "Available for OS",
+
+  "system.windows": "Windows",
+  "system.linux" : "Linux",
+  "system.macos": "MacOS",
 
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",

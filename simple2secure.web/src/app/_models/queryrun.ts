@@ -32,4 +32,6 @@ export class QueryRun extends Generic {
 	analysisIntervalUnit: Timeunit;
 	sqlQuery: string;
 	active: number;
+	systemsAvailable: number;
+	graphAble: boolean;
 }

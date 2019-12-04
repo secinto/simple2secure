@@ -28,6 +28,11 @@ public class ServiceCommand {
 	private ServiceCommands command;
 	private String[] arguments;
 
+	public ServiceCommand(ServiceCommands command) {
+		this.command = command;
+		arguments = new String[0];
+	}
+
 	public ServiceCommand(ServiceCommands command, String[] arguments) {
 		this.command = command;
 		this.arguments = arguments;

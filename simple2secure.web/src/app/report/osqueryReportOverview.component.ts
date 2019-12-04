@@ -74,7 +74,7 @@ export class OsQueryReportOverviewComponent {
 	ngOnInit() {
 		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadAllReports(0, 10);
+		this.loadReportsPaged(0, 10);
 	}
 
 	ngAfterViewInit() {
@@ -90,11 +90,11 @@ export class OsQueryReportOverviewComponent {
 	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadAllReports(e.pageIndex, e.pageSize);
+		this.loadReportsPaged(e.pageIndex, e.pageSize);
 		return e;
 	}
 
-	private loadAllReports(page: number, size: number) {
+	private loadReportsPaged(page: number, size: number) {
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id + '/' + page + '/' + size)
 			.subscribe(
@@ -153,7 +153,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.delete(environment.apiEndpoint + 'reports/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports(this.currentPage, this.pageSize);
+				this.loadReportsPaged(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
@@ -213,7 +213,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.post(this.selection.selected, environment.apiEndpoint + 'reports/delete/selected').subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports(this.currentPage, this.pageSize);
+				this.loadReportsPaged(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
