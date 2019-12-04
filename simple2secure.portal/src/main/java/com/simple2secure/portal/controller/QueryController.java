@@ -41,9 +41,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.QueryDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.OSInfo;
+import com.simple2secure.api.model.QueryCategory;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -52,6 +54,7 @@ import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
+import com.simple2secure.portal.repository.QueryCategoryRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
@@ -93,6 +96,9 @@ public class QueryController {
 	StepRepository stepRepository;
 
 	@Autowired
+	QueryCategoryRepository queryCategoryRepository;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
@@ -104,6 +110,29 @@ public class QueryController {
 	RestTemplate restTemplate = new RestTemplate();
 
 	static final Logger log = LoggerFactory.getLogger(QueryController.class);
+
+	/**
+	 * This function returns the query config for the specified user
+	 */
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
+	@ValidRequestMapping(value = "/all")
+	public ResponseEntity<List<QueryDTO>> getQueries(@ServerProvidedValue ValidInputLocale locale) {
+
+		List<QueryDTO> queryDtoList = new ArrayList<>();
+		List<QueryCategory> categories = queryCategoryRepository.findAll();
+		if (categories != null) {
+			for (QueryCategory category : categories) {
+				List<QueryRun> queryRunList = queryRepository.findByCategoryId(category.getId());
+
+				queryDtoList.add(new QueryDTO(category, queryRunList));
+			}
+
+			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
 
 	/**
 	 * This function updates or saves new Query config into the database

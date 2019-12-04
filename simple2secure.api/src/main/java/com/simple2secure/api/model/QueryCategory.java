@@ -19,28 +19,49 @@
  *
  *********************************************************************
  */
-package com.simple2secure.portal.repository;
+package com.simple2secure.api.model;
+import com.simple2secure.api.dbo.GenericDBObject;
 
-import java.util.List;
+public class QueryCategory extends GenericDBObject {
 
-import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.portal.dao.MongoRepository;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 4400048729580737036L;
+	private String name;
+	private String description;
+	private int systemsAvailable;
 
-public abstract class QueryRepository extends MongoRepository<QueryRun> {
+	public QueryCategory() {
+	}
 
-	public abstract List<QueryRun> findByGroupId(String groupId, boolean selectAll);
+	public QueryCategory(String name, String description, int systemsAvailable) {
+		this.name = name;
+		this.description = description;
+		this.systemsAvailable = systemsAvailable;
+	}
 
-	public abstract List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll);
+	public String getName() {
+		return name;
+	}
 
-	public abstract QueryRun findByName(String name);
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	public abstract List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osinfo, boolean selectAll);
+	public String getDescription() {
+		return description;
+	}
 
-	public abstract void deleteByGroupId(String groupId);
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-	public abstract List<QueryRun> findByActiveStatus(int active);
+	public int getSystemsAvailable() {
+		return systemsAvailable;
+	}
 
-	public abstract List<QueryRun> findByCategoryId(String categoryId);
-
+	public void setSystemsAvailable(int systemsAvailable) {
+		this.systemsAvailable = systemsAvailable;
+	}
 }

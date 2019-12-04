@@ -19,28 +19,39 @@
  *
  *********************************************************************
  */
-package com.simple2secure.portal.repository;
+package com.simple2secure.api.model;
+import com.simple2secure.api.dbo.GenericDBObject;
 
-import java.util.List;
+public class QueryGroupMapping extends GenericDBObject {
 
-import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.portal.dao.MongoRepository;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 4400048729580737036L;
+	private String groupId;
+	private String queryId;
 
-public abstract class QueryRepository extends MongoRepository<QueryRun> {
+	public QueryGroupMapping() {
+	}
 
-	public abstract List<QueryRun> findByGroupId(String groupId, boolean selectAll);
+	public QueryGroupMapping(String groupId, String queryId) {
+		this.groupId = groupId;
+		this.queryId = queryId;
+	}
 
-	public abstract List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll);
+	public String getGroupId() {
+		return groupId;
+	}
 
-	public abstract QueryRun findByName(String name);
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 
-	public abstract List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osinfo, boolean selectAll);
+	public String getQueryId() {
+		return queryId;
+	}
 
-	public abstract void deleteByGroupId(String groupId);
-
-	public abstract List<QueryRun> findByActiveStatus(int active);
-
-	public abstract List<QueryRun> findByCategoryId(String categoryId);
-
+	public void setQueryId(String queryId) {
+		this.queryId = queryId;
+	}
 }

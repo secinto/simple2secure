@@ -249,7 +249,6 @@ export class UserOverviewComponent {
 
 	}
 
-
 	public editGroup(groupItem: any) {
 		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
 	}

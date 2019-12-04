@@ -23,24 +23,11 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
-import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.QueryGroupMapping;
 import com.simple2secure.portal.dao.MongoRepository;
 
-public abstract class QueryRepository extends MongoRepository<QueryRun> {
+public abstract class QueryGroupMappingRepository extends MongoRepository<QueryGroupMapping> {
 
-	public abstract List<QueryRun> findByGroupId(String groupId, boolean selectAll);
-
-	public abstract List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll);
-
-	public abstract QueryRun findByName(String name);
-
-	public abstract List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osinfo, boolean selectAll);
-
-	public abstract void deleteByGroupId(String groupId);
-
-	public abstract List<QueryRun> findByActiveStatus(int active);
-
-	public abstract List<QueryRun> findByCategoryId(String categoryId);
+	public abstract List<QueryGroupMapping> findByGroupId(String groupId);
 
 }

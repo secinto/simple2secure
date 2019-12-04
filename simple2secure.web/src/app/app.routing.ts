@@ -56,6 +56,9 @@ import { TestSequenceResultComponent } from './report/testSequenceResult.compone
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
 import {DevicesComponent, DevicesOverviewComponent, DevicesListComponent} from './devices';
+import {QueriesComponent} from "./queries";
+import {QueryOverviewComponent} from "./queries/queryOverview.component";
+import {QueryListComponent} from "./queries/queryList.component";
 
 const appRoutes: Routes = [
 	{
@@ -97,6 +100,15 @@ const appRoutes: Routes = [
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
 					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled', breadcrumb: 'Scheduled Sequences'}},
 					{path: 'sut', component: OrbiterSystemsUnderTestListComponent, data : {title: 'orbiter.sut', breadcrumb: 'System Under Test'}},
+				]
+			},
+			{
+				path: 'queries',
+				component: QueriesComponent,
+				data: {title: 'menu.queries', breadcrumb: 'Queries'},
+				children: [
+					{path: '', component: QueryOverviewComponent, data: {title: 'menu.queries', breadcrumb: 'Dashboard'}},
+					{path: 'list', component: QueryListComponent, data: {title: 'menu.queryList', breadcrumb: 'Query List'}},
 				]
 			},
 			{

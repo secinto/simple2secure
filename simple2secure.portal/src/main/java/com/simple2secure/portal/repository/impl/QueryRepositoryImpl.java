@@ -119,4 +119,16 @@ public class QueryRepositoryImpl extends QueryRepository {
 		return possibleValues;
 	}
 
+	@Override
+	public List<QueryRun> findByActiveStatus(int active) {
+		Query query = new Query(Criteria.where("active").is(active));
+		return mongoTemplate.find(query, QueryRun.class, collectionName);
+	}
+
+	@Override
+	public List<QueryRun> findByCategoryId(String categoryId) {
+		Query query = new Query(Criteria.where("categoryId").is(categoryId));
+		return mongoTemplate.find(query, QueryRun.class, collectionName);
+	}
+
 }

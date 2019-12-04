@@ -47,11 +47,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Processor;
+import com.simple2secure.api.model.QueryCategory;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -495,4 +497,12 @@ public class PortalUtils {
 		log.info("New mapping added ({}): {}", rm, complete_url);
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
+
+	public QueryCategory generateQueryCategoryObjectFromJson(JsonNode node) {
+		String name = node.get("name").asText();
+		String description = node.get("description").asText();
+		int systemsAvailable = node.get("systemsAvailable").asInt();
+		return new QueryCategory(name, description, systemsAvailable);
+	}
+
 }

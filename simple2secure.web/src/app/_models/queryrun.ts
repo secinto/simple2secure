@@ -24,7 +24,6 @@ import {Generic} from './generic';
 import {Timeunit} from './index';
 
 export class QueryRun extends Generic {
-	groupId: string;
 	name: string;
 	description: string;
 	always: boolean;
@@ -34,4 +33,6 @@ export class QueryRun extends Generic {
 	active: number;
 	systemsAvailable: number;
 	graphAble: boolean;
+	availabilityCheck: boolean;
+	fixedSize: boolean;
 }

@@ -169,6 +169,8 @@
   "menu.dashboard": "Dashboard",
   "menu.probes": "Probe",
   "menu.deviceList": "Device List",
+  "menu.queries": "Queries",
+  "menu.queryList": "Query List",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",

@@ -19,28 +19,19 @@
  *
  *********************************************************************
  */
-package com.simple2secure.portal.repository;
 
-import java.util.List;
+import {Component} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.portal.dao.MongoRepository;
+@Component({
+	moduleId: module.id,
+	templateUrl: 'queryList.component.html'
+})
 
-public abstract class QueryRepository extends MongoRepository<QueryRun> {
+export class QueryListComponent {
 
-	public abstract List<QueryRun> findByGroupId(String groupId, boolean selectAll);
-
-	public abstract List<QueryRun> findByGroupIdGraphable(String groupId, boolean selectAll);
-
-	public abstract QueryRun findByName(String name);
-
-	public abstract List<QueryRun> findByGroupIdAndOSInfo(String groupId, OSInfo osinfo, boolean selectAll);
-
-	public abstract void deleteByGroupId(String groupId);
-
-	public abstract List<QueryRun> findByActiveStatus(int active);
-
-	public abstract List<QueryRun> findByCategoryId(String categoryId);
-
+	constructor(
+		private route: ActivatedRoute,
+		private router: Router)
+	{}
 }

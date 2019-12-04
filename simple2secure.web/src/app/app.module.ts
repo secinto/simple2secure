@@ -182,6 +182,9 @@ import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
 import {UserGroupEditComponent} from "./user/userGroupEdit.component";
+import {QueriesComponent} from "./queries";
+import {QueryOverviewComponent} from "./queries/queryOverview.component";
+import {QueryListComponent} from "./queries/queryList.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -342,6 +345,9 @@ export const httpInterceptorProviders = [
 		DevicesOverviewComponent,
 		DevicesListComponent,
 		UserGroupEditComponent,
+		QueriesComponent,
+		QueryOverviewComponent,
+		QueryListComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,

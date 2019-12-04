@@ -93,10 +93,6 @@ export class OsqueryConfigurationEditComponent {
 
 	saveQueryRun() {
 
-		if (this.action == UrlParameter.NEW) {
-			this.queryRun.groupId = this.groupId;
-		}
-
 		this.systemsValue();
 
 		this.httpService.post(this.queryRun, environment.apiEndpoint + 'query').subscribe(

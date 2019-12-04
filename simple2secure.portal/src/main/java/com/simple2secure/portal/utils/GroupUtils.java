@@ -37,7 +37,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.QueryGroupMapping;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -49,6 +49,7 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
+import com.simple2secure.portal.repository.QueryGroupMappingRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.repository.StepRepository;
@@ -85,6 +86,9 @@ public class GroupUtils {
 
 	@Autowired
 	GroupAccesRightRepository groupAccessRightRepository;
+
+	@Autowired
+	QueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -486,13 +490,14 @@ public class GroupUtils {
 	 * @param destGroupId
 	 */
 	public void copyGroupConfiguration(String sourceGroupId, String destGroupId) {
-		List<QueryRun> queries = queryRepository.findByGroupId(sourceGroupId, true);
 
-		if (queries != null) {
-			for (QueryRun query : queries) {
-				query.setGroupId(destGroupId);
-				query.setId(null);
-				queryRepository.save(query);
+		List<QueryGroupMapping> queryMappings = queryGroupMappingRepository.findByGroupId(sourceGroupId);
+
+		if (queryMappings != null) {
+			for (QueryGroupMapping mapping : queryMappings) {
+				mapping.setGroupId(destGroupId);
+				mapping.setId(null);
+				queryGroupMappingRepository.save(mapping);
 			}
 		}
 	}
