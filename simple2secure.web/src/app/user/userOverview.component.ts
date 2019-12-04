@@ -36,6 +36,7 @@ import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 import {UserInfo} from '../_models/userInfo';
+import {UserGroupEditComponent} from "./userGroupEdit.component";
 
 @Component({
 	moduleId: module.id,
@@ -250,7 +251,6 @@ export class UserOverviewComponent {
 
 
 	public editGroup(groupItem: any) {
-		this.dataService.set(groupItem);
 		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
 	}
 
@@ -480,6 +480,17 @@ export class UserOverviewComponent {
 				}
 			}
 		});
+	}
+
+	public onGroupNameEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			group: this.selectedItem,
+		};
+
+		const dialogRef = this.dialog.open(UserGroupEditComponent, dialogConfig);
+
 	}
 
 	openDialogAddUser(): void {

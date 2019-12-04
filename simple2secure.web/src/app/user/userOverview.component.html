@@ -286,6 +286,10 @@
                             <mat-icon>delete</mat-icon>
                             {{ 'button.delete' | translate }}
                         </button>
+                        <button mat-menu-item (click)="onGroupNameEditClick()">
+                            <mat-icon>edit</mat-icon>
+                            {{ 'button.edit' | translate }}
+                        </button>
                     </div>
                     <div *ngIf="!showEditAndDelete">
                         <button mat-menu-item (click)="onDownloadClick()">

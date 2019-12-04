@@ -181,6 +181,7 @@ import {WidgetStoreComponent} from './widgets/widgetStore.component';
 import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
+import {UserGroupEditComponent} from "./user/userGroupEdit.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -340,6 +341,7 @@ export const httpInterceptorProviders = [
 		DevicesComponent,
 		DevicesOverviewComponent,
 		DevicesListComponent,
+		UserGroupEditComponent,
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -367,7 +369,8 @@ export const httpInterceptorProviders = [
 		WidgetStoreComponent,
 		StatItemComponent,
 		StatComponent,
-		SUTDetailsComponent
+		SUTDetailsComponent,
+		UserGroupEditComponent
 	],
 	providers: [
 		AuthGuard,

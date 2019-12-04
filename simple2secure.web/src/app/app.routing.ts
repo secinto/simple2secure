@@ -86,12 +86,12 @@ const appRoutes: Routes = [
 				]
 			},
 			{
-				path: 'orbiter',
+				path: 'tests',
 				component: OrbiterComponent,
-				data: {title: 'menu.orbiter', breadcrumb: 'Orbiter'},
+				data: {title: 'menu.tests', breadcrumb: 'Tests'},
 				children: [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter', breadcrumb: 'Dashboard'}},
-					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Tests'}},
+					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Test Templates'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled', breadcrumb: 'Scheduled Tests'}},
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
