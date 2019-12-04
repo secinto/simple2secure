@@ -125,10 +125,12 @@ public class ProbeCLI {
 	}
 
 	private void checkStatus() {
-
+		log.debug("Checking PROBE status");
 		if (workerThread != null && workerThread.isRunning()) {
+			log.debug("PROBE_STATUS: OK");
 			System.out.println("PROBE_STATUS: OK");
 		} else {
+			log.debug("PROBE_STATUS: NOK");
 			System.out.println("PROBE_STATUS: NOK");
 		}
 

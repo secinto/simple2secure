@@ -247,7 +247,9 @@
   "table.sut.endDeviceLocation" : "End Device Location",
   "table.type": "Type",
   "table.probe": "Probe",
-
+  "table.systemsAvailable": "Supported OS",
+  "table.graphAble": "Depictable",
+  
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",
   "message.email": "Email Account added successfully!",

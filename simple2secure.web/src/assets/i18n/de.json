@@ -246,6 +246,8 @@
   "table.sut.endDeviceLocation" : "Endgerät Ort",
   "table.type": "Typ",
   "table.probe": "Probe",
+  "table.systemsAvailable": "Unterstützte OS",
+  "table.graphAble": "Darstellbar",
 
   "message.configuration": "Konfiguration erfolgreich geladen!",
   "message.configuration.save": "Konfiguration erfolgreich aktualisiert!",

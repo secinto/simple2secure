@@ -77,7 +77,7 @@ export class OsqueryConfigurationDetailsComponent {
 		this.groupEditable = this.dataService.isGroupEditable();
 
 		if (!this.groupEditable) {
-			this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
+			this.displayedColumns = ['name', 'query', 'graphAble', 'systemsAvailable', 'runAlways', 'interval', 'active'];
 		}
 
 		this.loadQueries();
