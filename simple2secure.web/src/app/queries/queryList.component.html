@@ -3,6 +3,11 @@
         <mat-tab *ngFor="let query of queries" [label]="query.category.name">
             <p class="mat-tab-description"><b>{{query.category.description}}</b></p>
 
+            <button mat-raised-button color="primary" id="addButton" type="button" (click)="onAddClick(query.category)"
+                    class="pull-right mat-green-button">
+                <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+            </button>
+
             <div *ngIf="query.queries" class="example-container mat-elevation-z8 table table-striped">
                 <div class="header-filter-table">
                     <mat-form-field class="header-filter-field">

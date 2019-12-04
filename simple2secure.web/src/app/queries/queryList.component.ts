@@ -33,6 +33,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
+import {QueryCategory} from "../_models/queryCategory";
 
 @Component({
 	moduleId: module.id,
@@ -98,6 +99,10 @@ export class QueryListComponent {
 					}
 				});
 		this.loading = false;
+	}
+
+	onAddClick(category: QueryCategory){
+		console.log(category);
 	}
 
 	onEditClick(element: QueryRun) {
