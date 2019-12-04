@@ -162,11 +162,10 @@ def create_license(app):
     """
     license_file = get_license_file(app)
     podInfo = get_pod(app)
-    devInfo = {'hostname': socket.gethostname(), 'ipAddress' : '', 'netMask' : ''}
+    #devInfo = {'hostname': socket.gethostname(), 'ipAddress' : '', 'netMask' : ''}
 
     if license_file is None:
-        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", podInfo.generated_id, datetime.datetime.now().date(),
-                                                 devInfo)
+        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", podInfo.generated_id, datetime.datetime.now().date())
         return dummy_license_obj
     else:
         lines = license_file.split("\n")
@@ -186,5 +185,5 @@ def create_license(app):
                     licenseId = row[1].rstrip()
 
         if groupId and licenseId:
-            license_obj = CompanyLicensePublic(groupId, licenseId, podInfo.generated_id, expiration_date, devInfo)
+            license_obj = CompanyLicensePublic(groupId, licenseId, podInfo.generated_id, expiration_date)
             return license_obj

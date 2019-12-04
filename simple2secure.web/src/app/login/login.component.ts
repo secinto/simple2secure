@@ -22,7 +22,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {AlertService, AuthenticationService, HttpService} from '../_services/index';
+import {AlertService, AuthenticationService, DataService, HttpService} from '../_services/index';
 import {TranslateService} from '@ngx-translate/core';
 import {JwtHelper} from 'angular2-jwt';
 import {environment} from '../../environments/environment';
@@ -42,8 +42,6 @@ export class LoginComponent implements OnInit {
 	loading = false;
 	returnUrl: string;
 	hide: boolean;
-	currentUser: any;
-	jwtHelper: JwtHelper = new JwtHelper();
 
 	constructor(
 		private route: ActivatedRoute,
@@ -52,7 +50,8 @@ export class LoginComponent implements OnInit {
 		private authenticationService: AuthenticationService,
 		private httpService: HttpService,
 		private dialog: MatDialog,
-		private alertService: AlertService)
+		private alertService: AlertService,
+		private dataService: DataService)
 	{}
 
 	ngOnInit() {
@@ -67,18 +66,12 @@ export class LoginComponent implements OnInit {
 
 	login() {
 		this.loading = true;
-		this.httpService.postLogin(this.model.username, this.model.password)
+		this.httpService.postLogin(this.model.username, this.model.password).shareReplay()
 			.subscribe(
 				response => {
-					const decodedToken = this.jwtHelper.decodeToken(response.headers.get('Authorization'));
-					const userId = decodedToken.userID;
-					localStorage.setItem('token', response.headers.get('Authorization'));
-					localStorage.setItem('currentUser', JSON.stringify({
-						firstName: this.model.username,
-						token: response.headers.get('Authorization'), userID: userId
-					}));
+					this.dataService.setAuthToken(response.headers.get('Authorization'));
 					// after successful login choose the context
-					this.getContexts(userId);
+					this.getContexts();
 				},
 				error => {
 					if (error.status == 0) {
@@ -93,9 +86,9 @@ export class LoginComponent implements OnInit {
 				});
 	}
 
-	private getContexts(userId: string) {
+	private getContexts() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'context/' + userId)
+		this.httpService.get(environment.apiEndpoint + 'context')
 			.subscribe(
 				data => {
 					this.openSelectContextModal(data);
@@ -141,10 +134,8 @@ export class LoginComponent implements OnInit {
 		}
 		// If size of the contexts is equal to 1, set currentContext automatically
 		else if (contexts.length == 1) {
-			localStorage.setItem('context', JSON.stringify(contexts[0]));
-			this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-			this.httpService.updateContext(contexts[0].context, this.currentUser.userID);
+			this.dataService.setRole(contexts[0].userRole);
+			this.httpService.updateContext(contexts[0].context);
 		}
 
 		// In this case some error occured and user needs to be redirect again to login page, call logout function

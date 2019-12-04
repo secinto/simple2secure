@@ -33,7 +33,6 @@ public class Step extends GenericDBObject {
 	 *
 	 */
 	private static final long serialVersionUID = -213373299338629068L;
-	private String groupId;
 	private int number;
 	private String name;
 	private int active;
@@ -52,14 +51,6 @@ public class Step extends GenericDBObject {
 		this.number = number;
 		this.name = name;
 		this.active = active;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 
 	/**

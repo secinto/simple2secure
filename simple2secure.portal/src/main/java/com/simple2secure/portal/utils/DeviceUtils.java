@@ -37,8 +37,10 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
@@ -84,6 +86,9 @@ public class DeviceUtils {
 
 	@Autowired
 	TestSequenceRepository testSequenceRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -111,15 +116,16 @@ public class DeviceUtils {
 				for (CompanyLicensePrivate license : licenses) {
 					if (license.isActivated()) {
 						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							DeviceStatus status = license.getStatus();
+							DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+							DeviceStatus status = devInfo.getDeviceStatus();
 
-							DeviceStatus deviceStatus = getDeviceStatus(license);
+							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 							if (status != deviceStatus) {
-								license.setStatus(deviceStatus);
+								devInfo.setDeviceStatus(deviceStatus);
 								licenseRepository.save(license);
 							}
 
-							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getDeviceInfo().getHostname(), deviceStatus,
+							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus,
 									license.isDevicePod());
 							myDevices.add(probe);
 						}
@@ -155,15 +161,16 @@ public class DeviceUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						DeviceStatus status = license.getStatus();
+						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+						DeviceStatus status = devInfo.getDeviceStatus();
 
-						DeviceStatus deviceStatus = getDeviceStatus(license);
+						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 						if (status != deviceStatus) {
-							license.setStatus(deviceStatus);
+							devInfo.setDeviceStatus(deviceStatus);
 							licenseRepository.save(license);
 						}
 						CompanyGroup group = groupRepository.find(license.getGroupId());
-						Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getDeviceInfo().getHostname(), deviceStatus, true);
+						Device device = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus, true);
 						myDevices.add(device);
 					}
 				}
@@ -193,15 +200,15 @@ public class DeviceUtils {
 	/**
 	 * This method checks the current status (online, offline, unknown) of the pod according to the lastOnlineTimestamp
 	 *
-	 * @param deviceLicense
+	 * @param deviceInfo
 	 * @return
 	 */
-	private DeviceStatus getDeviceStatus(CompanyLicensePrivate deviceLicense) {
+	private DeviceStatus getDeviceStatus(DeviceInfo devInfo) {
 		// make it multilingual
-		if (deviceLicense.getLastOnlineTimestamp() == 0) {
+		if (devInfo.getLastOnlineTimestamp() == 0) {
 			return DeviceStatus.UNKNOWN;
 		} else {
-			long timeDiff = System.currentTimeMillis() - deviceLicense.getLastOnlineTimestamp();
+			long timeDiff = System.currentTimeMillis() - devInfo.getLastOnlineTimestamp();
 			if (timeDiff > 60000) {
 				return DeviceStatus.OFFLINE;
 			} else {

@@ -21,7 +21,7 @@
  */
 
 import {Component, Inject} from '@angular/core';
-import {Context, ContextDTO} from '../_models/index';
+import {Context} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -42,10 +42,8 @@ export class UserContextAddDialogComponent {
 	id: string;
 	private sub: any;
 	url: string;
-	currentUser: any;
 	isDialogOpen: boolean;
 	context = new Context();
-	contextDTO: ContextDTO;
 	isNewContext: boolean;
 
 	constructor(
@@ -73,15 +71,12 @@ export class UserContextAddDialogComponent {
 		this.sub = this.route.params.subscribe(params => {
 			this.id = params['id'];
 		});
-
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.contextDTO = JSON.parse(localStorage.getItem('context'));
 	}
 
 	saveContext() {
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'context/add/' + this.currentUser.userID + '/' + this.contextDTO.context.id;
+		this.url = environment.apiEndpoint + 'context/add';
 		this.httpService.post(this.context, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);

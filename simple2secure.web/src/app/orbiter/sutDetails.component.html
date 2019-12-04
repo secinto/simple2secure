@@ -20,8 +20,12 @@
 		
         <div class="form-group">
             <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.sut.endDevicetype' | translate }}"
-                        [(ngModel)]="sut.endDeviceType" name="endDeviceType">
+              <mat-label>Device Type</mat-label>
+			  <mat-select [(ngModel)]="selectedType" name="type">
+				<mat-option *ngFor="let type of deviceTypeSelect" [value]="type">
+				  {{type}}
+				</mat-option>
+			  </mat-select>
             </mat-form-field>
         </div>
 

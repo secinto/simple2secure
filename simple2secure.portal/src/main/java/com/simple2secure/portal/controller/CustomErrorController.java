@@ -34,15 +34,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import com.simple2secure.commons.config.StaticConfigItems;
+
+import simple2secure.validator.annotation.ValidRequestMapping;
+
 @RestController
+@RequestMapping(StaticConfigItems.ERROR_API)
 public class CustomErrorController implements ErrorController {
-	private static final String PATH = "/error";
 
 	@Autowired
 	private ErrorAttributes errorAttributes;
 
-	@RequestMapping(
-			value = PATH)
+	@ValidRequestMapping
 	public Map<String, Object> error(HttpServletRequest request, WebRequest webrequest, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<>();
 		Map<String, Object> errAttributes = getErrorAttributes(webrequest, false);
@@ -62,6 +65,6 @@ public class CustomErrorController implements ErrorController {
 
 	@Override
 	public String getErrorPath() {
-		return PATH;
+		return StaticConfigItems.ERROR_API;
 	}
 }

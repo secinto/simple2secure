@@ -22,7 +22,6 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ContextDTO} from '../_models';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, PageEvent} from '@angular/material';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, HttpService, DataService} from '../_services';
@@ -30,9 +29,11 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['toolTestList.css'],
 	templateUrl: 'orbiterToolTestList.component.html'
 })
 
@@ -42,8 +43,6 @@ export class OrbiterToolTestListComponent {
 	podId: string;
 	isTestChanged: boolean;
 	tests: TestObjWeb[];
-	context: ContextDTO;
-	currentUser: any;
 	displayedColumns = ['testId', 'version', 'status', 'action'];
 	loading = false;
 	url: string;
@@ -67,9 +66,7 @@ export class OrbiterToolTestListComponent {
 	) {}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isTestChanged = false;
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.id = this.route.snapshot.paramMap.get('id');
 		this.loadTests(this.id, 0, 10);
 	}
@@ -98,7 +95,9 @@ export class OrbiterToolTestListComponent {
 
 	public loadTests(podId: string, page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + true)
+		const params = new HttpParams()
+			.set('usePagination', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size, params)
 			.subscribe(
 				data => {
 					this.tests = data.tests;
@@ -151,8 +150,7 @@ export class OrbiterToolTestListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' +
-			this.context.context.id + '/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'test/scheduleTest';
 		this.httpService.post(this.selectedTest, this.url).subscribe(
 			data => {
 

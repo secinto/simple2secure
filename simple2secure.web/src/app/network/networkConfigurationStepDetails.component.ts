@@ -28,7 +28,7 @@ import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} f
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {Step} from '../_models/index';
-import {HttpErrorResponse} from '@angular/common/http';
+import {HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {NetworkStepConfigurationEditComponent} from './networkStepConfigurationEdit.component';
 
 @Component({
@@ -39,7 +39,6 @@ import {NetworkStepConfigurationEditComponent} from './networkStepConfigurationE
 
 export class NetworkConfigurationStepDetailsComponent {
 
-	currentUser: any;
 	private sub: any;
 	steps: Step[];
 	selectedItem: Step;
@@ -66,7 +65,6 @@ export class NetworkConfigurationStepDetailsComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 		this.sub = this.route.params.subscribe(params => {
 			this.groupId = params['id'];
@@ -94,7 +92,9 @@ export class NetworkConfigurationStepDetailsComponent {
 
 	loadSteps() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'steps/group/' + this.groupId + '/true')
+		const params = new HttpParams()
+			.set('select_all', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'steps', params)
 			.subscribe(
 				data => {
 					this.steps = data;

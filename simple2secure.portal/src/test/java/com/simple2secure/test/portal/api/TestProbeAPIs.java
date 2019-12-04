@@ -62,7 +62,6 @@ public class TestProbeAPIs extends TestAPIBase {
 		// Create license object which should be deleted
 		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020", true);
 		license.setDeviceId("789");
-		license.setStatus(DeviceStatus.ONLINE);
 		licenseRepository.save(license);
 
 		// API call to delete the created license

@@ -249,7 +249,7 @@ public class TokenAuthenticationService {
 
 	}
 
-	private String resolveToken(HttpServletRequest req) {
+	public String resolveToken(HttpServletRequest req) {
 		String bearerToken = req.getHeader(HEADER_STRING);
 		if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
 			return bearerToken.replace(TOKEN_PREFIX, "").trim();

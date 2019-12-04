@@ -50,6 +50,7 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class LicenseController {
 
@@ -254,11 +255,7 @@ public class LicenseController {
 			ProbeConfiguration.probeId = UUID.randomUUID().toString();
 			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, ProbeConfiguration.probeId);
 		}
-		storedLicense.setStatus(DeviceStatus.ONLINE);
 		
-		DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.ipAddress, ProbeConfiguration.netmask);
-		
-		storedLicense.setDeviceInfo(deviceInfo);
 		/*
 		 * Update the license in the local DB.
 		 */

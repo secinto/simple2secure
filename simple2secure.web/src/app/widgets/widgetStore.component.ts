@@ -27,7 +27,6 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
 import {Widget} from '../_models/widget';
-import {StatComponent} from './stat.component';
 import {MatDialogRef} from '@angular/material';
 import {StatItemComponent} from './stat-item.component';
 
@@ -39,9 +38,7 @@ import {StatItemComponent} from './stat-item.component';
 })
 
 export class WidgetStoreComponent {
-	currentWidgets = [];
 	loading = false;
-	currentUser: any;
 	widgets: Widget[];
 
 	@ViewChild('container', {read: ViewContainerRef}) container: ViewContainerRef;
@@ -63,7 +60,6 @@ export class WidgetStoreComponent {
 	}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.dataService.clearWidgets();
 		this.loadWidgets();
 	}

@@ -41,7 +41,6 @@ import {WidgetColor} from '../_models/widgetColor';
 export class SettingsComponent {
 
 	loading = false;
-	currentUser: any;
 	settingsObj: SettingsDTO;
 	timeUnits = Timeunit;
 	updated = false;

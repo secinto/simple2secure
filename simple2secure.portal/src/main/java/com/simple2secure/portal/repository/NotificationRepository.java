@@ -38,4 +38,6 @@ public abstract class NotificationRepository extends MongoRepository<Notificatio
 
 	public abstract List<Notification> findAllSortDescending(String contextId);
 
+	public abstract List<Notification> getNotificationByReadValue(String contextId, boolean isRead);
+
 }

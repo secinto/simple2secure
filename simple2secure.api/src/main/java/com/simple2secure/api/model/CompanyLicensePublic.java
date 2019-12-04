@@ -21,14 +21,15 @@
  */
 package com.simple2secure.api.model;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(
 		name = "CompanyLicenseObj")
@@ -55,41 +56,30 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	@JsonProperty
 	protected boolean deviceIsPod = false;
-
-	@Embedded
-	protected DeviceInfo deviceInfo;
-
-	protected DeviceStatus status = DeviceStatus.UNKNOWN;
-
-	protected long lastOnlineTimestamp;
+	
 
 	public CompanyLicensePublic() {
 	}
 
 	public CompanyLicensePublic(String groupId, String licenseId) {
-		this.groupId = groupId;
-		this.licenseId = licenseId;
+		setGroupId(groupId);
+		setLicenseId(licenseId);
 	}
 
 	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate) {
 		this(groupId, licenseId);
-		this.expirationDate = expirationDate;
+		setExpirationDate(expirationDate);
 	}
 
 	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId) {
 		this(groupId, licenseId, expirationDate);
-		this.deviceId = deviceId;
+		setDeviceId(deviceId);
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, DeviceInfo deviceInfo) {
-		this(groupId, licenseId, expirationDate, deviceId);
-		this.deviceInfo = deviceInfo;
-	}
-
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, DeviceInfo deviceInfo,
+	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId,
 			String accessToken) {
-		this(groupId, licenseId, expirationDate, deviceId, deviceInfo);
-		this.accessToken = accessToken;
+		this(groupId, licenseId, expirationDate, deviceId);
+		setAccessToken(accessToken);
 	}
 
 	public String getGroupId() {
@@ -112,7 +102,7 @@ public class CompanyLicensePublic extends GenericDBObject {
 		return deviceIsPod;
 	}
 
-	public void setDevicePod(boolean deviceIsPod) {
+	public void setDeviceIsPod(boolean deviceIsPod) {
 		this.deviceIsPod = deviceIsPod;
 	}
 
@@ -146,29 +136,5 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setExpirationDate(String expirationDate) {
 		this.expirationDate = expirationDate;
-	}
-	
-	public DeviceInfo getDeviceInfo() {
-		return deviceInfo;
-	}
-
-	public void setDeviceInfo(DeviceInfo deviceInfo) {
-		this.deviceInfo = deviceInfo;
-	}
-
-	public DeviceStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(DeviceStatus status) {
-		this.status = status;
-	}
-
-	public long getLastOnlineTimestamp() {
-		return lastOnlineTimestamp;
-	}
-
-	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
-		this.lastOnlineTimestamp = lastOnlineTimestamp;
 	}
 }

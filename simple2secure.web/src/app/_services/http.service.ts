@@ -21,15 +21,15 @@
  */
 
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Context, User, UserRegistration} from '../_models';
-import {catchError} from 'rxjs/operators';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthenticationService} from './authentication.service';
 import { Location } from '@angular/common';
+import {DataService} from "./data.service";
 
 @Injectable()
 export class HttpService {
@@ -41,7 +41,8 @@ export class HttpService {
 	            private translate: TranslateService,
 	            private router: Router,
 	            private authenticationService: AuthenticationService,
-	            private location: Location)
+	            private location: Location,
+				private dataService: DataService)
 	{
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 	}
@@ -52,6 +53,12 @@ export class HttpService {
 		const headers = this.getHeaders(true);
 
 		return this.httpClient.get<any>(url, {headers});
+	}
+
+	public getWithParams(url: string, params: HttpParams): Observable<any> {
+		const headers = this.getHeaders(true);
+
+		return this.httpClient.get<any>(url, {headers, params});
 	}
 
 	public post(item: any, url: string): Observable<any> {
@@ -109,9 +116,9 @@ export class HttpService {
 			authenticationToken, password, {observe: 'response', headers});
 	}
 
-	public updateContext(context: Context, userId: string) {
+	public updateContext(context: Context) {
 
-		this.post(context, environment.apiEndpoint + 'context/' + userId).subscribe(
+		this.post(context, environment.apiEndpoint + 'context').subscribe(
 			() => {
 				// Navigate to the home route
 				this.router.navigate([this.returnUrl]);
@@ -134,7 +141,8 @@ export class HttpService {
 		}
 
 		if (withAuth) {
-			return new HttpHeaders().set('Authorization', localStorage.getItem('token'))
+			const token = this.dataService.getAuthToken();
+			return new HttpHeaders().set('Authorization', token)
 				.set('Accept-Language', this.currentLang)
 				.set('Access-Control-Allow-Origin', '*')
 				.set('Access-Control-Allow-Credentials', 'true');

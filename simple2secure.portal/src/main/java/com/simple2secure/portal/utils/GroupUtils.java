@@ -37,9 +37,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
-import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.Step;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -150,11 +148,6 @@ public class GroupUtils {
 	 * @param groupId
 	 */
 	public void deleteGroup(String groupId, boolean deleteAll) {
-		// Delete the group steps
-		stepRepository.deleteByGroupId(groupId);
-
-		// Delete the group processors
-		processorRepository.deleteByGroupId(groupId);
 
 		// Remove OSQuery configuration
 		queryRepository.deleteByGroupId(groupId);
@@ -494,30 +487,12 @@ public class GroupUtils {
 	 */
 	public void copyGroupConfiguration(String sourceGroupId, String destGroupId) {
 		List<QueryRun> queries = queryRepository.findByGroupId(sourceGroupId, true);
-		List<Processor> processors = processorRepository.getProcessorsByGroupId(sourceGroupId);
-		List<Step> steps = stepRepository.getStepsByGroupId(sourceGroupId, true);
 
 		if (queries != null) {
 			for (QueryRun query : queries) {
 				query.setGroupId(destGroupId);
 				query.setId(null);
 				queryRepository.save(query);
-			}
-		}
-
-		if (processors != null) {
-			for (Processor processor : processors) {
-				processor.setGroupId(destGroupId);
-				processor.setId(null);
-				processorRepository.save(processor);
-			}
-		}
-
-		if (steps != null) {
-			for (Step step : steps) {
-				step.setGroupId(destGroupId);
-				step.setId(null);
-				stepRepository.save(step);
 			}
 		}
 	}

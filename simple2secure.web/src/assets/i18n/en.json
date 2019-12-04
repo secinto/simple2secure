@@ -166,6 +166,9 @@
   "menu.english": "English",
   "menu.language": "Language",
   "menu.widgets": "Widgets",
+  "menu.dashboard": "Dashboard",
+  "menu.probes": "Probe",
+  "menu.deviceList": "Device List",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",
@@ -173,7 +176,6 @@
   "account.download": "Download probe with the click on the button below",
 
   "table.stepName": "Select step name",
-  "table.probe": "Probe",  
   "table.user": "User",
   "table.version": "Version",
   "table.action": "Action",
@@ -211,7 +213,7 @@
   "table.activated": "Activated",  
   "table.active": "Active",  
   "table.myprofile": "My Profile",  
-  "table.myprobes": "My Probes",
+  "table.myprobes": "Probes",
   "table.mypods": "My Pods",
   "table.myusers": "My Users",   
   "table.unit": "Select time unit", 
@@ -243,12 +245,8 @@
   "table.sut.endDeviceName" : "End Device Name",
   "table.sut.endDevicetype" : "End Device Type",
   "table.sut.endDeviceLocation" : "End Device Location",
-  "table.graphAble" : "Depictable",
-  "table.systemsAvailable": "Available for OS",
-
-  "system.windows": "Windows",
-  "system.linux" : "Linux",
-  "system.macos": "MacOS",
+  "table.type": "Type",
+  "table.probe": "Probe",
 
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",

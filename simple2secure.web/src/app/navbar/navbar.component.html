@@ -12,26 +12,23 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
 
-            <li class="nav-item dropdown dropdown-language" ngbDropdown>
-                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
-                    <i class="fa fa-language"></i> {{ 'menu.language' | translate }} <b class="caret"></b>
-                </a>
-                <div class="dropdown-menu-right" ngbDropdownMenu>
-                    <ul>
-                    <a class="dropdown-item" href="javascript:void(0)" (click)="setLocale('en')">
-                        {{ 'menu.english' | translate }}
-                    </a></ul>
-                    <ul><a class="dropdown-item" href="javascript:void(0)" (click)="setLocale('de')">
-                        {{ 'menu.german' | translate }}
-                    </a></ul>
-                </div>
+            <li>
+                <mat-form-field id="nav-right-custom-language-switcher">
+                    <mat-select id="nav-right-custom-language-switcher-select" [ngModel]="currentLang" (selectionChange)="setLocale($event.value)">
+
+                        <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages"
+                                    [value]="language.value">
+                            {{language.value}}
+                        </mat-option>
+
+                    </mat-select>
+                </mat-form-field>
             </li>
             <li *ngIf="loggedIn" class="nav-item dropdown dropdown-user" ngbDropdown>
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
                     <i class="fa fa-user fa-lg"></i> <b class="caret"></b>
                 </a>
                 <div class="dropdown-menu-right" ngbDropdownMenu>
-                    <p><b>{{currentUser.firstName}}</b></p>
                     <ul>
                         <i class="fa fa-user fa-xs "
                            aria-hidden="true"></i> <a class="dropdown-item" href="javascript:void(0)" routerLink="/user">

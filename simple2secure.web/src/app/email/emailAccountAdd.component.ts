@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {ContextDTO, EmailConfiguration, User} from '../_models/index';
+import {EmailConfiguration} from '../_models/index';
 import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
@@ -39,7 +39,6 @@ export class EmailAccountAddComponent {
 
 	public config: EmailConfiguration;
 	loading = false;
-	context: ContextDTO;
 	isConfigAdded = false;
 
 	constructor(
@@ -54,7 +53,6 @@ export class EmailAccountAddComponent {
 		@Inject(MAT_DIALOG_DATA) data)
 	{
 
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.config = data.config;
 
 		if (this.config.id) {
@@ -62,7 +60,6 @@ export class EmailAccountAddComponent {
 		}
 		else {
 			this.isConfigAdded = true;
-			this.config.contextId = this.context.context.id;
 		}
 	}
 

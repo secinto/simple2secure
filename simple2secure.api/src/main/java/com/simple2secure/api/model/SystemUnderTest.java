@@ -36,17 +36,19 @@ public class SystemUnderTest extends GenericDBObject {
     private String groupId;
     private String endDeviceId;
     @Embedded
-    private DeviceType endDeviceType;
+    private String endDeviceType;
     private String endDeviceLocation;
     private String name;
 	private String ipAdress;
     private String netMask;
+    private DeviceStatus deviceStatus;
+    private long lastOnlineTimestamp;
     
 
     public SystemUnderTest(){
     }
 
-    public SystemUnderTest(String groupId, String endDeviceId, DeviceType endDeviceType, String endDeviceLocation, 
+    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
     		String name,  String ipAdress, String netMask){
         setGroupId(groupId);
         setEndDeviceId(endDeviceId);
@@ -55,6 +57,13 @@ public class SystemUnderTest extends GenericDBObject {
         setName(name);
         setIpAdress(ipAdress);
         setNetMask(netMask);
+    }
+    
+    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
+    		String name,  String ipAdress, String netMask, DeviceStatus deviceStatus, long lastOnlineTimestamp){
+    	this(groupId, endDeviceId, endDeviceType, endDeviceLocation, name, ipAdress, netMask);
+        setDeviceStatus(deviceStatus);
+        setLastOnlineTimestamp(lastOnlineTimestamp);
     }
 
     public String getGroupId() {
@@ -73,11 +82,11 @@ public class SystemUnderTest extends GenericDBObject {
 		this.endDeviceId = endDeviceId;
 	}
 
-    public DeviceType getEndDeviceType() {
+    public String getEndDeviceType() {
         return endDeviceType;
     }
 
-    public void setEndDeviceType(DeviceType endDeviceType) {
+    public void setEndDeviceType(String endDeviceType) {
         this.endDeviceType = endDeviceType;
     }
 
@@ -111,5 +120,21 @@ public class SystemUnderTest extends GenericDBObject {
 
 	public void setNetMask(String netMask) {
 		this.netMask = netMask;
+	}
+
+	public DeviceStatus getDeviceStatus() {
+		return deviceStatus;
+	}
+
+	public void setDeviceStatus(DeviceStatus deviceStatus) {
+		this.deviceStatus = deviceStatus;
+	}
+
+	public long getLastOnlineTimestamp() {
+		return lastOnlineTimestamp;
+	}
+
+	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
+		this.lastOnlineTimestamp = lastOnlineTimestamp;
 	}
 }

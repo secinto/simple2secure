@@ -23,6 +23,7 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.MongoRepository;
@@ -30,8 +31,10 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
 
     public abstract List<SystemUnderTest> getByGroupId(String groupId, int page, int size);
+    public abstract List<SystemUnderTest> getByGroupIdAndType(String groupId, String deviceType);
     public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
     public abstract SystemUnderTest getByName(String name);
-    public abstract long getCountOfSUTWithGroupId(String groupId);
+    public abstract long getCountOfSUTWithGroupIdAndType(String groupId, String deviceType);
+    public abstract Map<String, Object> getByGroupIdsAndType(List<String> groupIds, int page, int size, String deviceType);
     
 }

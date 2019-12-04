@@ -31,7 +31,7 @@ public abstract class TestSequenceResultRepository extends MongoRepository<TestS
 
 	public abstract List<TestSequenceResult> getBySequenceId(String sequenceId);
 
-	public abstract List<TestSequenceResult> getByPodId(String podId);
+	public abstract List<TestSequenceResult> getByDeviceId(String deviceId);
 
 	public abstract TestSequenceResult getBySequenceRunId(String sequenceRunId);
 

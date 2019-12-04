@@ -1,10 +1,14 @@
 <mat-sidenav-container fullscreen>
     <mat-sidenav mode="side" opened>
         <a routerLink="/home"><img class="navbar-brand" src="assets/logo.png" alt="Logo"></a>
-        <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Context: {{currentContext.context.name}}</p>
+        <p *ngIf="loggedIn" id="current-context-id" (click)="changeContext()">Change context</p>
         <mat-divider></mat-divider>
         <p class="main-navigation-header">{{"menu.navigation" | translate}}</p>
         <mat-nav-list>
+            <ul class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="">
+                    <img class="img-sidenav" src="assets/icons/system.png"> {{ 'menu.dashboard' | translate }}</a></li>
+            </ul>
             <ul class="nav-parent-list">
                 <li (click)="collapseMenu('menu-reports')"><a *ngIf="loggedIn" mat-list-item routerLink="/report"><img class="img-sidenav" src="assets/icons/communication.png"> {{ 'menu.reports' | translate }}<b class="caret"></b></a>
                     <ul class="nav-child-list" *ngIf="showReportsSubmenu">
@@ -32,6 +36,13 @@
                     <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledTests">{{ 'menu.scheduledTests' | translate }}</a></li>
                     <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledSequences">{{ 'menu.scheduledSequences' | translate }}</a></li>
                     <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/sut">{{ 'orbiter.sut' | translate }}</a></li>
+                </ul>
+            </ul>
+            <ul (click)="collapseMenu('menu-devices')" class="nav-parent-list">
+                <li><a *ngIf="loggedIn" mat-list-item routerLink="/devices">
+                    <img class="img-sidenav" src="assets/icons/system.png"> {{ 'menu.mydevices' | translate }}<b class="caret"></b></a></li>
+                <ul class="nav-child-list" *ngIf="showDevicesSubmenu">
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/devices/list">{{ 'menu.deviceList' | translate }}</a></li>
                 </ul>
             </ul>
             <ul class="nav-parent-list">

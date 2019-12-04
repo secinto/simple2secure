@@ -124,8 +124,6 @@ public class DataInitialization {
 					} catch (IOException e) {
 						log.error(e.getMessage());
 					}
-					addDefaultGroupProcessors(groupId.toString());
-					addDefaultGroupSteps(groupId.toString());
 				}
 			}
 		}
@@ -164,8 +162,8 @@ public class DataInitialization {
 	 * @param user_id
 	 * @throws IOException
 	 */
-	public void addDefaultGroupProcessors(String groupId) throws IOException {
-		List<Processor> processorsDB = processorRepository.getProcessorsByGroupId(groupId);
+	public void addDefaultProcessors() throws IOException {
+		List<Processor> processorsDB = processorRepository.findAll();
 
 		if (processorsDB == null || processorsDB.isEmpty()) {
 
@@ -176,7 +174,6 @@ public class DataInitialization {
 			if (processorsArray != null) {
 				List<Processor> processors = Arrays.asList(processorsArray);
 				for (Processor processor : processors) {
-					processor.setGroupId(groupId);
 					processorRepository.save(processor);
 				}
 			}
@@ -225,8 +222,8 @@ public class DataInitialization {
 	 * @param user_id
 	 * @throws IOException
 	 */
-	public void addDefaultGroupSteps(String groupId) throws IOException {
-		List<Step> stepsDB = stepRepository.getStepsByGroupId(groupId, true);
+	public void addDefaultSteps() throws IOException {
+		List<Step> stepsDB = stepRepository.getStepsByFlagValue(true);
 		if (stepsDB == null || stepsDB.isEmpty()) {
 
 			File file = new File(getClass().getResource("/server/steps.json").getFile());
@@ -236,13 +233,12 @@ public class DataInitialization {
 			if (stepArray != null) {
 				List<Step> steps = Arrays.asList(stepArray);
 				for (Step step : steps) {
-					List<Step> stepsDBsize = stepRepository.getStepsByGroupId(groupId, true);
+					List<Step> stepsDBsize = stepRepository.getStepsByFlagValue(true);
 					if (stepsDBsize == null || stepsDBsize.isEmpty()) {
 						step.setNumber(1);
 					} else {
 						step.setNumber(stepsDBsize.size() + 1);
 					}
-					step.setGroupId(groupId);
 					step.setActive(1);
 					stepRepository.save(step);
 				}

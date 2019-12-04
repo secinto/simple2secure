@@ -166,6 +166,9 @@
   "menu.english": "Englisch",
   "menu.language": "Sprache",
   "menu.widgets": "Widgets",
+  "menu.dashboard": "Dashboard",
+  "menu.probes": "Probe",
+  "menu.deviceList": "Geräteliste",
 
   "account.activated": "Ihr Konto wurde bereits aktiviert!",
   "account.login": "Melden Sie sich mit dem folgenden Button im Portal an.",
@@ -173,7 +176,6 @@
   "account.download": "Probe herunterladen",
 
   "table.stepName": "Wählen Sie den Schrittname aus",
-  "table.probe": "Probe",
   "table.user": "Benutzer",
   "table.version": "Version",
   "table.action": "Aktion",
@@ -242,12 +244,8 @@
   "table.sut.endDeviceName" : "Endgerät Name",
   "table.sut.endDevicetype" : "Endgerät Typ",
   "table.sut.endDeviceLocation" : "Endgerät Ort",
-  "table.graphAble" : "Darstellbar",
-  "table.systemsAvailable": "Verfügbar für OS",
-
-  "system.windows": "Windows",
-  "system.linux" : "Linux",
-  "system.macos": "MacOS",
+  "table.type": "Typ",
+  "table.probe": "Probe",
 
   "message.configuration": "Konfiguration erfolgreich geladen!",
   "message.configuration.save": "Konfiguration erfolgreich aktualisiert!",

@@ -15,9 +15,9 @@ import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.config.ConfigItems;
 import com.simple2secure.api.dto.ReportDTO;
 import com.simple2secure.api.model.Report;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ReportRepository;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -39,9 +39,9 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public List<Report> getReportsByDeviceId(String probeId) {
+	public List<Report> getReportsByDeviceId(String deviceId) {
 		List<Report> reports = new ArrayList<>();
-		Query query = new Query(Criteria.where("probeId").is(probeId));
+		Query query = new Query(Criteria.where("probeId").is(deviceId));
 		reports = mongoTemplate.find(query, Report.class, collectionName);
 		return reports;
 	}
@@ -73,8 +73,8 @@ public class ReportRepositoryImpl extends ReportRepository {
 	}
 
 	@Override
-	public void deleteByDeviceId(String probeId) {
-		List<Report> reports = getReportsByDeviceId(probeId);
+	public void deleteByDeviceId(String deviceId) {
+		List<Report> reports = getReportsByDeviceId(deviceId);
 
 		if (reports != null) {
 			for (Report report : reports) {
@@ -121,14 +121,14 @@ public class ReportRepositoryImpl extends ReportRepository {
 	@Override
 	public long getPagesForReportsByName(String name) {
 		Query query = new Query(Criteria.where("name").is(name));
-		long count = mongoTemplate.count(query, Report.class, collectionName) / ConfigItems.DEFAULT_VALUE_SIZE;
+		long count = mongoTemplate.count(query, Report.class, collectionName) / StaticConfigItems.DEFAULT_VALUE_SIZE;
 		return count;
 	}
 
 	@Override
 	public long getPagesForReportsByDeviceAndName(String deviceId, String name) {
 		Query query = new Query(Criteria.where("deviceId").is(deviceId).and("name").is(name));
-		long count = mongoTemplate.count(query, Report.class, collectionName) / ConfigItems.DEFAULT_VALUE_SIZE;
+		long count = mongoTemplate.count(query, Report.class, collectionName) / StaticConfigItems.DEFAULT_VALUE_SIZE;
 		return count;
 	}
 

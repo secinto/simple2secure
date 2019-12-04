@@ -26,11 +26,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {StockChart} from 'angular-highcharts';
 import {environment} from '../../environments/environment';
-import {ContextDTO, GraphReport, NetworkReportDTO} from '../_models';
+import {GraphReport, NetworkReportDTO} from '../_models';
 import {HttpService} from '../_services';
 import {OsQueryReportDetailsComponent} from '../report';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {AddQueryDialog} from './addQueryDialog';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
 	moduleId: module.id,
@@ -44,8 +45,6 @@ export class AnalysisComponent implements OnInit{
 	reports: any[];
 	graphReports: GraphReport[];
 	queries: any[];
-	context: ContextDTO;
-	currentUser: any;
 	probes: any[];
 	selectedQuery: any;
 	selectedProbe: any;
@@ -65,14 +64,14 @@ export class AnalysisComponent implements OnInit{
 
 	ngOnInit() {
 
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllProbes(true);
 		// this.loadAllQueries(true);
 	}
 
 	loadAllProbes(defaultValue: boolean) {
-		this.httpService.get(environment.apiEndpoint + 'device/' + this.context.context.id + '/false')
+		const params = new HttpParams()
+			.set('active', String(false));
+		this.httpService.getWithParams(environment.apiEndpoint + 'device', params)
 			.subscribe(
 				data => {
 					this.probes = data;
@@ -87,7 +86,9 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadQueriesByProbe(probeId: string) {
-		this.httpService.get(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN/false')
+		const params = new HttpParams()
+			.set('select_all', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN', params)
 			.subscribe(
 				data => {
 					this.queries = data;
@@ -99,7 +100,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadReportsByNameAndDevice(probeId: string, name: string){
-		this.httpService.get(environment.apiEndpoint + 'reports/' + probeId + '/' + name)
+		this.httpService.get(environment.apiEndpoint + 'reports/device/' + probeId + '/' + name)
 			.subscribe(
 				data => {
 					this.graphReports = data;

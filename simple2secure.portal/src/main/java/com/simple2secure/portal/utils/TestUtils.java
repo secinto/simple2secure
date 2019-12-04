@@ -140,7 +140,7 @@ public class TestUtils {
 
 	public Test synchronizeReceivedTest(Test test) {
 		Test returnTest = new Test();
-		Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+		Test currentPortalTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
 
 		if (currentPortalTest != null) {
 			boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
@@ -170,7 +170,7 @@ public class TestUtils {
 
 			testRepository.save(currentPortalTest);
 
-			returnTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+			returnTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
 		}
 		return returnTest;
 	}
@@ -201,19 +201,19 @@ public class TestUtils {
 	/**
 	 * This function returns all tests by pod Id.
 	 *
-	 * @param podId
+	 * @param deviceId
 	 * @param locale
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<Map<String, Object>> getTestByPodId(String podId, int page, int size, boolean usePagination, String locale) {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination, String locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
 			Map<String, Object> testMap = new HashMap<>();
-			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodIdWithPagination(podId, page, size, usePagination));
+			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
 
 			if (testsWeb != null) {
 				testMap.put("tests", testsWeb);
-				testMap.put("totalSize", testRepository.getCountOfTestsWithPodid(podId));
+				testMap.put("totalSize", testRepository.getCountOfTestsWithDeviceId(deviceId));
 				return new ResponseEntity<>(testMap, HttpStatus.OK);
 			}
 		}
@@ -457,12 +457,12 @@ public class TestUtils {
 	 * This function adds new portal test to the list which will be returned to the pod. Before returning the flag newTest is set to false and
 	 * updated in the database accordingly
 	 *
-	 * @param podId
+	 * @param deviceId
 	 * @return
 	 */
-	public List<Test> getNewPortalTests(String podId) {
+	public List<Test> getNewPortalTests(String deviceId) {
 		List<Test> newPortalTests = new ArrayList<>();
-		newPortalTests = testRepository.getNewPortalTestsByPodId(podId);
+		newPortalTests = testRepository.getNewPortalTestsByDeviceId(deviceId);
 
 		for (Test test : newPortalTests) {
 			test.setNewTest(false);
@@ -481,11 +481,11 @@ public class TestUtils {
 	 * This function iterates over all tests which are tagged to be deleted, and deletes them from the database.
 	 *
 	 * @param syncTests
-	 * @param podId
+	 * @param deviceId
 	 * @return
 	 */
-	public void deleteTaggedPortalTests(String podId) {
-		List<Test> testsToBeDeleted = testRepository.getDeletedTestsByPodId(podId);
+	public void deleteTaggedPortalTests(String deviceId) {
+		List<Test> testsToBeDeleted = testRepository.getDeletedTestsByDeviceId(deviceId);
 		if (testsToBeDeleted != null) {
 			for (Test test : testsToBeDeleted) {
 				testRepository.delete(test);
@@ -497,11 +497,11 @@ public class TestUtils {
 	 * This function iterates over all tests which are not syncronized, and deletes them from the database.
 	 *
 	 * @param syncTests
-	 * @param podId
+	 * @param deviceId
 	 * @return
 	 */
-	public void deleteUnsyncedTests(String podId) {
-		List<Test> testsToBeDeleted = testRepository.getUnsyncedTestsByPodId(podId);
+	public void deleteUnsyncedTests(String deviceId) {
+		List<Test> testsToBeDeleted = testRepository.getUnsyncedTestsByDeviceId(deviceId);
 		if (testsToBeDeleted != null) {
 			for (Test test : testsToBeDeleted) {
 				testRepository.delete(test);
@@ -512,10 +512,10 @@ public class TestUtils {
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 * 
-	 * @param podId
+	 * @param deviceId
 	 */
-	public void setAllPodTestToUnsyncronized(String podId) {
-		List<Test> tests = testRepository.getByPodId(podId);
+	public void setAllPodTestToUnsyncronized(String deviceId) {
+		List<Test> tests = testRepository.getByDeviceId(deviceId);
 		for (Test test : tests) {
 			if (test != null) {
 				test.setSynced(false);

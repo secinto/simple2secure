@@ -27,6 +27,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { environment } from '../../environments/environment';
+import { DeviceType } from '../_models/DeviceType';
 
 
 @Component({
@@ -37,7 +38,9 @@ import { environment } from '../../environments/environment';
 export class SUTDetailsComponent {
 
     sut: SystemUnderTest;
+	deviceTypeSelect: any[];
     type: string;
+	selectedType: any;
     isNewSUT = false;
     url: string;
     loading = false;
@@ -60,12 +63,27 @@ export class SUTDetailsComponent {
 			this.isNewSUT = true;
             this.sut = new SystemUnderTest();
             this.sut.groupId = data.groupId;
+			this.deviceTypeSelect = Object.keys(DeviceType);
 		}
     }
 
 
     public updateSaveSUT() {
 		this.loading = true;
+		switch(this.selectedType) { 
+		   case "PROBE": { 
+			  this.sut.endDeviceType = DeviceType.PROBE; 
+			  break; 
+		   } 
+		   case "WWW": { 
+			  this.sut.endDeviceType = DeviceType.WWW; 
+			  break; 
+		   } 
+		   default: { 
+			  this.sut.endDeviceType = DeviceType.UNKNOWN; 
+			  break; 
+		   } 
+		} 
 		this.url = environment.apiEndpoint + 'sut/add';
 		this.httpService.post(this.sut, this.url).subscribe(
 			data => {

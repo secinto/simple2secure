@@ -28,11 +28,8 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO} from '../_models';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
-import {QueryReport} from '../_models/queryReport';
 import {ReportDTO} from '../_models/DTO/reportDTO';
-import {merge, tap} from 'rxjs/operators';
 import {PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
 
@@ -44,9 +41,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 
 export class OsQueryReportOverviewComponent {
 	public reportDTO: ReportDTO;
-	context: ContextDTO;
 	selectedReport: any;
-	currentUser: any;
 	loading = false;
 	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
 	public pageEvent: PageEvent;
@@ -72,9 +67,7 @@ export class OsQueryReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadReportsPaged(0, 10);
+		this.loadAllReports(0, 10);
 	}
 
 	ngAfterViewInit() {
@@ -90,13 +83,13 @@ export class OsQueryReportOverviewComponent {
 	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadReportsPaged(e.pageIndex, e.pageSize);
+		this.loadAllReports(e.pageIndex, e.pageSize);
 		return e;
 	}
 
-	private loadReportsPaged(page: number, size: number) {
+	private loadAllReports(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'reports/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;
@@ -153,7 +146,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.delete(environment.apiEndpoint + 'reports/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadReportsPaged(this.currentPage, this.pageSize);
+				this.loadAllReports(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
@@ -213,7 +206,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.post(this.selection.selected, environment.apiEndpoint + 'reports/delete/selected').subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadReportsPaged(this.currentPage, this.pageSize);
+				this.loadAllReports(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {

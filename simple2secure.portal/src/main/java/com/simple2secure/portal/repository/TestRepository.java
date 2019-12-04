@@ -29,9 +29,9 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestRepository extends MongoRepository<Test> {
 
-	public abstract List<Test> getByPodId(String podId);
+	public abstract List<Test> getByDeviceId(String deviceId);
 
-	public abstract List<Test> getByPodIdWithPagination(String podId, int page, int size, boolean usePagination);
+	public abstract List<Test> getByDeviceIdWithPagination(String deviceId, int page, int size, boolean usePagination);
 
 	public abstract List<Test> getByHostname(String hostname);
 
@@ -39,14 +39,14 @@ public abstract class TestRepository extends MongoRepository<Test> {
 
 	public abstract Test getTestByName(String name);
 
-	public abstract Test getTestByNameAndPodId(String name, String podId);
+	public abstract Test getTestByNameAndDeviceId(String name, String deviceId);
 
-	public abstract long getCountOfTestsWithPodid(String podId);
+	public abstract long getCountOfTestsWithDeviceId(String deviceId);
 
-	public abstract List<Test> getNewPortalTestsByPodId(String podId);
+	public abstract List<Test> getNewPortalTestsByDeviceId(String deviceId);
 
-	public abstract List<Test> getDeletedTestsByPodId(String podId);
+	public abstract List<Test> getDeletedTestsByDeviceId(String deviceId);
 
-	public abstract List<Test> getUnsyncedTestsByPodId(String podId);
+	public abstract List<Test> getUnsyncedTestsByDeviceId(String deviceId);
 
 }

@@ -24,12 +24,10 @@ import {ViewChild, Component} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatMenuTrigger} from '@angular/material';
 import {TranslateService} from '@ngx-translate/core';
 import {Router, ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs';
-import {ContextDTO, UserRole, Notification} from '../_models';
+import {ContextDTO, UserRole} from '../_models';
 import {environment} from '../../environments/environment';
 import {SelectContextDialog} from '../dialog/select-context';
 import {AlertService, AuthenticationService, DataService, HttpService} from '../_services';
-import {FormControl} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
 
 @Component({
@@ -41,16 +39,15 @@ import {Title} from '@angular/platform-browser';
 
 export class SidenavbarComponent {
 	@ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
-	currentUser: any;
-	currentContext: ContextDTO;
 	pageTitle: string;
 	loggedIn: boolean;
 	showSettings: boolean;
 	returnUrl: string;
-	showTitle: boolean;
 	showReportsSubmenu: boolean;
 	showEmailsSubmenu: boolean;
 	showOrbiterSubmenu: boolean;
+	showDevicesSubmenu: boolean;
+	userRole: string;
 
 	constructor(private translate: TranslateService,
 	            private router: Router,
@@ -66,17 +63,17 @@ export class SidenavbarComponent {
 		this.showReportsSubmenu = false;
 		this.showEmailsSubmenu = false;
 		this.showOrbiterSubmenu = false;
+		this.showDevicesSubmenu = false;
 	}
 
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.currentContext = JSON.parse(localStorage.getItem('context'));
+		this.userRole = this.dataService.getRole();
 
-		if (this.currentUser && this.currentContext) {
+		if (this.userRole) {
 			this.loggedIn = true;
 			this.showSettings = false;
-			if (this.currentContext.userRole == UserRole.SUPERADMIN) {
+			if (this.userRole == UserRole.SUPERADMIN) {
 				this.showSettings = true;
 			}
 		}
@@ -87,11 +84,11 @@ export class SidenavbarComponent {
 
 	changeContext() {
 		// if number of contexts is greater than 1 open dialog to change context
-		this.getContexts(this.currentUser.userID);
+		this.getContexts();
 	}
 
-	private getContexts(userId: string) {
-		this.httpService.get(environment.apiEndpoint + 'context/' + userId)
+	private getContexts() {
+		this.httpService.get(environment.apiEndpoint + 'context')
 			.subscribe(
 				data => {
 					this.openSelectContextModal(data);
@@ -127,6 +124,11 @@ export class SidenavbarComponent {
 
 			dialogRef.afterClosed().subscribe(result => {
 				if (result == true) {
+
+					this.router.routeReuseStrategy.shouldReuseRoute = function(){
+						return false;
+					}
+					this.router.navigated = false;
 					this.router.navigate([this.returnUrl]);
 				}
 				else {
@@ -148,32 +150,26 @@ export class SidenavbarComponent {
 
 	collapseMenu(parent: string){
 		if (parent == 'menu-reports'){
-			if (this.showReportsSubmenu == false){
-				this.showReportsSubmenu = true;
-			}
-			else{
-				this.showReportsSubmenu = false;
-			}
+			this.showReportsSubmenu = true;
 			this.showEmailsSubmenu = false;
 			this.showOrbiterSubmenu = false;
+			this.showDevicesSubmenu = false;
 		}
 		else if (parent == 'menu-emails'){
-			if (this.showEmailsSubmenu == false){
-				this.showEmailsSubmenu = true;
-			}
-			else{
-				this.showEmailsSubmenu = false;
-			}
+			this.showEmailsSubmenu = true;
 			this.showReportsSubmenu = false;
 			this.showOrbiterSubmenu = false;
+			this.showDevicesSubmenu = false;
 		}
 		else if (parent == 'menu-orbiter'){
-			if (this.showOrbiterSubmenu == false){
-				this.showOrbiterSubmenu = true;
-			}
-			else{
-				this.showOrbiterSubmenu = false;
-			}
+			this.showOrbiterSubmenu = true;
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = false;
+			this.showDevicesSubmenu = false;
+		}
+		else if (parent == 'menu-devices'){
+			this.showDevicesSubmenu = true;
+			this.showOrbiterSubmenu = false;
 			this.showReportsSubmenu = false;
 			this.showEmailsSubmenu = false;
 		}

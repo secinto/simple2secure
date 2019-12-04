@@ -31,12 +31,14 @@ import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
@@ -65,6 +67,9 @@ public class TestRunScheduler {
 
 	@Autowired
 	GroupRepository groupRepository;
+	
+	@Autowired
+	DeviceInfoRepository deviceInfoRepository;
 
 	@Autowired
 	NotificationUtils notificationUtils;
@@ -97,6 +102,7 @@ public class TestRunScheduler {
 				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
 
 					CompanyLicensePrivate license = licenseRepository.findByDeviceId(test.getPodId());
+					DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 					if (license != null) {
 
@@ -105,7 +111,7 @@ public class TestRunScheduler {
 						if (group != null) {
 							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
 									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-							testRun.setHostname(license.getDeviceInfo().getHostname());
+							testRun.setHostname(deviceInfo.getHostName());
 
 							test.setLastExecution(currentTimestamp);
 							testRunRepository.save(testRun);

@@ -28,8 +28,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {Ng4LoadingSpinnerService} from 'ng4-loading-spinner';
 import {SearchResult} from '../_models/searchResult';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
-import {TruncatePipe} from '../_helpers/truncate.pipe';
-import {ContextDTO, TestResult, TestResultDTO} from '../_models';
 import {TestResultDetailsComponent} from '../report/testResultDetails.component';
 import {NetworkReportDetailsComponent, OsQueryReportDetailsComponent} from '../report';
 import {NotificationDetailsComponent} from '../notification/notificationDetails.component';
@@ -46,7 +44,6 @@ export class SearchResultComponent implements OnInit{
 
     searchString = '';
     public loading = true;
-    context: ContextDTO;
     searchResult: SearchResult[] = [];
     displayedColumnsNotifications = ['content', 'timestamp'];
     displayedColumnsTR = ['result', 'timestamp'];
@@ -73,13 +70,10 @@ export class SearchResultComponent implements OnInit{
                 private translate: TranslateService,
                 private dialog: MatDialog,
                 private spinnerService: Ng4LoadingSpinnerService){
-
-        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     }
 
     ngOnInit() {
         this.loading = true;
-        this.context = JSON.parse(localStorage.getItem('context'));
         this.spinnerService.show();
         this.searchString = this.route.snapshot.paramMap.get('searchquery');
         this.getSearchResults();
@@ -118,7 +112,7 @@ export class SearchResultComponent implements OnInit{
     getSearchResults() {
         // Send request only if the search string is not null
         if (this.searchString){
-            this.httpService.get(environment.apiEndpoint + 'search/' + this.searchString + "/" + this.context.context.id)
+            this.httpService.get(environment.apiEndpoint + 'search/' + this.searchString)
             .subscribe(
                 data => {
                     this.searchResult = data;
