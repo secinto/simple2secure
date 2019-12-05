@@ -84,7 +84,7 @@ export class QueryListComponent {
 
 	public getQueries() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'query/all')
+		this.httpService.get(environment.apiEndpoint + 'query/allDto')
 			.subscribe(
 				data => {
 					this.queries = data;

@@ -59,6 +59,7 @@ import {DevicesComponent, DevicesOverviewComponent, DevicesListComponent} from '
 import {QueriesComponent} from "./queries";
 import {QueryOverviewComponent} from "./queries/queryOverview.component";
 import {QueryListComponent} from "./queries/queryList.component";
+import {QueryAssignComponent} from "./queries/queryAssign.component";
 
 const appRoutes: Routes = [
 	{
@@ -109,6 +110,7 @@ const appRoutes: Routes = [
 				children: [
 					{path: '', component: QueryOverviewComponent, data: {title: 'menu.queries', breadcrumb: 'Dashboard'}},
 					{path: 'list', component: QueryListComponent, data: {title: 'menu.queryList', breadcrumb: 'Query List'}},
+					{path: 'assign', component: QueryAssignComponent, data: {title: 'menu.mapQuery', breadcrumb: 'Map Queries'}},
 				]
 			},
 			{

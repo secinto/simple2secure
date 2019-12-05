@@ -46,6 +46,7 @@ import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.QueryCategory;
+import com.simple2secure.api.model.QueryGroupMapping;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -55,12 +56,14 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.QueryCategoryRepository;
+import com.simple2secure.portal.repository.QueryGroupMappingRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.GroupUtils;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.QueryUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -99,6 +102,9 @@ public class QueryController {
 	QueryCategoryRepository queryCategoryRepository;
 
 	@Autowired
+	QueryGroupMappingRepository queryGroupMappingRepository;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
@@ -107,16 +113,40 @@ public class QueryController {
 	@Autowired
 	GroupUtils groupUtils;
 
+	@Autowired
+	QueryUtils queryUtils;
+
 	RestTemplate restTemplate = new RestTemplate();
 
 	static final Logger log = LoggerFactory.getLogger(QueryController.class);
 
 	/**
-	 * This function returns the query config for the specified user
+	 * This function returns a {@link QueryRun} by the specified Id.
+	 *
+	 * @param id
+	 *          The id of the desired {@link QueryRun}
+	 * @param locale
+	 *          The currently selected locale
+	 * @return
 	 */
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	@ValidRequestMapping(value = "/all")
-	public ResponseEntity<List<QueryDTO>> getQueries(@ServerProvidedValue ValidInputLocale locale) {
+	@ValidRequestMapping
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<QueryRun> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
+
+		if (!Strings.isNullOrEmpty(queryId.getValue())) {
+			QueryRun queryConfig = queryRepository.find(queryId.getValue());
+			if (queryConfig != null) {
+				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
+			}
+		}
+		log.error("Query configuration not found for the query ID {}", queryId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(value = "/allDto")
+	public ResponseEntity<List<QueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
 
 		List<QueryDTO> queryDtoList = new ArrayList<>();
 		List<QueryCategory> categories = queryCategoryRepository.findAll();
@@ -130,6 +160,22 @@ public class QueryController {
 			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
 		}
 
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(value = "/unmapped")
+	public ResponseEntity<List<QueryRun>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
+			@ServerProvidedValue ValidInputLocale locale) {
+
+		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+			List<QueryRun> queryList = queryUtils.getUnmappedQueriesByGroup(groupId.getValue());
+
+			if (queryList != null) {
+				return new ResponseEntity<>(queryList, HttpStatus.OK);
+			}
+		}
 		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -163,27 +209,26 @@ public class QueryController {
 	}
 
 	/**
-	 * This function returns a {@link QueryRun} by the specified Id.
+	 * This function updates or saves new Query config into the database
 	 *
-	 * @param id
-	 *          The id of the desired {@link QueryRun}
-	 * @param locale
-	 *          The currently selected locale
-	 * @return
+	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping
+	@ValidRequestMapping(value = "/mapping", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<QueryRun>> updateQueryMappings(@RequestBody List<QueryRun> queryList, @PathVariable ValidInputGroup groupId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(queryId.getValue())) {
-			QueryRun queryConfig = queryRepository.find(queryId.getValue());
-			if (queryConfig != null) {
-				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
+		if (queryList != null && !Strings.isNullOrEmpty(groupId.getValue())) {
+			CompanyGroup group = groupRepository.find(groupId.getValue());
+			if (group != null) {
+				queryUtils.updateQueryGroupMapping(queryList, groupId.getValue());
+				return new ResponseEntity<>(queryList, HttpStatus.OK);
 			}
 		}
-		log.error("Query configuration not found for the query ID {}", queryId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+		log.error("Error while inserting/updating queryRun");
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
+
 	}
 
 	/**
@@ -196,6 +241,7 @@ public class QueryController {
 		if (!Strings.isNullOrEmpty(queryId.getValue())) {
 			QueryRun queryRun = queryRepository.find(queryId.getValue());
 			if (queryRun != null) {
+				queryGroupMappingRepository.deleteByQueryId(queryId.getValue());
 				queryRepository.delete(queryRun);
 				return new ResponseEntity<>(queryRun, HttpStatus.OK);
 			}
@@ -228,29 +274,20 @@ public class QueryController {
 					// Check if this is root group
 					if (group.isRootGroup()) {
 						// Take only the query runs of this group, because this is root group!
-						queryConfig = queryRepository.findByGroupIdAndOSInfo(license.getGroupId(), OSInfo.valueOf(osinfo.getValue()), select_all);
-						if (queryConfig != null) {
-							queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
-							return new ResponseEntity<>(queryConfig, HttpStatus.OK);
-						}
-
+						queryConfig = queryUtils.findByGroupIdAndOsInfo(group.getId(), OSInfo.valueOf(osinfo.getValue()), select_all);
 					} else {
 						// go until the root group is not found and get all configurations from all groups which are parents of this group
 						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
-
-						// Iterate through all found groups and add their queries to the queryConfig
 						if (foundGroups != null) {
-							for (CompanyGroup cg : foundGroups) {
-								List<QueryRun> currentQueries = queryRepository.findByGroupId(cg.getId(), select_all);
-								if (currentQueries != null) {
-									queryConfig.addAll(currentQueries);
-								}
+							List<String> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
+							if (groupIds != null) {
+								queryConfig = queryUtils.findByGroupIdsAndOsInfo(groupIds, OSInfo.valueOf(osinfo.getValue()), select_all);
 							}
 						}
-						if (queryConfig != null) {
-							queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
-							return new ResponseEntity<>(queryConfig, HttpStatus.OK);
-						}
+					}
+					if (queryConfig != null) {
+						queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
+						return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 					}
 				}
 			}
@@ -269,10 +306,20 @@ public class QueryController {
 			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
-			List<QueryRun> queryConfig = queryRepository.findByGroupId(groupId.getValue(), select_all);
+			List<QueryRun> queries = new ArrayList<>();
+			List<QueryGroupMapping> groupMappings = queryGroupMappingRepository.findByGroupId(groupId.getValue());
 
-			if (queryConfig != null) {
-				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
+			if (groupMappings != null) {
+				for (QueryGroupMapping mapping : groupMappings) {
+					QueryRun query = queryRepository.find(mapping.getQueryId());
+					if (query != null) {
+						queries.add(query);
+					}
+				}
+			}
+
+			if (queries != null) {
+				return new ResponseEntity<>(queries, HttpStatus.OK);
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);

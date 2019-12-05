@@ -185,6 +185,7 @@ import {UserGroupEditComponent} from "./user/userGroupEdit.component";
 import {QueriesComponent} from "./queries";
 import {QueryOverviewComponent} from "./queries/queryOverview.component";
 import {QueryListComponent} from "./queries/queryList.component";
+import {QueryAssignComponent} from "./queries/queryAssign.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -347,7 +348,8 @@ export const httpInterceptorProviders = [
 		UserGroupEditComponent,
 		QueriesComponent,
 		QueryOverviewComponent,
-		QueryListComponent
+		QueryListComponent,
+		QueryAssignComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,

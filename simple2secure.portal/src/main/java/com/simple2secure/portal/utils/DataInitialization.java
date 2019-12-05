@@ -181,7 +181,8 @@ public class DataInitialization {
 		List<QueryRun> activeQueries = queryRepository.findByActiveStatus(1);
 		if (activeQueries != null) {
 			for (QueryRun query : activeQueries) {
-				QueryGroupMapping queryGroupMapping = new QueryGroupMapping(groupId, query.getId());
+				QueryGroupMapping queryGroupMapping = new QueryGroupMapping(groupId, query.getId(), query.getAnalysisInterval(),
+						query.getAnalysisIntervalUnit(), query.getSystemsAvailable());
 				queryGroupMappingRepository.save(queryGroupMapping);
 			}
 		}

@@ -20,6 +20,8 @@
  *********************************************************************
  */
 package com.simple2secure.api.model;
+import java.util.concurrent.TimeUnit;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
 public class QueryGroupMapping extends GenericDBObject {
@@ -30,13 +32,19 @@ public class QueryGroupMapping extends GenericDBObject {
 	private static final long serialVersionUID = 4400048729580737036L;
 	private String groupId;
 	private String queryId;
+	private int analysisInterval;
+	private TimeUnit analysisIntervalUnit;
+	private int systemsAvailable;
 
 	public QueryGroupMapping() {
 	}
 
-	public QueryGroupMapping(String groupId, String queryId) {
+	public QueryGroupMapping(String groupId, String queryId, int analysisInterval, TimeUnit analysisIntervalUnit, int systemsAvailable) {
 		this.groupId = groupId;
 		this.queryId = queryId;
+		this.analysisInterval = analysisInterval;
+		this.analysisIntervalUnit = analysisIntervalUnit;
+		this.systemsAvailable = systemsAvailable;
 	}
 
 	public String getGroupId() {
@@ -53,5 +61,29 @@ public class QueryGroupMapping extends GenericDBObject {
 
 	public void setQueryId(String queryId) {
 		this.queryId = queryId;
+	}
+
+	public int getAnalysisInterval() {
+		return analysisInterval;
+	}
+
+	public void setAnalysisInterval(int analysisInterval) {
+		this.analysisInterval = analysisInterval;
+	}
+
+	public TimeUnit getAnalysisIntervalUnit() {
+		return analysisIntervalUnit;
+	}
+
+	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
+		this.analysisIntervalUnit = analysisIntervalUnit;
+	}
+
+	public int getSystemsAvailable() {
+		return systemsAvailable;
+	}
+
+	public void setSystemsAvailable(int systemsAvailable) {
+		this.systemsAvailable = systemsAvailable;
 	}
 }

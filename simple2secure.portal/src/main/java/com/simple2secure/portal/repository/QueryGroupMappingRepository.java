@@ -30,4 +30,14 @@ public abstract class QueryGroupMappingRepository extends MongoRepository<QueryG
 
 	public abstract List<QueryGroupMapping> findByGroupId(String groupId);
 
+	public abstract List<QueryGroupMapping> findByQueryId(String queryId);
+
+	public abstract void deleteByGroupId(String groupId);
+
+	public abstract void deleteByQueryId(String queryId);
+
+	public abstract List<QueryGroupMapping> findByGroupIdAndOSInfo(String groupId, List<Integer> possibleValues, boolean selectAll);
+
+	public abstract List<QueryGroupMapping> getAllMapingsByGroupIds(List<String> group_ids, List<Integer> possibleValues, boolean selectAll);
+
 }

@@ -171,6 +171,7 @@
   "menu.deviceList": "Geräteliste",
   "menu.queries": "Abfragen",
   "menu.queryList": "Abfrageliste",
+  "menu.mapQuery": "Abfragezuordnung",
 
   "account.activated": "Ihr Konto wurde bereits aktiviert!",
   "account.login": "Melden Sie sich mit dem folgenden Button im Portal an.",
@@ -409,6 +410,12 @@
   "osquery.runalways": "Immer ausführen?",
   "osquery.details": "Abfrage Details",
   "osquery.reports.charts": "OSQuery-Berichtsdiagramme",
+  "query.moving.error": "Die Abfrage ist dieser Gruppe bereits zugeordnet",
+  "query.moving.success": "Abfrage erfolgreich zugeordnet",
+  "query.mapped": "Zugeordnete Abfragen",
+  "query.available": "Verfügbare Abfragen",
+  "query.remove.error": "Beim Entfernen der Abfrage ist ein Problem aufgetreten",
+  "query.remove.success": "Abfrage erfolgreich entfernt",
 
   "orbiter.toolsconfig": "Werkzeugkonfiguration bearbeiten",
   "orbiter.edittests": "Tests bearbeiten",

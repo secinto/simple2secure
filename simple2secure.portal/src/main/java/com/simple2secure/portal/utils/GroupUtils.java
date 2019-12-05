@@ -154,7 +154,7 @@ public class GroupUtils {
 	public void deleteGroup(String groupId, boolean deleteAll) {
 
 		// Remove OSQuery configuration
-		queryRepository.deleteByGroupId(groupId);
+		queryGroupMappingRepository.deleteByGroupId(groupId);
 
 		// if this flag is set all group dependencies will be deleted
 		if (deleteAll) {
