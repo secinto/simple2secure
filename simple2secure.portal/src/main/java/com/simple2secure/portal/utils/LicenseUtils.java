@@ -15,8 +15,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.api.model.DeviceInfo;
-import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.LicenseDateUtil;
@@ -47,7 +45,7 @@ public class LicenseUtils {
 
 	@Autowired
 	LicensePlanRepository licensePlanRepository;
-	
+
 	@Autowired
 	DeviceInfoRepository deviceInfoRepository;
 

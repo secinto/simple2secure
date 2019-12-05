@@ -130,12 +130,4 @@ public class ReportUtils {
 
 		return graphReports;
 	}
-
-	public Report getDifferencesForIdWithPrevious(String id) {
-		Report report = reportRepository.find(id);
-		if (report != null) {
-			List<Report> lastReports = reportRepository.getLastReportsFromTimeStampAndName(report.getQueryTimestamp(), report.getName());
-		}
-		return report;
-	}
 }

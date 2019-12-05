@@ -150,7 +150,7 @@ public class DataInitialization {
 
 		if (queriesDB == null || queriesDB.isEmpty()) {
 
-			File file = new File(getClass().getResource("/server/queries_categorized.json").getFile());
+			File file = new File(getClass().getResource("/server/queries.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
 
 			JsonNode node = JSONUtils.fromString(content);

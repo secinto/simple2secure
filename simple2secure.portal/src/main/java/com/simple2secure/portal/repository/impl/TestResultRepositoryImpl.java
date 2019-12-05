@@ -39,27 +39,6 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 	}
 
 	@Override
-	public List<TestResult> getByGroupId(String groupId) {
-		Query query = new Query(Criteria.where("groupId").is(groupId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
-	}
-
-	@Override
-	public List<TestResult> getByLicenseId(String licenseId) {
-		Query query = new Query(Criteria.where("licenseId").is(licenseId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
-	}
-
-	@Override
-	public List<TestResult> getByTestId(String testId) {
-		Query query = new Query(Criteria.where("testId").is(testId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
-	}
-
-	@Override
 	public TestResult getByTestRunId(String testRunId) {
 		Query query = new Query(Criteria.where("testRunId").is(testRunId));
 		TestResult testResult = mongoTemplate.findOne(query, TestResult.class);

@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -27,10 +27,6 @@ import org.springframework.stereotype.Component;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.dao.MongoRepository;
 
-/**
- * @author Richard Heinz
- *
- */
 @Component
 public abstract class RuleConditionsRepository extends MongoRepository<TemplateCondition> {
 

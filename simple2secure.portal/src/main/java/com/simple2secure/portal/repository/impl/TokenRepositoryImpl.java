@@ -23,33 +23,12 @@ public class TokenRepositoryImpl extends TokenRepository {
 	@Override
 	public Token findByUserId(String userId) {
 		Query query = new Query(Criteria.where("userId").is(userId));
-		return this.mongoTemplate.findOne(query, Token.class);
-	}
-
-	@Override
-	public Token findByDeviceId(String deviceId) {
-		Query query = new Query(Criteria.where("probeId").is(deviceId));
-		return this.mongoTemplate.findOne(query, Token.class);
+		return mongoTemplate.findOne(query, Token.class);
 	}
 
 	@Override
 	public Token findByAccessToken(String accessToken) {
 		Query query = new Query(Criteria.where("accessToken").is(accessToken));
-		return this.mongoTemplate.findOne(query, Token.class);
-	}
-
-	@Override
-	public Token findByRefreshToken(String refreshToken) {
-		Query query = new Query(Criteria.where("refreshToken").is(refreshToken));
-		return this.mongoTemplate.findOne(query, Token.class);
-	}
-
-	@Override
-	public void deleteByUserId(String userId) {
-		Token token = findByUserId(userId);
-		if (token != null) {
-			delete(token);
-		}
-
+		return mongoTemplate.findOne(query, Token.class);
 	}
 }
