@@ -40,7 +40,7 @@ import {UserGroupComponent} from '../user';
 })
 
 export class OsqueryConfigurationDetailsComponent {
-	displayedColumns = ['name', 'runAlways', 'interval', 'active', 'action'];
+	displayedColumns = ['name', 'interval', 'active', 'action'];
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -77,7 +77,7 @@ export class OsqueryConfigurationDetailsComponent {
 		this.groupEditable = this.dataService.isGroupEditable();
 
 		if (!this.groupEditable) {
-			this.displayedColumns = ['name', 'query', 'graphAble', 'systemsAvailable', 'runAlways', 'interval', 'active'];
+			this.displayedColumns = ['name', 'query', 'graphAble', 'systemsAvailable', 'interval', 'active'];
 		}
 
 		this.loadQueries();

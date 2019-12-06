@@ -31,8 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(
-		name = "QueryRun")
+@Table(name = "QueryRun")
 public class QueryRun extends GenericDBObject {
 
 	/**
@@ -43,8 +42,6 @@ public class QueryRun extends GenericDBObject {
 	private String name;
 	private String description;
 
-	@JsonProperty
-	private boolean always;
 	private int analysisInterval;
 	private TimeUnit analysisIntervalUnit;
 	@JsonProperty
@@ -56,10 +53,10 @@ public class QueryRun extends GenericDBObject {
 
 	@JsonProperty
 	private boolean graphAble;
-	
+
 	@JsonProperty
 	private boolean availabilityCheck;
-	
+
 	@JsonProperty
 	private boolean fixedSize;
 
@@ -74,11 +71,9 @@ public class QueryRun extends GenericDBObject {
 		osquery = true;
 	}
 
-	public QueryRun(String name, boolean always, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
-			int active) {
+	public QueryRun(String name, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery, int active) {
 		super();
 		this.name = name;
-		this.always = always;
 		this.analysisInterval = analysisInterval;
 		this.analysisIntervalUnit = analysisIntervalUnit;
 		this.sqlQuery = sqlQuery;
@@ -107,14 +102,6 @@ public class QueryRun extends GenericDBObject {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public boolean isAlways() {
-		return always;
-	}
-
-	public void setAlways(boolean always) {
-		this.always = always;
 	}
 
 	public int getAnalysisInterval() {

@@ -42,7 +42,7 @@ import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 @Component({
 	moduleId: module.id,
 	templateUrl: 'queryAssign.component.html',
-	styleUrls: ['queryAssign.css'],
+	styleUrls: ['query.css'],
 })
 
 export class QueryAssignComponent {

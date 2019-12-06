@@ -529,3 +529,8 @@ ngx-widget-grid{
     width: 70% !important;
     height: 80% !important;
 }
+
+action-icon{
+    cursor: pointer;
+    color: #A7BD26 !important;
+}

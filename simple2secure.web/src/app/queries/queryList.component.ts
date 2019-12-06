@@ -34,15 +34,19 @@ import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {QueryCategory} from "../_models/queryCategory";
+import {ConfirmationDialog} from "../dialog/confirmation-dialog";
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'queryList.component.html'
+	templateUrl: 'queryList.component.html',
+	styleUrls: ['query.css']
 })
 
 export class QueryListComponent {
 
 	queries: QueryDTO[];
+	deleted = false;
+	added = false;
 	loading = false;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
@@ -88,7 +92,13 @@ export class QueryListComponent {
 			.subscribe(
 				data => {
 					this.queries = data;
-					console.log(data);
+					if (this.deleted == false && this.added == false) {
+						this.alertService.success(this.translate.instant('message.data'));
+					}
+					else {
+						this.deleted = false;
+						this.added = false;
+					}
 				},
 				error => {
 					if (error.status == 0) {
@@ -129,5 +139,52 @@ export class QueryListComponent {
 				}
 			}
 		});
+	}
+
+	onDeleteClick(element: QueryRun) {
+		this.openDialog(element);
+	}
+
+	public openDialog(item: QueryRun) {
+
+		const dialogConfig = new MatDialogConfig();
+
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
+
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.config.dialog')
+		};
+
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteConfig(item);
+			}
+		});
+	}
+
+	deleteConfig(queryConfig: QueryRun) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'query/' + queryConfig.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.osquery.delete'));
+				this.deleted = true;
+				this.getQueries();
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+		this.loading = false;
 	}
 }

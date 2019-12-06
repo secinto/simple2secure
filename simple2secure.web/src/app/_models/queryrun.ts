@@ -26,7 +26,6 @@ import {Timeunit} from './index';
 export class QueryRun extends Generic {
 	name: string;
 	description: string;
-	always: boolean;
 	analysisInterval: number;
 	analysisIntervalUnit: Timeunit;
 	sqlQuery: string;
