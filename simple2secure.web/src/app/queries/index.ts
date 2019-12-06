@@ -21,3 +21,8 @@
  */
 
 export * from './queries.component';
+export * from './mappedQueryEditDialog.component';
+export * from './queryAssign.component';
+export * from './queryEditDialog.component';
+export * from './queryList.component';
+export * from './queryOverview.component';

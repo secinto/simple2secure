@@ -29,7 +29,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {QueryRun} from '../_models';
-import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.component';
+import {QueryEditDialogComponent} from '../queries/queryEditDialog.component';
 import {UserGroupComponent} from '../user';
 
 @Component({
@@ -146,7 +146,7 @@ export class OsqueryConfigurationDetailsComponent {
 			groupId: this.groupId
 		};
 
-		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result == true) {
@@ -173,7 +173,7 @@ export class OsqueryConfigurationDetailsComponent {
 			groupId: this.groupId
 		};
 
-		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result == true) {

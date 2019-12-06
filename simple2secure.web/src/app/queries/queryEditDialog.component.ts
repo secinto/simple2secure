@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {Location} from '@angular/common';
-import {QueryRun, Timeunit, UrlParameter} from '../_models/index';
+import {QueryRun, Timeunit} from '../_models';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -32,17 +32,12 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'osqueryConfigurationEdit.component.html'
+	templateUrl: './queryEditDialog.component.html'
 })
 
-export class OsqueryConfigurationEditComponent {
+export class QueryEditDialogComponent {
 
 	queryRun: QueryRun;
-	id: string;
-	type: number;
-	action: string;
-	probeId: string;
-	groupId: string;
 	windows: boolean;
 	linux: boolean;
 	macos: boolean;
@@ -57,7 +52,7 @@ export class OsqueryConfigurationEditComponent {
 		private translate: TranslateService,
 		private route: ActivatedRoute,
 		private location: Location,
-		private dialogRef: MatDialogRef<OsqueryConfigurationEditComponent>,
+		private dialogRef: MatDialogRef<QueryEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) data
 	)
 	{
@@ -65,14 +60,11 @@ export class OsqueryConfigurationEditComponent {
 		this.linux = false;
 		this.macos = false;
 		if (data.queryRun == null) {
-			this.action = UrlParameter.NEW;
 			this.queryRun = new QueryRun();
-			this.groupId = data.groupId;
+			this.queryRun.categoryId = data.queryCategory.id;
 		}
 		else {
-			this.action = UrlParameter.EDIT;
 			this.queryRun = data.queryRun;
-			this.groupId = data.groupId;
 			if (data.systemsAvailable === 1 || data.systemsAvailable === 3 || data.systemsAvailable === 5 || data.systemsAvailable === 7) {
 				this.windows = true;
 			}

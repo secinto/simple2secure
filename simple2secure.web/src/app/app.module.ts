@@ -43,7 +43,7 @@ import {
 	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
 import {
-	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
+	OsqueryConfigurationDetailsComponent, QueryEditDialogComponent
 } from './osquery';
 import {
 	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
@@ -296,7 +296,7 @@ export const httpInterceptorProviders = [
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
 		OsqueryConfigurationDetailsComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		FooterComponent,
 		EqualValidator,
 		OrbiterComponent,
@@ -360,7 +360,7 @@ export const httpInterceptorProviders = [
 		UserGroupDialogComponent,
 		NetworkProcessorConfigurationEditComponent,
 		NetworkStepConfigurationEditComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,

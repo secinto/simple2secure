@@ -27,7 +27,7 @@ import {AlertService, HttpService} from "../_services";
 import {Notification, QueryRun} from "../_models";
 import {QueryDTO} from "../_models/DTO/queryDTO";
 import {TranslateService} from "@ngx-translate/core";
-import {OsqueryConfigurationEditComponent} from "../osquery";
+import {QueryEditDialogComponent} from "../osquery";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {MatTableDataSource} from "@angular/material/table";
@@ -111,10 +111,6 @@ export class QueryListComponent {
 		this.loading = false;
 	}
 
-	onAddClick(category: QueryCategory){
-		console.log(category);
-	}
-
 	onEditClick(element: QueryRun) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
@@ -122,7 +118,7 @@ export class QueryListComponent {
 			queryRun: element,
 		};
 
-		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result == true) {
@@ -186,5 +182,34 @@ export class QueryListComponent {
 				this.loading = false;
 			});
 		this.loading = false;
+	}
+
+	onAddClick(category: QueryCategory) {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			queryRun: null,
+			queryCategory: category
+		};
+
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.osquery.add'));
+				this.added = true;
+				this.getQueries();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
 	}
 }

@@ -27,7 +27,7 @@ import {AlertService, HttpService} from "../_services";
 import {CompanyGroup, Notification, QueryRun} from "../_models";
 import {QueryDTO} from "../_models/DTO/queryDTO";
 import {TranslateService} from "@ngx-translate/core";
-import {OsqueryConfigurationEditComponent} from "../osquery";
+import {QueryEditDialogComponent} from "../osquery";
 import {HttpErrorResponse, HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {MatTableDataSource} from "@angular/material/table";

@@ -101,7 +101,7 @@
     text-align: left;
 }
 .mat-header-cell:nth-child(2),.mat-cell:nth-child(2){
-    text-align: center;
+    flex:30%;
 }
 .mat-header-cell:nth-child(3),.mat-cell:nth-child(3){
     flex:15%;
