@@ -45,6 +45,7 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.security.TLSConfig;
 import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
@@ -90,9 +91,10 @@ public class ProbeCLI {
 		LicenseController licenseController = new LicenseController();
 
 		StartConditions startConditions = licenseController.checkLicenseValidity();
-		
-		ProbeUtils.saveDeviceInfo(new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, ProbeConfiguration.ipAddress, ProbeConfiguration.netmask, DeviceStatus.ONLINE));
-		
+
+		ProbeUtils.saveDeviceInfo(new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, ProbeConfiguration.ipAddress,
+				ProbeConfiguration.netmask, DeviceStatus.ONLINE));
+
 		try {
 			prepareOsQuery();
 		} catch (IOException e) {
@@ -128,10 +130,10 @@ public class ProbeCLI {
 		log.debug("Checking PROBE status");
 		if (workerThread != null && workerThread.isRunning()) {
 			log.debug("PROBE_STATUS: OK");
-			System.out.println("PROBE_STATUS: OK");
+			System.out.println(ServiceCommands.CHECK_STATUS.getPositiveCommandResponse());
 		} else {
 			log.debug("PROBE_STATUS: NOK");
-			System.out.println("PROBE_STATUS: NOK");
+			System.out.println(ServiceCommands.CHECK_STATUS.getNegativeCommandResponse());
 		}
 
 	}
