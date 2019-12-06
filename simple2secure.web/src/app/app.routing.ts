@@ -35,7 +35,7 @@ import {UserInvitationComponent} from './invitation';
 import {RegisterComponent} from './register';
 import {ActivationComponent, ActivatedComponent} from './activation';
 import {AnalysisComponent} from './analysis';
-import {UserGroupComponent, UserComponent, UserDetailsComponent, UserOverviewComponent} from './user';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user';
 import {EmailComponent, EmailOverviewComponent, EmailRuleOverviewComponent} from './email';
 import {RuleOverviewComponent} from './rule';
 import {OrbiterOverviewComponent,
@@ -128,8 +128,7 @@ const appRoutes: Routes = [
 				data: {title: 'menu.users', breadcrumb: 'User'},
 				children: [
 					{path: '', component: UserOverviewComponent},
-					{path: ':id', component: UserDetailsComponent},
-					{path: 'group/:id', component: UserGroupComponent}
+					{path: ':id', component: UserDetailsComponent}
 				]
 			},
 			{

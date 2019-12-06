@@ -24,10 +24,9 @@ import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
-import {Notification, QueryRun} from "../_models";
+import {QueryRun} from "../_models";
 import {QueryDTO} from "../_models/DTO/queryDTO";
 import {TranslateService} from "@ngx-translate/core";
-import {QueryEditDialogComponent} from "../osquery";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {MatTableDataSource} from "@angular/material/table";
@@ -35,6 +34,7 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {QueryCategory} from "../_models/queryCategory";
 import {ConfirmationDialog} from "../dialog/confirmation-dialog";
+import {QueryEditDialogComponent} from "./queryEditDialog.component";
 
 @Component({
 	moduleId: module.id,

@@ -39,12 +39,9 @@ import {SearchComponent, SearchResultComponent} from './search';
 import {NotificationComponent, NotificationDetailsComponent} from './notification';
 import {ConfigurationDetailsComponent} from './configuration';
 import {
-	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
+	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupDialogComponent,
 	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
-import {
-	OsqueryConfigurationDetailsComponent, QueryEditDialogComponent
-} from './osquery';
 import {
 	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
 	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
@@ -182,11 +179,8 @@ import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
 import {UserGroupEditComponent} from "./user/userGroupEdit.component";
-import {QueriesComponent} from "./queries";
-import {QueryOverviewComponent} from "./queries/queryOverview.component";
-import {QueryListComponent} from "./queries/queryList.component";
-import {QueryAssignComponent} from "./queries/queryAssign.component";
-import {MappedQueryEditDialog} from "./queries/mappedQueryEditDialog.component";
+import {QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
+	QueryAssignComponent, MappedQueryEditDialog} from "./queries";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -288,14 +282,12 @@ export const httpInterceptorProviders = [
 		UserComponent,
 		UserDetailsComponent,
 		UserOverviewComponent,
-		UserGroupComponent,
 		UserGroupDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
-		OsqueryConfigurationDetailsComponent,
 		QueryEditDialogComponent,
 		FooterComponent,
 		EqualValidator,

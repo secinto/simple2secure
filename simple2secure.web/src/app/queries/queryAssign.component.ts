@@ -20,23 +20,15 @@
  *********************************************************************
  */
 
-import {Component, Query, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
-import {CompanyGroup, Notification, QueryRun} from "../_models";
-import {QueryDTO} from "../_models/DTO/queryDTO";
+import {CompanyGroup, QueryRun} from "../_models";
 import {TranslateService} from "@ngx-translate/core";
-import {QueryEditDialogComponent} from "../osquery";
-import {HttpErrorResponse, HttpParams} from "@angular/common/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {MatTableDataSource} from "@angular/material/table";
-import {MatPaginator} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
-import {QueryCategory} from "../_models/queryCategory";
-import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
-import {query} from "@angular/animations";
-import {UserGroupApplyConfigComponent} from "../user";
+import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 
 @Component({

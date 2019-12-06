@@ -249,10 +249,6 @@ export class UserOverviewComponent {
 
 	}
 
-	public editGroup(groupItem: any) {
-		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
-	}
-
 	public deleteUser(user: any) {
 		this.loading = true;
 		this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id).subscribe(
@@ -428,10 +424,6 @@ export class UserOverviewComponent {
 		else {
 			return false;
 		}
-	}
-
-	public onGroupEditClick() {
-		this.editGroup(this.selectedItem);
 	}
 
 	public onDeleteGroupClick() {
