@@ -313,6 +313,7 @@ public class QueryController {
 				for (QueryGroupMapping mapping : groupMappings) {
 					QueryRun query = queryRepository.find(mapping.getQueryId());
 					if (query != null) {
+						query = queryUtils.setValuesFromMapping(query, mapping);
 						queries.add(query);
 					}
 				}

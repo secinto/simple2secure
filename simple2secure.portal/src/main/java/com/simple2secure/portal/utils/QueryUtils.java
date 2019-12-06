@@ -128,9 +128,7 @@ public class QueryUtils {
 			for (QueryGroupMapping mapping : mappings) {
 				QueryRun query = queryRepository.find(mapping.getQueryId());
 				if (query != null) {
-					query.setAnalysisInterval(mapping.getAnalysisInterval());
-					query.setAnalysisIntervalUnit(mapping.getAnalysisIntervalUnit());
-					query.setSystemsAvailable(mapping.getSystemsAvailable());
+					query = setValuesFromMapping(query, mapping);
 					queries.add(query);
 				}
 			}
@@ -157,15 +155,27 @@ public class QueryUtils {
 			for (QueryGroupMapping mapping : mappings) {
 				QueryRun query = queryRepository.find(mapping.getQueryId());
 				if (query != null) {
-					query.setAnalysisInterval(mapping.getAnalysisInterval());
-					query.setAnalysisIntervalUnit(mapping.getAnalysisIntervalUnit());
-					query.setSystemsAvailable(mapping.getSystemsAvailable());
+					query = setValuesFromMapping(query, mapping);
 					queries.add(query);
 				}
 			}
 		}
 
 		return queries;
+	}
+
+	/**
+	 * This function sets the custom values which can be defined pro query mapping
+	 *
+	 * @param query
+	 * @param mapping
+	 * @return
+	 */
+	public QueryRun setValuesFromMapping(QueryRun query, QueryGroupMapping mapping) {
+		query.setAnalysisInterval(mapping.getAnalysisInterval());
+		query.setAnalysisIntervalUnit(mapping.getAnalysisIntervalUnit());
+		query.setSystemsAvailable(mapping.getSystemsAvailable());
+		return query;
 	}
 
 	/**
