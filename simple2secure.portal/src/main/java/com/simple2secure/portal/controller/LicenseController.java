@@ -171,9 +171,12 @@ public class LicenseController {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@ValidRequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
+	@ValidRequestMapping(
+			value = "/authenticate",
+			method = RequestMethod.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
 			boolean podAuthentication = false;
@@ -188,14 +191,11 @@ public class LicenseController {
 			}
 			LicenseActivation activation = null;
 
-			if (!licensePublic.isActivated()) {
-				activation = licenseUtils.activateLicense(licensePublic, podAuthentication, locale.getValue());
-				if (!licensePublic.isDevicePod()) {
-					sutUtils.addProbeAsSUT(licensePublic);
-				}
-			} else {
-				activation = licenseUtils.checkToken(licensePublic, podAuthentication, locale.getValue());
+			activation = licenseUtils.authenticateLicense(licensePublic, podAuthentication, locale.getValue());
+			if (!licensePublic.isDevicePod()) {
+				sutUtils.addProbeAsSUT(licensePublic);
 			}
+
 			if (activation.isSuccess()) {
 				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
 				if (licensePrivate != null) {
@@ -224,7 +224,8 @@ public class LicenseController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<byte[]> getLicense(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale) throws Exception {
+	public ResponseEntity<byte[]> getLicense(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale)
+			throws Exception {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
@@ -276,8 +277,11 @@ public class LicenseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(value = "/downloadLicenseForScript", method = RequestMethod.POST)
-	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale) throws Exception {
+	@ValidRequestMapping(
+			value = "/downloadLicenseForScript",
+			method = RequestMethod.POST)
+	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
+			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
 
 			String payload = licenseUtils.getPayloadFromTheToken(authToken);

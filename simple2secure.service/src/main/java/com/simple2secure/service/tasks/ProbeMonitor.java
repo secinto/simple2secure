@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.model.ProbeProcessInteraction;
 import com.simple2secure.service.model.ServiceTask;
 
 public class ProbeMonitor extends ServiceTask {
@@ -43,19 +44,27 @@ public class ProbeMonitor extends ServiceTask {
 	public void run() {
 		log.debug("Executing {}", ProbeMonitor.class);
 		boolean restart = false;
-		log.debug("Probe process is alive {}", probeProcess.getProcess().isAlive());
 		if (probeProcess == null) {
+			log.debug("Probe process container is not available anymore");
 			restart = true;
 		} else {
 			if (probeProcess.getProcess() == null) {
+				log.debug("Probe process is null");
 				restart = true;
 			} else if (!probeProcess.getProcess().isAlive()) {
+				log.debug("Probe process is alive {}", probeProcess.getProcess().isAlive());
 				restart = true;
+			} else {
+				if (!ProbeProcessInteraction.getInstance(probeProcess).sendCheckStatusCommand()) {
+					log.debug("Probe process check status was not successful");
+					restart = true;
+				}
 			}
+
 		}
 
 		if (restart) {
-			log.info("Controlled probe process is not alive anymore, trying to restart it!");
+			log.info("Controlled probe process is not alive anymore, or not responding. Trying to restart it!");
 
 			if (!this.getProbeControllerEngine().isStopped()) {
 				log.debug("Triggering restart for controlled probe process!");

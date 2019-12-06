@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.api.model.DeviceInfo;
-import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
@@ -50,7 +48,6 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
-import com.simple2secure.probe.utils.ProbeUtils;
 
 public class LicenseController {
 
@@ -186,6 +183,10 @@ public class LicenseController {
 	public boolean authenticateLicense() {
 		CompanyLicensePublic license = loadLicenseFromDB();
 		if (license != null) {
+			/*
+			 * TODO: Hack because currently it doesn't work if the license has already been activated.
+			 */
+			license.setActivated(false);
 			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
 			if (response != null) {
 				license = activateLicenseAndUpdateInDB(response, license);
@@ -255,7 +256,7 @@ public class LicenseController {
 			ProbeConfiguration.probeId = UUID.randomUUID().toString();
 			storedLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, ProbeConfiguration.probeId);
 		}
-		
+
 		/*
 		 * Update the license in the local DB.
 		 */
