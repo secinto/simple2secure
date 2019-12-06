@@ -112,3 +112,7 @@
 .mat-header-cell:last-child,.mat-cell:last-child{
     flex:15%;
 }
+
+#addCategory{
+    margin-left: 15px;
+}

@@ -419,6 +419,10 @@
   "query.edit": "Abfrage bearbeiten",
   "query.update.success": "Abfrage erfolgreich aktualisiert",
 
+  "query.category.add": "Kategorie hinzufügen",
+  "query.category.edit": "Kategorie bearbeiten",
+  "query.category.add.success": "Abfragekategorie erfolgreich hinzugefügt",
+
   "orbiter.toolsconfig": "Werkzeugkonfiguration bearbeiten",
   "orbiter.edittests": "Tests bearbeiten",
   "orbiter.editsequence": "Sequenz bearbeiten",

@@ -1,4 +1,8 @@
- <mat-tab-group>
+<button mat-raised-button color="primary" id="addCategory" type="button" (click)="onCategoryAddClick()"
+        class="pull-right mat-green-button">
+    <i class="glyphicon glyphicon-plus"></i> {{ 'query.category.add' | translate }}
+</button>
+<mat-tab-group>
         <mat-tab *ngFor="let query of queries" [label]="query.category.name">
             <p class="mat-tab-description"><b>{{query.category.description}}</b></p>
 

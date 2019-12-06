@@ -179,8 +179,10 @@ import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
 import {UserGroupEditComponent} from "./user/userGroupEdit.component";
-import {QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
-	QueryAssignComponent, MappedQueryEditDialog} from "./queries";
+import {
+	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
+	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
+} from "./queries";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -343,7 +345,8 @@ export const httpInterceptorProviders = [
 		QueryOverviewComponent,
 		QueryListComponent,
 		QueryAssignComponent,
-		MappedQueryEditDialog
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -373,7 +376,8 @@ export const httpInterceptorProviders = [
 		StatComponent,
 		SUTDetailsComponent,
 		UserGroupEditComponent,
-		MappedQueryEditDialog
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog
 	],
 	providers: [
 		AuthGuard,

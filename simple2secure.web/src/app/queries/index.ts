@@ -26,3 +26,4 @@ export * from './queryAssign.component';
 export * from './queryEditDialog.component';
 export * from './queryList.component';
 export * from './queryOverview.component';
+export * from './queryCategoryAddDialog.component';

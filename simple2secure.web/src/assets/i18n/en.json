@@ -419,6 +419,11 @@
   "query.edit": "Edit Query",
   "query.update.success": "Query updated successfully",
 
+  "query.category.add": "Add Category",
+  "query.category.edit": "Edit Category",
+  "query.category.add.success": "Query Category added successfully",
+
+
   "orbiter.toolsconfig": "Edit tools configuration",
   "orbiter.edittests": "Edit test",
   "orbiter.editsequence" : "Edit Sequence",

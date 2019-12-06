@@ -35,6 +35,7 @@ import {MatSort} from "@angular/material/sort";
 import {QueryCategory} from "../_models/queryCategory";
 import {ConfirmationDialog} from "../dialog/confirmation-dialog";
 import {QueryEditDialogComponent} from "./queryEditDialog.component";
+import {QueryCategoryAddDialog} from "./queryCategoryAddDialog.component";
 
 @Component({
 	moduleId: module.id,
@@ -197,6 +198,34 @@ export class QueryListComponent {
 		dialogRef.afterClosed().subscribe(result => {
 			if (result == true) {
 				this.alertService.success(this.translate.instant('message.osquery.add'));
+				this.added = true;
+				this.getQueries();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
+
+	onCategoryAddClick(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			category: null,
+		};
+
+		const dialogRef = this.dialog.open(QueryCategoryAddDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('query.category.add.success'));
 				this.added = true;
 				this.getQueries();
 			}

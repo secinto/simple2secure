@@ -213,6 +213,36 @@ public class QueryController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
+	@ValidRequestMapping(value = "/category", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<QueryCategory> updateSaveCategory(@RequestBody QueryCategory category, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (category != null) {
+			if (!Strings.isNullOrEmpty(category.getId())) {
+
+				queryCategoryRepository.update(category);
+				return new ResponseEntity<>(category, HttpStatus.OK);
+			}
+
+			else {
+
+				// TODO: Check if category by name already exists
+				queryCategoryRepository.save(category);
+				return new ResponseEntity<>(category, HttpStatus.OK);
+			}
+		}
+		log.error("Error while inserting/updating queryRun");
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+
+	}
+
+	/**
+	 * This function updates or saves new Query config into the database
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@ValidRequestMapping(value = "/mapping", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<QueryRun>> updateQueryMappings(@RequestBody List<QueryRun> queryList, @PathVariable ValidInputGroup groupId,
