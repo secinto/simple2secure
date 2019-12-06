@@ -416,6 +416,8 @@
   "query.available": "Verfügbare Abfragen",
   "query.remove.error": "Beim Entfernen der Abfrage ist ein Problem aufgetreten",
   "query.remove.success": "Abfrage erfolgreich entfernt",
+  "query.edit": "Abfrage bearbeiten",
+  "query.update.success": "Abfrage erfolgreich aktualisiert",
 
   "orbiter.toolsconfig": "Werkzeugkonfiguration bearbeiten",
   "orbiter.edittests": "Tests bearbeiten",

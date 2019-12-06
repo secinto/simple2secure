@@ -186,6 +186,7 @@ import {QueriesComponent} from "./queries";
 import {QueryOverviewComponent} from "./queries/queryOverview.component";
 import {QueryListComponent} from "./queries/queryList.component";
 import {QueryAssignComponent} from "./queries/queryAssign.component";
+import {MappedQueryEditDialog} from "./queries/mappedQueryEditDialog.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -349,7 +350,8 @@ export const httpInterceptorProviders = [
 		QueriesComponent,
 		QueryOverviewComponent,
 		QueryListComponent,
-		QueryAssignComponent
+		QueryAssignComponent,
+		MappedQueryEditDialog
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -378,7 +380,8 @@ export const httpInterceptorProviders = [
 		StatItemComponent,
 		StatComponent,
 		SUTDetailsComponent,
-		UserGroupEditComponent
+		UserGroupEditComponent,
+		MappedQueryEditDialog
 	],
 	providers: [
 		AuthGuard,

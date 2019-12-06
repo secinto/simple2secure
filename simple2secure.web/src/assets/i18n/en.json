@@ -416,6 +416,8 @@
   "query.available": "Available Queries",
   "query.remove.error": "Problem occurred while removing query",
   "query.remove.success": "Query removed successfully",
+  "query.edit": "Edit Query",
+  "query.update.success": "Query updated successfully",
 
   "orbiter.toolsconfig": "Edit tools configuration",
   "orbiter.edittests": "Edit test",

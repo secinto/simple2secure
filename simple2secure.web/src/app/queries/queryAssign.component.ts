@@ -36,6 +36,8 @@ import {MatSort} from "@angular/material/sort";
 import {QueryCategory} from "../_models/queryCategory";
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 import {query} from "@angular/animations";
+import {UserGroupApplyConfigComponent} from "../user";
+import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 
 @Component({
 	moduleId: module.id,
@@ -57,7 +59,8 @@ export class QueryAssignComponent {
 		private router: Router,
 		private httpService: HttpService,
 		private alertService: AlertService,
-		private translate: TranslateService)
+		private translate: TranslateService,
+		private dialog: MatDialog)
 	{}
 
 	ngOnInit() {
@@ -187,7 +190,22 @@ export class QueryAssignComponent {
 	}
 
 	editMappedQuery(item: QueryRun){
-		console.log("hereeeee");
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			queryRun: item,
+		};
+
+		const dialogRef = this.dialog.open(MappedQueryEditDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+
+			const index = this.mappedQueries.indexOf(item);
+			if(index > -1){
+				this.mappedQueries[index] = result;
+			}
+			this.alertService.success(this.translate.instant('query.update.success'));
+		});
 	}
 
 	checkIfArrayContainsObject(mappedQueries: QueryRun[], movedQuery: QueryRun){

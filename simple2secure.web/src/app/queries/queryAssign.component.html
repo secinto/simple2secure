@@ -18,8 +18,11 @@
             class="example-list"
             (cdkDropListDropped)="drop($event)">
         <div class="example-box" *ngFor="let item of mappedQueries" cdkDrag>
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
-            {{item.name}}
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{item.name}}
+            <div *cdkDragPreview class="preview-drag-box">
+                <p>{{item.description}}</p>
+                <p>Interval: {{item.analysisInterval}} {{item.analysisIntervalUnit}}</p>
+            </div>
             <div class="drag-action-buttons">
                 <a class="delete-button" (click)='removeMappedQuery(item)'><mat-icon class="drag-action-icon">close</mat-icon></a>
                 <a class="edit-button" (click)='editMappedQuery(item)'><mat-icon class="drag-action-icon">edit</mat-icon></a>
