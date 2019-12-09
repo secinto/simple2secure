@@ -28,7 +28,7 @@
     <button mat-button [disabled]="!queryForm.dirty" mat-raised-button class="mat-green-button" color="primary"
             (click)="saveQueryRun()">{{ 'button.save' | translate }}
     </button>
-    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="queryRun"
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" (click)="saveQueryRun()"
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
 </div>
