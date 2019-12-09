@@ -127,15 +127,12 @@ project(':simple2secure.validator') {
 	dependencies {
 		implementation project(':simple2secure.api')
 		implementation project(':simple2secure.commons')
-		compile ('org.springframework.boot:spring-boot-starter-web'){
-			exclude group: 'org.hibernate'
-		}
+		compile group: 'org.springframework', name: 'spring-web', version: '5.2.0.RELEASE'
+		compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.2.0.RELEASE'
 		compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
-		compile 'org.springframework.boot:spring-boot-starter-security'
 		compile group: 'commons-io', name: 'commons-io', version: '2.6'
 		compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-		compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
+		compileOnly 'javax.servlet:servlet-api:2.5'		
 	}
 }
 
