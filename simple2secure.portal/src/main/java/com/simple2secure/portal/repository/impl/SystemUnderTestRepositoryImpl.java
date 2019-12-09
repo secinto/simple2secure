@@ -13,9 +13,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.SUTUtils;
 
 @Repository
 @Transactional
@@ -23,6 +26,9 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 
 	@Autowired
 	PortalUtils portalUtils;
+	
+	@Autowired
+	SUTUtils sutUtils;
 
 	@PostConstruct
 	public void init() {
@@ -94,6 +100,14 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 		query.skip(skip);
 		query.with(Sort.by(Sort.Direction.DESC, "startTime"));
 		suts = mongoTemplate.find(query, SystemUnderTest.class, collectionName);
+		
+		for(SystemUnderTest sut : suts) {
+			DeviceStatus status = sut.getDeviceStatus();
+			DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+			if(status != deviceStatus) {
+				sut.setDeviceStatus(deviceStatus);
+			}
+		}
 		
 		sutMap.put("sutList", suts);
 		sutMap.put("totalSize", count);	
