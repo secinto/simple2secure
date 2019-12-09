@@ -35,7 +35,7 @@ import {UserInvitationComponent} from './invitation';
 import {RegisterComponent} from './register';
 import {ActivationComponent, ActivatedComponent} from './activation';
 import {AnalysisComponent} from './analysis';
-import {UserGroupComponent, UserComponent, UserDetailsComponent, UserOverviewComponent} from './user';
+import {UserComponent, UserDetailsComponent, UserOverviewComponent} from './user';
 import {EmailComponent, EmailOverviewComponent, EmailRuleOverviewComponent} from './email';
 import {RuleOverviewComponent} from './rule';
 import {OrbiterOverviewComponent,
@@ -56,6 +56,10 @@ import { TestSequenceResultComponent } from './report/testSequenceResult.compone
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
 import {DevicesComponent, DevicesOverviewComponent, DevicesListComponent} from './devices';
+import {QueriesComponent} from "./queries";
+import {QueryOverviewComponent} from "./queries/queryOverview.component";
+import {QueryListComponent} from "./queries/queryList.component";
+import {QueryAssignComponent} from "./queries/queryAssign.component";
 
 const appRoutes: Routes = [
 	{
@@ -86,17 +90,27 @@ const appRoutes: Routes = [
 				]
 			},
 			{
-				path: 'orbiter',
+				path: 'tests',
 				component: OrbiterComponent,
-				data: {title: 'menu.orbiter', breadcrumb: 'Orbiter'},
+				data: {title: 'menu.tests', breadcrumb: 'Tests'},
 				children: [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter', breadcrumb: 'Dashboard'}},
-					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Tests'}},
+					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Test Templates'}},
 					{path: 'test/:id', component: OrbiterToolTestListComponent, data: {title: 'menu.tests'}},
 					{path: 'scheduledTests', component: OrbiterToolTestScheduledListComponent, data: {title: 'test.scheduled', breadcrumb: 'Scheduled Tests'}},
 					{path: 'test/sequences/:id', component: OrbiterToolTestSequenceListComponent, data : {title: 'test.sequences'}},
 					{path: 'scheduledSequences', component: OrbiterScheduledSequencesListComponent, data : {title: 'sequence.scheduled', breadcrumb: 'Scheduled Sequences'}},
 					{path: 'sut', component: OrbiterSystemsUnderTestListComponent, data : {title: 'orbiter.sut', breadcrumb: 'System Under Test'}},
+				]
+			},
+			{
+				path: 'queries',
+				component: QueriesComponent,
+				data: {title: 'menu.queries', breadcrumb: 'Queries'},
+				children: [
+					{path: '', component: QueryOverviewComponent, data: {title: 'menu.queries', breadcrumb: 'Dashboard'}},
+					{path: 'list', component: QueryListComponent, data: {title: 'menu.queryList', breadcrumb: 'Query List'}},
+					{path: 'assign', component: QueryAssignComponent, data: {title: 'menu.mapQuery', breadcrumb: 'Map Queries'}},
 				]
 			},
 			{
@@ -114,8 +128,7 @@ const appRoutes: Routes = [
 				data: {title: 'menu.users', breadcrumb: 'User'},
 				children: [
 					{path: '', component: UserOverviewComponent},
-					{path: ':id', component: UserDetailsComponent},
-					{path: 'group/:id', component: UserGroupComponent}
+					{path: ':id', component: UserDetailsComponent}
 				]
 			},
 			{

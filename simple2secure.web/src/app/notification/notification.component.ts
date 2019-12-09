@@ -37,14 +37,29 @@ export class NotificationComponent {
 	notifications: Notification[];
 	url: string;
 	dataRefresher: any;
+	loggedIn: boolean;
+	userRole: string;
 
 	constructor(private httpService: HttpService,
-	            private dataService: DataService){
+				private dataService: DataService){
 	}
 
 	ngOnInit() {
-		this.getNotifications();
-		this.refreshNotifications();
+		if(this.loggedIn){
+			this.getNotifications();
+			this.refreshNotifications();
+		}
+	}
+
+	ngDoCheck(){
+		this.userRole = this.dataService.getRole();
+
+		if (this.userRole) {
+			this.loggedIn = true;
+		}
+		else {
+			this.loggedIn = false;
+		}
 	}
 
 	public getNotifications() {

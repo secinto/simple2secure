@@ -41,20 +41,6 @@ public class TestSequenceRepositoryImpl extends TestSequenceRepository {
 	}
 
 	@Override
-	public TestSequence getSequenceByName(String name) {
-		Query query = new Query(Criteria.where("name").is(name));
-		TestSequence sequence = mongoTemplate.findOne(query, TestSequence.class);
-		return sequence;
-	}
-
-	@Override
-	public TestSequence getSequenceByNameAndDeviceId(String name, String deviceId) {
-		Query query = new Query(Criteria.where("podId").is(deviceId).and("name").is(name));
-		TestSequence sequence = mongoTemplate.findOne(query, TestSequence.class);
-		return sequence;
-	}
-
-	@Override
 	public long getCountOfSequencesWithDeviceid(String deviceId) {
 		Query query = new Query(Criteria.where("podId").is(deviceId));
 		long count = mongoTemplate.count(query, TestSequence.class, collectionName);

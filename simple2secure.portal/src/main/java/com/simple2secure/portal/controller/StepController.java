@@ -21,7 +21,6 @@
  */
 package com.simple2secure.portal.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,14 +38,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -54,8 +49,6 @@ import com.simple2secure.portal.utils.PortalUtils;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputDevice;
-import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputStep;
 
@@ -67,12 +60,6 @@ public class StepController {
 	private StepRepository repository;
 
 	@Autowired
-	private LicenseRepository licenseRepository;
-
-	@Autowired
-	private GroupRepository groupRepository;
-
-	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
@@ -82,55 +69,12 @@ public class StepController {
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
-	public ResponseEntity<List<Step>> getStepsByDeviceId(@PathVariable ValidInputDevice deviceId, @RequestParam boolean select_all,
-			@ServerProvidedValue ValidInputLocale locale) {
-		log.debug("Retrieving steps for probe id {}", deviceId.getValue());
-		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
+	public ResponseEntity<List<Step>> getSteps(@RequestParam boolean select_all, @ServerProvidedValue ValidInputLocale locale) {
 
-			if (license != null) {
-				CompanyGroup group = groupRepository.find(license.getGroupId());
-
-				if (group != null) {
-					List<Step> steps = new ArrayList<>();
-					if (group.isRootGroup()) {
-						// This is root group get configuration from this group only
-						steps = repository.getStepsByGroupId(license.getGroupId(), select_all);
-
-					} else {
-						// This is not root group get all processors from all parent groups, until we find the root group
-						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
-						// Iterate through all found groups and add their queries to the queryConfig
-						for (CompanyGroup cg : foundGroups) {
-							List<Step> currentSteps = repository.getStepsByGroupId(cg.getId(), select_all);
-							if (currentSteps != null) {
-								steps.addAll(currentSteps);
-							}
-						}
-					}
-					if (steps != null) {
-						return new ResponseEntity<>(steps, HttpStatus.OK);
-					}
-				}
-			}
+		List<Step> steps = repository.getStepsByFlagValue(select_all);
+		if (steps != null) {
+			return new ResponseEntity<>(steps, HttpStatus.OK);
 		}
-		log.error("Error while retrieving steps for probe id {}", deviceId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-	}
-
-	@ValidRequestMapping(value = "/group")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Step>> getStepsByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
-			@ServerProvidedValue ValidInputLocale locale) {
-
-		if (!Strings.isNullOrEmpty(groupId.getValue())) {
-			List<Step> steps = repository.getStepsByGroupId(groupId.getValue(), select_all);
-			if (steps != null) {
-				return new ResponseEntity<>(steps, HttpStatus.OK);
-			}
-		}
-		log.error("Error while retrieving steps for group id {}", groupId.getValue());
 		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -142,12 +86,8 @@ public class StepController {
 
 		if (step != null) {
 			if (Strings.isNullOrEmpty(step.getId())) {
-
-				// Set the correct number
-				if (!Strings.isNullOrEmpty(step.getGroupId())) {
-					List<Step> steps = repository.getStepsByGroupId(step.getGroupId(), true);
-					step.setNumber(steps.size() + 1);
-				}
+				List<Step> steps = repository.getStepsByFlagValue(true);
+				step.setNumber(steps.size() + 1);
 				repository.save(step);
 			} else {
 				repository.update(step);
@@ -172,7 +112,7 @@ public class StepController {
 
 		if (!Strings.isNullOrEmpty(stepId.getValue())) {
 			Step step = repository.find(stepId.getValue());
-			List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber(), step.getGroupId());
+			List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber());
 			{
 				repository.delete(step);
 				if (steps != null) {

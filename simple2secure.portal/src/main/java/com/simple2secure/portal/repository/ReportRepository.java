@@ -31,8 +31,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class ReportRepository extends MongoRepository<Report> {
 	public abstract List<Report> getReportsByDeviceId(String deviceId);
 
-	// public abstract List<Report> getReportsByName(String name);
-
 	public abstract List<Report> getReportsByName(String name, int page, int size);
 
 	public abstract List<Report> getReportsByDeviceAndName(String deviceId, String name, int page, int size);

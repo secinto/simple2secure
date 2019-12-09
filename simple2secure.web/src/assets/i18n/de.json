@@ -169,6 +169,9 @@
   "menu.dashboard": "Dashboard",
   "menu.probes": "Probe",
   "menu.deviceList": "Geräteliste",
+  "menu.queries": "Abfragen",
+  "menu.queryList": "Abfrageliste",
+  "menu.mapQuery": "Abfragezuordnung",
 
   "account.activated": "Ihr Konto wurde bereits aktiviert!",
   "account.login": "Melden Sie sich mit dem folgenden Button im Portal an.",
@@ -246,6 +249,8 @@
   "table.sut.endDeviceLocation" : "Endgerät Ort",
   "table.type": "Typ",
   "table.probe": "Probe",
+  "table.systemsAvailable": "Unterstützte OS",
+  "table.graphAble": "Darstellbar",
 
   "message.configuration": "Konfiguration erfolgreich geladen!",
   "message.configuration.save": "Konfiguration erfolgreich aktualisiert!",
@@ -405,6 +410,18 @@
   "osquery.runalways": "Immer ausführen?",
   "osquery.details": "Abfrage Details",
   "osquery.reports.charts": "OSQuery-Berichtsdiagramme",
+  "query.moving.error": "Die Abfrage ist dieser Gruppe bereits zugeordnet",
+  "query.moving.success": "Abfrage erfolgreich zugeordnet",
+  "query.mapped": "Zugeordnete Abfragen",
+  "query.available": "Verfügbare Abfragen",
+  "query.remove.error": "Beim Entfernen der Abfrage ist ein Problem aufgetreten",
+  "query.remove.success": "Abfrage erfolgreich entfernt",
+  "query.edit": "Abfrage bearbeiten",
+  "query.update.success": "Abfrage erfolgreich aktualisiert",
+
+  "query.category.add": "Kategorie hinzufügen",
+  "query.category.edit": "Kategorie bearbeiten",
+  "query.category.add.success": "Abfragekategorie erfolgreich hinzugefügt",
 
   "orbiter.toolsconfig": "Werkzeugkonfiguration bearbeiten",
   "orbiter.edittests": "Tests bearbeiten",

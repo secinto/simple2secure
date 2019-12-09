@@ -21,69 +21,54 @@
  */
 
 import {Component, ViewChild} from '@angular/core';
-import {AlertService, DataService, HttpService} from '../_services';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
-import {environment} from '../../environments/environment';
-import {TranslateService} from '@ngx-translate/core';
-import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {HttpErrorResponse, HttpParams} from '@angular/common/http';
-import {QueryRun} from '../_models';
-import {OsqueryConfigurationEditComponent} from './osqueryConfigurationEdit.component';
-import {UserGroupComponent} from '../user';
+import {environment} from "../../environments/environment";
+import {AlertService, HttpService} from "../_services";
+import {QueryRun} from "../_models";
+import {QueryDTO} from "../_models/DTO/queryDTO";
+import {TranslateService} from "@ngx-translate/core";
+import {HttpErrorResponse} from "@angular/common/http";
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
+import {MatTableDataSource} from "@angular/material/table";
+import {MatPaginator} from "@angular/material/paginator";
+import {MatSort} from "@angular/material/sort";
+import {QueryCategory} from "../_models/queryCategory";
+import {ConfirmationDialog} from "../dialog/confirmation-dialog";
+import {QueryEditDialogComponent} from "./queryEditDialog.component";
+import {QueryCategoryAddDialog} from "./queryCategoryAddDialog.component";
 
 @Component({
 	moduleId: module.id,
-	selector: 'osQueryConfigDetails',
-	styleUrls: ['osquery.css'],
-	templateUrl: 'osqueryConfigurationDetails.component.html'
+	templateUrl: 'queryList.component.html',
+	styleUrls: ['query.css']
 })
 
-export class OsqueryConfigurationDetailsComponent {
-	displayedColumns = ['name', 'runAlways', 'interval', 'active', 'action'];
+export class QueryListComponent {
+
+	queries: QueryDTO[];
+	deleted = false;
+	added = false;
+	loading = false;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
-	queries: any[];
-	selectedItem: QueryRun;
-	loading = false;
-	type: number;
-	deleted = false;
-	added = false;
-	private sub: any;
-	groupId: string;
-	probeId: string;
-	groupEditable: boolean;
-
+	displayedColumns = ['name', 'query', 'action'];
 
 	constructor(
-		private alertService: AlertService,
-		private httpService: HttpService,
-		private router: Router,
-		private dialog: MatDialog,
-		private dataService: DataService,
 		private route: ActivatedRoute,
-		private translate: TranslateService
-	)
+		private router: Router,
+		private httpService: HttpService,
+		private alertService: AlertService,
+		private translate: TranslateService,
+		private dialog: MatDialog)
 	{}
 
 	ngOnInit() {
-
-		this.sub = this.route.params.subscribe(params => {
-			this.groupId = params['id'];
-		});
-
-		this.groupEditable = this.dataService.isGroupEditable();
-
-		if (!this.groupEditable) {
-			this.displayedColumns = ['name', 'query', 'runAlways', 'interval', 'active'];
-		}
-
-		this.loadQueries();
+		this.getQueries();
 	}
 
-	ngAfterViewInit() {
+	ngAfterViewInit(){
 		this.dataSource.sort = this.sort;
 		this.dataSource.sortingDataAccessor = (item, property) => {
 			if (property === 'interval') {
@@ -102,26 +87,19 @@ export class OsqueryConfigurationDetailsComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-
-	loadQueries() {
+	public getQueries() {
 		this.loading = true;
-		const params = new HttpParams()
-			.set('select_all', String(true));
-		this.httpService.getWithParams(environment.apiEndpoint + 'query/group/' + this.groupId, params)
+		this.httpService.get(environment.apiEndpoint + 'query/allDto')
 			.subscribe(
 				data => {
 					this.queries = data;
-					this.dataSource.data = this.queries;
-					if (data.length > 0) {
-						if (this.deleted == false && this.added == false) {
-							this.alertService.success(this.translate.instant('message.data'));
-						}
-						else {
-							this.deleted = false;
-							this.added = false;
-						}
+					if (this.deleted == false && this.added == false) {
+						this.alertService.success(this.translate.instant('message.data'));
 					}
-					this.loading = false;
+					else {
+						this.deleted = false;
+						this.added = false;
+					}
 				},
 				error => {
 					if (error.status == 0) {
@@ -130,23 +108,18 @@ export class OsqueryConfigurationDetailsComponent {
 					else {
 						this.alertService.error(error.error.errorMessage);
 					}
-					this.loading = false;
 				});
+		this.loading = false;
 	}
 
-	onMenuTriggerClick(item: any) {
-		this.selectedItem = item;
-	}
-
-	onEditClick() {
+	onEditClick(element: QueryRun) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
 		dialogConfig.data = {
-			queryRun: this.selectedItem,
-			groupId: this.groupId
+			queryRun: element,
 		};
 
-		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(result => {
 			if (result == true) {
@@ -165,40 +138,11 @@ export class OsqueryConfigurationDetailsComponent {
 		});
 	}
 
-	onAddClick() {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '450px';
-		dialogConfig.data = {
-			queryRun: null,
-			groupId: this.groupId
-		};
-
-		const dialogRef = this.dialog.open(OsqueryConfigurationEditComponent, dialogConfig);
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.osquery.add'));
-				this.added = true;
-				this.loadQueries();
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
+	onDeleteClick(element: QueryRun) {
+		this.openDialog(element);
 	}
 
-	onDeleteClick() {
-		this.openDialog(this.selectedItem);
-	}
-
-	public openDialog(item: any) {
+	public openDialog(item: QueryRun) {
 
 		const dialogConfig = new MatDialogConfig();
 
@@ -220,13 +164,13 @@ export class OsqueryConfigurationDetailsComponent {
 		});
 	}
 
-	deleteConfig(queryConfig: any) {
+	deleteConfig(queryConfig: QueryRun) {
 		this.loading = true;
 		this.httpService.delete(environment.apiEndpoint + 'query/' + queryConfig.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.osquery.delete'));
 				this.deleted = true;
-				this.loadQueries();
+				this.getQueries();
 				this.loading = false;
 			},
 			error => {
@@ -238,5 +182,63 @@ export class OsqueryConfigurationDetailsComponent {
 				}
 				this.loading = false;
 			});
+		this.loading = false;
+	}
+
+	onAddClick(category: QueryCategory) {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			queryRun: null,
+			queryCategory: category
+		};
+
+		const dialogRef = this.dialog.open(QueryEditDialogComponent, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('message.osquery.add'));
+				this.added = true;
+				this.getQueries();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
+	}
+
+	onCategoryAddClick(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			category: null,
+		};
+
+		const dialogRef = this.dialog.open(QueryCategoryAddDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result == true) {
+				this.alertService.success(this.translate.instant('query.category.add.success'));
+				this.added = true;
+				this.getQueries();
+			}
+			else {
+				if (result instanceof HttpErrorResponse) {
+					if (result.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(result.error.errorMessage);
+					}
+				}
+			}
+		});
 	}
 }

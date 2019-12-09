@@ -26,6 +26,30 @@ import {Widget} from '../_models/widget';
 @Injectable()
 export class DataService {
 
+	get() {
+		return JSON.parse(sessionStorage.getItem('data'));
+	}
+
+	set(data: any){
+		sessionStorage.setItem('data', JSON.stringify(data));
+	}
+
+	setRole(role: string){
+		sessionStorage.setItem('role', role);
+	}
+
+	getRole(){
+		return sessionStorage.getItem('role');
+	}
+
+	setAuthToken(authToken: string){
+		sessionStorage.setItem('auth_token', authToken);
+	}
+
+	getAuthToken(){
+		return sessionStorage.getItem('auth_token');
+	}
+
 	setGroupEditable(value: boolean) {
 		sessionStorage.setItem('isGroupEditable', JSON.stringify(value));
 	}
@@ -44,6 +68,10 @@ export class DataService {
 
 	clearWidgets(){
 		sessionStorage.removeItem('selectedWidget');
+	}
+
+	clearSessionStorage(){
+		sessionStorage.clear();
 	}
 
 }

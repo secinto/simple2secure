@@ -52,18 +52,6 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> findByToolId(String toolId) {
-		Query query = new Query(Criteria.where("toolId").is(toolId));
-		return mongoTemplate.find(query, Notification.class);
-	}
-
-	@Override
-	public List<Notification> findByContextAndToolId(String contextId, String toolId) {
-		Query query = new Query(Criteria.where("toolId").is(toolId).and("contextId").is(contextId));
-		return mongoTemplate.find(query, Notification.class);
-	}
-
-	@Override
 	public void deleteByContextId(String contextId) {
 		List<Notification> notifications = findByContextId(contextId);
 

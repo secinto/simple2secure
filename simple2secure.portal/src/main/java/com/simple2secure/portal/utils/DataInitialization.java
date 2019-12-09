@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -34,10 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Processor;
+import com.simple2secure.api.model.QueryCategory;
+import com.simple2secure.api.model.QueryGroupMapping;
 import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Step;
@@ -51,6 +56,8 @@ import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
+import com.simple2secure.portal.repository.QueryCategoryRepository;
+import com.simple2secure.portal.repository.QueryGroupMappingRepository;
 import com.simple2secure.portal.repository.QueryRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
@@ -80,6 +87,9 @@ public class DataInitialization {
 	protected QueryRepository queryRepository;
 
 	@Autowired
+	protected QueryCategoryRepository queryCategoryRepository;
+
+	@Autowired
 	protected StepRepository stepRepository;
 
 	@Autowired
@@ -87,6 +97,9 @@ public class DataInitialization {
 
 	@Autowired
 	protected UserRepository userRepository;
+
+	@Autowired
+	protected QueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	protected PortalUtils portalUtils;
@@ -119,13 +132,7 @@ public class DataInitialization {
 				ObjectId groupId = groupRepository.saveAndReturnId(group);
 				log.debug("Default group added for user with id {}", userId);
 				if (!Strings.isNullOrEmpty(groupId.toString())) {
-					try {
-						addDefaultGroupQueries(groupId.toString());
-					} catch (IOException e) {
-						log.error(e.getMessage());
-					}
-					addDefaultGroupProcessors(groupId.toString());
-					addDefaultGroupSteps(groupId.toString());
+					mapActiveQueriesToDefaultGroup(groupId.toString());
 				}
 			}
 		}
@@ -138,22 +145,45 @@ public class DataInitialization {
 	 *          The group ID for which a default query should be created
 	 * @throws IOException
 	 */
-	public void addDefaultGroupQueries(String groupId) throws IOException {
-		List<QueryRun> queriesDB = queryRepository.findByGroupId(groupId, true);
+	public void addDefaultQueries() throws IOException {
+		List<QueryRun> queriesDB = queryRepository.findAll();
 
 		if (queriesDB == null || queriesDB.isEmpty()) {
 
 			File file = new File(getClass().getResource("/server/queries.json").getFile());
 			String content = new String(Files.readAllBytes(file.toPath()));
-			QueryRun[] queries = JSONUtils.fromString(content, QueryRun[].class);
 
-			if (queries != null) {
-				List<QueryRun> queryList = Arrays.asList(queries);
+			JsonNode node = JSONUtils.fromString(content);
 
-				for (QueryRun query : queryList) {
-					query.setGroupId(groupId);
-					queryRepository.save(query);
+			if (node.isArray()) {
+				ArrayNode arrayNode = (ArrayNode) node;
+				Iterator<JsonNode> queryCategoryNode = arrayNode.elements();
+
+				while (queryCategoryNode.hasNext()) {
+					JsonNode currentCategoryNode = queryCategoryNode.next();
+					QueryCategory category = portalUtils.generateQueryCategoryObjectFromJson(currentCategoryNode);
+					ObjectId categoryId = queryCategoryRepository.saveAndReturnId(category);
+					QueryRun[] queries = JSONUtils.fromString(JSONUtils.toString(currentCategoryNode.get("queries")), QueryRun[].class);
+
+					if (queries != null) {
+						List<QueryRun> queryList = Arrays.asList(queries);
+						for (QueryRun query : queryList) {
+							query.setCategoryId(categoryId.toString());
+							queryRepository.save(query);
+						}
+					}
 				}
+			}
+		}
+	}
+
+	public void mapActiveQueriesToDefaultGroup(String groupId) {
+		List<QueryRun> activeQueries = queryRepository.findByActiveStatus(1);
+		if (activeQueries != null) {
+			for (QueryRun query : activeQueries) {
+				QueryGroupMapping queryGroupMapping = new QueryGroupMapping(groupId, query.getId(), query.getAnalysisInterval(),
+						query.getAnalysisIntervalUnit(), query.getSystemsAvailable());
+				queryGroupMappingRepository.save(queryGroupMapping);
 			}
 		}
 	}
@@ -164,8 +194,8 @@ public class DataInitialization {
 	 * @param user_id
 	 * @throws IOException
 	 */
-	public void addDefaultGroupProcessors(String groupId) throws IOException {
-		List<Processor> processorsDB = processorRepository.getProcessorsByGroupId(groupId);
+	public void addDefaultProcessors() throws IOException {
+		List<Processor> processorsDB = processorRepository.findAll();
 
 		if (processorsDB == null || processorsDB.isEmpty()) {
 
@@ -176,7 +206,6 @@ public class DataInitialization {
 			if (processorsArray != null) {
 				List<Processor> processors = Arrays.asList(processorsArray);
 				for (Processor processor : processors) {
-					processor.setGroupId(groupId);
 					processorRepository.save(processor);
 				}
 			}
@@ -225,8 +254,8 @@ public class DataInitialization {
 	 * @param user_id
 	 * @throws IOException
 	 */
-	public void addDefaultGroupSteps(String groupId) throws IOException {
-		List<Step> stepsDB = stepRepository.getStepsByGroupId(groupId, true);
+	public void addDefaultSteps() throws IOException {
+		List<Step> stepsDB = stepRepository.getStepsByFlagValue(true);
 		if (stepsDB == null || stepsDB.isEmpty()) {
 
 			File file = new File(getClass().getResource("/server/steps.json").getFile());
@@ -236,13 +265,12 @@ public class DataInitialization {
 			if (stepArray != null) {
 				List<Step> steps = Arrays.asList(stepArray);
 				for (Step step : steps) {
-					List<Step> stepsDBsize = stepRepository.getStepsByGroupId(groupId, true);
+					List<Step> stepsDBsize = stepRepository.getStepsByFlagValue(true);
 					if (stepsDBsize == null || stepsDBsize.isEmpty()) {
 						step.setNumber(1);
 					} else {
 						step.setNumber(stepsDBsize.size() + 1);
 					}
-					step.setGroupId(groupId);
 					step.setActive(1);
 					stepRepository.save(step);
 				}

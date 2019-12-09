@@ -21,81 +21,84 @@
  */
 
 import {Component, Inject} from '@angular/core';
-import {Location} from '@angular/common';
-import {QueryRun, Timeunit, UrlParameter} from '../_models/index';
-
-import {AlertService, HttpService, DataService} from '../_services';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Context} from '../_models/index';
+import {AlertService, DataService, HttpService} from '../_services/index';
+import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
+import {Location} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {QueryCategory} from "../_models/queryCategory";
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'osqueryConfigurationEdit.component.html'
+	templateUrl: 'queryCategoryAddDialog.component.html',
 })
 
-export class OsqueryConfigurationEditComponent {
-
-	queryRun: QueryRun;
-	id: string;
-	type: number;
-	action: string;
-	probeId: string;
-	groupId: string;
-	alwaysFalseButton = false;
-	timeUnits = Timeunit;
+export class QueryCategoryAddDialog {
+	loading = false;
+	url: string;
+	category = new QueryCategory();
+	isNewCategory: boolean;
+	windows: boolean;
+	linux: boolean;
+	macos: boolean;
 
 	constructor(
-		private alertService: AlertService,
+		private router: Router,
+		private route: ActivatedRoute,
 		private httpService: HttpService,
 		private dataService: DataService,
-		private router: Router,
-		private translate: TranslateService,
-		private route: ActivatedRoute,
 		private location: Location,
-		private dialogRef: MatDialogRef<OsqueryConfigurationEditComponent>,
-		@Inject(MAT_DIALOG_DATA) data
-	)
+		private alertService: AlertService,
+		private translate: TranslateService,
+		private datePipe: DatePipe,
+		private dialogRef: MatDialogRef<QueryCategoryAddDialog>,
+		@Inject(MAT_DIALOG_DATA) data)
 	{
-		if (data.queryRun == null) {
-			this.action = UrlParameter.NEW;
-			this.queryRun = new QueryRun();
-			this.groupId = data.groupId;
+		if (data.context != null) {
+			this.category = data.context;
+			this.isNewCategory = false;
 		}
 		else {
-			this.action = UrlParameter.EDIT;
-			this.queryRun = data.queryRun;
-			this.groupId = data.groupId;
+			this.isNewCategory = true;
 		}
-		this.alwaysFalseButton = false;
 	}
 
-	extractTimeUnits(): Array<string> {
-		const keys = Object.keys(this.timeUnits);
-		return keys.slice();
-	}
+	saveCategory() {
+		this.systemsValue();
+		this.loading = true;
 
-	saveQueryRun() {
-
-		if (this.action == UrlParameter.NEW) {
-			this.queryRun.groupId = this.groupId;
-		}
-
-		this.httpService.post(this.queryRun, environment.apiEndpoint + 'query').subscribe(
+		this.url = environment.apiEndpoint + 'query/category';
+		this.httpService.post(this.category, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);
 			},
 			error => {
 				this.dialogRef.close(error);
+				this.loading = false;
 			});
 	}
 
-	setCheckedStatus(value) {
-		if (value == 0) {
-			this.alwaysFalseButton = true;
-		} else {
-			this.alwaysFalseButton = false;
+	systemsValue() {
+		let test = 0;
+
+		if (this.windows) {
+			test = test + 1;
 		}
+		if(this.linux) {
+			test = test + 2;
+		}
+		if(this.macos) {
+			test = test + 4;
+		}
+
+		this.category.systemsAvailable = test;
+
+	}
+
+	cancel() {
+		this.location.back();
 	}
 }

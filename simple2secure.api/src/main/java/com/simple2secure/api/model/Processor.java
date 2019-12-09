@@ -43,8 +43,6 @@ public class Processor extends GenericDBObject {
 
 	@JsonProperty
 	private boolean groovy = false;
-
-	private String groupId;
 	private String name;
 	private String processor_class;
 
@@ -68,14 +66,6 @@ public class Processor extends GenericDBObject {
 		this.name = name;
 		this.processor_class = processor_class;
 		this.groovyProcessor = groovyProcessor;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
 	}
 
 	public String getName() {

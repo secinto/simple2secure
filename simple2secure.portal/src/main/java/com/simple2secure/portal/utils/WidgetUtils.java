@@ -54,6 +54,7 @@ public class WidgetUtils {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
 					widgetDTOList.add(new WidgetDTO(widget, property));
+					log.info("Adding new widget {} to the list", widget.getName());
 				}
 			}
 		}

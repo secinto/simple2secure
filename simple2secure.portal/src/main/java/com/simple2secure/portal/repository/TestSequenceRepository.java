@@ -9,10 +9,6 @@ public abstract class TestSequenceRepository extends MongoRepository<TestSequenc
 
 	public abstract List<TestSequence> getByDeviceId(String deviceId, int page, int size);
 
-	public abstract TestSequence getSequenceByName(String name);
-
-	public abstract TestSequence getSequenceByNameAndDeviceId(String name, String deviceId);
-
 	public abstract long getCountOfSequencesWithDeviceid(String deviceId);
 
 }

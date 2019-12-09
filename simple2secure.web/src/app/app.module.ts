@@ -39,12 +39,9 @@ import {SearchComponent, SearchResultComponent} from './search';
 import {NotificationComponent, NotificationDetailsComponent} from './notification';
 import {ConfigurationDetailsComponent} from './configuration';
 import {
-	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
+	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupDialogComponent,
 	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
-import {
-	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
-} from './osquery';
 import {
 	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
 	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
@@ -181,6 +178,11 @@ import {WidgetStoreComponent} from './widgets/widgetStore.component';
 import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
+import {UserGroupEditComponent} from "./user/userGroupEdit.component";
+import {
+	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
+	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
+} from "./queries";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -282,15 +284,13 @@ export const httpInterceptorProviders = [
 		UserComponent,
 		UserDetailsComponent,
 		UserOverviewComponent,
-		UserGroupComponent,
 		UserGroupDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
-		OsqueryConfigurationDetailsComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		FooterComponent,
 		EqualValidator,
 		OrbiterComponent,
@@ -340,6 +340,13 @@ export const httpInterceptorProviders = [
 		DevicesComponent,
 		DevicesOverviewComponent,
 		DevicesListComponent,
+		UserGroupEditComponent,
+		QueriesComponent,
+		QueryOverviewComponent,
+		QueryListComponent,
+		QueryAssignComponent,
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -348,7 +355,7 @@ export const httpInterceptorProviders = [
 		UserGroupDialogComponent,
 		NetworkProcessorConfigurationEditComponent,
 		NetworkStepConfigurationEditComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
@@ -367,7 +374,10 @@ export const httpInterceptorProviders = [
 		WidgetStoreComponent,
 		StatItemComponent,
 		StatComponent,
-		SUTDetailsComponent
+		SUTDetailsComponent,
+		UserGroupEditComponent,
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog
 	],
 	providers: [
 		AuthGuard,

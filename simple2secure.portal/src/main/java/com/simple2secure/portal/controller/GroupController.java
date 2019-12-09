@@ -104,8 +104,9 @@ public class GroupController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ServerProvidedValue ValidInputUser userId, ValidInputGroup groupId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ServerProvidedValue ValidInputUser userId,
+			ValidInputGroup groupId, @ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (group != null && !Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
 			User user = userRepository.find(userId.getValue());
@@ -113,7 +114,7 @@ public class GroupController {
 					userId.getValue());
 			if (Strings.isNullOrEmpty(group.getId()) && user != null && contextUserAuthentication != null) {
 				if (groupUtils.checkIfGroupNameIsAllowed(group.getName(), contextId.getValue())) {
-					if (!groupId.getValue().equals("null")) {
+					if (!Strings.isNullOrEmpty(groupId.getValue())) {
 						// THERE IS A PARENT GROUP!!
 						CompanyGroup parentGroup = groupRepository.find(groupId.getValue());
 						if (parentGroup != null) {

@@ -47,6 +47,7 @@ export class SidenavbarComponent {
 	showEmailsSubmenu: boolean;
 	showOrbiterSubmenu: boolean;
 	showDevicesSubmenu: boolean;
+	showQueriesSubmenu: boolean;
 	userRole: string;
 
 	constructor(private translate: TranslateService,
@@ -64,11 +65,12 @@ export class SidenavbarComponent {
 		this.showEmailsSubmenu = false;
 		this.showOrbiterSubmenu = false;
 		this.showDevicesSubmenu = false;
+		this.showQueriesSubmenu = false;
 	}
 
 	ngDoCheck() {
 		this.pageTitle = this.titleService.getTitle();
-		this.userRole = sessionStorage.getItem('role');
+		this.userRole = this.dataService.getRole();
 
 		if (this.userRole) {
 			this.loggedIn = true;
@@ -154,21 +156,32 @@ export class SidenavbarComponent {
 			this.showEmailsSubmenu = false;
 			this.showOrbiterSubmenu = false;
 			this.showDevicesSubmenu = false;
+			this.showQueriesSubmenu = false;
 		}
 		else if (parent == 'menu-emails'){
 			this.showEmailsSubmenu = true;
 			this.showReportsSubmenu = false;
 			this.showOrbiterSubmenu = false;
 			this.showDevicesSubmenu = false;
+			this.showQueriesSubmenu = false;
 		}
 		else if (parent == 'menu-orbiter'){
 			this.showOrbiterSubmenu = true;
 			this.showReportsSubmenu = false;
 			this.showEmailsSubmenu = false;
 			this.showDevicesSubmenu = false;
+			this.showQueriesSubmenu = false;
 		}
 		else if (parent == 'menu-devices'){
 			this.showDevicesSubmenu = true;
+			this.showOrbiterSubmenu = false;
+			this.showReportsSubmenu = false;
+			this.showEmailsSubmenu = false;
+			this.showQueriesSubmenu = false;
+		}
+		else if (parent == 'menu-queries'){
+			this.showQueriesSubmenu = true;
+			this.showDevicesSubmenu = false;
 			this.showOrbiterSubmenu = false;
 			this.showReportsSubmenu = false;
 			this.showEmailsSubmenu = false;

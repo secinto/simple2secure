@@ -169,6 +169,9 @@
   "menu.dashboard": "Dashboard",
   "menu.probes": "Probe",
   "menu.deviceList": "Device List",
+  "menu.queries": "Queries",
+  "menu.queryList": "Query List",
+  "menu.mapQuery": "Query Mapping",
 
   "account.activated": "Your account has been already activated!",
   "account.login": "Login to the portal using the button below.",
@@ -247,7 +250,9 @@
   "table.sut.endDeviceLocation" : "End Device Location",
   "table.type": "Type",
   "table.probe": "Probe",
-
+  "table.systemsAvailable": "Supported OS",
+  "table.graphAble": "Depictable",
+  
   "message.configuration": "Configuration loaded successfully!",
   "message.configuration.save": "Configuration updated successfully!",
   "message.email": "Email Account added successfully!",
@@ -405,6 +410,19 @@
   "osquery.details": "Query Details",
   "osquery.runalways": "Run always?",
   "osquery.reports.charts": "OSQuery Reports Charts",
+  "query.moving.error": "Query is already mapped to this group",
+  "query.moving.success": "Query mapped successfully",
+  "query.mapped": "Mapped Queries",
+  "query.available": "Available Queries",
+  "query.remove.error": "Problem occurred while removing query",
+  "query.remove.success": "Query removed successfully",
+  "query.edit": "Edit Query",
+  "query.update.success": "Query updated successfully",
+
+  "query.category.add": "Add Category",
+  "query.category.edit": "Edit Category",
+  "query.category.add.success": "Query Category added successfully",
+
 
   "orbiter.toolsconfig": "Edit tools configuration",
   "orbiter.edittests": "Edit test",

@@ -31,20 +31,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(
-		name = "QueryRun")
+@Table(name = "QueryRun")
 public class QueryRun extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String groupId;
+	private String categoryId;
 	private String name;
 	private String description;
 
-	@JsonProperty
-	private boolean always;
 	private int analysisInterval;
 	private TimeUnit analysisIntervalUnit;
 	@JsonProperty
@@ -57,6 +54,12 @@ public class QueryRun extends GenericDBObject {
 	@JsonProperty
 	private boolean graphAble;
 
+	@JsonProperty
+	private boolean availabilityCheck;
+
+	@JsonProperty
+	private boolean fixedSize;
+
 	public static int NONE = 0;
 	public static int WINDOWS = 1;
 	public static int LINUX = 2;
@@ -68,12 +71,9 @@ public class QueryRun extends GenericDBObject {
 		osquery = true;
 	}
 
-	public QueryRun(String groupId, String name, boolean always, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery,
-			int active) {
+	public QueryRun(String name, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery, int active) {
 		super();
-		this.groupId = groupId;
 		this.name = name;
-		this.always = always;
 		this.analysisInterval = analysisInterval;
 		this.analysisIntervalUnit = analysisIntervalUnit;
 		this.sqlQuery = sqlQuery;
@@ -88,20 +88,20 @@ public class QueryRun extends GenericDBObject {
 		this.name = name;
 	}
 
+	public String getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(String categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public boolean isAlways() {
-		return always;
-	}
-
-	public void setAlways(boolean always) {
-		this.always = always;
 	}
 
 	public int getAnalysisInterval() {
@@ -128,14 +128,6 @@ public class QueryRun extends GenericDBObject {
 		this.sqlQuery = sqlQuery;
 	}
 
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
 	public int getActive() {
 		return active;
 	}
@@ -160,4 +152,19 @@ public class QueryRun extends GenericDBObject {
 		this.graphAble = graphAble;
 	}
 
+	public boolean isAvailabilityCheck() {
+		return availabilityCheck;
+	}
+
+	public void setAvailabilityCheck(boolean availabilityCheck) {
+		this.availabilityCheck = availabilityCheck;
+	}
+
+	public boolean isFixedSize() {
+		return fixedSize;
+	}
+
+	public void setFixedSize(boolean fixedSize) {
+		this.fixedSize = fixedSize;
+	}
 }

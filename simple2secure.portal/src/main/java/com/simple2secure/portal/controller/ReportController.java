@@ -157,16 +157,16 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@ValidRequestMapping(value = "/network", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
-	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (networkReport != null) {
 			networkReportRepository.save(networkReport);
 			return new ResponseEntity<>(networkReport, HttpStatus.OK);
 		}
 		log.error("Error occured while saving network report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -200,7 +200,8 @@ public class ReportController {
 
 	@ValidRequestMapping(value = "/network", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 
@@ -217,7 +218,8 @@ public class ReportController {
 
 	@ValidRequestMapping(value = "/report/network/name", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(name)) {
 			List<NetworkReport> reports = networkReportRepository.getReportsByName(name);
 			if (reports != null) {
@@ -231,7 +233,8 @@ public class ReportController {
 
 	@ValidRequestMapping(value = "/delete/selected", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (queryReports != null) {
 			for (Report queryReport : queryReports) {
 				Report dbReport = reportsRepository.find(queryReport.getId());

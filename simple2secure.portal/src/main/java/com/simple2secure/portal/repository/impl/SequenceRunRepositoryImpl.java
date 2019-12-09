@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.SequenceRun;
-import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.portal.repository.SequenceRunRepository;
 import com.simple2secure.portal.utils.PortalUtils;
 
@@ -32,13 +31,6 @@ public class SequenceRunRepositoryImpl extends SequenceRunRepository {
 	@Override
 	public List<SequenceRun> getByContextId(String contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
-		List<SequenceRun> sequences = mongoTemplate.find(query, SequenceRun.class);
-		return sequences;
-	}
-
-	@Override
-	public List<SequenceRun> getPlannedSequence(String deviceId) {
-		Query query = new Query(Criteria.where("testStatus").is(TestStatus.PLANNED).and("podId").is(deviceId));
 		List<SequenceRun> sequences = mongoTemplate.find(query, SequenceRun.class);
 		return sequences;
 	}

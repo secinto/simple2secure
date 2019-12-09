@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.process.ProcessContainer;
 import com.simple2secure.commons.process.ProcessUtils;
-import com.simple2secure.commons.service.ServiceCommand;
 import com.simple2secure.service.interfaces.ControllerEngine;
+import com.simple2secure.service.model.ProbeProcessInteraction;
 import com.simple2secure.service.model.TriggerableEngineStates;
 import com.simple2secure.service.observer.SimpleLoggingObserver;
 import com.simple2secure.service.tasks.PortalWatchdog;
@@ -125,7 +125,7 @@ public class ProbeControllerEngine implements ControllerEngine {
 		if (probeProcess != null) {
 			try {
 				log.debug("Calling destroy on probe process handle");
-				sendStopCommand();
+				ProbeProcessInteraction.getInstance(probeProcess).sendStopCommand();
 				TimeUnit.SECONDS.sleep(1);
 
 				if (probeProcess.getProcess().isAlive()) {
@@ -241,30 +241,11 @@ public class ProbeControllerEngine implements ControllerEngine {
 			log.debug("Added output observer to probe process.");
 			TimeUnit.SECONDS.sleep(5);
 			log.debug("Waited 5 seconds before sending instrumentation command");
-			sendStartCommand();
+			ProbeProcessInteraction.getInstance(probeProcess).sendStartCommand();
 			return true;
 		} catch (FileNotFoundException | InterruptedException ie) {
 			log.error("Couldn't invoke Probe using standard parameters. Reason {}", ie);
 		}
 		return false;
 	}
-
-	public void sendStartCommand() {
-		try {
-			log.debug("Sending START service command to PROBE");
-			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("START"));
-		} catch (Exception e) {
-			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
-		}
-	}
-
-	public void sendStopCommand() {
-		try {
-			log.debug("Sending START service command to PROBE");
-			probeProcess.instrumentService().sendCommand(ServiceCommand.fromString("STOP"));
-		} catch (Exception e) {
-			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());
-		}
-	}
-
 }

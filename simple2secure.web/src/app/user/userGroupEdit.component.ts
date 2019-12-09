@@ -20,27 +20,26 @@
  *********************************************************************
  */
 
-import {Component, OnInit} from '@angular/core';
-import {CompanyGroup} from '../_models/index';
+import {Component, Inject} from '@angular/core';
+import {CompanyGroup, ContextDTO} from '../_models/index';
 import {AlertService, DataService, HttpService} from '../_services/index';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
-import {MatDialog} from '@angular/material';
+import {DatePipe} from '@angular/common';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'userGroup.component.html',
-	selector: 'UserGroupComponent',
+	templateUrl: 'userGroupEdit.component.html',
+	selector: 'UserGroupEditComponent',
+	providers: [DatePipe]
 })
 
-export class UserGroupComponent implements OnInit {
-
-	group = new CompanyGroup();
+export class UserGroupEditComponent {
+	public group: CompanyGroup;
 	loading = false;
-	id: string;
-	private sub: any;
 	url: string;
 	groupEditable: boolean;
 
@@ -50,45 +49,17 @@ export class UserGroupComponent implements OnInit {
 		private httpService: HttpService,
 		private dataService: DataService,
 		private location: Location,
-		private dialog: MatDialog,
 		private alertService: AlertService,
-		private translate: TranslateService)
+		private translate: TranslateService,
+		private datePipe: DatePipe,
+		private dialogRef: MatDialogRef<UserGroupEditComponent>,
+		@Inject(MAT_DIALOG_DATA) data)
 	{
+		this.group = data.group;
 	}
 
 	ngOnInit() {
-		this.sub = this.route.params.subscribe(params => {
-			this.id = params['id'];
-		});
-
 		this.groupEditable = this.dataService.isGroupEditable();
-		this.loadGroup();
-	}
-
-	public loadGroup() {
-		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'group/' + this.id)
-			.subscribe(
-				data => {
-					this.group = data;
-					if (this.group) {
-						this.alertService.success(this.translate.instant('message.data'));
-					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
-					this.loading = false;
-
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
 	}
 
 	saveGroup() {
@@ -98,14 +69,7 @@ export class UserGroupComponent implements OnInit {
 		this.httpService.post(this.group, this.url).subscribe(
 			data => {
 				this.group = data;
-
-				if (this.id === 'new') {
-					this.alertService.success(this.translate.instant('message.user.create'));
-				}
-				else {
-					this.alertService.success(this.translate.instant('message.user.update'));
-				}
-				this.cancel();
+				this.alertService.success(this.translate.instant('message.user.group.update'));
 			},
 			error => {
 				if (error.status == 0) {
@@ -114,11 +78,9 @@ export class UserGroupComponent implements OnInit {
 				else {
 					this.alertService.error(error.error.errorMessage);
 				}
-				this.loading = false;
 			});
-	}
 
-	cancel() {
-		this.location.back();
+		this.loading = false;
+		this.dialogRef.close();
 	}
 }

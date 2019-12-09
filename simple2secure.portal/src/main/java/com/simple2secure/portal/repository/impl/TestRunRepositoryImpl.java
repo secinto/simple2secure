@@ -74,22 +74,6 @@ public class TestRunRepositoryImpl extends TestRunRepository {
 	}
 
 	@Override
-	public List<TestRun> getTestRunByDeviceId(List<String> deviceIds) {
-		List<TestRun> tests = new ArrayList<>();
-		List<Criteria> orExpression = new ArrayList<>();
-		Criteria orCriteria = new Criteria();
-		Query query = new Query();
-		for (String deviceId : deviceIds) {
-			Criteria expression = new Criteria();
-			expression.and("podId").is(deviceId);
-			orExpression.add(expression);
-		}
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
-		tests = mongoTemplate.find(query, TestRun.class, collectionName);
-		return tests;
-	}
-
-	@Override
 	public List<TestRun> getByContextId(String contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
 		List<TestRun> tests = mongoTemplate.find(query, TestRun.class);

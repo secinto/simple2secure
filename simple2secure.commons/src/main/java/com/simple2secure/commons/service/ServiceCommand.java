@@ -28,11 +28,23 @@ public class ServiceCommand {
 	private ServiceCommands command;
 	private String[] arguments;
 
+	public ServiceCommand(ServiceCommands command) {
+		this.command = command;
+		arguments = new String[0];
+	}
+
 	public ServiceCommand(ServiceCommands command, String[] arguments) {
 		this.command = command;
 		this.arguments = arguments;
 	}
 
+	/**
+	 * Parses the command from possible strings and creates an object using the found {@link ServiceCommands}.
+	 *
+	 * @param possibleCommand
+	 *          The {@link ServiceCommands} as string representation.
+	 * @return
+	 */
 	public static ServiceCommand fromString(String possibleCommand) {
 		String[] possibleCommandParts = possibleCommand.split(" ");
 		if (possibleCommandParts[0].equalsIgnoreCase("Start")) {
@@ -52,10 +64,20 @@ public class ServiceCommand {
 		}
 	}
 
+	/**
+	 * Returns the underlying {@link ServiceCommands} used to create this object.
+	 *
+	 * @return The {@link ServiceCommands} contained in this command.
+	 */
 	public ServiceCommands getCommand() {
 		return command;
 	}
 
+	/**
+	 * Returns the arguments provided for this command.
+	 *
+	 * @return A string array with the arguments for this command.
+	 */
 	public String[] getArguments() {
 		return arguments;
 	}

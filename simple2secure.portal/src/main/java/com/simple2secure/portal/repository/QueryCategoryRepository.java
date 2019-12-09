@@ -19,8 +19,11 @@
  *
  *********************************************************************
  */
+package com.simple2secure.portal.repository;
 
-export * from '../report/osqueryReportDetails.component';
-export * from '../report/osqueryReportOverview.component';
-export * from './osqueryConfigurationDetails.component';
-export * from './osqueryConfigurationEdit.component';
+import com.simple2secure.api.model.QueryCategory;
+import com.simple2secure.portal.dao.MongoRepository;
+
+public abstract class QueryCategoryRepository extends MongoRepository<QueryCategory> {
+
+}

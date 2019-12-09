@@ -94,7 +94,7 @@ export class NetworkConfigurationStepDetailsComponent {
 		this.loading = true;
 		const params = new HttpParams()
 			.set('select_all', String(true));
-		this.httpService.getWithParams(environment.apiEndpoint + 'steps/group/' + this.groupId, params)
+		this.httpService.getWithParams(environment.apiEndpoint + 'steps', params)
 			.subscribe(
 				data => {
 					this.steps = data;

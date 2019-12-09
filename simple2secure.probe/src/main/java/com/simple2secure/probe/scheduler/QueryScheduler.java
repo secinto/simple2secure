@@ -79,14 +79,10 @@ public class QueryScheduler extends TimerTask {
 				 */
 				if (!currentlyRunning.containsKey(query.getName())) {
 					QueryRunnable queryRunnable = new QueryRunnable(query);
-					if (query.isAlways()) {
-						ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(queryRunnable, 0, query.getAnalysisInterval(),
-								query.getAnalysisIntervalUnit());
-						queryRunnable.setScheduledFuture(scheduledFuture);
-						currentlyRunning.put(query.getName(), queryRunnable);
-					} else {
-						scheduler.schedule(queryRunnable, 0, query.getAnalysisIntervalUnit());
-					}
+					ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(queryRunnable, 0, query.getAnalysisInterval(),
+							query.getAnalysisIntervalUnit());
+					queryRunnable.setScheduledFuture(scheduledFuture);
+					currentlyRunning.put(query.getName(), queryRunnable);
 				} else {
 					/*
 					 * Check when to update the currently running queries.
@@ -97,7 +93,7 @@ public class QueryScheduler extends TimerTask {
 						/*
 						 * Check if something has changed for the current query. If yes cancel it and create a new scheduled future.
 						 */
-						if (currentQuery != null && currentQuery.isAlways() && (currentQuery.getAnalysisInterval() != query.getAnalysisInterval()
+						if (currentQuery != null && (currentQuery.getAnalysisInterval() != query.getAnalysisInterval()
 								|| currentQuery.getAnalysisIntervalUnit() != query.getAnalysisIntervalUnit())) {
 							currentQueryRunnable.getScheduledFuture().cancel(false);
 						}

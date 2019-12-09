@@ -7,7 +7,7 @@
         <mat-nav-list>
             <ul class="nav-parent-list">
                 <li><a *ngIf="loggedIn" mat-list-item routerLink="">
-                    <img class="img-sidenav" src="assets/icons/system.png"> {{ 'menu.dashboard' | translate }}</a></li>
+                    <img class="img-sidenav" src="assets/icons/dashboard.png"> {{ 'menu.dashboard' | translate }}</a></li>
             </ul>
             <ul class="nav-parent-list">
                 <li (click)="collapseMenu('menu-reports')"><a *ngIf="loggedIn" mat-list-item routerLink="/report"><img class="img-sidenav" src="assets/icons/communication.png"> {{ 'menu.reports' | translate }}<b class="caret"></b></a>
@@ -30,12 +30,19 @@
                 </ul>
             </ul>
             <ul class="nav-parent-list">
-                <li (click)="collapseMenu('menu-orbiter')"><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter"><img class="img-sidenav" src="assets/icons/orbiter.png"> {{ 'menu.orbiter' | translate }}<b class="caret"></b></a></li>
+                <li (click)="collapseMenu('menu-orbiter')"><a *ngIf="loggedIn" mat-list-item routerLink="/tests"><img class="img-sidenav" src="assets/icons/orbiter.png"> {{ 'menu.tests' | translate }}<b class="caret"></b></a></li>
                 <ul class="nav-child-list" *ngIf="showOrbiterSubmenu">
-                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/test">{{ 'menu.templates' | translate }}</a></li>
-                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledTests">{{ 'menu.scheduledTests' | translate }}</a></li>
-                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/scheduledSequences">{{ 'menu.scheduledSequences' | translate }}</a></li>
-                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/orbiter/sut">{{ 'orbiter.sut' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/tests/test">{{ 'menu.templates' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/tests/scheduledTests">{{ 'menu.scheduledTests' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/tests/scheduledSequences">{{ 'menu.scheduledSequences' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/tests/sut">{{ 'orbiter.sut' | translate }}</a></li>
+                </ul>
+            </ul>
+            <ul class="nav-parent-list">
+                <li (click)="collapseMenu('menu-queries')"><a *ngIf="loggedIn" mat-list-item routerLink="/queries"><img class="img-sidenav" src="assets/icons/orbiter.png"> {{ 'menu.queries' | translate }}<b class="caret"></b></a></li>
+                <ul class="nav-child-list" *ngIf="showQueriesSubmenu">
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/queries/list">{{ 'menu.queryList' | translate }}</a></li>
+                    <li><a *ngIf="loggedIn" mat-list-item routerLink="/queries/assign">{{ 'menu.mapQuery' | translate }}</a></li>
                 </ul>
             </ul>
             <ul (click)="collapseMenu('menu-devices')" class="nav-parent-list">

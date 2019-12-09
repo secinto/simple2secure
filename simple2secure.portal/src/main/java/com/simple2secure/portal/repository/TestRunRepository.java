@@ -35,6 +35,4 @@ public abstract class TestRunRepository extends MongoRepository<TestRun> {
 	public abstract List<TestRun> getByContextId(String contextId);
 
 	public abstract Map<String, Object> getByContextIdForPagination(String contextId, int page, int size);
-
-	public abstract List<TestRun> getTestRunByDeviceId(List<String> deviceIds);
 }

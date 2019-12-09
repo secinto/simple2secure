@@ -24,12 +24,15 @@ import {Generic} from './generic';
 import {Timeunit} from './index';
 
 export class QueryRun extends Generic {
-	groupId: string;
 	name: string;
+	categoryId: string;
 	description: string;
-	always: boolean;
 	analysisInterval: number;
 	analysisIntervalUnit: Timeunit;
 	sqlQuery: string;
 	active: number;
+	systemsAvailable: number;
+	graphAble: boolean;
+	availabilityCheck: boolean;
+	fixedSize: boolean;
 }

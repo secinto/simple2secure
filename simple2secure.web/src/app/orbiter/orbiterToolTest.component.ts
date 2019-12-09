@@ -98,7 +98,6 @@ export class OrbiterToolTestComponent {
 					else {
 						this.alertService.error(this.translate.instant('message.data.notProvided'));
 					}
-					this.loading = false;
 				},
 				error => {
 					if (error.status == 0) {
@@ -107,8 +106,9 @@ export class OrbiterToolTestComponent {
 					else {
 						this.alertService.error(error.error.errorMessage);
 					}
-					this.loading = false;
 				});
+
+		this.loading = false;
 	}
 
 	public showPodTests() {

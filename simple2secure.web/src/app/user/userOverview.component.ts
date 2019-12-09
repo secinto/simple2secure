@@ -36,6 +36,7 @@ import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 import {UserInfo} from '../_models/userInfo';
+import {UserGroupEditComponent} from "./userGroupEdit.component";
 
 @Component({
 	moduleId: module.id,
@@ -99,7 +100,7 @@ export class UserOverviewComponent {
 
 	ngOnInit() {
 		this.selectedItem = new CompanyGroup();
-		this.userRole = sessionStorage.getItem('role');
+		this.userRole = this.dataService.getRole();
 		this.loadMyProfile();
 		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN ||
 			this.userRole == UserRole.SUPERUSER)
@@ -246,11 +247,6 @@ export class UserOverviewComponent {
 			});
 
 
-	}
-
-
-	public editGroup(groupItem: any) {
-		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
 	}
 
 	public deleteUser(user: any) {
@@ -430,10 +426,6 @@ export class UserOverviewComponent {
 		}
 	}
 
-	public onGroupEditClick() {
-		this.editGroup(this.selectedItem);
-	}
-
 	public onDeleteGroupClick() {
 		this.openDialog('group');
 	}
@@ -479,6 +471,17 @@ export class UserOverviewComponent {
 				}
 			}
 		});
+	}
+
+	public onGroupNameEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			group: this.selectedItem,
+		};
+
+		const dialogRef = this.dialog.open(UserGroupEditComponent, dialogConfig);
+
 	}
 
 	openDialogAddUser(): void {
