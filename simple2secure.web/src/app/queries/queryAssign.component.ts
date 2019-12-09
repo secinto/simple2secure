@@ -187,7 +187,7 @@ export class QueryAssignComponent {
 	removeMappedQuery(item: OsQuery){
 		const index = this.dataSourceMappedQueries.data.indexOf(item);
 		if(index > -1){
-			this.dataSourceMappedQueries.data = this.dataSourceMappedQueries.data.filter(query => query.id != item.id);
+			this.dataSourceMappedQueries.data = this.dataSourceMappedQueries.data.filter(query => query["id"] != item.id);
 			this.alertService.success(this.translate.instant('query.remove.success'));
 		}
 		else{
