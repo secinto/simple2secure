@@ -13,7 +13,6 @@ sonarqube {
 	properties { property "sonar.projectBaseDir", "$projectDir/.." }
 }
 
-
 jar {
 	baseName = 'simple2secure-portal'
 	version =  '1.0.0-RC'
@@ -32,6 +31,7 @@ compileJava {
 }
 
 war {
+	// enabled = true
 	baseName = 'simple2secure.portal'
 }
 

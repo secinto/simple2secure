@@ -486,5 +486,8 @@
   "widget.label": "Label",
   "widget.store": "Widget Store",
   "widget.noplace": "Im Dashboard ist kein Speicherplatz verfügbar!",
-  "widget.deleted": "Widget erfolgreich gelöscht!"
+  "widget.deleted": "Widget erfolgreich gelöscht!",
+
+  "report.groups": "Gruppen",
+  "report.devices": "Geräte"
 }

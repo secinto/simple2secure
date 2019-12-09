@@ -1,3 +1,16 @@
+<mat-form-field>
+    <mat-label>{{"report.groups" | translate}}</mat-label>
+    <mat-select multiple>
+        <mat-option *ngFor="let group of groups" [value]="group">{{group.name}}</mat-option>
+    </mat-select>
+</mat-form-field>
+<mat-form-field class="devices-report">
+    <mat-label>{{"report.devices" | translate}}</mat-label>
+    <mat-select multiple>
+        <mat-option *ngFor="let device of devices" [value]="device">{{device.name}}</mat-option>
+    </mat-select>
+</mat-form-field>
+
 <div class="example-container mat-elevation-z8 table table-striped">
 
     <button mat-button [disabled]="!showDeleteButton" mat-raised-button class="mat-green-button delete-button-table" color="primary"

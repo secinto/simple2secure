@@ -32,6 +32,8 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 import {OsQueryReportDTO} from '../_models/DTO/osQueryReportDTO';
 import {PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
+import {CompanyGroup} from "../_models";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	moduleId: module.id,
@@ -41,6 +43,8 @@ import {SelectionModel} from '@angular/cdk/collections';
 
 export class OsQueryReportOverviewComponent {
 	public reportDTO: OsQueryReportDTO;
+	groups: CompanyGroup[] = [];
+	devices: any[] = [];
 	selectedReport: any;
 	loading = false;
 	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
@@ -67,7 +71,7 @@ export class OsQueryReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.loadAllReports(0, 10);
+		this.getGroups();
 	}
 
 	ngAfterViewInit() {
@@ -85,6 +89,42 @@ export class OsQueryReportOverviewComponent {
 		this.pageSize = e.pageSize;
 		this.loadAllReports(e.pageIndex, e.pageSize);
 		return e;
+	}
+
+	public getGroups() {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'group/context')
+			.subscribe(
+				data => {
+					this.groups = data;
+					this.loadAllReports(0, 10);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+		this.loading = false;
+	}
+
+	getAllProbes(defaultValue: boolean) {
+		const params = new HttpParams()
+			.set('active', String(false));
+		this.httpService.getWithParams(environment.apiEndpoint + 'device', params)
+			.subscribe(
+				data => {
+					this.devices = data;
+					if (defaultValue){
+						if (this.devices.length > 0) {
+							//this.selectedProbe = this.probes[0];
+							//this.loadQueriesByProbe(this.selectedProbe.deviceId);
+						}
+					}
+
+				});
 	}
 
 	private loadAllReports(page: number, size: number) {

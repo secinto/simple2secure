@@ -42,8 +42,8 @@
 	</appender>
 
 	<logger name="com.simple2secure" level="debug" />
-	<!-- <logger name="com.simple2secure.commons" level="info" />
-	<logger name="com.simple2secure.probe" level="debug" />
+	<logger name="com.simple2secure.commons" level="info" />
+	<!-- <logger name="com.simple2secure.probe" level="debug" />
 	<logger name="com.simple2secure.probe.osquery" level="info" />
 	<logger name="com.simple2secure.probe.network" level="debug" />
 	<logger name="com.simple2secure.probe.utils" level="debug" /> --> 
