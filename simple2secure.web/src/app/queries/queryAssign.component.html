@@ -10,45 +10,55 @@
 <div class="example-container">
     <h2>{{'query.mapped' | translate}}</h2>
 
-    <div
-            cdkDropList
-            #mappedQueriesList="cdkDropList"
-            [cdkDropListData]="mappedQueries"
-            [cdkDropListConnectedTo]="[allQueriesList]"
-            class="example-list"
-            (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of mappedQueries" cdkDrag>
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{item.name}}
+
+    <mat-table [dataSource]="dataSourceMappedQueries"
+               class="mat-elevation-z8" cdkDropList #mappedQueriesList="cdkDropList"
+               [cdkDropListData]="dataSourceMappedQueries.data" [cdkDropListConnectedTo]="[allQueriesList]"
+               (cdkDropListDropped)="drop($event)">
+
+        <ng-container matColumnDef="query">
+            <mat-header-cell *matHeaderCellDef> Query </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag>
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{row.name}}
             <div *cdkDragPreview class="preview-drag-box">
-                <p>{{item.description}}</p>
-                <p>Interval: {{item.analysisInterval}} {{item.analysisIntervalUnit}}</p>
+                <p>{{row.description}}</p>
+                <p>Interval: {{row.analysisInterval}} {{row.analysisIntervalUnit}}</p>
             </div>
             <div class="drag-action-buttons">
-                <a class="delete-button" (click)='removeMappedQuery(item)'><mat-icon class="drag-action-icon">close</mat-icon></a>
-                <a class="edit-button" (click)='editMappedQuery(item)'><mat-icon class="drag-action-icon">edit</mat-icon></a>
+                <a class="delete-button" (click)='removeMappedQuery(row)'><mat-icon class="drag-action-icon">close</mat-icon></a>
+                <a class="edit-button" (click)='editMappedQuery(row)'><mat-icon class="drag-action-icon">edit</mat-icon></a>
             </div>
-        </div>
-    </div>
+        </mat-row>
+    </mat-table>
 </div>
 
 <div class="example-container">
     <h2>{{'query.available' | translate}}</h2>
-    <div
-            cdkDropList
-            #allQueriesList="cdkDropList"
-            [cdkDropListData]="unmappedQueries"
-            [cdkDropListConnectedTo]="[mappedQueriesList]"
-            class="example-list"
-            (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of unmappedQueries" cdkDrag>{{item.name}}
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+
+    <mat-table [dataSource]="dataSourceUnmappedQueries"
+               class="mat-elevation-z8" cdkDropList #allQueriesList="cdkDropList"
+               [cdkDropListData]="dataSourceUnmappedQueries.data" [cdkDropListConnectedTo]="[mappedQueriesList]"
+               (cdkDropListDropped)="drop($event)">
+
+        <ng-container matColumnDef="query">
+            <mat-header-cell *matHeaderCellDef> Query </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag>
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{row.name}}
             <div *cdkDragPreview class="preview-drag-box">
-                <p>{{item.name}}</p>
-                <p>{{item.description}}</p>
-                <p>Interval: {{item.analysisInterval}} {{item.analysisIntervalUnit}}</p>
-                <p *ngIf="item.active">Active</p>
-                <p *ngIf="!item.active">Inactive</p>
+                <p>{{row.name}}</p>
+                <p>{{row.description}}</p>
+                <p>Interval: {{row.analysisInterval}} {{row.analysisIntervalUnit}}</p>
+                <p *ngIf="row.active">Active</p>
+                <p *ngIf="!row.active">Inactive</p>
             </div>
-        </div>
-    </div>
+        </mat-row>
+    </mat-table>
 </div>

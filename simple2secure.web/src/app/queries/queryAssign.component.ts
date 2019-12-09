@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
@@ -30,6 +30,9 @@ import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
+import {MatTableDataSource} from "@angular/material/table";
+import {MatSort} from "@angular/material/sort";
+import {MatPaginator} from "@angular/material/paginator";
 
 @Component({
 	moduleId: module.id,
@@ -39,12 +42,15 @@ import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 
 export class QueryAssignComponent {
 
-	unmappedQueries: QueryRun[];
-	mappedQueries: QueryRun[];
 	groups: CompanyGroup[] = [];
 	selectedGroup: CompanyGroup;
 	lastSelectedGroup: CompanyGroup;
 	loading = false;
+	displayedColumns: string[] = ['query'];
+	dataSourceUnmappedQueries = new MatTableDataSource();
+	dataSourceMappedQueries = new MatTableDataSource();
+	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -90,7 +96,7 @@ export class QueryAssignComponent {
 		this.httpService.get(environment.apiEndpoint + 'query/unmapped/' + group.id)
 			.subscribe(
 				data => {
-					this.unmappedQueries = data;
+					this.dataSourceUnmappedQueries.data = data;
 				},
 				error => {
 					if (error.status == 0) {
@@ -111,7 +117,7 @@ export class QueryAssignComponent {
 		this.httpService.getWithParams(environment.apiEndpoint + 'query/group/' + group.id, params)
 			.subscribe(
 				data => {
-					this.mappedQueries = data;
+					this.dataSourceMappedQueries.data = data;
 				},
 				error => {
 					if (error.status == 0) {
@@ -135,7 +141,7 @@ export class QueryAssignComponent {
 
 	public updateTheMappings(group: CompanyGroup){
 		this.loading = true;
-		this.httpService.post(this.mappedQueries, environment.apiEndpoint + 'query/mapping/' + group.id)
+		this.httpService.post(this.dataSourceMappedQueries.data, environment.apiEndpoint + 'query/mapping/' + group.id)
 			.subscribe(
 				data => {
 				},
@@ -162,6 +168,9 @@ export class QueryAssignComponent {
 					event.container.data,
 					event.previousIndex,
 					event.currentIndex);
+
+				this.dataSourceMappedQueries.connect().next(event.container.data);
+				this.dataSourceUnmappedQueries.data = event.previousContainer.data;
 				this.alertService.success(this.translate.instant('query.moving.success'));
 			}
 			else{
@@ -171,9 +180,9 @@ export class QueryAssignComponent {
 	}
 
 	removeMappedQuery(item: QueryRun){
-		const index = this.mappedQueries.indexOf(item);
+		const index = this.dataSourceMappedQueries.data.indexOf(item);
 		if(index > -1){
-			this.mappedQueries.splice(index, 1);
+			this.dataSourceMappedQueries.data.splice(index, 1);
 			this.alertService.success(this.translate.instant('query.remove.success'));
 		}
 		else{
@@ -192,16 +201,17 @@ export class QueryAssignComponent {
 
 		dialogRef.afterClosed().subscribe(result => {
 
-			const index = this.mappedQueries.indexOf(item);
+			const index = this.dataSourceMappedQueries.data.indexOf(item);
 			if(index > -1){
-				this.mappedQueries[index] = result;
+				this.dataSourceMappedQueries.data[index] = result;
 			}
 			this.alertService.success(this.translate.instant('query.update.success'));
 		});
 	}
 
 	checkIfArrayContainsObject(mappedQueries: QueryRun[], movedQuery: QueryRun){
-		const index = this.mappedQueries.findIndex(query=> query.name === movedQuery.name);
+		console.log("MOVED QUERY" + movedQuery);
+		const index = mappedQueries.findIndex(query=> query.name === movedQuery.name);
 
 		if(index > -1){
 			return true;

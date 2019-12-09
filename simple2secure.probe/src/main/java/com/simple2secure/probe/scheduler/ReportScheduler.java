@@ -65,9 +65,6 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getDeviceId())) {
 				report.setDeviceId(ProbeConfiguration.probeId);
 			}
-			if (Strings.isNullOrEmpty(report.getGroupId())) {
-				report.setGroupId(ProbeConfiguration.groupId);
-			}
 			if (Strings.isNullOrEmpty(report.getHostname())) {
 				report.setHostname(ProbeConfiguration.hostname);
 			}

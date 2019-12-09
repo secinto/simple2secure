@@ -30,15 +30,14 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(
-		name = "Report")
+@Table(name = "Report")
 public class Report extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -7217360147886001090L;
-	private String groupId;
+	private String queryId;
 	private String deviceId;
 	@Lob
 	private String query;
@@ -70,12 +69,12 @@ public class Report extends GenericDBObject {
 		this.isSent = isSent;
 	}
 
-	public String getGroupId() {
-		return groupId;
+	public String getQueryId() {
+		return queryId;
 	}
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
+	public void setQueryId(String queryId) {
+		this.queryId = queryId;
 	}
 
 	public boolean isSent() {
