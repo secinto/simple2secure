@@ -86,9 +86,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	loadQueriesByProbe(probeId: string) {
-		const params = new HttpParams()
-			.set('select_all', String(true));
-		this.httpService.getWithParams(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN', params)
+		this.httpService.get(environment.apiEndpoint + 'query/' + probeId + '/UNKNOWN')
 			.subscribe(
 				data => {
 					this.queries = data;

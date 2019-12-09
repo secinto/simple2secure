@@ -19,20 +19,49 @@
  *
  *********************************************************************
  */
+package com.simple2secure.api.model;
+import com.simple2secure.api.dbo.GenericDBObject;
 
-import {Generic} from './generic';
-import {Timeunit} from './index';
+public class OsQueryCategory extends GenericDBObject {
 
-export class QueryRun extends Generic {
-	name: string;
-	categoryId: string;
-	description: string;
-	analysisInterval: number;
-	analysisIntervalUnit: Timeunit;
-	sqlQuery: string;
-	active: number;
-	systemsAvailable: number;
-	graphAble: boolean;
-	availabilityCheck: boolean;
-	fixedSize: boolean;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 4400048729580737036L;
+	private String name;
+	private String description;
+	private int systemsAvailable;
+
+	public OsQueryCategory() {
+	}
+
+	public OsQueryCategory(String name, String description, int systemsAvailable) {
+		this.name = name;
+		this.description = description;
+		this.systemsAvailable = systemsAvailable;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getSystemsAvailable() {
+		return systemsAvailable;
+	}
+
+	public void setSystemsAvailable(int systemsAvailable) {
+		this.systemsAvailable = systemsAvailable;
+	}
 }

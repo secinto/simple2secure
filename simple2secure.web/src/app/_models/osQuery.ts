@@ -19,21 +19,20 @@
  *
  *********************************************************************
  */
-package com.simple2secure.probe.dao.impl;
 
-import com.google.common.base.Strings;
-import com.simple2secure.api.model.Report;
-import com.simple2secure.probe.dao.ReportDao;
+import {Generic} from './generic';
+import {Timeunit} from './index';
 
-public class ReportDaoImpl extends BaseDaoImpl<Report> implements ReportDao {
-
-	public ReportDaoImpl(String persistenceUnitName) {
-		entityClass = Report.class;
-		if (!Strings.isNullOrEmpty(persistenceUnitName)) {
-			init(persistenceUnitName);
-		} else {
-			init(BaseDaoImpl.PERSISTENCE_UNIT_NAME);
-		}
-	}
-
+export class OsQuery extends Generic {
+	name: string;
+	categoryId: string;
+	description: string;
+	analysisInterval: number;
+	analysisIntervalUnit: Timeunit;
+	sqlQuery: string;
+	active: number;
+	systemsAvailable: number;
+	graphAble: boolean;
+	availabilityCheck: boolean;
+	fixedSize: boolean;
 }

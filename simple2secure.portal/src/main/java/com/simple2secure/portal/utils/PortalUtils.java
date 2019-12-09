@@ -52,8 +52,9 @@ import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryCategory;
+import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -337,6 +338,13 @@ public class PortalUtils {
 						ids.add(sequenceRun.getId());
 					}
 				}
+
+				else if (object.getClass().equals(Device.class)) {
+					Device device = (Device) object;
+					if (!Strings.isNullOrEmpty(device.getDeviceId())) {
+						ids.add(device.getDeviceId());
+					}
+				}
 			}
 		}
 
@@ -498,11 +506,11 @@ public class PortalUtils {
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
 
-	public QueryCategory generateQueryCategoryObjectFromJson(JsonNode node) {
+	public OsQueryCategory generateQueryCategoryObjectFromJson(JsonNode node) {
 		String name = node.get("name").asText();
 		String description = node.get("description").asText();
 		int systemsAvailable = node.get("systemsAvailable").asInt();
-		return new QueryCategory(name, description, systemsAvailable);
+		return new OsQueryCategory(name, description, systemsAvailable);
 	}
 
 }

@@ -9,29 +9,29 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.portal.repository.QueryRepository;
+import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.portal.repository.OsQueryRepository;
 
 @Repository
 @Transactional
-public class QueryRepositoryImpl extends QueryRepository {
+public class OsQueryRepositoryImpl extends OsQueryRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "queryrun"; //$NON-NLS-1$
-		super.className = QueryRun.class;
+		super.collectionName = "osquery"; //$NON-NLS-1$
+		super.className = OsQuery.class;
 	}
 
 	@Override
-	public List<QueryRun> findByActiveStatus(int active) {
+	public List<OsQuery> findByActiveStatus(int active) {
 		Query query = new Query(Criteria.where("active").is(active));
-		return mongoTemplate.find(query, QueryRun.class, collectionName);
+		return mongoTemplate.find(query, OsQuery.class, collectionName);
 	}
 
 	@Override
-	public List<QueryRun> findByCategoryId(String categoryId) {
+	public List<OsQuery> findByCategoryId(String categoryId) {
 		Query query = new Query(Criteria.where("categoryId").is(categoryId));
-		return mongoTemplate.find(query, QueryRun.class, collectionName);
+		return mongoTemplate.find(query, OsQuery.class, collectionName);
 	}
 
 }

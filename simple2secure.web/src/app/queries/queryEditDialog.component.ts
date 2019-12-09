@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {Location} from '@angular/common';
-import {QueryRun, Timeunit} from '../_models';
+import {OsQuery, Timeunit} from '../_models';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -37,7 +37,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 export class QueryEditDialogComponent {
 
-	queryRun: QueryRun;
+	queryRun: OsQuery;
 	windows: boolean;
 	linux: boolean;
 	macos: boolean;
@@ -60,7 +60,7 @@ export class QueryEditDialogComponent {
 		this.linux = false;
 		this.macos = false;
 		if (data.queryRun == null) {
-			this.queryRun = new QueryRun();
+			this.queryRun = new OsQuery();
 			this.queryRun.categoryId = data.queryCategory.id;
 		}
 		else {

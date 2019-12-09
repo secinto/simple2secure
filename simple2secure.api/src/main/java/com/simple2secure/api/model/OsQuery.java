@@ -20,47 +20,88 @@
  *********************************************************************
  */
 package com.simple2secure.api.model;
+
 import java.util.concurrent.TimeUnit;
 
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class QueryGroupMapping extends GenericDBObject {
+@Entity
+@Table(name = "OsQuery")
+public class OsQuery extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String groupId;
-	private String queryId;
+	private String categoryId;
+	private String name;
+	private String description;
+
 	private int analysisInterval;
 	private TimeUnit analysisIntervalUnit;
+	@JsonProperty
+	private boolean osquery;
+	@Lob
+	private String sqlQuery;
+	private int active;
 	private int systemsAvailable;
 
-	public QueryGroupMapping() {
+	@JsonProperty
+	private boolean graphAble;
+
+	@JsonProperty
+	private boolean availabilityCheck;
+
+	@JsonProperty
+	private boolean fixedSize;
+
+	public static int NONE = 0;
+	public static int WINDOWS = 1;
+	public static int LINUX = 2;
+	public static int MACOS = 4;
+
+	public OsQuery() {
+		systemsAvailable = NONE;
+		graphAble = true;
+		osquery = true;
 	}
 
-	public QueryGroupMapping(String groupId, String queryId, int analysisInterval, TimeUnit analysisIntervalUnit, int systemsAvailable) {
-		this.groupId = groupId;
-		this.queryId = queryId;
+	public OsQuery(String name, int analysisInterval, TimeUnit analysisIntervalUnit, String sqlQuery, int active) {
+		super();
+		this.name = name;
 		this.analysisInterval = analysisInterval;
 		this.analysisIntervalUnit = analysisIntervalUnit;
-		this.systemsAvailable = systemsAvailable;
+		this.sqlQuery = sqlQuery;
+		this.active = active;
 	}
 
-	public String getGroupId() {
-		return groupId;
+	public String getName() {
+		return name;
 	}
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getQueryId() {
-		return queryId;
+	public String getCategoryId() {
+		return categoryId;
 	}
 
-	public void setQueryId(String queryId) {
-		this.queryId = queryId;
+	public void setCategoryId(String categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public int getAnalysisInterval() {
@@ -79,11 +120,51 @@ public class QueryGroupMapping extends GenericDBObject {
 		this.analysisIntervalUnit = analysisIntervalUnit;
 	}
 
+	public String getSqlQuery() {
+		return sqlQuery;
+	}
+
+	public void setSqlQuery(String sqlQuery) {
+		this.sqlQuery = sqlQuery;
+	}
+
+	public int getActive() {
+		return active;
+	}
+
+	public void setActive(int active) {
+		this.active = active;
+	}
+
 	public int getSystemsAvailable() {
 		return systemsAvailable;
 	}
 
 	public void setSystemsAvailable(int systemsAvailable) {
 		this.systemsAvailable = systemsAvailable;
+	}
+
+	public boolean isGraphAble() {
+		return graphAble;
+	}
+
+	public void setGraphAble(boolean graphAble) {
+		this.graphAble = graphAble;
+	}
+
+	public boolean isAvailabilityCheck() {
+		return availabilityCheck;
+	}
+
+	public void setAvailabilityCheck(boolean availabilityCheck) {
+		this.availabilityCheck = availabilityCheck;
+	}
+
+	public boolean isFixedSize() {
+		return fixedSize;
+	}
+
+	public void setFixedSize(boolean fixedSize) {
+		this.fixedSize = fixedSize;
 	}
 }

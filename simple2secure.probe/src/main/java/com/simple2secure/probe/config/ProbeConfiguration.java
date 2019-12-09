@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryRun;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -85,7 +85,7 @@ public class ProbeConfiguration {
 
 	private Map<String, Processor> currentProcessors;
 
-	private Map<String, QueryRun> currentQueries;
+	private Map<String, OsQuery> currentQueries;
 
 	private LicenseController licenseController = new LicenseController();
 
@@ -118,7 +118,13 @@ public class ProbeConfiguration {
 		currentQueries = new HashMap<>();
 		rb = ResourceBundle.getBundle("messageCodes", new java.util.Locale("en"));
 		osinfo = ProbeUtils.getOsinfo();
-		loadConfig();
+
+		if (isAPIAvailable()) {
+			checkAndUpdateConfigFromAPI();
+		} else {
+			loadConfig();
+		}
+
 	}
 
 	/**
@@ -315,15 +321,15 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Updates the {@link QueryRun} objects, which are used to obtain system information using OSQuery, from the API. Updates the local
+	 * Updates the {@link OsQuery} objects, which are used to obtain system information using OSQuery, from the API. Updates the local
 	 * configuration accordingly.
 	 */
 	private void updateQueriesFromAPI() {
-		List<QueryRun> apiQueries = getQueriesFromAPI();
+		List<OsQuery> apiQueries = getQueriesFromAPI();
 		if (apiQueries != null) {
-			DBUtil.getInstance().clearDB(QueryRun.class);
+			DBUtil.getInstance().clearDB(OsQuery.class);
 
-			for (QueryRun query : apiQueries) {
+			for (OsQuery query : apiQueries) {
 				if (query != null) {
 					DBUtil.getInstance().merge(query);
 				}
@@ -331,9 +337,9 @@ public class ProbeConfiguration {
 			/*
 			 * Obtain the processors stored in the DB to also obtain the ID.
 			 */
-			List<QueryRun> dbQueries = getQueriesFromDatabase();
+			List<OsQuery> dbQueries = getQueriesFromDatabase();
 			currentQueries.clear();
-			for (QueryRun query : dbQueries) {
+			for (OsQuery query : dbQueries) {
 				currentQueries.put(query.getName(), query);
 			}
 			log.info("Using queries configuration from server!");
@@ -348,19 +354,18 @@ public class ProbeConfiguration {
 		/*
 		 * Obtain currently stored configurations from database.
 		 */
-		List<QueryRun> dbQueries = getQueriesFromDatabase();
+		List<OsQuery> dbQueries = getQueriesFromDatabase();
 
 		if (dbQueries == null || dbQueries.size() == 0) {
 			log.debug("DB steps not available, reading from file. Should only happen once.");
-			List<QueryRun> fileQueries = getQueriesFromFile();
-			for (QueryRun query : fileQueries) {
-				query.setActive(1);
+			List<OsQuery> fileQueries = getQueriesFromFile();
+			for (OsQuery query : fileQueries) {
 				DBUtil.getInstance().merge(query);
 			}
 			dbQueries = getQueriesFromDatabase();
 		}
 
-		for (QueryRun query : dbQueries) {
+		for (OsQuery query : dbQueries) {
 			currentQueries.put(query.getName(), query);
 		}
 
@@ -402,8 +407,7 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI(),
-				ProbeConfiguration.authKey);
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI(), ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
 			Processor[] processorArray = JSONUtils.fromString(response, Processor[].class);
 			if (processorArray != null && processorArray.length > 0) {
@@ -462,8 +466,7 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "?select_all=false",
-				ProbeConfiguration.authKey);
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "?select_all=false", ProbeConfiguration.authKey);
 
 		if (!Strings.isNullOrEmpty(response)) {
 			Step[] stepArray = JSONUtils.fromString(response, Step[].class);
@@ -518,16 +521,15 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Returns a List of {@link QueryRun} objects from the associated Portal API.
+	 * Returns a List of {@link OsQuery} objects from the associated Portal API.
 	 *
-	 * @return The obtained List of {@link QueryRun} objects.
+	 * @return The obtained List of {@link OsQuery} objects.
 	 */
-	private List<QueryRun> getQueriesFromAPI() {
-		String response = RESTUtils.sendGet(
-				LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/" + ProbeConfiguration.osinfo + "/" + false,
-				ProbeConfiguration.authKey);
+	private List<OsQuery> getQueriesFromAPI() {
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/"
+				+ ProbeConfiguration.osinfo + "?select_all=false", ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
-			QueryRun[] queryRunArray = JSONUtils.fromString(response, QueryRun[].class);
+			OsQuery[] queryRunArray = JSONUtils.fromString(response, OsQuery[].class);
 			if (queryRunArray != null && queryRunArray.length > 0) {
 				return Arrays.asList(queryRunArray);
 			} else {
@@ -544,8 +546,8 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-	private List<QueryRun> getQueriesFromDatabase() {
-		return DBUtil.getInstance().findByFieldName("active", 1, new com.simple2secure.api.model.QueryRun());
+	private List<OsQuery> getQueriesFromDatabase() {
+		return DBUtil.getInstance().findByFieldName("active", 1, new com.simple2secure.api.model.OsQuery());
 	}
 
 	/**
@@ -553,9 +555,9 @@ public class ProbeConfiguration {
 	 *
 	 * @return
 	 */
-	private List<QueryRun> getQueriesFromFile() {
+	private List<OsQuery> getQueriesFromFile() {
 		File potentialQueries;
-		List<QueryRun> queries = new ArrayList<>();
+		List<OsQuery> queries = new ArrayList<>();
 
 		String queriesContent = null;
 		try {
@@ -627,11 +629,11 @@ public class ProbeConfiguration {
 	}
 
 	/**
-	 * Returns a map of currently specified {@link QueryRun} objects.
+	 * Returns a map of currently specified {@link OsQuery} objects.
 	 *
 	 * @return
 	 */
-	public Map<String, QueryRun> getCurrentQueries() {
+	public Map<String, OsQuery> getCurrentQueries() {
 		return currentQueries;
 	}
 }

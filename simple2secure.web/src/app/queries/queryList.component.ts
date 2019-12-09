@@ -24,15 +24,15 @@ import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
-import {QueryRun} from "../_models";
-import {QueryDTO} from "../_models/DTO/queryDTO";
+import {OsQuery} from "../_models";
+import {OsQueryDTO} from "../_models/DTO/osQueryDTO";
 import {TranslateService} from "@ngx-translate/core";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
-import {QueryCategory} from "../_models/queryCategory";
+import {OsQueryCategory} from "../_models/osQueryCategory";
 import {ConfirmationDialog} from "../dialog/confirmation-dialog";
 import {QueryEditDialogComponent} from "./queryEditDialog.component";
 import {QueryCategoryAddDialog} from "./queryCategoryAddDialog.component";
@@ -45,7 +45,7 @@ import {QueryCategoryAddDialog} from "./queryCategoryAddDialog.component";
 
 export class QueryListComponent {
 
-	queries: QueryDTO[];
+	queries: OsQueryDTO[];
 	deleted = false;
 	added = false;
 	loading = false;
@@ -112,7 +112,7 @@ export class QueryListComponent {
 		this.loading = false;
 	}
 
-	onEditClick(element: QueryRun) {
+	onEditClick(element: OsQuery) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
 		dialogConfig.data = {
@@ -138,11 +138,11 @@ export class QueryListComponent {
 		});
 	}
 
-	onDeleteClick(element: QueryRun) {
+	onDeleteClick(element: OsQuery) {
 		this.openDialog(element);
 	}
 
-	public openDialog(item: QueryRun) {
+	public openDialog(item: OsQuery) {
 
 		const dialogConfig = new MatDialogConfig();
 
@@ -164,7 +164,7 @@ export class QueryListComponent {
 		});
 	}
 
-	deleteConfig(queryConfig: QueryRun) {
+	deleteConfig(queryConfig: OsQuery) {
 		this.loading = true;
 		this.httpService.delete(environment.apiEndpoint + 'query/' + queryConfig.id).subscribe(
 			data => {
@@ -185,7 +185,7 @@ export class QueryListComponent {
 		this.loading = false;
 	}
 
-	onAddClick(category: QueryCategory) {
+	onAddClick(category: OsQueryCategory) {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
 		dialogConfig.data = {

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.utils.PortalUtils;
 
@@ -143,7 +143,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 		query.addCriteria(Criteria.where("deviceIsPod").is(deviceIsPod));
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
-		long count = mongoTemplate.count(query, Report.class, collectionName);
+		long count = mongoTemplate.count(query, OsQueryReport.class, collectionName);
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);
 

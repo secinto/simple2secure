@@ -31,11 +31,11 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.simple2secure.api.model.GraphReport;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 
 @Component
 public class ReportUtils {
@@ -43,7 +43,7 @@ public class ReportUtils {
 	private static Logger log = LoggerFactory.getLogger(ReportUtils.class);
 
 	@Autowired
-	ReportRepository reportRepository;
+	OsQueryReportRepository reportRepository;
 
 	@Autowired
 	NetworkReportRepository networkReportRepository;
@@ -63,9 +63,9 @@ public class ReportUtils {
 		long maxPages = reportRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage <= maxPages) {
-			List<Report> reports = reportRepository.getReportsByDeviceAndName(deviceId, queryName, currentPage, size);
+			List<OsQueryReport> reports = reportRepository.getReportsByDeviceAndName(deviceId, queryName, currentPage, size);
 			if (reports != null) {
-				for (Report report : reports) {
+				for (OsQueryReport report : reports) {
 					if (report != null) {
 						if (report.getQueryResult() != null) {
 							try {
@@ -103,9 +103,9 @@ public class ReportUtils {
 		long maxPages = reportRepository.getPagesForReportsByName(queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage < maxPages) {
-			List<Report> reports = reportRepository.getReportsByName(queryName, currentPage, size);
+			List<OsQueryReport> reports = reportRepository.getReportsByName(queryName, currentPage, size);
 			if (reports != null) {
-				for (Report report : reports) {
+				for (OsQueryReport report : reports) {
 					if (report != null) {
 						if (report.getQueryResult() != null) {
 							try {

@@ -10,42 +10,39 @@ package com.simple2secure.api.dto;
 
 import java.util.List;
 
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryCategory;
+import com.simple2secure.api.model.OsQuery;
 
-public class ReportDTO {
+public class OsQueryDTO {
 
-	private long totalSize;
-	private List<Report> report;
+	private OsQueryCategory category;
+	private List<OsQuery> queries;
 
-	public ReportDTO() {
+	public OsQueryDTO() {
 
 	}
 
-	/**
-	 *
-	 * @param name
-	 * @param report_class
-	 * @param interval
-	 */
-	public ReportDTO(List<Report> report, long totalSize) {
-		this.report = report;
-		this.totalSize = totalSize;
+	public OsQueryDTO(OsQueryCategory category, List<OsQuery> queries) {
+		super();
+		this.category = category;
+		this.queries = queries;
 	}
 
-	public long getTotalSize() {
-		return totalSize;
+	public OsQueryCategory getCategory() {
+		return category;
 	}
 
-	public void setTotalSize(long totalSize) {
-		this.totalSize = totalSize;
+	public void setCategory(OsQueryCategory category) {
+		this.category = category;
 	}
 
-	public List<Report> getReport() {
-		return report;
+	public List<OsQuery> getQueries() {
+		return queries;
 	}
 
-	public void setReport(List<Report> report) {
-		this.report = report;
+	public void setQueries(List<OsQuery> queries) {
+		this.queries = queries;
 	}
 
+	
 }

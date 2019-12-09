@@ -29,7 +29,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Location} from '@angular/common';
 import {DatePipe} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {QueryCategory} from "../_models/queryCategory";
+import {OsQueryCategory} from "../_models/osQueryCategory";
 
 @Component({
 	moduleId: module.id,
@@ -39,7 +39,7 @@ import {QueryCategory} from "../_models/queryCategory";
 export class QueryCategoryAddDialog {
 	loading = false;
 	url: string;
-	category = new QueryCategory();
+	category = new OsQueryCategory();
 	isNewCategory: boolean;
 	windows: boolean;
 	linux: boolean;

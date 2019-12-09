@@ -33,7 +33,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.osquery.QueryRunnable;
 import com.simple2secure.probe.utils.LocaleHolder;
@@ -72,7 +72,7 @@ public class QueryScheduler extends TimerTask {
 					}
 				}
 			}
-			for (QueryRun query : ProbeConfiguration.getInstance().getCurrentQueries().values()) {
+			for (OsQuery query : ProbeConfiguration.getInstance().getCurrentQueries().values()) {
 				/*
 				 * Check if the query is already in the currently running ones. Only for queries which are executed always. If not create a
 				 * scheduled future and add it to the currently running ones.
@@ -89,7 +89,7 @@ public class QueryScheduler extends TimerTask {
 					 */
 					QueryRunnable currentQueryRunnable = currentlyRunning.get(query.getName());
 					if (currentQueryRunnable != null) {
-						QueryRun currentQuery = currentQueryRunnable.getQuery();
+						OsQuery currentQuery = currentQueryRunnable.getQuery();
 						/*
 						 * Check if something has changed for the current query. If yes cancel it and create a new scheduled future.
 						 */

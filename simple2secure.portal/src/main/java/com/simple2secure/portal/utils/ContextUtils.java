@@ -48,8 +48,8 @@ import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -72,13 +72,13 @@ public class ContextUtils {
 	LicenseRepository licenseRepository;
 
 	@Autowired
-	ReportRepository reportRepository;
+	OsQueryReportRepository reportRepository;
 
 	@Autowired
 	NetworkReportRepository networkReportRepository;
 
 	@Autowired
-	QueryRepository queryRepository;
+	OsQueryRepository queryRepository;
 
 	@Autowired
 	ContextUserAuthRepository contextUserAuthRepository;

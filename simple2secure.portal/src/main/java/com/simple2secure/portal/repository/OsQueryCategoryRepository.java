@@ -21,29 +21,9 @@
  */
 package com.simple2secure.portal.repository;
 
-import java.util.Date;
-import java.util.List;
-
-import com.simple2secure.api.dto.ReportDTO;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.portal.dao.MongoRepository;
 
-public abstract class ReportRepository extends MongoRepository<Report> {
-	public abstract List<Report> getReportsByDeviceId(String deviceId);
+public abstract class OsQueryCategoryRepository extends MongoRepository<OsQueryCategory> {
 
-	public abstract List<Report> getReportsByName(String name, int page, int size);
-
-	public abstract List<Report> getReportsByDeviceAndName(String deviceId, String name, int page, int size);
-
-	public abstract List<Report> getLastReportsFromTimeStampAndName(Date timestamp, String name);
-
-	public abstract long getPagesForReportsByName(String name);
-
-	public abstract long getPagesForReportsByDeviceAndName(String deviceId, String name);
-
-	public abstract ReportDTO getReportsByGroupId(List<String> group_ids, int page, int size);
-
-	public abstract void deleteByDeviceId(String deviceId);
-
-	public abstract List<Report> getSearchQueryByGroupId(String searchQuery, String groupId);
 }

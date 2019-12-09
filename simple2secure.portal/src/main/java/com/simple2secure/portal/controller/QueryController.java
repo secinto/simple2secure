@@ -41,13 +41,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.QueryDTO;
+import com.simple2secure.api.dto.OsQueryDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.QueryCategory;
-import com.simple2secure.api.model.QueryGroupMapping;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQueryCategory;
+import com.simple2secure.api.model.OsQueryGroupMapping;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
@@ -55,9 +55,9 @@ import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryCategoryRepository;
-import com.simple2secure.portal.repository.QueryGroupMappingRepository;
-import com.simple2secure.portal.repository.QueryRepository;
+import com.simple2secure.portal.repository.OsQueryCategoryRepository;
+import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
+import com.simple2secure.portal.repository.OsQueryRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -81,7 +81,7 @@ public class QueryController {
 	UserRepository userRepository;
 
 	@Autowired
-	QueryRepository queryRepository;
+	OsQueryRepository queryRepository;
 
 	@Autowired
 	LicenseRepository licenseRepository;
@@ -99,10 +99,10 @@ public class QueryController {
 	StepRepository stepRepository;
 
 	@Autowired
-	QueryCategoryRepository queryCategoryRepository;
+	OsQueryCategoryRepository queryCategoryRepository;
 
 	@Autowired
-	QueryGroupMappingRepository queryGroupMappingRepository;
+	OsQueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -121,20 +121,20 @@ public class QueryController {
 	static final Logger log = LoggerFactory.getLogger(QueryController.class);
 
 	/**
-	 * This function returns a {@link QueryRun} by the specified Id.
+	 * This function returns a {@link OsQuery} by the specified Id.
 	 *
 	 * @param id
-	 *          The id of the desired {@link QueryRun}
+	 *          The id of the desired {@link OsQuery}
 	 * @param locale
 	 *          The currently selected locale
 	 * @return
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<OsQuery> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId.getValue())) {
-			QueryRun queryConfig = queryRepository.find(queryId.getValue());
+			OsQuery queryConfig = queryRepository.find(queryId.getValue());
 			if (queryConfig != null) {
 				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 			}
@@ -146,15 +146,15 @@ public class QueryController {
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(value = "/allDto")
-	public ResponseEntity<List<QueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<OsQueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
 
-		List<QueryDTO> queryDtoList = new ArrayList<>();
-		List<QueryCategory> categories = queryCategoryRepository.findAll();
+		List<OsQueryDTO> queryDtoList = new ArrayList<>();
+		List<OsQueryCategory> categories = queryCategoryRepository.findAll();
 		if (categories != null) {
-			for (QueryCategory category : categories) {
-				List<QueryRun> queryRunList = queryRepository.findByCategoryId(category.getId());
+			for (OsQueryCategory category : categories) {
+				List<OsQuery> queryRunList = queryRepository.findByCategoryId(category.getId());
 
-				queryDtoList.add(new QueryDTO(category, queryRunList));
+				queryDtoList.add(new OsQueryDTO(category, queryRunList));
 			}
 
 			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
@@ -166,11 +166,11 @@ public class QueryController {
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	@ValidRequestMapping(value = "/unmapped")
-	public ResponseEntity<List<QueryRun>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
+	public ResponseEntity<List<OsQuery>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
-			List<QueryRun> queryList = queryUtils.getUnmappedQueriesByGroup(groupId.getValue());
+			List<OsQuery> queryList = queryUtils.getUnmappedQueriesByGroup(groupId.getValue());
 
 			if (queryList != null) {
 				return new ResponseEntity<>(queryList, HttpStatus.OK);
@@ -187,7 +187,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryRun> updateQuery(@RequestBody QueryRun query, @ServerProvidedValue ValidInputLocale locale)
+	public ResponseEntity<OsQuery> updateQuery(@RequestBody OsQuery query, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (query != null) {
@@ -215,7 +215,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(value = "/category", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<QueryCategory> updateSaveCategory(@RequestBody QueryCategory category, @ServerProvidedValue ValidInputLocale locale)
+	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (category != null) {
@@ -245,7 +245,7 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(value = "/mapping", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<QueryRun>> updateQueryMappings(@RequestBody List<QueryRun> queryList, @PathVariable ValidInputGroup groupId,
+	public ResponseEntity<List<OsQuery>> updateQueryMappings(@RequestBody List<OsQuery> queryList, @PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (queryList != null && !Strings.isNullOrEmpty(groupId.getValue())) {
@@ -269,7 +269,7 @@ public class QueryController {
 	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(queryId.getValue())) {
-			QueryRun queryRun = queryRepository.find(queryId.getValue());
+			OsQuery queryRun = queryRepository.find(queryId.getValue());
 			if (queryRun != null) {
 				queryGroupMappingRepository.deleteByQueryId(queryId.getValue());
 				queryRepository.delete(queryRun);
@@ -286,8 +286,8 @@ public class QueryController {
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	@ValidRequestMapping
-	public ResponseEntity<List<QueryRun>> getQueriesByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputOsinfo osinfo,
-			@RequestParam boolean select_all, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<OsQuery>> getQueriesByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputOsinfo osinfo,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (Strings.isNullOrEmpty(osinfo.getValue())) {
 			osinfo.setValue(OSInfo.UNKNOWN.name());
@@ -299,24 +299,24 @@ public class QueryController {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
 				if (group != null) {
 
-					List<QueryRun> queryConfig = new ArrayList<>();
+					List<OsQuery> queryConfig = new ArrayList<>();
 
 					// Check if this is root group
 					if (group.isRootGroup()) {
 						// Take only the query runs of this group, because this is root group!
-						queryConfig = queryUtils.findByGroupIdAndOsInfo(group.getId(), OSInfo.valueOf(osinfo.getValue()), select_all);
+						queryConfig = queryUtils.findByGroupIdAndOsInfo(group.getId(), OSInfo.valueOf(osinfo.getValue()));
 					} else {
 						// go until the root group is not found and get all configurations from all groups which are parents of this group
 						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
 						if (foundGroups != null) {
 							List<String> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
 							if (groupIds != null) {
-								queryConfig = queryUtils.findByGroupIdsAndOsInfo(groupIds, OSInfo.valueOf(osinfo.getValue()), select_all);
+								queryConfig = queryUtils.findByGroupIdsAndOsInfo(groupIds, OSInfo.valueOf(osinfo.getValue()));
 							}
 						}
 					}
 					if (queryConfig != null) {
-						queryConfig.sort(Comparator.comparing(QueryRun::getName, String.CASE_INSENSITIVE_ORDER));
+						queryConfig.sort(Comparator.comparing(OsQuery::getName, String.CASE_INSENSITIVE_ORDER));
 						return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 					}
 				}
@@ -332,16 +332,16 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<QueryRun>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
+	public ResponseEntity<List<OsQuery>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
 			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(groupId.getValue())) {
-			List<QueryRun> queries = new ArrayList<>();
-			List<QueryGroupMapping> groupMappings = queryGroupMappingRepository.findByGroupId(groupId.getValue());
+			List<OsQuery> queries = new ArrayList<>();
+			List<OsQueryGroupMapping> groupMappings = queryGroupMappingRepository.findByGroupId(groupId.getValue());
 
 			if (groupMappings != null) {
-				for (QueryGroupMapping mapping : groupMappings) {
-					QueryRun query = queryRepository.find(mapping.getQueryId());
+				for (OsQueryGroupMapping mapping : groupMappings) {
+					OsQuery query = queryRepository.find(mapping.getQueryId());
 					if (query != null) {
 						query = queryUtils.setValuesFromMapping(query, mapping);
 						queries.add(query);

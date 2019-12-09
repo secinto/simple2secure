@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.commons.time.TimeUtils;
@@ -55,11 +55,11 @@ public class ReportScheduler extends TimerTask {
 	}
 
 	/**
-	 * This function sends the {@link Report} to the server updates the sent value and stores it in the database
+	 * This function sends the {@link OsQueryReport} to the server updates the sent value and stores it in the database
 	 *
 	 * @param report
 	 */
-	private void sendReport(Report report) {
+	private void sendReport(OsQueryReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
 			if (Strings.isNullOrEmpty(report.getDeviceId())) {
@@ -107,16 +107,16 @@ public class ReportScheduler extends TimerTask {
 	}
 
 	/**
-	 * This function retrieves all {@link Report} objects from the database where sent tag is false.
+	 * This function retrieves all {@link OsQueryReport} objects from the database where sent tag is false.
 	 */
 	private void sendReportsToServer() {
-		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("isSent", false, Report.class);
+		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("isSent", false, OsQueryReport.class);
 		int currentPageNumber = 1;
 		log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
 		while (currentPageNumber <= lastPageNumber) {
-			List<Report> reports = DBUtil.getInstance().findByFieldNamePaging("isSent", false, Report.class, currentPageNumber);
+			List<OsQueryReport> reports = DBUtil.getInstance().findByFieldNamePaging("isSent", false, OsQueryReport.class, currentPageNumber);
 			if (reports != null) {
-				for (Report report : reports) {
+				for (OsQueryReport report : reports) {
 					sendReport(report);
 				}
 			}

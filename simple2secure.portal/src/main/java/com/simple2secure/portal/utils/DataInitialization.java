@@ -41,9 +41,9 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryCategory;
-import com.simple2secure.api.model.QueryGroupMapping;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQueryCategory;
+import com.simple2secure.api.model.OsQueryGroupMapping;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.api.model.User;
@@ -56,9 +56,9 @@ import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicensePlanRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryCategoryRepository;
-import com.simple2secure.portal.repository.QueryGroupMappingRepository;
-import com.simple2secure.portal.repository.QueryRepository;
+import com.simple2secure.portal.repository.OsQueryCategoryRepository;
+import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
+import com.simple2secure.portal.repository.OsQueryRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
@@ -84,10 +84,10 @@ public class DataInitialization {
 	protected GroupRepository groupRepository;
 
 	@Autowired
-	protected QueryRepository queryRepository;
+	protected OsQueryRepository queryRepository;
 
 	@Autowired
-	protected QueryCategoryRepository queryCategoryRepository;
+	protected OsQueryCategoryRepository queryCategoryRepository;
 
 	@Autowired
 	protected StepRepository stepRepository;
@@ -99,7 +99,7 @@ public class DataInitialization {
 	protected UserRepository userRepository;
 
 	@Autowired
-	protected QueryGroupMappingRepository queryGroupMappingRepository;
+	protected OsQueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	protected PortalUtils portalUtils;
@@ -146,7 +146,7 @@ public class DataInitialization {
 	 * @throws IOException
 	 */
 	public void addDefaultQueries() throws IOException {
-		List<QueryRun> queriesDB = queryRepository.findAll();
+		List<OsQuery> queriesDB = queryRepository.findAll();
 
 		if (queriesDB == null || queriesDB.isEmpty()) {
 
@@ -161,13 +161,13 @@ public class DataInitialization {
 
 				while (queryCategoryNode.hasNext()) {
 					JsonNode currentCategoryNode = queryCategoryNode.next();
-					QueryCategory category = portalUtils.generateQueryCategoryObjectFromJson(currentCategoryNode);
+					OsQueryCategory category = portalUtils.generateQueryCategoryObjectFromJson(currentCategoryNode);
 					ObjectId categoryId = queryCategoryRepository.saveAndReturnId(category);
-					QueryRun[] queries = JSONUtils.fromString(JSONUtils.toString(currentCategoryNode.get("queries")), QueryRun[].class);
+					OsQuery[] queries = JSONUtils.fromString(JSONUtils.toString(currentCategoryNode.get("queries")), OsQuery[].class);
 
 					if (queries != null) {
-						List<QueryRun> queryList = Arrays.asList(queries);
-						for (QueryRun query : queryList) {
+						List<OsQuery> queryList = Arrays.asList(queries);
+						for (OsQuery query : queryList) {
 							query.setCategoryId(categoryId.toString());
 							queryRepository.save(query);
 						}
@@ -178,10 +178,10 @@ public class DataInitialization {
 	}
 
 	public void mapActiveQueriesToDefaultGroup(String groupId) {
-		List<QueryRun> activeQueries = queryRepository.findByActiveStatus(1);
+		List<OsQuery> activeQueries = queryRepository.findByActiveStatus(1);
 		if (activeQueries != null) {
-			for (QueryRun query : activeQueries) {
-				QueryGroupMapping queryGroupMapping = new QueryGroupMapping(groupId, query.getId(), query.getAnalysisInterval(),
+			for (OsQuery query : activeQueries) {
+				OsQueryGroupMapping queryGroupMapping = new OsQueryGroupMapping(groupId, query.getId(), query.getAnalysisInterval(),
 						query.getAnalysisIntervalUnit(), query.getSystemsAvailable());
 				queryGroupMappingRepository.save(queryGroupMapping);
 			}

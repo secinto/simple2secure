@@ -22,7 +22,7 @@
 
 export * from './user';
 export * from './DTO/userDTO';
-export * from './queryrun';
+export * from './osQuery';
 export * from './step';
 export * from './processor';
 export * from './config';

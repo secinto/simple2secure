@@ -39,21 +39,23 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.NetworkReportDTO;
-import com.simple2secure.api.dto.ReportDTO;
+import com.simple2secure.api.dto.OsQueryReportDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.ReportUtils;
 
@@ -72,7 +74,7 @@ import simple2secure.validator.model.ValidInputSize;
 public class ReportController {
 
 	@Autowired
-	ReportRepository reportsRepository;
+	OsQueryReportRepository reportsRepository;
 
 	@Autowired
 	NetworkReportRepository networkReportRepository;
@@ -96,6 +98,9 @@ public class ReportController {
 	PortalUtils portalUtils;
 
 	@Autowired
+	DeviceUtils deviceUtils;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	RestTemplate restTemplate = new RestTemplate();
@@ -104,7 +109,7 @@ public class ReportController {
 
 	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
-	public ResponseEntity<Report> saveReport(@RequestBody Report report, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<OsQueryReport> saveReport(@RequestBody OsQueryReport report, @ServerProvidedValue ValidInputLocale locale) {
 		if (report != null) {
 			reportsRepository.save(report);
 			return new ResponseEntity<>(report, HttpStatus.OK);
@@ -116,22 +121,23 @@ public class ReportController {
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<ReportDTO> getReportsByContextIdAndPagination(@ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<OsQueryReportDTO> getReportsByContextIdAndPagination(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
 
-				if (groups != null) {
+				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+
+				if (devices != null) {
 					log.debug("Loading OSQuery reports for contextId {}", contextId.getValue());
 
-					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+					List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
 
-					ReportDTO reportDto = new ReportDTO();
+					OsQueryReportDTO reportDto = new OsQueryReportDTO();
 
-					reportDto = reportsRepository.getReportsByGroupId(groupIds, page.getValue(), size.getValue());
+					reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
@@ -139,6 +145,20 @@ public class ReportController {
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
 		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@ValidRequestMapping(value = "/report")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId, @ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(reportId.getValue())) {
+			OsQueryReport report = reportsRepository.find(reportId.getValue());
+			if (report != null) {
+				return new ResponseEntity<>(report, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving report with id {}", reportId.getValue());
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -233,11 +253,11 @@ public class ReportController {
 
 	@ValidRequestMapping(value = "/delete/selected", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> deleteSelectedReports(@RequestBody List<Report> queryReports,
+	public ResponseEntity<List<OsQueryReport>> deleteSelectedReports(@RequestBody List<OsQueryReport> queryReports,
 			@ServerProvidedValue ValidInputLocale locale) {
 		if (queryReports != null) {
-			for (Report queryReport : queryReports) {
-				Report dbReport = reportsRepository.find(queryReport.getId());
+			for (OsQueryReport queryReport : queryReports) {
+				OsQueryReport dbReport = reportsRepository.find(queryReport.getId());
 				if (dbReport != null) {
 					reportsRepository.delete(dbReport);
 				}

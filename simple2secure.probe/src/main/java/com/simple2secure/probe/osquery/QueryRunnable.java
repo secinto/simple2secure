@@ -32,19 +32,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 
 public class QueryRunnable implements Runnable {
 	private static Logger log = LoggerFactory.getLogger(QueryRunnable.class);
 
-	private QueryRun query;
+	private OsQuery query;
 
 	private ScheduledFuture<?> scheduledFuture;
 
-	public QueryRunnable(QueryRun queryRun) {
+	public QueryRunnable(OsQuery queryRun) {
 		query = queryRun;
 	}
 
@@ -54,7 +54,7 @@ public class QueryRunnable implements Runnable {
 		log.info("Executing query {} ", query.getName());
 		String queryResult = executeQuery(queryString, query.getName());
 		if (!Strings.isNullOrEmpty(queryResult)) {
-			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
+			OsQueryReport result = new OsQueryReport(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
 			result.setQueryId(query.getId());
 			result.setHostname(ProbeConfiguration.hostname);
 			result.setName(query.getName());
@@ -107,11 +107,11 @@ public class QueryRunnable implements Runnable {
 		return result;
 	}
 
-	public QueryRun getQuery() {
+	public OsQuery getQuery() {
 		return query;
 	}
 
-	public void setQuery(QueryRun query) {
+	public void setQuery(OsQuery query) {
 		this.query = query;
 	}
 

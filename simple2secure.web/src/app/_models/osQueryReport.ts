@@ -20,9 +20,15 @@
  *********************************************************************
  */
 
-import {QueryReport} from '../queryReport';
+import {Generic} from './generic';
 
-export class ReportDTO {
-	public report: QueryReport[];
-	public totalSize: number;
+export class OsQueryReport extends Generic {
+	groupId: string;
+	deviceId: string;
+	query: string;
+	hostname: string;
+	queryResult: string;
+	name: string;
+	queryTimestamp: Date;
+	isSent: boolean;
 }

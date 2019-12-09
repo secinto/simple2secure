@@ -20,10 +20,10 @@
  *********************************************************************
  */
 
-import {QueryCategory} from "../queryCategory";
-import {QueryRun} from "../queryrun";
+import {OsQueryCategory} from "../osQueryCategory";
+import {OsQuery} from "../osQuery";
 
-export class QueryDTO {
-	category: QueryCategory;
-	queries: QueryRun[];
+export class OsQueryDTO {
+	category: OsQueryCategory;
+	queries: OsQuery[];
 }

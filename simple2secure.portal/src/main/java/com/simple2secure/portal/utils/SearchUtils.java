@@ -33,14 +33,14 @@ import org.springframework.stereotype.Component;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
 
@@ -53,7 +53,7 @@ public class SearchUtils {
 	NotificationRepository notificationRepository;
 
 	@Autowired
-	ReportRepository reportRepository;
+	OsQueryReportRepository reportRepository;
 
 	@Autowired
 	NetworkReportRepository networkReportRepository;
@@ -88,14 +88,14 @@ public class SearchUtils {
 
 		List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 
-		List<Report> queryReportList = new ArrayList<>();
+		List<OsQueryReport> queryReportList = new ArrayList<>();
 		List<NetworkReport> networkReportList = new ArrayList<>();
 		List<TestResult> testResultList = new ArrayList<>();
 
 		if (groups != null) {
 			for (CompanyGroup group : groups) {
 
-				List<Report> reports = reportRepository.getSearchQueryByGroupId(searchQuery, group.getId());
+				List<OsQueryReport> reports = reportRepository.getSearchQueryByGroupId(searchQuery, group.getId());
 
 				if (reports != null) {
 					queryReportList.addAll(reports);

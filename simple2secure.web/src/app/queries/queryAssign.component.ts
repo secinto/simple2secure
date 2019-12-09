@@ -24,7 +24,7 @@ import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
-import {CompanyGroup, QueryRun} from "../_models";
+import {CompanyGroup, OsQuery} from "../_models";
 import {TranslateService} from "@ngx-translate/core";
 import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
@@ -167,7 +167,7 @@ export class QueryAssignComponent {
 		this.selectedGroup = groups[0];
 	}
 
-	drop(event: CdkDragDrop<QueryRun[]>) {
+	drop(event: CdkDragDrop<OsQuery[]>) {
 		if (event.previousContainer != event.container) {
 			if(!this.checkIfArrayContainsObject(event.container.data, event.previousContainer.data[event.previousIndex])){
 				transferArrayItem(event.previousContainer.data,
@@ -185,7 +185,7 @@ export class QueryAssignComponent {
 		}
 	}
 
-	removeMappedQuery(item: QueryRun){
+	removeMappedQuery(item: OsQuery){
 		const index = this.dataSourceMappedQueries.data.indexOf(item);
 		if(index > -1){
 			this.dataSourceMappedQueries.data.splice(index, 1);
@@ -196,7 +196,7 @@ export class QueryAssignComponent {
 		}
 	}
 
-	editMappedQuery(item: QueryRun){
+	editMappedQuery(item: OsQuery){
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '450px';
 		dialogConfig.data = {
@@ -215,7 +215,7 @@ export class QueryAssignComponent {
 		});
 	}
 
-	checkIfArrayContainsObject(mappedQueries: QueryRun[], movedQuery: QueryRun){
+	checkIfArrayContainsObject(mappedQueries: OsQuery[], movedQuery: OsQuery){
 		console.log("MOVED QUERY" + movedQuery);
 		const index = mappedQueries.findIndex(query=> query.name === movedQuery.name);
 

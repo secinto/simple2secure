@@ -29,7 +29,7 @@ import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
-import {ReportDTO} from '../_models/DTO/reportDTO';
+import {OsQueryReportDTO} from '../_models/DTO/osQueryReportDTO';
 import {PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
 
@@ -40,7 +40,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 })
 
 export class OsQueryReportOverviewComponent {
-	public reportDTO: ReportDTO;
+	public reportDTO: OsQueryReportDTO;
 	selectedReport: any;
 	loading = false;
 	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];

@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {Location} from '@angular/common';
-import {QueryRun, Timeunit, UrlParameter} from '../_models/index';
+import {OsQuery, Timeunit, UrlParameter} from '../_models/index';
 
 import {AlertService, HttpService, DataService} from '../_services';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -37,7 +37,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 export class MappedQueryEditDialog {
 
-	queryRun: QueryRun;
+	queryRun: OsQuery;
 	timeUnits = Timeunit;
 
 

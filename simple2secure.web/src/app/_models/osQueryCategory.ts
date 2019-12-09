@@ -22,7 +22,7 @@
 
 import {Generic} from './generic';
 
-export class QueryCategory extends Generic {
+export class OsQueryCategory extends Generic {
 	name: string;
 	description: string;
 	systemsAvailable: number;

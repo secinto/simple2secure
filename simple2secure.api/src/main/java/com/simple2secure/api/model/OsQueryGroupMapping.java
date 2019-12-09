@@ -20,41 +20,63 @@
  *********************************************************************
  */
 package com.simple2secure.api.model;
+import java.util.concurrent.TimeUnit;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class QueryCategory extends GenericDBObject {
+public class OsQueryGroupMapping extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String name;
-	private String description;
+	private String groupId;
+	private String queryId;
+	private int analysisInterval;
+	private TimeUnit analysisIntervalUnit;
 	private int systemsAvailable;
 
-	public QueryCategory() {
+	public OsQueryGroupMapping() {
 	}
 
-	public QueryCategory(String name, String description, int systemsAvailable) {
-		this.name = name;
-		this.description = description;
+	public OsQueryGroupMapping(String groupId, String queryId, int analysisInterval, TimeUnit analysisIntervalUnit, int systemsAvailable) {
+		this.groupId = groupId;
+		this.queryId = queryId;
+		this.analysisInterval = analysisInterval;
+		this.analysisIntervalUnit = analysisIntervalUnit;
 		this.systemsAvailable = systemsAvailable;
 	}
 
-	public String getName() {
-		return name;
+	public String getGroupId() {
+		return groupId;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getQueryId() {
+		return queryId;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setQueryId(String queryId) {
+		this.queryId = queryId;
+	}
+
+	public int getAnalysisInterval() {
+		return analysisInterval;
+	}
+
+	public void setAnalysisInterval(int analysisInterval) {
+		this.analysisInterval = analysisInterval;
+	}
+
+	public TimeUnit getAnalysisIntervalUnit() {
+		return analysisIntervalUnit;
+	}
+
+	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
+		this.analysisIntervalUnit = analysisIntervalUnit;
 	}
 
 	public int getSystemsAvailable() {

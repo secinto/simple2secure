@@ -19,9 +19,21 @@
  *
  *********************************************************************
  */
-package com.simple2secure.probe.dao;
+package com.simple2secure.probe.dao.impl;
 
-import com.simple2secure.api.model.QueryRun;
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.probe.dao.OsQueryReportDao;
 
-public interface QueryDao extends BaseDao<QueryRun> {
+public class OsQueryReportDaoImpl extends BaseDaoImpl<OsQueryReport> implements OsQueryReportDao {
+
+	public OsQueryReportDaoImpl(String persistenceUnitName) {
+		entityClass = OsQueryReport.class;
+		if (!Strings.isNullOrEmpty(persistenceUnitName)) {
+			init(persistenceUnitName);
+		} else {
+			init(BaseDaoImpl.PERSISTENCE_UNIT_NAME);
+		}
+	}
+
 }

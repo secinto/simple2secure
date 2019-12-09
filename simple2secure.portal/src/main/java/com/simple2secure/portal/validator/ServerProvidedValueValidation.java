@@ -17,7 +17,7 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -38,7 +38,7 @@ public class ServerProvidedValueValidation implements HandlerMethodArgumentResol
 	ContextUserAuthRepository contextUserAuthRepository;
 
 	@Autowired
-	ReportRepository reportRepository;
+	OsQueryReportRepository reportRepository;
 
 	@Autowired
 	GroupRepository groupRepository;

@@ -19,11 +19,21 @@
  *
  *********************************************************************
  */
-package com.simple2secure.portal.repository;
+package com.simple2secure.probe.dao.impl;
 
-import com.simple2secure.api.model.QueryCategory;
-import com.simple2secure.portal.dao.MongoRepository;
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.probe.dao.OsQueryDao;
 
-public abstract class QueryCategoryRepository extends MongoRepository<QueryCategory> {
+public class OsQueryDaoImpl extends BaseDaoImpl<OsQuery> implements OsQueryDao {
+
+	public OsQueryDaoImpl(String persistenceUnitName) {
+		entityClass = OsQuery.class;
+		if (!Strings.isNullOrEmpty(persistenceUnitName)) {
+			init(persistenceUnitName);
+		} else {
+			init(BaseDaoImpl.PERSISTENCE_UNIT_NAME);
+		}
+	}
 
 }

@@ -37,7 +37,7 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
-import com.simple2secure.api.model.QueryGroupMapping;
+import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -49,9 +49,9 @@ import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryGroupMappingRepository;
-import com.simple2secure.portal.repository.QueryRepository;
-import com.simple2secure.portal.repository.ReportRepository;
+import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
+import com.simple2secure.portal.repository.OsQueryRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
@@ -73,13 +73,13 @@ public class GroupUtils {
 	LicenseRepository licenseRepository;
 
 	@Autowired
-	ReportRepository reportRepository;
+	OsQueryReportRepository reportRepository;
 
 	@Autowired
 	NetworkReportRepository networkReportRepository;
 
 	@Autowired
-	QueryRepository queryRepository;
+	OsQueryRepository queryRepository;
 
 	@Autowired
 	ContextUserAuthRepository contextUserAuthRepository;
@@ -88,7 +88,7 @@ public class GroupUtils {
 	GroupAccesRightRepository groupAccessRightRepository;
 
 	@Autowired
-	QueryGroupMappingRepository queryGroupMappingRepository;
+	OsQueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -491,10 +491,10 @@ public class GroupUtils {
 	 */
 	public void copyGroupConfiguration(String sourceGroupId, String destGroupId) {
 
-		List<QueryGroupMapping> queryMappings = queryGroupMappingRepository.findByGroupId(sourceGroupId);
+		List<OsQueryGroupMapping> queryMappings = queryGroupMappingRepository.findByGroupId(sourceGroupId);
 
 		if (queryMappings != null) {
-			for (QueryGroupMapping mapping : queryMappings) {
+			for (OsQueryGroupMapping mapping : queryMappings) {
 				mapping.setGroupId(destGroupId);
 				mapping.setId(null);
 				queryGroupMappingRepository.save(mapping);

@@ -23,13 +23,13 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.portal.dao.MongoRepository;
 
-public abstract class QueryRepository extends MongoRepository<QueryRun> {
+public abstract class OsQueryRepository extends MongoRepository<OsQuery> {
 
-	public abstract List<QueryRun> findByActiveStatus(int active);
+	public abstract List<OsQuery> findByActiveStatus(int active);
 
-	public abstract List<QueryRun> findByCategoryId(String categoryId);
+	public abstract List<OsQuery> findByCategoryId(String categoryId);
 
 }

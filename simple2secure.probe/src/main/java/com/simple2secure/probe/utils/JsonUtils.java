@@ -22,11 +22,15 @@
 package com.simple2secure.probe.utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.json.JSONUtils;
 
@@ -44,10 +48,10 @@ public class JsonUtils {
 	 * @param file
 	 * @return
 	 */
-	public static List<QueryRun> readRunQueriesFromFile(File file) {
+	public static List<OsQuery> readRunQueriesFromFile(File file) {
 
-		QueryRun[] queryRunArr = JSONUtils.fromFile(file, QueryRun[].class);
-		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
+		OsQuery[] queryRunArr = JSONUtils.fromFile(file, OsQuery[].class);
+		List<OsQuery> queryRunList = Arrays.asList(queryRunArr);
 		return queryRunList;
 
 	}
@@ -58,11 +62,30 @@ public class JsonUtils {
 	 * @param content
 	 * @return
 	 */
-	public static List<QueryRun> readRunQueriesFromString(String content) {
+	public static List<OsQuery> readRunQueriesFromString(String content) {
 
-		QueryRun[] queryRunArr = JSONUtils.fromString(content, QueryRun[].class);
-		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
-		return queryRunList;
+		JsonNode node = JSONUtils.fromString(content);
+		List<OsQuery> activeQueries = new ArrayList<>();
+		if (node.isArray()) {
+			ArrayNode arrayNode = (ArrayNode) node;
+			Iterator<JsonNode> queryCategoryNode = arrayNode.elements();
+
+			while (queryCategoryNode.hasNext()) {
+				JsonNode currentCategoryNode = queryCategoryNode.next();
+				OsQuery[] queries = JSONUtils.fromString(JSONUtils.toString(currentCategoryNode.get("queries")), OsQuery[].class);
+
+				if (queries != null) {
+					List<OsQuery> queryList = Arrays.asList(queries);
+					for (OsQuery query : queryList) {
+						if (query.getActive() == 1) {
+							activeQueries.add(query);
+						}
+					}
+
+				}
+			}
+		}
+		return activeQueries;
 
 	}
 

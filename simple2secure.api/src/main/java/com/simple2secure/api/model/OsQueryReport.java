@@ -30,8 +30,8 @@ import javax.persistence.Table;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 @Entity
-@Table(name = "Report")
-public class Report extends GenericDBObject {
+@Table(name = "OsQueryReport")
+public class OsQueryReport extends GenericDBObject {
 
 	/**
 	 *
@@ -50,7 +50,7 @@ public class Report extends GenericDBObject {
 	private Date queryTimestamp;
 	private boolean isSent;
 
-	public Report() {
+	public OsQueryReport() {
 
 	}
 
@@ -60,7 +60,7 @@ public class Report extends GenericDBObject {
 	 * @param report_class
 	 * @param interval
 	 */
-	public Report(String deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
+	public OsQueryReport(String deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
 		super();
 		this.deviceId = deviceId;
 		this.query = query;
