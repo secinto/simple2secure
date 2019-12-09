@@ -5,8 +5,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {environment} from '../../environments/environment';
 import { SUTDetailsComponent } from './sutDetails.component';
-import { SystemUnderTest } from '../_models/SystemUnderTest';
-import { DeviceType } from '../_models/DeviceType';
+import { SystemUnderTest } from '../_models/systemUnderTest';
+import { DeviceType } from '../_models/deviceType';
 
 /**
  *********************************************************************

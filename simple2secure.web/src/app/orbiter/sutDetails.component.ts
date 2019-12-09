@@ -27,7 +27,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { environment } from '../../environments/environment';
-import { DeviceType } from '../_models/DeviceType';
+import { DeviceType } from '../_models/deviceType';
 
 
 @Component({
