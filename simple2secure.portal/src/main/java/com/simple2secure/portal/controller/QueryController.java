@@ -22,6 +22,7 @@
 package com.simple2secure.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,19 +46,19 @@ import com.simple2secure.api.dto.OsQueryDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.OSInfo;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.OsQueryGroupMapping;
-import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.OsQueryCategoryRepository;
 import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
 import com.simple2secure.portal.repository.OsQueryRepository;
+import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
@@ -215,8 +216,8 @@ public class QueryController {
 	 */
 	@ValidRequestMapping(value = "/category", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (category != null) {
 			if (!Strings.isNullOrEmpty(category.getId())) {
@@ -350,6 +351,14 @@ public class QueryController {
 			}
 
 			if (queries != null) {
+
+				Collections.sort(queries, new Comparator<OsQuery>() {
+					@Override
+					public int compare(OsQuery u1, OsQuery u2) {
+						return u1.getName().compareTo(u2.getName());
+					}
+				});
+
 				return new ResponseEntity<>(queries, HttpStatus.OK);
 			}
 		}

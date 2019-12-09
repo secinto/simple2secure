@@ -22,6 +22,8 @@
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -30,8 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.OSInfo;
-import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
 import com.simple2secure.portal.repository.OsQueryRepository;
 
@@ -56,7 +58,7 @@ public class QueryUtils {
 		List<OsQuery> unmappedQueries = new ArrayList<>();
 
 		List<OsQuery> allQueries = queryRepository.findAll();
-		List<OsQuery> mappedQueries = getMappedQueriesByGruop(groupId);
+		List<OsQuery> mappedQueries = getMappedQueriesByGroup(groupId);
 
 		for (OsQuery query : allQueries) {
 			if (!mappedQueries.contains(query)) {
@@ -65,6 +67,13 @@ public class QueryUtils {
 		}
 
 		log.info("Group {} has {} unmapped queries", groupId, unmappedQueries.size());
+
+		Collections.sort(unmappedQueries, new Comparator<OsQuery>() {
+			@Override
+			public int compare(OsQuery u1, OsQuery u2) {
+				return u1.getName().compareTo(u2.getName());
+			}
+		});
 
 		return unmappedQueries;
 	}
@@ -75,7 +84,7 @@ public class QueryUtils {
 	 * @param groupId
 	 * @return
 	 */
-	public List<OsQuery> getMappedQueriesByGruop(String groupId) {
+	public List<OsQuery> getMappedQueriesByGroup(String groupId) {
 		List<OsQuery> queries = new ArrayList<>();
 		List<OsQueryGroupMapping> mappedQueries = queryGroupMappingsRepository.findByGroupId(groupId);
 
@@ -86,6 +95,13 @@ public class QueryUtils {
 				queries.add(currentQuery);
 			}
 		}
+
+		Collections.sort(queries, new Comparator<OsQuery>() {
+			@Override
+			public int compare(OsQuery u1, OsQuery u2) {
+				return u1.getName().compareTo(u2.getName());
+			}
+		});
 
 		log.info("Group {} has {} mapped queries", groupId, queries.size());
 

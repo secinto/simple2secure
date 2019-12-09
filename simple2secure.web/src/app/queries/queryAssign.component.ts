@@ -31,7 +31,6 @@ import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
 import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 import {MatTableDataSource} from "@angular/material/table";
-import {MatSort} from "@angular/material/sort";
 import {MatPaginator} from "@angular/material/paginator";
 
 @Component({
@@ -188,7 +187,7 @@ export class QueryAssignComponent {
 	removeMappedQuery(item: OsQuery){
 		const index = this.dataSourceMappedQueries.data.indexOf(item);
 		if(index > -1){
-			this.dataSourceMappedQueries.data.splice(index, 1);
+			this.dataSourceMappedQueries.data = this.dataSourceMappedQueries.data.filter(query => query.id != item.id);
 			this.alertService.success(this.translate.instant('query.remove.success'));
 		}
 		else{
