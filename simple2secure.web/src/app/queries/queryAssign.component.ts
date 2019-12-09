@@ -46,11 +46,12 @@ export class QueryAssignComponent {
 	selectedGroup: CompanyGroup;
 	lastSelectedGroup: CompanyGroup;
 	loading = false;
-	displayedColumns: string[] = ['query'];
+	displayedMappedColumns: string[] = ['query', 'action'];
+	displayedUnmappedColumns: string[] = ['query'];
 	dataSourceUnmappedQueries = new MatTableDataSource();
 	dataSourceMappedQueries = new MatTableDataSource();
-	@ViewChild(MatSort) sort: MatSort;
-	@ViewChild(MatPaginator) paginator: MatPaginator;
+	@ViewChild('paginatorMapped') paginatorMapped: MatPaginator;
+	@ViewChild('paginatorUnmapped') paginatorUnmapped: MatPaginator;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -63,6 +64,11 @@ export class QueryAssignComponent {
 
 	ngOnInit() {
 		this.getGroups();
+	}
+
+	ngAfterViewInit() {
+		this.dataSourceUnmappedQueries.paginator = this.paginatorUnmapped;
+		this.dataSourceMappedQueries.paginator = this.paginatorMapped;
 	}
 
 	ngOnDestroy() {

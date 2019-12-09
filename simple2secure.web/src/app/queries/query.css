@@ -116,3 +116,8 @@
 #addCategory{
     margin-left: 15px;
 }
+
+.mat-table-align-right{
+    text-align: right;
+    justify-content: flex-end;
+}

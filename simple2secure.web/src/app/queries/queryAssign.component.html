@@ -7,11 +7,11 @@
     </mat-select>
 </mat-form-field>
 
-<div class="example-container">
+<div class="example-container table table-striped">
     <h2>{{'query.mapped' | translate}}</h2>
 
 
-    <mat-table [dataSource]="dataSourceMappedQueries"
+    <mat-table #tableMapped [dataSource]="dataSourceMappedQueries"
                class="mat-elevation-z8" cdkDropList #mappedQueriesList="cdkDropList"
                [cdkDropListData]="dataSourceMappedQueries.data" [cdkDropListConnectedTo]="[allQueriesList]"
                (cdkDropListDropped)="drop($event)">
@@ -21,25 +21,37 @@
             <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag>
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-table-align-right">
+                <div class="drag-action-buttons">
+                    <a class="delete-button" (click)='removeMappedQuery(element)'><mat-icon class="drag-action-icon">close</mat-icon></a>
+                    <a class="edit-button" (click)='editMappedQuery(element)'><mat-icon class="drag-action-icon">edit</mat-icon></a>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedMappedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedMappedColumns;" cdkDrag>
             <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{row.name}}
             <div *cdkDragPreview class="preview-drag-box">
                 <p>{{row.description}}</p>
                 <p>Interval: {{row.analysisInterval}} {{row.analysisIntervalUnit}}</p>
             </div>
-            <div class="drag-action-buttons">
-                <a class="delete-button" (click)='removeMappedQuery(row)'><mat-icon class="drag-action-icon">close</mat-icon></a>
-                <a class="edit-button" (click)='editMappedQuery(row)'><mat-icon class="drag-action-icon">edit</mat-icon></a>
-            </div>
+
         </mat-row>
     </mat-table>
+    <mat-paginator #paginatorMapped
+                   [pageSize]="10"
+                   [hidePageSize]="true"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
 </div>
 
-<div class="example-container">
+<div class="example-container table table-striped">
     <h2>{{'query.available' | translate}}</h2>
 
-    <mat-table [dataSource]="dataSourceUnmappedQueries"
+    <mat-table #tableUnmapped [dataSource]="dataSourceUnmappedQueries"
                class="mat-elevation-z8" cdkDropList #allQueriesList="cdkDropList"
                [cdkDropListData]="dataSourceUnmappedQueries.data" [cdkDropListConnectedTo]="[mappedQueriesList]"
                (cdkDropListDropped)="drop($event)">
@@ -49,8 +61,8 @@
             <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag>
+        <mat-header-row *matHeaderRowDef="displayedUnmappedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedUnmappedColumns;" cdkDrag>
             <div class="example-custom-placeholder" *cdkDragPlaceholder></div>{{row.name}}
             <div *cdkDragPreview class="preview-drag-box">
                 <p>{{row.name}}</p>
@@ -61,4 +73,10 @@
             </div>
         </mat-row>
     </mat-table>
+
+    <mat-paginator #paginatorUnmapped
+                   [pageSize]="10"
+                   [hidePageSize]="true"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
 </div>
