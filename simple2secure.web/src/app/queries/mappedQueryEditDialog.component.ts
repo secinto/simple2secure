@@ -53,6 +53,7 @@ export class MappedQueryEditDialog {
 		@Inject(MAT_DIALOG_DATA) data
 	)
 	{
+			dialogRef.disableClose = true;
 			this.queryRun = data.queryRun;
 	}
 
