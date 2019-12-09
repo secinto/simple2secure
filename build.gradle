@@ -102,7 +102,10 @@ project(':simple2secure.portal') {
 		implementation project(':simple2secure.validator')
 
 		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
-		compile 'org.springframework.boot:spring-boot-starter-web'
+		compile ('org.springframework.boot:spring-boot-starter-web'){
+			exclude group: 'org.hibernate'
+		}
+		compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
 		compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
 		compile 'org.springframework.boot:spring-boot-starter-security'
 		compile 'org.springframework.boot:spring-boot-devtools'
@@ -124,7 +127,10 @@ project(':simple2secure.validator') {
 	dependencies {
 		implementation project(':simple2secure.api')
 		implementation project(':simple2secure.commons')
-		compile 'org.springframework.boot:spring-boot-starter-web'
+		compile ('org.springframework.boot:spring-boot-starter-web'){
+			exclude group: 'org.hibernate'
+		}
+		compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
 		compile 'org.springframework.boot:spring-boot-starter-security'
 		compile group: 'commons-io', name: 'commons-io', version: '2.6'
 		compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
