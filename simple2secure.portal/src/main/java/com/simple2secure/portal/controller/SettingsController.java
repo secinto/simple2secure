@@ -49,6 +49,7 @@ import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.TestMacroRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.utils.PortalUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -76,6 +77,9 @@ public class SettingsController {
 	WidgetRepository widgetRepository;
 
 	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
 	@ValidRequestMapping
@@ -85,9 +89,10 @@ public class SettingsController {
 		List<LicensePlan> licensePlans = licensePlanRepository.findAll();
 		List<TestMacro> testMacros = testMacroRepository.findAll();
 		List<Widget> widgets = widgetRepository.findAll();
+		List<String> widgetApis = portalUtils.getWidgetApis();
 		if (settings != null) {
 			if (settings.size() == 1) {
-				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros, widgets), HttpStatus.OK);
+				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros, widgets, widgetApis), HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving settings");
@@ -97,9 +102,7 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -113,9 +116,7 @@ public class SettingsController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -133,9 +134,7 @@ public class SettingsController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable ValidInputLicensePlan licensePlanId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -154,9 +153,7 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/testmacro",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/testmacro", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -175,10 +172,7 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {

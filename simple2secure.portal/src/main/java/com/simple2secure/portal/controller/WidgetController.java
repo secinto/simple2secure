@@ -21,12 +21,7 @@
  */
 package com.simple2secure.portal.controller;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -55,6 +50,7 @@ import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DeviceUtils;
+import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.WidgetUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -84,25 +80,15 @@ public class WidgetController {
 	DeviceUtils deviceUtils;
 
 	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
 	ContextRepository contextRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	List<String> widgetFunctions = new ArrayList<>();
-
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
-
-	@PostConstruct
-	public void initialize() {
-
-		final List<Method> allMethods = new ArrayList<>(Arrays.asList(WidgetController.class.getDeclaredMethods()));
-
-		for (final Method method : allMethods) {
-			if (method.isAnnotationPresent(WidgetFunction.class)) {
-			}
-		}
-	}
 
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
@@ -117,9 +103,7 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/delete",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> deleteWidget(@PathVariable ValidInputWidget widgetId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -138,10 +122,7 @@ public class WidgetController {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/add",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> saveWidget(@RequestBody Widget widget, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -159,10 +140,7 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/updatePosition",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/updatePosition", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -183,8 +161,7 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/get")
+	@ValidRequestMapping(value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -199,9 +176,7 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/delete/prop",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete/prop", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable ValidInputWidgetProp widgetPropId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -220,8 +195,7 @@ public class WidgetController {
 	}
 
 	@WidgetFunction
-	@ValidRequestMapping(
-			value = "/devActive")
+	@ValidRequestMapping(value = "/devActive")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {

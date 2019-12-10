@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -58,12 +59,14 @@ import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.controller.WidgetController;
 import com.simple2secure.portal.repository.GroupRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.annotation.WidgetFunction;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputParamType;
@@ -412,14 +415,13 @@ public class PortalUtils {
 	 * @param m
 	 * @return
 	 */
-	private StringBuilder createMethodUrl(String beanName, Method m) {
+	private StringBuilder createMethodUrl(Method m) {
 		StringBuilder sb = new StringBuilder();
 		Parameter[] params = m.getParameters();
 		if (params.length > 0) {
 			for (Parameter param : params) {
 				boolean isParamPathVariable = isParamPathVariable(param);
 				if (isParamPathVariable) {
-					// log.debug("Paramter {} in {}.{} will be used for creating Request Method Header", param.getType(), beanName, m.getName());
 					try {
 						sb.append(getRequestMethodTag(param));
 					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
@@ -513,7 +515,7 @@ public class PortalUtils {
 	 * @return
 	 */
 	public RequestMappingInfo createRequestMappingInfo(String beanName, Method m, String[] clazz_url) {
-		StringBuilder method_url = createMethodUrl(beanName, m);
+		StringBuilder method_url = createMethodUrl(m);
 		RequestMethod rm = (RequestMethod) getValueFromAnnotation(m, ValidInputParamType.METHOD);
 		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
 		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
@@ -523,11 +525,39 @@ public class PortalUtils {
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
 
+	/**
+	 * This function creates OsQueryCategory object from the JsonNode
+	 *
+	 * @param node
+	 * @return
+	 */
 	public OsQueryCategory generateQueryCategoryObjectFromJson(JsonNode node) {
 		String name = node.get("name").asText();
 		String description = node.get("description").asText();
 		int systemsAvailable = node.get("systemsAvailable").asInt();
 		return new OsQueryCategory(name, description, systemsAvailable);
+	}
+
+	/**
+	 * This function returns the list of the widget apis which are tagged with the @WidgetFunction annotation.
+	 *
+	 * @return
+	 */
+	public List<String> getWidgetApis() {
+		List<String> apis = new ArrayList<>();
+		final List<Method> allMethods = new ArrayList<>(Arrays.asList(WidgetController.class.getDeclaredMethods()));
+
+		for (final Method method : allMethods) {
+			if (method.isAnnotationPresent(WidgetFunction.class)) {
+				StringBuilder method_url = createMethodUrl(method);
+				String annotated_value = (String) getValueFromAnnotation(method, ValidInputParamType.VALUE);
+				String[] clazz_url = { StaticConfigItems.WIDGET_API };
+				String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+				apis.add(complete_url);
+			}
+		}
+
+		return apis;
 	}
 
 }

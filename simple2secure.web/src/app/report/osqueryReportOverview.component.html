@@ -8,7 +8,7 @@
 <mat-form-field class="devices-report">
     <mat-label>{{"report.devices" | translate}}</mat-label>
     <mat-select #selectdevices name="deviceSelection" [ngModel]="selectedDevices" multiple>
-        <mat-option *ngFor="let device of devices" [value]="device">{{device.hostname}}</mat-option>
+        <mat-option *ngFor="let device of devices" [value]="device">{{device.hostname}} ({{device.group.name}})</mat-option>
         <button mat-button mat-raised-button class="mat-green-button button-select-box" (click)="updateDevices()">Apply</button>
     </mat-select>
 </mat-form-field>
