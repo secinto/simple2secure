@@ -89,14 +89,22 @@ export class OsQueryReportOverviewComponent {
 	}
 
 	public handlePage(e?: PageEvent) {
+		console.log(this.devices);
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadAllReports(e.pageIndex, e.pageSize);
+		if(this.selectedDevices.length > 0){
+			this.loadReportsByDeviceIds(this.selectElRefDevices.value, e.pageIndex, e.pageSize);
+		}
+		else{
+			this.loadReportsByGroupIds(this.selectedGroups, e.pageIndex, e.pageSize);
+		}
 		return e;
 	}
 
 	public updateGroups(){
+		this.selectedGroups = this.selectElRefGroups.value;
 		if(!this.selectElRefGroups.value.isEmpty){
+			this.loadReportsByGroupIds(this.selectElRefGroups.value, 0, 10);
 			this.getProbesByGroupIds(this.selectElRefGroups.value);
 			this.selectElRefGroups.close();
 			this.selectElRefDevices.open();
@@ -104,6 +112,7 @@ export class OsQueryReportOverviewComponent {
 	}
 
 	public updateDevices(){
+		this.selectedDevices = this.selectElRefDevices.value;
 		if(!this.selectElRefDevices.value.isEmpty){
 			this.loadReportsByDeviceIds(this.selectElRefDevices.value, 0, 10);
 			this.selectElRefDevices.close();
@@ -116,7 +125,9 @@ export class OsQueryReportOverviewComponent {
 			.subscribe(
 				data => {
 					this.groups = data;
-					this.loadAllReports(0, 10);
+					this.selectedGroups = data;
+					this.loadReportsByGroupIds(data, 0, 10);
+					this.getProbesByGroupIds(data);
 				},
 				error => {
 					if (error.status == 0) {
@@ -137,10 +148,9 @@ export class OsQueryReportOverviewComponent {
 				});
 	}
 
-	private loadReportsByDeviceIds(devices: Device[], page: number, size: number){
+	loadReportsByGroupIds(groups: CompanyGroup[], page: number, size: number){
 		this.loading = true;
-		console.log(devices);
-		this.httpService.post(devices,environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
+		this.httpService.post(groups,environment.apiEndpoint + 'reports/groups/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;
@@ -166,9 +176,9 @@ export class OsQueryReportOverviewComponent {
 				});
 	}
 
-	private loadAllReports(page: number, size: number) {
+	private loadReportsByDeviceIds(devices: Device[], page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/' + page + '/' + size)
+		this.httpService.post(devices,environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;
@@ -225,7 +235,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.delete(environment.apiEndpoint + 'reports/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports(this.currentPage, this.pageSize);
+				this.loadReportsByGroupIds(this.selectedGroups, this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
@@ -285,7 +295,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.post(this.selection.selected, environment.apiEndpoint + 'reports/delete/selected').subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports(this.currentPage, this.pageSize);
+				this.loadReportsByGroupIds(this.selectedGroups, this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {

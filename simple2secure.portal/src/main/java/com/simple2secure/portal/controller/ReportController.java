@@ -148,6 +148,29 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
+	@ValidRequestMapping(value = "/groups", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<OsQueryReportDTO> getReportsByGroupIdsAndPagination(@RequestBody List<CompanyGroup> groups,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (groups != null) {
+
+			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+
+			if (groupIds != null && !groupIds.isEmpty()) {
+				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds, false);
+				List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+				if (deviceIds != null) {
+					OsQueryReportDTO reportDto = new OsQueryReportDTO();
+					reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
+				}
+			}
+		}
+		log.error("Error occured while retrieving reports for groups");
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
 	@ValidRequestMapping(value = "/devices", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryReportDTO> getReportsByDeviceIdsAndPagination(@RequestBody List<Device> devices,
