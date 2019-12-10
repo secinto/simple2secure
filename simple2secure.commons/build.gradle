@@ -4,7 +4,7 @@ sonarqube {
 	properties { property "sonar.projectBaseDir", "$projectDir/.." }
 }
 
-jar {
+task customFatJar(type: Jar) {
 	baseName = 'simple2secure.commons'
 	version =  '1.0.0-RC'
 	manifest {

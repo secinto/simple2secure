@@ -1,4 +1,4 @@
-jar {
+task customFatJar(type: Jar) {
 	baseName = 'simple2secure.validator'
 	version =  '1.0.0-RC'
 	manifest {
