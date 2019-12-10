@@ -551,7 +551,7 @@ public class PortalUtils {
 			if (method.isAnnotationPresent(WidgetFunction.class)) {
 				StringBuilder method_url = createMethodUrl(method);
 				String annotated_value = (String) getValueFromAnnotation(method, ValidInputParamType.VALUE);
-				String[] clazz_url = { StaticConfigItems.WIDGET_API };
+				String[] clazz_url = { StaticConfigItems.WIDGET_API.replace("/api/", "") };
 				String complete_url = generateUrl(clazz_url, annotated_value, method_url);
 				apis.add(complete_url);
 			}

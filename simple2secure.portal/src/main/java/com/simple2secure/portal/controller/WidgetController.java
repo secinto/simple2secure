@@ -202,7 +202,7 @@ public class WidgetController {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, true);
+				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
 				return new ResponseEntity<>(devices.size(), HttpStatus.OK);
 			}
 		}

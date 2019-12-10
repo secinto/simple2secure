@@ -2,25 +2,26 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class Widget extends GenericDBObject{
-	
+public class Widget extends GenericDBObject {
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -3052204613738700648L;
-	
+
 	private String name;
 	private String description;
 	private String tag;
 	private String bgClass;
 	private String icon;
 	private String label;
+	private String url;
 
 	public Widget() {
-		
+
 	}
-	
-	public Widget(String name, String description, String tag, String bgClass, String icon, String label) {
+
+	public Widget(String name, String description, String tag, String bgClass, String icon, String label, String url) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -28,6 +29,7 @@ public class Widget extends GenericDBObject{
 		this.bgClass = bgClass;
 		this.icon = icon;
 		this.label = label;
+		this.url = url;
 	}
 
 	public String getName() {
@@ -76,5 +78,13 @@ public class Widget extends GenericDBObject{
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

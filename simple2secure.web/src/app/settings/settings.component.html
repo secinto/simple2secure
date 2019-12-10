@@ -293,6 +293,19 @@
                                         </mat-form-field>
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
+                                                        name="bgClass{{in}}" required>
+                                                <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
+                                                    {{url}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
                             </table>
                         </mat-card-content>
                         <button class="mat-green-button" type="button" (click)="saveWidget(widget)"

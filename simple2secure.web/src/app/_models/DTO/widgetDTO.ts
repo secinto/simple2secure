@@ -27,5 +27,7 @@ export class WidgetDTO {
 
 	widget = new Widget();
 	widgetProperties = new WidgetProperties();
+	isValueSet: boolean;
+	value: number;
 
 }
