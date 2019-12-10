@@ -10,8 +10,8 @@
 		<class>com.simple2secure.api.model.Device</class>
 		<class>com.simple2secure.api.model.Packet</class>
 		<class>com.simple2secure.api.model.Processor</class>
-		<class>com.simple2secure.api.model.QueryRun</class>
-		<class>com.simple2secure.api.model.Report</class>
+		<class>com.simple2secure.api.model.OsQuery</class>
+		<class>com.simple2secure.api.model.OsQueryReport</class>
 		<class>com.simple2secure.api.model.Service</class>
 		<class>com.simple2secure.api.model.Step</class>
 		<class>com.simple2secure.api.model.CompanyLicensePublic</class>
