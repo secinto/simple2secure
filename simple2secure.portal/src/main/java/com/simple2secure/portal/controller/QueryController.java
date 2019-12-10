@@ -36,7 +36,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -73,6 +72,7 @@ import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputOsinfo;
 import simple2secure.validator.model.ValidInputQuery;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
@@ -146,7 +146,8 @@ public class QueryController {
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/allDto")
+	@ValidRequestMapping(
+			value = "/allDto")
 	public ResponseEntity<List<OsQueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
 
 		List<OsQueryDTO> queryDtoList = new ArrayList<>();
@@ -166,7 +167,8 @@ public class QueryController {
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/unmapped")
+	@ValidRequestMapping(
+			value = "/unmapped")
 	public ResponseEntity<List<OsQuery>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -186,7 +188,8 @@ public class QueryController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQuery> updateQuery(@RequestBody OsQuery query, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -214,7 +217,9 @@ public class QueryController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/category", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/category",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -244,7 +249,9 @@ public class QueryController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/mapping", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/mapping",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQuery>> updateQueryMappings(@RequestBody List<OsQuery> queryList, @PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -265,7 +272,8 @@ public class QueryController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
@@ -331,7 +339,8 @@ public class QueryController {
 	/**
 	 * This function returns query config by the id
 	 */
-	@ValidRequestMapping(value = "/group")
+	@ValidRequestMapping(
+			value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQuery>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
 			@ServerProvidedValue ValidInputLocale locale) {

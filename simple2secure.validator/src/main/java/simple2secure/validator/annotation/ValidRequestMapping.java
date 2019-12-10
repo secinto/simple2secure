@@ -6,14 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.web.bind.annotation.RequestMethod;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ValidRequestMapping {
 
-	RequestMethod method() default RequestMethod.GET;
+	ValidRequestMethodType method() default ValidRequestMethodType.GET;
 
 	String[] consumes() default {};
 

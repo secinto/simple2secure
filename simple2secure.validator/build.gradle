@@ -1,8 +1,4 @@
-plugins {
-	id "io.spring.dependency-management" version "1.0.8.RELEASE"
-}
-
-jar {
+task customFatJar(type: Jar) {
 	baseName = 'simple2secure.validator'
 	version =  '1.0.0-RC'
 	manifest {

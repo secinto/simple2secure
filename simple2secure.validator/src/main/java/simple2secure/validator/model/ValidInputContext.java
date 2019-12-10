@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
-
-public class ValidInputContext extends ValidatedInput<String>{
+public class ValidInputContext extends ValidatedInput<String> {
 
 	private String contextId;
 	private String tag = "/{contextId}";
-	
+
 	public ValidInputContext() {
 	}
-	
+
 	public ValidInputContext(String contextId) {
 		this.contextId = contextId;
 	}
@@ -28,8 +27,8 @@ public class ValidInputContext extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
-		//TODO: check how to use the repository
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
+		// TODO: check how to use the repository
 		return null;
 	}
 

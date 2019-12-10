@@ -53,8 +53,8 @@ import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Device;
-import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.OsQueryCategory;
+import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -444,7 +444,24 @@ public class PortalUtils {
 
 		if (vrm.length > 0) {
 			if (parameterType.equals(ValidInputParamType.METHOD)) {
-				return vrm[0].method();
+				switch (vrm[0].method()) {
+				case GET:
+					return RequestMethod.GET;
+				case POST:
+					return RequestMethod.POST;
+				case PUT:
+					return RequestMethod.PUT;
+				case DELETE:
+					return RequestMethod.DELETE;
+				case HEAD:
+					return RequestMethod.HEAD;
+				case OPTIONS:
+					return RequestMethod.OPTIONS;
+				case PATCH:
+					return RequestMethod.PATCH;
+				case TRACE:
+					return RequestMethod.TRACE;
+				}
 			} else if (parameterType.equals(ValidInputParamType.VALUE)) {
 				return vrm[0].value();
 			} else if (parameterType.equals(ValidInputParamType.CONSUMES)) {

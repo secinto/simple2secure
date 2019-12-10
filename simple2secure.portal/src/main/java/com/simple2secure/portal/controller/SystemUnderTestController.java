@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -39,6 +38,7 @@ import simple2secure.validator.model.ValidInputDeviceType;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputSize;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
@@ -73,7 +73,8 @@ public class SystemUnderTestController {
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
 
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputLocale locale) {
 		if (sut != null) {

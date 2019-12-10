@@ -9,7 +9,8 @@ jar {
 	baseName = 'simple2secure.service'
 	version =  '1.0.0-RC'
 	manifest {
-		attributes 'Implementation-Title': 'ManageService',
+		attributes 'Main-Class': 'com.simple2secure.service.control.ManageService',
+		'Implementation-Title': 'ManageService',
 		'Implementation-Version': version,
 		'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')
 	}

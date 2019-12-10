@@ -1,20 +1,22 @@
 package simple2secure.validator.model;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+import javax.servlet.http.HttpServletRequest;
 
 import com.simple2secure.api.model.User;
 
-public class ValidInputUser extends ValidatedInput<String>{
-	
+public class ValidInputUser extends ValidatedInput<String> {
+
+	public static String IS_AUTHENTICATED_TAG = "isAuthenticated";
+	public static String USER_OBJECT_TAG = "user";
+
 	private String userId;
 	private String tag = "/{userId}";
-	
+
 	public ValidInputUser() {
 	}
-	
+
 	public ValidInputUser(String userId) {
 		this.userId = userId;
 	}
@@ -30,10 +32,10 @@ public class ValidInputUser extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
-		if (auth.isAuthenticated()) {
-			if (auth.getPrincipal() != null) {
-				User currentUser = (User) auth.getPrincipal();
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
+		if (((Boolean) params.get(IS_AUTHENTICATED_TAG))) {
+			User currentUser = (User) params.get(USER_OBJECT_TAG);
+			if (currentUser != null) {
 				return new ValidInputUser(currentUser.getId());
 			}
 		}

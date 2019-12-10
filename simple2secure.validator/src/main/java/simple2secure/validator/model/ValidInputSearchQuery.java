@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+public class ValidInputSearchQuery extends ValidatedInput<String> {
 
-public class ValidInputSearchQuery extends ValidatedInput<String>{
-	
 	private String searchQuery;
 	private String tag = "/{searchQuery}";
-	
+
 	public ValidInputSearchQuery() {
 	}
-	
+
 	public ValidInputSearchQuery(String searchQuery) {
 		this.searchQuery = searchQuery;
 	}
@@ -28,7 +27,7 @@ public class ValidInputSearchQuery extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
