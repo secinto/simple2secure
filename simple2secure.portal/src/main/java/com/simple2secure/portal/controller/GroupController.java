@@ -34,7 +34,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -63,6 +62,7 @@ import simple2secure.validator.model.ValidInputDestGroup;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputUser;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.GROUP_API)
@@ -102,7 +102,8 @@ public class GroupController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> addGroup(@RequestBody CompanyGroup group, @ServerProvidedValue ValidInputUser userId,
 			ValidInputGroup groupId, @ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -197,7 +198,8 @@ public class GroupController {
 	/**
 	 * This function returns all groups according to the contextId
 	 */
-	@ValidRequestMapping(value = "/context")
+	@ValidRequestMapping(
+			value = "/context")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<CompanyGroup>> getGroupsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -220,7 +222,8 @@ public class GroupController {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<?> deleteGroup(@PathVariable ValidInputGroup groupId, @ServerProvidedValue ValidInputLocale locale) {
 
@@ -247,7 +250,9 @@ public class GroupController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/move", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/move",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> groupDragAndDrop(@PathVariable ValidInputGroup groupId, @PathVariable ValidInputDestGroup destGroupId,
 			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -265,7 +270,9 @@ public class GroupController {
 		}
 	}
 
-	@ValidRequestMapping(value = "/copy", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/copy",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<CompanyGroup> copyGroupConfiguration(@RequestBody CompanyGroup destGroup, @PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {

@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+public class ValidInputPage extends ValidatedInput<Integer> {
 
-public class ValidInputPage extends ValidatedInput<Integer>{
-	
 	private int page;
 	private String tag = "/{page}";
-	
+
 	public ValidInputPage() {
 	}
-	
+
 	public ValidInputPage(int page) {
 		this.page = page;
 	}
@@ -28,7 +27,7 @@ public class ValidInputPage extends ValidatedInput<Integer>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}

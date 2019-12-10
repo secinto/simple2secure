@@ -1,5 +1,8 @@
 package com.simple2secure.portal.validator;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +61,12 @@ public class ServerProvidedValueValidation implements HandlerMethodArgumentResol
 		if (methodParameter.getGenericParameterType().equals(ValidInputContext.class)) {
 			return validateContextInputParameter(auth, methodParameter);
 		} else if (methodParameter.getGenericParameterType().equals(ValidInputUser.class)) {
-			return new ValidInputUser().validate(auth, methodParameter, request);
+			Map<String, Object> params = new TreeMap<>();
+			params.put(ValidInputUser.IS_AUTHENTICATED_TAG, auth.isAuthenticated());
+			params.put(ValidInputUser.USER_OBJECT_TAG, auth.getPrincipal());
+			return new ValidInputUser().validate(request, params);
 		} else if (methodParameter.getGenericParameterType().equals(ValidInputLocale.class)) {
-			return new ValidInputLocale().validate(auth, methodParameter, request);
+			return new ValidInputLocale().validate(request, null);
 		}
 
 		return null;

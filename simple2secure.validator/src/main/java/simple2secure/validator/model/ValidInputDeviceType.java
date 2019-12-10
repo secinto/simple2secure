@@ -1,20 +1,19 @@
 package simple2secure.validator.model;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+import javax.servlet.http.HttpServletRequest;
 
 import com.simple2secure.api.model.DeviceType;
 
-public class ValidInputDeviceType extends ValidatedInput<String>{
-	
+public class ValidInputDeviceType extends ValidatedInput<String> {
+
 	private String deviceType;
 	private String tag = "/{deviceType}";
-	
+
 	public ValidInputDeviceType() {
 	}
-	
+
 	public ValidInputDeviceType(String deviceType) {
 		this.deviceType = deviceType;
 	}
@@ -30,16 +29,16 @@ public class ValidInputDeviceType extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Object validatePathVariable(String value) {
-		
+
 		String deviceType = DeviceType.valueOf(value).toString();
-		
+
 		return new ValidInputDeviceType(deviceType);
 	}
 }

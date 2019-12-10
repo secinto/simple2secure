@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+public class ValidInputWidget extends ValidatedInput<String> {
 
-public class ValidInputWidget extends ValidatedInput<String>{
-	
 	private String widgetId;
 	private String tag = "/{widgetId}";
-	
+
 	public ValidInputWidget() {
 	}
-	
+
 	public ValidInputWidget(String widgetId) {
 		this.widgetId = widgetId;
 	}
@@ -28,7 +27,7 @@ public class ValidInputWidget extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}

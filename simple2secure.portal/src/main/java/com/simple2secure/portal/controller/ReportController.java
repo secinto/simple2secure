@@ -33,7 +33,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -68,6 +67,7 @@ import simple2secure.validator.model.ValidInputName;
 import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputReport;
 import simple2secure.validator.model.ValidInputSize;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.REPORT_API)
@@ -107,7 +107,9 @@ public class ReportController {
 
 	private static Logger log = LoggerFactory.getLogger(ReportController.class);
 
-	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<OsQueryReport> saveReport(@RequestBody OsQueryReport report, @ServerProvidedValue ValidInputLocale locale) {
 		if (report != null) {
@@ -148,9 +150,11 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/report")
+	@ValidRequestMapping(
+			value = "/report")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 			OsQueryReport report = reportsRepository.find(reportId.getValue());
 			if (report != null) {
@@ -162,7 +166,8 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/device")
+	@ValidRequestMapping(
+			value = "/device")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputName name,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -177,7 +182,10 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/network", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/network",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -190,7 +198,8 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/network")
+	@ValidRequestMapping(
+			value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -218,7 +227,9 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/network", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/network",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -236,7 +247,9 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/report/network/name", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/report/network/name",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -251,7 +264,9 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/delete/selected", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/delete/selected",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQueryReport>> deleteSelectedReports(@RequestBody List<OsQueryReport> queryReports,
 			@ServerProvidedValue ValidInputLocale locale) {

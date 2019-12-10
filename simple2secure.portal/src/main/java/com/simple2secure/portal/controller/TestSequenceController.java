@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,6 +58,7 @@ import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputSequence;
 import simple2secure.validator.model.ValidInputSize;
 import simple2secure.validator.model.ValidInputUser;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEQUENCE_API)
@@ -95,7 +95,7 @@ public class TestSequenceController {
 
 	@Autowired
 	GroupRepository groupRepository;
-	
+
 	@Autowired
 	DeviceInfoRepository deviceInfoRepository;
 
@@ -123,7 +123,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputLocale locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
@@ -152,7 +153,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -171,7 +173,10 @@ public class TestSequenceController {
 
 	}
 
-	@ValidRequestMapping(value = "/scheduledSequence", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/scheduledSequence",
+			method = ValidRequestMethodType.GET,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -195,10 +200,14 @@ public class TestSequenceController {
 
 	}
 
-	@ValidRequestMapping(value = "/scheduleSequence", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/scheduleSequence",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (sequence != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 
 			User user = userRepository.find(userId.getValue());
@@ -226,7 +235,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/scheduledSequence")
+	@ValidRequestMapping(
+			value = "/scheduledSequence")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
@@ -247,7 +257,10 @@ public class TestSequenceController {
 
 	}
 
-	@ValidRequestMapping(value = "/update/status", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/update/status",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
 			@PathVariable ValidInputSequence sequenceId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -267,7 +280,9 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/save/sequencerunresult", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/save/sequencerunresult",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestSequenceResult> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -281,7 +296,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/sequenceresults")
+	@ValidRequestMapping(
+			value = "/sequenceresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -295,7 +311,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/sequencerunresults")
+	@ValidRequestMapping(
+			value = "/sequencerunresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable ValidInputSequence seqId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -309,7 +326,8 @@ public class TestSequenceController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/result")
+	@ValidRequestMapping(
+			value = "/result")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {

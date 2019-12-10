@@ -36,7 +36,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -59,6 +58,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputRule;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 /**
  *
@@ -103,10 +103,14 @@ public class RuleController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/rulewithsource", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/rulewithsource",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (ruleWithSourcecode != null) {
 
@@ -139,10 +143,14 @@ public class RuleController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/templaterule", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/templaterule",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (templateRule != null) {
 
@@ -174,7 +182,8 @@ public class RuleController {
 	 * @return ResponseEntity object with the TemplateRule objects as a List or an error.
 	 *
 	 */
-	@ValidRequestMapping(value = "/templaterule")
+	@ValidRequestMapping(
+			value = "/templaterule")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -204,7 +213,8 @@ public class RuleController {
 	 * @return ResponseEntity object with the rules in a List or an error.
 	 *
 	 */
-	@ValidRequestMapping(value = "/rulewithsource")
+	@ValidRequestMapping(
+			value = "/rulewithsource")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -232,9 +242,11 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the Conditions in a List or an error.
 	 */
-	@ValidRequestMapping(value = "/template_conditions")
+	@ValidRequestMapping(
+			value = "/template_conditions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates,
+			@ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateCondition> conditions;
 		try {
 			conditions = ruleConditionsRepository.findAll();
@@ -260,9 +272,11 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the Actions in a List or an error.
 	 */
-	@ValidRequestMapping(value = "/template_actions")
+	@ValidRequestMapping(
+			value = "/template_actions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates,
+			@ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateAction> actions;
 		try {
 			actions = ruleActionsRepository.findAll();
@@ -289,7 +303,9 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@ValidRequestMapping(value = "/rulewithsource", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/rulewithsource",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable ValidInputRule ruleId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -318,9 +334,12 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@ValidRequestMapping(value = "/templaterule", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/templaterule",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(ruleId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
 			TemplateRule templateRule = templateRuleRepository.find(ruleId.getValue());
