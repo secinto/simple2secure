@@ -56,4 +56,6 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract Map<String, Object> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod, int page, int size);
 
+	public abstract List<CompanyLicensePrivate> findByGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod);
+
 }

@@ -140,7 +140,10 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 			expression.and("groupId").is(groupId);
 			orExpression.add(expression);
 		}
-		query.addCriteria(Criteria.where("deviceIsPod").is(deviceIsPod));
+		if (deviceIsPod) {
+			query.addCriteria(Criteria.where("deviceIsPod").is(deviceIsPod));
+		}
+
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
 		long count = mongoTemplate.count(query, OsQueryReport.class, collectionName);
@@ -158,5 +161,25 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 		licensesMap.put("totalSize", count);
 
 		return licensesMap;
+	}
+
+	@Override
+	public List<CompanyLicensePrivate> findByGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod) {
+		List<CompanyLicensePrivate> licenses = new ArrayList<>();
+		if (!groupIds.isEmpty()) {
+			List<Criteria> orExpression = new ArrayList<>();
+			Criteria orCriteria = new Criteria();
+			Query query = new Query();
+			for (String groupId : groupIds) {
+				Criteria expression = new Criteria();
+				expression.and("groupId").is(groupId);
+				orExpression.add(expression);
+			}
+			query.addCriteria(Criteria.where("deviceIsPod").is(deviceIsPod));
+			query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+			licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
+		}
+
+		return licenses;
 	}
 }

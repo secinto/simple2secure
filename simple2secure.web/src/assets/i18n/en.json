@@ -66,6 +66,7 @@
   "button.addTest": "Add Test",
   "button.add.sut.text" : "Add System Under Test",
   "button.addContext": "Add context",
+  "button.filter": "Filter",
 
   "login.email": "Email",
   "login.email.placeholder": "Please enter your e-mail",

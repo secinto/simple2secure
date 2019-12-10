@@ -66,6 +66,7 @@
   "button.addTest": "Test hinzufügen",
   "button.add.sut.text" : "System im Test hinzufügen",
   "button.addContext": "Kontext hinzufügen",
+  "button.filter": "Filter",
 
   "login.email": "E-Mail",
   "login.email.placeholder": "Bitte geben Sie Ihre E-Mail Adresse ein",

@@ -23,6 +23,10 @@ td.mat-cell, td.mat-footer-cell, th.mat-header-cell{
   border-bottom-style: none;
 }
 
-.devices-report{
+.devices-report, .button-filter{
   margin-left: 10px;
+}
+
+.button-select-box{
+  width: 100%;
 }

@@ -32,7 +32,7 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 import {OsQueryReportDTO} from '../_models/DTO/osQueryReportDTO';
 import {PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
-import {CompanyGroup} from "../_models";
+import {CompanyGroup, Device} from "../_models";
 import {HttpParams} from "@angular/common/http";
 
 @Component({
@@ -44,7 +44,9 @@ import {HttpParams} from "@angular/common/http";
 export class OsQueryReportOverviewComponent {
 	public reportDTO: OsQueryReportDTO;
 	groups: CompanyGroup[] = [];
-	devices: any[] = [];
+	selectedGroups: CompanyGroup[] = [];
+	selectedDevices: Device[] = [];
+	devices: Device[] = [];
 	selectedReport: any;
 	loading = false;
 	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
@@ -55,6 +57,8 @@ export class OsQueryReportOverviewComponent {
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
+	@ViewChild('selectgroup') selectElRefGroups;
+	@ViewChild('selectdevices') selectElRefDevices;
 	selection = new SelectionModel<any>(true, []);
 	showDeleteButton = false;
 	numSelected = 0;
@@ -91,6 +95,21 @@ export class OsQueryReportOverviewComponent {
 		return e;
 	}
 
+	public updateGroups(){
+		if(!this.selectElRefGroups.value.isEmpty){
+			this.getProbesByGroupIds(this.selectElRefGroups.value);
+			this.selectElRefGroups.close();
+			this.selectElRefDevices.open();
+		}
+	}
+
+	public updateDevices(){
+		if(!this.selectElRefDevices.value.isEmpty){
+			this.loadReportsByDeviceIds(this.selectElRefDevices.value, 0, 10);
+			this.selectElRefDevices.close();
+		}
+	}
+
 	public getGroups() {
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'group/context')
@@ -110,20 +129,40 @@ export class OsQueryReportOverviewComponent {
 		this.loading = false;
 	}
 
-	getAllProbes(defaultValue: boolean) {
-		const params = new HttpParams()
-			.set('active', String(false));
-		this.httpService.getWithParams(environment.apiEndpoint + 'device', params)
+	getProbesByGroupIds(groups: CompanyGroup[]) {
+		this.httpService.post(groups,environment.apiEndpoint + 'device/group')
 			.subscribe(
 				data => {
 					this.devices = data;
-					if (defaultValue){
-						if (this.devices.length > 0) {
-							//this.selectedProbe = this.probes[0];
-							//this.loadQueriesByProbe(this.selectedProbe.deviceId);
-						}
-					}
+				});
+	}
 
+	private loadReportsByDeviceIds(devices: Device[], page: number, size: number){
+		this.loading = true;
+		console.log(devices);
+		this.httpService.post(devices,environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
+			.subscribe(
+				data => {
+					this.reportDTO = data;
+					this.dataSource.data = this.reportDTO.report;
+					this.totalSize = data.totalSize;
+					if (data.report.length > 0) {
+						this.alertService.success(this.translate.instant('message.report'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.report.notProvided'));
+					}
+					this.loading = false;
+
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
 				});
 	}
 

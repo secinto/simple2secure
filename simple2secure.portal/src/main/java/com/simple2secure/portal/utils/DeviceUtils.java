@@ -44,9 +44,9 @@ import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
 import com.simple2secure.portal.repository.OsQueryReportRepository;
+import com.simple2secure.portal.repository.OsQueryRepository;
+import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestSequenceRepository;
@@ -86,7 +86,7 @@ public class DeviceUtils {
 
 	@Autowired
 	TestSequenceRepository testSequenceRepository;
-	
+
 	@Autowired
 	DeviceInfoRepository deviceInfoRepository;
 
@@ -138,6 +138,42 @@ public class DeviceUtils {
 	}
 
 	/**
+	 * This function creates the devices objects from the CompanyLicensePrivate objects and returns it according to the provided groupIds
+	 *
+	 * @param groupIds
+	 * @param isDevicePod
+	 * @return
+	 */
+	public List<Device> getAllProbesByGroupIds(List<String> groupIds, boolean isDevicePod) {
+		List<Device> devices = new ArrayList<>();
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdsAndDeviceType(groupIds, isDevicePod);
+
+		if (licenses != null) {
+			for (CompanyLicensePrivate license : licenses) {
+				if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+					DeviceStatus status = devInfo.getDeviceStatus();
+
+					DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+					if (status != deviceStatus) {
+						devInfo.setDeviceStatus(deviceStatus);
+						licenseRepository.save(license);
+					}
+
+					CompanyGroup group = groupRepository.find(license.getGroupId());
+					Device device = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus,
+							license.isDevicePod());
+					devices.add(device);
+				}
+
+			}
+		}
+
+		return devices;
+
+	}
+
+	/**
 	 * This function returns all pods from the current context with merged Test objects.
 	 *
 	 * @param context
@@ -152,7 +188,7 @@ public class DeviceUtils {
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
 
-		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, true, page, size);
+		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, false, page, size);
 
 		if (licenseMap != null) {
 
@@ -170,7 +206,8 @@ public class DeviceUtils {
 							licenseRepository.save(license);
 						}
 						CompanyGroup group = groupRepository.find(license.getGroupId());
-						Device device = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus, true);
+						Device device = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus,
+								license.isDevicePod());
 						myDevices.add(device);
 					}
 				}
@@ -216,4 +253,5 @@ public class DeviceUtils {
 			}
 		}
 	}
+
 }

@@ -1,13 +1,15 @@
 <mat-form-field>
     <mat-label>{{"report.groups" | translate}}</mat-label>
-    <mat-select multiple>
+    <mat-select #selectgroup name="groupSelection" [ngModel]="selectedGroups" multiple>
         <mat-option *ngFor="let group of groups" [value]="group">{{group.name}}</mat-option>
+        <button mat-button mat-raised-button class="mat-green-button button-select-box" (click)="updateGroups()">Apply</button>
     </mat-select>
 </mat-form-field>
 <mat-form-field class="devices-report">
     <mat-label>{{"report.devices" | translate}}</mat-label>
-    <mat-select multiple>
-        <mat-option *ngFor="let device of devices" [value]="device">{{device.name}}</mat-option>
+    <mat-select #selectdevices name="deviceSelection" [ngModel]="selectedDevices" multiple>
+        <mat-option *ngFor="let device of devices" [value]="device">{{device.hostname}}</mat-option>
+        <button mat-button mat-raised-button class="mat-green-button button-select-box" (click)="updateDevices()">Apply</button>
     </mat-select>
 </mat-form-field>
 

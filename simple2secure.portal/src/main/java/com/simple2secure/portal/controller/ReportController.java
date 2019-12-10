@@ -148,9 +148,29 @@ public class ReportController {
 				HttpStatus.NOT_FOUND);
 	}
 
+	@ValidRequestMapping(value = "/devices", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<OsQueryReportDTO> getReportsByDeviceIdsAndPagination(@RequestBody List<Device> devices,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (devices != null) {
+
+			List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+
+			if (deviceIds != null && !deviceIds.isEmpty()) {
+				OsQueryReportDTO reportDto = new OsQueryReportDTO();
+				reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
+				return new ResponseEntity<>(reportDto, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving reports for groups");
+		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
 	@ValidRequestMapping(value = "/report")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId,
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 			OsQueryReport report = reportsRepository.find(reportId.getValue());
 			if (report != null) {
