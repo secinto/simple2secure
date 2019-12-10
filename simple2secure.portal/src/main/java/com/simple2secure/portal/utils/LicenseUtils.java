@@ -1,9 +1,9 @@
 package com.simple2secure.portal.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,9 +139,7 @@ public class LicenseUtils {
 		String[] split_string = token.split("\\.");
 		String base64EncodedBody = split_string[1];
 
-		Base64 base64Url = new Base64(true);
-
-		String payload = new String(base64Url.decode(base64EncodedBody));
+		String payload = new String(Base64.getDecoder().decode(base64EncodedBody));
 
 		return payload;
 
