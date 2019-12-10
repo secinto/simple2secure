@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -63,6 +62,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputUser;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.CONTEXT_API)
@@ -105,7 +105,9 @@ public class ContextController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/add", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/add",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
 	public ResponseEntity<Context> addContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
@@ -171,7 +173,8 @@ public class ContextController {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
-	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(userId.getValue())) {
 			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId.getValue());
@@ -200,7 +203,9 @@ public class ContextController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/delete", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/delete",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Context> deleteContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -236,7 +241,8 @@ public class ContextController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
 	public ResponseEntity<CurrentContext> selectUserContext(@ServerProvidedValue ValidInputUser userId, @RequestBody Context context,

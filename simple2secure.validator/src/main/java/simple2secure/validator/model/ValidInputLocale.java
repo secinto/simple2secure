@@ -1,20 +1,19 @@
 package simple2secure.validator.model;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+import javax.servlet.http.HttpServletRequest;
 
 import com.simple2secure.api.model.LocaleLanguage;
 import com.simple2secure.commons.config.StaticConfigItems;
 
-public class ValidInputLocale extends ValidatedInput<String>{
-	
+public class ValidInputLocale extends ValidatedInput<String> {
+
 	private String locale;
-	
+
 	public ValidInputLocale() {
 	}
-	
+
 	public ValidInputLocale(String locale) {
 		this.locale = locale;
 	}
@@ -30,7 +29,7 @@ public class ValidInputLocale extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		LocaleLanguage lang = LocaleLanguage.valueOfLabel(request.getHeader("Accept-Language"));
 
 		if (lang == null) {
@@ -44,5 +43,5 @@ public class ValidInputLocale extends ValidatedInput<String>{
 	public Object validatePathVariable(String value) {
 		// TODO Auto-generated method stub
 		return null;
-	}	
+	}
 }

@@ -42,7 +42,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -89,6 +88,7 @@ import simple2secure.validator.model.ValidInputContext;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputToken;
 import simple2secure.validator.model.ValidInputUser;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.USER_API)
@@ -172,7 +172,8 @@ public class UserController {
 	 * This function finds and returns user according to the user id
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(method = RequestMethod.GET)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.GET)
 	public ResponseEntity<UserDTO> getUserByID(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -218,7 +219,8 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@ValidRequestMapping(method = RequestMethod.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
@@ -249,7 +251,10 @@ public class UserController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/register",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
@@ -270,7 +275,9 @@ public class UserController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(value = "/resendActivation", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/resendActivation",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> resendActivation(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (!Strings.isNullOrEmpty(email)) {
@@ -296,7 +303,9 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/update", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/update",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
@@ -322,7 +331,9 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(value = "/activate/updatePassword", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/activate/updatePassword",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable ValidInputToken token, @RequestBody String password,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
@@ -373,7 +384,9 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(value = "/activate", method = RequestMethod.GET)
+	@ValidRequestMapping(
+			value = "/activate",
+			method = ValidRequestMethodType.GET)
 	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(token.getValue());
@@ -416,7 +429,9 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/sendResetPasswordEmail",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
@@ -457,7 +472,8 @@ public class UserController {
 	 * @throws URISyntaxException
 	 */
 
-	@ValidRequestMapping(value = "/resetPassword")
+	@ValidRequestMapping(
+			value = "/resetPassword")
 	@PermitAll
 	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable ValidInputToken token) throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token.getValue());
@@ -473,7 +489,8 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(value = "/invite")
+	@ValidRequestMapping(
+			value = "/invite")
 	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws URISyntaxException {
 
@@ -488,7 +505,8 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 *
 	 */
-	@ValidRequestMapping(value = "/invite/process")
+	@ValidRequestMapping(
+			value = "/invite/process")
 	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(token)) {
@@ -545,7 +563,9 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(value = "/updatePassword", method = RequestMethod.POST)
+	@ValidRequestMapping(
+			value = "/updatePassword",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> updateUserPassword(@PathVariable ValidInputToken token, @RequestBody String password,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
@@ -598,7 +618,8 @@ public class UserController {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {

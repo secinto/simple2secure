@@ -33,7 +33,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -56,6 +55,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputLicensePlan;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputTestMacro;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SETTINGS_API)
@@ -97,7 +97,9 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -111,7 +113,9 @@ public class SettingsController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/licensePlan",
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -129,7 +133,9 @@ public class SettingsController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/licensePlan",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable ValidInputLicensePlan licensePlanId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -148,10 +154,12 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(value = "/testmacro", method = RequestMethod.DELETE)
+	@ValidRequestMapping(
+			value = "/testmacro",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
-	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(testMacroId.getValue())) {
 			TestMacro testMacro = testMacroRepository.find(testMacroId.getValue());
@@ -167,7 +175,10 @@ public class SettingsController {
 
 	}
 
-	@ValidRequestMapping(value = "/licensePlan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/licensePlan",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {

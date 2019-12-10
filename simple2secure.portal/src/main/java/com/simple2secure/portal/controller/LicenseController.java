@@ -39,7 +39,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -77,6 +76,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
+import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
@@ -173,7 +173,7 @@ public class LicenseController {
 	 */
 	@ValidRequestMapping(
 			value = "/authenticate",
-			method = RequestMethod.POST,
+			method = ValidRequestMethodType.POST,
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
@@ -279,7 +279,7 @@ public class LicenseController {
 	 */
 	@ValidRequestMapping(
 			value = "/downloadLicenseForScript",
-			method = RequestMethod.POST)
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {

@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+public class ValidInputDestGroup extends ValidatedInput<String> {
 
-public class ValidInputDestGroup extends ValidatedInput<String>{
-	
 	private String destGroupId;
 	private String tag = "/{destGroupId}";
-	
+
 	public ValidInputDestGroup() {
 	}
-	
+
 	public ValidInputDestGroup(String destGroupId) {
 		this.destGroupId = destGroupId;
 	}
@@ -21,14 +20,14 @@ public class ValidInputDestGroup extends ValidatedInput<String>{
 	public String getValue() {
 		return destGroupId;
 	}
-	
+
 	@Override
 	public String getTag() {
 		return tag;
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}

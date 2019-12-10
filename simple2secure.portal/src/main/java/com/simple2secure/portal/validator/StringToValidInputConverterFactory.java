@@ -1,4 +1,4 @@
-package simple2secure.validator.factory;
+package com.simple2secure.portal.validator;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;

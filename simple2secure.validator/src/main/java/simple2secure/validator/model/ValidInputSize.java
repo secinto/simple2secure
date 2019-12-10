@@ -1,20 +1,19 @@
 package simple2secure.validator.model;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+import javax.servlet.http.HttpServletRequest;
 
 import com.simple2secure.commons.config.StaticConfigItems;
 
-public class ValidInputSize extends ValidatedInput<Integer>{
-	
+public class ValidInputSize extends ValidatedInput<Integer> {
+
 	private int size;
 	private String tag = "/{size}";
-	
+
 	public ValidInputSize() {
 	}
-	
+
 	public ValidInputSize(int size) {
 		this.size = size;
 	}
@@ -30,18 +29,16 @@ public class ValidInputSize extends ValidatedInput<Integer>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Object validatePathVariable(Integer value) {
-		if(value > StaticConfigItems.MAX_VALUE_SIZE) {
+		if (value > StaticConfigItems.MAX_VALUE_SIZE) {
 			value = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		}
 		return new ValidInputSize(value);
 	}
 }
-
-

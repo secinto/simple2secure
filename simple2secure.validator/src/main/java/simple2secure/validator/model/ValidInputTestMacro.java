@@ -1,18 +1,17 @@
 package simple2secure.validator.model;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
+public class ValidInputTestMacro extends ValidatedInput<String> {
 
-public class ValidInputTestMacro extends ValidatedInput<String>{
-	
 	private String testMacroId;
 	private String tag = "/{testMacroId}";
-	
+
 	public ValidInputTestMacro() {
 	}
-	
+
 	public ValidInputTestMacro(String testMacroId) {
 		this.testMacroId = testMacroId;
 	}
@@ -28,7 +27,7 @@ public class ValidInputTestMacro extends ValidatedInput<String>{
 	}
 
 	@Override
-	public Object validate(Authentication auth, MethodParameter methodParameter, HttpServletRequest request) {
+	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
