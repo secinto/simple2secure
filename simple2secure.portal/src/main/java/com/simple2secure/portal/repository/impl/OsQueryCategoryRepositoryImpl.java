@@ -14,7 +14,7 @@ public class OsQueryCategoryRepositoryImpl extends OsQueryCategoryRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "osquerycategory"; //$NON-NLS-1$
+		super.collectionName = "osQueryCategory"; //$NON-NLS-1$
 		super.className = OsQueryCategory.class;
 	}
 }

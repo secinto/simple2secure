@@ -38,4 +38,6 @@ public abstract class NetworkReportRepository extends MongoRepository<NetworkRep
 	public abstract List<NetworkReport> getReportsByName(String name);
 
 	public abstract List<NetworkReport> getSearchQueryByGroupId(String searchQuery, String groupId);
+
+	public abstract List<NetworkReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds);
 }

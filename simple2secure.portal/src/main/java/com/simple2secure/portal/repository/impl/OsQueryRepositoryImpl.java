@@ -18,7 +18,7 @@ public class OsQueryRepositoryImpl extends OsQueryRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "osquery"; //$NON-NLS-1$
+		super.collectionName = "osQuery"; //$NON-NLS-1$
 		super.className = OsQuery.class;
 	}
 

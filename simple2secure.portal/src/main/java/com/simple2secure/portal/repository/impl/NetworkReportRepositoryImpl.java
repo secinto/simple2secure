@@ -99,4 +99,23 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 		return reportDTO;
 	}
 
+	@Override
+	public List<NetworkReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds) {
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String deviceId : deviceIds) {
+			Criteria expression = new Criteria();
+			expression.and("deviceId").is(deviceId);
+			orExpression.add(expression);
+		}
+
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+		query.addCriteria(criteria);
+
+		List<NetworkReport> result = mongoTemplate.find(query, className, collectionName);
+		return result;
+	}
+
 }

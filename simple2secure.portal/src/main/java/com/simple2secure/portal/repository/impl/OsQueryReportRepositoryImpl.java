@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,7 @@ public class OsQueryReportRepositoryImpl extends OsQueryReportRepository {
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "osqueryreport"; //$NON-NLS-1$
+		super.collectionName = "osQueryReport"; //$NON-NLS-1$
 		super.className = OsQueryReport.class;
 	}
 
@@ -137,10 +136,20 @@ public class OsQueryReportRepositoryImpl extends OsQueryReportRepository {
 	}
 
 	@Override
-	public List<OsQueryReport> getSearchQueryByGroupId(String searchQuery, String groupId) {
+	public List<OsQueryReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds) {
+
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String deviceId : deviceIds) {
+			Criteria expression = new Criteria();
+			expression.and("deviceId").is(deviceId);
+			orExpression.add(expression);
+		}
+
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
-		Query query = TextQuery.queryText(criteria).sortByScore();
-		query.addCriteria(Criteria.where("groupId").is(groupId));
+		query.addCriteria(criteria);
 		List<OsQueryReport> result = mongoTemplate.find(query, className, collectionName);
 		return result;
 
