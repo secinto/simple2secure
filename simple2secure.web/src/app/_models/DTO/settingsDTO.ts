@@ -30,4 +30,5 @@ export class SettingsDTO {
 	public licensePlan: LicensePlan[];
 	public testMacroList: TestMacro[];
 	public widgetList: Widget[];
+	public widgetApis: String[];
 }

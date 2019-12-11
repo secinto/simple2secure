@@ -50,9 +50,14 @@ public class NetworkScheduler extends TimerTask {
 
 	@Override
 	public void run() {
+		log.debug("Running network scheduler");
+		log.debug("Checking if server is reachable");
 		ProbeUtils.isServerReachable();
+		log.debug("Obtaining network statistics");
 		getNetworkStatistics();
+		log.debug("Checking network filtering");
 		checkNetworkFilter();
+		log.debug("Finished network scheduler run");
 	}
 
 	/**
@@ -89,7 +94,7 @@ public class NetworkScheduler extends TimerTask {
 			if (!filterApplied) {
 				log.debug("Applying network filter");
 				monitor.getReceiverHandle().setFilter(
-						"not (host 127.0.0.1 and host simple2secure.info and port (8080 or 8443 or 9000 or 51003 or 51001))", BpfCompileMode.OPTIMIZE);
+						"not (host 127.0.0.1 and host 144.76.93.104 and port (8080 or 8443 or 9000 or 51003 or 51001))", BpfCompileMode.OPTIMIZE);
 				filterApplied = true;
 			}
 		} catch (Exception e) {

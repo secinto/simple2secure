@@ -72,6 +72,7 @@ public class QueryScheduler extends TimerTask {
 					}
 				}
 			}
+
 			for (OsQuery query : ProbeConfiguration.getInstance().getCurrentQueries().values()) {
 				/*
 				 * Check if the query is already in the currently running ones. Only for queries which are executed always. If not create a

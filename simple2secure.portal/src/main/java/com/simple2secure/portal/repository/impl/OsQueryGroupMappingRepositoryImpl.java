@@ -19,7 +19,7 @@ public class OsQueryGroupMappingRepositoryImpl extends OsQueryGroupMappingReposi
 
 	@PostConstruct
 	public void init() {
-		super.collectionName = "osquerygroupmapping"; //$NON-NLS-1$
+		super.collectionName = "osQueryGroupMapping"; //$NON-NLS-1$
 		super.className = OsQueryGroupMapping.class;
 	}
 

@@ -50,6 +50,7 @@ public class ProbeWorkerThread extends Thread {
 		configScheduler = new ConfigScheduler();
 		reportScheduler = new ReportScheduler();
 		queryScheduler = new QueryScheduler();
+		networkMonitor = NetworkMonitor.startMonitor();
 		networkScheduler = new NetworkScheduler(networkMonitor);
 		time = new Timer();
 
@@ -59,7 +60,6 @@ public class ProbeWorkerThread extends Thread {
 	public void run() {
 		log.debug("ProbeWorkerThread running");
 		log.debug("Starting network monitor");
-		networkMonitor = NetworkMonitor.startMonitor();
 		log.debug("Scheduling the different tasks");
 		time.schedule(networkScheduler, 0, TimeUnit.MINUTES.toMillis(1));
 		time.schedule(configScheduler, 0, TimeUnit.MINUTES.toMillis(1));

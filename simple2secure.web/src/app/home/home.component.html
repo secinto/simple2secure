@@ -2,12 +2,13 @@
     <button class="btn btn-sm btn-add-widget mat-green-button" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
     <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
                      [showGrid]="false" (widgetPositionChange)="onWidgetChange($event)" #grid>
-        <ngx-widget *ngFor="let widget of widgets;let $index = index; "
+        <ngx-widget *ngFor="let widget of widgets;let $index = index;"
                     [position]="getRectangle(widget)"
                     [movable]="true"
                     [resizable]="false">
+                    <span *ngIf="!widget.isValueSet">{{getValueFromApi(widget)}} </span>
             <app-stat *ngIf="widget.widget.tag === 'app-stat'" [bgClass]="widget.widget.bgClass"
-                      [icon]="widget.widget.icon" [count]="10" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id"></app-stat>
+                      [icon]="widget.widget.icon" [count]="widget.value" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id"></app-stat>
         </ngx-widget>
     </ngx-widget-grid>
 </div>

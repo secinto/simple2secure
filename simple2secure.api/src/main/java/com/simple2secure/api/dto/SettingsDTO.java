@@ -36,14 +36,18 @@ public class SettingsDTO {
 	private List<LicensePlan> licensePlan;
 
 	private List<TestMacro> testMacroList;
-	
+
 	private List<Widget> widgetList;
 
-	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList, List<Widget> widgetList) {
+	private List<String> widgetApis;
+
+	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList, List<Widget> widgetList,
+			List<String> widgetApis) {
 		this.settings = settings;
 		this.licensePlan = licensePlan;
 		this.testMacroList = testMacroList;
-		this.widgetList = widgetList;		
+		this.widgetList = widgetList;
+		this.widgetApis = widgetApis;
 	}
 
 	public Settings getSettings() {
@@ -76,5 +80,13 @@ public class SettingsDTO {
 
 	public void setWidgetList(List<Widget> widgetList) {
 		this.widgetList = widgetList;
+	}
+
+	public List<String> getWidgetApis() {
+		return widgetApis;
+	}
+
+	public void setWidgetApis(List<String> widgetApis) {
+		this.widgetApis = widgetApis;
 	}
 }

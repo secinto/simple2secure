@@ -56,7 +56,7 @@ public class SearchController extends BaseController {
 			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
-				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery.getValue(), contextId.getValue());
+				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery.getValue(), context);
 
 				if (srList != null) {
 					return new ResponseEntity<>(srList, HttpStatus.OK);
