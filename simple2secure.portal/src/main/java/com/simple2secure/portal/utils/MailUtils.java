@@ -48,15 +48,11 @@ import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
-import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.EmailConfigurationRepository;
-import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Configuration
 @Component
-public class MailUtils {
+public class MailUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(MailUtils.class);
 
@@ -73,22 +69,7 @@ public class MailUtils {
 	private String mailSMTPHost;
 
 	@Autowired
-	EmailConfigurationRepository emailConfigRepository;
-
-	@Autowired
-	EmailRepository emailRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
 	JavaMailSender javaMailSender;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
 
 	@Autowired
 	RuleUtils ruleUtils;

@@ -1,5 +1,6 @@
 package com.simple2secure.portal.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -32,7 +35,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
-public class SystemUnderTestController extends BaseController {
+public class SystemUnderTestController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(SystemUnderTestController.class);
 
@@ -66,11 +69,27 @@ public class SystemUnderTestController extends BaseController {
 
 				if (groups != null) {
 					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+					if (groupIds != null && groupIds.size() > 0) {
+						List<SystemUnderTest> suts = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(),
+								deviceType.getValue());
+						if (suts != null && suts.size() > 0) {
+							for (SystemUnderTest sut : suts) {
+								DeviceStatus status = sut.getDeviceStatus();
+								DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+								if (status != deviceStatus) {
+									sut.setDeviceStatus(deviceStatus);
+								}
+							}
 
-					Map<String, Object> sutMap = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(),
-							deviceType.getValue());
+							Map<String, Object> sutMap = new HashMap<>();
 
-					return new ResponseEntity<>(sutMap, HttpStatus.OK);
+							long count = sutRepository.getTotalAmountOfSystemUnderTest(groupIds, deviceType.getValue());
+							sutMap.put("sutList", suts);
+							sutMap.put("totalSize", count);
+
+							return new ResponseEntity<>(sutMap, HttpStatus.OK);
+						}
+					}
 				}
 			}
 

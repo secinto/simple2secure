@@ -34,6 +34,7 @@ import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -48,7 +49,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEQUENCE_API)
-public class TestSequenceController extends BaseController {
+public class TestSequenceController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(TestSequenceController.class);
 

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -42,7 +43,7 @@ import simple2secure.validator.model.ValidInputLocale;
 
 @RestController
 @RequestMapping(StaticConfigItems.DOWNLOAD_API)
-public class DownloadController extends BaseController {
+public class DownloadController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(DownloadController.class);
 

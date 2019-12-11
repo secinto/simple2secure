@@ -35,6 +35,7 @@ import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -43,7 +44,7 @@ import simple2secure.validator.model.ValidInputVersion;
 
 @RestController
 @RequestMapping(StaticConfigItems.SERVICE_API)
-public class ServiceController extends BaseController {
+public class ServiceController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
 	public ResponseEntity<Service> getServiceVersion(@ServerProvidedValue ValidInputLocale locale) {

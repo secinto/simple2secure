@@ -45,6 +45,7 @@ import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -59,7 +60,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.REPORT_API)
-public class ReportController extends BaseController {
+public class ReportController extends BaseUtilsProvider {
 	static Logger log = LoggerFactory.getLogger(ReportController.class);
 
 	@ValidRequestMapping(

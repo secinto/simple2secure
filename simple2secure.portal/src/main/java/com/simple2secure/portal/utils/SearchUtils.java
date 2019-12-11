@@ -38,39 +38,12 @@ import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
-import com.simple2secure.portal.repository.TestResultRepository;
-import com.simple2secure.portal.repository.TestRunRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class SearchUtils {
+public class SearchUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(SearchUtils.class);
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	OsQueryReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	TestResultRepository testResultRepository;
-
-	@Autowired
-	TestRunRepository testRunRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
 
 	@Autowired
 	DeviceUtils deviceUtils;
@@ -102,7 +75,7 @@ public class SearchUtils {
 			searchResultList.add(new SearchResult(notifications, "Notification"));
 		}
 
-		List<OsQueryReport> reports = reportRepository.getSearchQueryByDeviceIds(searchQuery, deviceIds);
+		List<OsQueryReport> reports = reportsRepository.getSearchQueryByDeviceIds(searchQuery, deviceIds);
 
 		if (reports != null) {
 			log.info("Found {} osquery reports for search query: {}", reports.size(), searchQuery);

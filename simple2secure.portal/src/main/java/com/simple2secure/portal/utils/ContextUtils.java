@@ -37,75 +37,12 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
-import com.simple2secure.portal.repository.EmailConfigurationRepository;
-import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class ContextUtils {
+public class ContextUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(ContextUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	OsQueryReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	OsQueryRepository queryRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	UserInvitationRepository userInvitationRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	EmailConfigurationRepository emailConfigurationRepository;
-
-	@Autowired
-	EmailRepository emailRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
 	GroupUtils groupUtils;

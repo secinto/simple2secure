@@ -35,6 +35,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -44,7 +45,7 @@ import simple2secure.validator.model.ValidInputSearchQuery;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
-public class SearchController extends BaseController {
+public class SearchController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable ValidInputSearchQuery searchQuery,

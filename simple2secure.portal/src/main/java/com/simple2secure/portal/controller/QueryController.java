@@ -49,6 +49,7 @@ import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -61,7 +62,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
-public class QueryController extends BaseController {
+public class QueryController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(QueryController.class);
 
@@ -260,7 +261,7 @@ public class QueryController extends BaseController {
 						queryConfig = queryUtils.findByGroupIdAndOsInfo(group.getId(), OSInfo.valueOf(osinfo.getValue()));
 					} else {
 						// go until the root group is not found and get all configurations from all groups which are parents of this group
-						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
+						List<CompanyGroup> foundGroups = groupUtils.findAllParentGroups(group);
 						if (foundGroups != null) {
 							List<String> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
 							if (groupIds != null) {

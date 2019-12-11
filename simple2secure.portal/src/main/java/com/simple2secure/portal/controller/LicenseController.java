@@ -53,6 +53,7 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.model.LicenseActivation;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -62,7 +63,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
-public class LicenseController extends BaseController {
+public class LicenseController extends BaseUtilsProvider {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	@Value("${license.filepath}")

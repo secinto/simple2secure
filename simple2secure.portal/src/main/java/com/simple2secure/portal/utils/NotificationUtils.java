@@ -24,29 +24,17 @@ package com.simple2secure.portal.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class NotificationUtils {
+public class NotificationUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(NotificationUtils.class);
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
 
 	public void addNewNotificationPortal(String data, String contextId) {
 		Notification notification = new Notification(data, false, contextId, System.currentTimeMillis());

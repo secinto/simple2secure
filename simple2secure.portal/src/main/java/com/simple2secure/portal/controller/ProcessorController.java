@@ -41,6 +41,7 @@ import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -50,7 +51,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.PROCESSOR_API)
-public class ProcessorController extends BaseController {
+public class ProcessorController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(ProcessorController.class);
 

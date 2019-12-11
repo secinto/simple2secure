@@ -28,25 +28,17 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.OsQueryGroupMapping;
-import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class QueryUtils {
+public class QueryUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(QueryUtils.class);
-
-	@Autowired
-	OsQueryRepository queryRepository;
-
-	@Autowired
-	OsQueryGroupMappingRepository queryGroupMappingsRepository;
 
 	/**
 	 * This function returns all unmapped queries according to the group id
@@ -86,7 +78,7 @@ public class QueryUtils {
 	 */
 	public List<OsQuery> getMappedQueriesByGroup(String groupId) {
 		List<OsQuery> queries = new ArrayList<>();
-		List<OsQueryGroupMapping> mappedQueries = queryGroupMappingsRepository.findByGroupId(groupId);
+		List<OsQueryGroupMapping> mappedQueries = queryGroupMappingRepository.findByGroupId(groupId);
 
 		for (OsQueryGroupMapping mapping : mappedQueries) {
 
@@ -117,11 +109,11 @@ public class QueryUtils {
 	 */
 	public void updateQueryGroupMapping(List<OsQuery> queries, String groupId) {
 		if (queries != null) {
-			queryGroupMappingsRepository.deleteByGroupId(groupId);
+			queryGroupMappingRepository.deleteByGroupId(groupId);
 			for (OsQuery query : queries) {
 				OsQueryGroupMapping mapping = new OsQueryGroupMapping(groupId, query.getId(), query.getAnalysisInterval(),
 						query.getAnalysisIntervalUnit(), query.getSystemsAvailable());
-				queryGroupMappingsRepository.save(mapping);
+				queryGroupMappingRepository.save(mapping);
 			}
 		}
 	}
@@ -138,7 +130,7 @@ public class QueryUtils {
 	public List<OsQuery> findByGroupIdsAndOsInfo(List<String> groupIds, OSInfo osInfo) {
 		List<Integer> possibleValues = getPossibleValues(osInfo);
 		List<OsQuery> queries = new ArrayList<>();
-		List<OsQueryGroupMapping> mappings = queryGroupMappingsRepository.getAllMapingsByGroupIds(groupIds, possibleValues);
+		List<OsQueryGroupMapping> mappings = queryGroupMappingRepository.getAllMapingsByGroupIds(groupIds, possibleValues);
 
 		if (mappings != null) {
 			for (OsQueryGroupMapping mapping : mappings) {
@@ -165,7 +157,7 @@ public class QueryUtils {
 	public List<OsQuery> findByGroupIdAndOsInfo(String groupId, OSInfo osInfo) {
 		List<Integer> possibleValues = getPossibleValues(osInfo);
 		List<OsQuery> queries = new ArrayList<>();
-		List<OsQueryGroupMapping> mappings = queryGroupMappingsRepository.findByGroupIdAndOSInfo(groupId, possibleValues);
+		List<OsQueryGroupMapping> mappings = queryGroupMappingRepository.findByGroupIdAndOSInfo(groupId, possibleValues);
 
 		if (mappings != null) {
 			for (OsQueryGroupMapping mapping : mappings) {

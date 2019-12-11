@@ -39,59 +39,12 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.DeviceInfoRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestSequenceRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class DeviceUtils {
+public class DeviceUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(DeviceUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	OsQueryReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	OsQueryRepository queryRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	TestSequenceRepository testSequenceRepository;
-
-	@Autowired
-	DeviceInfoRepository deviceInfoRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	@Autowired
 	TestUtils testUtils;

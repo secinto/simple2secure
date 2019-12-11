@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -43,55 +42,12 @@ import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.GroupAccesRightRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class GroupUtils {
+public class GroupUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(GroupUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	OsQueryReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	OsQueryRepository queryRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	GroupAccesRightRepository groupAccessRightRepository;
-
-	@Autowired
-	OsQueryGroupMappingRepository queryGroupMappingRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	/**
 	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
@@ -164,7 +120,7 @@ public class GroupUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						reportRepository.deleteByDeviceId(license.getDeviceId());
+						reportsRepository.deleteByDeviceId(license.getDeviceId());
 						networkReportRepository.deleteByDeviceId(license.getDeviceId());
 					}
 					licenseRepository.delete(license);
@@ -527,5 +483,48 @@ public class GroupUtils {
 		}
 
 		return false;
+	}
+
+	/**
+	 * This function finds the parent group of the current child
+	 *
+	 * @param group
+	 * @return
+	 */
+	public CompanyGroup findTheParentGroup(CompanyGroup group) {
+
+		if (!Strings.isNullOrEmpty(group.getParentId())) {
+			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
+			if (parentGroup != null) {
+				return parentGroup;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * This function searches recursively for all dependent groups until the root group is found
+	 *
+	 * @param group
+	 * @return
+	 */
+	public List<CompanyGroup> findAllParentGroups(CompanyGroup group) {
+		List<CompanyGroup> foundGroups = new ArrayList<>();
+		foundGroups.add(group);
+		boolean rootGroupFound = false;
+		while (!rootGroupFound) {
+			CompanyGroup parentGroup = findTheParentGroup(group);
+			if (parentGroup != null) {
+				foundGroups.add(parentGroup);
+				if (parentGroup.isRootGroup()) {
+					rootGroupFound = true;
+				} else {
+					group = parentGroup;
+				}
+			} else {
+				rootGroupFound = true;
+			}
+		}
+		return foundGroups;
 	}
 }

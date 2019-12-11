@@ -33,12 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.ERROR_API)
-public class CustomErrorController extends BaseController implements ErrorController {
+public class CustomErrorController extends BaseUtilsProvider implements ErrorController {
 
 	@ValidRequestMapping
 	public Map<String, Object> error(HttpServletRequest request, WebRequest webrequest, HttpServletResponse response) {

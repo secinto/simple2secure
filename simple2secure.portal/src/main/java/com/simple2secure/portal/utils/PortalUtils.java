@@ -60,7 +60,6 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.controller.WidgetController;
-import com.simple2secure.portal.repository.GroupRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -79,9 +78,6 @@ public class PortalUtils {
 
 	@Autowired
 	JavaMailSender javaMailSender;
-
-	@Autowired
-	GroupRepository groupRepository;
 
 	static final String CLAIM_POD = "podID";
 	static final String CLAIMS_SUBJECT = "data";
@@ -162,49 +158,6 @@ public class PortalUtils {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * This function finds the parent group of the current child
-	 *
-	 * @param group
-	 * @return
-	 */
-	public CompanyGroup findTheParentGroup(CompanyGroup group) {
-
-		if (!Strings.isNullOrEmpty(group.getParentId())) {
-			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
-			if (parentGroup != null) {
-				return parentGroup;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * This function searches recursively for all dependent groups until the root group is found
-	 *
-	 * @param group
-	 * @return
-	 */
-	public List<CompanyGroup> findAllParentGroups(CompanyGroup group) {
-		List<CompanyGroup> foundGroups = new ArrayList<>();
-		foundGroups.add(group);
-		boolean rootGroupFound = false;
-		while (!rootGroupFound) {
-			CompanyGroup parentGroup = findTheParentGroup(group);
-			if (parentGroup != null) {
-				foundGroups.add(parentGroup);
-				if (parentGroup.isRootGroup()) {
-					rootGroupFound = true;
-				} else {
-					group = parentGroup;
-				}
-			} else {
-				rootGroupFound = true;
-			}
-		}
-		return foundGroups;
 	}
 
 	/**

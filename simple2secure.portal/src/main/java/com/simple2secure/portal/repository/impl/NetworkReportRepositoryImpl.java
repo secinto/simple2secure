@@ -16,17 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class NetworkReportRepositoryImpl extends NetworkReportRepository {
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
 	@Autowired
 	PortalUtils portalUtils;
 

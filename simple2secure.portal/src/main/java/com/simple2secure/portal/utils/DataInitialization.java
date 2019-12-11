@@ -33,73 +33,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.LicensePlan;
-import com.simple2secure.api.model.Processor;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.OsQueryGroupMapping;
-import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.OsQueryCategoryRepository;
-import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
-import com.simple2secure.portal.repository.SettingsRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.UserRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class DataInitialization {
+public class DataInitialization extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(DataInitialization.class);
-
-	@Autowired
-	RestTemplate restTemplate;
-
-	@Autowired
-	protected LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	protected SettingsRepository settingsRepository;
-
-	@Autowired
-	protected ProcessorRepository processorRepository;
-
-	@Autowired
-	protected GroupRepository groupRepository;
-
-	@Autowired
-	protected OsQueryRepository queryRepository;
-
-	@Autowired
-	protected OsQueryCategoryRepository queryCategoryRepository;
-
-	@Autowired
-	protected StepRepository stepRepository;
-
-	@Autowired
-	protected LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	protected UserRepository userRepository;
-
-	@Autowired
-	protected OsQueryGroupMappingRepository queryGroupMappingRepository;
 
 	@Autowired
 	protected PortalUtils portalUtils;

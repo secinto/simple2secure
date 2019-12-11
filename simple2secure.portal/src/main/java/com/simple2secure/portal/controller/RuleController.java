@@ -45,6 +45,7 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -62,7 +63,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
  */
 @RestController
 @RequestMapping(StaticConfigItems.RULE_API)
-public class RuleController extends BaseController {
+public class RuleController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(RuleController.class);
 
