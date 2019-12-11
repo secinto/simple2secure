@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,21 +49,9 @@ import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.DeviceInfoRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestResultRepository;
-import com.simple2secure.portal.repository.TestRunRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.NotificationUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.TestUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -81,43 +68,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.TEST_API)
-public class TestController {
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	TestResultRepository testResultRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	TestRunRepository testRunRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	NotificationUtils notificationUtils;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	DeviceInfoRepository deviceInfoRepository;
-
-	@Autowired
-	TestUtils testUtils;
-
-	@Autowired
-	PortalUtils portalUtils;
+public class TestController extends BaseController {
 
 	/*
 	 * -------------------------------------------------------------------------------------------------------------------------------------

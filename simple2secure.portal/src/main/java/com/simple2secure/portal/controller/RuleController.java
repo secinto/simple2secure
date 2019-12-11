@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,12 +45,6 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.RuleActionsRepository;
-import com.simple2secure.portal.repository.RuleConditionsRepository;
-import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
-import com.simple2secure.portal.repository.TemplateRuleRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.RuleUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -69,27 +62,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
  */
 @RestController
 @RequestMapping(StaticConfigItems.RULE_API)
-public class RuleController {
+public class RuleController extends BaseController {
 
 	private static Logger log = LoggerFactory.getLogger(RuleController.class);
-
-	@Autowired
-	RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	RuleConditionsRepository ruleConditionsRepository;
-
-	@Autowired
-	RuleActionsRepository ruleActionsRepository;
-
-	@Autowired
-	TemplateRuleRepository templateRuleRepository;
-
-	@Autowired
-	RuleUtils ruleUtils;
 
 	/**
 	 * Method to save/update the source code for a rule into/from the database

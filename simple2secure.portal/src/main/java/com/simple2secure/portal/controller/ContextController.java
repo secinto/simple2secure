@@ -28,7 +28,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,16 +45,6 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.ContextUtils;
-import com.simple2secure.portal.utils.DataInitialization;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.UserUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -66,39 +55,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.CONTEXT_API)
-public class ContextController {
+public class ContextController extends BaseController {
 
 	public static final Logger log = LoggerFactory.getLogger(ContextController.class);
-
-	@Autowired
-	private ContextRepository contextRepository;
-
-	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
-	private ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	private LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	private CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	UserUtils userUtils;
-
-	@Autowired
-	ContextUtils contextUtils;
-
-	@Autowired
-	DataInitialization dataInitialization;
 
 	/**
 	 * This function adds new context (This is only possible for admins or superadmins)

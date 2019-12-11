@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +43,6 @@ import com.simple2secure.api.model.Widget;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.SettingsRepository;
-import com.simple2secure.portal.repository.TestMacroRepository;
-import com.simple2secure.portal.repository.WidgetRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -59,24 +53,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SETTINGS_API)
-public class SettingsController {
+public class SettingsController extends BaseController {
 
 	static final Logger log = LoggerFactory.getLogger(SettingsController.class);
-
-	@Autowired
-	SettingsRepository settingsRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	TestMacroRepository testMacroRepository;
-
-	@Autowired
-	WidgetRepository widgetRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAuthority('SUPERADMIN')")

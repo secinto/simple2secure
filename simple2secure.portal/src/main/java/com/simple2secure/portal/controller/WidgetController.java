@@ -31,7 +31,6 @@ import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,12 +49,6 @@ import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.WidgetPropertiesRepository;
-import com.simple2secure.portal.repository.WidgetRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.DeviceUtils;
-import com.simple2secure.portal.utils.WidgetUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -69,25 +62,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.WIDGET_API)
-public class WidgetController {
-
-	@Autowired
-	WidgetRepository widgetRepository;
-
-	@Autowired
-	WidgetPropertiesRepository widgetPropertiesRepository;
-
-	@Autowired
-	WidgetUtils widgetUtils;
-
-	@Autowired
-	DeviceUtils deviceUtils;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
+public class WidgetController extends BaseController {
 
 	List<String> widgetFunctions = new ArrayList<>();
 

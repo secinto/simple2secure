@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,24 +29,11 @@ import com.simple2secure.api.model.TestSequence;
 import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.DeviceInfoRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.SequenceRunRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestSequenceRepository;
-import com.simple2secure.portal.repository.TestSequenceResultRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.NotificationUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.TestUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -62,48 +48,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEQUENCE_API)
-public class TestSequenceController {
+public class TestSequenceController extends BaseController {
 
 	private static Logger log = LoggerFactory.getLogger(TestSequenceController.class);
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	TestSequenceRepository testSequenceRepository;
-
-	@Autowired
-	SequenceRunRepository sequenceRunrepository;
-
-	@Autowired
-	TestSequenceResultRepository testSequenceResultRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	NotificationUtils notificationUtils;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	DeviceInfoRepository deviceInfoRepository;
-
-	@Autowired
-	TestUtils testUtils;
-
-	@Autowired
-	PortalUtils portalUtils;
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")

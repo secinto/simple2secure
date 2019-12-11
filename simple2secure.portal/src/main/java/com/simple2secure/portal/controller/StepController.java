@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +40,6 @@ import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.PortalUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -54,16 +50,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.STEP_API)
-public class StepController {
-
-	@Autowired
-	private StepRepository repository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	PortalUtils portalUtils;
+public class StepController extends BaseController {
 
 	public static final Logger log = LoggerFactory.getLogger(StepController.class);
 
@@ -71,7 +58,7 @@ public class StepController {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Step>> getSteps(@RequestParam boolean select_all, @ServerProvidedValue ValidInputLocale locale) {
 
-		List<Step> steps = repository.getStepsByFlagValue(select_all);
+		List<Step> steps = stepRepository.getStepsByFlagValue(select_all);
 		if (steps != null) {
 			return new ResponseEntity<>(steps, HttpStatus.OK);
 		}
@@ -88,11 +75,11 @@ public class StepController {
 
 		if (step != null) {
 			if (Strings.isNullOrEmpty(step.getId())) {
-				List<Step> steps = repository.getStepsByFlagValue(true);
+				List<Step> steps = stepRepository.getStepsByFlagValue(true);
 				step.setNumber(steps.size() + 1);
-				repository.save(step);
+				stepRepository.save(step);
 			} else {
-				repository.update(step);
+				stepRepository.update(step);
 			}
 
 			return new ResponseEntity<>(step, HttpStatus.OK);
@@ -114,14 +101,14 @@ public class StepController {
 			throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(stepId.getValue())) {
-			Step step = repository.find(stepId.getValue());
-			List<Step> steps = repository.getAllGreaterThanNumber(step.getNumber());
+			Step step = stepRepository.find(stepId.getValue());
+			List<Step> steps = stepRepository.getAllGreaterThanNumber(step.getNumber());
 			{
-				repository.delete(step);
+				stepRepository.delete(step);
 				if (steps != null) {
 					for (Step stepObj : steps) {
 						stepObj.setNumber(stepObj.getNumber() - 1);
-						repository.update(stepObj);
+						stepRepository.update(stepObj);
 					}
 				}
 				return new ResponseEntity<>(step, HttpStatus.OK);

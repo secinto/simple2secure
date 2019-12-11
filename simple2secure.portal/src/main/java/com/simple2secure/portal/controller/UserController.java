@@ -31,14 +31,12 @@ import javax.annotation.security.PermitAll;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,30 +55,9 @@ import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserInfoRepository;
-import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.security.PasswordValidator;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.ContextUtils;
-import com.simple2secure.portal.utils.DataInitialization;
-import com.simple2secure.portal.utils.DeviceUtils;
-import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.utils.LicenseUtils;
-import com.simple2secure.portal.utils.MailUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.UserUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -92,81 +69,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.USER_API)
-public class UserController {
+public class UserController extends BaseController {
 
 	static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	UserInvitationRepository userInvitationRepository;
-
-	@Autowired
-	UserInfoRepository userInfoRepository;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	PasswordValidator passwordValidator;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	MailUtils mailUtils;
-
-	@Autowired
-	UserUtils userUtils;
-
-	@Autowired
-	GroupUtils groupUtils;
-
-	@Autowired
-	DeviceUtils deviceUtils;
-
-	@Autowired
-	ContextUtils contextUtils;
-
-	@Autowired
-	DataInitialization dataInitialization;
-
-	@Autowired
-	TokenRepository tokenRepository;
-
-	@Autowired
-	LicenseController licenseController;
-
-	@Autowired
-	ContextUserAuthRepository contextUserRepository;
-
-	@Autowired
-	LicenseUtils licenseUtils;
 
 	/**
 	 * This function finds and returns user according to the user id
