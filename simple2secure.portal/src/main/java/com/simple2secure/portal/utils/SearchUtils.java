@@ -30,13 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
@@ -67,6 +69,15 @@ public class SearchUtils {
 	@Autowired
 	TestRunRepository testRunRepository;
 
+	@Autowired
+	ContextRepository contextRepository;
+
+	@Autowired
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
+
 	/**
 	 * This function searches notification, testResult, report and networkReport tables in the database by the full text search for the
 	 * content with the provided searchQuery and contextId
@@ -75,51 +86,38 @@ public class SearchUtils {
 	 * @param contextId
 	 * @return
 	 */
-	public List<SearchResult> getAllSearchResults(String searchQuery, String contextId) {
-		List<SearchResult> searchResultList = new ArrayList<>();
+	public List<SearchResult> getAllSearchResults(String searchQuery, Context context) {
 
-		List<Notification> notifications = notificationRepository.getBySearchQuery(searchQuery, contextId, false);
+		List<SearchResult> searchResultList = new ArrayList<>();
+		List<TestResult> testResultList = new ArrayList<>();
+
+		List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+
+		List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+
+		List<Notification> notifications = notificationRepository.getBySearchQuery(searchQuery, context.getId(), false);
 
 		if (notifications != null) {
 			log.info("Found {} notifications for search query: {}", notifications.size(), searchQuery);
-			SearchResult sr = new SearchResult(notifications, "Notification");
-			searchResultList.add(sr);
+			searchResultList.add(new SearchResult(notifications, "Notification"));
 		}
 
-		List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+		List<OsQueryReport> reports = reportRepository.getSearchQueryByDeviceIds(searchQuery, deviceIds);
 
-		List<OsQueryReport> queryReportList = new ArrayList<>();
-		List<NetworkReport> networkReportList = new ArrayList<>();
-		List<TestResult> testResultList = new ArrayList<>();
+		if (reports != null) {
+			log.info("Found {} osquery reports for search query: {}", reports.size(), searchQuery);
+			searchResultList.add(new SearchResult(reports, "OSQuery Reports"));
 
-		if (groups != null) {
-			for (CompanyGroup group : groups) {
-
-				List<OsQueryReport> reports = reportRepository.getSearchQueryByGroupId(searchQuery, group.getId());
-
-				if (reports != null) {
-					queryReportList.addAll(reports);
-					log.info("Found {} osquery reports for search query: {}", reports.size(), searchQuery);
-
-				}
-
-				List<NetworkReport> networkReports = networkReportRepository.getSearchQueryByGroupId(searchQuery, group.getId());
-
-				if (networkReports != null) {
-					networkReportList.addAll(networkReports);
-					log.info("Found {} network reports for search query: {}", networkReports.size(), searchQuery);
-
-				}
-			}
 		}
 
-		SearchResult sr = new SearchResult(queryReportList, "OSQuery Reports");
-		searchResultList.add(sr);
+		List<NetworkReport> networkReports = networkReportRepository.getSearchQueryByDeviceIds(searchQuery, deviceIds);
 
-		sr = new SearchResult(networkReportList, "Network Reports");
-		searchResultList.add(sr);
+		if (networkReports != null) {
+			log.info("Found {} network reports for search query: {}", networkReports.size(), searchQuery);
+			searchResultList.add(new SearchResult(networkReports, "Network Reports"));
+		}
 
-		List<TestRun> tests = testRunRepository.getByContextId(contextId);
+		List<TestRun> tests = testRunRepository.getByContextId(context.getId());
 
 		if (tests != null) {
 			for (TestRun testRun : tests) {
@@ -130,9 +128,7 @@ public class SearchUtils {
 				}
 			}
 		}
-
-		sr = new SearchResult(testResultList, "Test Results");
-		searchResultList.add(sr);
+		searchResultList.add(new SearchResult(testResultList, "Test Results"));
 
 		return searchResultList;
 	}

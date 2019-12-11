@@ -45,5 +45,5 @@ public abstract class OsQueryReportRepository extends MongoRepository<OsQueryRep
 
 	public abstract void deleteByDeviceId(String deviceId);
 
-	public abstract List<OsQueryReport> getSearchQueryByGroupId(String searchQuery, String groupId);
+	public abstract List<OsQueryReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds);
 }
