@@ -31,8 +31,8 @@ public abstract class SystemUnderTestRepository extends MongoRepository<SystemUn
 
 	public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
 
-	public abstract long getTotalAmountOfSystemUnderTest(List<String> testRunIds, String deviceType);
+	public abstract long getTotalAmountOfSystemUnderTest(String contextId, String deviceType);
 
-	public abstract List<SystemUnderTest> getByGroupIdsAndType(List<String> groupIds, int page, int size, String deviceType);
+	public abstract List<SystemUnderTest> getByContextIdAndType(String contextId, int page, int size, String deviceType);
 
 }

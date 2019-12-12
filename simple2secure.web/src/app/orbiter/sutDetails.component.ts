@@ -62,7 +62,7 @@ export class SUTDetailsComponent {
 			this.type == 'new'){
 			this.isNewSUT = true;
             this.sut = new SystemUnderTest();
-            this.sut.groupId = data.groupId;
+            this.sut.contextId = data.contextId;
 			this.deviceTypeSelect = Object.keys(DeviceType);
 		}
     }

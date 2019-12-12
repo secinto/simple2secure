@@ -124,14 +124,19 @@ public class LicenseController extends BaseUtilsProvider {
 			LicenseActivation activation = null;
 
 			activation = licenseUtils.authenticateLicense(licensePublic, podAuthentication, locale.getValue());
-			if (!licensePublic.isDevicePod()) {
-				sutUtils.addProbeAsSUT(licensePublic);
-			}
 
 			if (activation.isSuccess()) {
 				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
 				if (licensePrivate != null) {
 					licensePublic = licensePrivate.getPublicLicense();
+					
+					if (!licensePublic.isDevicePod()) {
+						
+						CompanyGroup group = groupRepository.find(licensePublic.getGroupId());
+						if(group != null) {
+							sutUtils.addProbeAsSUT(licensePublic, group.getContextId());
+						}
+					}
 				}
 
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);

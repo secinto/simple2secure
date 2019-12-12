@@ -307,7 +307,8 @@ public class DeviceController extends BaseUtilsProvider {
 			if (!license.isDevicePod()) {
 				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 				deviceInfoRepository.save(deviceInfo);
-				sutUtils.addProbeAsSUT(license);
+				CompanyGroup group = groupRepository.find(license.getGroupId());
+				sutUtils.addProbeAsSUT(license, group.getContextId());
 				deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 			} else {
 				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());

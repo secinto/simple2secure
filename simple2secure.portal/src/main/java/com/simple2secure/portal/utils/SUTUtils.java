@@ -16,12 +16,12 @@ import com.simple2secure.portal.providers.BaseServiceProvider;
 public class SUTUtils extends BaseServiceProvider {
 	private static Logger log = LoggerFactory.getLogger(SUTUtils.class);
 
-	public void addProbeAsSUT(CompanyLicensePublic license) {
+	public void addProbeAsSUT(CompanyLicensePublic license, String contextId) {
 		SystemUnderTest sut = sutRepository.getByEndDeviceId(license.getDeviceId());
 		DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 		if (sut == null && deviceInfo != null && license != null) {
-			SystemUnderTest newSut = new SystemUnderTest(license.getGroupId(), license.getDeviceId(), DeviceType.PROBE.toString(), null,
+			SystemUnderTest newSut = new SystemUnderTest(contextId, license.getDeviceId(), DeviceType.PROBE.toString(), null,
 					deviceInfo.getHostName(), deviceInfo.getIpAddress(), deviceInfo.getNetMask(), deviceInfo.getDeviceStatus(),
 					deviceInfo.getLastOnlineTimestamp());
 

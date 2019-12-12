@@ -39,35 +39,23 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 	}
 
 	@Override
-	public long getTotalAmountOfSystemUnderTest(List<String> groupIds, String deviceType) {
-		List<Criteria> orExpression = new ArrayList<>();
-		Criteria orCriteria = new Criteria();
+	public long getTotalAmountOfSystemUnderTest(String contextId, String deviceType) {
 		Query query = new Query();
-		for (String groupId : groupIds) {
-			Criteria expression = new Criteria();
-			expression.and("groupId").is(groupId);
-			orExpression.add(expression);
-		}
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+		Criteria expression = new Criteria();
+		expression.and("contextId").is(contextId);
 		query.addCriteria(Criteria.where("endDeviceType").is(deviceType));
+		query.addCriteria(expression);
 
 		return mongoTemplate.count(query, SystemUnderTest.class, collectionName);
 	}
 
 	@Override
-	public List<SystemUnderTest> getByGroupIdsAndType(List<String> groupIds, int page, int size, String deviceType) {
-		List<SystemUnderTest> suts = new ArrayList<>();
-		List<Criteria> orExpression = new ArrayList<>();
-		Map<String, Object> sutMap = new HashMap<>();
-		Criteria orCriteria = new Criteria();
+	public List<SystemUnderTest> getByContextIdAndType(String contextId, int page, int size, String deviceType) {
 		Query query = new Query();
-		for (String groupId : groupIds) {
-			Criteria expression = new Criteria();
-			expression.and("groupId").is(groupId);
-			orExpression.add(expression);
-		}
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+		Criteria expression = new Criteria();
+		expression.and("contextId").is(contextId);
 		query.addCriteria(Criteria.where("endDeviceType").is(deviceType));
+		query.addCriteria(expression);
 
 		int limit = portalUtils.getPaginationLimit(size);
 		int skip = portalUtils.getPaginationStart(size, page, limit);

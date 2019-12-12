@@ -1,5 +1,6 @@
 package com.simple2secure.portal.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,12 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(SystemUnderTestController.class);
 
-	@ValidRequestMapping(
+	@ValidRequestMapping(value = "/add",
 			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputLocale locale) {
-		if (sut != null) {
+	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sut != null && contextId.getValue() != null) {
+			sut.setContextId(contextId.getValue());
 			sutRepository.save(sut);
 			log.debug("System Under Test: {} has been saved", sut.getName());
 
@@ -61,35 +63,31 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			@PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && deviceType != null) {
-
-			Context context = contextRepository.find(contextId.getValue());
-
-			if (context != null) {
-				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
-
-				if (groups != null) {
-					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
-					if (groupIds != null && groupIds.size() > 0) {
-						List<SystemUnderTest> suts = sutRepository.getByGroupIdsAndType(groupIds, page.getValue(), size.getValue(),
-								deviceType.getValue());
-						if (suts != null && suts.size() > 0) {
-							for (SystemUnderTest sut : suts) {
-								DeviceStatus status = sut.getDeviceStatus();
-								DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
-								if (status != deviceStatus) {
-									sut.setDeviceStatus(deviceStatus);
-								}
-							}
-
-							Map<String, Object> sutMap = new HashMap<>();
-
-							long count = sutRepository.getTotalAmountOfSystemUnderTest(groupIds, deviceType.getValue());
-							sutMap.put("sutList", suts);
-							sutMap.put("totalSize", count);
-
-							return new ResponseEntity<>(sutMap, HttpStatus.OK);
+			if (contextId != null) {
+				List<SystemUnderTest> suts = sutRepository.getByContextIdAndType(contextId.getValue(), page.getValue(), size.getValue(),
+						deviceType.getValue());
+				if (suts != null && suts.size() > 0) {
+					for (SystemUnderTest sut : suts) {
+						DeviceStatus status = sut.getDeviceStatus();
+						DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+						if (status != deviceStatus) {
+							sut.setDeviceStatus(deviceStatus);
 						}
 					}
+
+					Map<String, Object> sutMap = new HashMap<>();
+
+					long count = sutRepository.getTotalAmountOfSystemUnderTest(contextId.getValue(), deviceType.getValue());
+					sutMap.put("sutList", suts);
+					sutMap.put("totalSize", count);
+
+					return new ResponseEntity<>(sutMap, HttpStatus.OK);
+				}else {
+					Map<String, Object> emptySUTMap = new HashMap<>();
+					long count = 0;
+					emptySUTMap.put("sutList", new ArrayList<SystemUnderTest>());
+					emptySUTMap.put("totalSize", count);
+					return new ResponseEntity<>(emptySUTMap, HttpStatus.OK);
 				}
 			}
 

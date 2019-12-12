@@ -24,7 +24,7 @@ import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
 
 export class SystemUnderTest extends Base {
-    groupId: string;
+    contextId: string;
 	endDeviceId: string;
     endDeviceType: DeviceType;
     endDeviceLocation: string;

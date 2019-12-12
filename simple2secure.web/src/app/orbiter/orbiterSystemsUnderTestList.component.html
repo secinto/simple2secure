@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group> 
 	<mat-tab label="List View">
 		<h1> Monitored Systems </h1>
 		<div class="example-container mat-elevation-z8 table table-striped">
@@ -13,12 +13,6 @@
 				<ng-container matColumnDef="name">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
 					<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
-				</ng-container>
-
-				<ng-container matColumnDef="groupId">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
-					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.groupId}}</mat-cell>
 				</ng-container>
 
 				<ng-container matColumnDef="endDevice">
@@ -73,12 +67,6 @@
 					<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
 				</ng-container>
 
-				<ng-container matColumnDef="groupId">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
-					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.groupId}}</mat-cell>
-				</ng-container>
-
 				<ng-container matColumnDef="endDevice">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.endDevice' | translate }}
 					</mat-header-cell>
@@ -118,22 +106,6 @@
 
 		<mat-menu #menu="matMenu">
 		</mat-menu>	
-	</mat-tab>
-	<mat-tab label="Object View">
-		<div class="example-container mat-elevation-z8 table table-striped">
-			<ng-container *ngFor="let sut of monitoredSUT">
-			<div class="sut-objects">
-				<h4>{{sut.name}}</h4>
-				<i class="material-icons">
-					computer
-				</i>
-				Online: <div *ngIf="sut.deviceStatus=='ONLINE'" class="status-circle-green"></div><div *ngIf="sut.deviceStatus=='OFFLINE'" class="status-circle-red"></div>
-				{{sut.groupId}}<br>
-				{{sut.endDeviceType}}<br>
-				{{sut.ipAdress}}<br>
-			</div>
-			</ng-container>
-		</div>
 	</mat-tab>
 </mat-tab-group>
 

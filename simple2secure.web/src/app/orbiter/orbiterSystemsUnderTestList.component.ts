@@ -2,7 +2,6 @@ import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, PageEvent} from '@angular/material';
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
-import { Router, ActivatedRoute } from '@angular/router';
 import {environment} from '../../environments/environment';
 import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
@@ -30,7 +29,6 @@ import { DeviceType } from '../_models/deviceType';
  *********************************************************************
  */
 
-
  @Component({
      moduleId: module.id,
 	 styleUrls: ['sutList.css'],
@@ -39,9 +37,9 @@ import { DeviceType } from '../_models/deviceType';
 
 export class OrbiterSystemsUnderTestListComponent {
 
-	displayedColumnsMonitored = ['name', 'groupId', 'endDevice', 'ipAdress', 'deviceStatus'];
-	displayedColumnsTargeted = ['name', 'groupId', 'endDevice', 'ipAdress', 'action'];
-	groupId: string;
+	displayedColumnsMonitored = ['name', 'endDevice', 'ipAdress', 'deviceStatus'];
+	displayedColumnsTargeted = ['name', 'endDevice', 'ipAdress', 'action'];
+	contextId: string;
 	monitoredSUT: SystemUnderTest[];
 	otherSUT: SystemUnderTest[];
 	selectedSUT: SystemUnderTest;
@@ -70,6 +68,7 @@ export class OrbiterSystemsUnderTestListComponent {
 	}
 
 	ngAfterViewInit() {
+
 	}
 
 	applyFilter(filterValue: string) {
@@ -92,7 +91,6 @@ export class OrbiterSystemsUnderTestListComponent {
 		dialogConfig.width = '750px';
 		dialogConfig.data = {
 			type: type,
-			groupId: this.groupId
 		};
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
@@ -125,7 +123,6 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.loading = false;
 				});
 	}
-	
 	public loadOtherSUTList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'sut/' + DeviceType.WWW + '/' + page + '/' + size)
