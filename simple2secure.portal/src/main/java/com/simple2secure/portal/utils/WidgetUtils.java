@@ -32,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
-
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
@@ -57,8 +56,7 @@ public class WidgetUtils extends BaseServiceProvider {
 	}
 
 	public Object getValueFromApi(String url) {
-		LoadedConfigItems configItems = new LoadedConfigItems();
-		String completeUrl = configItems.getBaseURL() + url;
+		String completeUrl = loadedConfigItems.getBaseURL() + url;
 		RestTemplate restTemplate = new RestTemplate();
 		Object result = restTemplate.getForObject(completeUrl, Object.class);
 		return result;
