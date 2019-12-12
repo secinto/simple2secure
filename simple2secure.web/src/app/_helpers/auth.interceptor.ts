@@ -34,8 +34,9 @@ export class AuthInterceptor implements HttpInterceptor {
 				private dataService: DataService) { }
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
 		return next.handle(req).pipe(tap(event => {}, err => {
-			if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403) {
+			if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403 || err.status == 0) {
 				this.dataService.clearSessionStorage();
 				this.router.navigate(['/login']);
 			}
