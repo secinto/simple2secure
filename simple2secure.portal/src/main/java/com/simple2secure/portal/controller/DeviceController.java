@@ -69,11 +69,42 @@ public class DeviceController extends BaseUtilsProvider {
 	public static final Logger log = LoggerFactory.getLogger(DeviceController.class);
 
 	/**
-	 * This function returns all pods according to the contextId
+	 * This function returns all devices according to the contextId
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@ValidRequestMapping
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Map<String, Object>> getDevicesByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
+			if (context != null) {
+				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page.getValue(), size.getValue());
+
+				if (pods != null) {
+					return new ResponseEntity<>(pods, HttpStatus.OK);
+				}
+			}
+		}
+
+		log.error("Problem occured while retrieving devices for contextId {}", contextId.getValue());
+
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_devices", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+
+	}
+	
+	
+	/**
+	 * This function returns all pods according to the contextId
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@ValidRequestMapping(value = "/pods")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
@@ -82,7 +113,7 @@ public class DeviceController extends BaseUtilsProvider {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page.getValue(), size.getValue());
+				Map<String, Object> pods = deviceUtils.getAllPodsFromCurrentContextPagination(context, page.getValue(), size.getValue());
 
 				if (pods != null) {
 					return new ResponseEntity<>(pods, HttpStatus.OK);
