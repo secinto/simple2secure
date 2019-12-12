@@ -62,13 +62,11 @@ public class ProcessorController extends BaseUtilsProvider {
 		if (processors != null) {
 			return new ResponseEntity<>(processors, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -78,7 +76,7 @@ public class ProcessorController extends BaseUtilsProvider {
 				List<Processor> processors = processorRepository.findAll();
 
 				if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
-					return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale.getValue())),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 				processorRepository.save(processor);
@@ -88,15 +86,14 @@ public class ProcessorController extends BaseUtilsProvider {
 			return new ResponseEntity<>(processor, HttpStatus.OK);
 		}
 		log.error("Error occured while saving/updating processor");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ServerProvidedValue ValidInputLocale locale) {
 
@@ -117,7 +114,7 @@ public class ProcessorController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting processor with id {}", processorId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_processor",
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_processor",
 				ObjectUtils.toObjectArray(processorId), locale.getValue())), HttpStatus.NOT_FOUND);
 
 	}

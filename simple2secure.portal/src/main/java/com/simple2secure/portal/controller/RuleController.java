@@ -79,10 +79,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/rulewithsource",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -103,7 +100,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		}
 
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -119,10 +116,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/templaterule",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/templaterule", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -143,7 +137,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		}
 
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -158,8 +152,7 @@ public class RuleController extends BaseUtilsProvider {
 	 * @return ResponseEntity object with the TemplateRule objects as a List or an error.
 	 *
 	 */
-	@ValidRequestMapping(
-			value = "/templaterule")
+	@ValidRequestMapping(value = "/templaterule")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -173,7 +166,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -189,8 +182,7 @@ public class RuleController extends BaseUtilsProvider {
 	 * @return ResponseEntity object with the rules in a List or an error.
 	 *
 	 */
-	@ValidRequestMapping(
-			value = "/rulewithsource")
+	@ValidRequestMapping(value = "/rulewithsource")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -204,7 +196,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -218,8 +210,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @return ResponseEntity object with the Conditions in a List or an error.
 	 */
-	@ValidRequestMapping(
-			value = "/template_conditions")
+	@ValidRequestMapping(value = "/template_conditions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -233,7 +224,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity<>(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
 		}
 
 		return new ResponseEntity<>(conditions, HttpStatus.OK);
@@ -248,8 +239,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @return ResponseEntity object with the Actions in a List or an error.
 	 */
-	@ValidRequestMapping(
-			value = "/template_actions")
+	@ValidRequestMapping(value = "/template_actions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -263,7 +253,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity<>(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
 		}
 
 		return new ResponseEntity<>(actions, HttpStatus.OK);
@@ -279,9 +269,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@ValidRequestMapping(
-			value = "/rulewithsource",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable ValidInputRule ruleId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -294,7 +282,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -310,9 +298,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@ValidRequestMapping(
-			value = "/templaterule",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/templaterule", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -325,7 +311,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 

@@ -67,7 +67,7 @@ public class DownloadController extends BaseUtilsProvider {
 			return new ResponseEntity<>(downloadData, httpHeaders, HttpStatus.OK);
 		} else {
 			log.error("File for download not found!");
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}

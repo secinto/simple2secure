@@ -71,7 +71,7 @@ public class WidgetController extends BaseUtilsProvider {
 			return new ResponseEntity<>(widgets, HttpStatus.OK);
 		}
 		log.error("Problem occured while retrieving widgets");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -89,7 +89,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting widget with id {}", widgetId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_widget", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -108,7 +108,7 @@ public class WidgetController extends BaseUtilsProvider {
 			return new ResponseEntity<>(widget, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving widget");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -129,7 +129,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 			return new ResponseEntity<>(widgetDTO.getWidgetProperties(), HttpStatus.OK);
 		}
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -144,7 +144,7 @@ public class WidgetController extends BaseUtilsProvider {
 			return new ResponseEntity<>(widgets, HttpStatus.OK);
 		}
 		log.error("Problem occured while retrieving widgets");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -163,7 +163,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting widget with id {}", widgetPropId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_widget", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -181,7 +181,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving widgets");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -199,7 +199,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving widgets");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -217,7 +217,7 @@ public class WidgetController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving widgets");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

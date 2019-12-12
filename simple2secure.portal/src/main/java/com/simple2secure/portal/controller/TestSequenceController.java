@@ -66,13 +66,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 				return new ResponseEntity<>(sequencesMap, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestSequence> addNewSequence(@RequestBody TestSequence sequence, @ServerProvidedValue ValidInputLocale locale)
 			throws com.simple2secure.portal.exceptions.ItemNotFoundRepositoryException, NoSuchAlgorithmException,
@@ -96,13 +95,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sequence, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -115,16 +113,13 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			value = "/scheduledSequence",
-			method = ValidRequestMethodType.GET,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduledSequence", method = ValidRequestMethodType.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<SequenceRun>> getScheduledSequence(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -142,16 +137,13 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(filteredSeqRuns, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			value = "/scheduleSequence",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleSequence", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SequenceRun> addSequenceToSchedule(@RequestBody TestSequence sequence,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputUser userId,
@@ -178,13 +170,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_sequence", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/scheduledSequence")
+	@ValidRequestMapping(value = "/scheduledSequence")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getScheduledSequenceWithPag(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
@@ -199,16 +190,13 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(scheduledSequencesMap, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			value = "/update/status",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/update/status", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<SequenceRun> updateSequenceRunStatus(@RequestBody String sequenceRunInfo,
 			@PathVariable ValidInputSequence sequenceId, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -223,14 +211,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/save/sequencerunresult",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/save/sequencerunresult", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestSequenceResult> saveSequenceRunResult(@RequestBody TestSequenceResult sequenceRunResult,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -239,13 +225,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/sequenceresults")
+	@ValidRequestMapping(value = "/sequenceresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceResults(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -254,13 +239,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/sequencerunresults")
+	@ValidRequestMapping(value = "/sequencerunresults")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<TestSequenceResult>> getSequenceRunResults(@PathVariable ValidInputSequence seqId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -269,13 +253,12 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/result")
+	@ValidRequestMapping(value = "/result")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getSequenceRunResultsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -292,13 +275,13 @@ public class TestSequenceController extends BaseUtilsProvider {
 					sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
 					return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
 				} else {
-					return new ResponseEntity<>(
+					return new ResponseEntity(
 							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 			}
 		}
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

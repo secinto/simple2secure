@@ -72,15 +72,13 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving settings");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Settings> updateSettings(@RequestBody Settings settings, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -89,14 +87,12 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(settings, HttpStatus.OK);
 		}
 		log.error("Problem occured while updating settings");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -109,14 +105,12 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving license plan");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> deleteLicensePlan(@PathVariable ValidInputLicensePlan licensePlanId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -129,15 +123,13 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting license plan with id {}", licensePlanId);
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_license_plan", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			value = "/testmacro",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/testmacro", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> deleteTestMacro(@PathVariable ValidInputTestMacro testMacroId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -150,16 +142,13 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting test macro with id {}", testMacroId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_macro", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
 
-	@ValidRequestMapping(
-			value = "/licensePlan",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -172,7 +161,7 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(testMacro, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving test macro");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

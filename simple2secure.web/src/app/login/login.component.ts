@@ -37,7 +37,7 @@ import {SelectContextDialog} from '../dialog/select-context';
 	templateUrl: 'login.component.html'
 })
 
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit{
 	model: any = {};
 	loading = false;
 	returnUrl: string;
@@ -79,7 +79,13 @@ export class LoginComponent implements OnInit {
 						this.loading = false;
 					}
 					else {
-						this.alertService.error(error.error.errorMessage);
+						if(error.error){
+							this.alertService.error(error.error.errorMessage);
+						}
+						else{
+							this.alertService.error("Unauthorized");
+						}
+
 					}
 					this.loading = false;
 
