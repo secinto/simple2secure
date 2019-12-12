@@ -184,6 +184,8 @@ import {
 	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
 } from "./queries";
 import {NotificationCardItem} from "./widgets/notification-card-item.component";
+import {NgxGraphModule} from "@swimlane/ngx-graph"
+import {TooltipModule} from "@swimlane/ngx-charts";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -258,8 +260,9 @@ export const httpInterceptorProviders = [
 		DragDropModule,
 		NgxWidgetGridModule,
 		BoxModule,
-		BreadcrumbsModule
-
+		BreadcrumbsModule,
+		NgxGraphModule,
+		TooltipModule
 	],
 	declarations: [
 		AppComponent,

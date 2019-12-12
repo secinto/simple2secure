@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group xmlns:svg="">
 	<mat-tab label="List View">
 		<h1> Monitored Systems </h1>
 		<div class="example-container mat-elevation-z8 table table-striped">
@@ -120,20 +120,64 @@
 		</mat-menu>	
 	</mat-tab>
 	<mat-tab label="Object View">
-		<div class="example-container mat-elevation-z8 table table-striped">
-			<ng-container *ngFor="let sut of monitoredSUT">
-			<div class="sut-objects">
-				<h4>{{sut.name}}</h4>
-				<i class="material-icons">
-					computer
-				</i>
-				Online: <div *ngIf="sut.deviceStatus=='ONLINE'" class="status-circle-green"></div><div *ngIf="sut.deviceStatus=='OFFLINE'" class="status-circle-red"></div>
-				{{sut.groupId}}<br>
-				{{sut.endDeviceType}}<br>
-				{{sut.ipAdress}}<br>
-			</div>
-			</ng-container>
+		<div class="example-container">
+			<ngx-graph
+					class="chart-container"
+					[view]="[768, 1024]"
+					[links]="[
+                        {
+                          id: 'a',
+                          source: 'first',
+                            target: 'second',
+                          label: 'is parent of'
+                        }, {
+                          id: 'b',
+                          source: 'first',
+                          target: 'third',
+                          label: 'custom label'
+                        }
+                      ]"
+					[nodes]="[
+                        {
+                          id: 'first',
+                          label: 'Aaaaaa'
+                        }, {
+                          id: 'second',
+                          label: 'Bsadsad'
+                        }, {
+                          id: 'third',
+                          label: 'Csadsads'
+                        }
+                      ]"
+			>
+
+				<ng-template #nodeTemplate let-node>
+					<svg:g class="node" ngx-tooltip [tooltipPlacement]="'top'" [tooltipType]="'tooltip'" [tooltipTitle]="node.label">
+						<svg:circle [attr.r]="node.dimension.width/2" [attr.cx]="node.dimension.width/2" [attr.cy]="node.dimension.width/2" [attr.fill]="node.data.color" />
+						<svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height">
+							{{node.label}}
+						</svg:text>
+					</svg:g>
+				</ng-template>
+
+				<ng-template #linkTemplate let-link>
+					<svg:g class="edge">
+						<svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
+						<svg:text class="edge-label" text-anchor="middle">
+							<textPath
+									class="text-path"
+									[attr.href]="'#' + link.id"
+									[style.dominant-baseline]="link.dominantBaseline"
+									startOffset="50%"
+							>
+								{{link.label}}
+							</textPath>
+						</svg:text>
+					</svg:g>
+				</ng-template>
+			</ngx-graph>
 		</div>
+
 	</mat-tab>
 </mat-tab-group>
 

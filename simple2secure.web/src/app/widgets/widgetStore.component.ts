@@ -102,7 +102,7 @@ export class WidgetStoreComponent {
 			else if (widget.tag == 'app-notification'){
 				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(NotificationCardItem);
 				const component = this.container.createComponent(componentFactory);
-				let notifications : any[] = ["{content: 'First notification'},{content: 'Second notification'}"];
+				let notifications : any[] = ['First notification','Second notification'];
 
 				(<NotificationCardItem>component.instance).id = widget.id;
 				(<NotificationCardItem>component.instance).name = widget.name;
