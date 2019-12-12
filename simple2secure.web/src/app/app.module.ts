@@ -183,6 +183,7 @@ import {
 	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
 	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
 } from "./queries";
+import {NotificationCardItem} from "./widgets/notification-card-item.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -336,6 +337,7 @@ export const httpInterceptorProviders = [
 		StatComponent,
 		StatItemComponent,
 		NotificationCardComponent,
+		NotificationCardItem,
 		WidgetStoreComponent,
 		DevicesComponent,
 		DevicesOverviewComponent,
@@ -374,6 +376,8 @@ export const httpInterceptorProviders = [
 		WidgetStoreComponent,
 		StatItemComponent,
 		StatComponent,
+		NotificationCardComponent,
+		NotificationCardItem,
 		SUTDetailsComponent,
 		UserGroupEditComponent,
 		MappedQueryEditDialog,

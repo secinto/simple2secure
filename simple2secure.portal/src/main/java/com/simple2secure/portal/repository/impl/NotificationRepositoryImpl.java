@@ -22,10 +22,12 @@
 
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -34,10 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.portal.repository.NotificationRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class NotificationRepositoryImpl extends NotificationRepository {
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -77,5 +83,21 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 		query = query.with(Sort.by(Sort.Direction.DESC, "_id"));
 
 		return mongoTemplate.find(query, Notification.class);
+	}
+
+	@Override
+	public List<Notification> getNotificationsWithPagination(String contextId, int page, int size) {
+
+		List<Notification> notifications = new ArrayList<>();
+		Query query = new Query(Criteria.where("contextId").is(contextId));
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.ASC, "timestamp"));
+
+		notifications = mongoTemplate.find(query, Notification.class, collectionName);
+		return notifications;
 	}
 }

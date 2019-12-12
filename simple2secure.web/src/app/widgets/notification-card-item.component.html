@@ -1,0 +1,15 @@
+<div class="stat-item-component">
+    <button class="add-widget-button mat-green-button" color="primary" mat-fab (click)="addWidget()" [mat-dialog-close]="true" cdkFocusInitia><mat-icon>add</mat-icon></button>
+        <div class="card text-white bg-{{bgClass}}">
+        <div class="card-body bg-{{bgClass}}">
+            <div class="list-group bg-{{bgClass}}">
+                <a *ngFor="let item of data" href="#" class="list-group-item clearfix d-block bg-{{bgClass}}">
+                    <i class="fa fa-comment fa-fw"></i> Notification number 1
+                </a>
+            </div>
+        </div>
+        <div class="card-footer">
+            <span class="float-right"><b>{{label}}</b></span>
+        </div>
+    </div>
+</div>

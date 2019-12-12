@@ -39,7 +39,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
-import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -76,9 +76,7 @@ public class WidgetController extends BaseUtilsProvider {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/delete",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> deleteWidget(@PathVariable ValidInputWidget widgetId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -97,10 +95,7 @@ public class WidgetController extends BaseUtilsProvider {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/add",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> saveWidget(@RequestBody Widget widget, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -118,10 +113,7 @@ public class WidgetController extends BaseUtilsProvider {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/updatePosition",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/updatePosition", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -142,8 +134,7 @@ public class WidgetController extends BaseUtilsProvider {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/get")
+	@ValidRequestMapping(value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -159,9 +150,7 @@ public class WidgetController extends BaseUtilsProvider {
 	}
 
 	@WidgetFunction
-	@ValidRequestMapping(
-			value = "/delete/prop",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete/prop", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable ValidInputWidgetProp widgetPropId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -180,8 +169,7 @@ public class WidgetController extends BaseUtilsProvider {
 	}
 
 	@WidgetFunction
-	@ValidRequestMapping(
-			value = "/devActive")
+	@ValidRequestMapping(value = "/devActive")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -208,6 +196,24 @@ public class WidgetController extends BaseUtilsProvider {
 			if (context != null) {
 				int size = reportUtils.countExecutedQueries(context);
 				return new ResponseEntity<>(size, HttpStatus.OK);
+			}
+		}
+		log.error("Problem occured while retrieving widgets");
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@WidgetFunction
+	@ValidRequestMapping(value = "/lastNotifications")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<List<Notification>> getLatestNotifications(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
+			if (context != null) {
+				List<Notification> notifications = notificationRepository.getNotificationsWithPagination(contextId.getValue(), 0, 3);
+				return new ResponseEntity<>(notifications, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving widgets");

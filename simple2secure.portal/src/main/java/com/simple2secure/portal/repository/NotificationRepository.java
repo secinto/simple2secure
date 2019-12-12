@@ -36,4 +36,6 @@ public abstract class NotificationRepository extends MongoRepository<Notificatio
 
 	public abstract List<Notification> getNotificationByReadValue(String contextId, boolean isRead);
 
+	public abstract List<Notification> getNotificationsWithPagination(String contextId, int page, int size);
+
 }
