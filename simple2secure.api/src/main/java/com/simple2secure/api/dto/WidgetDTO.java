@@ -6,13 +6,16 @@ import com.simple2secure.api.model.WidgetProperties;
 public class WidgetDTO {
 	private Widget widget;
 	private WidgetProperties widgetProperties;
-	
-	public WidgetDTO() {}
+	private Object value;
 
-	public WidgetDTO(Widget widget, WidgetProperties widgetProperties) {
+	public WidgetDTO() {
+	}
+
+	public WidgetDTO(Widget widget, WidgetProperties widgetProperties, Object value) {
 		super();
 		this.widget = widget;
 		this.widgetProperties = widgetProperties;
+		this.value = value;
 	}
 
 	public Widget getWidget() {
@@ -29,7 +32,13 @@ public class WidgetDTO {
 
 	public void setWidgetProperties(WidgetProperties widgetProperties) {
 		this.widgetProperties = widgetProperties;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	public void setValue(Object value) {
+		this.value = value;
 	};
-	
-	
 }

@@ -41,9 +41,11 @@ public abstract class OsQueryReportRepository extends MongoRepository<OsQueryRep
 
 	public abstract long getPagesForReportsByDeviceAndName(String deviceId, String name);
 
-	public abstract OsQueryReportDTO getReportsByDeviceId(List<String> group_ids, int page, int size);
+	public abstract OsQueryReportDTO getReportsByDeviceIdWithPagination(List<String> deviceIds, int page, int size);
 
 	public abstract void deleteByDeviceId(String deviceId);
 
 	public abstract List<OsQueryReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds);
+
+	public abstract List<OsQueryReport> getReportsByDeviceId(List<String> deviceIds);
 }

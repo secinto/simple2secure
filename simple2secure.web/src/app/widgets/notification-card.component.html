@@ -1,24 +1,13 @@
-<div class="card-body">
-    <div class="list-group">
-        <a href="#" class="list-group-item clearfix d-block">
-            <i class="fa fa-comment fa-fw"></i> New Comment
-            <span class="float-right text-muted small"><em>4 minutes ago</em></span>
-        </a>
-        <a href="#" class="list-group-item clearfix d-block">
-            <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-            <span class="float-right text-muted small"><em>12 minutes ago</em></span>
-        </a>
-        <a href="#" class="list-group-item clearfix d-block">
-            <i class="fa fa-envelope fa-fw"></i> Message Sent
-            <span class="float-right text-muted small"><em>27 minutes ago</em></span>
-        </a>
-        <a href="#" class="list-group-item clearfix d-block">
-            <i class="fa fa-tasks fa-fw"></i> New Task
-            <span class="float-right text-muted small"><em>43 minutes ago</em></span>
-        </a>
-        <a href="#" class="list-group-item clearfix d-block">
-            <i class="fa fa-upload fa-fw"></i> Server Rebooted
-            <span class="float-right text-muted small"><em>11:32 AM</em></span>
-        </a>
+<div class="card text-white bg-{{bgClass}}">
+    <div class="card-body bg-{{bgClass}}">
+        <div class="list-group bg-{{bgClass}}">
+            <a *ngFor="let item of data" href="#" class="list-group-item clearfix d-block bg-{{bgClass}}">
+                <i class="fa fa-comment fa-fw"></i> {{item.content}}
+            </a>
+        </div>
+    </div>
+    <div class="card-footer">
+        <span class="float-left"><button class="widget-delete-btn" color="info" mat-button (click)="deleteWidgetProperty(propertiesId)"><mat-icon>delete</mat-icon></button></span>
+        <span class="float-right"><b>{{label}}</b></span>
     </div>
 </div>

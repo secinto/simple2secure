@@ -29,6 +29,8 @@ import {Location} from '@angular/common';
 import {Widget} from '../_models/widget';
 import {MatDialogRef} from '@angular/material';
 import {StatItemComponent} from './stat-item.component';
+import {NotificationCardItem} from "./notification-card-item.component";
+import {Notification} from "../_models";
 
 @Component({
 	moduleId: module.id,
@@ -96,6 +98,19 @@ export class WidgetStoreComponent {
 				(<StatItemComponent>component.instance).icon = widget.icon;
 				(<StatItemComponent>component.instance).count = 10;
 				(<StatItemComponent>component.instance).label = widget.label;
+			}
+			else if (widget.tag == 'app-notification'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(NotificationCardItem);
+				const component = this.container.createComponent(componentFactory);
+				let notifications : any[] = ['First notification','Second notification'];
+
+				(<NotificationCardItem>component.instance).id = widget.id;
+				(<NotificationCardItem>component.instance).name = widget.name;
+				(<NotificationCardItem>component.instance).tag = widget.tag;
+				(<NotificationCardItem>component.instance).description = widget.description;
+				(<NotificationCardItem>component.instance).bgClass = widget.bgClass;
+				(<NotificationCardItem>component.instance).label = widget.label;
+				(<NotificationCardItem>component.instance).data = notifications;
 			}
 		}
 	}

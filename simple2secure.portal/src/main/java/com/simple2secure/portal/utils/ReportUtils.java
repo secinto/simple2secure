@@ -26,9 +26,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -39,6 +42,12 @@ import com.simple2secure.portal.providers.BaseServiceProvider;
 public class ReportUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(ReportUtils.class);
+
+	@Autowired
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	/**
 	 * This function prepares the Report for the graph in the web. It parses only the necessary information so that we ignore the long queues.
@@ -118,5 +127,20 @@ public class ReportUtils extends BaseServiceProvider {
 		}
 
 		return graphReports;
+	}
+
+	public int countExecutedQueries(Context context) {
+		int size = 0;
+		if (context != null) {
+			List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+			List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+			if (deviceIds != null && deviceIds.size() > 0) {
+				List<OsQueryReport> reports = reportsRepository.getReportsByDeviceId(deviceIds);
+				if (reports != null) {
+					size = reports.size();
+				}
+			}
+		}
+		return size;
 	}
 }

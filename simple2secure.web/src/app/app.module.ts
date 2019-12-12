@@ -178,13 +178,14 @@ import {WidgetStoreComponent} from './widgets/widgetStore.component';
 import {StatItemComponent} from './widgets/stat-item.component';
 import {DevicesOverviewComponent} from './devices/devicesOverview.component';
 import {NavbarLoginComponent} from './navbar/navbarlogin.component';
-import {UserGroupEditComponent} from './user/userGroupEdit.component';
-import { NgxGraphModule } from '@swimlane/ngx-graph';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import {UserGroupEditComponent} from "./user/userGroupEdit.component";
 import {
 	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
 	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
-} from './queries';
+} from "./queries";
+import {NotificationCardItem} from "./widgets/notification-card-item.component";
+import {NgxGraphModule} from "@swimlane/ngx-graph"
+import {TooltipModule} from "@swimlane/ngx-charts";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -261,7 +262,7 @@ export const httpInterceptorProviders = [
 		BoxModule,
 		BreadcrumbsModule,
 		NgxGraphModule,
-		NgxChartsModule
+		TooltipModule
 	],
 	declarations: [
 		AppComponent,
@@ -339,6 +340,7 @@ export const httpInterceptorProviders = [
 		StatComponent,
 		StatItemComponent,
 		NotificationCardComponent,
+		NotificationCardItem,
 		WidgetStoreComponent,
 		DevicesComponent,
 		DevicesOverviewComponent,
@@ -349,7 +351,7 @@ export const httpInterceptorProviders = [
 		QueryListComponent,
 		QueryAssignComponent,
 		MappedQueryEditDialog,
-		QueryCategoryAddDialog,
+		QueryCategoryAddDialog
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -377,6 +379,8 @@ export const httpInterceptorProviders = [
 		WidgetStoreComponent,
 		StatItemComponent,
 		StatComponent,
+		NotificationCardComponent,
+		NotificationCardItem,
 		SUTDetailsComponent,
 		UserGroupEditComponent,
 		MappedQueryEditDialog,
