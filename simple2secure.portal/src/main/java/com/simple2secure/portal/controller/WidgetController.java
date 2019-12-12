@@ -26,7 +26,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,15 +45,7 @@ import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
-import com.simple2secure.portal.repository.WidgetPropertiesRepository;
-import com.simple2secure.portal.repository.WidgetRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.DeviceUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.ReportUtils;
-import com.simple2secure.portal.utils.WidgetUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -68,34 +59,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.WIDGET_API)
-public class WidgetController {
-
-	@Autowired
-	WidgetRepository widgetRepository;
-
-	@Autowired
-	WidgetPropertiesRepository widgetPropertiesRepository;
-
-	@Autowired
-	WidgetUtils widgetUtils;
-
-	@Autowired
-	DeviceUtils deviceUtils;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	ReportUtils reportUtils;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	OsQueryReportRepository osQueryReportRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
+public class WidgetController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
 
@@ -112,7 +76,9 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			value = "/delete",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> deleteWidget(@PathVariable ValidInputWidget widgetId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -131,7 +97,10 @@ public class WidgetController {
 
 	}
 
-	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/add",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<Widget> saveWidget(@RequestBody Widget widget, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -149,7 +118,10 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/updatePosition", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/updatePosition",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<WidgetProperties> updateWidgetPosition(@RequestBody WidgetDTO widgetDTO, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -170,7 +142,8 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/get")
+	@ValidRequestMapping(
+			value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -185,7 +158,10 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(value = "/delete/prop", method = ValidRequestMethodType.DELETE)
+	@WidgetFunction
+	@ValidRequestMapping(
+			value = "/delete/prop",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable ValidInputWidgetProp widgetPropId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -204,7 +180,8 @@ public class WidgetController {
 	}
 
 	@WidgetFunction
-	@ValidRequestMapping(value = "/devActive")
+	@ValidRequestMapping(
+			value = "/devActive")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {

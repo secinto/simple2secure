@@ -27,23 +27,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.ERROR_API)
-public class CustomErrorController implements ErrorController {
-
-	@Autowired
-	private ErrorAttributes errorAttributes;
+public class CustomErrorController extends BaseUtilsProvider implements ErrorController {
 
 	@ValidRequestMapping
 	public Map<String, Object> error(HttpServletRequest request, WebRequest webrequest, HttpServletResponse response) {

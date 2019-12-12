@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,12 +41,7 @@ import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -57,32 +51,14 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.PROCESSOR_API)
-public class ProcessorController {
+public class ProcessorController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(ProcessorController.class);
-
-	@Autowired
-	ProcessorRepository repository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	PortalUtils portalUtils;
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessors(@ServerProvidedValue ValidInputLocale locale) {
-		List<Processor> processors = repository.findAll();
+		List<Processor> processors = processorRepository.findAll();
 		if (processors != null) {
 			return new ResponseEntity<>(processors, HttpStatus.OK);
 		}
@@ -99,15 +75,15 @@ public class ProcessorController {
 
 		if (processor != null) {
 			if (Strings.isNullOrEmpty(processor.getId())) {
-				List<Processor> processors = repository.findAll();
+				List<Processor> processors = processorRepository.findAll();
 
 				if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
 					return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
-				repository.save(processor);
+				processorRepository.save(processor);
 			} else {
-				repository.update(processor);
+				processorRepository.update(processor);
 			}
 			return new ResponseEntity<>(processor, HttpStatus.OK);
 		}
@@ -125,7 +101,7 @@ public class ProcessorController {
 	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(processorId.getValue())) {
-			Processor processor = repository.find(processorId.getValue());
+			Processor processor = processorRepository.find(processorId.getValue());
 			if (processor != null) {
 				// Check according to the processor name if the same step exists
 
@@ -135,7 +111,7 @@ public class ProcessorController {
 					stepRepository.delete(step);
 				}
 
-				repository.delete(processor);
+				processorRepository.delete(processor);
 
 				return new ResponseEntity<>(processor, HttpStatus.OK);
 			}

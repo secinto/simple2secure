@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,11 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ServiceLibraryRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -47,16 +44,7 @@ import simple2secure.validator.model.ValidInputVersion;
 
 @RestController
 @RequestMapping(StaticConfigItems.SERVICE_API)
-public class ServiceController {
-
-	@Autowired
-	ServiceLibraryRepository serviceLibraryRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
+public class ServiceController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
 	public ResponseEntity<Service> getServiceVersion(@ServerProvidedValue ValidInputLocale locale) {
@@ -64,7 +52,8 @@ public class ServiceController {
 	}
 
 	@ValidRequestMapping
-	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable ValidInputVersion version, @ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<ServiceLibraryDTO> getServiceVersion(@PathVariable ValidInputVersion version,
+			@ServerProvidedValue ValidInputLocale locale) {
 		ServiceLibraryDTO library = (ServiceLibraryDTO) serviceLibraryRepository.findByVersion(version.getValue());
 
 		try {

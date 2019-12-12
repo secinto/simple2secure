@@ -23,7 +23,6 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
-import java.util.Map;
 
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.MongoRepository;
@@ -32,6 +31,8 @@ public abstract class SystemUnderTestRepository extends MongoRepository<SystemUn
 
 	public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
 
-	public abstract Map<String, Object> getByGroupIdsAndType(List<String> groupIds, int page, int size, String deviceType);
+	public abstract long getTotalAmountOfSystemUnderTest(List<String> testRunIds, String deviceType);
+
+	public abstract List<SystemUnderTest> getByGroupIdsAndType(List<String> groupIds, int page, int size, String deviceType);
 
 }

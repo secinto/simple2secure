@@ -24,7 +24,6 @@ package com.simple2secure.portal.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,10 +35,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.SearchUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -49,19 +45,7 @@ import simple2secure.validator.model.ValidInputSearchQuery;
 
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
-public class SearchController {
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	SearchUtils searchUtils;
+public class SearchController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable ValidInputSearchQuery searchQuery,

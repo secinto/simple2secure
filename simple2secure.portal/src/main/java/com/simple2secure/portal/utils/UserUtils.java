@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -47,28 +46,13 @@ import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.EmailConfigurationRepository;
-import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.repository.GroupAccesRightRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserInfoRepository;
-import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.security.PasswordValidator;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class UserUtils {
+public class UserUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(UserUtils.class);
 
@@ -83,60 +67,6 @@ public class UserUtils {
 
 	@Autowired
 	ContextUtils contextUtils;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	EmailConfigurationRepository emailConfigRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	EmailRepository emailRepository;
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	TokenRepository tokenRepository;
-
-	@Autowired
-	GroupAccesRightRepository groupAccessRightRepository;
-
-	@Autowired
-	UserInvitationRepository userInvitationRepository;
-
-	@Autowired
-	UserInfoRepository userInfoRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	PasswordValidator passwordValidator;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	DataInitialization dataInitialization;
 
 	/**
 	 * This function checks if user already exists and calls the inviteUserToContext in case if the registration type is ADDED_BY_USER, in all

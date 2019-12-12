@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,38 +17,11 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.model.LicenseActivation;
-import com.simple2secure.portal.repository.DeviceInfoRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.SettingsRepository;
-import com.simple2secure.portal.security.auth.TokenAuthenticationService;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class LicenseUtils {
+public class LicenseUtils extends BaseServiceProvider {
 	private static Logger log = LoggerFactory.getLogger(LicenseUtil.class);
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	SettingsRepository settingsRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	DeviceInfoRepository deviceInfoRepository;
-
-	@Autowired
-	TokenAuthenticationService tokenAuthenticationService;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	/**
 	 * Activates the provided license and creates a private license {@link CompanyLicensePrivate} and stores it in the database. If the

@@ -29,7 +29,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
@@ -55,22 +53,7 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.model.LicenseActivation;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.SettingsRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.security.auth.TokenAuthenticationService;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.DataInitialization;
-import com.simple2secure.portal.utils.LicenseUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.SUTUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -80,7 +63,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
-public class LicenseController {
+public class LicenseController extends BaseUtilsProvider {
 	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	@Value("${license.filepath}")
@@ -91,57 +74,6 @@ public class LicenseController {
 
 	@Value("${license.publicKey}")
 	private String publicKeyPath;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	TokenRepository tokenRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	SettingsRepository settingsRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	DataInitialization dataInitialization;
-
-	@Autowired
-	TokenAuthenticationService tokenAuthenticationService;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserRepository;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	LicenseUtils licenseUtils;
-
-	@Autowired
-	SUTUtils sutUtils;
-
-	@Autowired
-	RestTemplate restTemplate;
 
 	@PostConstruct
 	public void initialize() {

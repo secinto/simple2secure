@@ -17,16 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.simple2secure.api.dto.OsQueryReportDTO;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class OsQueryReportRepositoryImpl extends OsQueryReportRepository {
-
-	@Autowired
-	LicenseRepository licenseRepository;
 
 	@Autowired
 	PortalUtils portalUtils;

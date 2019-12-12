@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.OsQueryDTO;
@@ -51,19 +49,7 @@ import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.OsQueryCategoryRepository;
-import com.simple2secure.portal.repository.OsQueryGroupMappingRepository;
-import com.simple2secure.portal.repository.OsQueryRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.QueryUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -76,48 +62,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
-public class QueryController {
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	OsQueryRepository queryRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	OsQueryCategoryRepository queryCategoryRepository;
-
-	@Autowired
-	OsQueryGroupMappingRepository queryGroupMappingRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	GroupUtils groupUtils;
-
-	@Autowired
-	QueryUtils queryUtils;
-
-	RestTemplate restTemplate = new RestTemplate();
+public class QueryController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(QueryController.class);
 
@@ -316,7 +261,7 @@ public class QueryController {
 						queryConfig = queryUtils.findByGroupIdAndOsInfo(group.getId(), OSInfo.valueOf(osinfo.getValue()));
 					} else {
 						// go until the root group is not found and get all configurations from all groups which are parents of this group
-						List<CompanyGroup> foundGroups = portalUtils.findAllParentGroups(group);
+						List<CompanyGroup> foundGroups = groupUtils.findAllParentGroups(group);
 						if (foundGroups != null) {
 							List<String> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
 							if (groupIds != null) {

@@ -26,27 +26,19 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
-import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.portal.repository.WidgetPropertiesRepository;
-import com.simple2secure.portal.repository.WidgetRepository;
+
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class WidgetUtils {
+public class WidgetUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(WidgetUtils.class);
-
-	@Autowired
-	WidgetPropertiesRepository widgetPropertiesRepository;
-
-	@Autowired
-	WidgetRepository widgetRepository;
 
 	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();

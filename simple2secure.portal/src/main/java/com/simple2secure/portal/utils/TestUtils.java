@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
@@ -46,57 +45,16 @@ import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestSequenceResult;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.SequenceRunRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestResultRepository;
-import com.simple2secure.portal.repository.TestRunRepository;
-import com.simple2secure.portal.repository.TestSequenceResultRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class TestUtils {
+public class TestUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(TestUtils.class);
-
-	@Autowired
-	TestResultRepository testResultRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	protected LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	RestTemplate restTemplate;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	SequenceRunRepository sequenceRunRepository;
-
-	@Autowired
-	TestRunRepository testRunRepository;
-
-	@Autowired
-	TestSequenceResultRepository testSequenceResultRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	TestUtils testUtils;
 
 	@Autowired
 	PortalUtils portalUtils;
@@ -124,18 +82,32 @@ public class TestUtils {
 	 * @return
 	 */
 	public Map<String, Object> getTestResultByContextId(String contextId, String locale, int page, int size) {
+		Map<String, Object> testResultsMap = new HashMap<>();
+
+		testResultsMap.put("tests", new ArrayList<TestRunDTO>());
+		testResultsMap.put("totalSize", 0);
+
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
 
 			List<TestRun> testRunList = testRunRepository.getByContextId(contextId);
 			if (testRunList != null) {
 				List<String> testRunIds = portalUtils.extractIdsFromObjects(testRunList);
-				Map<String, Object> testResults = testResultRepository.getByTestRunIdWithPagination(testRunIds, page, size);
-				if (testResults != null) {
-					return testResults;
+				if (testRunIds != null && testRunIds.size() > 0) {
+					List<TestResult> testResults = testResultRepository.getByTestRunIdWithPagination(testRunIds, page, size);
+
+					if (testResults != null && testResults.size() > 0) {
+						long count = testResultRepository.getTotalAmountOfTestResults(testRunIds);
+
+						List<TestRunDTO> testRunDto = generateTestRunDTOByTestResults(testResults);
+						if (testRunDto != null && testRunDto.size() > 0) {
+							testResultsMap.put("tests", testRunDto);
+							testResultsMap.put("totalSize", count);
+						}
+					}
 				}
 			}
 		}
-		return null;
+		return testResultsMap;
 	}
 
 	public Test synchronizeReceivedTest(Test test) {
@@ -143,8 +115,7 @@ public class TestUtils {
 		Test currentPortalTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
 
 		if (currentPortalTest != null) {
-			boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
-					test.getLastChangedTimestamp());
+			boolean isPortalTestOlder = checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(), test.getLastChangedTimestamp());
 
 			returnTest = currentPortalTest;
 
@@ -209,7 +180,8 @@ public class TestUtils {
 	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination, String locale) {
 		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
 			Map<String, Object> testMap = new HashMap<>();
-			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
+			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(
+					testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
 
 			if (testsWeb != null) {
 				testMap.put("tests", testsWeb);
@@ -511,7 +483,7 @@ public class TestUtils {
 
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
-	 * 
+	 *
 	 * @param deviceId
 	 */
 	public void setAllPodTestToUnsyncronized(String deviceId) {

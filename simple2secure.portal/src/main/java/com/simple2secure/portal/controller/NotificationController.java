@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +39,7 @@ import com.simple2secure.api.model.Notification;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.NotificationUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -53,18 +50,9 @@ import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
 @RequestMapping(StaticConfigItems.NOTIFICATION_API)
-public class NotificationController {
+public class NotificationController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
-
-	@Autowired
-	private NotificationRepository notificationRepository;
-
-	@Autowired
-	private NotificationUtils notificationUtils;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
 
 	@ValidRequestMapping(
 			method = ValidRequestMethodType.POST,

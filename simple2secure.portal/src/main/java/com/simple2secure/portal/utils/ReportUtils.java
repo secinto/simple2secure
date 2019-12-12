@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,31 +35,12 @@ import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.OsQueryReportRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
-public class ReportUtils {
+public class ReportUtils extends BaseServiceProvider {
 
 	private static Logger log = LoggerFactory.getLogger(ReportUtils.class);
-
-	@Autowired
-	OsQueryReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	IpToGeoUtils iptoGeoUtils;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	DeviceUtils deviceUtils;
-
-	@Autowired
-	OsQueryReportRepository osQueryReportRepository;
 
 	/**
 	 * This function prepares the Report for the graph in the web. It parses only the necessary information so that we ignore the long queues.
@@ -71,10 +51,10 @@ public class ReportUtils {
 	public List<GraphReport> prepareReportsForGraph(String deviceId, String queryName) {
 		int currentPage = 0;
 		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
-		long maxPages = reportRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
+		long maxPages = reportsRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage <= maxPages) {
-			List<OsQueryReport> reports = reportRepository.getReportsByDeviceAndName(deviceId, queryName, currentPage, size);
+			List<OsQueryReport> reports = reportsRepository.getReportsByDeviceAndName(deviceId, queryName, currentPage, size);
 			if (reports != null) {
 				for (OsQueryReport report : reports) {
 					if (report != null) {
@@ -111,10 +91,10 @@ public class ReportUtils {
 	public List<GraphReport> prepareReportsForGraph(String queryName) {
 		int currentPage = 0;
 		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
-		long maxPages = reportRepository.getPagesForReportsByName(queryName);
+		long maxPages = reportsRepository.getPagesForReportsByName(queryName);
 		List<GraphReport> graphReports = new ArrayList<>();
 		while (currentPage < maxPages) {
-			List<OsQueryReport> reports = reportRepository.getReportsByName(queryName, currentPage, size);
+			List<OsQueryReport> reports = reportsRepository.getReportsByName(queryName, currentPage, size);
 			if (reports != null) {
 				for (OsQueryReport report : reports) {
 					if (report != null) {
