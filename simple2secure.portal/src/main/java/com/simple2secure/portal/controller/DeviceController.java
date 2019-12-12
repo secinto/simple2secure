@@ -92,7 +92,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving devices for contextId {}", contextId.getValue());
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_devices", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 

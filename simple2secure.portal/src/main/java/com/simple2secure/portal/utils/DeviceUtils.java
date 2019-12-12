@@ -172,7 +172,55 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
 		return deviceMap;
 	}
+	
+	
+	/**
+	 * This function returns all pods from the current context with merged Test objects.
+	 *
+	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getAllPodsFromCurrentContextPagination(Context context, int page, int size) {
+		log.debug("Retrieving pods for the context {}", context.getName());
+		/* Set user probes from the licenses - not from the users anymore */
+		List<Device> myDevices = new ArrayList<>();
+		Map<String, Object> deviceMap = new HashMap<>();
+		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
+		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
 
+		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, true, page, size);
+
+		if (licenseMap != null) {
+
+			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
+
+			if (licenses != null) {
+				for (CompanyLicensePrivate license : licenses) {
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+						DeviceStatus status = devInfo.getDeviceStatus();
+
+						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+						if (status != deviceStatus) {
+							devInfo.setDeviceStatus(deviceStatus);
+							licenseRepository.save(license);
+						}
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+						Device device = new Device(license.getDeviceId(), group, license.isActivated(), devInfo.getHostName(), deviceStatus,
+								license.isDevicePod());
+						myDevices.add(device);
+					}
+				}
+			}
+
+			deviceMap.put("devices", myDevices);
+			deviceMap.put("totalSize", licenseMap.get("totalSize"));
+		}
+		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
+		return deviceMap;
+	}
+	
 	/**
 	 * This function deletes the device dependencies for the specified device id
 	 *

@@ -39,8 +39,9 @@ public class LicenseUtils extends BaseServiceProvider {
 	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale)
 			throws UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
-
-		activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
+		
+		//TODO: delete or put in other place, not necessary here in this place
+		//activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
 
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
