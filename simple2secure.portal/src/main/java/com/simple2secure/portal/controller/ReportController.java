@@ -63,9 +63,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 public class ReportController extends BaseUtilsProvider {
 	static Logger log = LoggerFactory.getLogger(ReportController.class);
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<OsQueryReport> saveReport(@RequestBody OsQueryReport report, @ServerProvidedValue ValidInputLocale locale) {
 		if (report != null) {
@@ -73,7 +71,7 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(report, HttpStatus.OK);
 		}
 		log.error("Error occured while saving report");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -102,14 +100,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/groups",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/groups", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryReportDTO> getReportsByGroupIdsAndPagination(@RequestBody List<CompanyGroup> groups,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -128,14 +123,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for groups");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/devices",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/devices", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryReportDTO> getReportsByDeviceIdsAndPagination(@RequestBody List<Device> devices,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -150,12 +142,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for groups");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/report")
+	@ValidRequestMapping(value = "/report")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -166,12 +157,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with id {}", reportId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/device")
+	@ValidRequestMapping(value = "/device")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputName name,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -182,14 +172,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/network",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/network", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -198,12 +185,11 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(networkReport, HttpStatus.OK);
 		}
 		log.error("Error occured while saving network report");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/network")
+	@ValidRequestMapping(value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -227,13 +213,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving network reports for context id {}", contextId);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/network",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/network", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -247,13 +231,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting network report with id {}", reportId);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/report/network/name",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/report/network/name", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -264,13 +246,11 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/delete/selected",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/delete/selected", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQueryReport>> deleteSelectedReports(@RequestBody List<OsQueryReport> queryReports,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -284,7 +264,7 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(queryReports, HttpStatus.OK);
 		}
 		log.error("Error occured while deleting selected network reports!");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }

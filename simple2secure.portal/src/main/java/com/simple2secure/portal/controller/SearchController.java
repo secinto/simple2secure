@@ -64,7 +64,7 @@ public class SearchController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 

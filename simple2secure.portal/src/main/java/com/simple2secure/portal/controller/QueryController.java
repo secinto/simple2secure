@@ -86,13 +86,12 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Query configuration not found for the query ID {}", queryId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(
-			value = "/allDto")
+	@ValidRequestMapping(value = "/allDto")
 	public ResponseEntity<List<OsQueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
 
 		List<OsQueryDTO> queryDtoList = new ArrayList<>();
@@ -107,13 +106,12 @@ public class QueryController extends BaseUtilsProvider {
 			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(
-			value = "/unmapped")
+	@ValidRequestMapping(value = "/unmapped")
 	public ResponseEntity<List<OsQuery>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -124,7 +122,7 @@ public class QueryController extends BaseUtilsProvider {
 				return new ResponseEntity<>(queryList, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -133,8 +131,7 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQuery> updateQuery(@RequestBody OsQuery query, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -152,7 +149,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -162,9 +159,7 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/category",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/category", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -184,7 +179,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -194,9 +189,7 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/mapping",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/mapping", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQuery>> updateQueryMappings(@RequestBody List<OsQuery> queryList, @PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -209,7 +202,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -217,8 +210,7 @@ public class QueryController extends BaseUtilsProvider {
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
@@ -277,15 +269,14 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while getting query run for the probe id {}", deviceId);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
 	/**
 	 * This function returns query config by the id
 	 */
-	@ValidRequestMapping(
-			value = "/group")
+	@ValidRequestMapping(value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQuery>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -317,7 +308,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }

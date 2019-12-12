@@ -52,8 +52,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -92,8 +91,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			}
 
 		}
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 }

@@ -103,10 +103,7 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@ValidRequestMapping(
-			value = "/authenticate",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/authenticate", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
@@ -118,7 +115,7 @@ public class LicenseController extends BaseUtilsProvider {
 				podAuthentication = false;
 			} else {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 			LicenseActivation activation = null;
@@ -141,10 +138,10 @@ public class LicenseController extends BaseUtilsProvider {
 
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
+				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -203,7 +200,7 @@ public class LicenseController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -214,9 +211,7 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(
-			value = "/downloadLicenseForScript",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/downloadLicenseForScript", method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {

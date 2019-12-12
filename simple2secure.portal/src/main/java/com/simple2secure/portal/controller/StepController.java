@@ -63,13 +63,11 @@ public class StepController extends BaseUtilsProvider {
 		if (steps != null) {
 			return new ResponseEntity<>(steps, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @ServerProvidedValue ValidInputLocale locale,
 			@ServerProvidedValue ValidInputContext context) throws ItemNotFoundRepositoryException {
@@ -86,7 +84,7 @@ public class StepController extends BaseUtilsProvider {
 			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 		log.error("Error while updating step");
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -95,8 +93,7 @@ public class StepController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteStep(@PathVariable ValidInputStep stepId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -116,7 +113,7 @@ public class StepController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while deleting step with id {}", stepId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

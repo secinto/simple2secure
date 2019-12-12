@@ -123,7 +123,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -134,9 +134,7 @@ public class DeviceController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/group",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/group", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Device>> getPodsByGroupId(@RequestBody List<CompanyGroup> groups, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -152,7 +150,7 @@ public class DeviceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_user_devices", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -181,7 +179,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId);
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -196,8 +194,7 @@ public class DeviceController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/config")
+	@ValidRequestMapping(value = "/config")
 	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
 			throws ItemNotFoundRepositoryException {
 
@@ -224,9 +221,7 @@ public class DeviceController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/scheduledTests",
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -237,7 +232,7 @@ public class DeviceController extends BaseUtilsProvider {
 			return testUtils.getScheduledTestsByDeviceId(deviceId.getValue(), locale.getValue());
 		}
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
@@ -246,9 +241,7 @@ public class DeviceController extends BaseUtilsProvider {
 	/**
 	 * This function deletes the specified the POD with the specified ID if it exists
 	 */
-	@ValidRequestMapping(
-			value = "/delete",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -265,7 +258,7 @@ public class DeviceController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while deleting device with id {}", deviceId);
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_device", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -275,9 +268,7 @@ public class DeviceController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/changeGroup",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/changeGroup", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable ValidInputDevice deviceId, @RequestBody CompanyGroup group,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -298,22 +289,19 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while updating group for device id {}", deviceId.getValue());
 
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_device_group", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/status")
+	@ValidRequestMapping(value = "/status")
 	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
-	@ValidRequestMapping(
-			value = "/status",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/status", method = ValidRequestMethodType.POST)
 	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
@@ -327,9 +315,7 @@ public class DeviceController extends BaseUtilsProvider {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
-	@ValidRequestMapping(
-			value = "/update",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/update", method = ValidRequestMethodType.POST)
 	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());

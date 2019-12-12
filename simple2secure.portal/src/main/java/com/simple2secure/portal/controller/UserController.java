@@ -78,8 +78,7 @@ public class UserController extends BaseUtilsProvider {
 	 * This function finds and returns user according to the user id
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.GET)
+	@ValidRequestMapping(method = ValidRequestMethodType.GET)
 	public ResponseEntity<UserDTO> getUserByID(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -110,7 +109,7 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -125,8 +124,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
@@ -142,8 +140,7 @@ public class UserController extends BaseUtilsProvider {
 			}
 
 		} else {
-			return new ResponseEntity<>(
-					new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -157,17 +154,13 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(
-			value = "/register",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/register", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
 			return userUtils.addNewUser(user, locale.getValue());
 		} else {
-			return new ResponseEntity<>(
-					new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -181,9 +174,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(
-			value = "/resendActivation",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/resendActivation", method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> resendActivation(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (!Strings.isNullOrEmpty(email)) {
@@ -192,12 +183,12 @@ public class UserController extends BaseUtilsProvider {
 				if (!user.isActivated()) {
 					return userUtils.resendActivation(user, locale.getValue());
 				} else {
-					return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("user_already_activated", locale.getValue())),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("user_already_activated", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -209,9 +200,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(
-			value = "/update",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/update", method = ValidRequestMethodType.POST)
 	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
@@ -223,7 +212,7 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(userInfo, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -237,9 +226,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(
-			value = "/activate/updatePassword",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/activate/updatePassword", method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable ValidInputToken token, @RequestBody String password,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
@@ -253,7 +240,7 @@ public class UserController extends BaseUtilsProvider {
 				String error = userUtils.validateUserPassword(user);
 
 				if (!Strings.isNullOrEmpty(error)) {
-					return new ResponseEntity<>(new CustomErrorType(error), HttpStatus.NOT_FOUND);
+					return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
 				}
 
 				user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -267,13 +254,13 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
 
 			} else {
-				return new ResponseEntity<>(
+				return new ResponseEntity(
 						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 
 		} else {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -290,9 +277,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(
-			value = "/activate",
-			method = ValidRequestMethodType.GET)
+	@ValidRequestMapping(value = "/activate", method = ValidRequestMethodType.GET)
 	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 		User user = userRepository.findByActivationToken(token.getValue());
@@ -322,7 +307,7 @@ public class UserController extends BaseUtilsProvider {
 			}
 
 		} else {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -335,9 +320,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(
-			value = "/sendResetPasswordEmail",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/sendResetPasswordEmail", method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
@@ -356,16 +339,16 @@ public class UserController extends BaseUtilsProvider {
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
 					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
-					return new ResponseEntity<>(
-							new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale.getValue())), HttpStatus.NOT_FOUND);
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale.getValue())),
+							HttpStatus.NOT_FOUND);
 				}
 			} else {
-				return new ResponseEntity<>(
+				return new ResponseEntity(
 						new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_not_exists", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 		} else {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 	}
@@ -378,8 +361,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 */
 
-	@ValidRequestMapping(
-			value = "/resetPassword")
+	@ValidRequestMapping(value = "/resetPassword")
 	@PermitAll
 	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable ValidInputToken token) throws URISyntaxException {
 		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token.getValue());
@@ -395,8 +377,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@ValidRequestMapping(
-			value = "/invite")
+	@ValidRequestMapping(value = "/invite")
 	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws URISyntaxException {
 
@@ -411,8 +392,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 *
 	 */
-	@ValidRequestMapping(
-			value = "/invite/process")
+	@ValidRequestMapping(value = "/invite/process")
 	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(token)) {
@@ -442,21 +422,20 @@ public class UserController extends BaseUtilsProvider {
 					} else {
 						log.error("Invitation token expired {}", token);
 						userInvitationRepository.delete(userInvitation);
-						return new ResponseEntity<>(
-								new CustomErrorType(messageByLocaleService.getMessage("invitation_token_expired", locale.getValue())),
+						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_token_expired", locale.getValue())),
 								HttpStatus.NOT_FOUND);
 					}
 
 				} else {
 					userInvitationRepository.delete(userInvitation);
-					return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("invitation_rejected", locale.getValue())),
+					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_rejected", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 
 			}
 		}
 		log.error("Error occured during invitation for invitation token {}", token);
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -469,9 +448,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@ValidRequestMapping(
-			value = "/updatePassword",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/updatePassword", method = ValidRequestMethodType.POST)
 	public ResponseEntity<User> updateUserPassword(@PathVariable ValidInputToken token, @RequestBody String password,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
@@ -486,7 +463,7 @@ public class UserController extends BaseUtilsProvider {
 					String error = userUtils.validateUserPassword(user);
 
 					if (!Strings.isNullOrEmpty(error)) {
-						return new ResponseEntity<>(new CustomErrorType(error), HttpStatus.NOT_FOUND);
+						return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
 					}
 
 					user.setPassword(passwordEncoder.encode(password));
@@ -501,17 +478,17 @@ public class UserController extends BaseUtilsProvider {
 					httpHeaders.setLocation(url);
 					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
 				} else {
-					return new ResponseEntity<>(
+					return new ResponseEntity(
 							new CustomErrorType(messageByLocaleService.getMessage("password_reset_token_expired", locale.getValue())),
 							HttpStatus.NOT_FOUND);
 				}
 			} else {
-				return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale.getValue())),
+				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale.getValue())),
 						HttpStatus.NOT_FOUND);
 			}
 
 		} else {
-			return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
+			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
 					HttpStatus.NOT_FOUND);
 		}
 
@@ -524,8 +501,7 @@ public class UserController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -540,7 +516,7 @@ public class UserController extends BaseUtilsProvider {
 						user.getId());
 				if (contextUserAuthentication != null) {
 					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
-						return new ResponseEntity<>(
+						return new ResponseEntity(
 								new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_superadmin", locale.getValue())),
 								HttpStatus.NOT_FOUND);
 					} else {
@@ -550,7 +526,7 @@ public class UserController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

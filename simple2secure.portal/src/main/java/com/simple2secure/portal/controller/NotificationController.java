@@ -54,9 +54,7 @@ public class NotificationController extends BaseUtilsProvider {
 
 	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
 	public ResponseEntity<Notification> saveNotification(@RequestBody Notification notification, @PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -66,8 +64,8 @@ public class NotificationController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while saving notification");
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@ValidRequestMapping
@@ -82,14 +80,12 @@ public class NotificationController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving notifications for context id {}", contextId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/read",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/read", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Notification> setNotificationRead(@RequestBody Notification notification,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -101,12 +97,11 @@ public class NotificationController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while updating read parameter");
-		return new ResponseEntity<>(
-				new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())), HttpStatus.NOT_FOUND);
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
-	@ValidRequestMapping(
-			value = "/read")
+	@ValidRequestMapping(value = "/read")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Integer> getCountOfUnreadNotifications(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -117,7 +112,7 @@ public class NotificationController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while retrieving number of unread notifications");
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}

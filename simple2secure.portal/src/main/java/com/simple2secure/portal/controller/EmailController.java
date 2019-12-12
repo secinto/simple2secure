@@ -55,8 +55,7 @@ public class EmailController extends BaseUtilsProvider {
 
 	private static final Logger log = LoggerFactory.getLogger(EmailController.class);
 
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
@@ -73,7 +72,7 @@ public class EmailController extends BaseUtilsProvider {
 			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale.getValue())),
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
 
@@ -93,7 +92,7 @@ public class EmailController extends BaseUtilsProvider {
 		}
 
 		log.error("Error occured while getting email config for user with id {}", contextId.getValue());
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
@@ -105,8 +104,7 @@ public class EmailController extends BaseUtilsProvider {
 	 * @return
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable ValidInputEmailConfig emailConfigId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -120,7 +118,7 @@ public class EmailController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting email configuration with id {}", emailConfigId);
-		return new ResponseEntity<>(
+		return new ResponseEntity(
 				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 	}
