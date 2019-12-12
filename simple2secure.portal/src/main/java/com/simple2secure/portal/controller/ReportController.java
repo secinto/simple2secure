@@ -137,7 +137,7 @@ public class ReportController {
 
 					OsQueryReportDTO reportDto = new OsQueryReportDTO();
 
-					reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
+					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
 
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
@@ -161,7 +161,7 @@ public class ReportController {
 				List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
 				if (deviceIds != null) {
 					OsQueryReportDTO reportDto = new OsQueryReportDTO();
-					reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
+					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
 					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
 			}
@@ -181,7 +181,7 @@ public class ReportController {
 
 			if (deviceIds != null && !deviceIds.isEmpty()) {
 				OsQueryReportDTO reportDto = new OsQueryReportDTO();
-				reportDto = reportsRepository.getReportsByDeviceId(deviceIds, page.getValue(), size.getValue());
+				reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
 				return new ResponseEntity<>(reportDto, HttpStatus.OK);
 			}
 		}

@@ -46,7 +46,7 @@ public class OsQueryReportRepositoryImpl extends OsQueryReportRepository {
 	}
 
 	@Override
-	public OsQueryReportDTO getReportsByDeviceId(List<String> deviceIds, int page, int size) {
+	public OsQueryReportDTO getReportsByDeviceIdWithPagination(List<String> deviceIds, int page, int size) {
 		List<OsQueryReport> reports = new ArrayList<>();
 		long count = 0;
 		OsQueryReportDTO reportDTO = new OsQueryReportDTO(reports, count);
@@ -162,6 +162,21 @@ public class OsQueryReportRepositoryImpl extends OsQueryReportRepository {
 		query.limit(2);
 		query.skip(0);
 		query.with(Sort.by(Sort.Direction.ASC, "queryTimestamp"));
+		List<OsQueryReport> result = mongoTemplate.find(query, className, collectionName);
+		return result;
+	}
+
+	@Override
+	public List<OsQueryReport> getReportsByDeviceId(List<String> deviceIds) {
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String deviceId : deviceIds) {
+			Criteria expression = new Criteria();
+			expression.and("deviceId").is(deviceId);
+			orExpression.add(expression);
+		}
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 		List<OsQueryReport> result = mongoTemplate.find(query, className, collectionName);
 		return result;
 	}

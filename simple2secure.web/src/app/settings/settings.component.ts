@@ -79,7 +79,6 @@ export class SettingsComponent {
 			.subscribe(
 				data => {
 					this.settingsObj = data;
-					console.log(this.settingsObj);
 					if (this.updated) {
 						this.alertService.success(this.translate.instant('message.settings.update'));
 					}

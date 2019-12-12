@@ -54,17 +54,19 @@ export class HomeComponent implements OnInit {
 	}
 
 	public getValueFromApi(widget: WidgetDTO){
-		this.httpService.get(environment.apiEndpoint + widget.widget.url)
-			.subscribe(
-				data => {
-					widget.isValueSet = true;
-					widget.value = data;
-					return data;
-				},
-				error => {
-					return 0;
-				});
-		return 0;
+		if(!widget.isValueSet){
+			this.httpService.get(environment.apiEndpoint + widget.widget.url).shareReplay()
+				.subscribe(
+					data => {
+						widget.isValueSet = true;
+						widget.value = data;
+						return data;
+					},
+					error => {
+						return 0;
+					});
+			return 0;
+		}
 	}
 
 	public loadAllWidgetsByUserId() {
@@ -72,6 +74,7 @@ export class HomeComponent implements OnInit {
 			.subscribe(
 				data => {
 					this.widgets = data;
+
 				},
 				error => {
 

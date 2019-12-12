@@ -40,17 +40,20 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.repository.ContextRepository;
+import com.simple2secure.portal.repository.OsQueryReportRepository;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DeviceUtils;
 import com.simple2secure.portal.utils.PortalUtils;
+import com.simple2secure.portal.utils.ReportUtils;
 import com.simple2secure.portal.utils.WidgetUtils;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -83,7 +86,13 @@ public class WidgetController {
 	PortalUtils portalUtils;
 
 	@Autowired
+	ReportUtils reportUtils;
+
+	@Autowired
 	ContextRepository contextRepository;
+
+	@Autowired
+	OsQueryReportRepository osQueryReportRepository;
 
 	@Autowired
 	MessageByLocaleService messageByLocaleService;
@@ -176,7 +185,6 @@ public class WidgetController {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@WidgetFunction
 	@ValidRequestMapping(value = "/delete/prop", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable ValidInputWidgetProp widgetPropId,
@@ -205,6 +213,24 @@ public class WidgetController {
 			if (context != null) {
 				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
 				return new ResponseEntity<>(devices.size(), HttpStatus.OK);
+			}
+		}
+		log.error("Problem occured while retrieving widgets");
+		return new ResponseEntity<>(
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_widgets", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@WidgetFunction
+	@ValidRequestMapping(value = "/executedQueries")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<Integer> countExecutedQueries(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
+			if (context != null) {
+				int size = reportUtils.countExecutedQueries(context);
+				return new ResponseEntity<>(size, HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving widgets");

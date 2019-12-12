@@ -28,10 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 
@@ -53,12 +55,21 @@ public class WidgetUtils {
 			for (WidgetProperties property : properties) {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
-					widgetDTOList.add(new WidgetDTO(widget, property));
+					Object value = null;
+					widgetDTOList.add(new WidgetDTO(widget, property, value));
 					log.info("Adding new widget {} to the list", widget.getName());
 				}
 			}
 		}
 		return widgetDTOList;
+	}
+
+	public Object getValueFromApi(String url) {
+		LoadedConfigItems configItems = new LoadedConfigItems();
+		String completeUrl = configItems.getBaseURL() + url;
+		RestTemplate restTemplate = new RestTemplate();
+		Object result = restTemplate.getForObject(completeUrl, Object.class);
+		return result;
 	}
 
 }

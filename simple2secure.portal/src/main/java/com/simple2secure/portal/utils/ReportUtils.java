@@ -30,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -50,6 +52,15 @@ public class ReportUtils {
 
 	@Autowired
 	IpToGeoUtils iptoGeoUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
+
+	@Autowired
+	DeviceUtils deviceUtils;
+
+	@Autowired
+	OsQueryReportRepository osQueryReportRepository;
 
 	/**
 	 * This function prepares the Report for the graph in the web. It parses only the necessary information so that we ignore the long queues.
@@ -129,5 +140,20 @@ public class ReportUtils {
 		}
 
 		return graphReports;
+	}
+
+	public int countExecutedQueries(Context context) {
+		int size = 0;
+		if (context != null) {
+			List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+			List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+			if (deviceIds != null && deviceIds.size() > 0) {
+				List<OsQueryReport> reports = osQueryReportRepository.getReportsByDeviceId(deviceIds);
+				if (reports != null) {
+					size = reports.size();
+				}
+			}
+		}
+		return size;
 	}
 }
