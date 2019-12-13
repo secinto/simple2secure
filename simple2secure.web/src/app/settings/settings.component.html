@@ -266,8 +266,8 @@
                                         <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.bgColor' | translate }}" [(ngModel)]="settingsObj.widgetList[in].bgClass"
                                                         name="bgClass{{in}}" required>
-                                                <mat-option *ngFor="let color of colors" [value]="color">
-                                                    {{color}}
+                                                <mat-option *ngFor="let color of colors"
+                                                            [value]="color">{{color}}
                                                 </mat-option>
                                             </mat-select>
                                         </mat-form-field>
@@ -298,7 +298,7 @@
                                     <td>
                                         <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
-                                                        name="bgClass{{in}}" required>
+                                                        name="url{{in}}" required>
                                                 <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
                                                     {{url}}
                                                 </mat-option>

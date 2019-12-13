@@ -43,8 +43,9 @@ export class SettingsComponent {
 	loading = false;
 	settingsObj: SettingsDTO;
 	timeUnits = Timeunit;
+	colorEnums = WidgetColor;
+	colors: string[];
 	updated = false;
-	colors: WidgetColor[];
 	icons: string[];
 
 	constructor(
@@ -59,17 +60,22 @@ export class SettingsComponent {
 		this.settingsObj = new SettingsDTO();
 		this.settingsObj.licensePlan = [];
 		this.settingsObj.settings = new Settings();
-		this.colors = [WidgetColor.DANGER, WidgetColor.DARK, WidgetColor.INFO, WidgetColor.LIGHT, WidgetColor.SUCCESS,
-					   WidgetColor.WARNING, WidgetColor.SECINTO];
 		this.icons = ['fa-server', 'fa-user', 'fa-satellite'];
 	}
 
 	ngOnInit() {
+		this.colors = this.extractColors();
+		console.log(this.colors);
 		this.loadSettings();
 	}
 
 	extractTimeUnits(): Array<string> {
 		const keys = Object.keys(this.timeUnits);
+		return keys.slice();
+	}
+
+	extractColors(): Array<string> {
+		const keys = Object.keys(this.colorEnums);
 		return keys.slice();
 	}
 
@@ -79,6 +85,7 @@ export class SettingsComponent {
 			.subscribe(
 				data => {
 					this.settingsObj = data;
+					console.log(this.settingsObj);
 					if (this.updated) {
 						this.alertService.success(this.translate.instant('message.settings.update'));
 					}

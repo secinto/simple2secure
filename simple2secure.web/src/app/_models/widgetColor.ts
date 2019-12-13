@@ -21,11 +21,11 @@
  */
 
 export enum WidgetColor {
-	SUCCESS = 'success',
-	INFO = 'info',
-	WARNING = 'warning',
-	DANGER = 'danger',
-	LIGHT = 'light',
-	DARK = 'dark',
-	SECINTO = 'secinto'
+	success = 'success',
+	info = 'info',
+	warning = 'warning',
+	danger = 'danger',
+	light = 'light',
+	dark = 'dark',
+	secinto = 'secinto'
 }
