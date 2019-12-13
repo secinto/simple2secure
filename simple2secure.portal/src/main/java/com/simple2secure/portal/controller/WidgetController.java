@@ -149,7 +149,6 @@ public class WidgetController extends BaseUtilsProvider {
 				HttpStatus.NOT_FOUND);
 	}
 
-	@WidgetFunction
 	@ValidRequestMapping(value = "/delete/prop", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<WidgetProperties> deleteWidgetProperty(@PathVariable ValidInputWidgetProp widgetPropId,

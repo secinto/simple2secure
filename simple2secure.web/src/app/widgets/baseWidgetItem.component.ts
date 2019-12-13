@@ -1,12 +1,6 @@
-import {EventEmitter, Input, OnInit, Output} from "@angular/core";
-import {AlertService, DataService, HttpService} from "../_services";
-import {TranslateService} from "@ngx-translate/core";
-import {Location} from "@angular/common";
-import {ActivatedRoute, Router} from "@angular/router";
-import {HomeComponent} from "../home";
-import {environment} from "../../environments/environment";
+import {EventEmitter, Input, Output} from "@angular/core";
+import {DataService} from "../_services";
 import {Widget} from "../_models/widget";
-import {Notification} from "../_models";
 
 export class BaseWidgetItem{
     widget: Widget;

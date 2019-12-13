@@ -45,6 +45,15 @@ export class NotificationComponent {
 	}
 
 	ngOnInit() {
+		this.userRole = this.dataService.getRole();
+
+		if (this.userRole) {
+			this.loggedIn = true;
+		}
+		else {
+			this.loggedIn = false;
+		}
+		
 		if(this.loggedIn){
 			this.getNotifications();
 			this.refreshNotifications();
