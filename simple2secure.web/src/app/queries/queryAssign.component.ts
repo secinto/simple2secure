@@ -58,7 +58,8 @@ export class QueryAssignComponent {
 		private httpService: HttpService,
 		private alertService: AlertService,
 		private translate: TranslateService,
-		private dialog: MatDialog)
+		private dialog: MatDialog,
+		private changeDetectorRefs: ChangeDetectorRef)
 	{}
 
 	ngOnInit() {
@@ -184,6 +185,8 @@ export class QueryAssignComponent {
 				this.dataSourceUnmappedQueries.data = this.dataSourceUnmappedQueries.data.filter(query => query["id"] != event.previousContainer.data[dataIndex].id);
 				this.dataSourceUnmappedQueries.paginator.length = this.dataSourceUnmappedQueries.paginator.length - 1 ;
 
+				this.changeDetectorRefs.detectChanges();
+
 				this.alertService.success(this.translate.instant('query.moving.success'));
 			}
 			else{
@@ -197,8 +200,11 @@ export class QueryAssignComponent {
 
 		if(index > -1){
 			this.dataSourceUnmappedQueries.data.push(this.dataSourceMappedQueries.data.find(query => query["id"] == item.id));
+			this.dataSourceMappedQueries.data = this.dataSourceMappedQueries.data.filter(query => query["id"] != item.id);
 			this.dataSourceMappedQueries.paginator.length = this.dataSourceMappedQueries.paginator.length - 1 ;
 			this.dataSourceUnmappedQueries.paginator.length = this.dataSourceUnmappedQueries.paginator.length + 1 ;
+
+			this.changeDetectorRefs.detectChanges();
 
 			this.alertService.success(this.translate.instant('query.remove.success'));
 		}
