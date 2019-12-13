@@ -778,9 +778,12 @@ $font-weight-bold: 700 !default;
 }
 
 .widget-delete-btn{
-  width: 10px;
-  height: 10px;
   margin-left: -20px;
   margin-top: -10px;
   z-index: 21;
+}
+
+.widget-download-btn{
+  z-index: 21;
+  margin-right: -120%;
 }

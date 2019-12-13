@@ -36,4 +36,8 @@ export class BaseWidget{
                 this.loading = false;
             });
     }
+
+    downloadLicense(){
+        console.log("download license");
+    }
 }

@@ -186,6 +186,7 @@ import {
 import {NotificationCardItem} from "./widgets/notification-card-item.component";
 import {NgxGraphModule} from "@swimlane/ngx-graph"
 import {TooltipModule} from "@swimlane/ngx-charts";
+import {DownloadWidgetComponent} from "./widgets/download-widget.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -342,6 +343,7 @@ export const httpInterceptorProviders = [
 		NotificationCardComponent,
 		NotificationCardItem,
 		WidgetStoreComponent,
+		DownloadWidgetComponent,
 		DevicesComponent,
 		DevicesOverviewComponent,
 		DevicesListComponent,
@@ -384,7 +386,8 @@ export const httpInterceptorProviders = [
 		SUTDetailsComponent,
 		UserGroupEditComponent,
 		MappedQueryEditDialog,
-		QueryCategoryAddDialog
+		QueryCategoryAddDialog,
+		DownloadWidgetComponent
 	],
 	providers: [
 		AuthGuard,
