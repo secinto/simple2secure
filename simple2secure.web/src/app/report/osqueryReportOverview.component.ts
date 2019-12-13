@@ -89,7 +89,6 @@ export class OsQueryReportOverviewComponent {
 	}
 
 	public handlePage(e?: PageEvent) {
-		console.log(this.devices);
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
 		if(this.selectedDevices.length > 0){

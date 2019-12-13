@@ -224,11 +224,9 @@ export class EmailOverviewComponent {
 
 	public openDialogShowRules()
 	{
-		console.log("inside openDialogShowRules: not implemented yet");
 	}
 
 	public openDialogAddRule()
 	{
-		console.log("inside openDialogAddRule: not implemented yet");
 	}
 }

@@ -53,7 +53,7 @@ export class NotificationComponent {
 		else {
 			this.loggedIn = false;
 		}
-		
+
 		if(this.loggedIn){
 			this.getNotifications();
 			this.refreshNotifications();
