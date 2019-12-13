@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from "../../environments/environment";
 import {AlertService, HttpService} from "../_services";
@@ -28,7 +28,7 @@ import {CompanyGroup, OsQuery} from "../_models";
 import {TranslateService} from "@ngx-translate/core";
 import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {CdkDragDrop, transferArrayItem} from "@angular/cdk/drag-drop";
+import {CdkDragDrop, copyArrayItem, transferArrayItem} from "@angular/cdk/drag-drop";
 import {MappedQueryEditDialog} from "./mappedQueryEditDialog.component";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
@@ -169,13 +169,21 @@ export class QueryAssignComponent {
 	drop(event: CdkDragDrop<OsQuery[]>) {
 		if (event.previousContainer != event.container) {
 			if(!this.checkIfArrayContainsObject(event.container.data, event.previousContainer.data[event.previousIndex])){
-				transferArrayItem(event.previousContainer.data,
-					event.container.data,
-					event.previousIndex,
-					event.currentIndex);
 
-				this.dataSourceMappedQueries.connect().next(event.container.data);
-				this.dataSourceUnmappedQueries.data = event.previousContainer.data;
+				let dataIndex = event.previousIndex;
+				if(this.dataSourceUnmappedQueries.paginator.pageIndex > 0){
+					dataIndex = (this.dataSourceUnmappedQueries.paginator.pageIndex * this.dataSourceUnmappedQueries.paginator.pageSize) + event.previousIndex;
+				}
+
+				copyArrayItem(event.previousContainer.data,
+					event.container.data,
+					dataIndex,
+					this.dataSourceMappedQueries.paginator.length);
+
+				this.dataSourceMappedQueries.paginator.length = this.dataSourceMappedQueries.paginator.length + 1 ;
+				this.dataSourceUnmappedQueries.data = this.dataSourceUnmappedQueries.data.filter(query => query["id"] != event.previousContainer.data[dataIndex].id);
+				this.dataSourceUnmappedQueries.paginator.length = this.dataSourceUnmappedQueries.paginator.length - 1 ;
+
 				this.alertService.success(this.translate.instant('query.moving.success'));
 			}
 			else{
@@ -186,8 +194,12 @@ export class QueryAssignComponent {
 
 	removeMappedQuery(item: OsQuery){
 		const index = this.dataSourceMappedQueries.data.indexOf(item);
+
 		if(index > -1){
-			this.dataSourceMappedQueries.data = this.dataSourceMappedQueries.data.filter(query => query["id"] != item.id);
+			this.dataSourceUnmappedQueries.data.push(this.dataSourceMappedQueries.data.find(query => query["id"] == item.id));
+			this.dataSourceMappedQueries.paginator.length = this.dataSourceMappedQueries.paginator.length - 1 ;
+			this.dataSourceUnmappedQueries.paginator.length = this.dataSourceUnmappedQueries.paginator.length + 1 ;
+
 			this.alertService.success(this.translate.instant('query.remove.success'));
 		}
 		else{
@@ -215,7 +227,6 @@ export class QueryAssignComponent {
 	}
 
 	checkIfArrayContainsObject(mappedQueries: OsQuery[], movedQuery: OsQuery){
-		console.log("MOVED QUERY" + movedQuery);
 		const index = mappedQueries.findIndex(query=> query.name === movedQuery.name);
 
 		if(index > -1){
