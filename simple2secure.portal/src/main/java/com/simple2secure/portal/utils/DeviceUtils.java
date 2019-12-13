@@ -97,9 +97,9 @@ public class DeviceUtils extends BaseServiceProvider {
 	 * @param isDevicePod
 	 * @return
 	 */
-	public List<Device> getAllProbesByGroupIds(List<String> groupIds, boolean isDevicePod) {
+	public List<Device> getAllProbesByGroupIds(List<String> groupIds) {
 		List<Device> devices = new ArrayList<>();
-		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdsAndDeviceType(groupIds, isDevicePod);
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
 
 		if (licenses != null) {
 			for (CompanyLicensePrivate license : licenses) {
@@ -141,7 +141,7 @@ public class DeviceUtils extends BaseServiceProvider {
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
 
-		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, false, page, size);
+		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
 
 		if (licenseMap != null) {
 
@@ -172,8 +172,7 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
 		return deviceMap;
 	}
-	
-	
+
 	/**
 	 * This function returns all pods from the current context with merged Test objects.
 	 *
@@ -189,7 +188,7 @@ public class DeviceUtils extends BaseServiceProvider {
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
 
-		Map<String, Object> licenseMap = licenseRepository.findByListOfGroupIdsAndDeviceType(groupIds, true, page, size);
+		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
 
 		if (licenseMap != null) {
 
@@ -220,7 +219,9 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
 		return deviceMap;
 	}
-	
+
+	public Map<String, Object> getPodsFor
+
 	/**
 	 * This function deletes the device dependencies for the specified device id
 	 *

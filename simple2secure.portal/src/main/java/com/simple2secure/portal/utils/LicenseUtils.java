@@ -39,9 +39,9 @@ public class LicenseUtils extends BaseServiceProvider {
 	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale)
 			throws UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
-		
-		//TODO: delete or put in other place, not necessary here in this place
-		//activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
+
+		// TODO: delete or put in other place, not necessary here in this place
+		// activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
 
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
@@ -54,7 +54,7 @@ public class LicenseUtils extends BaseServiceProvider {
 				/*
 				 * Check if a license has already been activated and associated with this POD or PROBE
 				 */
-				license = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId, podActivation);
+				license = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId);
 
 				/*
 				 * If no license has been activated and associated with the POD or PROBE we need to create one for them.
@@ -88,7 +88,7 @@ public class LicenseUtils extends BaseServiceProvider {
 							license.setDeviceId(deviceId);
 						}
 						license.setAccessToken(accessToken);
-						license.setDeviceIsPod(podActivation);
+						// license.setDeviceIsPod(podActivation);
 						if (!license.isActivated()) {
 							license.setActivated(true);
 						}

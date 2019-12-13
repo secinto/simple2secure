@@ -2,23 +2,25 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+public class DeviceInfo extends GenericDBObject {
 
-public class DeviceInfo extends GenericDBObject{
-	
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7168259292146418922L;
-	
+
 	protected String deviceId;
 	protected String hostName;
 	protected String ipAddress;
 	protected String netMask;
 	protected DeviceStatus deviceStatus = DeviceStatus.UNKNOWN;
 	protected long lastOnlineTimestamp;
-	
-	public DeviceInfo() {}
-	
+
+	protected DeviceType type;
+
+	public DeviceInfo() {
+	}
+
 	public DeviceInfo(String deviceId, String hostName, String ipAddress, String netMask, DeviceStatus deviceStatus) {
 		setDeviceId(deviceId);
 		setHostName(hostName);
