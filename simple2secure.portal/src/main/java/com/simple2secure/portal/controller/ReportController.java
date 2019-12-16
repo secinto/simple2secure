@@ -113,7 +113,7 @@ public class ReportController extends BaseUtilsProvider {
 			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
 			if (groupIds != null && !groupIds.isEmpty()) {
-				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds, false);
+				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds);
 				List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
 				if (deviceIds != null) {
 					OsQueryReportDTO reportDto = new OsQueryReportDTO();

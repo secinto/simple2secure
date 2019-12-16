@@ -11,6 +11,10 @@ class DeviceStatus(str, Enum):
     UNKNOWN = 'UNKNOWN'
 
 
+class DeviceType(str, Enum):
+    POD = 'POD'
+
+
 class PodInfo(db.Model):
     __tablename__ = 'pod_info'
     id = db.Column(db.Integer, unique=True, primary_key=True)
@@ -38,14 +42,16 @@ class DeviceInfo(db.Model):
     netMask = db.Column(db.Text)
     deviceStatus = db.Column(db.Enum(DeviceStatus))
     lastOnlineTimestamp = db.Column(db.Float)
+    deviceType = db.Column(db.Enum(DeviceType))
 
-    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN):
+    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, deviceType = DeviceType.POD):
         self.deviceId = deviceId
         self.hostName = hostName
         self.ipAddress = ipAddress
         self.netMask = netMask
         self.deviceStatus = deviceStatus
         self.lastOnlineTimestamp = lastOnlineTimestamp
+        self.deviceType = deviceType
 
 
 class Test(db.Model):
@@ -130,7 +136,6 @@ class CompanyLicensePublic(db.Model):
     accessToken = db.Column(db.Text)
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
-    deviceIsPod = db.Column(db.Boolean)
 
     def __init__(self, group_id, license_id, pod_id, expiration_date):
         self.groupId = group_id
@@ -139,7 +144,6 @@ class CompanyLicensePublic(db.Model):
         self.expirationDate = expiration_date
         self.activated = False
         self.accessToken = ""
-        self.deviceIsPod = True
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

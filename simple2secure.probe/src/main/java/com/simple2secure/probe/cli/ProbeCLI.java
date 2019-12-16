@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.file.FileUtil;
@@ -93,7 +94,7 @@ public class ProbeCLI {
 		StartConditions startConditions = licenseController.checkLicenseValidity();
 
 		ProbeUtils.saveDeviceInfo(new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, ProbeConfiguration.ipAddress,
-				ProbeConfiguration.netmask, DeviceStatus.ONLINE));
+				ProbeConfiguration.netmask, DeviceStatus.ONLINE, DeviceType.PROBE));
 
 		try {
 			prepareOsQuery();

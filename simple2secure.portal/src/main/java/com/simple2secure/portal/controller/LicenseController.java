@@ -46,6 +46,8 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseDateUtil;
@@ -107,7 +109,9 @@ public class LicenseController extends BaseUtilsProvider {
 	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
-
+			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(licensePublic.getDeviceId());
+			
+			/*
 			boolean podAuthentication = false;
 			if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && licensePublic.isDevicePod()) {
 				podAuthentication = true;
@@ -117,18 +121,17 @@ public class LicenseController extends BaseUtilsProvider {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
 				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
 						HttpStatus.NOT_FOUND);
-			}
+			}*/
 			LicenseActivation activation = null;
 
-			activation = licenseUtils.authenticateLicense(licensePublic, podAuthentication, locale.getValue());
+			activation = licenseUtils.authenticateLicense(licensePublic, locale.getValue());
 
 			if (activation.isSuccess()) {
 				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
 				if (licensePrivate != null) {
 					licensePublic = licensePrivate.getPublicLicense();
 					
-					if (!licensePublic.isDevicePod()) {
-						
+					if (deviceInfo != null && deviceInfo.getType().equals(DeviceType.PROBE)) {
 						CompanyGroup group = groupRepository.find(licensePublic.getGroupId());
 						if(group != null) {
 							sutUtils.addProbeAsSUT(licensePublic, group.getContextId());

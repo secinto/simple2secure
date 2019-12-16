@@ -297,8 +297,8 @@ public class PortalUtils {
 
 				else if (object.getClass().equals(Device.class)) {
 					Device device = (Device) object;
-					if (!Strings.isNullOrEmpty(device.getDeviceId())) {
-						ids.add(device.getDeviceId());
+					if (!Strings.isNullOrEmpty(device.getInfo().getDeviceId())) {
+						ids.add(device.getInfo().getDeviceId());
 					}
 				}
 			}

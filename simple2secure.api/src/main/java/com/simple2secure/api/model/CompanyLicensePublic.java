@@ -54,9 +54,6 @@ public class CompanyLicensePublic extends GenericDBObject {
 	@JsonProperty
 	protected boolean activated = false;
 
-	@JsonProperty
-	protected boolean deviceIsPod = false;
-	
 
 	public CompanyLicensePublic() {
 	}
@@ -96,14 +93,6 @@ public class CompanyLicensePublic extends GenericDBObject {
 
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
-	}
-
-	public boolean isDevicePod() {
-		return deviceIsPod;
-	}
-
-	public void setDeviceIsPod(boolean deviceIsPod) {
-		this.deviceIsPod = deviceIsPod;
 	}
 
 	public String getLicenseId() {

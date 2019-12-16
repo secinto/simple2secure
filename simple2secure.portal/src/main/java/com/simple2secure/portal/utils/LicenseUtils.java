@@ -36,7 +36,7 @@ public class LicenseUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale)
+	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, String locale)
 			throws UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
 		

@@ -3,7 +3,6 @@ import platform
 
 from flask import json
 
-from src.db.database import DeviceStatus
 
 log = logging.getLogger('pod.util.json_utils')
 
@@ -89,22 +88,3 @@ def construct_command(tool, argument):
     else:
         return tool + ' ' + argument
 
-'''
-PUBLIC_ENUMS = {
-    'DeviceStatus': DeviceStatus
-}
-
-
-class EnumEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if type(obj) in PUBLIC_ENUMS.values():
-            return {"__enum__": str(obj)}
-        return json.JSONEncoder.default(self, obj)
-
-
-def as_enum(d):
-    if "__enum__" in d:
-        name, member = d["__enum__"].split(".")
-        return getattr(PUBLIC_ENUMS[name], member)
-    else:
-        return d'''

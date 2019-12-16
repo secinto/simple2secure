@@ -44,6 +44,7 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
@@ -321,7 +322,7 @@ public class DeviceController extends BaseUtilsProvider {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());
 		if (deviceInfo != null && deviceInfoFromDB == null) {
-			if (!license.isDevicePod()) {
+			if (deviceInfo.getType().equals(DeviceType.PROBE)) {
 				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 				deviceInfoRepository.save(deviceInfo);
 				CompanyGroup group = groupRepository.find(license.getGroupId());
