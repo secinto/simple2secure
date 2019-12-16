@@ -6,5 +6,5 @@
 export const environment = {
   production: false,
   envName: 'dev',
-  apiEndpoint: 'https://localhost:8443/api/'
+  apiEndpoint: 'https://localhost:8443/api/v1/'
 };

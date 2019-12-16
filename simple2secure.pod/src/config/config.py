@@ -9,8 +9,8 @@ class Config(object):
     CELERY_RESULT_BACKEND = "redis://localhost:6379"
     SQLALCHEMY_DATABASE_URI = ""
     POD_ID = ''
-    PORTAL_URL = 'https://localhost:8443/api/'
-    # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/'
+    PORTAL_URL = 'https://localhost:8443/api/v1/'
+    # PORTAL_URL = 'https://simple2secure.info:51001/s2s/api/v1/'
     IS_CELERY = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CONNECTED_WITH_PORTAL = False
