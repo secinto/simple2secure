@@ -39,7 +39,6 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -49,6 +48,7 @@ import simple2secure.validator.model.ValidInputEmailConfig;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.EMAIL_API)
 public class EmailController extends BaseUtilsProvider {
@@ -72,8 +72,7 @@ public class EmailController extends BaseUtilsProvider {
 			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("configuration_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<EmailConfiguration>) buildResponseEntity("configuration_not_found", locale);
 	}
 
 	@ValidRequestMapping()
@@ -92,9 +91,8 @@ public class EmailController extends BaseUtilsProvider {
 		}
 
 		log.error("Error occured while getting email config for user with id {}", contextId.getValue());
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return (ResponseEntity<List<EmailConfigurationDTO>>) buildResponseEntity("problem_occured_while_getting_email_config", locale);
 	}
 
 	/**
@@ -118,8 +116,7 @@ public class EmailController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting email configuration with id {}", emailConfigId);
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return (ResponseEntity<EmailConfiguration>) buildResponseEntity("problem_occured_while_deleting_email_config", locale);
 	}
 }

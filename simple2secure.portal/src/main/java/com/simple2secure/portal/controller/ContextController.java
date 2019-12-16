@@ -44,7 +44,6 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -54,6 +53,7 @@ import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputUser;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.CONTEXT_API)
 public class ContextController extends BaseUtilsProvider {
@@ -103,9 +103,7 @@ public class ContextController extends BaseUtilsProvider {
 									return new ResponseEntity<>(context, HttpStatus.OK);
 								} catch (IOException e) {
 									log.error(e.getMessage());
-									return new ResponseEntity(
-											new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-											HttpStatus.NOT_FOUND);
+									return (ResponseEntity<Context>) buildResponseEntity("unknown_error_occured", locale);
 								}
 
 							}
@@ -113,15 +111,12 @@ public class ContextController extends BaseUtilsProvider {
 					}
 				} else {
 					log.error("Context {} already exist", context.getName());
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_context_exists", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return (ResponseEntity<Context>) buildResponseEntity("problem_occured_context_exists", locale);
 				}
 			}
 		}
 		log.error("Problem occured while adding context");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Context>) buildResponseEntity("unknown_error_occured", locale);
 	}
 
 	/**
@@ -150,8 +145,8 @@ public class ContextController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving contexts for user ID {}" + userId.getValue());
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<ContextDTO>>) buildResponseEntity("unknown_error_occured", locale);
+
 	}
 
 	/**
@@ -178,18 +173,14 @@ public class ContextController extends BaseUtilsProvider {
 				} else {
 					// User not allowed to delete
 					log.error("{} not allowed to delete this default context {}", user.getEmail(), context.getName());
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("not_allowed_to_delete_this_context", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return (ResponseEntity<Context>) buildResponseEntity("not_allowed_to_delete_this_context", locale);
 				}
 
 			}
 
 		}
 		log.error("Problem occured while deleting context {}" + contextId);
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_context", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Context>) buildResponseEntity("problem_occured_while_deleting_context", locale);
 	}
 
 	/**
@@ -222,8 +213,7 @@ public class ContextController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while updating/creating context");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CurrentContext>) buildResponseEntity("unknown_error_occured", locale);
 	}
 
 }

@@ -48,9 +48,11 @@ import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import simple2secure.validator.model.ValidInputLocale;
+
+@SuppressWarnings("unchecked")
 @Component
 public class TestUtils extends BaseServiceProvider {
 
@@ -153,9 +155,9 @@ public class TestUtils extends BaseServiceProvider {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<TestResult> deleteTestResult(String testResultId, String locale) {
-		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale)) {
+
+	public ResponseEntity<TestResult> deleteTestResult(String testResultId, ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale.getValue())) {
 			TestResult testResult = testResultRepository.find(testResultId);
 			if (testResult != null) {
 				testResultRepository.delete(testResult);
@@ -164,8 +166,7 @@ public class TestUtils extends BaseServiceProvider {
 			log.error("Problem occured while deleting test result");
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestResult>) buildResponseEntity("problem_occured_while_deleting_test_result", locale));
 
 	}
 
@@ -176,9 +177,9 @@ public class TestUtils extends BaseServiceProvider {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination, String locale) {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination,
+			ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
 			Map<String, Object> testMap = new HashMap<>();
 			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(
 					testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
@@ -189,8 +190,7 @@ public class TestUtils extends BaseServiceProvider {
 				return new ResponseEntity<>(testMap, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	/**
@@ -200,9 +200,8 @@ public class TestUtils extends BaseServiceProvider {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(String deviceId, String locale) {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(String deviceId, ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
 
 			List<SequenceRun> sequenceRuns = sequenceRunRepository.getSequenceRunByDeviceId(deviceId);
 
@@ -210,8 +209,7 @@ public class TestUtils extends BaseServiceProvider {
 				return new ResponseEntity<>(sequenceRuns, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<SequenceRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	/**
@@ -222,9 +220,9 @@ public class TestUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(String deviceId, String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(String deviceId, ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
 
 			List<TestRun> testRunList = testRunRepository.getPlannedTests(deviceId);
 
@@ -232,8 +230,8 @@ public class TestUtils extends BaseServiceProvider {
 				return new ResponseEntity<>(testRunList, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
-				HttpStatus.NOT_FOUND);
+
+		return ((ResponseEntity<List<TestRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	/**

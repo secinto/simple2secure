@@ -53,6 +53,8 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import simple2secure.validator.model.ValidInputLocale;
+
 @Component
 public class DataInitialization extends BaseServiceProvider {
 
@@ -248,7 +250,8 @@ public class DataInitialization extends BaseServiceProvider {
 				userRegistration.setEmail(email);
 				userRegistration.setRegistrationType(UserRegistrationType.INITIALIZATION);
 				userRegistration.setUserRole(UserRole.SUPERADMIN);
-				userUtils.initializeSecintoUsers(userRegistration, "en");
+				ValidInputLocale locale = new ValidInputLocale("en");
+				userUtils.initializeSecintoUsers(userRegistration, locale);
 			}
 		}
 	}

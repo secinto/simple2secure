@@ -51,7 +51,6 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
@@ -61,6 +60,7 @@ import simple2secure.validator.model.ValidInputGroup;
 import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
 public class LicenseController extends BaseUtilsProvider {
@@ -115,8 +115,7 @@ public class LicenseController extends BaseUtilsProvider {
 				podAuthentication = false;
 			} else {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
 			}
 			LicenseActivation activation = null;
 
@@ -126,11 +125,11 @@ public class LicenseController extends BaseUtilsProvider {
 				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
 				if (licensePrivate != null) {
 					licensePublic = licensePrivate.getPublicLicense();
-					
+
 					if (!licensePublic.isDevicePod()) {
-						
+
 						CompanyGroup group = groupRepository.find(licensePublic.getGroupId());
-						if(group != null) {
+						if (group != null) {
 							sutUtils.addProbeAsSUT(licensePublic, group.getContextId());
 						}
 					}
@@ -138,11 +137,10 @@ public class LicenseController extends BaseUtilsProvider {
 
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
+				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity(activation.getMessage(), locale);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
 	}
 
 	/**
@@ -200,8 +198,7 @@ public class LicenseController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<byte[]>) buildResponseEntity("max_license_number_exceeded", locale);
 	}
 
 	/**

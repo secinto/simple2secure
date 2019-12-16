@@ -41,6 +41,7 @@ import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+@SuppressWarnings("unchecked")
 @Component
 public class DeviceUtils extends BaseServiceProvider {
 
@@ -132,7 +133,7 @@ public class DeviceUtils extends BaseServiceProvider {
 	 * @param context
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+
 	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size) {
 		log.debug("Retrieving pods for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
@@ -172,15 +173,13 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
 		return deviceMap;
 	}
-	
-	
+
 	/**
 	 * This function returns all pods from the current context with merged Test objects.
 	 *
 	 * @param context
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public Map<String, Object> getAllPodsFromCurrentContextPagination(Context context, int page, int size) {
 		log.debug("Retrieving pods for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
@@ -220,7 +219,7 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
 		return deviceMap;
 	}
-	
+
 	/**
 	 * This function deletes the device dependencies for the specified device id
 	 *

@@ -39,7 +39,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -49,6 +48,7 @@ import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputStep;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.STEP_API)
 public class StepController extends BaseUtilsProvider {
@@ -63,8 +63,7 @@ public class StepController extends BaseUtilsProvider {
 		if (steps != null) {
 			return new ResponseEntity<>(steps, HttpStatus.OK);
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<Step>>) buildResponseEntity("error_while_getting_steps", locale));
 	}
 
 	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -84,8 +83,7 @@ public class StepController extends BaseUtilsProvider {
 			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 		log.error("Error while updating step");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Step>) buildResponseEntity("error_while_saving_step", locale));
 	}
 
 	/**
@@ -113,8 +111,6 @@ public class StepController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while deleting step with id {}", stepId.getValue());
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (buildResponseEntity("problem_occured_while_deleting_step", locale));
 	}
 }

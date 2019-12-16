@@ -57,7 +57,6 @@ import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -68,6 +67,7 @@ import simple2secure.validator.model.ValidInputToken;
 import simple2secure.validator.model.ValidInputUser;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.USER_API)
 public class UserController extends BaseUtilsProvider {
@@ -109,8 +109,8 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return ((ResponseEntity<UserDTO>) buildResponseEntity("problem_occured_user_not_found", locale));
 
 	}
 
@@ -134,14 +134,13 @@ public class UserController extends BaseUtilsProvider {
 				user.setCurrentContextId(contextId.getValue());
 				user.setAddedByUserId(userId.getValue());
 
-				return userUtils.addNewUser(user, locale.getValue());
+				return userUtils.addNewUser(user, locale);
 			} else {
-				return userUtils.updateUser(user, locale.getValue());
+				return userUtils.updateUser(user, locale);
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 		}
 	}
 
@@ -158,10 +157,9 @@ public class UserController extends BaseUtilsProvider {
 	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 		if (user != null) {
-			return userUtils.addNewUser(user, locale.getValue());
+			return userUtils.addNewUser(user, locale);
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 		}
 	}
 
@@ -181,15 +179,13 @@ public class UserController extends BaseUtilsProvider {
 			User user = userRepository.findByEmail(email);
 			if (user != null) {
 				if (!user.isActivated()) {
-					return userUtils.resendActivation(user, locale.getValue());
+					return userUtils.resendActivation(user, locale);
 				} else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("user_already_activated", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("user_already_activated", locale));
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 	}
 
 	/**
@@ -212,8 +208,7 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(userInfo, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<UserInfo>) buildResponseEntity("problem_occured_user_not_found", locale));
 	}
 
 	/**
@@ -240,7 +235,7 @@ public class UserController extends BaseUtilsProvider {
 				String error = userUtils.validateUserPassword(user);
 
 				if (!Strings.isNullOrEmpty(error)) {
-					return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity(error, locale));
 				}
 
 				user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -254,14 +249,11 @@ public class UserController extends BaseUtilsProvider {
 				return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
 
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 		}
 
 	}
@@ -307,8 +299,7 @@ public class UserController extends BaseUtilsProvider {
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<InputStreamResource>) buildResponseEntity("activation_token_not_valid", locale));
 		}
 	}
 
@@ -339,17 +330,13 @@ public class UserController extends BaseUtilsProvider {
 				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
 					return new ResponseEntity<>(user, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("error_while_sending_email", locale));
 				}
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_not_exists", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("user_with_provided_email_not_exists", locale));
 			}
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 		}
 	}
 
@@ -422,21 +409,18 @@ public class UserController extends BaseUtilsProvider {
 					} else {
 						log.error("Invitation token expired {}", token);
 						userInvitationRepository.delete(userInvitation);
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_token_expired", locale.getValue())),
-								HttpStatus.NOT_FOUND);
+						return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_token_expired", locale));
 					}
 
 				} else {
 					userInvitationRepository.delete(userInvitation);
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_rejected", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_rejected", locale));
 				}
 
 			}
 		}
 		log.error("Error occured during invitation for invitation token {}", token);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<UserInvitation>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -463,7 +447,7 @@ public class UserController extends BaseUtilsProvider {
 					String error = userUtils.validateUserPassword(user);
 
 					if (!Strings.isNullOrEmpty(error)) {
-						return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
+						return ((ResponseEntity<User>) buildResponseEntity(error, locale));
 					}
 
 					user.setPassword(passwordEncoder.encode(password));
@@ -478,18 +462,14 @@ public class UserController extends BaseUtilsProvider {
 					httpHeaders.setLocation(url);
 					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("password_reset_token_expired", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("password_reset_token_expired", locale));
 				}
 			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("problem_token_already_used", locale));
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 		}
 
 	}
@@ -516,9 +496,7 @@ public class UserController extends BaseUtilsProvider {
 						user.getId());
 				if (contextUserAuthentication != null) {
 					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
-						return new ResponseEntity(
-								new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_superadmin", locale.getValue())),
-								HttpStatus.NOT_FOUND);
+						return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_superadmin", locale));
 					} else {
 						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
 						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
@@ -526,9 +504,7 @@ public class UserController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_user", locale));
 	}
 
 }

@@ -1,16 +1,25 @@
 package com.simple2secure.portal.providers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
 
+import simple2secure.validator.model.ValidInputLocale;
+
 public class BaseServiceProvider extends BaseRepositoryProvider {
+	static final Logger log = LoggerFactory.getLogger(BaseServiceProvider.class);
+
 	/*
 	 * Special services
 	 */
@@ -35,4 +44,14 @@ public class BaseServiceProvider extends BaseRepositoryProvider {
 
 	@Autowired
 	public PasswordValidator passwordValidator;
+
+	protected ResponseEntity<?> buildResponseEntity(String message, ValidInputLocale locale) {
+		log.error("Responding with error for message {}", message);
+
+		ApiError apiError = new ApiError();
+		apiError.setErrorMessage(messageByLocaleService.getMessage(message, locale.getValue()));
+		apiError.setStatus(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+
+	}
 }

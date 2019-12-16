@@ -86,7 +86,7 @@ export class OrbiterToolTestComponent {
 
 	loadPods(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'device/pods' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'device/pods/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.pods = data.devices;
@@ -100,6 +100,7 @@ export class OrbiterToolTestComponent {
 					}
 				},
 				error => {
+					console.log(error);
 					if (error.status == 0) {
 						this.alertService.error(this.translate.instant('server.notresponding'));
 					}

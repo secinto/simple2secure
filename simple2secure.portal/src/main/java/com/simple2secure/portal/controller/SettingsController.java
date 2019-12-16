@@ -42,7 +42,6 @@ import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -52,6 +51,7 @@ import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidInputTestMacro;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SETTINGS_API)
 public class SettingsController extends BaseUtilsProvider {
@@ -72,9 +72,7 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving settings");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_settings", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<SettingsDTO>) buildResponseEntity("problem_occured_while_retrieving_settings", locale));
 
 	}
 
@@ -87,9 +85,7 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(settings, HttpStatus.OK);
 		}
 		log.error("Problem occured while updating settings");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Settings>) buildResponseEntity("problem_occured_while_updating_settings", locale));
 	}
 
 	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -105,9 +101,7 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(licensePlan, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving license plan");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<LicensePlan>) buildResponseEntity("problem_occured_while_updating_settings", locale));
 	}
 
 	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.DELETE)
@@ -123,9 +117,7 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting license plan with id {}", licensePlanId);
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_license_plan", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<LicensePlan>) buildResponseEntity("problem_occured_while_deleting_license_plan", locale));
 
 	}
 
@@ -142,9 +134,7 @@ public class SettingsController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting test macro with id {}", testMacroId.getValue());
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_macro", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestMacro>) buildResponseEntity("problem_occured_while_deleting_test_macro", locale));
 
 	}
 
@@ -161,8 +151,6 @@ public class SettingsController extends BaseUtilsProvider {
 			return new ResponseEntity<>(testMacro, HttpStatus.OK);
 		}
 		log.error("Problem occured while saving test macro");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_settings", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestMacro>) buildResponseEntity("problem_occured_while_updating_settings", locale));
 	}
 }

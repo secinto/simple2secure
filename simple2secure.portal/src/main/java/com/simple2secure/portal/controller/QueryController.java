@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +47,6 @@ import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -60,6 +58,7 @@ import simple2secure.validator.model.ValidInputOsinfo;
 import simple2secure.validator.model.ValidInputQuery;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
 public class QueryController extends BaseUtilsProvider {
@@ -86,8 +85,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Query configuration not found for the query ID {}", queryId.getValue());
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQuery>) buildResponseEntity("queryrun_not_found", locale);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -106,8 +104,7 @@ public class QueryController extends BaseUtilsProvider {
 			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<OsQueryDTO>>) buildResponseEntity("error_while_getting_queryrun", locale);
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -122,8 +119,8 @@ public class QueryController extends BaseUtilsProvider {
 				return new ResponseEntity<>(queryList, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_getting_queryrun", locale);
 	}
 
 	/**
@@ -149,8 +146,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQuery>) buildResponseEntity("error_while_update_queryrun", locale);
 
 	}
 
@@ -179,9 +175,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return (ResponseEntity<OsQueryCategory>) buildResponseEntity("error_while_update_queryrun", locale);
 	}
 
 	/**
@@ -202,8 +196,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_update_queryrun", locale);
 
 	}
 
@@ -223,8 +216,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting query run with id {}", queryId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun",
-				ObjectUtils.toObjectArray(queryId), locale.getValue())), HttpStatus.NOT_FOUND);
+		return buildResponseEntity("problem_occured_while_deleting_queryrun", locale);
 	}
 
 	/**
@@ -269,8 +261,9 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while getting query run for the probe id {}", deviceId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_getting_queryrun", locale);
+
 	}
 
 	/**
@@ -308,7 +301,6 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("queryrun_not_found", locale);
 	}
 }

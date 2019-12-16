@@ -49,7 +49,6 @@ import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -62,6 +61,7 @@ import simple2secure.validator.model.ValidInputPage;
 import simple2secure.validator.model.ValidInputSize;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.DEVICE_API)
 public class DeviceController extends BaseUtilsProvider {
@@ -92,13 +92,10 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving devices for contextId {}", contextId.getValue());
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_devices", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_devices", locale);
 
 	}
-	
-	
+
 	/**
 	 * This function returns all pods according to the contextId
 	 *
@@ -123,10 +120,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return (ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_getting_retrieving_pods", locale);
 	}
 
 	/**
@@ -150,9 +144,7 @@ public class DeviceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_user_devices", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<Device>>) buildResponseEntity("problem_occured_while_getting_user_devices", locale);
 
 	}
 
@@ -179,10 +171,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		log.error("Problem occured while retrieving pods for contextId {}", contextId);
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return (ResponseEntity<List<Device>>) buildResponseEntity("problem_occured_while_getting_retrieving_pods", locale);
 	}
 
 	/**
@@ -229,13 +218,10 @@ public class DeviceController extends BaseUtilsProvider {
 		if (devInfo != null) {
 			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(devInfo);
-			return testUtils.getScheduledTestsByDeviceId(deviceId.getValue(), locale.getValue());
+			return testUtils.getScheduledTestsByDeviceId(deviceId.getValue(), locale);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_tests", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return (ResponseEntity<List<TestRun>>) buildResponseEntity("problem_occured_while_retrieving_scheduled_tests", locale);
 	}
 
 	/**
@@ -258,9 +244,7 @@ public class DeviceController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while deleting device with id {}", deviceId);
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_device", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyLicensePrivate>) buildResponseEntity("problem_occured_while_deleting_device", locale);
 	}
 
 	/**
@@ -288,10 +272,7 @@ public class DeviceController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while updating group for device id {}", deviceId.getValue());
-
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_device_group", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyLicensePrivate>) buildResponseEntity("problem_occured_while_updating_device_group", locale);
 	}
 
 	@ValidRequestMapping(value = "/status")

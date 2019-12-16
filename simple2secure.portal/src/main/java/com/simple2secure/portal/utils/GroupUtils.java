@@ -41,9 +41,11 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import simple2secure.validator.model.ValidInputLocale;
+
+@SuppressWarnings("unchecked")
 @Component
 public class GroupUtils extends BaseServiceProvider {
 
@@ -262,9 +264,9 @@ public class GroupUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user, String locale)
-			throws ItemNotFoundRepositoryException {
+
+	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user,
+			ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (fromGroup != null) {
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(fromGroup.getContextId(),
@@ -328,8 +330,7 @@ public class GroupUtils extends BaseServiceProvider {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-				HttpStatus.NO_CONTENT);
+		return ((ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_moving_group", locale));
 	}
 
 	/**

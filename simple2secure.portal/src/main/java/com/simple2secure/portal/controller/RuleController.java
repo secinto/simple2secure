@@ -44,7 +44,6 @@ import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -61,6 +60,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
  *         In this class all request for the rules between web and server are implemented
  *
  */
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.RULE_API)
 public class RuleController extends BaseUtilsProvider {
@@ -79,6 +79,7 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
+
 	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
@@ -99,9 +100,7 @@ public class RuleController extends BaseUtilsProvider {
 			return new ResponseEntity<>(ruleWithSourcecode, HttpStatus.OK);
 
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<RuleWithSourcecode>) buildResponseEntity("rule_not_found", locale));
 	}
 
 	/**
@@ -136,9 +135,8 @@ public class RuleController extends BaseUtilsProvider {
 			return new ResponseEntity<>(templateRule, HttpStatus.OK);
 
 		}
+		return ((ResponseEntity<TemplateRule>) buildResponseEntity("rule_not_found", locale));
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -161,14 +159,12 @@ public class RuleController extends BaseUtilsProvider {
 
 			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
 
-			if (templateRules != null) {
+			if (templateRules != null && templateRules.size() > 0) {
 				return new ResponseEntity<>(templateRules, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<TemplateRule>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
 
 	/**
@@ -196,9 +192,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<RuleWithSourcecode>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
 
 	/**
@@ -224,7 +218,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return (ResponseEntity<Collection<TemplateCondition>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 		}
 
 		return new ResponseEntity<>(conditions, HttpStatus.OK);
@@ -253,7 +247,7 @@ public class RuleController extends BaseUtilsProvider {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return (ResponseEntity<Collection<TemplateAction>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 		}
 
 		return new ResponseEntity<>(actions, HttpStatus.OK);
@@ -282,9 +276,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<RuleWithSourcecode>) buildResponseEntity("problem_occured_while_deleting_rule", locale);
 
 	}
 
@@ -311,9 +303,7 @@ public class RuleController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<TemplateRule>) buildResponseEntity("problem_occured_while_deleting_rule", locale);
 
 	}
 
