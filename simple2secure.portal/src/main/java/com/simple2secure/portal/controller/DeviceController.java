@@ -144,7 +144,7 @@ public class DeviceController extends BaseUtilsProvider {
 			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
 			if (groupIds != null) {
-				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds, false);
+				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds);
 				if (devices != null) {
 					return new ResponseEntity<>(devices, HttpStatus.OK);
 				}

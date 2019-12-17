@@ -30,8 +30,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class LicenseRepository extends MongoRepository<CompanyLicensePrivate> {
 	public abstract List<CompanyLicensePrivate> findAllByGroupId(String groupId);
 
-	public abstract List<CompanyLicensePrivate> findByGroupIdAndDeviceType(String groupId, boolean deviceIsPod);
-
 	public abstract List<CompanyLicensePrivate> findByUserId(String userId);
 
 	public abstract CompanyLicensePrivate findByDeviceId(String deviceId);
@@ -40,7 +38,7 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
 
-	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId, boolean deviceIsPod);
+	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId);
 
 	public abstract CompanyLicensePrivate findByLicenseAndHostname(String licenseId, String hostname);
 
@@ -54,8 +52,8 @@ public abstract class LicenseRepository extends MongoRepository<CompanyLicensePr
 
 	public abstract void deleteByDeviceId(String deviceId);
 
-	public abstract Map<String, Object> findByListOfGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod, int page, int size);
+	public abstract Map<String, Object> findByGroupIdsPaged(List<String> groupIds, int page, int size);
 
-	public abstract List<CompanyLicensePrivate> findByGroupIdsAndDeviceType(List<String> groupIds, boolean deviceIsPod);
+	public abstract List<CompanyLicensePrivate> findByGroupIds(List<String> groupIds);
 
 }

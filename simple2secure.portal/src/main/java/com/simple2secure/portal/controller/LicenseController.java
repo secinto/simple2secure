@@ -111,17 +111,6 @@ public class LicenseController extends BaseUtilsProvider {
 		if (licensePublic != null) {
 			DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(licensePublic.getDeviceId());
 			
-			/*
-			boolean podAuthentication = false;
-			if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && licensePublic.isDevicePod()) {
-				podAuthentication = true;
-			} else if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && !licensePublic.isDevicePod()) {
-				podAuthentication = false;
-			} else {
-				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
-						HttpStatus.NOT_FOUND);
-			}*/
 			LicenseActivation activation = null;
 
 			activation = licenseUtils.authenticateLicense(licensePublic, locale.getValue());

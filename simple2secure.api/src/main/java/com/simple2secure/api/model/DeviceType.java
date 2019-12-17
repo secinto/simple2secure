@@ -26,6 +26,6 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public enum DeviceType {
-	PROBE, WWW, UNKNOWN
+	PROBE, POD, WWW, UNKNOWN
 }
 

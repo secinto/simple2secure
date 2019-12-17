@@ -12,7 +12,11 @@ class DeviceStatus(str, Enum):
 
 
 class DeviceType(str, Enum):
+    PROBE = 'PROBE'
     POD = 'POD'
+    WWW = 'WWW'
+    UNKNOWN = 'UNKNOWN'
+
 
 
 class PodInfo(db.Model):
@@ -42,16 +46,16 @@ class DeviceInfo(db.Model):
     netMask = db.Column(db.Text)
     deviceStatus = db.Column(db.Enum(DeviceStatus))
     lastOnlineTimestamp = db.Column(db.Float)
-    deviceType = db.Column(db.Enum(DeviceType))
+    type = db.Column(db.Enum(DeviceType))
 
-    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, deviceType = DeviceType.POD):
+    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, type = DeviceType.POD):
         self.deviceId = deviceId
         self.hostName = hostName
         self.ipAddress = ipAddress
         self.netMask = netMask
         self.deviceStatus = deviceStatus
         self.lastOnlineTimestamp = lastOnlineTimestamp
-        self.deviceType = deviceType
+        self.type = type
 
 
 class Test(db.Model):
