@@ -24,8 +24,22 @@ package com.simple2secure.api.model;
 
 import javax.persistence.Embeddable;
 
+import org.apache.commons.lang3.StringUtils;
+
 @Embeddable
 public enum DeviceType {
-	PROBE, POD, WWW, UNKNOWN
-}
+	PROBE, POD, SUT, UNKNOWN;
 
+	public static DeviceType getDeviceType(String type) {
+		switch (StringUtils.upperCase(type)) {
+		case "PROBE":
+			return DeviceType.PROBE;
+		case "POD":
+			return DeviceType.POD;
+		case "SUT":
+			return DeviceType.SUT;
+		default:
+			return DeviceType.UNKNOWN;
+		}
+	}
+}
