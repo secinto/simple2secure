@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit{
 							this.alertService.error(error.error.errorMessage);
 						}
 						else{
-							this.alertService.error("Unauthorized");
+							this.alertService.error('Unauthorized');
 						}
 
 					}

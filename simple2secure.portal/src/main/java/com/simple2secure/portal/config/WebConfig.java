@@ -15,8 +15,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.simple2secure.portal.validator.ServerProvidedValueValidation;
-import com.simple2secure.portal.validator.StringToValidInputConverterFactory;
+import com.simple2secure.portal.validation.ServerProvidedValueValidation;
+import com.simple2secure.portal.validation.StringToValidInputConverterFactory;
 
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;

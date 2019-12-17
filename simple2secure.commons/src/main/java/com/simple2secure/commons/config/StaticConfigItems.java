@@ -52,6 +52,8 @@ public class StaticConfigItems {
 	public static final int SNAPLEN = 65536; // [bytes]
 	public static final int READ_TIMEOUT = 10; // [ms]
 
+	public static final long tokenValidity = 24 * 60 * 60 * 100;
+
 	public static final String DEFAULT_PROCESSOR = "default";
 	public static final String CONFIG_JSON_LOCATION = "/configuration/config.json";
 	public static final String QUERIES_JSON_LOCATION = "/configuration/queries.json";
@@ -71,31 +73,37 @@ public class StaticConfigItems {
 	public static final int DEFAULT_VALUE_SIZE = 10;
 	public static final int MAX_VALUE_SIZE = 10;
 	public static final LocaleLanguage DEFAULT_LOCALE = LocaleLanguage.ENGLISH;
-	
-	public static final String CONFIG_API = "/api/config";
-	public static final String CONTEXT_API = "/api/context";
-	public static final String DASH_API = "/api/dash";
-	public static final String DEVICE_API = "/api/device";
-	public static final String DOWNLOAD_API = "/api/download";
-	public static final String EMAIL_API = "/api/email";
-	public static final String GROUP_API = "/api/group";
-	public static final String LICENSE_API = "/api/license";
-	public static final String NOTIFICATION_API = "/api/notification";
-	public static final String PROCESSOR_API = "/api/processors";
-	public static final String QUERY_API = "/api/query";
-	public static final String REPORT_API = "/api/reports";
-	public static final String RULE_API = "/api/rule";
-	public static final String SEARCH_API = "/api/search";
-	public static final String SERVICE_API = "/api/service";
-	public static final String SETTINGS_API = "/api/settings";
-	public static final String STEP_API = "/api/steps";
-	public static final String SUT_API = "/api/sut";
-	public static final String TEST_API = "/api/test";
-	public static final String SEQUENCE_API = "/api/sequence";
-	public static final String USER_API = "/api/user";
-	public static final String WIDGET_API = "/api/widget";
-	public static final String ERROR_API = "/api/error";
-	
+
+	public static final String API_PREFIX = "/api";
+
+	public static final String API_VERSION = "/v1";
+
+	public static final String API_ENDPOINT = API_PREFIX + API_VERSION;
+
+	public static final String CONTEXT_API = API_ENDPOINT + "/context";
+	public static final String DASH_API = API_ENDPOINT + "/dash";
+	public static final String DEVICE_API = API_ENDPOINT + "/devices";
+	public static final String DOWNLOAD_API = API_ENDPOINT + "/download";
+	public static final String EMAIL_API = API_ENDPOINT + "/email";
+	public static final String GROUP_API = API_ENDPOINT + "/group";
+	public static final String LICENSE_API = API_ENDPOINT + "/license";
+	public static final String NOTIFICATION_API = API_ENDPOINT + "/notification";
+	public static final String PROCESSOR_API = API_ENDPOINT + "/processors";
+	public static final String QUERY_API = API_ENDPOINT + "/query";
+	public static final String REPORT_API = API_ENDPOINT + "/reports";
+	public static final String RULE_API = API_ENDPOINT + "/rule";
+	public static final String SEARCH_API = API_ENDPOINT + "/search";
+	public static final String SERVICE_API = API_ENDPOINT + "/service";
+	public static final String SETTINGS_API = API_ENDPOINT + "/settings";
+	public static final String STEP_API = API_ENDPOINT + "/steps";
+	public static final String SUT_API = API_ENDPOINT + "/sut";
+	public static final String TEST_API = API_ENDPOINT + "/test";
+	public static final String SEQUENCE_API = API_ENDPOINT + "/sequence";
+	public static final String USER_API = API_ENDPOINT + "/user";
+	public static final String WIDGET_API = API_ENDPOINT + "/widget";
+	public static final String ERROR_API = API_ENDPOINT + "/error";
+	public static final String LOGIN_API = API_ENDPOINT + "/login";
+
 	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
 	public static final String DESTGROUP_ANNOTATION_TAG = "/{destGroupId}";
 	public static final String DEVICE_ANNOTATION_TAG = "/{deviceId}";

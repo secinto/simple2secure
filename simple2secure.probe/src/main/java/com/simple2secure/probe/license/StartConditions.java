@@ -22,5 +22,5 @@
 package com.simple2secure.probe.license;
 
 public enum StartConditions {
-	LICENSE_NOT_AVAILABLE, LICENSE_VALID;
+	LICENSE_NOT_AVAILABLE, LICENSE_NOT_VALID, LICENSE_VALID;
 }

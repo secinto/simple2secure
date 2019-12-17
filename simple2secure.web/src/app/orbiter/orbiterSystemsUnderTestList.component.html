@@ -12,31 +12,31 @@
 
 				<ng-container matColumnDef="name">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
 				</ng-container>
 
 				<ng-container matColumnDef="groupId">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.groupId}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.group.groupId}}</mat-cell>
 				</ng-container>
 
-				<ng-container matColumnDef="endDevice">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.endDevice' | translate }}
+				<ng-container matColumnDef="device">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.device' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.endDeviceType}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.type}}</mat-cell>
 				</ng-container>
 				
 				<ng-container matColumnDef="ipAdress">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAdress' | translate }}
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.ipAdress}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.ipAddress}}</mat-cell>
 				</ng-container>
 				
 				<ng-container matColumnDef="deviceStatus">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.deviceStatus}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.deviceStatus}}</mat-cell>
 				</ng-container>
 
 				<mat-header-row *matHeaderRowDef="displayedColumnsMonitored"></mat-header-row>
@@ -70,25 +70,19 @@
 
 				<ng-container matColumnDef="name">
 					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
 				</ng-container>
 
-				<ng-container matColumnDef="groupId">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
+				<ng-container matColumnDef="device">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.device' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.groupId}}</mat-cell>
-				</ng-container>
-
-				<ng-container matColumnDef="endDevice">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.endDevice' | translate }}
-					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.endDeviceType}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.systemType}}</mat-cell>
 				</ng-container>
 				
 				<ng-container matColumnDef="ipAdress">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAdress' | translate }}
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
 					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.ipAdress}}</mat-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.ipAddress}}</mat-cell>
 				</ng-container>
 
 

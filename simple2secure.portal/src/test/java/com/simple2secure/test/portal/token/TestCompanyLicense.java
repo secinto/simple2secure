@@ -38,7 +38,7 @@ public class TestCompanyLicense {
 
 	@Test
 	public void testLicenseCasting() {
-		CompanyLicensePrivate license = new CompanyLicensePrivate("my group", "l1111", "20/12/2018", false);
+		CompanyLicensePrivate license = new CompanyLicensePrivate("my group", "l1111", "20/12/2018");
 		license.setDeviceId("dadfas");
 		license.setAccessToken("Sasdfasdf");
 		license.setTokenSecret("SECRET");

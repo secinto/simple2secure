@@ -50,14 +50,14 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputDevice;
+import com.simple2secure.portal.validation.model.ValidInputGroup;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputOsinfo;
+import com.simple2secure.portal.validation.model.ValidInputQuery;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputDevice;
-import simple2secure.validator.model.ValidInputGroup;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputOsinfo;
-import simple2secure.validator.model.ValidInputQuery;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController

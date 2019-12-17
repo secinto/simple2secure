@@ -44,18 +44,6 @@ public class LoadedConfigItems {
 
 	private String[] trustedCertificates = new String[0];
 
-	private String usersAPI = "/api/user";
-	private String loginAPI = "/api/login";
-	private String reportsAPI = "/api/reports";
-	private String queryAPI = "/api/query";
-	private String deviceAPI = "/api/device";
-	private String packetAPI = "/api/packet";
-	private String stepAPI = "/api/steps";
-	private String processorAPI = "/api/processors";
-	private String licenseAPI = "/api/license";
-	private String serviceAPI = "/api/service";
-	private String groupAPI = "/api/group";
-
 	private static LoadedConfigItems instance;
 
 	public static LoadedConfigItems getInstance() {
@@ -128,50 +116,6 @@ public class LoadedConfigItems {
 
 	public String getBaseURLWeb() {
 		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
-	}
-
-	public String getUsersAPI() {
-		return getBaseURL() + usersAPI;
-	}
-
-	public String getLoginAPI() {
-		return getBaseURL() + loginAPI;
-	}
-
-	public String getReportsAPI() {
-		return getBaseURL() + reportsAPI;
-	}
-
-	public String getQueryAPI() {
-		return getBaseURL() + queryAPI;
-	}
-
-	public String getDeviceAPI() {
-		return getBaseURL() + deviceAPI;
-	}
-
-	public String getPacketAPI() {
-		return getBaseURL() + packetAPI;
-	}
-
-	public String getStepAPI() {
-		return getBaseURL() + stepAPI;
-	}
-
-	public String getProcessorAPI() {
-		return getBaseURL() + processorAPI;
-	}
-
-	public String getLicenseAPI() {
-		return getBaseURL() + licenseAPI;
-	}
-
-	public String getServiceAPI() {
-		return getBaseURL() + serviceAPI;
-	}
-
-	public String getGroupAPI() {
-		return getBaseURL() + groupAPI;
 	}
 
 	public String getVersion() {
