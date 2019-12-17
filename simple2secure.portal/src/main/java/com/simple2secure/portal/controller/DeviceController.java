@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
-import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
@@ -51,15 +50,16 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputDevice;
+import com.simple2secure.portal.validation.model.ValidInputDeviceType;
+import com.simple2secure.portal.validation.model.ValidInputHostname;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputPage;
+import com.simple2secure.portal.validation.model.ValidInputSize;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputDevice;
-import simple2secure.validator.model.ValidInputHostname;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputPage;
-import simple2secure.validator.model.ValidInputSize;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController
@@ -82,10 +82,11 @@ public class DeviceController extends BaseUtilsProvider {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> pods = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page.getValue(), size.getValue());
+				Map<String, Object> devices = deviceUtils.getAllDevicesFromCurrentContextPagination(context, null, page.getValue(),
+						size.getValue());
 
-				if (pods != null) {
-					return new ResponseEntity<>(pods, HttpStatus.OK);
+				if (devices != null) {
+					return new ResponseEntity<>(devices, HttpStatus.OK);
 				}
 			}
 		}
@@ -99,32 +100,32 @@ public class DeviceController extends BaseUtilsProvider {
 	}
 
 	/**
-	 * This function returns all pods according to the contextId
+	 * This function returns all devices according to the contextId
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(
-			value = "/pods")
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getPodsByContextId(@ServerProvidedValue ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<Map<String, Object>> getDevicesByContextIdAndType(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(deviceType.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> pods = deviceUtils.getAllPodsFromCurrentContextPagination(context, page.getValue(), size.getValue());
+				Map<String, Object> devices = deviceUtils.getAllDevicesFromCurrentContextPagination(context, deviceType.getValue(), page.getValue(),
+						size.getValue());
 
-				if (pods != null) {
-					return new ResponseEntity<>(pods, HttpStatus.OK);
+				if (devices != null) {
+					return new ResponseEntity<>(devices, HttpStatus.OK);
 				}
 			}
 		}
 
-		log.error("Problem occured while retrieving pods for contextId {}", contextId.getValue());
+		log.error("Problem occured while retrieving devices for contextId {} and deviceType {}", contextId.getValue(), deviceType.getValue());
 
 		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_pods", locale.getValue())),
+				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_devices", locale.getValue())),
 				HttpStatus.NOT_FOUND);
 
 	}
@@ -138,14 +139,14 @@ public class DeviceController extends BaseUtilsProvider {
 			value = "/group",
 			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Device>> getPodsByGroupId(@RequestBody List<CompanyGroup> groups, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+	public ResponseEntity<List<Device>> getDevicesByGroupId(@RequestBody List<CompanyGroup> groups,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (groups != null) {
 			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 
 			if (groupIds != null) {
-				List<Device> devices = deviceUtils.getAllProbesByGroupIds(groupIds);
+				List<Device> devices = deviceUtils.getAllDevicesByGroupIds(groupIds);
 				if (devices != null) {
 					return new ResponseEntity<>(devices, HttpStatus.OK);
 				}
@@ -165,16 +166,16 @@ public class DeviceController extends BaseUtilsProvider {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Device>> getPodsByContextIdAndStatus(@ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<List<Device>> getDevicesByContextIdAndStatus(@ServerProvidedValue ValidInputContext contextId,
 			@RequestParam boolean active, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<Device> pods = deviceUtils.getAllDevicesFromCurrentContext(context, active);
+				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, active);
 
-				if (pods != null) {
-					return new ResponseEntity<>(pods, HttpStatus.OK);
+				if (devices != null) {
+					return new ResponseEntity<>(devices, HttpStatus.OK);
 				}
 			}
 		}
@@ -250,7 +251,7 @@ public class DeviceController extends BaseUtilsProvider {
 			value = "/delete",
 			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deletePod(@PathVariable ValidInputDevice deviceId,
+	public ResponseEntity<CompanyLicensePrivate> deleteDevice(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
@@ -321,7 +322,6 @@ public class DeviceController extends BaseUtilsProvider {
 			if (devInfo != null) {
 				devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
 				deviceInfoRepository.update(devInfo);
-				sutUtils.updateSUTLastOnlineTtimestamp(devInfo.getDeviceId(), System.currentTimeMillis());
 			}
 		}
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
@@ -333,24 +333,16 @@ public class DeviceController extends BaseUtilsProvider {
 	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
-		CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceInfo.getDeviceId());
 		if (deviceInfo != null && deviceInfoFromDB == null) {
-			if (!license.isDevicePod()) {
-				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-				deviceInfoRepository.save(deviceInfo);
-				CompanyGroup group = groupRepository.find(license.getGroupId());
-				sutUtils.addProbeAsSUT(license, group.getContextId());
-				deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
-			} else {
-				deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-				deviceInfoRepository.save(deviceInfo);
-				deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
-			}
+			/*
+			 * TODO: Verify if this still works
+			 */
+			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+			deviceInfoRepository.save(deviceInfo);
+			deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
 		} else if (deviceInfo != null && deviceInfoFromDB != null) {
 			deviceInfoFromDB.setLastOnlineTimestamp(System.currentTimeMillis());
 			deviceInfoRepository.update(deviceInfoFromDB);
-			deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
-			sutUtils.updateSUTLastOnlineTtimestamp(deviceInfoFromDB.getDeviceId(), System.currentTimeMillis());
 		}
 		return new ResponseEntity<>(deviceInfoFromDB, HttpStatus.OK);
 	}

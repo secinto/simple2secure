@@ -141,7 +141,7 @@ export class OsQueryReportOverviewComponent {
 	}
 
 	getProbesByGroupIds(groups: CompanyGroup[]) {
-		this.httpService.post(groups,environment.apiEndpoint + 'device/group')
+		this.httpService.post(groups,environment.apiEndpoint + 'devices/group')
 			.subscribe(
 				data => {
 					this.devices = data;
@@ -178,7 +178,7 @@ export class OsQueryReportOverviewComponent {
 
 	private loadReportsByDeviceIds(devices: Device[], page: number, size: number){
 		this.loading = true;
-		this.httpService.post(devices,environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
+		this.httpService.post(devices, environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.reportDTO = data;

@@ -193,6 +193,9 @@ public class ProbeConfiguration {
 	 * license is not valid anymore the properties are set accordingly.
 	 */
 	private void verifyLicense() {
+		/*
+		 * TODO: Provide a check that it is only performed if no auth token is available or if it must be renewed.
+		 */
 		if (licenseController.authenticateLicense()) {
 			isLicenseValid = true;
 			if (support != null) {
@@ -407,7 +410,8 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Processor} objects.
 	 */
 	public List<Processor> getProcessorsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getProcessorAPI(), ProbeConfiguration.authKey);
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.PROCESSOR_API,
+				ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
 			Processor[] processorArray = JSONUtils.fromString(response, Processor[].class);
 			if (processorArray != null && processorArray.length > 0) {
@@ -466,7 +470,8 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link Step} objects.
 	 */
 	private List<Step> getStepsFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getStepAPI() + "?select_all=false", ProbeConfiguration.authKey);
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.STEP_API + "?select_all=false",
+				ProbeConfiguration.authKey);
 
 		if (!Strings.isNullOrEmpty(response)) {
 			Step[] stepArray = JSONUtils.fromString(response, Step[].class);
@@ -526,8 +531,8 @@ public class ProbeConfiguration {
 	 * @return The obtained List of {@link OsQuery} objects.
 	 */
 	private List<OsQuery> getQueriesFromAPI() {
-		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getQueryAPI() + "/" + ProbeConfiguration.probeId + "/"
-				+ ProbeConfiguration.osinfo + "?select_all=false", ProbeConfiguration.authKey);
+		String response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.QUERY_API + "/"
+				+ ProbeConfiguration.probeId + "/" + ProbeConfiguration.osinfo + "?select_all=false", ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
 			OsQuery[] queryRunArray = JSONUtils.fromString(response, OsQuery[].class);
 			if (queryRunArray != null && queryRunArray.length > 0) {

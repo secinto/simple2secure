@@ -49,11 +49,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.UserRepository;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestUserLogin {
@@ -109,7 +112,8 @@ public class TestUserLogin {
 
 		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getBaseURL() + StaticConfigItems.LOGIN_API,
+				HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
@@ -137,7 +141,8 @@ public class TestUserLogin {
 
 		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getBaseURL() + StaticConfigItems.LOGIN_API,
+				HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");

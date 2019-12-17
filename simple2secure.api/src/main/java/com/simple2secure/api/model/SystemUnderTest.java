@@ -26,115 +26,33 @@ import javax.persistence.Embedded;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class SystemUnderTest extends GenericDBObject {
 
-    /**
-	 * 
-	 */
+	/**
+	*
+	*/
 	private static final long serialVersionUID = 5020907897089097628L;
 
-    private String contextId;
-    private String endDeviceId;
-    @Embedded
-    private String endDeviceType;
-    private String endDeviceLocation;
-    private String name;
+	private @NonNull String contextId;
+	private @NonNull String deviceId;
+	private @NonNull String name;
 	private String ipAdress;
-    private String netMask;
-    private DeviceStatus deviceStatus;
-    private long lastOnlineTimestamp;
-    
+	private String netMask;
+	private String uri;
+	@Embedded
+	private @NonNull SystemType systemType;
+	private String deviceLocation;
+	private DeviceStatus deviceStatus;
+	private long lastOnlineTimestamp;
 
-    public SystemUnderTest(){
-    }
-
-    public SystemUnderTest(String contextId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
-    		String name,  String ipAdress, String netMask){
-        setContextId(contextId);
-        setEndDeviceId(endDeviceId);
-        setEndDeviceType(endDeviceType);
-        setEndDeviceLocation(endDeviceLocation);
-        setName(name);
-        setIpAdress(ipAdress);
-        setNetMask(netMask);
-    }
-    
-    public SystemUnderTest(String groupId, String endDeviceId, String endDeviceType, String endDeviceLocation, 
-    		String name,  String ipAdress, String netMask, DeviceStatus deviceStatus, long lastOnlineTimestamp){
-    	this(groupId, endDeviceId, endDeviceType, endDeviceLocation, name, ipAdress, netMask);
-        setDeviceStatus(deviceStatus);
-        setLastOnlineTimestamp(lastOnlineTimestamp);
-    }
-
-    public String getContextId() {
-        return contextId;
-    }
-
-    public void setContextId(String contextId) {
-        this.contextId = contextId;
-    }
-    
-    public String getEndDeviceId() {
-		return endDeviceId;
-	}
-
-	public void setEndDeviceId(String endDeviceId) {
-		this.endDeviceId = endDeviceId;
-	}
-
-    public String getEndDeviceType() {
-        return endDeviceType;
-    }
-
-    public void setEndDeviceType(String endDeviceType) {
-        this.endDeviceType = endDeviceType;
-    }
-
-    public String getEndDeviceLocation() {
-        return endDeviceLocation;
-    }
-
-    public void setEndDeviceLocation(String endDeviceLocation) {
-        this.endDeviceLocation = endDeviceLocation;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getIpAdress() {
-		return ipAdress;
-	}
-
-	public void setIpAdress(String ipAdress) {
-		this.ipAdress = ipAdress;
-	}
-
-	public String getNetMask() {
-		return netMask;
-	}
-
-	public void setNetMask(String netMask) {
-		this.netMask = netMask;
-	}
-
-	public DeviceStatus getDeviceStatus() {
-		return deviceStatus;
-	}
-
-	public void setDeviceStatus(DeviceStatus deviceStatus) {
-		this.deviceStatus = deviceStatus;
-	}
-
-	public long getLastOnlineTimestamp() {
-		return lastOnlineTimestamp;
-	}
-
-	public void setLastOnlineTimestamp(long lastOnlineTimestamp) {
-		this.lastOnlineTimestamp = lastOnlineTimestamp;
-	}
 }

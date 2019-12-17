@@ -29,10 +29,14 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
 
-	public abstract SystemUnderTest getByEndDeviceId(String endDeviceId);
+	public abstract SystemUnderTest getByDeviceId(String deviceId);
 
-	public abstract long getTotalAmountOfSystemUnderTest(String contextId, String deviceType);
+	public abstract long getTotalAmountOfSystemUnderTest(String contextId);
 
-	public abstract List<SystemUnderTest> getByContextIdAndType(String contextId, int page, int size, String deviceType);
+	public abstract long getTotalAmountOfSystemUnderTestWithType(String contextId, String deviceType);
+
+	public abstract List<SystemUnderTest> getAllByContextIdPaged(String contextId, int page, int size);
+
+	public abstract List<SystemUnderTest> getAllByContextIdAndSystemTypePaged(String contextId, int page, int size, String type);
 
 }

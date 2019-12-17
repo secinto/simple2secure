@@ -22,36 +22,13 @@
 
 package com.simple2secure.api.model;
 
+import lombok.Data;
+import lombok.NonNull;
+
+@Data
 public class Device {
 
-	private CompanyGroup group;
-	private DeviceInfo info;
-
-	public Device() {
-
-	}
-
-	public Device(CompanyGroup group, DeviceInfo info) {
-		super();
-
-		this.group = group;
-		this.info = info;
-	}
-
-	public CompanyGroup getGroup() {
-		return group;
-	}
-
-	public void setGroup(CompanyGroup group) {
-		this.group = group;
-	}
-
-	public DeviceInfo getInfo() {
-		return info;
-	}
-
-	public void setInfo(DeviceInfo info) {
-		this.info = info;
-	}
+	private @NonNull CompanyGroup group;
+	private @NonNull DeviceInfo info;
 
 }

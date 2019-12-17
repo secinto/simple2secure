@@ -56,10 +56,10 @@ import { TestSequenceResultComponent } from './report/testSequenceResult.compone
 import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
 import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
 import {DevicesComponent, DevicesOverviewComponent, DevicesListComponent} from './devices';
-import {QueriesComponent} from "./queries";
-import {QueryOverviewComponent} from "./queries/queryOverview.component";
-import {QueryListComponent} from "./queries/queryList.component";
-import {QueryAssignComponent} from "./queries/queryAssign.component";
+import {QueriesComponent} from './queries';
+import {QueryOverviewComponent} from './queries/queryOverview.component';
+import {QueryListComponent} from './queries/queryList.component';
+import {QueryAssignComponent} from './queries/queryAssign.component';
 
 const appRoutes: Routes = [
 	{

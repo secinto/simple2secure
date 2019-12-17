@@ -31,6 +31,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -40,8 +41,11 @@ public class ReportScheduler extends TimerTask {
 
 	private static Logger log = LoggerFactory.getLogger(ReportScheduler.class);
 
+	private final String reportAPI;
+
 	public ReportScheduler() {
 		// TODO Auto-generated constructor stub
+		reportAPI = LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.REPORT_API;
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class ReportScheduler extends TimerTask {
 			}
 			log.info("Sending query report {} with timestamp {} to the API.", report.getName(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(reportAPI, report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
 				DBUtil.getInstance().delete(report);
 			}
@@ -97,8 +101,7 @@ public class ReportScheduler extends TimerTask {
 
 			log.info("Sending network report with id {} for processor {} with timestamp {} to the API ", report.getId(),
 					report.getProcessorName(), TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
-					ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(reportAPI + "/network", report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
 				DBUtil.getInstance().delete(report);
 			}

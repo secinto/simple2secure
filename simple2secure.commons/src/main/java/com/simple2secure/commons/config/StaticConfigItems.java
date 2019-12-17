@@ -52,6 +52,8 @@ public class StaticConfigItems {
 	public static final int SNAPLEN = 65536; // [bytes]
 	public static final int READ_TIMEOUT = 10; // [ms]
 
+	public static final long tokenValidity = 24 * 60 * 60 * 100;
+
 	public static final String DEFAULT_PROCESSOR = "default";
 	public static final String CONFIG_JSON_LOCATION = "/configuration/config.json";
 	public static final String QUERIES_JSON_LOCATION = "/configuration/queries.json";
@@ -76,29 +78,31 @@ public class StaticConfigItems {
 
 	public static final String API_VERSION = "/v1";
 
-	public static final String CONFIG_API = API_PREFIX + API_VERSION + "/config";
-	public static final String CONTEXT_API = API_PREFIX + API_VERSION + "/context";
-	public static final String DASH_API = API_PREFIX + API_VERSION + "/dash";
-	public static final String DEVICE_API = API_PREFIX + API_VERSION + "/device";
-	public static final String DOWNLOAD_API = API_PREFIX + API_VERSION + "/download";
-	public static final String EMAIL_API = API_PREFIX + API_VERSION + "/email";
-	public static final String GROUP_API = API_PREFIX + API_VERSION + "/group";
-	public static final String LICENSE_API = API_PREFIX + API_VERSION + "/license";
-	public static final String NOTIFICATION_API = API_PREFIX + API_VERSION + "/notification";
-	public static final String PROCESSOR_API = API_PREFIX + API_VERSION + "/processors";
-	public static final String QUERY_API = API_PREFIX + API_VERSION + "/query";
-	public static final String REPORT_API = API_PREFIX + API_VERSION + "/reports";
-	public static final String RULE_API = API_PREFIX + API_VERSION + "/rule";
-	public static final String SEARCH_API = API_PREFIX + API_VERSION + "/search";
-	public static final String SERVICE_API = API_PREFIX + API_VERSION + "/service";
-	public static final String SETTINGS_API = API_PREFIX + API_VERSION + "/settings";
-	public static final String STEP_API = API_PREFIX + API_VERSION + "/steps";
-	public static final String SUT_API = API_PREFIX + API_VERSION + "/sut";
-	public static final String TEST_API = API_PREFIX + API_VERSION + "/test";
-	public static final String SEQUENCE_API = API_PREFIX + API_VERSION + "/sequence";
-	public static final String USER_API = API_PREFIX + API_VERSION + "/user";
-	public static final String WIDGET_API = API_PREFIX + API_VERSION + "/widget";
-	public static final String ERROR_API = API_PREFIX + API_VERSION + "/error";
+	public static final String API_ENDPOINT = API_PREFIX + API_VERSION;
+
+	public static final String CONTEXT_API = API_ENDPOINT + "/context";
+	public static final String DASH_API = API_ENDPOINT + "/dash";
+	public static final String DEVICE_API = API_ENDPOINT + "/devices";
+	public static final String DOWNLOAD_API = API_ENDPOINT + "/download";
+	public static final String EMAIL_API = API_ENDPOINT + "/email";
+	public static final String GROUP_API = API_ENDPOINT + "/group";
+	public static final String LICENSE_API = API_ENDPOINT + "/license";
+	public static final String NOTIFICATION_API = API_ENDPOINT + "/notification";
+	public static final String PROCESSOR_API = API_ENDPOINT + "/processors";
+	public static final String QUERY_API = API_ENDPOINT + "/query";
+	public static final String REPORT_API = API_ENDPOINT + "/reports";
+	public static final String RULE_API = API_ENDPOINT + "/rule";
+	public static final String SEARCH_API = API_ENDPOINT + "/search";
+	public static final String SERVICE_API = API_ENDPOINT + "/service";
+	public static final String SETTINGS_API = API_ENDPOINT + "/settings";
+	public static final String STEP_API = API_ENDPOINT + "/steps";
+	public static final String SUT_API = API_ENDPOINT + "/sut";
+	public static final String TEST_API = API_ENDPOINT + "/test";
+	public static final String SEQUENCE_API = API_ENDPOINT + "/sequence";
+	public static final String USER_API = API_ENDPOINT + "/user";
+	public static final String WIDGET_API = API_ENDPOINT + "/widget";
+	public static final String ERROR_API = API_ENDPOINT + "/error";
+	public static final String LOGIN_API = API_ENDPOINT + "/login";
 
 	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
 	public static final String DESTGROUP_ANNOTATION_TAG = "/{destGroupId}";

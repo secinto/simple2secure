@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
-
-import simple2secure.validator.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 public class BaseController extends BaseUtilsProvider {
 	private static Logger log = LoggerFactory.getLogger(BaseController.class);

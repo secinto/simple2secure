@@ -35,16 +35,16 @@ import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputDevice;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputPage;
+import com.simple2secure.portal.validation.model.ValidInputSequence;
+import com.simple2secure.portal.validation.model.ValidInputSize;
+import com.simple2secure.portal.validation.model.ValidInputUser;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputDevice;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputPage;
-import simple2secure.validator.model.ValidInputSequence;
-import simple2secure.validator.model.ValidInputSize;
-import simple2secure.validator.model.ValidInputUser;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @RestController

@@ -1,5 +1,7 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,6 +26,12 @@ public class DeviceInfoRepositoryImpl extends DeviceInfoRepository {
 	public DeviceInfo findByDeviceId(String deviceId) {
 		Query query = new Query(Criteria.where("deviceId").is(deviceId));
 		return mongoTemplate.findOne(query, DeviceInfo.class);
+	}
+
+	@Override
+	public List<DeviceInfo> findByDeviceType(String type) {
+		Query query = new Query(Criteria.where("deviceType").is(type.toString()));
+		return mongoTemplate.find(query, DeviceInfo.class);
 	}
 
 }
