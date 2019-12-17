@@ -88,9 +88,15 @@ public final class ProbeUtils {
 	
 	
 	public static void saveDeviceInfo(DeviceInfo deviceInfo) {
+		List<DeviceInfo> deviceList = DBUtil.getInstance().findAll(DeviceInfo.class);
 		String response = null;
-		deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/update", deviceInfo);
+		if(deviceList != null && deviceList.size() != 0) {
+			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
+			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/update", deviceInfo);
+			
+			DBUtil.getInstance().save(deviceInfo);
+		}
+		
 		if(!Strings.isNullOrEmpty(response)) {
 			log.info("Device Information has been sent to portal!");
 		}else {

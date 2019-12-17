@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.api.model.Processor;
@@ -35,6 +36,7 @@ import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.probe.dao.BaseDao;
+import com.simple2secure.probe.dao.impl.DeviceInfoDaoImpl;
 import com.simple2secure.probe.dao.impl.LicenseDaoImpl;
 import com.simple2secure.probe.dao.impl.NetworkReportDaoImpl;
 import com.simple2secure.probe.dao.impl.ProbePacketDaoImpl;
@@ -58,6 +60,7 @@ public class DBUtil {
 	private OsQueryDaoImpl queryDao;
 	private StepDaoImpl stepDao;
 	private ProbePacketDaoImpl probePacketDao;
+	private DeviceInfoDaoImpl deviceInfoDao;
 	public static boolean hasDBChanged = false;
 
 	public static DBUtil getInstance() throws IllegalArgumentException {
@@ -99,6 +102,10 @@ public class DBUtil {
 
 		if (probePacketDao == null) {
 			probePacketDao = new ProbePacketDaoImpl(persistenceUnitName);
+		}
+		
+		if(deviceInfoDao == null) {
+			deviceInfoDao = new DeviceInfoDaoImpl(persistenceUnitName);
 		}
 
 		if (log.isDebugEnabled()) {
@@ -216,6 +223,10 @@ public class DBUtil {
 
 		else if (t instanceof ProbePacket || t == ProbePacket.class) {
 			return probePacketDao;
+		}
+		
+		else if(t instanceof DeviceInfo || t == DeviceInfo.class) {
+			return deviceInfoDao;
 		}
 		return null;
 	}

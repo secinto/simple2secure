@@ -1,7 +1,12 @@
 package com.simple2secure.api.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
+@Entity
+@Table(name = "DeviceInfo")
 public class DeviceInfo extends GenericDBObject {
 
 	/**
