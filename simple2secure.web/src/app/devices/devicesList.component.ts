@@ -84,7 +84,7 @@ export class DevicesListComponent {
 
 	loadDevices(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'device/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'devices/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.devices = data.devices;

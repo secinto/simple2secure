@@ -37,11 +37,11 @@ import { DeviceType } from '../_models/deviceType';
 
 export class OrbiterSystemsUnderTestListComponent {
 
-	displayedColumnsMonitored = ['name', 'endDevice', 'ipAdress', 'deviceStatus'];
-	displayedColumnsTargeted = ['name', 'endDevice', 'ipAdress', 'action'];
+	displayedColumnsMonitored = ['name', 'device', 'ipAdress', 'deviceStatus'];
+	displayedColumnsTargeted = ['name', 'device', 'ipAdress', 'action'];
 	contextId: string;
-	monitoredSUT: SystemUnderTest[];
-	otherSUT: SystemUnderTest[];
+	monitoredSystems: SystemUnderTest[];
+	systemsUnderTest: SystemUnderTest[];
 	selectedSUT: SystemUnderTest;
 	loading = false;
 	public pageSize = 10;
@@ -63,8 +63,8 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	ngOnInit() {
 		// TODO: Benjamin: change this function to work with contextId
-		this.loadMonitoredSUTList(0, 10);
-		this.loadOtherSUTList(0, 10);
+		this.loadMonitoredSystemsList(0, 10);
+		this.loadSUTList(0, 10);
 	}
 
 	ngAfterViewInit() {
@@ -79,8 +79,8 @@ export class OrbiterSystemsUnderTestListComponent {
 	public handlePage(e?: PageEvent) {
 		this.currentPage = e.pageIndex;
 		this.pageSize = e.pageSize;
-		this.loadMonitoredSUTList(e.pageIndex, e.pageSize);
-		this.loadOtherSUTList(e.pageIndex, e.pageSize);
+		this.loadMonitoredSystemsList(e.pageIndex, e.pageSize);
+		this.loadSUTList(e.pageIndex, e.pageSize);
 		return e;
 	}
 
@@ -97,15 +97,16 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	}
 
-	public loadMonitoredSUTList(page: number, size: number){
+	public loadMonitoredSystemsList(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sut/' + DeviceType.PROBE + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.PROBE + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.monitoredSUT = data.sutList;
-					this.dataSourceMonitored = data.sutList;
+					this.monitoredSystems = data.devices;
+					this.dataSourceMonitored = data.devices;
 					this.totalSize = data.totalSize;
-					if (data.sutList.length > 0) {
+					console.log(this.monitoredSystems);
+					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
 					else {
@@ -123,14 +124,15 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.loading = false;
 				});
 	}
-	public loadOtherSUTList(page: number, size: number){
+	public loadSUTList(page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sut/' + DeviceType.WWW + '/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.otherSUT = data.sutList;
+					this.systemsUnderTest = data.sutList;
 					this.dataSourceOther = data.sutList;
 					this.totalSize = data.totalSize;
+					console.log(this.systemsUnderTest);
 					if (data.sutList.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}

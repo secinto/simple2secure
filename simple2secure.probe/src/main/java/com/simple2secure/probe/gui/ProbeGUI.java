@@ -35,6 +35,10 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.gui.view.ViewNavigator;
@@ -42,6 +46,7 @@ import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
 import com.simple2secure.probe.utils.LocaleHolder;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 import ch.qos.logback.classic.Level;
 import javafx.application.Application;
@@ -108,8 +113,16 @@ public class ProbeGUI extends Application {
 		createTrayIcon(primaryStage);
 
 		ProbeConfiguration.isGuiRunning = true;
+		CompanyLicensePublic license = licenseCon.loadLicense();
 
-		StartConditions startConditions = licenseCon.checkLicenseValidity();
+		if (ProbeUtils.isServerReachable()) {
+			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, ProbeConfiguration.ipAddress,
+					ProbeConfiguration.netmask, DeviceType.PROBE);
+			deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
+
+			ProbeUtils.sendDeviceInfo(deviceInfo);
+		}
+		StartConditions startConditions = licenseCon.checkLicenseValidity(license);
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:

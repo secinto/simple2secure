@@ -34,6 +34,7 @@ import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
@@ -69,38 +70,39 @@ public final class ProbeUtils {
 	/**
 	 * This function checks if the server is reachable
 	 */
-	public static void isServerReachable() {
+	public static boolean isServerReachable() {
 		String response = null;
 		if (!Strings.isNullOrEmpty(ProbeConfiguration.probeId)) {
-			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/status/" + ProbeConfiguration.probeId, null,
+			response = RESTUtils.sendPost(
+					LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status/" + ProbeConfiguration.probeId, null,
 					null);
 		} else {
-			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/status");
+			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status");
 		}
 		if (!Strings.isNullOrEmpty(response)) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
+			return true;
 		} else {
 			ProbeConfiguration.setAPIAvailablitity(false);
 			log.error("SERVER NOT REACHABLE!");
+			return false;
 		}
 	}
-	
-	
-	public static void saveDeviceInfo(DeviceInfo deviceInfo) {
-		List<DeviceInfo> deviceList = DBUtil.getInstance().findAll(DeviceInfo.class);
+
+	/**
+	 * Sends the {@link DeviceInfo} for the local device to the server.
+	 *
+	 * @param deviceInfo
+	 *          The {@link DeviceInfo} representing the local device.
+	 */
+	public static void sendDeviceInfo(DeviceInfo deviceInfo) {
 		String response = null;
-		if(deviceList != null && deviceList.size() != 0) {
-			deviceInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-			response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + "/api/device/update", deviceInfo);
-			
-			DBUtil.getInstance().save(deviceInfo);
-		}
-		
-		if(!Strings.isNullOrEmpty(response)) {
+		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/update", deviceInfo);
+		if (!Strings.isNullOrEmpty(response)) {
 			log.info("Device Information has been sent to portal!");
-		}else {
-			log.info("Problem occured while sending device information to portal!");
+		} else {
+			log.error("Problem occured while sending device information to portal!");
 		}
 	}
 

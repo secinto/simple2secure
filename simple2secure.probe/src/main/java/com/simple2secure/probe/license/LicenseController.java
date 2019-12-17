@@ -23,8 +23,6 @@ package com.simple2secure.probe.license;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -39,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.file.FileUtil;
 import com.simple2secure.commons.file.ZIPUtils;
 import com.simple2secure.commons.json.JSONUtils;
@@ -56,6 +55,20 @@ public class LicenseController {
 	public LicenseController() {
 	}
 
+	public CompanyLicensePublic loadLicense() {
+		CompanyLicensePublic license = loadLicenseFromDB();
+		if (license == null) {
+			license = loadLicenseFromPath();
+		}
+
+		if (license != null) {
+			ProbeConfiguration.probeId = license.getDeviceId();
+			ProbeConfiguration.groupId = license.getGroupId();
+			ProbeConfiguration.authKey = license.getAccessToken();
+		}
+		return license;
+	}
+
 	/**
 	 * Checks if there is a license stored in the DB. Checks if the license is activated. If not, it is activated and if the activation was
 	 * successful {@link StartConditions#LICENSE_VALID} is returned. If the license is expired or the activation was not successful it is
@@ -64,26 +77,19 @@ public class LicenseController {
 	 *
 	 * @return The {@link StartConditions} which corresponds to the current state.
 	 */
-	public StartConditions checkLicenseValidity() {
-		CompanyLicensePublic license = loadLicenseFromDB();
-		if (license != null) {
-			ProbeConfiguration.probeId = license.getDeviceId();
-			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
-				if (license.isActivated()) {
-					ProbeConfiguration.isLicenseValid = true;
-					ProbeConfiguration.groupId = license.getGroupId();
-					ProbeConfiguration.authKey = license.getAccessToken();
-					return StartConditions.LICENSE_VALID;
-				} else {
-					if (authenticateLicense()) {
-						return StartConditions.LICENSE_VALID;
-					}
-				}
-			}
+	public StartConditions checkLicenseValidity(CompanyLicensePublic license) {
+		if (license == null) {
+			license = loadLicense();
 		}
-		license = loadLicenseFromPath();
-		if (license != null && authenticateLicense()) {
-			return StartConditions.LICENSE_VALID;
+
+		if (license != null) {
+			if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
+				if (authenticateLicense()) {
+					return StartConditions.LICENSE_VALID;
+				}
+			} else {
+				return StartConditions.LICENSE_NOT_VALID;
+			}
 		}
 		return StartConditions.LICENSE_NOT_AVAILABLE;
 	}
@@ -186,14 +192,17 @@ public class LicenseController {
 			/*
 			 * TODO: Hack because currently it doesn't work if the license has already been activated.
 			 */
-			license.setActivated(false);
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getLicenseAPI() + "/authenticate", license);
+			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.LICENSE_API + "/authenticate",
+					license);
 			if (response != null) {
 				license = activateLicenseAndUpdateInDB(response, license);
 				if (license != null) {
 					ProbeConfiguration.authKey = license.getAccessToken();
-					ProbeConfiguration.probeId = license.getDeviceId();
-					ProbeConfiguration.groupId = license.getGroupId();
+					/*
+					 * TODO: Check whether this is really necessary
+					 */
+					// ProbeConfiguration.probeId = license.getDeviceId();
+					// ProbeConfiguration.groupId = license.getGroupId();
 					ProbeConfiguration.setAPIAvailablitity(true);
 					log.info("License successfully activated and AuthToken obtained");
 					return true;
@@ -229,11 +238,6 @@ public class LicenseController {
 		groupId = license.getProperty("groupId");
 		licenseId = license.getProperty("licenseId");
 		expirationDate = license.getExpirationDateAsString();
-		try {
-			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			log.error("Couldn't obtain hostname locally.");
-		}
 
 		/*
 		 * Obtain license stored in DB if any.
