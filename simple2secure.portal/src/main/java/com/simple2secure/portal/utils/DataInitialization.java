@@ -52,8 +52,7 @@ import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.providers.BaseServiceProvider;
-
-import simple2secure.validator.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 @Component
 public class DataInitialization extends BaseServiceProvider {

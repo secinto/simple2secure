@@ -20,7 +20,6 @@ import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
@@ -32,15 +31,14 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
 public class SystemUnderTestController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(SystemUnderTestController.class);
 
-	@ValidRequestMapping(
-			value = "/add",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -52,8 +50,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 
 	@ValidRequestMapping
@@ -91,8 +88,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 
 	@ValidRequestMapping
@@ -132,7 +128,6 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 }

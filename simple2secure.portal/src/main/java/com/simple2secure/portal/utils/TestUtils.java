@@ -49,8 +49,7 @@ import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
-
-import simple2secure.validator.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 @SuppressWarnings("unchecked")
 @Component

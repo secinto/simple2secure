@@ -14,8 +14,7 @@ import com.simple2secure.portal.security.PasswordValidator;
 import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
-
-import simple2secure.validator.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 public class BaseServiceProvider extends BaseRepositoryProvider {
 	static final Logger log = LoggerFactory.getLogger(BaseServiceProvider.class);
