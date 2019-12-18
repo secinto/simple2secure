@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputVersion;
@@ -42,6 +41,7 @@ import com.simple2secure.portal.validation.model.ValidInputVersion;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SERVICE_API)
 public class ServiceController extends BaseUtilsProvider {
@@ -65,9 +65,7 @@ public class ServiceController extends BaseUtilsProvider {
 		if (library != null) {
 			return new ResponseEntity<>(library, HttpStatus.OK);
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
-					HttpStatus.NOT_FOUND);
-
+			return ((ResponseEntity<ServiceLibraryDTO>) buildResponseEntity("service_not_found", locale));
 		}
 	}
 

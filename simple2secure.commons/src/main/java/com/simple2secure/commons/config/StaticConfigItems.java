@@ -103,25 +103,4 @@ public class StaticConfigItems {
 	public static final String WIDGET_API = API_ENDPOINT + "/widget";
 	public static final String ERROR_API = API_ENDPOINT + "/error";
 	public static final String LOGIN_API = API_ENDPOINT + "/login";
-
-	public static final String CONTEXT_ANNOTATION_TAG = "/{contextId}";
-	public static final String DESTGROUP_ANNOTATION_TAG = "/{destGroupId}";
-	public static final String DEVICE_ANNOTATION_TAG = "/{deviceId}";
-	public static final String EMAILCONFIG_ANNOTATION_TAG = "/{emailConfigId}";
-	public static final String GROUP_ANNOTATION_TAG = "/{groupId}";
-	public static final String HOSTNAME_ANNOTATION_TAG = "/{hostname}";
-	public static final String LICENSEPLAN_ANNOTATION_TAG = "/{licensePlanId}";
-	public static final String PAGE_ANNOTATION_TAG = "/{page}";
-	public static final String PROCESSOR_ANNOTATION_TAG = "/{processorId}";
-	public static final String QUERY_ANNOTATION_TAG = "/{queryId}";
-	public static final String REPORT_ANNOTATION_TAG = "/{reportId}";
-	public static final String RULE_ANNOTATION_TAG = "/{ruleId}";
-	public static final String SEARCH_ANNOTATION_TAG = "/{searchQuery}";
-	public static final String SIZE_ANNOTATION_TAG = "/{size}";
-	public static final String STEP_ANNOTATION_TAG = "/{stepId}";
-	public static final String SUT_ANNOTATION_TAG = "/{sutId}";
-	public static final String MACRO_ANNOTATION_TAG = "/{testMacroId}";
-	public static final String USER_ANNOTATION_TAG = "/{userId}";
-	public static final String VERSION_ANNOTATION_TAG = "/{version}";
-
 }

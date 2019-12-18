@@ -38,7 +38,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
@@ -48,6 +47,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.NOTIFICATION_API)
 public class NotificationController extends BaseUtilsProvider {
@@ -64,8 +64,7 @@ public class NotificationController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while saving notification");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Notification>) buildResponseEntity("error_while_saving_notification", locale);
 	}
 
 	@ValidRequestMapping
@@ -80,9 +79,7 @@ public class NotificationController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving notifications for context id {}", contextId.getValue());
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<Notification>>) buildResponseEntity("error_while_getting_notifications", locale);
 	}
 
 	@ValidRequestMapping(value = "/read", method = ValidRequestMethodType.POST)
@@ -97,8 +94,7 @@ public class NotificationController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while updating read parameter");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_saving_notification", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Notification>) buildResponseEntity("error_while_saving_notification", locale);
 	}
 
 	@ValidRequestMapping(value = "/read")
@@ -112,8 +108,6 @@ public class NotificationController extends BaseUtilsProvider {
 		}
 
 		log.error("Problem occured while retrieving number of unread notifications");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_notifications", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Integer>) buildResponseEntity("error_while_getting_notifications", locale);
 	}
 }

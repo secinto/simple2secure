@@ -48,9 +48,10 @@ import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseServiceProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+@SuppressWarnings("unchecked")
 @Component
 public class UserUtils extends BaseServiceProvider {
 
@@ -79,8 +80,8 @@ public class UserUtils extends BaseServiceProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<User> addNewUser(UserRegistration userRegistration, String locale)
+
+	public ResponseEntity<User> addNewUser(UserRegistration userRegistration, ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException {
 		if (userRegistration != null) {
 			if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
@@ -93,9 +94,7 @@ public class UserUtils extends BaseServiceProvider {
 					}
 					// In case of standard registration return an error
 					else {
-						return new ResponseEntity(
-								new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_already_exists", locale)),
-								HttpStatus.NOT_FOUND);
+						return ((ResponseEntity<User>) buildResponseEntity("user_with_provided_email_already_exists", locale));
 					}
 				} else {
 					if (userRegistration.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
@@ -108,9 +107,7 @@ public class UserUtils extends BaseServiceProvider {
 				}
 			}
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -122,8 +119,7 @@ public class UserUtils extends BaseServiceProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<User> addUserAddedByRegistration(UserRegistration userRegistration, String locale)
+	public ResponseEntity<User> addUserAddedByRegistration(UserRegistration userRegistration, ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException {
 
 		if (!Strings.isNullOrEmpty(userRegistration.getAddedByUserId())) {
@@ -149,7 +145,7 @@ public class UserUtils extends BaseServiceProvider {
 								userRegistration.getUserRole(), false);
 
 						// If sending email was successful, update addedByUser, if not delete the user and userContextAuth
-						if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)
+						if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale.getValue()), StaticConfigItems.email_subject_al)
 								&& contextUserId != null) {
 
 							// Add userInfo to the current user
@@ -173,16 +169,13 @@ public class UserUtils extends BaseServiceProvider {
 
 							log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
 
-							return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
-									HttpStatus.NOT_FOUND);
+							return ((ResponseEntity<User>) buildResponseEntity("error_while_sending_email", locale));
 						}
 					}
 				}
 			}
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -193,8 +186,7 @@ public class UserUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<User> addUserStandardRegistration(UserRegistration userRegistration, String locale) throws IOException {
+	public ResponseEntity<User> addUserStandardRegistration(UserRegistration userRegistration, ValidInputLocale locale) throws IOException {
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail()) && !Strings.isNullOrEmpty(userRegistration.getPassword())) {
 
 			User user = new User(userRegistration.getEmail());
@@ -207,7 +199,7 @@ public class UserUtils extends BaseServiceProvider {
 			// validate the user password
 			String error = validateUserPassword(user);
 			if (!Strings.isNullOrEmpty(error)) {
-				return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity(error, locale));
 			}
 
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -218,7 +210,7 @@ public class UserUtils extends BaseServiceProvider {
 			ObjectId contextId = contextUtils.addNewContextForRegistration(user, userID);
 
 			if (contextId != null) {
-				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale.getValue()), StaticConfigItems.email_subject_al)) {
 
 					// add user info to the current user
 					addUserInfo(userID.toString(), user.getEmail());
@@ -237,22 +229,16 @@ public class UserUtils extends BaseServiceProvider {
 					contextRepository.deleteByContextId(contextId.toString());
 
 					log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
-
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 				}
 
 			} else {
 				userRepository.deleteByUserID(userID.toString());
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 			}
 
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
-
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -266,15 +252,12 @@ public class UserUtils extends BaseServiceProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<User> resendActivation(User user, String locale) throws ItemNotFoundRepositoryException, IOException {
+	public ResponseEntity<User> resendActivation(User user, ValidInputLocale locale) throws ItemNotFoundRepositoryException, IOException {
 		// Return userId and get user with id from this id
-		if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+		if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale.getValue()), StaticConfigItems.email_subject_al)) {
 			return new ResponseEntity<>(user, HttpStatus.OK);
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -286,8 +269,7 @@ public class UserUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<User> initializeSecintoUsers(UserRegistration userRegistration, String locale) throws IOException {
+	public ResponseEntity<User> initializeSecintoUsers(UserRegistration userRegistration, ValidInputLocale locale) throws IOException {
 		if (!Strings.isNullOrEmpty(userRegistration.getEmail())) {
 
 			User user = new User(userRegistration.getEmail());
@@ -301,7 +283,7 @@ public class UserUtils extends BaseServiceProvider {
 			ObjectId contextId = contextUtils.addNewContextForRegistration(user, userID);
 
 			if (contextId != null) {
-				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale), StaticConfigItems.email_subject_al)) {
+				if (mailUtils.sendEmail(user, mailUtils.generateEmailContent(user, locale.getValue()), StaticConfigItems.email_subject_al)) {
 					// add user info for current user
 					addUserInfo(userID.toString(), user.getEmail());
 
@@ -321,21 +303,16 @@ public class UserUtils extends BaseServiceProvider {
 					contextRepository.deleteByContextId(contextId.toString());
 
 					log.error("Error while sending activation email, user {} has been deleted", user.getEmail());
-
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 				}
 
 			} else {
 				userRepository.deleteByUserID(userID.toString());
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 			}
 
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -357,8 +334,8 @@ public class UserUtils extends BaseServiceProvider {
 		return null;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<User> updateUser(UserRegistration userRegistration, String locale) throws ItemNotFoundRepositoryException {
+	public ResponseEntity<User> updateUser(UserRegistration userRegistration, ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (userRegistration != null && !Strings.isNullOrEmpty(userRegistration.getEmail())
 				&& !Strings.isNullOrEmpty(userRegistration.getCurrentContextId())) {
@@ -395,8 +372,7 @@ public class UserUtils extends BaseServiceProvider {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
@@ -419,8 +395,7 @@ public class UserUtils extends BaseServiceProvider {
 	 * @param userRegistration
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ResponseEntity<User> inviteUserToContext(UserRegistration userRegistration, String locale) throws IOException {
+	private ResponseEntity<User> inviteUserToContext(UserRegistration userRegistration, ValidInputLocale locale) throws IOException {
 
 		// invite is only possible if user is added by another user
 		if (userRegistration.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
@@ -444,7 +419,7 @@ public class UserUtils extends BaseServiceProvider {
 								portalUtils.generateToken(), tokenExpirationTime, userRegistration.getGroupIds());
 
 						// If email has been sent save the user invitation to the database
-						if (mailUtils.sendEmail(user, mailUtils.generateInvitationEmail(userInvitation, context, addedByUser, locale),
+						if (mailUtils.sendEmail(user, mailUtils.generateInvitationEmail(userInvitation, context, addedByUser, locale.getValue()),
 								StaticConfigItems.email_subject_inv)) {
 							userInvitationRepository.save(userInvitation);
 							return new ResponseEntity<>(user, HttpStatus.OK);
@@ -455,9 +430,7 @@ public class UserUtils extends BaseServiceProvider {
 			}
 
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_already_exists", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<User>) buildResponseEntity("user_with_provided_email_already_exists", locale));
 
 	}
 
