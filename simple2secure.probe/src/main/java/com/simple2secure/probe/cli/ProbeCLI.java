@@ -34,12 +34,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.pcap4j.core.PcapNetworkInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.file.FileUtil;
@@ -75,25 +76,32 @@ public class ProbeCLI {
 		ProbeConfiguration.licensePath = importFilePath;
 
 		try {
-			PcapNetworkInterface netwInt = PcapUtil.getNetworkInterfaceByInetAddr(PcapUtil.getIpAddrOfNetworkInterface());
 			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
-			ProbeConfiguration.netmask = netwInt.getAddresses().get(1).getNetmask().toString();
-			ProbeConfiguration.ipAddress = netwInt.getAddresses().get(1).getAddress().toString();
+			ProbeConfiguration.netmask = PcapUtil.getOutgoingNetmask();
+			ProbeConfiguration.ipAddress = PcapUtil.getOutgoingIPAddress();
 
 		} catch (Exception e) {
 			log.error("Couldn't obtain network information for machine.");
 		}
 
 		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
-
-		ProbeUtils.isServerReachable();
-
+		/*
+		 * Needs to be performed before transmitting the device info (saveDeviceInfo) to the server. Otherwise the has not have been
+		 * initialized. If the device info is not already available at the server before authentication the device can not associated with the
+		 * correct SUT type (PROBE is a monitored system).
+		 */
 		LicenseController licenseController = new LicenseController();
+		CompanyLicensePublic license = licenseController.loadLicense();
 
-		StartConditions startConditions = licenseController.checkLicenseValidity();
+		if (ProbeUtils.isServerReachable()) {
+			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, ProbeConfiguration.ipAddress,
+					ProbeConfiguration.netmask, DeviceType.PROBE);
+			deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
 
-		ProbeUtils.saveDeviceInfo(new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, ProbeConfiguration.ipAddress,
-				ProbeConfiguration.netmask, DeviceStatus.ONLINE));
+			ProbeUtils.sendDeviceInfo(deviceInfo);
+		}
+
+		StartConditions startConditions = licenseController.checkLicenseValidity(license);
 
 		try {
 			prepareOsQuery();

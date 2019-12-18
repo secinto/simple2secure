@@ -67,7 +67,7 @@ public class TestRunScheduler {
 
 	@Autowired
 	GroupRepository groupRepository;
-	
+
 	@Autowired
 	DeviceInfoRepository deviceInfoRepository;
 
@@ -111,7 +111,7 @@ public class TestRunScheduler {
 						if (group != null) {
 							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
 									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-							testRun.setHostname(deviceInfo.getHostName());
+							testRun.setHostname(deviceInfo.getName());
 
 							test.setLastExecution(currentTimestamp);
 							testRunRepository.save(testRun);

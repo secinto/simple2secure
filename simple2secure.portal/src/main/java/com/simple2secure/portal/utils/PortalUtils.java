@@ -60,16 +60,16 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.controller.WidgetController;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputParamType;
+import com.simple2secure.portal.validation.model.ValidInputUser;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
-import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputParamType;
-import simple2secure.validator.model.ValidInputUser;
 import simple2secure.validator.model.ValidatedInput;
 
 @Component
@@ -297,8 +297,8 @@ public class PortalUtils {
 
 				else if (object.getClass().equals(Device.class)) {
 					Device device = (Device) object;
-					if (!Strings.isNullOrEmpty(device.getDeviceId())) {
-						ids.add(device.getDeviceId());
+					if (!Strings.isNullOrEmpty(device.getInfo().getDeviceId())) {
+						ids.add(device.getInfo().getDeviceId());
 					}
 				}
 			}

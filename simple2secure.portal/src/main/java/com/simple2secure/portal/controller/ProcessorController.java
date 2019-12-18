@@ -40,11 +40,11 @@ import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputProcessor;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputProcessor;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @SuppressWarnings("unchecked")

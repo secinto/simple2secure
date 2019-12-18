@@ -48,6 +48,7 @@ import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Configuration
@@ -167,8 +168,8 @@ public class MailUtils extends BaseServiceProvider {
 	}
 
 	public String generateEmailContent(User user, String locale) {
-		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/user/activate/"
-				+ user.getActivationToken();
+		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL()
+				+ StaticConfigItems.USER_API + "/activate/" + user.getActivationToken();
 	}
 
 	/**
@@ -182,8 +183,8 @@ public class MailUtils extends BaseServiceProvider {
 	 */
 	public String generateInvitationEmail(UserInvitation userInvitation, Context context, User addedByUser, String locale) {
 		String content = "You have been invited by " + addedByUser.getEmail() + " to join " + context.getName()
-				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL() + "/api/user/invite/"
-				+ userInvitation.getInvitationToken();
+				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL()
+				+ StaticConfigItems.USER_API + "/invite/" + userInvitation.getInvitationToken();
 		return content;
 	}
 

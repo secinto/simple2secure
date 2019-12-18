@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputLocale;
 
 @SuppressWarnings("unchecked")
 @RestController

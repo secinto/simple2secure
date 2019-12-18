@@ -4,7 +4,7 @@ import logging
 import requests
 from flask import json
 
-from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus
+from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType
 from src.db.database_schema import CompanyLicensePublicSchema, TestSchema, DeviceInfoSchema
 from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license, \
     clear_pod_status_auth
@@ -114,7 +114,9 @@ def send_license(app, licensePublic=None):
     resp_data = portal_post(app, url, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
-        send_device_info(app, license_json)
+        devInfo = DeviceInfo.query.one()
+        if not devInfo:
+            send_device_info(app, license_json)
         accessToken = json.loads(resp_data.text)['accessToken']
         if accessToken:
             licensePublic.accessToken = accessToken
@@ -138,7 +140,7 @@ def send_device_info(app, license):
     lastOnlineTimestamp = datetime.now().timestamp() * 1000
     license_obj = json.loads(license)
     deviceId = license_obj['deviceId']
-    deviceInfo = DeviceInfo(deviceId, 'POD-' + deviceId, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE)
+    deviceInfo = DeviceInfo(deviceId, 'POD-' + deviceId, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
 
     device_info_schema = DeviceInfoSchema()
     device_info_json = json.dumps(device_info_schema.dump(deviceInfo))

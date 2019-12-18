@@ -53,11 +53,11 @@ import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputGroup;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputGroup;
-import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @SuppressWarnings("unchecked")
@@ -103,38 +103,26 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@ValidRequestMapping(value = "/authenticate", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CompanyLicensePublic> activate(@RequestBody CompanyLicensePublic licensePublic,
+	@ValidRequestMapping(
+			value = "/authenticate",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<CompanyLicensePublic> authenticate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
-			boolean podAuthentication = false;
-			if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && licensePublic.isDevicePod()) {
-				podAuthentication = true;
-			} else if (!Strings.isNullOrEmpty(licensePublic.getDeviceId()) && !licensePublic.isDevicePod()) {
-				podAuthentication = false;
-			} else {
+			if (Strings.isNullOrEmpty(licensePublic.getDeviceId())) {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
 				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
 			}
+
 			LicenseActivation activation = null;
 
-			activation = licenseUtils.authenticateLicense(licensePublic, podAuthentication, locale.getValue());
+			activation = licenseUtils.authenticateLicense(licensePublic, locale.getValue());
 
 			if (activation.isSuccess()) {
-				CompanyLicensePrivate licensePrivate = licenseRepository.findByDeviceId(licensePublic.getDeviceId());
-				if (licensePrivate != null) {
-					licensePublic = licensePrivate.getPublicLicense();
-
-					if (!licensePublic.isDevicePod()) {
-
-						CompanyGroup group = groupRepository.find(licensePublic.getGroupId());
-						if (group != null) {
-							sutUtils.addProbeAsSUT(licensePublic, group.getContextId());
-						}
-					}
-				}
-
+				licensePublic.setAccessToken(activation.getAccessToken());
+				licensePublic.setActivated(true);
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
 				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity(activation.getMessage(), locale);
@@ -144,9 +132,9 @@ public class LicenseController extends BaseUtilsProvider {
 	}
 
 	/**
-	 * Obtains the license for the provided group and user for the associated license plan. Returns the license contained in a ZIP file
-	 * together with the public key for verification of the signature. The ZIP is returned as byte array. It is used in the WEB to provide a
-	 * license download.
+	 * Obtains the license for the provided group and the associated license plan. Returns the license contained in a ZIP file together with
+	 * the public key for verification of the signature. The ZIP is returned as byte array. It is used in the WEB to provide a license
+	 * download.
 	 *
 	 * @param groupId
 	 * @param userId
@@ -176,11 +164,11 @@ public class LicenseController extends BaseUtilsProvider {
 					 */
 					List<CompanyLicensePrivate> companyLicenses = licenseRepository.findAllByGroupId(groupId.getValue());
 					String licenseId = LicenseUtil.generateLicenseId();
-					CompanyLicensePrivate companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate, false);
+					CompanyLicensePrivate companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate);
 
 					if (companyLicenses != null && companyLicenses.size() > 0) {
 						licenseId = companyLicenses.get(companyLicenses.size() - 1).getLicenseId();
-						companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate, false);
+						companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate);
 					} else {
 						licenseRepository.save(companyLicense);
 					}
@@ -208,7 +196,9 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(value = "/downloadLicenseForScript", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/downloadLicenseForScript",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {

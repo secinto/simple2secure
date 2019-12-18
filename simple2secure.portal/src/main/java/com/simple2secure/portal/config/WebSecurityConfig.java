@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.security.CustomEntryPoint;
 import com.simple2secure.portal.security.auth.CustomAuthenticationFailureHandler;
@@ -46,6 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Autowired
+	public LoadedConfigItems loadedConfigItems;
+
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -68,15 +72,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.LOGIN_API).permitAll().and().authorizeRequests().antMatchers(StaticConfigItems.SERVICE_API)
-				.permitAll().and().authorizeRequests().antMatchers(StaticConfigItems.USER_API + "register/**").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.LOGIN_API).permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.API_ENDPOINT + "/service").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.API_ENDPOINT + "/register/**").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.API_ENDPOINT + "/test").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.API_ENDPOINT + "/download/**").permitAll().and().authorizeRequests()
 				.antMatchers(StaticConfigItems.USER_API + "/activate/").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.TEST_API).permitAll().and().authorizeRequests()
 				.antMatchers(StaticConfigItems.USER_API + "/updatePassword/**").permitAll().and().authorizeRequests()
 				.antMatchers(StaticConfigItems.USER_API + "/invite/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.DOWNLOAD_API + "/**").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.USER_API + "/activate/**").permitAll().and().authorizeRequests()
+				.antMatchers(StaticConfigItems.USER_API + "/authenticate/**").permitAll().and().authorizeRequests()
 				.antMatchers(StaticConfigItems.DEVICE_API + "/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.LICENSE_API + "/authenticate/**").permitAll().and().authorizeRequests()
 				// filter the login requests
 				.and()
 				.addFilterBefore(new JWTLoginFilter(StaticConfigItems.LOGIN_API, this.authenticationManager()),

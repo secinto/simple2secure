@@ -35,11 +35,11 @@ import com.simple2secure.api.dto.ServiceLibraryDTO;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputVersion;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputVersion;
 
 @SuppressWarnings("unchecked")
 @RestController

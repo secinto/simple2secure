@@ -20,25 +20,27 @@ import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputPage;
+import com.simple2secure.portal.validation.model.ValidInputSize;
+import com.simple2secure.portal.validation.model.ValidInputSystemType;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputDeviceType;
-import simple2secure.validator.model.ValidInputLocale;
-import simple2secure.validator.model.ValidInputPage;
-import simple2secure.validator.model.ValidInputSize;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
 public class SystemUnderTestController extends BaseUtilsProvider {
 
 	private static Logger log = LoggerFactory.getLogger(SystemUnderTestController.class);
 
-	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/add",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -50,44 +52,87 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getSUTList(@ServerProvidedValue ValidInputContext contextId,
-			@PathVariable ValidInputDeviceType deviceType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && deviceType != null) {
-			if (contextId != null) {
-				List<SystemUnderTest> suts = sutRepository.getByContextIdAndType(contextId.getValue(), page.getValue(), size.getValue(),
-						deviceType.getValue());
-				if (suts != null && suts.size() > 0) {
-					for (SystemUnderTest sut : suts) {
-						DeviceStatus status = sut.getDeviceStatus();
-						DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
-						if (status != deviceStatus) {
-							sut.setDeviceStatus(deviceStatus);
-						}
+	public ResponseEntity<Map<String, Object>> getAllSUTsForContext(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
+
+			Map<String, Object> sutMap = new HashMap<>();
+			long count = 0;
+			sutMap.put("sutList", new ArrayList<SystemUnderTest>());
+			sutMap.put("totalSize", count);
+
+			List<SystemUnderTest> suts = sutRepository.getAllByContextIdPaged(contextId.getValue(), page.getValue(), size.getValue());
+			if (suts != null && suts.size() > 0) {
+				for (SystemUnderTest sut : suts) {
+					/*
+					 * Updates the device status for all systems under test.
+					 *
+					 * TODO: Check if there is a better place or additional places. Because this could also be done in a scheduler or any other
+					 * recurring task.
+					 */
+					DeviceStatus status = sut.getDeviceStatus();
+					DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+					if (status != deviceStatus) {
+						sut.setDeviceStatus(deviceStatus);
 					}
-
-					Map<String, Object> sutMap = new HashMap<>();
-
-					long count = sutRepository.getTotalAmountOfSystemUnderTest(contextId.getValue(), deviceType.getValue());
-					sutMap.put("sutList", suts);
-					sutMap.put("totalSize", count);
-
-					return new ResponseEntity<>(sutMap, HttpStatus.OK);
-				} else {
-					Map<String, Object> emptySUTMap = new HashMap<>();
-					long count = 0;
-					emptySUTMap.put("sutList", new ArrayList<SystemUnderTest>());
-					emptySUTMap.put("totalSize", count);
-					return new ResponseEntity<>(emptySUTMap, HttpStatus.OK);
 				}
+
+				count = sutRepository.getTotalAmountOfSystemUnderTest(contextId.getValue());
+				sutMap.put("sutList", suts);
+				sutMap.put("totalSize", count);
 			}
 
+			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+				HttpStatus.NOT_FOUND);
+	}
+
+	@ValidRequestMapping
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Map<String, Object>> getAllSUTsForContextAndType(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputSystemType systemType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && systemType != null
+				&& !Strings.isNullOrEmpty(systemType.getValue())) {
+
+			Map<String, Object> sutMap = new HashMap<>();
+			long count = 0;
+			sutMap.put("sutList", new ArrayList<SystemUnderTest>());
+			sutMap.put("totalSize", count);
+
+			List<SystemUnderTest> suts = sutRepository.getAllByContextIdAndSystemTypePaged(contextId.getValue(), page.getValue(), size.getValue(),
+					systemType.getValue());
+			if (suts != null && suts.size() > 0) {
+				for (SystemUnderTest sut : suts) {
+					/*
+					 * Updates the device status for all systems under test.
+					 *
+					 * TODO: Check if there is a better place or additional places. Because this could also be done in a scheduler or any other
+					 * recurring task.
+					 */
+					DeviceStatus status = sut.getDeviceStatus();
+					DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
+					if (status != deviceStatus) {
+						sut.setDeviceStatus(deviceStatus);
+					}
+				}
+
+				count = sutRepository.getTotalAmountOfSystemUnderTestWithType(contextId.getValue(), systemType.getValue());
+				sutMap.put("sutList", suts);
+				sutMap.put("totalSize", count);
+			}
+
+			return new ResponseEntity<>(sutMap, HttpStatus.OK);
+		}
+		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue())),
+				HttpStatus.NOT_FOUND);
 	}
 }

@@ -5,8 +5,6 @@ import java.util.Base64;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,14 +12,13 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
-import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 @Component
 public class LicenseUtils extends BaseServiceProvider {
-	private static Logger log = LoggerFactory.getLogger(LicenseUtil.class);
 
 	/**
 	 * Activates the provided license and creates a private license {@link CompanyLicensePrivate} and stores it in the database. If the
@@ -36,12 +33,11 @@ public class LicenseUtils extends BaseServiceProvider {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, boolean podActivation, String locale)
-			throws UnsupportedEncodingException {
+	public LicenseActivation authenticateLicense(CompanyLicensePublic licensePublic, String locale) throws UnsupportedEncodingException {
 		LicenseActivation activation = new LicenseActivation(false);
-		
-		//TODO: delete or put in other place, not necessary here in this place
-		//activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
+
+		// TODO: delete or put in other place, not necessary here in this place
+		// activation.setMessage(messageByLocaleService.getMessage("problem_during_activation", locale));
 
 		if (licensePublic != null) {
 			String groupId = licensePublic.getGroupId();
@@ -54,7 +50,7 @@ public class LicenseUtils extends BaseServiceProvider {
 				/*
 				 * Check if a license has already been activated and associated with this POD or PROBE
 				 */
-				license = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId, podActivation);
+				license = licenseRepository.findByLicenseIdAndDeviceId(licenseId, deviceId);
 
 				/*
 				 * If no license has been activated and associated with the POD or PROBE we need to create one for them.
@@ -75,29 +71,28 @@ public class LicenseUtils extends BaseServiceProvider {
 				 * Create a new access token for the POD or PROBE and update the license
 				 */
 				if (group != null && license != null) {
-					if (!license.isActivated()) {
+					if (license.getLastTokenRefresh() == 0
+							|| license.getLastTokenRefresh() + StaticConfigItems.tokenValidity < System.currentTimeMillis()) {
 						license.setTokenSecret(RandomStringUtils.randomAlphanumeric(20));
-					}
 
-					String accessToken = null;
+						String accessToken = null;
 
-					accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, license);
+						accessToken = tokenAuthenticationService.addDeviceAuthentication(deviceId, group, license);
 
-					if (!Strings.isNullOrEmpty(accessToken)) {
-						if (Strings.isNullOrEmpty(license.getDeviceId())) {
-							license.setDeviceId(deviceId);
-						}
-						license.setAccessToken(accessToken);
-						license.setDeviceIsPod(podActivation);
-						if (!license.isActivated()) {
+						if (!Strings.isNullOrEmpty(accessToken)) {
+							if (Strings.isNullOrEmpty(license.getDeviceId())) {
+								license.setDeviceId(deviceId);
+							}
+							license.setAccessToken(accessToken);
+							license.setLastTokenRefresh(System.currentTimeMillis());
 							license.setActivated(true);
+							licenseRepository.save(license);
 						}
-
-						licenseRepository.save(license);
-						activation.setAccessToken(accessToken);
-						activation.setSuccess(true);
-						return activation;
 					}
+					activation.setAccessToken(license.getAccessToken());
+					activation.setSuccess(true);
+					return activation;
+
 				} else {
 					activation.setMessage(messageByLocaleService.getMessage("specified_license_not_available", locale));
 				}

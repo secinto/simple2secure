@@ -40,12 +40,12 @@ import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputEmailConfig;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
-import simple2secure.validator.model.ValidInputContext;
-import simple2secure.validator.model.ValidInputEmailConfig;
-import simple2secure.validator.model.ValidInputLocale;
 import simple2secure.validator.model.ValidRequestMethodType;
 
 @SuppressWarnings("unchecked")

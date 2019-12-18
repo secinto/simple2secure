@@ -22,15 +22,10 @@
 package com.simple2secure.probe.test;
 
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
-import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.namednumber.ArpHardwareType;
@@ -43,16 +38,6 @@ import com.simple2secure.api.model.PacketInfo;
 import com.simple2secure.probe.utils.PcapUtil;
 
 public class TestPcapUtil {
-
-	@Test
-	public void getNetIfByInetAddr_validIpAsParam_PcapNetworkInterface() throws PcapNativeException, UnknownHostException, SocketException {
-
-		List<PcapNetworkInterface> networkInterfaceList = Pcaps.findAllDevs();
-		PcapNetworkInterface networkInterface = PcapUtil.getNetworkInterfaceByInetAddr(PcapUtil.getIpAddrOfNetworkInterface());
-		boolean containsNetworkInterface = networkInterfaceList.contains(networkInterface);
-
-		Assertions.assertTrue(containsNetworkInterface);
-	}
 
 	@Test
 	public void extractPacketInformation() {

@@ -36,4 +36,4 @@ class TestSequenceResultSchema(ma.ModelSchema):
 
 class DeviceInfoSchema(ma.ModelSchema):
     class Meta:
-        fields = ["deviceId", "hostName", "ipAddress", "netMask", "deviceStatus", "lastOnlineTimestamp"]
+        fields = ["deviceId", "hostName", "ipAddress", "netMask", "deviceStatus", "lastOnlineTimestamp", "type"]
