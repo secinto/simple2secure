@@ -17,7 +17,10 @@ import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class LicenseUtils extends BaseServiceProvider {
 
 	/**

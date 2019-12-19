@@ -39,8 +39,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -71,20 +69,18 @@ import com.simple2secure.portal.validation.model.ValidInputUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
 import simple2secure.validator.model.ValidatedInput;
 
 @Component
+@Slf4j
 public class PortalUtils {
-	private static Logger log = LoggerFactory.getLogger(PortalUtils.class);
 
 	@Autowired
 	JavaMailSender javaMailSender;
-
-	static final String CLAIM_POD = "podID";
-	static final String CLAIMS_SUBJECT = "data";
 
 	/**
 	 * This function generates a token(activation, invitation, paswordReset) for each user
@@ -222,8 +218,8 @@ public class PortalUtils {
 	 */
 	public String generatePodToken(String deviceId, String tokenSecret) {
 
-		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-		claims.put(CLAIM_POD, deviceId);
+		Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+		claims.put(StaticConfigItems.CLAIM_POD, deviceId);
 
 		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
 				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
@@ -526,7 +522,7 @@ public class PortalUtils {
 
 	/**
 	 * This function returns the list of the annotated methods with the NotSecuredApi annotation.
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -553,7 +549,7 @@ public class PortalUtils {
 
 	/**
 	 * This function converts List to array
-	 * 
+	 *
 	 * @param items
 	 * @return
 	 */

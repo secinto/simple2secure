@@ -27,8 +27,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -42,12 +40,12 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.utils.PortalUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
+@Slf4j
 @Component
 public class StartupApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
-
-	private static Logger log = LoggerFactory.getLogger(StartupApplicationListener.class);
 
 	@Autowired
 	private DataInitialization dataInitializer;

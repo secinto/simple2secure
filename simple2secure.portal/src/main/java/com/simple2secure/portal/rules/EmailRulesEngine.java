@@ -25,8 +25,6 @@ package com.simple2secure.portal.rules;
 import java.util.List;
 
 import org.jeasy.rules.api.Rule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,20 +34,14 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
 import com.simple2secure.portal.utils.RuleUtils;
 
-/**
- *
- * @author Richard Heinz
- *
- *         A rule engine for checking mails. Extents the GeneralRulesEngineImpl.
- *
- */
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EmailRulesEngine extends GeneralRulesEngineImpl {
 
 	@Autowired
 	private RuleUtils ruleUtils;
-
-	private static Logger log = LoggerFactory.getLogger(EmailRulesEngine.class);
 
 	/**
 	 * Method to load, create and register all rules which are given for this user.

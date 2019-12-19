@@ -30,8 +30,10 @@ import com.simple2secure.portal.validation.model.ValidInputToken;
 import com.simple2secure.portal.validation.model.ValidInputWidget;
 import com.simple2secure.portal.validation.model.ValidInputWidgetProp;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.model.ValidatedInput;
 
+@Slf4j
 public class StringToValidInputConverterFactory implements ConverterFactory<String, ValidatedInput<?>> {
 
 	@Override

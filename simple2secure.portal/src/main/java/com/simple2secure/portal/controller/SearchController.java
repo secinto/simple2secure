@@ -39,12 +39,14 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputSearchQuery;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
+@Slf4j
 public class SearchController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
@@ -58,6 +60,8 @@ public class SearchController extends BaseUtilsProvider {
 
 			if (context != null) {
 				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery.getValue(), context);
+
+				log.debug("Found {} search results for search query {}", srList.size(), searchQuery);
 
 				if (srList != null) {
 					return new ResponseEntity<>(srList, HttpStatus.OK);

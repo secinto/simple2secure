@@ -23,8 +23,6 @@ package com.simple2secure.portal.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +41,7 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -50,9 +49,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.NOTIFICATION_API)
+@Slf4j
 public class NotificationController extends BaseUtilsProvider {
-
-	static final Logger log = LoggerFactory.getLogger(NotificationController.class);
 
 	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")

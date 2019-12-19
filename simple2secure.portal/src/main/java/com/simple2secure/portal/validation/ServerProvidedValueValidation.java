@@ -26,9 +26,11 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 
 @Component
+@Slf4j
 public class ServerProvidedValueValidation implements HandlerMethodArgumentResolver {
 
 	@Autowired

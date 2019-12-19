@@ -24,8 +24,6 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,10 +32,11 @@ import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
-@Component
-public class WidgetUtils extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(WidgetUtils.class);
+@Component
+@Slf4j
+public class WidgetUtils extends BaseServiceProvider {
 
 	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();

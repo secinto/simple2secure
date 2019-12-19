@@ -2,8 +2,6 @@ package com.simple2secure.portal.config;
 
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,14 +27,15 @@ import com.simple2secure.portal.security.auth.JWTAuthenticationFilter;
 import com.simple2secure.portal.security.auth.JWTLoginFilter;
 import com.simple2secure.portal.utils.PortalUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @EnableWebSecurity
 @EnableMongoRepositories("com.simple2secure.portal.dao")
 @CrossOrigin(origins = "https://localhost:9000")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-	public static final Logger log = LoggerFactory.getLogger(WebSecurityConfig.class);
 
 	@Autowired
 	CustomAuthenticationProvider authProvider;

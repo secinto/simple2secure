@@ -25,8 +25,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
@@ -37,6 +35,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Extension of the {@link org.springframework.data.mongodb.core.MongoTemplate} implementing additional finder methods (e.g. by example, by
  * native query).
@@ -44,9 +44,8 @@ import com.mongodb.MongoClient;
  * @author skraxberger
  *
  */
+@Slf4j
 public class ExtendedMongoTemplate extends MongoTemplate {
-
-	static final Logger log = LoggerFactory.getLogger(ExtendedMongoTemplate.class);
 
 	/**
 	 * @param mongoClient

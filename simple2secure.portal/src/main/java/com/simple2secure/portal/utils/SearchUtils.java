@@ -25,8 +25,6 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,10 +38,11 @@ import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
-@Component
-public class SearchUtils extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(SearchUtils.class);
+@Component
+@Slf4j
+public class SearchUtils extends BaseServiceProvider {
 
 	@Autowired
 	DeviceUtils deviceUtils;

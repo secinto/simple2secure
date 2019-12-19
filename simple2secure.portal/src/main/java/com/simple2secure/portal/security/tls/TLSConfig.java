@@ -29,15 +29,14 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class TLSConfig {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(TLSConfig.class);
+@Configuration
+@Slf4j
+public class TLSConfig {
 
 	@Value("${server.certificate.serial}")
 	private String[] acceptedSerialNumbers;

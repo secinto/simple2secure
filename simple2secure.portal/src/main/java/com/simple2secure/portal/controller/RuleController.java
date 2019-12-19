@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,23 +47,16 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputRule;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-/**
- *
- * @author Richard Heinz
- *
- *         In this class all request for the rules between web and server are implemented
- *
- */
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.RULE_API)
+@Slf4j
 public class RuleController extends BaseUtilsProvider {
-
-	private static Logger log = LoggerFactory.getLogger(RuleController.class);
 
 	/**
 	 * Method to save/update the source code for a rule into/from the database

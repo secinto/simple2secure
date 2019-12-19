@@ -27,8 +27,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,6 +54,7 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -64,8 +63,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
+@Slf4j
 public class LicenseController extends BaseUtilsProvider {
-	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	@Value("${license.filepath}")
 	private String licenseFilePath;

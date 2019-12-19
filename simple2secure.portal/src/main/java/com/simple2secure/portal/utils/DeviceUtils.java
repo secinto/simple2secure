@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,10 +39,11 @@ import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
-@Component
-public class DeviceUtils extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(DeviceUtils.class);
+@Component
+@Slf4j
+public class DeviceUtils extends BaseServiceProvider {
 
 	@Autowired
 	TestUtils testUtils;

@@ -18,15 +18,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.simple2secure.portal.validation.ServerProvidedValueValidation;
 import com.simple2secure.portal.validation.StringToValidInputConverterFactory;
 
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Component
-@EnableSwagger2
+@Slf4j
 public class WebConfig implements WebMvcConfigurer {
 
 	@Autowired
@@ -40,11 +36,6 @@ public class WebConfig implements WebMvcConfigurer {
 	@Bean
 	public TaskScheduler taskScheduler() {
 		return new ConcurrentTaskScheduler();
-	}
-
-	@Bean
-	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
 	}
 
 	@Override

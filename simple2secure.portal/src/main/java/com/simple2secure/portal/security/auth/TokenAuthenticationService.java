@@ -45,6 +45,7 @@ import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Token;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
 import com.simple2secure.portal.repository.CurrentContextRepository;
@@ -85,13 +86,6 @@ public class TokenAuthenticationService {
 	@Autowired
 	PortalUtils portalUtils;
 
-	static final String TOKEN_PREFIX = "Bearer";
-	static final String HEADER_STRING = "Authorization";
-	static final String CLAIMS_SUBJECT = "data";
-	static final String CLAIM_USERID = "userID";
-	static final String CLAIM_USERROLE = "userRole";
-	static final String CLAIM_DEVICEID = "deviceId";
-
 	/**
 	 * This function is used to create probe authentication token so that it is available to send data to the portal
 	 *
@@ -118,9 +112,9 @@ public class TokenAuthenticationService {
 				return null;
 			}
 
-			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-			claims.put(CLAIM_DEVICEID, deviceId);
-			claims.put(CLAIM_USERROLE, UserRole.DEVICE);
+			Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+			claims.put(StaticConfigItems.CLAIM_DEVICEID, deviceId);
+			claims.put(StaticConfigItems.CLAIM_USERROLE, UserRole.DEVICE);
 			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
 
@@ -138,8 +132,8 @@ public class TokenAuthenticationService {
 
 			Token token = tokenRepository.findByUserId(user.getId());
 
-			Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-			claims.put(CLAIM_USERID, user.getId());
+			Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+			claims.put(StaticConfigItems.CLAIM_USERID, user.getId());
 
 			List<Settings> settings = settingsRepository.findAll();
 
@@ -169,7 +163,7 @@ public class TokenAuthenticationService {
 				}
 			}
 
-			res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + accessToken);
+			res.addHeader(StaticConfigItems.HEADER_STRING, StaticConfigItems.TOKEN_PREFIX + " " + accessToken);
 		} else {
 			log.error("User {} cannot be found.", username);
 		}
@@ -181,7 +175,7 @@ public class TokenAuthenticationService {
 		String accessToken = resolveToken(request);
 
 		if (accessToken != null) {
-			Token token = tokenRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
+			Token token = tokenRepository.findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
 			UserRole userRole = UserRole.LOGINUSER;
 			if (token != null) {
 				User user = userRepository.find(token.getUserId());
@@ -216,7 +210,7 @@ public class TokenAuthenticationService {
 			else {
 				// Handle token for devices
 				// Check if there is a token with this id in the licenseRepo
-				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(TOKEN_PREFIX, "").trim());
+				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
 
 				if (license != null) {
 					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
@@ -250,9 +244,9 @@ public class TokenAuthenticationService {
 	}
 
 	public String resolveToken(HttpServletRequest req) {
-		String bearerToken = req.getHeader(HEADER_STRING);
-		if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-			return bearerToken.replace(TOKEN_PREFIX, "").trim();
+		String bearerToken = req.getHeader(StaticConfigItems.HEADER_STRING);
+		if (bearerToken != null && bearerToken.startsWith(StaticConfigItems.TOKEN_PREFIX)) {
+			return bearerToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim();
 		}
 		return null;
 	}

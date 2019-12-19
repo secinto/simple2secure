@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,10 +52,11 @@ import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
-@Component
-public class DataInitialization extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(DataInitialization.class);
+@Component
+@Slf4j
+public class DataInitialization extends BaseServiceProvider {
 
 	@Autowired
 	protected PortalUtils portalUtils;

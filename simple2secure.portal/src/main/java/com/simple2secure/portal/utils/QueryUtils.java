@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.OSInfo;
@@ -35,10 +33,11 @@ import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
-@Component
-public class QueryUtils extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(QueryUtils.class);
+@Component
+@Slf4j
+public class QueryUtils extends BaseServiceProvider {
 
 	/**
 	 * This function returns all unmapped queries according to the group id

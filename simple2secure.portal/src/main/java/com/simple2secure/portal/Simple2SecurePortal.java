@@ -14,8 +14,6 @@ import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -38,12 +36,13 @@ import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.MongoRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = { "com.simple2secure.portal" }, exclude = { EmbeddedMongoAutoConfiguration.class,
 		MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
+@Slf4j
 public class Simple2SecurePortal extends SpringBootServletInitializer {
-
-	private static Logger log = LoggerFactory.getLogger(Simple2SecurePortal.class);
 
 	@Value("${mail.username}")
 	private String mailUser;

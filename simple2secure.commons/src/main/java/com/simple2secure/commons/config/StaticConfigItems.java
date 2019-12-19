@@ -103,4 +103,12 @@ public class StaticConfigItems {
 	public static final String WIDGET_API = API_ENDPOINT + "/widget";
 	public static final String ERROR_API = API_ENDPOINT + "/error";
 	public static final String LOGIN_API = API_ENDPOINT + "/login";
+	
+	public static final String TOKEN_PREFIX = "Bearer";
+	public static final String HEADER_STRING = "Authorization";
+	public static final String CLAIM_SUBJECT = "data";
+	public static final String CLAIM_USERID = "userID";
+	public static final String CLAIM_USERROLE = "userRole";
+	public static final String CLAIM_DEVICEID = "deviceId";
+	public static final String CLAIM_POD = "podID";
 }

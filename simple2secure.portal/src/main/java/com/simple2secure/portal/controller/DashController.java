@@ -21,17 +21,16 @@
  */
 package com.simple2secure.portal.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.commons.config.StaticConfigItems;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping(StaticConfigItems.DASH_API)
+@Slf4j
 public class DashController {
-
-	static final Logger log = LoggerFactory.getLogger(DashController.class);
 
 }

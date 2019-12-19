@@ -27,8 +27,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,6 +59,7 @@ import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputToken;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -69,9 +68,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.USER_API)
+@Slf4j
 public class UserController extends BaseUtilsProvider {
-
-	static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 	/**
 	 * This function finds and returns user according to the user id

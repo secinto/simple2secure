@@ -40,9 +40,11 @@ import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
 
 import groovy.lang.GroovyClassLoader;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Component
+@Slf4j
 public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils {
 
 	@Autowired

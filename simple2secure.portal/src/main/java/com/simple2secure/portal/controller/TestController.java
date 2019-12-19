@@ -62,6 +62,7 @@ import com.simple2secure.portal.validation.model.ValidInputTestResult;
 import com.simple2secure.portal.validation.model.ValidInputTestRun;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -69,6 +70,7 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.TEST_API)
+@Slf4j
 public class TestController extends BaseUtilsProvider {
 
 	/*

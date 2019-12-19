@@ -6,7 +6,10 @@ import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class SUTUtils extends BaseServiceProvider {
 
 	/**

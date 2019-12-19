@@ -35,10 +35,12 @@ import org.springframework.web.context.request.WebRequest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @RestController
 @RequestMapping(StaticConfigItems.ERROR_API)
+@Slf4j
 public class CustomErrorController extends BaseUtilsProvider implements ErrorController {
 
 	@ValidRequestMapping
