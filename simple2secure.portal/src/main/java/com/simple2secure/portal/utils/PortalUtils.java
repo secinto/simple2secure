@@ -41,11 +41,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -68,6 +71,7 @@ import com.simple2secure.portal.validation.model.ValidInputUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
 import simple2secure.validator.model.ValidatedInput;
@@ -478,6 +482,13 @@ public class PortalUtils {
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
 
+	public String getCompleteUrlApi(Method m, String[] clazz_url) {
+		StringBuilder method_url = createMethodUrl(m);
+		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
+		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+		return complete_url;
+	}
+
 	/**
 	 * This function creates OsQueryCategory object from the JsonNode
 	 *
@@ -511,6 +522,49 @@ public class PortalUtils {
 		}
 
 		return apis;
+	}
+
+	/**
+	 * This function returns the list of the annotated methods with the NotSecuredApi annotation.
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public String[] getListOfNotSecuredApis(ApplicationContext context) {
+		List<String> url_list = new ArrayList<>();
+		for (String beanName : context.getBeanNamesForAnnotation(RestController.class)) {
+			Object bean = context.getBean(beanName);
+			Class<?> clazz = AopUtils.getTargetClass(bean);
+			String[] clazz_url = getClassUrlFromAnnotation(clazz);
+
+			Method[] methods = clazz.getDeclaredMethods();
+
+			for (Method m : methods) {
+				if (m.isAnnotationPresent(NotSecuredApi.class)) {
+
+					String url = getCompleteUrlApi(m, clazz_url);
+					url_list.add(url);
+				}
+			}
+		}
+		url_list.add(StaticConfigItems.LOGIN_API);
+		return listToArray(url_list);
+	}
+
+	/**
+	 * This function converts List to array
+	 * 
+	 * @param items
+	 * @return
+	 */
+	public String[] listToArray(List<String> items) {
+		String[] urls = new String[items.size()];
+
+		for (int index = 0; index < items.size(); index++) {
+			urls[index] = items.get(index);
+		}
+
+		return urls;
 	}
 
 }

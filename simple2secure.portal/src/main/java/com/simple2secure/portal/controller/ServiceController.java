@@ -38,6 +38,7 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputVersion;
 
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
@@ -46,6 +47,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 @RequestMapping(StaticConfigItems.SERVICE_API)
 public class ServiceController extends BaseUtilsProvider {
 
+	@NotSecuredApi
 	@ValidRequestMapping
 	public ResponseEntity<Service> getServiceVersion(@ServerProvidedValue ValidInputLocale locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);

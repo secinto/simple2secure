@@ -94,9 +94,7 @@ public class TestController extends BaseUtilsProvider {
 		return testUtils.getTestByDeviceId(deviceId.getValue(), page.getValue(), size.getValue(), usePagination, locale);
 	}
 
-	@ValidRequestMapping(
-			value = "/delete",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Test> deleteTest(@PathVariable ValidInputTest testId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -114,10 +112,7 @@ public class TestController extends BaseUtilsProvider {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/scheduleTest",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
@@ -147,8 +142,7 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/getScheduledTests")
+	@ValidRequestMapping(value = "/getScheduledTests")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -162,8 +156,7 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/testresult")
+	@ValidRequestMapping(value = "/testresult")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Map<String, Object>> getTestResultByContextId(@ServerProvidedValue ValidInputContext contextId,
 			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
@@ -178,18 +171,14 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_getting_retrieving_tests", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/testresult",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/testresult", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestResult> deleteTestResult(@PathVariable ValidInputTestResult testResultId,
 			@ServerProvidedValue ValidInputLocale locale) {
 		return testUtils.deleteTestResult(testResultId.getValue(), locale);
 	}
 
-	@ValidRequestMapping(
-			value = "/testrun/delete",
-			method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(value = "/testrun/delete", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestRun> deleteTestRun(@PathVariable ValidInputTestRun testRunId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -205,9 +194,7 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_deleting_test", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/save",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/save", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Test> updateSaveTest(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, NoSuchAlgorithmException {
@@ -234,10 +221,7 @@ public class TestController extends BaseUtilsProvider {
 	 * -------------------------------------------------------------------------------------------------------------------------------------
 	 */
 
-	@ValidRequestMapping(
-			value = "/scheduleTestPod",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleTestPod", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestRun> addTestToSchedulePod(@RequestBody Test test, @PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -272,19 +256,14 @@ public class TestController extends BaseUtilsProvider {
 
 	}
 
-	@ValidRequestMapping(
-			value = "/saveTestResult",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/saveTestResult", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestResult> saveTestResult(@RequestBody TestResult testResult, @ServerProvidedValue ValidInputLocale locale) {
 		TestResult result = testUtils.saveTestResult(testResult, locale.getValue());
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	@ValidRequestMapping(
-			value = "/syncTest",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/syncTest", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<Test> syncTestWithPod(@RequestBody Test test, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -296,10 +275,7 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/syncTests",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/syncTests", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<Test>> syncTestsWithPod(@RequestBody List<Test> tests, @PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -332,9 +308,7 @@ public class TestController extends BaseUtilsProvider {
 		return ((ResponseEntity<List<Test>>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
-	@ValidRequestMapping(
-			value = "/updateTestStatus",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/updateTestStatus", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<TestStatusDTO> updateTestStatus(@RequestBody TestStatusDTO testRunDTO, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {

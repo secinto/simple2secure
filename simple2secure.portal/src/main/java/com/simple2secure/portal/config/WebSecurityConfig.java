@@ -1,5 +1,9 @@
 package com.simple2secure.portal.config;
 
+import java.util.Arrays;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +12,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +27,7 @@ import com.simple2secure.portal.security.auth.CustomAuthenticationProvider;
 import com.simple2secure.portal.security.auth.CustomAuthenticationSuccessHandler;
 import com.simple2secure.portal.security.auth.JWTAuthenticationFilter;
 import com.simple2secure.portal.security.auth.JWTLoginFilter;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +35,8 @@ import com.simple2secure.portal.security.auth.JWTLoginFilter;
 @CrossOrigin(origins = "https://localhost:9000")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+	public static final Logger log = LoggerFactory.getLogger(WebSecurityConfig.class);
 
 	@Autowired
 	CustomAuthenticationProvider authProvider;
@@ -50,6 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public LoadedConfigItems loadedConfigItems;
 
+	@Autowired
+	private PortalUtils portalUtils;
+
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -58,42 +67,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return authProvider;
 	}
 
-	@Override
-	public void configure(WebSecurity web) {
-		web.ignoring().antMatchers(StaticConfigItems.USER_API + "register/**", StaticConfigItems.USER_API + "/activate/",
-				StaticConfigItems.SERVICE_API, StaticConfigItems.TEST_API, StaticConfigItems.USER_API + "/sendResetPasswordEmail",
-				StaticConfigItems.USER_API + "/resetPassword/**", StaticConfigItems.USER_API + "/updatePassword/**",
-				StaticConfigItems.USER_API + "/invite/**", StaticConfigItems.DOWNLOAD_API + "/**", StaticConfigItems.DEVICE_API + "/**",
-				StaticConfigItems.LICENSE_API + "/authenticate/**");
-	}
-
-	// TODO - find better solution for antMatchers!
+	/**
+	 * Annotate the function with @NotSecuredApi if you want to exclude the api from the autorization
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.LOGIN_API).permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.API_ENDPOINT + "/service").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.API_ENDPOINT + "/register/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.API_ENDPOINT + "/test").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.API_ENDPOINT + "/download/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.USER_API + "/activate/").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.USER_API + "/updatePassword/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.USER_API + "/invite/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.USER_API + "/activate/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.USER_API + "/authenticate/**").permitAll().and().authorizeRequests()
-				.antMatchers(StaticConfigItems.DEVICE_API + "/**").permitAll().and().authorizeRequests()
-				// filter the login requests
-				.and()
+		String[] unsecuredApis = portalUtils.getListOfNotSecuredApis(getApplicationContext());
+
+		log.info("Following APIs are annotated as insecured {}", Arrays.toString(unsecuredApis));
+
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers(unsecuredApis).permitAll().and().authorizeRequests().anyRequest()
+				.authenticated().and()
 				.addFilterBefore(new JWTLoginFilter(StaticConfigItems.LOGIN_API, this.authenticationManager()),
 						UsernamePasswordAuthenticationFilter.class)
-				// And filter other requests to check the presence of JWTth in header
 				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 
 		http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
 		http.formLogin().successHandler(authenticationSuccessHandler);
 		http.formLogin().failureHandler(authenticationFailureHandler);
-		// http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Override

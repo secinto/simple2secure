@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -55,7 +56,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	private ApplicationContext context;
 
 	@Autowired
-	private PortalUtils portalUtils;
+	public PortalUtils portalUtils;
 
 	@Autowired
 	private RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -103,7 +104,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	 */
 	private void initializeMethodHeaders() throws Exception {
 		List<RequestMappingInfo> requestMappingList = new ArrayList<>();
-		for (String beanName : context.getBeanDefinitionNames()) {
+		for (String beanName : context.getBeanNamesForAnnotation(RestController.class)) {
 			Object bean = context.getBean(beanName);
 			Class<?> clazz = AopUtils.getTargetClass(bean);
 			String[] clazz_url = portalUtils.getClassUrlFromAnnotation(clazz);

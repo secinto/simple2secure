@@ -37,6 +37,7 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
@@ -55,6 +56,7 @@ public class DownloadController extends BaseUtilsProvider {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
+	@NotSecuredApi
 	@ValidRequestMapping
 	public ResponseEntity<byte[]> downloadProbe(@ServerProvidedValue ValidInputLocale locale) throws IOException, URISyntaxException {
 

@@ -56,6 +56,7 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -103,10 +104,8 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@ValidRequestMapping(
-			value = "/authenticate",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/authenticate", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> authenticate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
@@ -196,9 +195,7 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(
-			value = "/downloadLicenseForScript",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/downloadLicenseForScript", method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
