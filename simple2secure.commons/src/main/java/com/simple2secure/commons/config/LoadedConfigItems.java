@@ -118,6 +118,46 @@ public class LoadedConfigItems {
 		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
 	}
 
+	public String getUsersAPI() {
+		return getBaseURL() + StaticConfigItems.USER_API;
+	}
+
+	public String getLoginAPI() {
+		return getBaseURL() + StaticConfigItems.LOGIN_API;
+	}
+
+	public String getReportsAPI() {
+		return getBaseURL() + StaticConfigItems.REPORT_API;
+	}
+
+	public String getQueryAPI() {
+		return getBaseURL() + StaticConfigItems.QUERY_API;
+	}
+
+	public String getDeviceAPI() {
+		return getBaseURL() + StaticConfigItems.DEVICE_API;
+	}
+
+	public String getStepAPI() {
+		return getBaseURL() + StaticConfigItems.STEP_API;
+	}
+
+	public String getProcessorAPI() {
+		return getBaseURL() + StaticConfigItems.PROCESSOR_API;
+	}
+
+	public String getLicenseAPI() {
+		return getBaseURL() + StaticConfigItems.LICENSE_API;
+	}
+
+	public String getServiceAPI() {
+		return getBaseURL() + StaticConfigItems.SERVICE_API;
+	}
+
+	public String getGroupAPI() {
+		return getBaseURL() + StaticConfigItems.GROUP_API;
+	}
+
 	public String getVersion() {
 		return version;
 	}

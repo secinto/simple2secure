@@ -33,7 +33,6 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
@@ -47,6 +46,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SEQUENCE_API)
 public class TestSequenceController extends BaseUtilsProvider {
@@ -66,9 +66,8 @@ public class TestSequenceController extends BaseUtilsProvider {
 				return new ResponseEntity<>(sequencesMap, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequences", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_sequences", locale));
 	}
 
 	@ValidRequestMapping(method = ValidRequestMethodType.POST)
@@ -95,9 +94,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sequence, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestSequence>) buildResponseEntity("problem_occured_while_saving_sequence", locale));
 	}
 
 	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
@@ -113,9 +110,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_sequence", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestSequence>) buildResponseEntity("problem_occured_while_deleting_sequence", locale));
 
 	}
 
@@ -130,16 +125,14 @@ public class TestSequenceController extends BaseUtilsProvider {
 			log.debug("Updating last online time for device {}", deviceId);
 			deviceInfoRepository.update(deviceInfo);
 			log.debug("Updated last online time for device {}", deviceId);
-			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId.getValue(), locale.getValue());
+			ResponseEntity<List<SequenceRun>> respEntObj = testUtils.getSequenceByDeviceId(deviceId.getValue(), locale);
 			List<SequenceRun> allSeqRuns = respEntObj.getBody();
 			List<SequenceRun> filteredSeqRuns = allSeqRuns.stream().filter(sR -> sR.getSequenceStatus().equals(TestStatus.PLANNED))
 					.collect(Collectors.toList());
 			return new ResponseEntity<>(filteredSeqRuns, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<SequenceRun>>) buildResponseEntity("problem_occured_while_retrieving_scheduled_sequences", locale));
 
 	}
 
@@ -170,9 +163,8 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_sequence", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<SequenceRun>) buildResponseEntity("problem_occured_while_scheduling_sequence", locale));
+
 	}
 
 	@ValidRequestMapping(value = "/scheduledSequence")
@@ -190,9 +182,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(scheduledSequencesMap, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_scheduled_sequences", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_scheduled_sequences", locale));
 
 	}
 
@@ -211,9 +201,8 @@ public class TestSequenceController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_updating_sequence_status", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<SequenceRun>) buildResponseEntity("problem_occured_while_updating_sequence_status", locale));
+
 	}
 
 	@ValidRequestMapping(value = "/save/sequencerunresult", method = ValidRequestMethodType.POST)
@@ -225,9 +214,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sequenceRunResult, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_sequence_results", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestSequenceResult>) buildResponseEntity("problem_occured_while_saving_sequence_results", locale));
 	}
 
 	@ValidRequestMapping(value = "/sequenceresults")
@@ -239,9 +226,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<TestSequenceResult>>) buildResponseEntity("problem_occured_while_loading_sequence_results", locale));
 	}
 
 	@ValidRequestMapping(value = "/sequencerunresults")
@@ -253,9 +238,7 @@ public class TestSequenceController extends BaseUtilsProvider {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<TestSequenceResult>>) buildResponseEntity("problem_occured_while_loading_sequence_results", locale));
 	}
 
 	@ValidRequestMapping(value = "/result")
@@ -275,15 +258,11 @@ public class TestSequenceController extends BaseUtilsProvider {
 					sequenceResultMap.put("totalSize", testSequenceResultRepository.getCountOfSequencesWithSequenceRunIds(sequenceIds));
 					return new ResponseEntity<>(sequenceResultMap, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_sequence_results", locale));
 				}
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_loading_sequence_results", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_sequence_results", locale));
 	}
 
 }

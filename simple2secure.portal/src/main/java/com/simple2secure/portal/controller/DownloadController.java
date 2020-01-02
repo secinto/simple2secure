@@ -34,13 +34,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.DOWNLOAD_API)
 public class DownloadController extends BaseUtilsProvider {
@@ -67,8 +67,8 @@ public class DownloadController extends BaseUtilsProvider {
 			return new ResponseEntity<>(downloadData, httpHeaders, HttpStatus.OK);
 		} else {
 			log.error("File for download not found!");
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_during_download", locale.getValue())),
-					HttpStatus.NOT_FOUND);
+
+			return (ResponseEntity<byte[]>) buildResponseEntity("error_during_download", locale);
 		}
 	}
 }

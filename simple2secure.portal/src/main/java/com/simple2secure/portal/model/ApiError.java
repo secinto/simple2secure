@@ -21,15 +21,62 @@
  */
 package com.simple2secure.portal.model;
 
-public class CustomErrorType {
+import java.time.LocalDateTime;
 
-	private String error;
+import org.springframework.http.HttpStatus;
 
-	public CustomErrorType(String errorMessage) {
-		error = errorMessage;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+public class ApiError {
+
+	private String message;
+	private HttpStatus status;
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	private LocalDateTime timestamp;
+
+	public ApiError() {
+		timestamp = LocalDateTime.now();
+	}
+
+	public ApiError(String errorMessage) {
+		message = errorMessage;
+	}
+
+	public ApiError(String errorMessage, HttpStatus status) {
+		message = errorMessage;
+		this.status = status;
+	}
+
+	public ApiError(String message, HttpStatus status, LocalDateTime timestamp) {
+		super();
+		this.message = message;
+		this.status = status;
+		this.timestamp = timestamp;
 	}
 
 	public String getErrorMessage() {
-		return error;
+		return message;
 	}
+
+	public void setErrorMessage(String error) {
+		message = error;
+	}
+
+	public HttpStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(HttpStatus status) {
+		this.status = status;
+	}
+
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+
 }

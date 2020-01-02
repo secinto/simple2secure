@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +39,6 @@ import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputProcessor;
@@ -49,6 +47,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.PROCESSOR_API)
 public class ProcessorController extends BaseUtilsProvider {
@@ -62,8 +61,7 @@ public class ProcessorController extends BaseUtilsProvider {
 		if (processors != null) {
 			return new ResponseEntity<>(processors, HttpStatus.OK);
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<Processor>>) buildResponseEntity("error_while_getting_processors", locale);
 	}
 
 	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -76,8 +74,7 @@ public class ProcessorController extends BaseUtilsProvider {
 				List<Processor> processors = processorRepository.findAll();
 
 				if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("processor_already_exist", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return (ResponseEntity<Processor>) buildResponseEntity("processor_already_exist", locale);
 				}
 				processorRepository.save(processor);
 			} else {
@@ -86,8 +83,7 @@ public class ProcessorController extends BaseUtilsProvider {
 			return new ResponseEntity<>(processor, HttpStatus.OK);
 		}
 		log.error("Error occured while saving/updating processor");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_processor", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<Processor>) buildResponseEntity("problem_saving_processor", locale);
 	}
 
 	/**
@@ -114,8 +110,6 @@ public class ProcessorController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting processor with id {}", processorId.getValue());
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_processor",
-				ObjectUtils.toObjectArray(processorId), locale.getValue())), HttpStatus.NOT_FOUND);
-
+		return buildResponseEntity("problem_occured_while_deleting_processor", locale);
 	}
 }

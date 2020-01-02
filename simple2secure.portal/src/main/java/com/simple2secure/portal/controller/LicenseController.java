@@ -51,7 +51,6 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
@@ -61,6 +60,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
 public class LicenseController extends BaseUtilsProvider {
@@ -113,8 +113,7 @@ public class LicenseController extends BaseUtilsProvider {
 
 			if (Strings.isNullOrEmpty(licensePublic.getDeviceId())) {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
 			}
 
 			LicenseActivation activation = null;
@@ -122,27 +121,14 @@ public class LicenseController extends BaseUtilsProvider {
 			activation = licenseUtils.authenticateLicense(licensePublic, locale.getValue());
 
 			if (activation.isSuccess()) {
-				/*
-				 * TODO: Check if this is really necessary. Because it will be available later if not immediately during authentication. And the SUT
-				 * should be not mixed with the devices of the system.
-				 *
-				 */
-				/*
-				 * DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(licensePublic.getDeviceId());
-				 *
-				 * if (devInfo != null && devInfo.getType() == DeviceType.PROBE) { CompanyGroup group =
-				 * groupRepository.find(licensePublic.getGroupId()); if (group != null) { sutUtils.addProbeAsSUT(licensePublic.getDeviceId(),
-				 * group.getContextId()); } }
-				 */
 				licensePublic.setAccessToken(activation.getAccessToken());
 				licensePublic.setActivated(true);
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(new CustomErrorType(activation.getMessage()), HttpStatus.NOT_FOUND);
+				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity(activation.getMessage(), locale);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_during_activation", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
 	}
 
 	/**
@@ -200,8 +186,7 @@ public class LicenseController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<byte[]>) buildResponseEntity("max_license_number_exceeded", locale);
 	}
 
 	/**

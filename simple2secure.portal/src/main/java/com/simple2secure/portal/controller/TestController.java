@@ -51,7 +51,6 @@ import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
@@ -67,6 +66,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.TEST_API)
 public class TestController extends BaseUtilsProvider {
@@ -91,7 +91,7 @@ public class TestController extends BaseUtilsProvider {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Map<String, Object>> getTestByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputPage page,
 			@PathVariable ValidInputSize size, @RequestParam boolean usePagination, @ServerProvidedValue ValidInputLocale locale) {
-		return testUtils.getTestByDeviceId(deviceId.getValue(), page.getValue(), size.getValue(), usePagination, locale.getValue());
+		return testUtils.getTestByDeviceId(deviceId.getValue(), page.getValue(), size.getValue(), usePagination, locale);
 	}
 
 	@ValidRequestMapping(
@@ -110,9 +110,7 @@ public class TestController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_deleting_test", locale));
 
 	}
 
@@ -146,9 +144,7 @@ public class TestController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
 	@ValidRequestMapping(
@@ -163,9 +159,7 @@ public class TestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(tests, HttpStatus.OK);
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	@ValidRequestMapping(
@@ -181,9 +175,7 @@ public class TestController extends BaseUtilsProvider {
 				return new ResponseEntity<>(results, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_retrieving_tests", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_getting_retrieving_tests", locale));
 	}
 
 	@ValidRequestMapping(
@@ -192,7 +184,7 @@ public class TestController extends BaseUtilsProvider {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<TestResult> deleteTestResult(@PathVariable ValidInputTestResult testResultId,
 			@ServerProvidedValue ValidInputLocale locale) {
-		return testUtils.deleteTestResult(testResultId.getValue(), locale.getValue());
+		return testUtils.deleteTestResult(testResultId.getValue(), locale);
 	}
 
 	@ValidRequestMapping(
@@ -210,10 +202,7 @@ public class TestController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_deleting_test", locale));
 	}
 
 	@ValidRequestMapping(
@@ -231,14 +220,10 @@ public class TestController extends BaseUtilsProvider {
 				testRepository.save(convertedTest);
 				return new ResponseEntity<>(convertedTest, HttpStatus.OK);
 			} else {
-				return new ResponseEntity(
-						new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test_name_exists", locale.getValue())),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test_name_exists", locale));
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
 	/*
@@ -283,9 +268,7 @@ public class TestController extends BaseUtilsProvider {
 
 			}
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_scheduling_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_scheduling_test", locale));
 
 	}
 
@@ -310,9 +293,7 @@ public class TestController extends BaseUtilsProvider {
 			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
 			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
 		}
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
 	@ValidRequestMapping(
@@ -348,9 +329,7 @@ public class TestController extends BaseUtilsProvider {
 
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<Test>>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
 	@ValidRequestMapping(
@@ -374,9 +353,7 @@ public class TestController extends BaseUtilsProvider {
 
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_test", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestStatusDTO>) buildResponseEntity("problem_occured_while_saving_test", locale));
 	}
 
 }

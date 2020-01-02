@@ -38,7 +38,7 @@ password = input("Password:")
 data = {'username': username, 'password': password}
 
 response = requests.post(
-    portal_url + '/api/login',
+    portal_url + '/api/v1/login',
     data=json.dumps(data), verify=False
 )
 
@@ -50,7 +50,7 @@ if response.status_code == 200:
         headers = create_headers(token)
 
         license_file = requests.post(
-            portal_url + '/api/license/downloadLicenseForScript',
+            portal_url + '/api/v1/license/downloadLicenseForScript',
             data=token, headers=headers, verify=False
         )
 

@@ -44,7 +44,6 @@ import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
@@ -58,6 +57,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.REPORT_API)
 public class ReportController extends BaseUtilsProvider {
@@ -73,8 +73,7 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(report, HttpStatus.OK);
 		}
 		log.error("Error occured while saving report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReport>) buildResponseEntity("problem_saving_report", locale);
 	}
 
 	@ValidRequestMapping
@@ -102,8 +101,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
 	@ValidRequestMapping(
@@ -128,8 +126,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for groups");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
 	@ValidRequestMapping(
@@ -150,8 +147,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving reports for groups");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
 	@ValidRequestMapping(
@@ -166,8 +162,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with id {}", reportId.getValue());
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReport>) buildResponseEntity("report_not_found", locale);
 	}
 
 	@ValidRequestMapping(
@@ -182,8 +177,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<GraphReport>>) buildResponseEntity("report_not_found", locale);
 	}
 
 	@ValidRequestMapping(
@@ -198,8 +192,7 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(networkReport, HttpStatus.OK);
 		}
 		log.error("Error occured while saving network report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<NetworkReport>) buildResponseEntity("problem_saving_report", locale);
 	}
 
 	@ValidRequestMapping(
@@ -227,8 +220,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving network reports for context id {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<NetworkReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
 	@ValidRequestMapping(
@@ -247,8 +239,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting network report with id {}", reportId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<NetworkReport>) buildResponseEntity("no_reports_provided", locale);
 	}
 
 	@ValidRequestMapping(
@@ -264,8 +255,7 @@ public class ReportController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<NetworkReport>>) buildResponseEntity("report_not_found", locale);
 	}
 
 	@ValidRequestMapping(
@@ -284,7 +274,6 @@ public class ReportController extends BaseUtilsProvider {
 			return new ResponseEntity<>(queryReports, HttpStatus.OK);
 		}
 		log.error("Error occured while deleting selected network reports!");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<OsQueryReport>>) buildResponseEntity("no_reports_provided", locale);
 	}
 }

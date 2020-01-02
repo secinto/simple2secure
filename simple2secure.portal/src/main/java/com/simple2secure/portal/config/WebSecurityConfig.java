@@ -28,10 +28,8 @@ import com.simple2secure.portal.security.auth.JWTLoginFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMongoRepositories("com.simple2secure.portal.dao")
-@CrossOrigin(
-		origins = "https://localhost:9000")
-@EnableGlobalMethodSecurity(
-		prePostEnabled = true)
+@CrossOrigin(origins = "https://localhost:9000")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -62,11 +60,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) {
-		web.ignoring().antMatchers(StaticConfigItems.API_ENDPOINT + "/register/**", StaticConfigItems.API_ENDPOINT + "/test",
-				StaticConfigItems.API_ENDPOINT + "/download/**", StaticConfigItems.USER_API + "/sendResetPasswordEmail",
+		web.ignoring().antMatchers(StaticConfigItems.USER_API + "register/**", StaticConfigItems.USER_API + "/activate/",
+				StaticConfigItems.SERVICE_API, StaticConfigItems.TEST_API, StaticConfigItems.USER_API + "/sendResetPasswordEmail",
 				StaticConfigItems.USER_API + "/resetPassword/**", StaticConfigItems.USER_API + "/updatePassword/**",
-				StaticConfigItems.USER_API + "/invite/**", StaticConfigItems.USER_API + "/authenticate/**",
-				StaticConfigItems.USER_API + "/activate/", StaticConfigItems.SERVICE_API + "/**", StaticConfigItems.DEVICE_API + "/**");
+				StaticConfigItems.USER_API + "/invite/**", StaticConfigItems.DOWNLOAD_API + "/**", StaticConfigItems.DEVICE_API + "/**",
+				StaticConfigItems.LICENSE_API + "/authenticate/**");
 	}
 
 	// TODO - find better solution for antMatchers!

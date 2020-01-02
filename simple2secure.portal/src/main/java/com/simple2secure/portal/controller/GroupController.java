@@ -44,7 +44,7 @@ import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
+import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDestGroup;
@@ -56,6 +56,7 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.GROUP_API)
 public class GroupController extends BaseUtilsProvider {
@@ -125,9 +126,7 @@ public class GroupController extends BaseUtilsProvider {
 					}
 				} else {
 					log.error("Group cannot contain the standard name");
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("problem_saving_group_standard_name", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return (ResponseEntity<CompanyGroup>) buildResponseEntity("problem_saving_group_standard_name", locale);
 				}
 
 			} else {
@@ -138,9 +137,7 @@ public class GroupController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while saving/updating group");
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_saving_group", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_saving_group", locale);
 	}
 
 	/**
@@ -156,10 +153,7 @@ public class GroupController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving group with id {}", groupId.getValue());
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale.getValue())),
-				HttpStatus.NOT_FOUND);
-
+		return (ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_retrieving_group", locale);
 	}
 
 	/**
@@ -180,9 +174,7 @@ public class GroupController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving group for context with id {}", contextId);
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_group", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<CompanyGroup>>) buildResponseEntity("problem_occured_while_retrieving_group", locale);
 	}
 
 	/**
@@ -199,14 +191,12 @@ public class GroupController extends BaseUtilsProvider {
 					groupUtils.deleteGroup(groupId.getValue(), true);
 					return new ResponseEntity<>(group, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(
-							new CustomErrorType(messageByLocaleService.getMessage("standard_group_delete_error", locale.getValue())),
-							HttpStatus.NOT_FOUND);
+					return buildResponseEntity("standard_group_delete_error", locale);
 				}
 			}
 		}
 		log.error("Problem occured while deleting group with id {}", groupId.getValue());
-		return new ResponseEntity<>(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_group",
+		return new ResponseEntity<>(new ApiError(messageByLocaleService.getMessage("problem_occured_while_deleting_group",
 				ObjectUtils.toObjectArray(groupId.getValue()), locale.getValue())), HttpStatus.NOT_FOUND);
 	}
 
@@ -224,12 +214,10 @@ public class GroupController extends BaseUtilsProvider {
 		User user = userRepository.find(userId.getValue());
 
 		if (sourceGroup != null && user != null) {
-			return groupUtils.checkIfGroupCanBeMoved(sourceGroup, toGroup, user, locale.getValue());
+			return groupUtils.checkIfGroupCanBeMoved(sourceGroup, toGroup, user, locale);
 		} else {
 			log.error("Problem occured while moving group with id {}", groupId);
-			return new ResponseEntity(
-					new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale.getValue())),
-					HttpStatus.NO_CONTENT);
+			return (ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_moving_group", locale);
 		}
 	}
 
@@ -259,8 +247,6 @@ public class GroupController extends BaseUtilsProvider {
 			}
 		}
 
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_copying_config", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_copying_config", locale);
 	}
 }

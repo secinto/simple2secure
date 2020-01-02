@@ -34,7 +34,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.model.CustomErrorType;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
@@ -43,6 +42,7 @@ import com.simple2secure.portal.validation.model.ValidInputSearchQuery;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
+@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
 public class SearchController extends BaseUtilsProvider {
@@ -64,8 +64,7 @@ public class SearchController extends BaseUtilsProvider {
 				}
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("service_not_found", locale.getValue())),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<List<SearchResult>>) buildResponseEntity("service_not_found", locale));
 	}
 
 }
