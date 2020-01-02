@@ -87,6 +87,7 @@ public class ProbeWorkerThread extends Thread {
 					networkMonitor = NetworkMonitor.startMonitor();
 				}
 				networkScheduler = new NetworkScheduler(networkMonitor);
+				time.schedule(networkScheduler, 0, interval);
 			}
 
 			/*
@@ -99,6 +100,7 @@ public class ProbeWorkerThread extends Thread {
 				}
 			} else {
 				configScheduler = new ConfigScheduler();
+				time.schedule(configScheduler, 0, interval);
 			}
 
 			/*
@@ -111,6 +113,7 @@ public class ProbeWorkerThread extends Thread {
 				}
 			} else {
 				queryScheduler = new QueryScheduler();
+				time.schedule(queryScheduler, 200, interval);
 			}
 			/*
 			 * Check if report scheduler is OK, if not restart it.
@@ -122,6 +125,7 @@ public class ProbeWorkerThread extends Thread {
 				}
 			} else {
 				reportScheduler = new ReportScheduler();
+				time.schedule(reportScheduler, 500, interval);
 			}
 
 			try {
@@ -161,8 +165,13 @@ public class ProbeWorkerThread extends Thread {
 		return false;
 	}
 
-	public void setRunning(boolean running) {
-		this.running = running;
+	public void stopWorkerThread() {
+		running = false;
+		networkMonitor.stopMonitor();
+		networkScheduler.cancel();
+		configScheduler.cancel();
+		queryScheduler.cancel();
+		reportScheduler.cancel();
 	}
 
 }
