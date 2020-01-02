@@ -368,7 +368,7 @@ public class PortalUtils {
 	 * @param m
 	 * @return
 	 */
-	private StringBuilder createMethodUrl(Method m) {
+	private StringBuilder createMethodUrl(Method m, boolean useWildcard) {
 		StringBuilder sb = new StringBuilder();
 		Parameter[] params = m.getParameters();
 		if (params.length > 0) {
@@ -376,7 +376,12 @@ public class PortalUtils {
 				boolean isParamPathVariable = isParamPathVariable(param);
 				if (isParamPathVariable) {
 					try {
-						sb.append(getRequestMethodTag(param));
+						if (useWildcard) {
+							sb.append("/**");
+							break;
+						} else {
+							sb.append(getRequestMethodTag(param));
+						}
 					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
 							| InvocationTargetException e) {
 						// TODO Auto-generated catch block
@@ -468,7 +473,7 @@ public class PortalUtils {
 	 * @return
 	 */
 	public RequestMappingInfo createRequestMappingInfo(String beanName, Method m, String[] clazz_url) {
-		StringBuilder method_url = createMethodUrl(m);
+		StringBuilder method_url = createMethodUrl(m, false);
 		RequestMethod rm = (RequestMethod) getValueFromAnnotation(m, ValidInputParamType.METHOD);
 		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
 		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
@@ -479,7 +484,7 @@ public class PortalUtils {
 	}
 
 	public String getCompleteUrlApi(Method m, String[] clazz_url) {
-		StringBuilder method_url = createMethodUrl(m);
+		StringBuilder method_url = createMethodUrl(m, true);
 		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
 		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
 		return complete_url;
@@ -509,7 +514,7 @@ public class PortalUtils {
 
 		for (final Method method : allMethods) {
 			if (method.isAnnotationPresent(WidgetFunction.class)) {
-				StringBuilder method_url = createMethodUrl(method);
+				StringBuilder method_url = createMethodUrl(method, false);
 				String annotated_value = (String) getValueFromAnnotation(method, ValidInputParamType.VALUE);
 				String[] clazz_url = { StaticConfigItems.WIDGET_API.replace("/api/", "") };
 				String complete_url = generateUrl(clazz_url, annotated_value, method_url);
