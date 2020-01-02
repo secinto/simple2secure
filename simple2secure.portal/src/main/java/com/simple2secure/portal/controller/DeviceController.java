@@ -56,6 +56,7 @@ import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputSize;
 
 import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -128,7 +129,9 @@ public class DeviceController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/group", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/group",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<Device>> getDevicesByGroupId(@RequestBody List<CompanyGroup> groups,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -183,7 +186,8 @@ public class DeviceController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/config")
+	@ValidRequestMapping(
+			value = "/config")
 	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
 			throws ItemNotFoundRepositoryException {
 
@@ -210,7 +214,9 @@ public class DeviceController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/scheduledTests", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/scheduledTests",
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('DEVICE')")
 	public ResponseEntity<List<TestRun>> getScheduledTests(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -227,7 +233,9 @@ public class DeviceController extends BaseUtilsProvider {
 	/**
 	 * This function deletes the specified the POD with the specified ID if it exists
 	 */
-	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			value = "/delete",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> deleteDevice(@PathVariable ValidInputDevice deviceId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -252,7 +260,9 @@ public class DeviceController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/changeGroup", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/changeGroup",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<CompanyLicensePrivate> changeGroupProbe(@PathVariable ValidInputDevice deviceId, @RequestBody CompanyGroup group,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -275,14 +285,19 @@ public class DeviceController extends BaseUtilsProvider {
 		return (ResponseEntity<CompanyLicensePrivate>) buildResponseEntity("problem_occured_while_updating_device_group", locale);
 	}
 
-	@ValidRequestMapping(value = "/status")
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/status")
 	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
-	@ValidRequestMapping(value = "/status", method = ValidRequestMethodType.POST)
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/status",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<Service> postStatus(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
@@ -295,7 +310,9 @@ public class DeviceController extends BaseUtilsProvider {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);
 	}
 
-	@ValidRequestMapping(value = "/update", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/update",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<DeviceInfo> updateDeviceInfo(@RequestBody DeviceInfo deviceInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		DeviceInfo deviceInfoFromDB = deviceInfoRepository.findByDeviceId(deviceInfo.getDeviceId());
