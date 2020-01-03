@@ -40,7 +40,9 @@ import com.simple2secure.api.model.DataType;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParam {
-
+	
+	public static final String TYPE_LIMIT = "typeLimit";
+	
 	String name();
 
 	String description_de();
