@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -27,10 +27,6 @@ import java.util.List;
 import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.portal.dao.MongoRepository;
 
-/**
- * @author Richard Heinz
- *
- */
 public abstract class RuleWithSourcecodeRepository extends MongoRepository<RuleWithSourcecode> {
 	public abstract List<RuleWithSourcecode> findByContextId(String contextId);
 }

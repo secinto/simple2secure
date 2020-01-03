@@ -21,34 +21,21 @@
  */
 package com.simple2secure.probe.network;
 
-import java.util.List;
-
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
-import org.pcap4j.core.PcapAddress;
 import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapIpV4Address;
-import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
-import org.pcap4j.core.Pcaps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.simple2secure.commons.collections.ProcessingQueue;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.network.NetUtils;
 import com.simple2secure.probe.exceptions.NetworkException;
-import com.simple2secure.probe.exceptions.ProbeException;
 import com.simple2secure.probe.utils.LocaleHolder;
 import com.simple2secure.probe.utils.PcapUtil;
 
 public class NetworkMonitor {
 
-	private static Logger log = LoggerFactory.getLogger(NetworkMonitor.class);
-
 	private static NetworkMonitor instance;
 
-	private List<PcapNetworkInterface> interfaces;
 	private PcapNetworkInterface singleInterface;
 	private PacketReceiver receiver;
 	private PacketProcessorFSM packetProcessor;
@@ -64,22 +51,17 @@ public class NetworkMonitor {
 		return instance;
 	}
 
+	public void stopMonitor() {
+		receiver.stop();
+		packetProcessor.stop();
+	}
+
 	private NetworkMonitor() {
 		initMonitor();
 	}
 
 	private void initMonitor() {
-		try {
-			interfaces = Pcaps.findAllDevs();
-		} catch (PcapNativeException e1) {
-			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
-		}
-
-		if (interfaces == null || interfaces.isEmpty()) {
-			throw new ProbeException(LocaleHolder.getMessage("pcap_no_interfaces"));
-		}
-
-		getSingleInterface(false);
+		singleInterface = PcapUtil.getOutgoingInterface(true, false);
 
 		if (singleInterface == null) {
 			throw new NetworkException(LocaleHolder.getMessage("no_usable_address"));
@@ -92,7 +74,8 @@ public class NetworkMonitor {
 			 * TODO: Verify if this setting works and is correctly applied. A verification for inconsistent or incorrect BPF filter strings must
 			 * be developed
 			 */
-			receiverHandle.setFilter("not (host 127.0.0.1 and port (8080 or 8443 or 9000))", BpfCompileMode.OPTIMIZE);
+			receiverHandle.setFilter("not ((host 127.0.0.1 and port (8443 or 9000)) or (host 127.0.0.1 and port (51001 or 51003)))",
+					BpfCompileMode.OPTIMIZE);
 
 			processingQueue = new ProcessingQueue<>();
 
@@ -114,40 +97,22 @@ public class NetworkMonitor {
 
 	}
 
-	private void getSingleInterface(boolean show) {
-		String previousAddress = "";
-
-		for (PcapNetworkInterface currentInterface : interfaces) {
-			if (show) {
-				log.info(currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
-			}
-			/*
-			 * Iterate through the addresses of the interfaces and check if someone fits.
-			 *
-			 * TODO: We should store the interfaces which have relevant addresses.
-			 */
-			List<PcapAddress> addresses = currentInterface.getAddresses();
-			for (PcapAddress address : addresses) {
-				if (address instanceof PcapIpV4Address) {
-					String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
-					if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
-						if (singleInterface != null) {
-							log.info("Found another usable address {}, discarding old one {}", ipAddress, previousAddress);
-						}
-						singleInterface = currentInterface;
-						previousAddress = ipAddress;
-					}
-				}
-			}
-		}
-	}
-
 	public PacketReceiver getReceiver() {
 		return receiver;
 	}
 
 	public PcapHandle getReceiverHandle() {
 		return receiverHandle;
+	}
+
+	public boolean isRunning() {
+		if (packetProcessor != null && receiver != null) {
+			if (packetProcessor.isRunning() && receiver.isRunning()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

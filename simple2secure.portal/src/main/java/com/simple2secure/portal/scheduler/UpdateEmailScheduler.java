@@ -33,8 +33,6 @@ import javax.mail.Store;
 import javax.mail.UIDFolder;
 import javax.mail.internet.MimeMultipart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -53,7 +51,10 @@ import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class UpdateEmailScheduler {
 
 	private String STORE = "imap";
@@ -84,8 +85,6 @@ public class UpdateEmailScheduler {
 	EmailRulesEngine emailRulesEngine;
 
 	private Properties emailProperties;
-
-	private static final Logger log = LoggerFactory.getLogger(UpdateEmailScheduler.class);
 
 	private Hashtable<String, Store> storeMapping = new Hashtable<>();
 

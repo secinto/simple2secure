@@ -22,7 +22,6 @@
 package com.simple2secure.probe.osquery;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
@@ -33,30 +32,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
 
 public class QueryRunnable implements Runnable {
 	private static Logger log = LoggerFactory.getLogger(QueryRunnable.class);
 
-	private QueryRun query;
+	private OsQuery query;
 
 	private ScheduledFuture<?> scheduledFuture;
 
-	public QueryRunnable(QueryRun queryRun) {
+	public QueryRunnable(OsQuery queryRun) {
 		query = queryRun;
 	}
 
 	@Override
 	public void run() {
 		String queryString = query.getSqlQuery();
-		String queryResult = executeQuery(queryString);
+		log.info("Executing query {} ", query.getName());
+		String queryResult = executeQuery(queryString, query.getName());
 		if (!Strings.isNullOrEmpty(queryResult)) {
-			Report result = new Report(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
-			result.setGroupId(ProbeConfiguration.groupId);
+			OsQueryReport result = new OsQueryReport(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
+			result.setQueryId(query.getId());
 			result.setHostname(ProbeConfiguration.hostname);
+			result.setName(query.getName());
 			DBUtil.getInstance().save(result);
 		}
 	}
@@ -77,41 +78,40 @@ public class QueryRunnable implements Runnable {
 	 * @param query
 	 * @return
 	 */
-	public String executeQuery(String query) {
+	public String executeQuery(String query, String name) {
 		String result = "";
 		Process p;
 
-		File queryExec = new File("src/main/resources/osquery/os_win7" + File.separator + "osqueryi.exe");
-		String myCommand = queryExec.getAbsolutePath();
+		String myCommand = ProbeConfiguration.osQueryExecutablePath;
 		String myArgs0 = "--json";
-		String myArgs1 = "--config-path=./src/main/resources/osquery/os_win7" + File.separator + "osquery.conf";
+		String myArgs1 = "--config-path=" + ProbeConfiguration.osQueryConfigPath;
 		String myArgs2 = query;
 
 		ProcessBuilder pb = new ProcessBuilder(myCommand, myArgs0, myArgs1, myArgs2).redirectErrorStream(true);
 		// pb.directory(directory);
-
+		log.debug("Using command {} to execute query", pb.command());
 		try {
 			p = pb.start();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 			result = IOUtils.toString(reader);
-			log.debug("OSQuery {} resulted {}", query, result);
+			log.debug("OSQuery {} resulted {}", name, result);
 			result = StringUtils.substringBetween(result, "[", "]").trim();
 			if (!Strings.isNullOrEmpty(result)) {
 				result = "[" + result + "]";
 			}
 			p.destroy();
 		} catch (Exception e) {
-			log.error("Execution during QSQuery. Reason {}", e.getMessage());
+			log.error("Exception during QSQuery. Reason {}", e.getMessage());
 		}
 		return result;
 	}
 
-	public QueryRun getQuery() {
+	public OsQuery getQuery() {
 		return query;
 	}
 
-	public void setQuery(QueryRun query) {
+	public void setQuery(OsQuery query) {
 		this.query = query;
 	}
 

@@ -4,7 +4,7 @@ import logging
 import os
 import zipfile
 
-from src.db.database import Test
+from src.db.database import Test, TestSequence
 
 ALLOWED_EXTENSIONS = {'zip'}
 

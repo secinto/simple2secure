@@ -51,19 +51,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	}
 
 	private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
-		// user.setEnabled(true);
 		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.isEnabled(), true, true, true,
 				authorities);
 	}
-
-	// private List<GrantedAuthority> buildUserAuthority(String userRole) {
-	//
-	// Set<GrantedAuthority> setAuths = new HashSet<GrantedAuthority>();
-	//
-	// setAuths.add(new SimpleGrantedAuthority(userRole));
-	//
-	// List<GrantedAuthority> Result = new ArrayList<GrantedAuthority>(setAuths);
-	//
-	// return Result;
-	// }
 }

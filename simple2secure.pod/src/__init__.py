@@ -9,7 +9,7 @@ import src.config.config as config_module
 from src.celery.start_celery import run_worker
 from src.db.database import db, PodInfo, Test
 from src.db.database_schema import ma, TestSchema
-from src.util.db_utils import init_db, update, get_pod
+from src.util.db_utils import update, get_pod
 from src.util.util import print_error_message, shutdown_server, check_command_params, init_logger
 from src.util.auth_utils import authenticate
 from src.util.rest_utils import check_portal_alive
@@ -23,8 +23,13 @@ def create_app(argv):
 def create_celery_app(app):
     # Initialize Celery
 
-    celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
-                    backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
+    if app.config['USE_CELERY_IN_DOCKER']:
+        celery = Celery('celery_tasks', broker=config_module.ProductionConfig.CELERY_BROKER_URL,
+                        backend=config_module.ProductionConfig.CELERY_BROKER_URL)
+    else:
+        celery = Celery('celery_tasks', broker=config_module.DevelopmentConfig.CELERY_BROKER_URL,
+                        backend=config_module.DevelopmentConfig.CELERY_BROKER_URL)
+
     celery.conf.broker_url = app.config['CELERY_BROKER_URL']
     celery.conf.result_backend = app.config['CELERY_RESULT_BACKEND']
 
@@ -47,14 +52,16 @@ def entrypoint(argv, mode='app'):
     # Check command line arguments and initialize logger, thereafter loggers can be used
     if mode != 'app':
         init_logger(app)
-
-    if mode == 'app':
+        log = logging.getLogger('celery.init')
+    else:
         check_command_params(argv, app)
         log = logging.getLogger('pod.init')
-    else:
-        log = logging.getLogger('celery.init')
 
     CORS(app)
+
+    log.info('===============================================================')
+    log.info('=====================      STARTING      ======================')
+    log.info('===============================================================')
 
     if not app.config['SQLALCHEMY_DATABASE_URI']:
         db_path = os.path.abspath(os.path.relpath('db'))
@@ -70,7 +77,8 @@ def entrypoint(argv, mode='app'):
         db.init_app(app)
         ma.init_app(app)
         log.info("Creating tables in the DB if not existent")
-        init_db()
+        db.create_all()
+        db.session.commit()
 
         if not app.config['POD_ID']:
             log.info('Obtaining the POD info')

@@ -24,6 +24,7 @@ package com.simple2secure.service.test;
 import org.junit.jupiter.api.Test;
 
 import com.simple2secure.service.engine.ProbeControllerEngine;
+import com.simple2secure.service.model.ProbeProcessInteraction;
 
 public class TestProbeControllerEngine {
 
@@ -32,6 +33,7 @@ public class TestProbeControllerEngine {
 		ProbeControllerEngine engine = new ProbeControllerEngine(System.getProperty("user.dir") + "\\release\\libs\\simple2secure.probe.jar",
 				System.getProperty("user.dir") + "\\release\\license");
 		engine.start();
+		ProbeProcessInteraction.getInstance(engine.getControlledProcess()).sendStartCommand();
 		engine.stop();
 	}
 

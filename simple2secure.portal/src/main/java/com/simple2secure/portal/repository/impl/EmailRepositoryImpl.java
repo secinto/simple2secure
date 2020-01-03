@@ -40,7 +40,7 @@ public class EmailRepositoryImpl extends EmailRepository {
 
 		if (emails != null) {
 			for (Email email : emails) {
-				delete(email);
+				this.delete(email);
 			}
 		}
 

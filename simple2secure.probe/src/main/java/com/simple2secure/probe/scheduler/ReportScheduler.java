@@ -29,8 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
@@ -40,8 +41,11 @@ public class ReportScheduler extends TimerTask {
 
 	private static Logger log = LoggerFactory.getLogger(ReportScheduler.class);
 
+	private final String reportAPI;
+
 	public ReportScheduler() {
 		// TODO Auto-generated constructor stub
+		reportAPI = LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.REPORT_API;
 	}
 
 	@Override
@@ -55,25 +59,24 @@ public class ReportScheduler extends TimerTask {
 	}
 
 	/**
-	 * This function sends the {@link Report} to the server updates the sent value and stores it in the database
+	 * This function sends the {@link OsQueryReport} to the server updates the sent value and stores it in the database
 	 *
 	 * @param report
 	 */
-	private void sendReport(Report report) {
+	private void sendReport(OsQueryReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
 			if (Strings.isNullOrEmpty(report.getDeviceId())) {
 				report.setDeviceId(ProbeConfiguration.probeId);
 			}
-			if (Strings.isNullOrEmpty(report.getGroupId())) {
-				report.setGroupId(ProbeConfiguration.groupId);
+			if (Strings.isNullOrEmpty(report.getHostname())) {
+				report.setHostname(ProbeConfiguration.hostname);
 			}
-			log.debug("Sending query report {} with timestamp {} to the API.", report.getQuery(),
+			log.info("Sending query report {} with timestamp {} to the API.", report.getName(),
 					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getQueryTimestamp()));
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI(), report, ProbeConfiguration.authKey);
+			String response = RESTUtils.sendPost(reportAPI, report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
-				report.setSent(true);
-				DBUtil.getInstance().merge(report);
+				DBUtil.getInstance().delete(report);
 			}
 		}
 	}
@@ -92,40 +95,56 @@ public class ReportScheduler extends TimerTask {
 			if (Strings.isNullOrEmpty(report.getGroupId())) {
 				report.setGroupId(ProbeConfiguration.groupId);
 			}
-			log.info("Sending network report {} with timestamp {} to the API ", report.getId(),
-					TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
-			String response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getReportsAPI() + "/network", report,
-					ProbeConfiguration.authKey);
+			if (Strings.isNullOrEmpty(report.getHostname())) {
+				report.setHostname(ProbeConfiguration.hostname);
+			}
+
+			log.info("Sending network report with id {} for processor {} with timestamp {} to the API ", report.getId(),
+					report.getProcessorName(), TimeUtils.formatDate(TimeUtils.SIMPLE_TIME_FORMAT, report.getStartTime()));
+			String response = RESTUtils.sendPost(reportAPI + "/network", report, ProbeConfiguration.authKey);
 			if (!Strings.isNullOrEmpty(response)) {
-				report.setSent(true);
-				DBUtil.getInstance().merge(report);
+				DBUtil.getInstance().delete(report);
 			}
 		}
 
 	}
 
 	/**
-	 * This function retrieves all {@link Report} objects from the database where sent tag is false.
+	 * This function retrieves all {@link OsQueryReport} objects from the database where sent tag is false.
 	 */
 	private void sendReportsToServer() {
-		List<Report> reports = DBUtil.getInstance().findByFieldName("isSent", false, Report.class);
-		if (reports != null) {
-			for (Report report : reports) {
-				sendReport(report);
+		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("isSent", false, OsQueryReport.class);
+		int currentPageNumber = 1;
+		while (currentPageNumber <= lastPageNumber) {
+			List<OsQueryReport> reports = DBUtil.getInstance().findByFieldNamePaging("isSent", false, OsQueryReport.class, currentPageNumber);
+			if (reports != null) {
+				log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
+				for (OsQueryReport report : reports) {
+					sendReport(report);
+				}
 			}
+			currentPageNumber++;
 		}
+		log.debug("Finished sending {} pages of reports to server", currentPageNumber);
 	}
 
 	/**
 	 * This function retrieves all {@link NetworkReport} objects from the database where sent tag is false.
 	 */
 	private void sendNetworkReportsToServer() {
-		List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldName("sent", false, NetworkReport.class);
-		if (networkReports != null) {
-			for (NetworkReport networkReport : networkReports) {
-				sendNetworkReport(networkReport);
+		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("sent", false, NetworkReport.class);
+		int currentPageNumber = 1;
+		while (currentPageNumber <= lastPageNumber) {
+			List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldNamePaging("sent", false, NetworkReport.class,
+					currentPageNumber);
+			if (networkReports != null) {
+				log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
+				for (NetworkReport networkReport : networkReports) {
+					sendNetworkReport(networkReport);
+				}
 			}
+			currentPageNumber++;
 		}
+		log.debug("Finished sending {} pages of network reports to server", currentPageNumber);
 	}
-
 }

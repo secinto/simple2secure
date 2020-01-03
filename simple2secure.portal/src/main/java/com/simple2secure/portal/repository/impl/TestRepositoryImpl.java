@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -11,10 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.Test;
 import com.simple2secure.portal.repository.TestRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class TestRepositoryImpl extends TestRepository {
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -23,8 +29,8 @@ public class TestRepositoryImpl extends TestRepository {
 	}
 
 	@Override
-	public List<Test> getByPodId(String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId));
+	public List<Test> getByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId));
 		List<Test> tests = mongoTemplate.find(query, Test.class);
 		return tests;
 	}
@@ -51,10 +57,52 @@ public class TestRepositoryImpl extends TestRepository {
 	}
 
 	@Override
-	public Test getTestByNameAndPodId(String name, String podId) {
-		Query query = new Query(Criteria.where("podId").is(podId).and("name").is(name));
+	public Test getTestByNameAndDeviceId(String name, String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("name").is(name));
 		Test test = mongoTemplate.findOne(query, Test.class);
 		return test;
+	}
+
+	@Override
+	public List<Test> getByDeviceIdWithPagination(String deviceId, int page, int size, boolean usePagination) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(false));
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+		if (usePagination) {
+			query.limit(limit);
+			query.skip(skip);
+		}
+		query.with(Sort.by(Sort.Direction.DESC, "lastChangedTimestamp"));
+		List<Test> tests = mongoTemplate.find(query, Test.class, collectionName);
+		return tests;
+	}
+
+	@Override
+	public long getCountOfTestsWithDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(false));
+		long count = mongoTemplate.count(query, Test.class, collectionName);
+		return count;
+	}
+
+	@Override
+	public List<Test> getNewPortalTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("newTest").is(true));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
+	@Override
+	public List<Test> getDeletedTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("deleted").is(true));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
+	}
+
+	@Override
+	public List<Test> getUnsyncedTestsByDeviceId(String deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId).and("synced").is(false));
+		List<Test> tests = mongoTemplate.find(query, Test.class);
+		return tests;
 	}
 
 }

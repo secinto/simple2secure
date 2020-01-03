@@ -1,4 +1,24 @@
+<mat-form-field>
+    <mat-label>{{"report.groups" | translate}}</mat-label>
+    <mat-select #selectgroup name="groupSelection" [ngModel]="selectedGroups" multiple>
+        <mat-option *ngFor="let group of groups" [value]="group">{{group.name}}</mat-option>
+        <button mat-button mat-raised-button class="mat-green-button button-select-box" (click)="updateGroups()">Apply</button>
+    </mat-select>
+</mat-form-field>
+<mat-form-field class="devices-report">
+    <mat-label>{{"report.devices" | translate}}</mat-label>
+    <mat-select #selectdevices name="deviceSelection" [ngModel]="selectedDevices" multiple>
+        <mat-option *ngFor="let device of devices" [value]="device">{{device.hostname}} ({{device.group.name}})</mat-option>
+        <button mat-button mat-raised-button class="mat-green-button button-select-box" (click)="updateDevices()">Apply</button>
+    </mat-select>
+</mat-form-field>
+
 <div class="example-container mat-elevation-z8 table table-striped">
+
+    <button mat-button [disabled]="!showDeleteButton" mat-raised-button class="mat-green-button delete-button-table" color="primary"
+            (click)="deleteSelectedReports()">{{ 'button.deleteSelected' | translate:{'count':numSelected } }}
+    </button>
+
     <div class="header-filter-table">
         <mat-form-field class="header-filter-field">
             <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
@@ -6,10 +26,27 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort>
 
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                              [checked]="selection.hasValue() && isAllSelected()"
+                              [indeterminate]="selection.hasValue() && !isAllSelected()"
+                              [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                              (change)="$event ? selection.toggle(row) : null"
+                              [checked]="selection.isSelected(row)"
+                              [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
         <!-- Position Column -->
         <ng-container matColumnDef="query">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.query' | translate }}</mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.query}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
         </ng-container>
 
         <!-- Position Column -->
@@ -30,25 +67,16 @@
             <mat-cell *matCellDef="let element"> {{element.queryTimestamp | date : 'short'}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate
-                }}
-            </mat-header-cell>
-            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-                <button mat-button color="primary" class="mat-green-button" (click)="onDeleteClick(element)">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </mat-cell>
-        </ng-container>
-
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
                  (click)="openDialogShowReportDetails(row)"></mat-row>
     </mat-table>
     <mat-paginator #paginator
-                   [pageSize]="10"
+                   [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"
-                   [showFirstLastButtons]="true">
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
     </mat-paginator>
     <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>

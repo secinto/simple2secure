@@ -1,9 +1,6 @@
 <div class="container">
     <form #settingsForm="ngForm">
         <mat-tab-group>
-            <mat-tab label="{{ 'menu.general' | translate }}">
-                <configurationDetails></configurationDetails>
-            </mat-tab>
             <mat-tab label="{{ 'menu.tokens' | translate }}">
                 <div>
                     <mat-card class="mat-card-custom">
@@ -218,6 +215,112 @@
                 </div>
 
             </mat-tab>
+            <mat-tab label="{{ 'menu.widgets' | translate }}">
+                <button mat-raised-button color="primary" id="addButton" type="button" (click)="addNewWidget()"
+                        class="pull-right mat-green-button">
+                    <i class="glyphicon glyphicon-plus"></i> {{ 'widget.add' | translate }}
+                </button>
+                <div *ngFor="let widget of settingsObj.widgetList; let in=index"
+                     ngModelGroup="settingsObj.widgetList">
+                    <mat-card class="mat-card-custom mat-card-license-plan">
+                        <mat-card-header>
+                            <mat-card-title class="mat-card-title-left">{{widget.name}}</mat-card-title>
+                            <mat-card-title class="mat-card-title-right">
+                                <button mat-raised-button color="primary" type="button"
+                                        (click)="deleteWidget(widget)"
+                                        class="mat-red-button"><i class="glyphicon glyphicon-remove"></i>
+                                    {{ 'button.delete' | translate }}
+                                </button>
+                            </mat-card-title>
+                        </mat-card-header>
+
+                        <mat-card-content>
+                            <table class="full_width_input" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input matInput type="text"
+                                                   placeholder="{{ 'widget.name.placeholder' | translate }}"
+                                                   [(ngModel)]="settingsObj.widgetList[in].name" name="name{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="text" matInput
+                                                   placeholder="{{ 'table.description' | translate }}"
+                                                   [(ngModel)]="settingsObj.widgetList[in].description"
+                                                   name="description{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="text" matInput
+                                                   placeholder="{{ 'widget.tag' | translate }}"
+                                                   [(ngModel)]="settingsObj.widgetList[in].tag"
+                                                   name="tag{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select placeholder="{{ 'widget.bgColor' | translate }}" [(ngModel)]="settingsObj.widgetList[in].bgClass"
+                                                        name="bgClass{{in}}" required>
+                                                <mat-option *ngFor="let color of colors"
+                                                            [value]="color">{{color}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select placeholder="{{ 'widget.icon' | translate }}" [(ngModel)]="settingsObj.widgetList[in].icon"
+                                                        name="icon{{in}}" required>
+                                                <mat-option *ngFor="let icon of icons" [value]="icon">
+                                                    <span class="fa {{icon}}"> {{icon}}</span>
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <input type="text" matInput
+                                                   placeholder="{{ 'widget.label' | translate }}"
+                                                   [(ngModel)]="settingsObj.widgetList[in].label"
+                                                   name="label{{in}}">
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <mat-form-field class="full_width_input">
+                                            <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
+                                                        name="url{{in}}" required>
+                                                <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
+                                                    {{url}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </td>
+                                </tr>
+                            </table>
+                        </mat-card-content>
+                        <button class="mat-green-button" type="button" (click)="saveWidget(widget)"
+                                id="saveButton" mat-raised-button color="primary">{{ 'button.save' | translate }}
+                        </button>
+                    </mat-card>
+                </div>
+            </mat-tab>
+            <!--<mat-tab label="{{ 'network.processors' | translate }}">
+                <networkConfigurationProcessor></networkConfigurationProcessor>
+            </mat-tab>
+
+            <mat-tab label="{{ 'network.steps' | translate }}">
+                <networkConfigurationStep></networkConfigurationStep>
+            </mat-tab>-->
         </mat-tab-group>
     </form>
 </div>

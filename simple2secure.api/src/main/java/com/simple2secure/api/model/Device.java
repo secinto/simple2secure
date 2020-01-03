@@ -22,80 +22,13 @@
 
 package com.simple2secure.api.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NonNull;
 
+@Data
 public class Device {
 
-	private String deviceId;
-	private CompanyGroup group;
-	@JsonProperty
-	private boolean activated;
-	private String hostname;
-	private String status;
-	@JsonProperty
-	private boolean pod;
-
-	public Device() {
-
-	}
-
-	public Device(String deviceId, CompanyGroup group, boolean activated, String hostname, String status, boolean pod) {
-		super();
-
-		this.deviceId = deviceId;
-		this.group = group;
-		this.activated = activated;
-		this.hostname = hostname;
-		this.status = status;
-		this.pod = pod;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public boolean isActivated() {
-		return activated;
-	}
-
-	public void setActivated(boolean activated) {
-		this.activated = activated;
-	}
-
-	public CompanyGroup getGroup() {
-		return group;
-	}
-
-	public void setGroup(CompanyGroup group) {
-		this.group = group;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public boolean isPod() {
-		return pod;
-	}
-
-	public void setPod(boolean pod) {
-		this.pod = pod;
-	}
+	private @NonNull CompanyGroup group;
+	private @NonNull DeviceInfo info;
 
 }

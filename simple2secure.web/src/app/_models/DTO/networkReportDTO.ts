@@ -21,8 +21,8 @@
  */
 
 import {NetworkReport} from '../networkReport';
-import {Coordinates} from '../coordinates';
 
-export class NetworkReportDTO extends NetworkReport{
-	coordinates: Coordinates[];
+export class NetworkReportDTO{
+	public report: NetworkReport[];
+	public totalSize: number;
 }

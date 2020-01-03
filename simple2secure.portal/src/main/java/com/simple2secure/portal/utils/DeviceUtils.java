@@ -23,73 +23,33 @@
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.DeviceDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
-import com.simple2secure.api.model.TestObjWeb;
-import com.simple2secure.api.model.TestSequence;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryRepository;
-import com.simple2secure.portal.repository.ReportRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestSequenceRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class DeviceUtils {
-
-	private static Logger log = LoggerFactory.getLogger(DeviceUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	QueryRepository queryRepository;
-
-	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	TestSequenceRepository testSequenceRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
+@Slf4j
+public class DeviceUtils extends BaseServiceProvider {
 
 	@Autowired
 	TestUtils testUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	/**
 	 * This function returns all probes from the current context
@@ -97,29 +57,68 @@ public class DeviceUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<Device> getAllDevicesFromCurrentContext(Context context) {
+	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
-		List<Device> myDevices = new ArrayList<>();
+		List<Device> devices = new ArrayList<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
 		for (CompanyGroup group : assignedGroups) {
 			List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(group.getId());
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String deviceStatus = getDeviceStatus(license);
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+						DeviceStatus status = devInfo.getDeviceStatus();
 
-							Device probe = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus,
-									license.isDevicePod());
-							myDevices.add(probe);
+						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+						if (status != deviceStatus) {
+							devInfo.setDeviceStatus(deviceStatus);
+							licenseRepository.save(license);
 						}
+
+						Device device = new Device(group, devInfo);
+						devices.add(device);
 					}
 				}
 			}
 		}
-		log.debug("Retrieved {0} probes for context {1}", myDevices.size(), context.getName());
-		return myDevices;
+		log.debug("Retrieved {} probes for context {}", devices.size(), context.getName());
+		return devices;
+	}
+
+	/**
+	 * This function creates the devices objects from the CompanyLicensePrivate objects and returns it according to the provided groupIds
+	 *
+	 * @param groupIds
+	 * @param isDevicePod
+	 * @return
+	 */
+	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) {
+		List<Device> devices = new ArrayList<>();
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
+
+		if (licenses != null) {
+			for (CompanyLicensePrivate license : licenses) {
+				if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+					DeviceStatus status = devInfo.getDeviceStatus();
+
+					DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+					if (status != deviceStatus) {
+						devInfo.setDeviceStatus(deviceStatus);
+						licenseRepository.save(license);
+					}
+
+					CompanyGroup group = groupRepository.find(license.getGroupId());
+					Device device = new Device(group, devInfo);
+					devices.add(device);
+				}
+
+			}
+		}
+
+		return devices;
+
 	}
 
 	/**
@@ -128,30 +127,45 @@ public class DeviceUtils {
 	 * @param context
 	 * @return
 	 */
-	public List<DeviceDTO> getAllDevicesFromCurrentContextWithTests(Context context) {
-		log.debug("Retrieving pods for the context {}", context.getName());
-		/* Set user probes from the licenses - not from the users anymore */
-		List<DeviceDTO> myDevices = new ArrayList<>();
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, String type, int page, int size) {
+		log.debug("Retrieving devices for the context {}", context.getName());
+		List<Device> devices = new ArrayList<>();
+		Map<String, Object> deviceMap = new HashMap<>();
 		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
-		for (CompanyGroup group : assignedGroups) {
-			List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
+		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+
+		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
+
+		if (licenseMap != null) {
+
+			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
+
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (license.isActivated()) {
-						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							String deviceStatus = getDeviceStatus(license);
-							Device device = new Device(license.getDeviceId(), group, license.isActivated(), license.getHostname(), deviceStatus, true);
-							List<TestObjWeb> tests = testUtils.convertToTestObjectForWeb(testRepository.getByPodId(device.getDeviceId()));
-							List<TestSequence> test_sequences = testSequenceRepository.getByPodId(device.getDeviceId());
-							DeviceDTO deviceDTO = new DeviceDTO(device, tests, test_sequences);
-							myDevices.add(deviceDTO);
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+						if (devInfo != null && (Strings.isNullOrEmpty(type) || devInfo.getType().name().equals(type))) {
+							DeviceStatus status = devInfo.getDeviceStatus();
+
+							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+							if (status != deviceStatus) {
+								devInfo.setDeviceStatus(deviceStatus);
+								licenseRepository.save(license);
+							}
+							CompanyGroup group = groupRepository.find(license.getGroupId());
+							Device device = new Device(group, devInfo);
+							devices.add(device);
 						}
 					}
 				}
 			}
+
+			deviceMap.put("devices", devices);
+			deviceMap.put("totalSize", licenseMap.get("totalSize"));
 		}
-		log.debug("Retrieved {0} devices for context {1}", myDevices.size(), context.getName());
-		return myDevices;
+		log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
+		return deviceMap;
 	}
 
 	/**
@@ -171,19 +185,19 @@ public class DeviceUtils {
 	/**
 	 * This method checks the current status (online, offline, unknown) of the pod according to the lastOnlineTimestamp
 	 *
-	 * @param deviceLicense
+	 * @param deviceInfo
 	 * @return
 	 */
-	private String getDeviceStatus(CompanyLicensePrivate deviceLicense) {
+	private DeviceStatus getDeviceStatus(DeviceInfo devInfo) {
 		// make it multilingual
-		if (deviceLicense.getLastOnlineTimestamp() == 0) {
-			return "Unknown";
+		if (devInfo.getLastOnlineTimestamp() == 0) {
+			return DeviceStatus.UNKNOWN;
 		} else {
-			long timeDiff = System.currentTimeMillis() - deviceLicense.getLastOnlineTimestamp();
+			long timeDiff = System.currentTimeMillis() - devInfo.getLastOnlineTimestamp();
 			if (timeDiff > 60000) {
-				return "Offline";
+				return DeviceStatus.OFFLINE;
 			} else {
-				return "Online";
+				return DeviceStatus.ONLINE;
 			}
 		}
 	}

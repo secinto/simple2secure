@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 
 import requests
 from flask import json
 
-from src.db.database import Notification, TestStatusDTO
-from src.db.database_schema import CompanyLicensePublicSchema, TestSchema
+from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType
+from src.db.database_schema import CompanyLicensePublicSchema, TestSchema, DeviceInfoSchema
 from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license, \
     clear_pod_status_auth
 
@@ -107,11 +108,15 @@ def send_license(app, licensePublic=None):
         licensePublic = get_license(app)
 
     license_schema = CompanyLicensePublicSchema()
+
     license_json = json.dumps(license_schema.dump(licensePublic))
 
     resp_data = portal_post(app, url, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
+        devInfo = DeviceInfo.query.one()
+        if not devInfo:
+            send_device_info(app, license_json)
         accessToken = json.loads(resp_data.text)['accessToken']
         if accessToken:
             licensePublic.accessToken = accessToken
@@ -130,6 +135,28 @@ def send_license(app, licensePublic=None):
         clear_pod_status_auth(app)
 
 
+def send_device_info(app, license):
+    url = app.config['PORTAL_URL'] + "device/update"
+    lastOnlineTimestamp = datetime.now().timestamp() * 1000
+    license_obj = json.loads(license)
+    deviceId = license_obj['deviceId']
+    deviceInfo = DeviceInfo(deviceId, 'POD-' + deviceId, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
+
+    device_info_schema = DeviceInfoSchema()
+    device_info_json = json.dumps(device_info_schema.dump(deviceInfo))
+    resp_data = portal_post(app, url, device_info_json, True)
+    if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
+        device_info_response = json.loads(resp_data.content)
+        device_info_from_db = DeviceInfo.query.filter_by(deviceId=device_info_response['deviceId']).first()
+        if device_info_from_db:
+            device_info_from_db.deviceStatus = device_info_response['deviceStatus']
+            device_info_from_db.lastOnlineTimestamp = device_info_response['lastOnlineTimestamp']
+            update(device_info_from_db)
+        else:
+            device_info_for_db = DeviceInfo(device_info_response['deviceId'], device_info_response['hostName'], None, None, device_info_response['lastOnlineTimestamp'], device_info_response['deviceStatus'])
+            update(device_info_for_db)
+
+
 def send_notification(content, app):
     """
     Sends the provided content as notification to the PORTAL. This is then shown in the PORTAL as information.
@@ -138,7 +165,7 @@ def send_notification(content, app):
     :param app: The application context
     :return:
     """
-    url = app.config['PORTAL_URL'] + "notification/pod/" + app.config['POD_ID']
+    url = app.config['PORTAL_URL'] + "notification/" + app.config['POD_ID']
 
     notification = Notification(content)
     return portal_post(app, url, json.dumps(notification.__dict__))
@@ -157,6 +184,24 @@ def update_test_status(app, test_run_id, test_id, test_status):
     url = app.config['PORTAL_URL'] + "test/updateTestStatus"
     test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
     return portal_post(app, url, json.dumps(test_run_dto.__dict__))
+
+
+def update_sequence_status(app, sequence_run_id, sequence_id, status):
+    """
+    Sends the status of the sequence to the PORTAL.
+
+    :param app: The application context
+    :param sequence_run_id: The id of the sequence test run
+    :param sequence_id: The id of the sequence
+    :param status: The current status of the sequence test run
+    :return:
+    """
+    url = app.config['PORTAL_URL'] + "sequence/update/status/" + sequence_run_id
+    info = {'sequence_run_id': sequence_run_id, 'sequence_id': sequence_id, 'status': status}
+    dumped_info = json.dumps(info)
+
+    with app.app_context():
+        return portal_post(app, url, dumped_info)
 
 
 def schedule_test_on_the_portal(test, app):
@@ -183,6 +228,25 @@ def sync_test_with_portal(test, app):
     test_schema = TestSchema()
     test_json = test_schema.dump(test)
     return portal_post(app, app.config['PORTAL_URL'] + "test/syncTest", json.dumps(test_json))
+
+
+def sync_tests_with_portal(tests, app):
+    """
+    Synchronizes the list of all tests with the PORTAL.
+
+    :param test: The test to be synchronized
+    :param app: The application context
+    :return:
+    """
+    tests_array = []
+
+    if tests is not None:
+        for test in tests:
+            test_schema = TestSchema()
+            test_json = test_schema.dump(test)
+            tests_array.append(test_json)
+
+    return portal_post(app, app.config['PORTAL_URL'] + "test/syncTests/" + app.config['POD_ID'], json.dumps(tests_array))
 
 
 # ----------------------------------------
@@ -237,6 +301,8 @@ def check_portal_alive(app):
     response = portal_get(app, app.config['PORTAL_URL'] + "service", True)
 
     if response is not None and response.status_code == 200:
+        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is alive')
         update_pod_status_connection(app, True)
     else:
+        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is dead')
         update_pod_status_connection(app, False)

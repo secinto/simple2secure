@@ -1,5 +1,6 @@
 /**
  *********************************************************************
+
  *   simple2secure is a cyber risk and information security platform.
  *   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
  *********************************************************************

@@ -114,4 +114,9 @@ public class PacketProcessorFSM implements Runnable {
 	public void stop() {
 		running = false;
 	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
 }

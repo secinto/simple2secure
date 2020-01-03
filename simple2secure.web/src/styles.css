@@ -223,6 +223,13 @@ body{
     justify-content: flex-end;
 }
 
+.mat-column-left{
+    display: flex;
+    float: left;
+    justify-content: left;
+}
+
+
 /* in-flight clone */
 .gu-mirror {
   position: fixed !important;
@@ -267,20 +274,20 @@ body{
         pointer-events: none;
 }
 
+.mat-green-button-with-hover{
+    background-color: #A7BD26 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.mat-green-button-with-hover:hover{
+    background-color: #8fa02c !important;
+}
+
 .mat-grey-button{
 	background-color: grey !important;
 	color: white !important;
 	font-weight: bold !important;
-}
-
-.mat-green-button-with-hover{
-	background-color: #A7BD26 !important;
-	color: white !important;
-	font-weight: bold !important;
-}
-
-.mat-green-button-with-hover:hover{
-	background-color: #8fa02c !important;
 }
 
 .mat-red-button{
@@ -288,6 +295,14 @@ body{
 	color: white !important;
 	font-weight: bold !important;	
 }
+
+.mat-blue-button{
+    background-color: #3e6bbd !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+
 
 .mat-icon-green{
 	color: #A7BD26 !important;
@@ -387,6 +402,12 @@ body{
 	text-align: center;
 }
 
+.mat-cell-left{
+    display: flex;
+    align-content: flex-start;
+    justify-content: left;
+}
+
 .mat-sort-header-container {
   display:flex;
   justify-content:center;
@@ -465,10 +486,6 @@ tree-viewport{
     margin-top: 50px;
 }
 
-.mat-card-custom {
-    margin: 4px;
-}
-
 .mat-card-title-left {
     display: inline;
 }
@@ -484,4 +501,36 @@ tree-viewport{
 
 .mat-expansion-panel-header-description{
     flex-basis: 0 !important;
+}
+
+mat-sidenav-content{
+    margin-left: 0px !important;
+}
+
+.mat-table-cb-header{
+    width: 5%;
+}
+
+.mat-table-cb-content{
+    width: 5%;
+}
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background{
+    background-color: #a7bd26 !important;
+}
+
+.delete-button-table{
+    width: 20%;
+    margin-top: 5px !important;
+    margin-left: 5px !important;
+}
+
+ngx-widget-grid{
+    width: 70% !important;
+    height: 80% !important;
+}
+
+action-icon{
+    cursor: pointer;
+    color: #A7BD26 !important;
 }

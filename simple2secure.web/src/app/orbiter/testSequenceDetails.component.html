@@ -1,5 +1,6 @@
 <h3 *ngIf="!isNewTest" mat-dialog-title>{{ 'orbiter.editsequence' | translate }}</h3>
 <h3 *ngIf="isNewTest" mat-dialog-title>{{ 'button.addSequence' | translate }}</h3>
+<h4 mat-dialog-title>{{ 'orbiter.sequenceLength' | translate }} {{sequenceToShow.length}}</h4>
 
 <div mat-dialog-content>
     <form id="cfgForm" #configForm="ngForm">
@@ -10,52 +11,69 @@
                              [(ngModel)]="sequence.name" value="" name="name">
                     </mat-form-field>
                  
-					<mat-card>
-					  <mat-card-header>
-						Test Sequence
-					  </mat-card-header>
-					  <mat-card-content>
-						  <div
-							cdkDropList
-							cdkDropListOrientation="horizontal"
-							#testSequenceList="cdkDropList"
-							[cdkDropListData]="testSequence"
-						    class="example-list-horizontal"
-							(cdkDropListDropped)="dropHorizontal($event)"
-							[cdkDropListConnectedTo]="[testList]">
-						    	<div class="example-box-horizontal" *ngFor="let item of testSequence" cdkDrag>
-									{{item}}
-									<div class="test-class">
-										<mat-label>Select an adapter</mat-label>
-										<mat-select>
-											<mat-option *ngFor="let adapter of elements" [value]="adapter" (mousedown)="clicked($event)">
-									        {{adapter}}
-									    	</mat-option>
-										</mat-select>
+					<mat-card class="mat-card-sequences">
+						<mat-card-content class="mat_card_content" >	  	
+							<carousel-component [lockSlides]="true" class="carousel_component" #carousel>
+									<div class="item-carousel" [(ngModel)]="sequenceToShow" *ngFor="let test of sequenceToShow" name="test-carousel" ngDefaultControl>
+										<h4>{{test.name}}</h4>
+										<div class="test-details-carousel">
+											Precondition: <p>{{test.test_content.test_definition.precondition.command.executable}}</p>
+											Step: <p>{{test.test_content.test_definition.step.command.executable}}</p>
+											Postcondition: <p>{{test.test_content.test_definition.postcondition.command.executable}}</p>
+										</div>
+										<button mat-raised-button color="primary" id="removeButton" type="button"
+											(click)="removeTestFromSequence(test)"
+											class="pull-right mat-green-button minus">
+											<i class="glyphicon glyphicon-minus"></i>
+										</button>
 									</div>
-								</div>
-						  </div>			
-					  </mat-card-content>
-
+							</carousel-component>
+						</mat-card-content>
+						<div class="carousel-arrows">
+							<div class="backward-arrow-carousel">
+									<i class="material-icons" (click)="prev()">
+										arrow_back_ios
+									</i>
+							</div>
+							<div class="forward-arrow-carousel">
+									<i class="material-icons" (click)="next()">
+										arrow_forward_ios
+									</i>
+							</div>
+						</div>
 					</mat-card>
-					
-					<mat-card>
-					  <mat-card-header>
-						Tests
-					  </mat-card-header>
-					  <mat-card-content>
-						  <div
-						    cdkDropList
-						    #testList="cdkDropList"
-						    [cdkDropListData]="testNamesCurrent"
-						    [cdkDropListConnectedTo]="[testSequenceList]"
-							(cdkDropListDropped)="drop($event)"
-						    class="example-list">
-						    <div class="example-box" *ngFor="let item of testNamesCurrent" cdkDrag>{{item}}</div>
-						  </div>			
-					  </mat-card-content>
 
-					</mat-card>
+					  <div class="example-container mat-elevation-z8 table table-striped">
+						  <mat-table #table [dataSource]="dataSource" matSort>
+
+							  <ng-container matColumnDef="test">
+								  <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}</mat-header-cell>
+								  <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+							  </ng-container>
+
+							  <ng-container matColumnDef="action">
+								  <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate}}</mat-header-cell>
+								  <mat-cell *matCellDef="let element" class="mat-column-right">
+									  <button mat-raised-button color="primary" id="addButton" type="button"
+											  (click)="addTestToSequence(element)"
+											  class="pull-right mat-green-button">
+										  <i class="glyphicon glyphicon-plus"></i>
+									  </button>
+								  </mat-cell>
+							  </ng-container>
+
+							  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+							  <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"></mat-row>
+						  </mat-table>
+						  <mat-paginator #paginator
+										 [pageSize]="pageSize"
+										 [pageSizeOptions]="[5, 10, 20]"
+										 [showFirstLastButtons]="true"
+										 [length]="totalSize"
+										 (page)="pageEvent = handlePage($event)">
+						  </mat-paginator>
+						  <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+					  </div>
             </mat-accordion>
 
         </div>

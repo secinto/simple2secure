@@ -21,15 +21,16 @@
  */
 package com.simple2secure.probe.utils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryRun;
+import com.simple2secure.api.model.OsQuery;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.json.JSONUtils;
 
@@ -40,32 +41,6 @@ import com.simple2secure.commons.json.JSONUtils;
  *
  */
 public class JsonUtils {
-	/**
-	 * This function reads JSON from the URL.
-	 *
-	 * @param urlString
-	 * @return
-	 * @throws Exception
-	 */
-	public static String readJsonFromUrl(String urlString) throws Exception {
-		BufferedReader reader = null;
-		try {
-			URL url = new URL(urlString);
-			reader = new BufferedReader(new InputStreamReader(url.openStream()));
-			StringBuffer buffer = new StringBuffer();
-			int read;
-			char[] chars = new char[1024];
-			while ((read = reader.read(chars)) != -1) {
-				buffer.append(chars, 0, read);
-			}
-
-			return buffer.toString();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-	}
 
 	/**
 	 * This function reads runQueries from the file
@@ -73,11 +48,44 @@ public class JsonUtils {
 	 * @param file
 	 * @return
 	 */
-	public static List<QueryRun> readRunQueriesFromFile(File file) {
+	public static List<OsQuery> readRunQueriesFromFile(File file) {
 
-		QueryRun[] queryRunArr = JSONUtils.fromFile(file, QueryRun[].class);
-		List<QueryRun> queryRunList = Arrays.asList(queryRunArr);
+		OsQuery[] queryRunArr = JSONUtils.fromFile(file, OsQuery[].class);
+		List<OsQuery> queryRunList = Arrays.asList(queryRunArr);
 		return queryRunList;
+
+	}
+
+	/**
+	 * This function reads runQueries from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<OsQuery> readRunQueriesFromString(String content) {
+
+		JsonNode node = JSONUtils.fromString(content);
+		List<OsQuery> activeQueries = new ArrayList<>();
+		if (node.isArray()) {
+			ArrayNode arrayNode = (ArrayNode) node;
+			Iterator<JsonNode> queryCategoryNode = arrayNode.elements();
+
+			while (queryCategoryNode.hasNext()) {
+				JsonNode currentCategoryNode = queryCategoryNode.next();
+				OsQuery[] queries = JSONUtils.fromString(JSONUtils.toString(currentCategoryNode.get("queries")), OsQuery[].class);
+
+				if (queries != null) {
+					List<OsQuery> queryList = Arrays.asList(queries);
+					for (OsQuery query : queryList) {
+						if (query.getActive() == 1) {
+							activeQueries.add(query);
+						}
+					}
+
+				}
+			}
+		}
+		return activeQueries;
 
 	}
 
@@ -95,6 +103,23 @@ public class JsonUtils {
 	}
 
 	/**
+	 * This function reads processors from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<Processor> readProcessorsFromString(String content) {
+		Processor[] processorArr = JSONUtils.fromString(content, Processor[].class);
+		List<Processor> processors = Arrays.asList(processorArr);
+		return processors;
+
+	}
+	//
+	// public static List<T> T readFromString(String content, Class<T> type) {
+	// T[] array = JSONUtils.fromString(content, T[]);
+	// }
+
+	/**
 	 * This function reads steps from the file
 	 *
 	 * @param file
@@ -102,6 +127,18 @@ public class JsonUtils {
 	 */
 	public static List<Step> readStepsFromFile(File file) {
 		Step[] stepArr = JSONUtils.fromFile(file, Step[].class);
+		List<Step> steps = Arrays.asList(stepArr);
+		return steps;
+	}
+
+	/**
+	 * This function reads steps from the string content
+	 *
+	 * @param content
+	 * @return
+	 */
+	public static List<Step> readStepsFromString(String content) {
+		Step[] stepArr = JSONUtils.fromString(content, Step[].class);
 		List<Step> steps = Arrays.asList(stepArr);
 		return steps;
 	}

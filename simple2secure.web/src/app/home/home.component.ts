@@ -20,73 +20,143 @@
  *********************************************************************
  */
 
-import {Component, OnInit} from '@angular/core';
-import {User} from '../_models/index';
-
-declare var $: any;
+import {
+	Component,
+	OnInit,
+	ViewChild} from '@angular/core';
+import {NgxWidgetGridComponent, Rectangle, WidgetPositionChange} from 'ngx-widget-grid';
+import {MatDialog, MatDialogConfig} from '@angular/material';
+import {WidgetStoreComponent} from '../widgets/widgetStore.component';
+import {TranslateService} from '@ngx-translate/core';
+import {AlertService, DataService, HttpService} from '../_services';
+import {WidgetDTO} from '../_models/DTO/widgetDTO';
+import {environment} from '../../environments/environment';
 
 @Component({
-	styleUrls: ['home.component.css'],
+	styleUrls: ['home.component.scss'],
 	moduleId: module.id,
 	templateUrl: 'home.component.html'
 })
 
 export class HomeComponent implements OnInit {
-	currentUser: User;
-	users: User[] = [];
-
-	constructor() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+	widgets: WidgetDTO[] = [];
+	widgetDTO: WidgetDTO;
+	@ViewChild('grid') grid: NgxWidgetGridComponent;
+	constructor(private dialog: MatDialog,
+				private alertService: AlertService,
+				private translate: TranslateService,
+				private dataService: DataService,
+				private httpService: HttpService) {
 	}
 
-	ngOnInit() {
+	ngOnInit(): void {
+		this.loadAllWidgetsByUserId();
 	}
 
-	ngAfterViewInit() {
-		/*Set all navigation items to grey*/
-		$('.navbar-nav li img').each(function (index) {
-			$(this).css('-webkit-filter', 'grayscale(100%)');
-			$(this).css('filter', 'grayscale(100%)');
+	public getValueFromApi(widget: WidgetDTO){
+		if(!widget.isValueSet){
+			this.httpService.get(environment.apiEndpoint + widget.widget.url).shareReplay()
+				.subscribe(
+					data => {
+						widget.isValueSet = true;
+						widget.value = data;
+						return data;
+					},
+					error => {
+						return 0;
+					});
+			return 0;
+		}
+	}
+
+	public loadAllWidgetsByUserId() {
+		this.httpService.get(environment.apiEndpoint + 'widget/get')
+			.subscribe(
+				data => {
+					this.widgets = data;
+
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+	}
+
+	onWidgetChange(event: WidgetPositionChange) {
+		this.widgets[event.index].widgetProperties.width = event.newPosition.width;
+		this.widgets[event.index].widgetProperties.height = event.newPosition.height;
+		this.widgets[event.index].widgetProperties.left = event.newPosition.left;
+		this.widgets[event.index].widgetProperties.top = event.newPosition.top;
+
+		this.updateSaveWidgetPosition(this.widgets[event.index]);
+
+	}
+
+
+	updateSaveWidgetPosition(widget: WidgetDTO){
+		this.httpService.post(widget, environment.apiEndpoint + 'widget/updatePosition')
+			.subscribe(
+				data => {
+					widget.widgetProperties = data;
+				},
+				error => {
+
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+	}
+
+	openDialogAddWidget(): void {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '350px';
+
+		dialogConfig.data = {
+			widgets: null
+		};
+		const dialogRef = this.dialog.open(WidgetStoreComponent, dialogConfig);
+		this.dataService.clearWidgets();
+		dialogRef.afterClosed().subscribe(result => {
+			this.addWidgetsToTheList();
 		});
+	}
 
+	addWidgetsToTheList(){
+		if (this.dataService.getSelectedWidget() != null) {
+			const position = this.grid.getNextPosition();
+			if (position) {
+				this.widgetDTO = new WidgetDTO();
+				this.widgetDTO.widget = this.dataService.getSelectedWidget();
+				this.widgetDTO.widgetProperties.height = 1;
+				this.widgetDTO.widgetProperties.left = position.left;
+				this.widgetDTO.widgetProperties.top = position.top;
+				this.widgetDTO.widgetProperties.width = 1;
+				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
 
-		$('.column').hover(function ()
-			{
-				/* on hover set all items on grey*/
-				$('.navbar-nav li img').each(function (index) {
-					$(this).css('-webkit-filter', 'grayscale(100%)');
-					$(this).css('filter', 'grayscale(100%)');
-				});
-				let rotateAngleTop = -60;
-				$('.subitems button').each(function (index) {
-					let rotator = (2 - index) * 20;
-					rotateAngleTop = rotateAngleTop - 30;
-
-				});
-				/* before selecting some item from the dashboard, first set all transform styles to empty, to deselect the last selected item*/
-				$('.column').each(function (index) {
-					$(this).css('-webkit-transform', '');
-					$(this).css('-moz-transform', '');
-					$(this).css('-ms-transform', '');
-					$(this).css('-o-transform', '');
-					$(this).css('transform', '');
-					$(this).find('.subitems').hide();
-				});
-
-				/* Select item on the dashboard and set the color to the normal one*/
-				$(this).toggleClass('hover');
-				$(this).css('-webkit-transform', 'scale(1.25)');
-				$(this).css('-moz-transform', 'scale(1.25)');
-				$(this).css('-ms-transform', 'scale(1.25)');
-				$(this).css('-o-transform', 'scale(1.25)');
-				$(this).css('transform', 'scale(1.25)');
-				$(this).find('.subitems').show();
-				$('#' + this.id + '-menu').find('img').css('-webkit-filter', '');
-				$('#' + this.id + '-menu').find('img').css('filter', '');
-			}, function ()
-			{
-				/*Do not do anything*/
+				this.widgets.push(this.widgetDTO);
 			}
-		);
+			else{
+				this.alertService.error(this.translate.instant('widget.noplace'));
+			}
+
+			this.dataService.clearWidgets();
+		}
+	}
+
+	getRectangle(widget: WidgetDTO){
+		const rectangle = new Rectangle();
+		rectangle.width = widget.widgetProperties.width;
+		rectangle.height = widget.widgetProperties.height;
+		rectangle.left = widget.widgetProperties.left;
+		rectangle.top = widget.widgetProperties.top;
+		return rectangle;
 	}
 }

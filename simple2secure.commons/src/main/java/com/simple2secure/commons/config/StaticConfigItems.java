@@ -23,6 +23,8 @@ package com.simple2secure.commons.config;
 
 import java.nio.charset.Charset;
 
+import com.simple2secure.api.model.LocaleLanguage;
+
 public class StaticConfigItems {
 	public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -50,13 +52,15 @@ public class StaticConfigItems {
 	public static final int SNAPLEN = 65536; // [bytes]
 	public static final int READ_TIMEOUT = 10; // [ms]
 
+	public static final long tokenValidity = 24 * 60 * 60 * 100;
+
 	public static final String DEFAULT_PROCESSOR = "default";
 	public static final String CONFIG_JSON_LOCATION = "/configuration/config.json";
 	public static final String QUERIES_JSON_LOCATION = "/configuration/queries.json";
 	public static final String PROCESSORS_JSON_LOCATION = "/configuration/processors.json";
 	public static final String STEPS_JSON_LOCATION = "/configuration/steps.json";
 	public static final String KEYS_LOCATION = "./src/main/resources/keys/";
-	public static final String OSQUERY_PATH = ".\\\\\\\\bin\\\\\\\\osquery\\\\\\\\os_win7";
+	public static final String[] OSQUERY_DATA_LOCALTION = { "/osquery/os_win7/osquery.conf", "/osquery/os_win7/osqueryi.exe" };
 
 	public static final String[] SECINTO_EMAIL_LIST = { "s2s.test@secinto.at" };
 	public static final String STANDARD_GROUP_NAME = "Standard";
@@ -66,5 +70,45 @@ public class StaticConfigItems {
 	public static final String PROFILE_PRODUCTION = "prod";
 	public static final String PROFILE_DEFAULT = "default";
 	public static final String PROFILE_TEST = "test";
+	public static final int DEFAULT_VALUE_SIZE = 10;
+	public static final int MAX_VALUE_SIZE = 10;
+	public static final LocaleLanguage DEFAULT_LOCALE = LocaleLanguage.ENGLISH;
 
+	public static final String API_PREFIX = "/api";
+
+	public static final String API_VERSION = "/v1";
+
+	public static final String API_ENDPOINT = API_PREFIX + API_VERSION;
+
+	public static final String CONTEXT_API = API_ENDPOINT + "/context";
+	public static final String DASH_API = API_ENDPOINT + "/dash";
+	public static final String DEVICE_API = API_ENDPOINT + "/devices";
+	public static final String DOWNLOAD_API = API_ENDPOINT + "/download";
+	public static final String EMAIL_API = API_ENDPOINT + "/email";
+	public static final String GROUP_API = API_ENDPOINT + "/group";
+	public static final String LICENSE_API = API_ENDPOINT + "/license";
+	public static final String NOTIFICATION_API = API_ENDPOINT + "/notification";
+	public static final String PROCESSOR_API = API_ENDPOINT + "/processors";
+	public static final String QUERY_API = API_ENDPOINT + "/query";
+	public static final String REPORT_API = API_ENDPOINT + "/reports";
+	public static final String RULE_API = API_ENDPOINT + "/rule";
+	public static final String SEARCH_API = API_ENDPOINT + "/search";
+	public static final String SERVICE_API = API_ENDPOINT + "/service";
+	public static final String SETTINGS_API = API_ENDPOINT + "/settings";
+	public static final String STEP_API = API_ENDPOINT + "/steps";
+	public static final String SUT_API = API_ENDPOINT + "/sut";
+	public static final String TEST_API = API_ENDPOINT + "/test";
+	public static final String SEQUENCE_API = API_ENDPOINT + "/sequence";
+	public static final String USER_API = API_ENDPOINT + "/user";
+	public static final String WIDGET_API = API_ENDPOINT + "/widget";
+	public static final String ERROR_API = API_ENDPOINT + "/error";
+	public static final String LOGIN_API = API_ENDPOINT + "/login";
+	
+	public static final String TOKEN_PREFIX = "Bearer";
+	public static final String HEADER_STRING = "Authorization";
+	public static final String CLAIM_SUBJECT = "data";
+	public static final String CLAIM_USERID = "userID";
+	public static final String CLAIM_USERROLE = "userRole";
+	public static final String CLAIM_DEVICEID = "deviceId";
+	public static final String CLAIM_POD = "podID";
 }

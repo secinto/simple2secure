@@ -29,10 +29,13 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.commons.network.NetUtils;
+import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public final class ProbeUtils {
@@ -67,13 +70,40 @@ public final class ProbeUtils {
 	/**
 	 * This function checks if the server is reachable
 	 */
-	public static void isServerReachable() {
-		if (NetUtils.netIsAvailable(LoadedConfigItems.getInstance().getBaseURL() + "/api/service")) {
+	public static boolean isServerReachable() {
+		String response = null;
+		if (!Strings.isNullOrEmpty(ProbeConfiguration.probeId)) {
+			response = RESTUtils.sendPost(
+					LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status/" + ProbeConfiguration.probeId, null,
+					null);
+		} else {
+			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status");
+		}
+		if (!Strings.isNullOrEmpty(response)) {
 			ProbeConfiguration.setAPIAvailablitity(true);
 			log.info("SERVER REACHABLE!");
+			return true;
 		} else {
 			ProbeConfiguration.setAPIAvailablitity(false);
 			log.error("SERVER NOT REACHABLE!");
+			return false;
+		}
+	}
+
+	/**
+	 * Sends the {@link DeviceInfo} for the local device to the server.
+	 *
+	 * @param deviceInfo
+	 *          The {@link DeviceInfo} representing the local device.
+	 */
+	public static void sendDeviceInfo(DeviceInfo deviceInfo) {
+		String response = null;
+		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/update", deviceInfo,
+				ProbeConfiguration.authKey);
+		if (!Strings.isNullOrEmpty(response)) {
+			log.info("Device Information has been sent to portal!");
+		} else {
+			log.error("Problem occured while sending device information to portal!");
 		}
 	}
 

@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {DataService, HttpService} from '../_services';
 import {Notification} from '../_models';
@@ -36,19 +36,53 @@ export class NotificationComponent {
 
 	notifications: Notification[];
 	url: string;
+	dataRefresher: any;
+	loggedIn: boolean;
+	userRole: string;
 
 	constructor(private httpService: HttpService,
-	            private dataService: DataService){
+				private dataService: DataService){
 	}
 
-	ngDoCheck() {
-		this.notifications = this.dataService.getNotifications();
+	ngOnInit() {
+		this.userRole = this.dataService.getRole();
+
+		if (this.userRole) {
+			this.loggedIn = true;
+		}
+		else {
+			this.loggedIn = false;
+		}
+
+		if(this.loggedIn){
+			this.getNotifications();
+			this.refreshNotifications();
+		}
+	}
+
+	ngDoCheck(){
+		this.userRole = this.dataService.getRole();
+
+		if (this.userRole) {
+			this.loggedIn = true;
+		}
+		else {
+			this.loggedIn = false;
+		}
+	}
+
+	public getNotifications() {
+		this.httpService.get(environment.apiEndpoint + 'notification')
+			.subscribe(
+				data => {
+					this.notifications = data;
+				},
+				error => {
+				});
 	}
 
 	isRead(notification: Notification){
-
 		if (!notification.read){
-			// console.log('Notification ID ' + notification.id);
 			this.url = environment.apiEndpoint + 'notification/read';
 			this.httpService.post(notification, this.url).subscribe(
 				data => {
@@ -58,5 +92,12 @@ export class NotificationComponent {
 				});
 		}
 
+	}
+
+	refreshNotifications(){
+		this.dataRefresher =
+			setInterval(() => {
+				this.getNotifications();
+			}, 5000);
 	}
 }

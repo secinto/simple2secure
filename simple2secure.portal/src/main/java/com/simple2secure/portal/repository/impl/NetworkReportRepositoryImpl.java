@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -13,16 +14,16 @@ import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.dto.NetworkReportDTO;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.NetworkReportRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class NetworkReportRepositoryImpl extends NetworkReportRepository {
-
 	@Autowired
-	LicenseRepository licenseRepository;
+	PortalUtils portalUtils;
 
 	@PostConstruct
 	public void init() {
@@ -31,24 +32,16 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 	}
 
 	@Override
-	public List<NetworkReport> getReportsByDeviceId(String probeId) {
+	public List<NetworkReport> getReportsByDeviceId(String deviceId) {
 		List<NetworkReport> networkReports = new ArrayList<>();
-		Query query = new Query(Criteria.where("probeId").is(probeId));
+		Query query = new Query(Criteria.where("probeId").is(deviceId));
 		networkReports = mongoTemplate.find(query, NetworkReport.class, collectionName);
 		return networkReports;
 	}
 
 	@Override
-	public List<NetworkReport> getReportsByGroupId(String groupId) {
-		List<NetworkReport> reports = new ArrayList<>();
-		Query query = new Query(Criteria.where("groupId").is(groupId));
-		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
-		return reports;
-	}
-
-	@Override
-	public void deleteByDeviceId(String probeId) {
-		List<NetworkReport> reports = getReportsByDeviceId(probeId);
+	public void deleteByDeviceId(String deviceId) {
+		List<NetworkReport> reports = getReportsByDeviceId(deviceId);
 
 		if (reports != null) {
 			for (NetworkReport report : reports) {
@@ -70,6 +63,52 @@ public class NetworkReportRepositoryImpl extends NetworkReportRepository {
 		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
 		Query query = TextQuery.queryText(criteria).sortByScore();
 		query.addCriteria(Criteria.where("groupId").is(groupId));
+		List<NetworkReport> result = mongoTemplate.find(query, className, collectionName);
+		return result;
+	}
+
+	@Override
+	public NetworkReportDTO getReportsByGroupId(List<String> group_ids, int size, int page) {
+		List<NetworkReport> reports = new ArrayList<>();
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String groupId : group_ids) {
+			Criteria expression = new Criteria();
+			expression.and("groupId").is(groupId);
+			orExpression.add(expression);
+		}
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		long count = mongoTemplate.count(query, NetworkReport.class, collectionName);
+
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "startTime"));
+		reports = mongoTemplate.find(query, NetworkReport.class, collectionName);
+
+		NetworkReportDTO reportDTO = new NetworkReportDTO(reports, count);
+		return reportDTO;
+	}
+
+	@Override
+	public List<NetworkReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds) {
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String deviceId : deviceIds) {
+			Criteria expression = new Criteria();
+			expression.and("deviceId").is(deviceId);
+			orExpression.add(expression);
+		}
+
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
+		query.addCriteria(criteria);
+
 		List<NetworkReport> result = mongoTemplate.find(query, className, collectionName);
 		return result;
 	}

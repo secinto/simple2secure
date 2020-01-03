@@ -149,7 +149,6 @@ public class LicenseUtil {
 				selfInitialize();
 			}
 		}
-
 	}
 
 	/**
@@ -213,6 +212,7 @@ public class LicenseUtil {
 				}
 			}
 		}
+		log.error("Couldn't find provided key in path {} ", keyPath);
 		return null;
 	}
 

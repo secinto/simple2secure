@@ -1,22 +1,12 @@
 plugins {
 	id "org.sonarqube" version "2.6.2"
 	id "org.springframework.boot" version "2.2.0.RELEASE"
-	id 'application'
 	id "io.spring.dependency-management" version "1.0.8.RELEASE"
 	id 'war'
 }
 
-mainClassName = "com.simple2secure.portal.Simple2SecurePortal"
-
-
 sonarqube {
 	properties { property "sonar.projectBaseDir", "$projectDir/.." }
-}
-
-
-jar {
-	baseName = 'simple2secure-portal'
-	version =  '1.0.0-RC'
 }
 
 dependencies {
@@ -34,6 +24,8 @@ compileJava {
 war {
 	baseName = 's2s-portal'
 }
+
+
 
 
 

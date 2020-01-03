@@ -21,26 +21,20 @@
  */
 package com.simple2secure.probe.utils;
 
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Base64;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.pcap4j.core.PcapAddress;
-import org.pcap4j.core.PcapHandle;
+import org.pcap4j.core.PcapIpV4Address;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
-import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
@@ -57,18 +51,16 @@ import org.pcap4j.packet.namednumber.ProtocolFamily;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.simple2secure.api.model.PacketInfo;
+import com.simple2secure.commons.network.NetUtils;
 
 public class PcapUtil {
 	private static Logger log = LoggerFactory.getLogger(PcapUtil.class);
 
-	public static Map<String, Boolean> findOutgoingInterfaces(List<String> addresses) {
-		Map<String, Boolean> mapping = new HashMap<>();
-		for (String ipAddress : addresses) {
-			mapping.put(ipAddress, checkAddress(ipAddress));
-		}
-		return mapping;
-	}
+	private static PcapNetworkInterface outgoingInterface = null;
+	private static String outgoingIPAddress = null;
+	private static String outgoingNetmask = null;
 
 	/**
 	 * This method converts a packet converted to a hex stream, back to a packet.
@@ -91,64 +83,62 @@ public class PcapUtil {
 		return new String(encodedRawData);
 	}
 
-	/**
-	 * This method creates automatically a PcapHandle with the outgoing network interface
-	 *
-	 * @return... PcapHandle
-	 */
-	public static PcapHandle getPcapHandle() {
-		final int SNAP_LEN = 65536;
-		final int READ_TIMEOUT = 10;
-		PcapHandle handle = null;
-		String ip = null;
-		try {
-			ip = PcapUtil.getIpAddrOfNetworkInterface();
-			PcapNetworkInterface nI = PcapUtil.getNetworkInterfaceByInetAddr(ip);
-			handle = nI.openLive(SNAP_LEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
-		} catch (UnknownHostException | SocketException | PcapNativeException e) {
-			log.error("Could not retreive the ip address of the network interface.");
-		}
-		return handle;
-	}
+	public static PcapNetworkInterface getOutgoingInterface(boolean show, boolean renew) {
 
-	/**
-	 * This function returns the network interface with the provided ip address.
-	 *
-	 * @param... ipAdress of the network interface you want to get @return... PcapNetworkInterface object with the network interface of the
-	 * provided ip
-	 */
-	public static PcapNetworkInterface getNetworkInterfaceByInetAddr(String ipAddress) {
+		if (outgoingInterface != null && !renew) {
+			log.debug("Already obtained outgoing interface is used and returend as result of getOutgoingInterface");
+			return outgoingInterface;
+		}
+
+		List<PcapNetworkInterface> interfaces;
+
 		try {
-			for (PcapNetworkInterface nI : Pcaps.findAllDevs()) {
-				List<PcapAddress> ipAdressList = nI.getAddresses();
-				for (PcapAddress add : ipAdressList) {
-					if (add.getAddress().toString().equals("/" + ipAddress)) {
-						return Pcaps.getDevByAddress(add.getAddress());
+			interfaces = Pcaps.findAllDevs();
+		} catch (PcapNativeException e) {
+			log.error("An exception occured during obtaining all available network interfaces using PCAP4J. Reason {}", e.getLocalizedMessage());
+			return null;
+		}
+
+		for (PcapNetworkInterface currentInterface : interfaces) {
+			if (show) {
+				log.info(currentInterface.getName() + "(" + currentInterface.getDescription() + ")");
+			}
+			/*
+			 * Iterate through the addresses of the interfaces and check if someone fits.
+			 *
+			 * TODO: We should store the interfaces which have relevant addresses.
+			 */
+			List<PcapAddress> addresses = currentInterface.getAddresses();
+			for (PcapAddress address : addresses) {
+				if (address instanceof PcapIpV4Address) {
+					String ipAddress = ((PcapIpV4Address) address).getAddress().getHostAddress();
+					if (NetUtils.isUseableIPv4Address(ipAddress) && PcapUtil.checkAddress(ipAddress)) {
+						if (PcapUtil.outgoingInterface != null) {
+							log.info("Found another usable address {}, discarding old one {}", ipAddress, outgoingIPAddress);
+						}
+						outgoingInterface = currentInterface;
+						outgoingIPAddress = ipAddress;
+						outgoingNetmask = ((PcapIpV4Address) address).getNetmask().getHostAddress();
+						break;
 					}
 				}
 			}
-		} catch (PcapNativeException e) {
-			log.error("Could not find network interface with the provided ip.");
 		}
-		return null;
+		return outgoingInterface;
 	}
 
-	/**
-	 * 8.8.8.8 the address does not have to be reachable
-	 * https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
-	 *
-	 * @return IP-address of the outgoing network interface as string
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 */
-	public static String getIpAddrOfNetworkInterface() throws UnknownHostException, SocketException {
-		// seems like this method is taking advantage of a sideffect of the "socket.connect" method
-		String ipAddr;
-		try (final DatagramSocket socket = new DatagramSocket()) {
-			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-			ipAddr = socket.getLocalAddress().getHostAddress();
+	public static String getOutgoingIPAddress() {
+		if (Strings.isNullOrEmpty(outgoingIPAddress)) {
+			getOutgoingInterface(false, true);
 		}
-		return ipAddr;
+		return outgoingIPAddress;
+	}
+
+	public static String getOutgoingNetmask() {
+		if (Strings.isNullOrEmpty(outgoingNetmask)) {
+			getOutgoingInterface(false, true);
+		}
+		return outgoingNetmask;
 	}
 
 	public static boolean checkAddress(String ipAddress) {
@@ -164,7 +154,8 @@ public class PcapUtil {
 
 					if (address.getAddress() instanceof Inet4Address && address.getAddress().equals(inet)) {
 						socket.bind(new InetSocketAddress(address.getAddress(), 0));
-						socket.connect(new InetSocketAddress(InetAddress.getByName("stackoverflow.com"), 80));
+						log.info("Trying to use address {} for pinging remote address {}", address.getAddress(), "simple2secure.info");
+						socket.connect(new InetSocketAddress(InetAddress.getByName("simple2secure.info"), 51003));
 						socket.close();
 						return true;
 					}

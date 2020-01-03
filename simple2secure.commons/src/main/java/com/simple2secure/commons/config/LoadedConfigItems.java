@@ -36,23 +36,13 @@ public class LoadedConfigItems {
 
 	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
 	private String baseProtocol = "https";
-	private String baseHost = "https://simple2secure.info";
-	private String basePort = "51001/s2s";
-	private String basePortWeb = "51003";
+	private String baseHost = "localhost";
+	private String basePort = "8443";
+	private String basePortWeb = "9000";
 
-	private String version = "0.2.0";
+	private String version = "0.2.1";
 
-	private String usersAPI = "/api/user";
-	private String loginAPI = "/api/login";
-	private String reportsAPI = "/api/reports";
-	private String queryAPI = "/api/query";
-	private String deviceAPI = "/api/device";
-	private String packetAPI = "/api/packet";
-	private String stepAPI = "/api/steps";
-	private String processorAPI = "/api/processors";
-	private String licenseAPI = "/api/license";
-	private String serviceAPI = "/api/service";
-	private String groupAPI = "/api/group";
+	private String[] trustedCertificates = new String[0];
 
 	private static LoadedConfigItems instance;
 
@@ -129,50 +119,55 @@ public class LoadedConfigItems {
 	}
 
 	public String getUsersAPI() {
-		return getBaseURL() + usersAPI;
+		return getBaseURL() + StaticConfigItems.USER_API;
 	}
 
 	public String getLoginAPI() {
-		return getBaseURL() + loginAPI;
+		return getBaseURL() + StaticConfigItems.LOGIN_API;
 	}
 
 	public String getReportsAPI() {
-		return getBaseURL() + reportsAPI;
+		return getBaseURL() + StaticConfigItems.REPORT_API;
 	}
 
 	public String getQueryAPI() {
-		return getBaseURL() + queryAPI;
+		return getBaseURL() + StaticConfigItems.QUERY_API;
 	}
 
 	public String getDeviceAPI() {
-		return getBaseURL() + deviceAPI;
-	}
-
-	public String getPacketAPI() {
-		return getBaseURL() + packetAPI;
+		return getBaseURL() + StaticConfigItems.DEVICE_API;
 	}
 
 	public String getStepAPI() {
-		return getBaseURL() + stepAPI;
+		return getBaseURL() + StaticConfigItems.STEP_API;
 	}
 
 	public String getProcessorAPI() {
-		return getBaseURL() + processorAPI;
+		return getBaseURL() + StaticConfigItems.PROCESSOR_API;
 	}
 
 	public String getLicenseAPI() {
-		return getBaseURL() + licenseAPI;
+		return getBaseURL() + StaticConfigItems.LICENSE_API;
 	}
 
 	public String getServiceAPI() {
-		return getBaseURL() + serviceAPI;
+		return getBaseURL() + StaticConfigItems.SERVICE_API;
 	}
 
 	public String getGroupAPI() {
-		return getBaseURL() + groupAPI;
+		return getBaseURL() + StaticConfigItems.GROUP_API;
 	}
 
 	public String getVersion() {
 		return version;
 	}
+
+	public String[] getTrustedCertificates() {
+		return trustedCertificates;
+	}
+
+	public void setTrustedCertificates(String[] trustedCertificates) {
+		this.trustedCertificates = trustedCertificates;
+	}
+
 }

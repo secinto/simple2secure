@@ -23,12 +23,14 @@
 import {Component} from '@angular/core';
 import {MatDialog} from '@angular/material';
 import {TestMacro} from '../_models/TestMacro';
-import {AlertService, HttpService, DataService} from '../_services/index';
-import {Router, ActivatedRoute} from '@angular/router';
+import {AlertService, DataService, HttpService} from '../_services/index';
+import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Settings, SettingsDTO, Timeunit} from '../_models';
 import {environment} from '../../environments/environment';
 import {LicensePlan} from '../_models/LicensePlan';
+import {Widget} from '../_models/widget';
+import {WidgetColor} from '../_models/widgetColor';
 
 @Component({
 	moduleId: module.id,
@@ -39,10 +41,12 @@ import {LicensePlan} from '../_models/LicensePlan';
 export class SettingsComponent {
 
 	loading = false;
-	currentUser: any;
 	settingsObj: SettingsDTO;
 	timeUnits = Timeunit;
+	colorEnums = WidgetColor;
+	colors: string[];
 	updated = false;
+	icons: string[];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -56,14 +60,21 @@ export class SettingsComponent {
 		this.settingsObj = new SettingsDTO();
 		this.settingsObj.licensePlan = [];
 		this.settingsObj.settings = new Settings();
+		this.icons = ['fa-server', 'fa-user', 'fa-satellite'];
 	}
 
 	ngOnInit() {
+		this.colors = this.extractColors();
 		this.loadSettings();
 	}
 
 	extractTimeUnits(): Array<string> {
 		const keys = Object.keys(this.timeUnits);
+		return keys.slice();
+	}
+
+	extractColors(): Array<string> {
+		const keys = Object.keys(this.colorEnums);
 		return keys.slice();
 	}
 
@@ -194,6 +205,54 @@ export class SettingsComponent {
 	saveTestMacro(testMacro: TestMacro) {
 		this.loading = true;
 		this.httpService.post(testMacro, environment.apiEndpoint + 'settings/testmacro').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.settings.update'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	addNewWidget(){
+		if (this.settingsObj.widgetList){
+			this.settingsObj.widgetList.push(new Widget());
+		}
+		else{
+			this.settingsObj.widgetList = [];
+			this.settingsObj.widgetList.push(new Widget());
+		}
+	}
+
+	deleteWidget(widget: Widget) {
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'widget/delete/' + widget.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.user.delete'));
+				this.loading = false;
+				this.loadSettings();
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
+
+	saveWidget(widget: Widget) {
+		this.loading = true;
+		this.httpService.post(widget, environment.apiEndpoint + 'widget/add').subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.settings.update'));
 				this.loading = false;

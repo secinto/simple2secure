@@ -1,0 +1,39 @@
+<div class="example-container mat-elevation-z8 table table-striped">
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="testSequenceResults" matSort>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequence_name}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.pod_id}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{(element.time_stamp) | date:'dd.MM.yyyy HH:mm:ss'}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
+                 (click)="openDialogShowTestSequenceResult(row)"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+

@@ -40,9 +40,11 @@ import com.mongodb.DBObject;
 import com.simple2secure.api.dbo.GenericDBObject;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides generic methods for Mongo DB repositories. Call _init() from the concrete repository after collectionName, collectionIndexName
@@ -54,6 +56,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
  *          the concrete database object which is managed by the repository. Has to be derived from BasicDBObject
  */
 @Repository
+@Slf4j
 public class MongoRepository<T extends GenericDBObject> {
 
 	static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
@@ -215,7 +218,7 @@ public class MongoRepository<T extends GenericDBObject> {
 		mongoTemplate.indexOps(Notification.class).ensureIndex(textIndex);
 
 		textIndex = new TextIndexDefinitionBuilder().onField("queryResult").onField("query").build();
-		mongoTemplate.indexOps(Report.class).ensureIndex(textIndex);
+		mongoTemplate.indexOps(OsQueryReport.class).ensureIndex(textIndex);
 
 		textIndex = new TextIndexDefinitionBuilder().onField("stringContent").build();
 		mongoTemplate.indexOps(NetworkReport.class).ensureIndex(textIndex);

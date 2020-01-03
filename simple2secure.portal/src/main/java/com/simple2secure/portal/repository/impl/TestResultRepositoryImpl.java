@@ -1,9 +1,12 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -13,36 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.repository.TestResultRepository;
+import com.simple2secure.portal.utils.PortalUtils;
 
 @Repository
 @Transactional
 public class TestResultRepositoryImpl extends TestResultRepository {
 
+	@Autowired
+	PortalUtils portalUtils;
+
 	@PostConstruct
 	public void init() {
 		super.collectionName = "testResult"; //$NON-NLS-1$
 		super.className = TestResult.class;
-	}
-
-	@Override
-	public List<TestResult> getByGroupId(String groupId) {
-		Query query = new Query(Criteria.where("groupId").is(groupId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
-	}
-
-	@Override
-	public List<TestResult> getByLicenseId(String licenseId) {
-		Query query = new Query(Criteria.where("licenseId").is(licenseId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
-	}
-
-	@Override
-	public List<TestResult> getByTestId(String testId) {
-		Query query = new Query(Criteria.where("testId").is(testId));
-		List<TestResult> testResults = mongoTemplate.find(query, TestResult.class);
-		return testResults;
 	}
 
 	@Override
@@ -59,5 +45,46 @@ public class TestResultRepositoryImpl extends TestResultRepository {
 		query.addCriteria(Criteria.where("testRunId").is(testRunId));
 		List<TestResult> result = mongoTemplate.find(query, className, collectionName);
 		return result;
+	}
+
+	@Override
+	public long getTotalAmountOfTestResults(List<String> testRunIds) {
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String testRunId : testRunIds) {
+			Criteria expression = new Criteria();
+			expression.and("testRunId").is(testRunId);
+			orExpression.add(expression);
+		}
+
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		return mongoTemplate.count(query, TestResult.class, collectionName);
+	}
+
+	@Override
+	public List<TestResult> getByTestRunIdWithPagination(List<String> testRunIds, int page, int size) {
+
+		List<Criteria> orExpression = new ArrayList<>();
+		Criteria orCriteria = new Criteria();
+		Query query = new Query();
+		for (String testRunId : testRunIds) {
+			Criteria expression = new Criteria();
+			expression.and("testRunId").is(testRunId);
+			orExpression.add(expression);
+		}
+
+		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
+
+		int limit = portalUtils.getPaginationLimit(size);
+		int skip = portalUtils.getPaginationStart(size, page, limit);
+
+		query.limit(limit);
+		query.skip(skip);
+		query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
+
+		return mongoTemplate.find(query, TestResult.class, collectionName);
+
 	}
 }

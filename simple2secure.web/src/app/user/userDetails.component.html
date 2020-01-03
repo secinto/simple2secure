@@ -10,7 +10,7 @@
         </mat-form-field>
 
         <mat-form-field class="full_width_input">
-            <mat-select placeholder="{{ 'userRole.placeholder' | translate }}" [(ngModel)]="user.userRole"
+            <mat-select placeholder="{{ 'user.role.placeholder' | translate }}" [(ngModel)]="user.userRole"
                         name="userRole" (selectionChange)="onRoleChange($event.value)" required>
                 <mat-option *ngFor="let role of userRoleKeys()" [value]="role">
                     {{role}}

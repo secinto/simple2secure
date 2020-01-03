@@ -28,8 +28,10 @@ export class TestRun extends Base {
 	testId: string;
 	testName: string;
 	podId: string;
+	hostname: string;
 	contextId: string;
 	testRunType: TestRunType;
 	testContent: string;
 	testStatus: TestStatus;
+	timestamp: number;
 }

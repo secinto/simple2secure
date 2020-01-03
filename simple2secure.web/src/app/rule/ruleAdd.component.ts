@@ -28,7 +28,7 @@ import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO, TemplateRule} from '../_models';
+import {TemplateRule} from '../_models';
 import {AceEditorComponent} from 'ng2-ace-editor';
 import {TemplateCondition} from '../_models/templateCondition';
 import {TemplateAction} from '../_models/templateAction';
@@ -68,7 +68,6 @@ export class RuleAddComponent {
     selectedTab: number;
     // title which will be displayed at the head of the dialog
     dialogTitle: string;
-    context: ContextDTO;
 
     @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -87,8 +86,6 @@ export class RuleAddComponent {
 
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-		this.context = JSON.parse(localStorage.getItem('context'));
-
         this.selectedTab = 0;
 
         // if a rule should be edited the old data of the rule will be displayed
@@ -428,16 +425,11 @@ export class RuleAddComponent {
                 // saves all data from gui into the rule object
                 this.ruleTemplate.name = this.ruleName;
                 this.ruleTemplate.description = this.ruleDescription;
-
-                if (!this.ruleTemplate.contextID) {
-                    this.ruleTemplate.contextID = this.context.context.id;
-                }
-
                 this.ruleTemplate.templateCondition = this.selectedCondition;
                 this.ruleTemplate.templateAction = this.selectedAction;
 
                 // tries to save the rule
-                this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule/').subscribe(
+                this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule').subscribe(
                     data => {
                         this.dialogRef.close(true);
                     },
@@ -460,12 +452,8 @@ export class RuleAddComponent {
                 this.ruleExpert.name = this.ruleName;
                 this.ruleExpert.description = this.ruleDescription;
 
-                if (!this.ruleExpert.contextID) {
-                    this.ruleExpert.contextID = this.context.context.id;
-                }
-
                 // tries to save the rule
-                this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource/').subscribe(
+                this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource').subscribe(
                     data => {
                         this.dialogRef.close(true);
                     },

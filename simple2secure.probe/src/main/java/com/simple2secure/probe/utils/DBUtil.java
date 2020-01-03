@@ -31,16 +31,16 @@ import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.ProbePacket;
 import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.Report;
+import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.probe.dao.BaseDao;
 import com.simple2secure.probe.dao.impl.LicenseDaoImpl;
 import com.simple2secure.probe.dao.impl.NetworkReportDaoImpl;
 import com.simple2secure.probe.dao.impl.ProbePacketDaoImpl;
 import com.simple2secure.probe.dao.impl.ProcessorDaoImpl;
-import com.simple2secure.probe.dao.impl.QueryDaoImpl;
-import com.simple2secure.probe.dao.impl.ReportDaoImpl;
+import com.simple2secure.probe.dao.impl.OsQueryDaoImpl;
+import com.simple2secure.probe.dao.impl.OsQueryReportDaoImpl;
 import com.simple2secure.probe.dao.impl.StepDaoImpl;
 
 public class DBUtil {
@@ -54,8 +54,8 @@ public class DBUtil {
 	private LicenseDaoImpl licenseDao;
 	private NetworkReportDaoImpl networkReportDao;
 	private ProcessorDaoImpl processorDao;
-	private ReportDaoImpl reportDao;
-	private QueryDaoImpl queryDao;
+	private OsQueryReportDaoImpl reportDao;
+	private OsQueryDaoImpl queryDao;
 	private StepDaoImpl stepDao;
 	private ProbePacketDaoImpl probePacketDao;
 	public static boolean hasDBChanged = false;
@@ -86,11 +86,11 @@ public class DBUtil {
 		}
 
 		if (reportDao == null) {
-			reportDao = new ReportDaoImpl(persistenceUnitName);
+			reportDao = new OsQueryReportDaoImpl(persistenceUnitName);
 		}
 
 		if (queryDao == null) {
-			queryDao = new QueryDaoImpl(persistenceUnitName);
+			queryDao = new OsQueryDaoImpl(persistenceUnitName);
 		}
 
 		if (stepDao == null) {
@@ -146,6 +146,29 @@ public class DBUtil {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public synchronized <T> List<T> findByFieldNamePaging(String fieldName, Object value, Object t, int lastPageNumber) {
+		List<T> queryObjects = new ArrayList<>();
+
+		BaseDao dao = getDao(t);
+		if (dao != null) {
+			queryObjects = dao.findByFieldNamePaging(fieldName, value, lastPageNumber);
+		}
+
+		return queryObjects;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public synchronized int getLastPageNumberByFieldName(String fieldName, Object value, Object t) {
+		BaseDao dao = getDao(t);
+		if (dao != null) {
+			return dao.getLastPageNumberByFieldName(fieldName, value);
+		}
+
+		return 0;
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public synchronized <T> List<T> findAll(Object t) {
 		List<T> queryObjects = new ArrayList<>();
 
@@ -179,11 +202,11 @@ public class DBUtil {
 			return processorDao;
 		}
 
-		else if (t instanceof Report || t == Report.class) {
+		else if (t instanceof OsQueryReport || t == OsQueryReport.class) {
 			return reportDao;
 		}
 
-		else if (t instanceof QueryRun || t == QueryRun.class) {
+		else if (t instanceof OsQuery || t == OsQuery.class) {
 			return queryDao;
 		}
 

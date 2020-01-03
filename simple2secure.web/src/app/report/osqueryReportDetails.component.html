@@ -1,9 +1,8 @@
-<h3 mat-dialog-title>{{ 'query.details' | translate }} {{report.query}}</h3>
+<h3 mat-dialog-title>{{report.name}}</h3>
 
 <div mat-dialog-content>
     <p><b>{{ 'table.query' | translate }}: </b> {{report.query}}</p>
-    <p><b>{{ 'table.query' | translate }} ID: </b> {{report.queryID}}</p>
-    <p><b>{{ 'table.time' | translate }}: </b> {{report.queryTimestamp}}</p>
+    <p><b>{{ 'table.time' | translate }}: </b> {{report.queryTimestamp | date : 'short'}}</p>
     <!--<ngx-json-viewer [json]="getQueryResult()" [expanded]="false"></ngx-json-viewer>-->
     <ngx-json-view [data]="getQueryResult()"></ngx-json-view>
 </div>

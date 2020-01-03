@@ -29,12 +29,10 @@ import java.util.List;
 
 import javax.net.ssl.X509TrustManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Simple2SecureTrustManager implements X509TrustManager {
-
-	private static Logger log = LoggerFactory.getLogger(Simple2SecureTrustManager.class);
 
 	private String[] acceptedSerialNumbers;
 	private X509TrustManager sunJsseX509TrustManager;

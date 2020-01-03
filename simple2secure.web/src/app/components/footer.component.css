@@ -8,6 +8,7 @@ footer {
     background-color: #A7BD26;
     text-align: center;
     font-size: 80%;
+    z-index: 1;
 }
 
 span {

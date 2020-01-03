@@ -31,8 +31,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -48,17 +46,15 @@ import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInvitation;
-import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.EmailConfigurationRepository;
-import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Component
-public class MailUtils {
-
-	private static Logger log = LoggerFactory.getLogger(MailUtils.class);
+@Slf4j
+public class MailUtils extends BaseServiceProvider {
 
 	@Value("${mail.username}")
 	private String mailUser;
@@ -73,22 +69,7 @@ public class MailUtils {
 	private String mailSMTPHost;
 
 	@Autowired
-	EmailConfigurationRepository emailConfigRepository;
-
-	@Autowired
-	EmailRepository emailRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
 	JavaMailSender javaMailSender;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
 
 	@Autowired
 	RuleUtils ruleUtils;
@@ -186,8 +167,8 @@ public class MailUtils {
 	}
 
 	public String generateEmailContent(User user, String locale) {
-		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL() + "/api/user/activate/"
-				+ user.getActivationToken();
+		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL()
+				+ StaticConfigItems.USER_API + "/activate/" + user.getActivationToken();
 	}
 
 	/**
@@ -201,8 +182,8 @@ public class MailUtils {
 	 */
 	public String generateInvitationEmail(UserInvitation userInvitation, Context context, User addedByUser, String locale) {
 		String content = "You have been invited by " + addedByUser.getEmail() + " to join " + context.getName()
-				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL() + "/api/user/invite/"
-				+ userInvitation.getInvitationToken();
+				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL()
+				+ StaticConfigItems.USER_API + "/invite/" + userInvitation.getInvitationToken();
 		return content;
 	}
 

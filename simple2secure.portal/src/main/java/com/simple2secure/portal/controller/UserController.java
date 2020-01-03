@@ -27,22 +27,16 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.security.PermitAll;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -51,140 +45,45 @@ import com.simple2secure.api.dto.UserRoleDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserInfo;
 import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.api.model.UserRegistration;
 import com.simple2secure.api.model.UserRegistrationType;
 import com.simple2secure.api.model.UserRole;
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserInfoRepository;
-import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.security.PasswordValidator;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.ContextUtils;
-import com.simple2secure.portal.utils.DataInitialization;
-import com.simple2secure.portal.utils.DeviceUtils;
-import com.simple2secure.portal.utils.GroupUtils;
-import com.simple2secure.portal.utils.LicenseUtils;
-import com.simple2secure.portal.utils.MailUtils;
-import com.simple2secure.portal.utils.PortalUtils;
-import com.simple2secure.portal.utils.UserUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputToken;
+import com.simple2secure.portal.validation.model.ValidInputUser;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidRequestMethodType;
+
+@SuppressWarnings("unchecked")
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
-
-	static final Logger log = LoggerFactory.getLogger(UserController.class);
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	UserInvitationRepository userInvitationRepository;
-
-	@Autowired
-	UserInfoRepository userInfoRepository;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	PasswordValidator passwordValidator;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	PortalUtils portalUtils;
-
-	@Autowired
-	MailUtils mailUtils;
-
-	@Autowired
-	UserUtils userUtils;
-
-	@Autowired
-	GroupUtils groupUtils;
-
-	@Autowired
-	DeviceUtils deviceUtils;
-
-	@Autowired
-	ContextUtils contextUtils;
-
-	@Autowired
-	DataInitialization dataInitialization;
-
-	@Autowired
-	TokenRepository tokenRepository;
-
-	@Autowired
-	LicenseController licenseController;
-
-	@Autowired
-	ContextUserAuthRepository contextUserRepository;
-
-	@Autowired
-	LicenseUtils licenseUtils;
-
-	/**
-	 * This function returns all users from the user repository
-	 */
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<User>> getUsers(@RequestHeader("Accept-Language") String locale) {
-		List<User> userList = userRepository.findAll();
-		return new ResponseEntity<>(userList, HttpStatus.OK);
-	}
+@RequestMapping(StaticConfigItems.USER_API)
+@Slf4j
+public class UserController extends BaseUtilsProvider {
 
 	/**
 	 * This function finds and returns user according to the user id
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<UserDTO> getUserByID(@PathVariable("userId") String userId, @PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	@ValidRequestMapping(method = ValidRequestMethodType.GET)
+	public ResponseEntity<UserDTO> getUserByID(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		User user = userRepository.find(userId);
+		User user = userRepository.find(userId.getValue());
 
-		if (user != null && !Strings.isNullOrEmpty(contextId)) {
+		if (user != null && !Strings.isNullOrEmpty(contextId.getValue())) {
 			// Retrieving the context according to the current active context
-			Context context = contextRepository.find(contextId);
+			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
 
@@ -194,55 +93,56 @@ public class UserController {
 				List<String> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
 				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Device> myDevices = deviceUtils.getAllDevicesFromCurrentContext(context);
 				List<Context> myContexts = contextUtils.getContextsByUserId(user);
 				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
-				log.debug("Found {} devices, {} groups, {} users, and {} contexts", myDevices.size(), groups.size(), myUsers.size(),
-						myContexts.size());
+				log.debug("Found {} groups, {} users, and {} contexts", groups.size(), myUsers.size(), myContexts.size());
 				if (contextUserAuth != null) {
 					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
 						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, user);
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myDevices, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myContexts, assignedGroups);
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-				HttpStatus.NOT_FOUND);
+
+		return ((ResponseEntity<UserDTO>) buildResponseEntity("problem_occured_user_not_found", locale));
 
 	}
 
 	/**
 	 * This function is used to add new user. For each user added it sets the configuration, queries, processors and steps from the default
-	 * configuration .json files which are placed on the server
+	 * configuration files which are placed on the server. This function is called from a super user or admin from within the portal. If the
+	 * user is added by the normal registration process this is performed via {@link #registerUser(UserRegistration, String)}.
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
+	@ValidRequestMapping(method = ValidRequestMethodType.POST)
+	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (user != null) {
 			if (user.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
+				user.setCurrentContextId(contextId.getValue());
+				user.setAddedByUserId(userId.getValue());
+
 				return userUtils.addNewUser(user, locale);
 			} else {
 				return userUtils.updateUser(user, locale);
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 		}
 	}
 
 	/**
-	 * This function is used for the standard registration over the login page
+	 * This function is used for adding users via the standard registration process provided on the login page.
 	 *
 	 * @param user
 	 * @return
@@ -250,16 +150,20 @@ public class UserController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @RequestHeader("Accept-Language") String locale)
+	@ValidRequestMapping(value = "/resendActivation", method = ValidRequestMethodType.POST)
+	public ResponseEntity<User> resendActivation(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
-		if (user != null) {
-			return userUtils.addNewUser(user, locale);
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-					HttpStatus.NOT_FOUND);
+		if (!Strings.isNullOrEmpty(email)) {
+			User user = userRepository.findByEmail(email);
+			if (user != null) {
+				if (!user.isActivated()) {
+					return userUtils.resendActivation(user, locale);
+				} else {
+					return ((ResponseEntity<User>) buildResponseEntity("user_already_activated", locale));
+				}
+			}
 		}
+		return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 	}
 
 	/**
@@ -269,10 +173,9 @@ public class UserController {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @RequestHeader("Accept-Language") String locale)
+	@ValidRequestMapping(value = "/update", method = ValidRequestMethodType.POST)
+	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
 
 		if (userInfo != null) {
@@ -283,13 +186,46 @@ public class UserController {
 				return new ResponseEntity<>(userInfo, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<UserInfo>) buildResponseEntity("problem_occured_user_not_found", locale));
 	}
 
 	/**
-	 * This function is used to update the password after clicking on the activation link. This is used only for the users which are added by
-	 * another user.
+	 * This function deletes the user from the current context
+	 *
+	 * @param userId
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
+		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
+
+			User user = userRepository.find(userId);
+			Context context = contextRepository.find(contextId);
+
+			if (user != null && context != null) {
+				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
+						user.getId());
+				if (contextUserAuthentication != null) {
+					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
+						return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_superadmin", locale));
+					} else {
+						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
+						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
+					}
+				}
+			}
+		}
+		return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_user", locale));
+	}
+
+	// Unsecured APIs
+
+	/**
+	 * This function updates the user password with the token sent in the password reset email.
 	 *
 	 * @param user
 	 * @return
@@ -297,150 +233,46 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/activate/updatePassword/{authenticationToken}", method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable("authenticationToken") String authenticationToken,
-			@RequestBody String password, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/updatePassword", method = ValidRequestMethodType.POST)
+	public ResponseEntity<User> updateUserPassword(@PathVariable ValidInputToken token, @RequestBody String password,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
-		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(authenticationToken)) {
-			User user = userRepository.findByActivationToken(authenticationToken);
+		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
+			User user = userRepository.findByPasswordResetToken(token.getValue());
 
 			if (user != null) {
-				user.setActivated(true);
-				user.setPassword(password);
+				if (portalUtils.checkIfTokenIsStillValid(user.getPasswordResetExpirationTime())) {
 
-				String error = userUtils.validateUserPassword(user);
+					user.setPassword(password);
 
-				if (!Strings.isNullOrEmpty(error)) {
-					return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
-				}
+					String error = userUtils.validateUserPassword(user);
 
-				user.setPassword(passwordEncoder.encode(user.getPassword()));
-				user.setPasswordUpdated(true);
+					if (!Strings.isNullOrEmpty(error)) {
+						return ((ResponseEntity<User>) buildResponseEntity(error, locale));
+					}
 
-				userRepository.update(user);
-
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + user.getActivationToken());
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
-
-			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_user_not_found", locale)),
-						HttpStatus.NOT_FOUND);
-			}
-
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-					HttpStatus.NOT_FOUND);
-		}
-
-	}
-
-	/**
-	 * This function activates the user, after the user has clicked on the link in the activation email which has been sent after successful
-	 * registration
-	 *
-	 * @param activationToken
-	 * @param locale
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws URISyntaxException
-	 * @throws IOException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/activate/{activationToken}", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> activateUser(@PathVariable("activationToken") String activationToken,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
-		User user = userRepository.findByActivationToken(activationToken);
-
-		if (user != null) {
-
-			if (!user.isActivated()) {
-				if (user.isPasswordUpdated()) {
-					user.setActivated(true);
+					user.setPassword(passwordEncoder.encode(password));
+					user.setPasswordResetToken(token.getValue());
 					userRepository.update(user);
-				}
 
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + activationToken);
+					String emailContent = messageByLocaleService.getMessage("password_changed_email_content", locale.getValue());
+					mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subjct_pcs);
 
-				if (!user.isPasswordUpdated()) {
-					url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/updatePassword/" + activationToken);
-				}
-
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-			} else {
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activated/");
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-			}
-
-		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("activation_token_not_valid", locale)),
-					HttpStatus.NOT_FOUND);
-		}
-	}
-
-	/**
-	 * This function sends password reset email with the generated link to the user.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
-	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException, IOException {
-
-		if (!Strings.isNullOrEmpty(email)) {
-			User user = userRepository.findByEmailOnlyActivated(email);
-			if (user != null) {
-				user.setPasswordResetToken(portalUtils.generateToken());
-				user.setPasswordResetExpirationTime(System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset);
-
-				userRepository.update(user);
-
-				// Add template for the email content and retrieve it from the database!
-				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
-						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
-
-				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
-					return new ResponseEntity<>(user, HttpStatus.OK);
+					URI url = new URI(loadedConfigItems.getBaseURLWeb());
+					HttpHeaders httpHeaders = new HttpHeaders();
+					httpHeaders.setLocation(url);
+					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
 				} else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_sending_email", locale)),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<User>) buildResponseEntity("password_reset_token_expired", locale));
 				}
 			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("user_with_provided_email_not_exists", locale)),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("problem_token_already_used", locale));
 			}
+
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 		}
-	}
-
-	/**
-	 * This function only redirects the user to the correct page in the web, after the user clicks on the link in the password reset email.
-	 *
-	 * @param user
-	 * @return
-	 * @throws URISyntaxException
-	 */
-
-	@RequestMapping(value = "/resetPassword/{token}")
-	@PermitAll
-	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable("token") String token) throws URISyntaxException {
-		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token);
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setLocation(url);
-		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
 	}
 
 	/**
@@ -450,12 +282,13 @@ public class UserController {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(value = "/invite/{invitationToken}", method = RequestMethod.GET)
-	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable("invitationToken") String invitationToken,
-			@RequestHeader("Accept-Language") String locale) throws URISyntaxException {
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/invite")
+	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
+			throws URISyntaxException {
 
 		// TODO - check if token exists
-		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/invitation/" + invitationToken);
+		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/invitation/" + token.getValue());
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setLocation(url);
 		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
@@ -465,13 +298,12 @@ public class UserController {
 	 * @throws ItemNotFoundRepositoryException
 	 *
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/invite/process/{invitationToken}/{isAccepted}", method = RequestMethod.GET)
-	public ResponseEntity<UserInvitation> processInvitation(@PathVariable("invitationToken") String invitationToken,
-			@PathVariable("isAccepted") boolean isAccepted, @RequestHeader("Accept-Language") String locale)
-			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(invitationToken)) {
-			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(invitationToken);
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/invite/process")
+	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(token)) {
+			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(token);
 			if (userInvitation != null) {
 				User user = userRepository.find(userInvitation.getUserId());
 				if (isAccepted && user != null) {
@@ -492,30 +324,48 @@ public class UserController {
 
 						} else {
 							userInvitationRepository.delete(userInvitation);
-							log.error("Context not found for following {}", invitationToken);
+							log.error("Context not found for following {}", token);
 						}
 					} else {
-						log.error("Invitation token expired {}", invitationToken);
+						log.error("Invitation token expired {}", token);
 						userInvitationRepository.delete(userInvitation);
-						return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_token_expired", locale)),
-								HttpStatus.NOT_FOUND);
+						return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_token_expired", locale));
 					}
 
 				} else {
 					userInvitationRepository.delete(userInvitation);
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("invitation_rejected", locale)),
-							HttpStatus.NOT_FOUND);
+					return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_rejected", locale));
 				}
 
 			}
 		}
-		log.error("Error occured during invitation for invitation token {}", invitationToken);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-				HttpStatus.NOT_FOUND);
+		log.error("Error occured during invitation for invitation token {}", token);
+		return ((ResponseEntity<UserInvitation>) buildResponseEntity("unknown_error_occured", locale));
 	}
 
 	/**
-	 * This function updates the user password with the token sent in the password reset email.
+	 * This function is used for adding users via the standard registration process provided on the login page.
+	 *
+	 * @param user
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/register", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+		if (user != null) {
+			return userUtils.addNewUser(user, locale);
+		} else {
+			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
+		}
+	}
+
+	/**
+	 * This function is used to update the password after clicking on the activation link. This is used only for the users which are added by
+	 * another user.
 	 *
 	 * @param user
 	 * @return
@@ -523,86 +373,142 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/updatePassword/{token}", method = RequestMethod.POST)
-	public ResponseEntity<User> updateUserPassword(@PathVariable("token") String token, @RequestBody String password,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/activate/updatePassword", method = ValidRequestMethodType.POST)
+	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable ValidInputToken token, @RequestBody String password,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
 
-		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token)) {
-			User user = userRepository.findByPasswordResetToken(token);
+		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
+			User user = userRepository.findByActivationToken(token.getValue());
 
 			if (user != null) {
-				if (portalUtils.checkIfTokenIsStillValid(user.getPasswordResetExpirationTime())) {
+				user.setActivated(true);
+				user.setPassword(password);
 
-					user.setPassword(password);
+				String error = userUtils.validateUserPassword(user);
 
-					String error = userUtils.validateUserPassword(user);
-
-					if (!Strings.isNullOrEmpty(error)) {
-						return new ResponseEntity(new CustomErrorType(error), HttpStatus.NOT_FOUND);
-					}
-
-					user.setPassword(passwordEncoder.encode(password));
-					user.setPasswordResetToken(token);
-					userRepository.update(user);
-
-					String emailContent = messageByLocaleService.getMessage("password_changed_email_content", locale);
-					mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subjct_pcs);
-
-					URI url = new URI(loadedConfigItems.getBaseURLWeb());
-					HttpHeaders httpHeaders = new HttpHeaders();
-					httpHeaders.setLocation(url);
-					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
-				} else {
-					return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("password_reset_token_expired", locale)),
-							HttpStatus.NOT_FOUND);
+				if (!Strings.isNullOrEmpty(error)) {
+					return ((ResponseEntity<User>) buildResponseEntity(error, locale));
 				}
+
+				user.setPassword(passwordEncoder.encode(user.getPassword()));
+				user.setPasswordUpdated(true);
+
+				userRepository.update(user);
+
+				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + user.getActivationToken());
+				HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.setLocation(url);
+				return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
+
 			} else {
-				return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_token_already_used", locale)),
-						HttpStatus.NOT_FOUND);
+				return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
 			}
 
 		} else {
-			return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("unknown_error_occured", locale)),
-					HttpStatus.NOT_FOUND);
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
 		}
 
 	}
 
 	/**
-	 * This function deletes the user from the current context
+	 * This function activates the user, after the user has clicked on the link in the activation email which has been sent after successful
+	 * registration
 	 *
-	 * @param userId
+	 * @param token
+	 * @param locale
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/{userId}/{contextId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable("userId") String userId,
-			@PathVariable("contextId") String contextId, @RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
-		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
-		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/activate", method = ValidRequestMethodType.GET)
+	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
+		User user = userRepository.findByActivationToken(token.getValue());
 
-			User user = userRepository.find(userId);
-			Context context = contextRepository.find(contextId);
+		if (user != null) {
 
-			if (user != null && context != null) {
-				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
-						user.getId());
-				if (contextUserAuthentication != null) {
-					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
-						return new ResponseEntity(
-								new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_superadmin", locale)),
-								HttpStatus.NOT_FOUND);
-					} else {
-						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
-						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
-					}
+			if (!user.isActivated()) {
+				if (user.isPasswordUpdated()) {
+					user.setActivated(true);
+					userRepository.update(user);
 				}
+
+				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + token.getValue());
+
+				if (!user.isPasswordUpdated()) {
+					url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/updatePassword/" + token.getValue());
+				}
+
+				HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.setLocation(url);
+				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+			} else {
+				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activated/");
+				HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.setLocation(url);
+				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
 			}
+
+		} else {
+			return ((ResponseEntity<InputStreamResource>) buildResponseEntity("activation_token_not_valid", locale));
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_user", locale)),
-				HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * This function sends password reset email with the generated link to the user.
+	 *
+	 * @param user
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 * @throws IOException
+	 */
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/sendResetPasswordEmail", method = ValidRequestMethodType.POST)
+	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException, IOException {
+
+		if (!Strings.isNullOrEmpty(email)) {
+			User user = userRepository.findByEmailOnlyActivated(email);
+			if (user != null) {
+				user.setPasswordResetToken(portalUtils.generateToken());
+				user.setPasswordResetExpirationTime(System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset);
+
+				userRepository.update(user);
+
+				// Add template for the email content and retrieve it from the database!
+				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
+						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
+
+				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
+					return new ResponseEntity<>(user, HttpStatus.OK);
+				} else {
+					return ((ResponseEntity<User>) buildResponseEntity("error_while_sending_email", locale));
+				}
+			} else {
+				return ((ResponseEntity<User>) buildResponseEntity("user_with_provided_email_not_exists", locale));
+			}
+		} else {
+			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
+		}
+	}
+
+	/**
+	 * This function only redirects the user to the correct page in the web, after the user clicks on the link in the password reset email.
+	 *
+	 * @param user
+	 * @return
+	 * @throws URISyntaxException
+	 */
+
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/resetPassword")
+	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable ValidInputToken token) throws URISyntaxException {
+		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token.getValue());
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setLocation(url);
+		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
 	}
 }

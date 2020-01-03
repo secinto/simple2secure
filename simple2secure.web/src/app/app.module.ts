@@ -30,6 +30,7 @@ import {ActivationComponent, ActivatedComponent} from './activation';
 import {UserInvitationComponent} from './invitation';
 import {RegisterComponent} from './register';
 import {ResetComponent} from './resetPassword';
+import {ResendComponent} from './resendActivation';
 import {UpdatePasswordComponent} from './updatePassword';
 
 import {AlertComponent, FooterComponent} from './components';
@@ -38,12 +39,9 @@ import {SearchComponent, SearchResultComponent} from './search';
 import {NotificationComponent, NotificationDetailsComponent} from './notification';
 import {ConfigurationDetailsComponent} from './configuration';
 import {
-	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupComponent, UserGroupDialogComponent,
+	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupDialogComponent,
 	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
 } from './user';
-import {
-	OsqueryConfigurationDetailsComponent, OsqueryConfigurationEditComponent
-} from './osquery';
 import {
 	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
 	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
@@ -51,7 +49,7 @@ import {
 	from './network';
 import {
 	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent
+	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent
 } from './report';
 import {
 	EmailOverviewComponent,
@@ -76,6 +74,11 @@ import {
 } from './orbiter';
 
 import {ConfirmationDialog} from './dialog/confirmation-dialog';
+import { TestSequenceResultComponent } from './report/testSequenceResult.component';
+import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
+import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
+import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
+import {DevicesComponent, DevicesListComponent} from './devices/index';
 
 
 /**
@@ -88,6 +91,7 @@ import {AlertService, AuthenticationService, DataService, HelperService, HttpSer
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
 import {LoginLayoutComponent} from './_layouts/loginLayout';
 import {NavbarComponent} from './navbar';
+import {SidenavbarComponent} from './navbar';
 
 /**
  * Internal framework components
@@ -127,6 +131,7 @@ import {
 	MatMenuModule,
 	MatIconModule,
 	MatSidenavModule,
+	MatToolbarModule,
 	MatButtonToggleModule,
 	MatTableModule,
 	MatTabsModule,
@@ -147,7 +152,7 @@ import {
 import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
 import {TreeModule} from 'angular-tree-component';
 import {TreeTableModule} from 'ng-treetable';
-import {RoleGuard} from './_guards/role.guard';
+import {RoleGuard} from './_guards';
 import {AuthInterceptor} from './_helpers/auth.interceptor';
 import {TreeviewModule} from 'ngx-treeview';
 import {SelectContextDialog} from './dialog/select-context';
@@ -160,11 +165,28 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
-import {TestResultComponent} from './report/testResult.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
-
-
+import {CarouselModule} from 'ngx-carousel-lib';
+import { NgxWidgetGridModule } from 'ngx-widget-grid';
+import { BoxModule } from 'angular-admin-lte';
+import { SUTDetailsComponent } from './orbiter/sutDetails.component';
+import {BreadcrumbsModule} from 'ng6-breadcrumbs';
+import {StatComponent} from './widgets/stat.component';
+import {NotificationCardComponent} from './widgets/notification-card.component';
+import {WidgetStoreComponent} from './widgets/widgetStore.component';
+import {StatItemComponent} from './widgets/stat-item.component';
+import {DevicesOverviewComponent} from './devices/devicesOverview.component';
+import {NavbarLoginComponent} from './navbar/navbarlogin.component';
+import {UserGroupEditComponent} from "./user/userGroupEdit.component";
+import {
+	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
+	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
+} from "./queries";
+import {NotificationCardItem} from "./widgets/notification-card-item.component";
+import {NgxGraphModule} from "@swimlane/ngx-graph"
+import {TooltipModule} from "@swimlane/ngx-charts";
+import {DownloadWidgetComponent} from "./widgets/download-widget.component";
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -216,6 +238,7 @@ export const httpInterceptorProviders = [
 		TreeviewModule.forRoot(),
 		TreeModule.forRoot(),
 		NgxJsonViewModule,
+		CarouselModule,
 		TranslateModule.forRoot({
 			loader: {
 				provide: TranslateLoader,
@@ -235,8 +258,12 @@ export const httpInterceptorProviders = [
 		MatSnackBarModule,
 		NgMatSearchBarModule,
 		Ng4LoadingSpinnerModule.forRoot(),
-		DragDropModule
-
+		DragDropModule,
+		NgxWidgetGridModule,
+		BoxModule,
+		BreadcrumbsModule,
+		NgxGraphModule,
+		TooltipModule
 	],
 	declarations: [
 		AppComponent,
@@ -250,6 +277,8 @@ export const httpInterceptorProviders = [
 		DashboardLayoutComponent,
 		LoginLayoutComponent,
 		NavbarComponent,
+		NavbarLoginComponent,
+		SidenavbarComponent,
 		ConfigurationDetailsComponent,
 		NetworkReportOverviewComponent,
 		NetworkConfigurationStepDetailsComponent,
@@ -260,15 +289,13 @@ export const httpInterceptorProviders = [
 		UserComponent,
 		UserDetailsComponent,
 		UserOverviewComponent,
-		UserGroupComponent,
 		UserGroupDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
 		OsQueryReportOverviewComponent,
 		OsQueryReportDetailsComponent,
-		OsqueryConfigurationDetailsComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		FooterComponent,
 		EqualValidator,
 		OrbiterComponent,
@@ -298,12 +325,35 @@ export const httpInterceptorProviders = [
 		OrbiterToolTestComponent,
 		OrbiterToolTestListComponent,
 		OrbiterToolTestScheduledListComponent,
+		OrbiterScheduledSequencesListComponent,
+		OrbiterToolTestSequenceListComponent,
 		SearchComponent,
 		SearchResultComponent,
 		TruncatePipe,
 		NotificationDetailsComponent,
 		OrbiterToolTestSequenceListComponent,
 		TestSequenceDetailsComponent,
+		ResendComponent,
+		TestSequenceResultComponent,
+		TestSequenceResultDetailsComponent,
+		OrbiterSystemsUnderTestListComponent,
+		SUTDetailsComponent,
+		StatComponent,
+		StatItemComponent,
+		NotificationCardComponent,
+		NotificationCardItem,
+		WidgetStoreComponent,
+		DownloadWidgetComponent,
+		DevicesComponent,
+		DevicesOverviewComponent,
+		DevicesListComponent,
+		UserGroupEditComponent,
+		QueriesComponent,
+		QueryOverviewComponent,
+		QueryListComponent,
+		QueryAssignComponent,
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -312,7 +362,7 @@ export const httpInterceptorProviders = [
 		UserGroupDialogComponent,
 		NetworkProcessorConfigurationEditComponent,
 		NetworkStepConfigurationEditComponent,
-		OsqueryConfigurationEditComponent,
+		QueryEditDialogComponent,
 		UserGroupApplyConfigComponent,
 		UserDeviceChangeGroupComponent,
 		UserContextAddDialogComponent,
@@ -327,6 +377,17 @@ export const httpInterceptorProviders = [
 		TestDetailsComponent,
 		NotificationDetailsComponent,
 		TestSequenceDetailsComponent,
+		TestSequenceResultDetailsComponent,
+		WidgetStoreComponent,
+		StatItemComponent,
+		StatComponent,
+		NotificationCardComponent,
+		NotificationCardItem,
+		SUTDetailsComponent,
+		UserGroupEditComponent,
+		MappedQueryEditDialog,
+		QueryCategoryAddDialog,
+		DownloadWidgetComponent
 	],
 	providers: [
 		AuthGuard,

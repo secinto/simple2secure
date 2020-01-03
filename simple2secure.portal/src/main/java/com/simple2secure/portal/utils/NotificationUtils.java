@@ -22,31 +22,18 @@
 
 package com.simple2secure.portal.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Notification;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class NotificationUtils {
-
-	private static Logger log = LoggerFactory.getLogger(NotificationUtils.class);
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
+@Slf4j
+public class NotificationUtils extends BaseServiceProvider {
 
 	public void addNewNotificationPortal(String data, String contextId) {
 		Notification notification = new Notification(data, false, contextId, System.currentTimeMillis());
@@ -54,9 +41,9 @@ public class NotificationUtils {
 		log.info("New notification has been added");
 	}
 
-	public boolean addNewNotificationPod(String data, String podId) {
+	public boolean addNewNotificationPod(String data, String deviceId) {
 
-		CompanyLicensePrivate license = licenseRepository.findByDeviceId(podId);
+		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
 
 		if (license != null) {
 

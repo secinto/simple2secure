@@ -21,80 +21,57 @@
  */
 
 import {Injectable} from '@angular/core';
-import {CompanyGroup, Notification} from '../_models';
-import {PodDTO} from '../_models/DTO/podDTO';
+import {Widget} from '../_models/widget';
 
 @Injectable()
 export class DataService {
-	data: any;
 
 	get() {
-		// information lost on page refresh
-		// return this.data
-
-		// information stored in local storage
-		return JSON.parse(localStorage.getItem('data'));
+		return JSON.parse(sessionStorage.getItem('data'));
 	}
 
-	set(data: any) {
-
-		// information lost on page refresh
-		// this.data = data;
-
-		// information stored in local storage
-		localStorage.setItem('data', JSON.stringify(data));
+	set(data: any){
+		sessionStorage.setItem('data', JSON.stringify(data));
 	}
 
-	getCurrentUser() {
-		return JSON.parse(localStorage.getItem('currentUser'));
+	setRole(role: string){
+		sessionStorage.setItem('role', role);
 	}
 
-	setProbe(data: any) {
-		localStorage.setItem('probe', JSON.stringify(data));
+	getRole(){
+		return sessionStorage.getItem('role');
 	}
 
-	setTool(data: any) {
-		localStorage.setItem('tool', JSON.stringify(data));
+	setAuthToken(authToken: string){
+		sessionStorage.setItem('auth_token', authToken);
 	}
 
-	getTool() {
-		return JSON.parse(localStorage.getItem('tool'));
-	}
-
-	static getProbe() {
-		return JSON.parse(localStorage.getItem('probe'));
-	}
-
-	setGroups(data: CompanyGroup[]) {
-		localStorage.setItem('groups', JSON.stringify(data));
-	}
-
-	getGroups() {
-		return JSON.parse(localStorage.getItem('groups'));
+	getAuthToken(){
+		return sessionStorage.getItem('auth_token');
 	}
 
 	setGroupEditable(value: boolean) {
-		localStorage.setItem('isGroupEditable', JSON.stringify(value));
+		sessionStorage.setItem('isGroupEditable', JSON.stringify(value));
 	}
 
 	isGroupEditable() {
-		return JSON.parse(localStorage.getItem('isGroupEditable'));
+		return JSON.parse(sessionStorage.getItem('isGroupEditable'));
 	}
 
-	setPods(data: PodDTO) {
-		localStorage.setItem('pod', JSON.stringify(data));
+	getSelectedWidget(){
+		return JSON.parse(sessionStorage.getItem('selectedWidget'));
 	}
 
-	getPods() {
-		return JSON.parse(localStorage.getItem('pod'));
+	addWidgetToLS(widget: Widget) {
+		sessionStorage.setItem('selectedWidget', JSON.stringify(widget));
 	}
 
-	setNotifications(notifications: Notification[]) {
-		localStorage.setItem('notifications', JSON.stringify(notifications));
+	clearWidgets(){
+		sessionStorage.removeItem('selectedWidget');
 	}
 
-	getNotifications(){
-		return JSON.parse(localStorage.getItem('notifications'));
+	clearSessionStorage(){
+		sessionStorage.clear();
 	}
 
 }

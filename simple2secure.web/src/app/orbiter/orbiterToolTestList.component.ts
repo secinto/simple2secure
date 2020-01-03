@@ -22,18 +22,18 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO} from '../_models';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, PageEvent} from '@angular/material';
 import {TestObjWeb} from '../_models/testObjWeb';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['toolTestList.css'],
 	templateUrl: 'orbiterToolTestList.component.html'
 })
 
@@ -42,13 +42,15 @@ export class OrbiterToolTestListComponent {
 	selectedTest: TestObjWeb = new TestObjWeb();
 	podId: string;
 	isTestChanged: boolean;
-	pod: PodDTO;
 	tests: TestObjWeb[];
-	context: ContextDTO;
-	currentUser: any;
 	displayedColumns = ['testId', 'version', 'status', 'action'];
 	loading = false;
 	url: string;
+	id: string;
+	public pageEvent: PageEvent;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -64,16 +66,13 @@ export class OrbiterToolTestListComponent {
 	) {}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isTestChanged = false;
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.pod = this.dataService.getPods();
-		this.loadTests(this.pod.pod.deviceId);
+		this.id = this.route.snapshot.paramMap.get('id');
+		this.loadTests(this.id, 0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -87,15 +86,25 @@ export class OrbiterToolTestListComponent {
 
 	}
 
-	public loadTests(podId: string){
+	public handlePage(e?: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadTests(this.id, e.pageIndex, e.pageSize);
+		return e;
+	}
+
+	public loadTests(podId: string, page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'test/' + podId)
+		const params = new HttpParams()
+			.set('usePagination', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size, params)
 			.subscribe(
 				data => {
-					this.tests = data;
+					this.tests = data.tests;
 					this.dataSource.data = this.tests;
+					this.totalSize = data.totalSize;
 					if (!this.isTestChanged){
-						if (data.length > 0) {
+						if (data.tests.length > 0) {
 							this.alertService.success(this.translate.instant('message.data'));
 						}
 						else {
@@ -123,7 +132,7 @@ export class OrbiterToolTestListComponent {
 		dialogConfig.data = {
 			tests: this.selectedTest,
 			type: type,
-			podId: this.pod.pod.deviceId
+			podId: this.id
 		};
 
 		const dialogRef = this.dialog.open(TestDetailsComponent, dialogConfig);
@@ -131,7 +140,7 @@ export class OrbiterToolTestListComponent {
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
 				this.isTestChanged = true;
-				this.loadTests(this.pod.pod.deviceId);
+				this.loadTests(this.id, this.currentPage, this.pageSize);
 			}
 		});
 
@@ -141,8 +150,7 @@ export class OrbiterToolTestListComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' +
-			this.context.context.id + '/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'test/scheduleTest';
 		this.httpService.post(this.selectedTest, this.url).subscribe(
 			data => {
 
@@ -188,7 +196,7 @@ export class OrbiterToolTestListComponent {
 				this.alertService.success(this.translate.instant('message.test.delete'));
 				this.loading = false;
 				this.isTestChanged = true;
-				this.loadTests(this.pod.pod.deviceId);
+				this.loadTests(this.id, this.currentPage, this.pageSize);
 			},
 			error => {
 				if (error.status == 0) {

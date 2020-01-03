@@ -25,6 +25,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AlertService, HttpService} from '../_services/index';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
 	moduleId: module.id,
@@ -55,9 +56,10 @@ export class UserInvitationComponent {
 
 	public performContextAction(value: boolean) {
 		this.loading = true;
-
-		this.url = environment.apiEndpoint + 'user/invite/process/' + this.invitationToken + '/' + value;
-		this.httpService.processInvitation(this.url).subscribe(
+		const params = new HttpParams()
+			.set('active', String(value));
+		this.url = environment.apiEndpoint + 'user/invite/process/' + this.invitationToken;
+		this.httpService.getWithParams(this.url, params).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('invitation.accept'), true);
 				setTimeout((router: Router) => {

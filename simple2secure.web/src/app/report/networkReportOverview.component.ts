@@ -22,16 +22,15 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {NgxSpinnerService} from 'ngx-spinner';
-import {HttpService, AlertService, DataService} from '../_services/index';
+import {HttpService, AlertService, DataService} from '../_services';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO, NetworkReport} from '../_models/index';
+import {NetworkReportDTO} from '../_models';
 import {NetworkReportDetailsComponent} from './networkReportDetails.component';
-import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
+import {PageEvent} from '@angular/material/paginator';
 
 @Component({
 	moduleId: module.id,
@@ -40,11 +39,13 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 })
 
 export class NetworkReportOverviewComponent {
-	currentUser: any;
-	reports: NetworkReport[];
-	context: ContextDTO;
+	reportDTO: NetworkReportDTO;
 	selectedReport: any;
 	loading = false;
+	public pageEvent: PageEvent;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 
 	displayedColumns = ['probe', 'hostname', 'processorName', 'startTime', 'action'];
 	dataSource = new MatTableDataSource();
@@ -63,14 +64,11 @@ export class NetworkReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadAllReports();
+		this.loadAllReports(0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -79,14 +77,24 @@ export class NetworkReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	private loadAllReports() {
+	public handlePage(e: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadAllReports(e.pageIndex, e.pageSize);
+		return e;
+	}
+
+	private loadAllReports(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/network/' + this.context.context.id)
+		this.currentPage = page;
+		this.pageSize = size;
+		this.httpService.get(environment.apiEndpoint + 'reports/network/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.reports = data;
-					this.dataSource.data = this.reports;
-					if (data.length > 0) {
+					this.reportDTO = data;
+					this.dataSource.data = this.reportDTO.report;
+					this.totalSize = data.totalSize;
+					if (data.report.length > 0) {
 						this.alertService.success(this.translate.instant('message.report'));
 					}
 					else {
@@ -104,13 +112,14 @@ export class NetworkReportOverviewComponent {
 					}
 					this.loading = false;
 				});
+		this.loading = false;
 	}
 
 	public deleteReport(report: any) {
 		this.httpService.delete(environment.apiEndpoint + 'reports/network/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports();
+				this.loadAllReports(this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
