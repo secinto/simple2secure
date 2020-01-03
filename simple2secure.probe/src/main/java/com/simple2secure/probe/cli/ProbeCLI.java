@@ -21,6 +21,9 @@
  */
 package com.simple2secure.probe.cli;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
@@ -30,15 +33,26 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.file.FileUtil;
+import com.simple2secure.commons.security.TLSConfig;
 import com.simple2secure.commons.service.ServiceCommand;
+import com.simple2secure.commons.service.ServiceCommands;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.license.LicenseController;
 import com.simple2secure.probe.license.StartConditions;
 import com.simple2secure.probe.scheduler.ProbeWorkerThread;
-import com.simple2secure.probe.security.TLSConfig;
+import com.simple2secure.probe.utils.PcapUtil;
+import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeCLI {
 	private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
@@ -48,6 +62,7 @@ public class ProbeCLI {
 
 	private static String OPTION_INSTRUMENTATION_SHORT = "i";
 	private static String OPTION_INSTRUMENTATION = "instrumentation";
+	private ProbeWorkerThread workerThread;
 
 	/**
 	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
@@ -60,12 +75,40 @@ public class ProbeCLI {
 
 		ProbeConfiguration.licensePath = importFilePath;
 
-		TLSConfig.initializeTLSConfiguration(
-				new String[] { "1009697567", "93791718698785438451096221151509119784", "132145755450301565074331139870923558714" });
+		try {
+			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
+			ProbeConfiguration.netmask = PcapUtil.getOutgoingNetmask();
+			ProbeConfiguration.ipAddress = PcapUtil.getOutgoingIPAddress();
 
+		} catch (Exception e) {
+			log.error("Couldn't obtain network information for machine.");
+		}
+
+		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
+		/*
+		 * Needs to be performed before transmitting the device info (saveDeviceInfo) to the server. Otherwise the has not have been
+		 * initialized. If the device info is not already available at the server before authentication the device can not associated with the
+		 * correct SUT type (PROBE is a monitored system).
+		 */
 		LicenseController licenseController = new LicenseController();
+		CompanyLicensePublic license = licenseController.loadLicense();
 
-		StartConditions startConditions = licenseController.checkLicenseValidity();
+		if (ProbeUtils.isServerReachable()) {
+			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, ProbeConfiguration.ipAddress,
+					ProbeConfiguration.netmask, DeviceType.PROBE);
+			deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
+
+			ProbeUtils.sendDeviceInfo(deviceInfo);
+		}
+
+		StartConditions startConditions = licenseController.checkLicenseValidity(license);
+
+		try {
+			prepareOsQuery();
+		} catch (IOException e) {
+			log.error("OSQuery couldn't be prepared. Stopping execution");
+			System.exit(-1);
+		}
 
 		switch (startConditions) {
 		case LICENSE_NOT_AVAILABLE:
@@ -75,19 +118,49 @@ public class ProbeCLI {
 			log.info("A valid license is available");
 			break;
 		}
+
+		workerThread = new ProbeWorkerThread();
 	}
 
 	private void stopWorkerThreads() {
-
+		workerThread.stopWorkerThread();
 	}
 
 	private void startWorkerThreads() {
 		/*
 		 * Starting background worker threads.
 		 */
-		ProbeWorkerThread workerThread = new ProbeWorkerThread();
 		workerThread.run();
 
+	}
+
+	private void checkStatus() {
+		log.debug("Checking PROBE status");
+		if (workerThread != null && workerThread.isRunning()) {
+			log.debug("PROBE_STATUS: OK");
+			System.out.println(ServiceCommands.CHECK_STATUS.getPositiveCommandResponse());
+		} else {
+			log.debug("PROBE_STATUS: NOK");
+			System.out.println(ServiceCommands.CHECK_STATUS.getNegativeCommandResponse());
+		}
+
+	}
+
+	private void prepareOsQuery() throws IOException {
+		if (!FileUtil.fileOrFolderExists("tools")) {
+			FileUtil.createFolder("tools", true);
+		}
+		for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION) {
+			File newLocation = new File("./tools" + location);
+			if (!newLocation.exists()) {
+				FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+			}
+			if (location.endsWith("osqueryi.exe")) {
+				ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+			} else {
+				ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+			}
+		}
 	}
 
 	/**
@@ -101,7 +174,7 @@ public class ProbeCLI {
 		Scanner commandService = new Scanner(System.in);
 		try {
 			ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
-
+			log.info("Received command {} via instrumentation", command.getCommand().name());
 			while (running) {
 				switch (command.getCommand()) {
 				case START:
@@ -110,10 +183,14 @@ public class ProbeCLI {
 				case GET_VERSION:
 				case RESET:
 					stopWorkerThreads();
+					workerThread = new ProbeWorkerThread();
 					startWorkerThreads();
 					break;
 				case STOP:
 				case TERMINATE:
+				case CHECK_STATUS:
+					checkStatus();
+					break;
 				case OTHER:
 					log.debug("Obtained not recognized command {}", command);
 					stopWorkerThreads();
@@ -138,7 +215,7 @@ public class ProbeCLI {
 
 		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
 				.desc("The path to the license ZIP file which should be used.").build();
-		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).hasArg().argName("INSTRUMENTATION")
+		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
 				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
 		options.addOption(filePath);
@@ -149,14 +226,19 @@ public class ProbeCLI {
 			ProbeCLI client = new ProbeCLI();
 
 			if (line.hasOption(filePath.getOpt())) {
-				client.init(line.getOptionValue(filePath.getOpt()));
+				String licensePath = line.getOptionValue(filePath.getOpt());
+				log.debug("Initializing PROBE with provided license path {}", licensePath);
+				client.init(licensePath);
 			} else {
+				log.debug("Initializing PROBE with default license path");
 				client.init("./license/");
 			}
 
 			if (line.hasOption(instrumentation.getOpt())) {
+				log.debug("Starting PROBE with instrumentation");
 				client.startInstrumentation();
 			} else {
+				log.debug("Starting PROBE in normal mode");
 				client.startWorkerThreads();
 			}
 

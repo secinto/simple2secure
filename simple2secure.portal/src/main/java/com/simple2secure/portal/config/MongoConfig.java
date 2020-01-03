@@ -38,9 +38,12 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.ExtendedMongoTemplate;
 import com.simple2secure.portal.utils.YamlPropertySourceFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:application.yml")
 @EnableMongoRepositories
+@Slf4j
 public class MongoConfig extends AbstractMongoConfiguration {
 
 	@Value("${spring.data.mongodb.host}")

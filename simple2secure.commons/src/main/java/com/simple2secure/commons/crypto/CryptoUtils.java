@@ -21,7 +21,9 @@
  */
 package com.simple2secure.commons.crypto;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -155,5 +157,43 @@ public class CryptoUtils {
 		log.debug("Signature encoded {}", new String(signatureEncoded));
 
 		return signatureEncoded;
+	}
+
+	/**
+	 * Generates a SHA3-512 message digest from the provided content and returns the digest as byte array.
+	 *
+	 * @param content
+	 *          The content to be hashed
+	 * @return The hash value of the content.
+	 * @throws NoSuchAlgorithmException
+	 */
+	public static byte[] generateSecureHash(byte[] content) throws NoSuchAlgorithmException {
+		final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		final byte[] hashbytes = digest.digest(content);
+		return hashbytes;
+	}
+
+	/**
+	 * Generates a SHA3-512 message digest from the provided content and returns the digest as string in HEX representation.
+	 *
+	 * @param content
+	 *          The content to be hashed
+	 * @return The hash value of the content.
+	 * @throws NoSuchAlgorithmException
+	 */
+	public static String generateSecureHashHexString(String content) throws NoSuchAlgorithmException {
+		return bytesToHex(generateSecureHash(content.getBytes(StandardCharsets.UTF_8)));
+	}
+
+	private static String bytesToHex(byte[] hash) {
+		StringBuffer hexString = new StringBuffer();
+		for (int i = 0; i < hash.length; i++) {
+			String hex = Integer.toHexString(0xff & hash[i]);
+			if (hex.length() == 1) {
+				hexString.append('0');
+			}
+			hexString.append(hex);
+		}
+		return hexString.toString();
 	}
 }

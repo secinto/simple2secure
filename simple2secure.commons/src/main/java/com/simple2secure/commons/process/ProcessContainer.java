@@ -27,12 +27,15 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.simple2secure.commons.service.ServiceInstrumentation;
+
 public class ProcessContainer {
 
 	private static Logger log = LoggerFactory.getLogger(ProcessContainer.class);
 
 	private Process process;
 	private ProcessStreamObservable observable;
+	private ServiceInstrumentation serviceInstrumentation;
 
 	public ProcessContainer(Process process, ProcessStreamObservable observable) {
 		this.process = process;
@@ -52,6 +55,13 @@ public class ProcessContainer {
 		log.debug("Start observing with new single thread for {}", observable);
 		pool.submit(observable);
 		pool.shutdown();
+	}
+
+	public ServiceInstrumentation instrumentService() {
+		if (serviceInstrumentation == null) {
+			serviceInstrumentation = new ServiceInstrumentation(process.getOutputStream());
+		}
+		return serviceInstrumentation;
 	}
 
 }

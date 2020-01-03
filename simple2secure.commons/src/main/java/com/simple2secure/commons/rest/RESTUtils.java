@@ -30,15 +30,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.simple2secure.commons.json.JSONUtils;
+import com.simple2secure.commons.security.TrustAllHostnameVerifier;
 
 public class RESTUtils {
 
@@ -56,8 +55,10 @@ public class RESTUtils {
 			HttpsURLConnection connection = getConnection(url, "POST", authKey);
 
 			OutputStream os = connection.getOutputStream();
-			os.write(JSONUtils.toString(obj).getBytes());
-			os.flush();
+			if (obj != null) {
+				os.write(JSONUtils.toString(obj).getBytes());
+				os.flush();
+			}
 
 			return getResponse(connection);
 
@@ -77,7 +78,8 @@ public class RESTUtils {
 	public static String sendGet(String url, String authKey) {
 		try {
 
-			HttpURLConnection connection = getConnection(url, "GET", authKey);
+			HttpsURLConnection connection = getConnection(url, "GET", authKey);
+
 			return getResponse(connection);
 		} catch (MalformedURLException e) {
 			log.error("Couldn 't send GET to URL {} with response because of malformed URL {}", url, e.getStackTrace());
@@ -108,13 +110,7 @@ public class RESTUtils {
 	private static HttpsURLConnection getConnection(String url, String method, String authKey) throws IOException {
 		URL remote = new URL(url);
 
-		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-
-			@Override
-			public boolean verify(final String hostname, final SSLSession session) {
-				return true;
-			}
-		});
+		HttpsURLConnection.setDefaultHostnameVerifier(new TrustAllHostnameVerifier());
 
 		HttpsURLConnection conn = (HttpsURLConnection) remote.openConnection();
 
@@ -128,33 +124,4 @@ public class RESTUtils {
 
 		return conn;
 	}
-
-	/**
-	 *
-	 * @param string_url
-	 * @return
-	 */
-	public static boolean netIsAvailable(String string_url) {
-		try {
-			final URL url = new URL(string_url);
-
-			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-
-				@Override
-				public boolean verify(final String hostname, final SSLSession session) {
-					return true;
-				}
-			});
-
-			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-			conn.connect();
-			return true;
-		} catch (MalformedURLException e) {
-			log.error(e.getMessage());
-			return false;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-
 }

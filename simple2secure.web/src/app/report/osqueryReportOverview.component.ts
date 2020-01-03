@@ -28,8 +28,12 @@ import {Modal} from 'ngx-modialog/plugins/bootstrap';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TranslateService} from '@ngx-translate/core';
-import {ContextDTO} from '../_models';
 import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
+import {OsQueryReportDTO} from '../_models/DTO/osQueryReportDTO';
+import {PageEvent} from '@angular/material/paginator';
+import {SelectionModel} from '@angular/cdk/collections';
+import {CompanyGroup, Device} from "../_models";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	moduleId: module.id,
@@ -38,15 +42,26 @@ import {OsQueryReportDetailsComponent} from './osqueryReportDetails.component';
 })
 
 export class OsQueryReportOverviewComponent {
-	reports: any[];
-	context: ContextDTO;
+	public reportDTO: OsQueryReportDTO;
+	groups: CompanyGroup[] = [];
+	selectedGroups: CompanyGroup[] = [];
+	selectedDevices: Device[] = [];
+	devices: Device[] = [];
 	selectedReport: any;
-	currentUser: any;
 	loading = false;
-	displayedColumns = ['probe', 'hostname', 'query', 'timestamp', 'action'];
+	displayedColumns = ['select', 'probe', 'hostname', 'query', 'timestamp'];
+	public pageEvent: PageEvent;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
+	@ViewChild('selectgroup') selectElRefGroups;
+	@ViewChild('selectdevices') selectElRefDevices;
+	selection = new SelectionModel<any>(true, []);
+	showDeleteButton = false;
+	numSelected = 0;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -60,14 +75,11 @@ export class OsQueryReportOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.loadAllReports();
+		this.getGroups();
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -76,14 +88,102 @@ export class OsQueryReportOverviewComponent {
 		this.dataSource.filter = filterValue;
 	}
 
-	private loadAllReports() {
+	public handlePage(e?: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		if(this.selectedDevices.length > 0){
+			this.loadReportsByDeviceIds(this.selectElRefDevices.value, e.pageIndex, e.pageSize);
+		}
+		else{
+			this.loadReportsByGroupIds(this.selectedGroups, e.pageIndex, e.pageSize);
+		}
+		return e;
+	}
+
+	public updateGroups(){
+		this.selectedGroups = this.selectElRefGroups.value;
+		if(!this.selectElRefGroups.value.isEmpty){
+			this.loadReportsByGroupIds(this.selectElRefGroups.value, 0, 10);
+			this.getProbesByGroupIds(this.selectElRefGroups.value);
+			this.selectElRefGroups.close();
+			this.selectElRefDevices.open();
+		}
+	}
+
+	public updateDevices(){
+		this.selectedDevices = this.selectElRefDevices.value;
+		if(!this.selectElRefDevices.value.isEmpty){
+			this.loadReportsByDeviceIds(this.selectElRefDevices.value, 0, 10);
+			this.selectElRefDevices.close();
+		}
+	}
+
+	public getGroups() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'reports/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'group/context')
 			.subscribe(
 				data => {
-					this.reports = data;
-					this.dataSource.data = this.reports;
-					if (data.length > 0) {
+					this.groups = data;
+					this.selectedGroups = data;
+					this.loadReportsByGroupIds(data, 0, 10);
+					this.getProbesByGroupIds(data);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+		this.loading = false;
+	}
+
+	getProbesByGroupIds(groups: CompanyGroup[]) {
+		this.httpService.post(groups,environment.apiEndpoint + 'devices/group')
+			.subscribe(
+				data => {
+					this.devices = data;
+				});
+	}
+
+	loadReportsByGroupIds(groups: CompanyGroup[], page: number, size: number){
+		this.loading = true;
+		this.httpService.post(groups,environment.apiEndpoint + 'reports/groups/' + page + '/' + size)
+			.subscribe(
+				data => {
+					this.reportDTO = data;
+					this.dataSource.data = this.reportDTO.report;
+					this.totalSize = data.totalSize;
+					if (data.report.length > 0) {
+						this.alertService.success(this.translate.instant('message.report'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.report.notProvided'));
+					}
+					this.loading = false;
+
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+	}
+
+	private loadReportsByDeviceIds(devices: Device[], page: number, size: number){
+		this.loading = true;
+		this.httpService.post(devices, environment.apiEndpoint + 'reports/devices/' + page + '/' + size)
+			.subscribe(
+				data => {
+					this.reportDTO = data;
+					this.dataSource.data = this.reportDTO.report;
+					this.totalSize = data.totalSize;
+					if (data.report.length > 0) {
 						this.alertService.success(this.translate.instant('message.report'));
 					}
 					else {
@@ -134,7 +234,7 @@ export class OsQueryReportOverviewComponent {
 		this.httpService.delete(environment.apiEndpoint + 'reports/' + report.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.report.delete'));
-				this.loadAllReports();
+				this.loadReportsByGroupIds(this.selectedGroups, this.currentPage, this.pageSize);
 				this.loading = false;
 			},
 			error => {
@@ -157,5 +257,55 @@ export class OsQueryReportOverviewComponent {
 
 		this.dialog.open(OsQueryReportDetailsComponent, dialogConfig);
 
+	}
+
+	/** Whether the number of selected elements matches the total number of rows. */
+	isAllSelected() {
+		this.numSelected = this.selection.selected.length;
+		const numRows = this.dataSource.data.length;
+
+		if (this.numSelected > 0){
+			this.showDeleteButton = true;
+		}
+		else{
+			this.showDeleteButton = false;
+		}
+
+		return this.numSelected === numRows;
+	}
+
+	/** Selects all rows if they are not all selected; otherwise clear selection. */
+	masterToggle() {
+		this.isAllSelected() ?
+			this.selection.clear() :
+			this.dataSource.data.forEach(row => this.selection.select(row));
+	}
+
+	/** The label for the checkbox on the passed row */
+	checkboxLabel(row?: any): string {
+		if (!row) {
+			return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+		}
+		return `${this.selection.isSelected(row) ? 'deselect' : 'select'}`;
+	}
+
+	deleteSelectedReports(){
+		this.loading = true;
+		this.httpService.post(this.selection.selected, environment.apiEndpoint + 'reports/delete/selected').subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.report.delete'));
+				this.loadReportsByGroupIds(this.selectedGroups, this.currentPage, this.pageSize);
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+		this.selection.clear();
 	}
 }

@@ -1,0 +1,60 @@
+.img-sidenav{
+    height: 70%;
+}
+
+.navbar-brand {
+    display: block;
+    float: none !important;
+    margin: auto;
+}
+
+.sidenav-submenu a{
+    font-size: 12px !important;
+    margin-left: 10px;
+}
+
+.nav-parent-list{
+    padding-inline-start: 2px !important;
+    color: #A7BD26 !important;
+}
+
+.mat-nav-list ul{
+    list-style-type: none;
+}
+
+.nav-child-list{
+    padding-inline-start: 10px !important;
+}
+
+.nav-child-list li a{
+    font-size: 12px;
+}
+.mat-drawer-side{
+    border-right: 1px solid #A7BD26;
+}
+
+#current-context-id{
+    font-size: 10px;
+    text-align: center;
+    background-color: #A7BD26;
+    cursor: pointer;
+}
+
+.search-bar-input{
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.mat-icon-sidenav{
+    color: #A7BD26;
+}
+
+.main-navigation-header{
+    text-align: center;
+    font-size: 10px;
+    margin-top: 5px;
+    color: #A7BD26;
+}
+
+
+

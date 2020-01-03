@@ -55,6 +55,7 @@ import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.ContextRepository;
 import com.simple2secure.portal.repository.ContextUserAuthRepository;
@@ -222,7 +223,8 @@ public class TestAPIBase {
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getLoginAPI(), HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getBaseURL() + StaticConfigItems.LOGIN_API,
+				HttpMethod.POST, entity, String.class);
 
 		if (loginResponse.getStatusCode() == HttpStatus.OK) {
 			List<String> all_headers = loginResponse.getHeaders().get("Authorization");

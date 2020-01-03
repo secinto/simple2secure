@@ -1,13 +1,27 @@
-import json
+from enum import Enum
 
 from flask_sqlalchemy import SQLAlchemy
-from enum import Enum
 
 db = SQLAlchemy()
 
 
+class DeviceStatus(str, Enum):
+    ONLINE = 'ONLINE'
+    OFFLINE = 'OFFLINE'
+    UNKNOWN = 'UNKNOWN'
+
+
+class DeviceType(str, Enum):
+    PROBE = 'PROBE'
+    POD = 'POD'
+    WWW = 'WWW'
+    UNKNOWN = 'UNKNOWN'
+
+
+
 class PodInfo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'pod_info'
+    id = db.Column(db.Integer, unique=True, primary_key=True)
     generated_id = db.Column(db.Text)
     authToken = db.Column(db.Text)
     connected = db.Column(db.Boolean)
@@ -23,13 +37,35 @@ class PodInfo(db.Model):
         self.licenseId = ""
         self.hash_value_service = ""
 
+
+class DeviceInfo(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    deviceId = db.Column(db.Text)
+    hostName = db.Column(db.Text)
+    ipAddress = db.Column(db.Text)
+    netMask = db.Column(db.Text)
+    deviceStatus = db.Column(db.Enum(DeviceStatus))
+    lastOnlineTimestamp = db.Column(db.Float)
+    type = db.Column(db.Enum(DeviceType))
+
+    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, type = DeviceType.POD):
+        self.deviceId = deviceId
+        self.hostName = hostName
+        self.ipAddress = ipAddress
+        self.netMask = netMask
+        self.deviceStatus = deviceStatus
+        self.lastOnlineTimestamp = lastOnlineTimestamp
+        self.type = type
+
+
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     podId = db.Column(db.Text)
     name = db.Column(db.Text)
     test_content = db.Column(db.Text)
     hash_value = db.Column(db.Text)
-    lastChangedTimestamp = db.Column(db.BigInteger)
+    deleted = db.Column(db.Boolean)
+    lastChangedTimestamp = db.Column(db.Text)
 
     def __init__(self, name, test_content, hash_value, last_changed_timestamp, pod_id):
         self.name = name
@@ -37,22 +73,23 @@ class Test(db.Model):
         self.test_content = test_content
         self.hash_value = hash_value
         self.lastChangedTimestamp = last_changed_timestamp
+        self.deleted = False
 
 
 class TestSequence(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     podId = db.Column(db.Text)
     name = db.Column(db.Text)
-    sequence_content = db.Column(db.Text)
-    hash_value = db.Column(db.Text)
-    lastChangedTimestamp = db.Column(db.BigInteger)
+    sequenceContent = db.Column(db.Text)
+    sequenceHash = db.Column(db.Text)
+    lastChangedTimeStamp = db.Column(db.Float)
 
     def __init__(self, name, sequence_content, hash_value, last_changed_timestamp, pod_id):
         self.name = name
         self.podId = pod_id
-        self.sequence_content = sequence_content
-        self.hash_value = hash_value
-        self.lastChangedTimestamp = last_changed_timestamp
+        self.sequenceContent = sequence_content
+        self.sequenceHash = hash_value
+        self.lastChangedTimeStamp = last_changed_timestamp
 
 
 class TestResult(db.Model):
@@ -77,14 +114,19 @@ class TestResult(db.Model):
 
 
 class TestSequenceResult(db.Model):
+    __tablename__ = "test_sequence_result"
     id = db.Column(db.Integer, primary_key=True)
-    podId = db.Column(db.Text)
+    sequence_run_id = db.Column(db.Text)
+    sequence_id = db.Column(db.Text)
+    pod_id = db.Column(db.Text)
     sequence_name = db.Column(db.Text)
     sequence_result = db.Column(db.Text)
     time_stamp = db.Column(db.BigInteger)
 
-    def __init__(self, pod_id, sequence_name, sequence_result, time_stamp):
-        self.podId = pod_id
+    def __init__(self, sequence_run_id, sequence_id, pod_id, sequence_name, sequence_result, time_stamp):
+        self.sequence_run_id = sequence_run_id
+        self.sequence_id = sequence_id
+        self.pod_id = pod_id
         self.sequence_name = sequence_name
         self.sequence_result = sequence_result
         self.time_stamp = time_stamp
@@ -96,20 +138,16 @@ class CompanyLicensePublic(db.Model):
     licenseId = db.Column(db.Text)
     deviceId = db.Column(db.Text)
     accessToken = db.Column(db.Text)
-    hostname = db.Column(db.Text)
     activated = db.Column(db.Boolean)
     expirationDate = db.Column(db.Date)
-    deviceIsPod = db.Column(db.Boolean)
 
-    def __init__(self, group_id, license_id, pod_id, expiration_date, hostname):
+    def __init__(self, group_id, license_id, pod_id, expiration_date):
         self.groupId = group_id
         self.licenseId = license_id
         self.deviceId = pod_id
         self.expirationDate = expiration_date
-        self.hostname = hostname
         self.activated = False
         self.accessToken = ""
-        self.deviceIsPod = True
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

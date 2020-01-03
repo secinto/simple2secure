@@ -41,12 +41,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simple2secure.api.model.Service;
 import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.test.portal.utils.TLSConfig;
 
 @ExtendWith({ SpringExtension.class })
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { Simple2SecurePortal.class })
+@SpringBootTest(
+		webEnvironment = WebEnvironment.RANDOM_PORT,
+		classes = { Simple2SecurePortal.class })
 @ActiveProfiles("test")
 public class TestGetServiceLibrary {
 
@@ -73,7 +76,7 @@ public class TestGetServiceLibrary {
 
 	@Test
 	public void testGetServiceCurrent() throws Exception {
-		String response = RESTUtils.sendGet(loadedConfigItems.getServiceAPI() + "/");
+		String response = RESTUtils.sendGet(loadedConfigItems.getBaseURL() + StaticConfigItems.SEARCH_API + "/");
 		assertNotNull(response);
 		log.debug("Response received {}", response.toString());
 		ObjectMapper objectMapper = new ObjectMapper();

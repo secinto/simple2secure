@@ -32,17 +32,15 @@ public class UserDTO {
 
 	private List<UserRoleDTO> myUsersList;
 	private List<CompanyGroup> myGroups;
-	private List<Device> myDevices;
 	private List<Context> myContexts;
 	private List<String> assignedGroups;
 	private UserInfo myProfile;
 
-	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Device> myDevices, List<Context> myContexts,
+	public UserDTO(UserInfo user, List<UserRoleDTO> myUsers, List<CompanyGroup> myGroups, List<Context> myContexts,
 			List<String> assignedGroups) {
 		myProfile = user;
 		myUsersList = myUsers;
 		this.myGroups = myGroups;
-		this.myDevices = myDevices;
 		this.myContexts = myContexts;
 		this.assignedGroups = assignedGroups;
 	}
@@ -85,13 +83,5 @@ public class UserDTO {
 
 	public void setAssignedGroups(List<String> assignedGroups) {
 		this.assignedGroups = assignedGroups;
-	}
-
-	public List<Device> getMyDevices() {
-		return myDevices;
-	}
-
-	public void setMyDevices(List<Device> myDevices) {
-		this.myDevices = myDevices;
 	}
 }

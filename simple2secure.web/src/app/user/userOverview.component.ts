@@ -24,7 +24,7 @@ import {Component, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {AlertService, DataService, HttpService} from '../_services';
 import {saveAs as importedSaveAs} from 'file-saver';
-import {CompanyGroup, ContextDTO, User, UserDTO, UserRole, Device} from '../_models';
+import {CompanyGroup, User, UserDTO, UserRole} from '../_models';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -34,9 +34,9 @@ import {UserGroupDialogComponent} from './userGroupDialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {UserDetailsComponent} from './userDetails.component';
 import {UserGroupApplyConfigComponent} from './userGroupApplyConfig.component';
-import {UserDeviceChangeGroupComponent} from './user-device-change-group.component';
 import {UserContextAddDialogComponent} from './userContextAddDialog.component';
 import {UserInfo} from '../_models/userInfo';
+import {UserGroupEditComponent} from "./userGroupEdit.component";
 
 @Component({
 	moduleId: module.id,
@@ -46,12 +46,10 @@ import {UserInfo} from '../_models/userInfo';
 })
 
 export class UserOverviewComponent {
-	users: any[];
+	userRole: string;
 	loading = false;
 	userDeleted = false;
 	groupDeleted = false;
-	probeDeleted = false;
-	podDeleted = false;
 	contextDeleted = false;
 	groupAdded = false;
 	contextAdded = false;
@@ -64,39 +62,27 @@ export class UserOverviewComponent {
 	id: string;
 	public user: User;
 	private sub: any;
-	currentUser: any;
-	context: ContextDTO;
 	showMyUsers: boolean;
 	addNewGroup: boolean;
 	addNewContext: boolean;
 	showGroupTable: boolean;
 	showUserTable: boolean;
-	showProbeTable: boolean;
-	showPodTable: boolean;
 	showContextTable: boolean;
 	showEditAndDelete: boolean;
 	isGroupDeletable = false;
 
 	displayedColumnsUsers = ['email', 'userRole', 'action'];
-	displayedColumnsDevices = ['probeId', 'hostname', 'group', 'status', 'action'];
 	displayedColumnsContext = ['name', 'licenseDownloads', 'action'];
-	displayedColumnsPods = ['podId', 'hostname', 'group', 'status', 'action'];
 
 	userDataSource = new MatTableDataSource();
-	probeDataSource = new MatTableDataSource();
 	groupDataSource = new MatTableDataSource();
 	contextDataSource = new MatTableDataSource();
-	podDataSource = new MatTableDataSource();
 	options = {focused: true, allowDrag: true};
 
 	@ViewChild('userPaginator') userPaginator: MatPaginator;
-	@ViewChild('probePaginator') probePaginator: MatPaginator;
 	@ViewChild('contextPaginator') contextPaginator: MatPaginator;
-	@ViewChild('podPaginator') podPaginator: MatPaginator;
 	@ViewChild('sortUser') sortUser: MatSort;
-	@ViewChild('sortProbe') sortProbe: MatSort;
 	@ViewChild('sortContext ') sortContext: MatSort;
-	@ViewChild('sortPod') sortPod: MatSort;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -114,11 +100,10 @@ export class UserOverviewComponent {
 
 	ngOnInit() {
 		this.selectedItem = new CompanyGroup();
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
-		this.context = JSON.parse(localStorage.getItem('context'));
+		this.userRole = this.dataService.getRole();
 		this.loadMyProfile();
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN ||
-			this.context.userRole == UserRole.SUPERUSER)
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN ||
+			this.userRole == UserRole.SUPERUSER)
 		{
 			this.showMyUsers = true;
 			this.addNewGroup = true;
@@ -128,7 +113,7 @@ export class UserOverviewComponent {
 			this.addNewGroup = false;
 		}
 
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			this.addNewContext = true;
 		}
 		else {
@@ -138,13 +123,9 @@ export class UserOverviewComponent {
 
 	ngAfterViewInit() {
 		this.userDataSource.paginator = this.userPaginator;
-		this.probeDataSource.paginator = this.probePaginator;
 		this.contextDataSource.paginator = this.contextPaginator;
-		this.podDataSource.paginator = this.podPaginator;
 		this.userDataSource.sort = this.sortUser;
-		this.probeDataSource.sort = this.sortProbe;
 		this.contextDataSource.sort = this.sortContext;
-		this.podDataSource.sort = this.sortPod;
 	}
 
 	applyFilterUser(filterValue: string) {
@@ -153,21 +134,9 @@ export class UserOverviewComponent {
 		this.userDataSource.filter = filterValue;
 	}
 
-	applyFilterProbe(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.probeDataSource.filter = filterValue;
-	}
-
-	applyFilterPod(filterValue: string) {
-		filterValue = filterValue.trim(); // Remove whitespace
-		filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-		this.podDataSource.filter = filterValue;
-	}
-
 	private loadMyProfile() {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'user/' + this.currentUser.userID + '/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'user')
 			.subscribe(
 				data => {
 					this.myProfile = data;
@@ -175,41 +144,20 @@ export class UserOverviewComponent {
 					this.groupDataSource.data = this.myProfile.myGroups;
 					this.contextDataSource.data = this.myProfile.myContexts;
 
-					const probes: Array<Device> = [];
-					const pods: Array<Device> = [];
-
-					for (let i = 0; i < this.myProfile.myDevices.length; i++) {
-						if (this.myProfile.myDevices[i].pod) {
-							pods.push(this.myProfile.myDevices[i]);
-							console.log('Found POD');
-						}
-						else {
-							probes.push(this.myProfile.myDevices[i]);
-							console.log('Found PROBE');
-						}
-					}
-					this.podDataSource.data = pods;
-					this.probeDataSource.data = probes;
-
 					this.checkMyGroupSize(this.myProfile.myGroups);
 					this.checkMyUsersSize(this.myProfile.myUsersList);
-					this.checkMyProbesSize(probes);
 					this.checkMyContextsSize(this.myProfile.myContexts);
-					this.checkMyPodsSize(pods);
 
-					this.dataService.setGroups(this.myProfile.myGroups);
-					if (!this.userDeleted && !this.groupDeleted && !this.probeDeleted && !this.contextDeleted &&
-						!this.podDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible &&
+					if (!this.userDeleted && !this.groupDeleted &&
+						!this.contextDeleted && !this.groupAdded && !this.userAdded && !this.moveNotPossible &&
 						!this.contextAdded) {
 						this.alertService.success(this.translate.instant('message.user'));
 					}
 
 					this.moveNotPossible = false;
 					this.groupDeleted = false;
-					this.probeDeleted = false;
 					this.contextDeleted = false;
 					this.groupAdded = false;
-					this.podDeleted = false;
 					this.contextAdded = false;
 					this.userAdded = false;
 					this.userDeleted = false;
@@ -269,23 +217,6 @@ export class UserOverviewComponent {
 		}
 	}
 
-	checkMyProbesSize(probes: any) {
-		if (probes.length > 0) {
-			this.showProbeTable = true;
-		} else {
-		this.showProbeTable = false;
-		}
-	}
-
-	checkMyPodsSize(pods: any) {
-		if (pods.length > 0) {
-				this.showPodTable = true;
-		}
-		else {
-			this.showPodTable = false;
-		}
-	}
-
 	checkMyContextsSize(contexts: any) {
 		if (contexts.length > 0) {
 			this.showContextTable = true;
@@ -293,20 +224,6 @@ export class UserOverviewComponent {
 		else {
 			this.showContextTable = false;
 		}
-	}
-
-	public download() {
-		this.loading = true;
-		this.httpService.getFile(environment.apiEndpoint + 'download')
-			.subscribe(
-				data => {
-					importedSaveAs(data, 's2s_setup.exe');
-					this.loading = false;
-				},
-				error => {
-					this.alertService.error(error.errorMessage);
-					this.loading = false;
-				});
 	}
 
 	updateUserInfo() {
@@ -332,15 +249,9 @@ export class UserOverviewComponent {
 
 	}
 
-
-	public editGroup(groupItem: any) {
-		this.dataService.set(groupItem);
-		this.router.navigate(['../user/group', groupItem.id], {relativeTo: this.route});
-	}
-
 	public deleteUser(user: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id + '/' + this.context.context.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'user/' + user.user.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.user.delete'));
 				this.userDeleted = true;
@@ -378,29 +289,9 @@ export class UserOverviewComponent {
 			});
 	}
 
-	public deleteDevice(device: any) {
-		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'device/delete/' + device.deviceId).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.probe.delete'));
-				this.loadMyProfile();
-				this.probeDeleted = true;
-				this.loading = false;
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-				this.loading = false;
-			});
-	}
-
 	public deleteContext(context: any) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'context/delete/' + this.currentUser.userID + '/' + context.id).subscribe(
+		this.httpService.delete(environment.apiEndpoint + 'context/delete/' + context.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.context.delete'));
 				this.loadMyProfile();
@@ -421,12 +312,12 @@ export class UserOverviewComponent {
 	public onMenuTriggerClick(item: any) {
 		this.selectedItem = item;
 
-		if (this.context.userRole === UserRole.SUPERADMIN || this.context.userRole === UserRole.ADMIN) {
+		if (this.userRole === UserRole.SUPERADMIN || this.userRole === UserRole.ADMIN) {
 			this.showEditAndDelete = true;
 			this.dataService.setGroupEditable(this.showEditAndDelete);
 		}
 		else {
-			if (this.context.userRole === UserRole.SUPERUSER) {
+			if (this.userRole === UserRole.SUPERUSER) {
 				this.showEditAndDelete = this.checkIfUserCanEditGroup(item);
 				this.dataService.setGroupEditable(this.showEditAndDelete);
 			}
@@ -443,10 +334,10 @@ export class UserOverviewComponent {
 			this.isGroupDeletable = true;
 		}
 
-		if (this.context.userRole === UserRole.SUPERADMIN) {
+		if (this.userRole === UserRole.SUPERADMIN) {
 			this.canDeleteAndEditUser = true;
 		}
-		else if (this.context.userRole === UserRole.ADMIN) {
+		else if (this.userRole === UserRole.ADMIN) {
 			if (item.userRole === UserRole.SUPERADMIN) {
 				this.canDeleteAndEditUser = false;
 			}
@@ -454,7 +345,7 @@ export class UserOverviewComponent {
 				this.canDeleteAndEditUser = true;
 			}
 		}
-		else if (this.context.userRole === UserRole.SUPERUSER) {
+		else if (this.userRole === UserRole.SUPERUSER) {
 			if (item.userRole === UserRole.SUPERUSER || item.userRole === UserRole.USER) {
 				this.canDeleteAndEditUser = true;
 			}
@@ -466,12 +357,10 @@ export class UserOverviewComponent {
 
 	checkIfUserCanMoveGroup(fromGroup: CompanyGroup, toGroup: CompanyGroup) {
 
-		console.log(JSON.stringify(this.myProfile.assignedGroups));
-
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			return true;
 		}
-		else if (this.context.userRole == UserRole.SUPERUSER) {
+		else if (this.userRole == UserRole.SUPERUSER) {
 			if (fromGroup && toGroup) {
 				if (this.myProfile.assignedGroups) {
 					if (this.myProfile.assignedGroups.indexOf(fromGroup.id) > -1 && this.myProfile.assignedGroups.indexOf(toGroup.id) > -1) {
@@ -510,10 +399,10 @@ export class UserOverviewComponent {
 	}
 
 	checkIfUserCanEditGroup(group: CompanyGroup) {
-		if (this.context.userRole == UserRole.SUPERADMIN || this.context.userRole == UserRole.ADMIN) {
+		if (this.userRole == UserRole.SUPERADMIN || this.userRole == UserRole.ADMIN) {
 			return true;
 		}
-		else if (this.context.userRole == UserRole.SUPERUSER) {
+		else if (this.userRole == UserRole.SUPERUSER) {
 			if (group) {
 				if (this.myProfile.assignedGroups) {
 					if (this.myProfile.assignedGroups.indexOf(group.id) > -1) {
@@ -535,10 +424,6 @@ export class UserOverviewComponent {
 		else {
 			return false;
 		}
-	}
-
-	public onGroupEditClick() {
-		this.editGroup(this.selectedItem);
 	}
 
 	public onDeleteGroupClick() {
@@ -586,6 +471,17 @@ export class UserOverviewComponent {
 				}
 			}
 		});
+	}
+
+	public onGroupNameEditClick() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '450px';
+		dialogConfig.data = {
+			group: this.selectedItem,
+		};
+
+		const dialogRef = this.dialog.open(UserGroupEditComponent, dialogConfig);
+
 	}
 
 	openDialogAddUser(): void {
@@ -728,31 +624,6 @@ export class UserOverviewComponent {
 		});
 	}
 
-	openDialogChangeDeviceGroup(): void {
-		const dialogRef = this.dialog2.open(UserDeviceChangeGroupComponent, {
-			width: '350px',
-			data: this.selectedItem
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
-			if (result == true) {
-				this.alertService.success(this.translate.instant('message.group.add'));
-				this.groupAdded = true;
-				this.loadMyProfile();
-			}
-			else {
-				if (result instanceof HttpErrorResponse) {
-					if (result.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(result.error.errorMessage);
-					}
-				}
-			}
-		});
-	}
-
 	openDialogRootGroup(): void {
 		const dialogRef = this.dialog.open(UserGroupDialogComponent, {
 			width: '250px',
@@ -780,10 +651,10 @@ export class UserOverviewComponent {
 
 	onMoveGroupNode($event) {
 		if (this.checkIfUserCanMoveGroup($event.node, $event.to.parent)) {
-			this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id + '/' + this.currentUser.userID;
+			this.url = environment.apiEndpoint + 'group/move/' + $event.node.id + '/' + $event.to.parent.id;
 			this.httpService.post(null, this.url).subscribe(
 				data => {
-					this.alertService.success(this.translate.instant('node.move.success'));
+					this.alertService.success(this.translate.instant('group.move.success'));
 					this.loading = false;
 				},
 				error => {
@@ -800,21 +671,21 @@ export class UserOverviewComponent {
 		}
 		else {
 			this.moveNotPossible = true;
-			this.alertService.error(this.translate.instant('node.move.error'));
+			this.alertService.error(this.translate.instant('group.move.error'));
 			this.loadMyProfile();
 		}
 	}
 
 	public onDownloadClick() {
 		this.loading = true;
-		this.httpService.getFile(environment.apiEndpoint + 'license/' + this.selectedItem.id + '/' + this.currentUser.userID)
+		this.httpService.getFile(environment.apiEndpoint + 'license/' + this.selectedItem.id)
 			.subscribe(
 				data => {
 					importedSaveAs(data, 'license-' + this.selectedItem.id + '.zip');
 					this.loading = false;
 				},
 				error => {
-					this.alertService.error(error.errorMessage);
+					this.alertService.error('Error occured while downloading license');
 					this.loading = false;
 				});
 	}
@@ -844,13 +715,6 @@ export class UserOverviewComponent {
 				content: this.translate.instant('message.user.dialog')
 			};
 		}
-		else if (type == 'probe') {
-			dialogConfig.data = {
-				id: 1,
-				title: this.translate.instant('message.areyousure'),
-				content: this.translate.instant('message.probe.dialog')
-			};
-		}
 		else if (type == 'context') {
 			dialogConfig.data = {
 				id: 1,
@@ -864,15 +728,7 @@ export class UserOverviewComponent {
 				title: this.translate.instant('message.areyousure'),
 				content: this.translate.instant('message.group.dialog')
 			};
-		} else if (type == 'pod') {
-			dialogConfig.data = {
-				id: 1,
-				title: this.translate.instant('message.areyousure'),
-				content: this.translate.instant('message.pod.dialog')
-			};
 		}
-
-
 		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
 
 		dialogRef.afterClosed().subscribe(data => {
@@ -882,12 +738,6 @@ export class UserOverviewComponent {
 				}
 				else if (type == 'group') {
 					this.deleteGroup(this.selectedItem);
-				}
-				else if (type == 'probe') {
-					this.deleteDevice(this.selectedItem);
-				}
-				else if (type == 'pod') {
-					this.deleteDevice(this.selectedItem);
 				}
 				else if (type == 'context') {
 					this.deleteContext(this.selectedItem);
@@ -907,12 +757,6 @@ export class UserOverviewComponent {
 					!this.contextDataSource.paginator ? this.contextDataSource.paginator = this.contextPaginator : null;
 					!this.contextDataSource.sort ? this.contextDataSource.sort = this.sortContext : null;
 					break;
-				case 4:
-					!this.probeDataSource.paginator ? this.probeDataSource.paginator = this.probePaginator : null;
-					!this.probeDataSource.sort ? this.probeDataSource.sort = this.sortProbe : null;
-				case 5:
-					!this.podDataSource.paginator ? this.podDataSource.paginator = this.podPaginator : null;
-					!this.podDataSource.sort ? this.podDataSource.sort = this.sortPod : null;
 			}
 		});
 	}

@@ -1,14 +1,15 @@
 import json
 import logging
+import socket
 import time
 
 import requests
 
 from src.db.database import Test
 from src.db.database_schema import TestSchema
-from src.util.db_utils import update, clear_pod_status_auth
+from src.util.db_utils import update, clear_pod_status_auth, delete_all_entries_from_table, delete_test_by_name
 from src.util.file_utils import read_json_testfile, update_services_file
-from src.util.rest_utils import sync_test_with_portal
+from src.util.rest_utils import sync_tests_with_portal
 from src.util.util import create_secure_hash, generate_test_object_from_json
 
 log = logging.getLogger('pod.util.test_utils')
@@ -32,6 +33,22 @@ def get_tests(app):
         return get_and_store_tests_from_file(app)
 
 
+def get_test_by_name(test_name):
+    """
+    Returns the test from the database by name. If no test object is found, new None will be returned and new object
+    will be created.
+
+    Parameters:
+        app: Context object
+        test_name: Name of the test
+    Return:
+        A list of all tests currently stored in the database
+    """
+    test = Test.query.filter_by(name=test_name).first()
+
+    return test
+
+
 def get_and_store_tests_from_file(app):
     """
     Reads the local services.json file and provides it to the update_insert_tests_to_db function for verification and
@@ -43,11 +60,11 @@ def get_and_store_tests_from_file(app):
         A list of all tests currently stored in the database
     """
     tests_as_string = read_json_testfile()
-    update_insert_tests_to_db(tests_as_string, app)
+    update_tests(tests_as_string, app)
     return Test.query.all()
 
 
-def update_insert_tests_to_db(tests, app):
+def update_tests(tests, app):
     """
     Reads the provided JSON data and obtains the test descriptions contained in it. It is checked if the contained
     test is already stored locally in the database. If not it is added or if it contains changes the entry is
@@ -60,10 +77,11 @@ def update_insert_tests_to_db(tests, app):
     tests_json = json.loads(tests)
     current_milli_time = int(round(time.time() * 1000))
 
+    delete_all_entries_from_table(Test)
+
     for test in tests_json:
         current_test_name = test["name"]
         db_test = Test.query.filter_by(name=current_test_name).first()
-
         test_dump = json.dumps(test)
         test_hash = create_secure_hash(test_dump)
 
@@ -81,6 +99,7 @@ def update_insert_tests_to_db(tests, app):
 
 def sync_tests(app):
     """
+    TODO: Tests which are added in portal are not syncronized with the services.json
     Synchronizes the locally stored tests with the PORTAl and updates the services.json and the DB if updates from
     the PORTAL are available
 
@@ -89,32 +108,39 @@ def sync_tests(app):
     """
     with app.app_context():
         try:
+            response = read_json_testfile()
+            update_tests(response, app)
             tests = get_tests(app)
             if tests is not None:
                 sync_ok = False
                 amount_tests = len(tests)
                 synced_tests = 0
-                for test in tests:
-                    resp = sync_test_with_portal(test, app)
+                resp = sync_tests_with_portal(tests, app)
 
-                    if resp is not None and resp.status_code == 200:
-                        log.info('Received response with status code 200 from PORTAL for syncTest')
-                        synchronized_test = json.loads(resp.text)
-                        if synchronized_test is not None:
-                            test_obj = generate_test_object_from_json(synchronized_test, test)
-                            log.info('Synchronized test with id {} and name {} with PORTAL'.format(test.id, test_obj.name))
-                            update(test_obj)
+                if resp is not None and resp.status_code == 200:
+                    log.info('Received response with status code 200 from PORTAL for syncTest')
+                    syncronized_tests = json.loads(resp.text)
+                    if syncronized_tests is not None:
+                        for syncronized_test in syncronized_tests:
+                            if syncronized_test["deleted"] is True:
+                                delete_test_by_name(syncronized_test["name"])
+                                log.info('Deleted test with id name {} with PORTAL'.format(syncronized_test["name"]))
+                            else:
+                                db_test = get_test_by_name(syncronized_test["name"])
+                                test_obj = generate_test_object_from_json(syncronized_test, db_test)
+                                log.info('Synchronized test with id {} and name {} with PORTAL'.format(test_obj.id, test_obj.name))
+                                update(test_obj)
                             sync_ok = True
                             synced_tests = synced_tests + 1
-                        else:
-                            log.error('Could not parse provided data {} to Test object'.format(resp.text))
                     else:
-                        sync_ok = False
-                        if resp is not None:
-                            log.info('Failed to synchronize test {} with portal. Response data: {}'.format(test.name, resp.text))
-                            clear_pod_status_auth(app)
-                        else:
-                            log.info('Failed to synchronize test {} with portal.'.format(test.name))
+                        log.error('Could not parse provided data {} to Test object'.format(resp.text))
+                else:
+                    sync_ok = False
+                    if resp is not None:
+                        log.info('Failed to synchronize tests {} with portal. Response data: {}'.format(len(tests), resp.text))
+                        clear_pod_status_auth(app)
+                    else:
+                        log.info('Failed to synchronize tests {} with portal.'.format(len(tests)))
 
                 if sync_ok and synced_tests > 0:
                     update_services_file()

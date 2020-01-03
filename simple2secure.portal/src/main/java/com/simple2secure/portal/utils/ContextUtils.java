@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,75 +35,13 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
-import com.simple2secure.portal.repository.EmailConfigurationRepository;
-import com.simple2secure.portal.repository.EmailRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicensePlanRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryRepository;
-import com.simple2secure.portal.repository.ReportRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class ContextUtils {
-
-	private static Logger log = LoggerFactory.getLogger(ContextUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	QueryRepository queryRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	UserInvitationRepository userInvitationRepository;
-
-	@Autowired
-	LicensePlanRepository licensePlanRepository;
-
-	@Autowired
-	NotificationRepository notificationRepository;
-
-	@Autowired
-	EmailConfigurationRepository emailConfigurationRepository;
-
-	@Autowired
-	EmailRepository emailRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
+@Slf4j
+public class ContextUtils extends BaseServiceProvider {
 
 	@Autowired
 	GroupUtils groupUtils;

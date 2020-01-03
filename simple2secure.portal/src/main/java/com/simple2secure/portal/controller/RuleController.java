@@ -26,17 +26,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
@@ -44,45 +40,23 @@ import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.RuleActionsRepository;
-import com.simple2secure.portal.repository.RuleConditionsRepository;
-import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
-import com.simple2secure.portal.repository.TemplateRuleRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.RuleUtils;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputRule;
 
-/**
- *
- * @author Richard Heinz
- *
- *         In this class all request for the rules between web and server are implemented
- *
- */
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidRequestMethodType;
+
+@SuppressWarnings("unchecked")
 @RestController
-@RequestMapping("/api/rule")
-public class RuleController {
-
-	private static Logger log = LoggerFactory.getLogger(RuleController.class);
-
-	@Autowired
-	RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	RuleConditionsRepository ruleConditionsRepository;
-
-	@Autowired
-	RuleActionsRepository ruleActionsRepository;
-
-	@Autowired
-	TemplateRuleRepository templateRuleRepository;
-
-	@Autowired
-	RuleUtils ruleUtils;
+@RequestMapping(StaticConfigItems.RULE_API)
+@Slf4j
+public class RuleController extends BaseUtilsProvider {
 
 	/**
 	 * Method to save/update the source code for a rule into/from the database
@@ -96,25 +70,28 @@ public class RuleController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/rulewithsource/", method = RequestMethod.POST, consumes = "application/json")
+
+	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (ruleWithSourcecode != null) {
 
 			if (!Strings.isNullOrEmpty(ruleWithSourcecode.getId())) {
 				ruleWithSourcecodeRepository.update(ruleWithSourcecode);
 			} else {
+				if (Strings.isNullOrEmpty(ruleWithSourcecode.getContextID())) {
+					ruleWithSourcecode.setContextID(contextId.getValue());
+				}
 				ruleWithSourcecodeRepository.save(ruleWithSourcecode);
 			}
 
 			return new ResponseEntity<>(ruleWithSourcecode, HttpStatus.OK);
 
 		}
-
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale)), HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<RuleWithSourcecode>) buildResponseEntity("rule_not_found", locale));
 	}
 
 	/**
@@ -129,25 +106,28 @@ public class RuleController {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/templaterule/", method = RequestMethod.POST, consumes = "application/json")
+	@ValidRequestMapping(value = "/templaterule", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TemplateRule> addOrUpdateTemplateRule(@RequestBody TemplateRule templateRule,
-			@RequestHeader("Accept-Language") String locale) throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
 
 		if (templateRule != null) {
 
 			if (!Strings.isNullOrEmpty(templateRule.getId())) {
 				templateRuleRepository.update(templateRule);
 			} else {
+				if (Strings.isNullOrEmpty(templateRule.getContextID())) {
+					templateRule.setContextID(contextId.getValue());
+				}
 				templateRuleRepository.save(templateRule);
 			}
 
 			return new ResponseEntity<>(templateRule, HttpStatus.OK);
 
 		}
+		return ((ResponseEntity<TemplateRule>) buildResponseEntity("rule_not_found", locale));
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("rule_not_found", locale)), HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -161,23 +141,21 @@ public class RuleController {
 	 * @return ResponseEntity object with the TemplateRule objects as a List or an error.
 	 *
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/templaterule/{contextId}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/templaterule")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
-			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
+			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
 
-			if (templateRules != null) {
+			if (templateRules != null && templateRules.size() > 0) {
 				return new ResponseEntity<>(templateRules, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<TemplateRule>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
 
 	/**
@@ -191,23 +169,21 @@ public class RuleController {
 	 * @return ResponseEntity object with the rules in a List or an error.
 	 *
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/rulewithsource/{contextId}", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/rulewithsource")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<List<RuleWithSourcecode>> getRulesWithSourcecodeByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
-			List<RuleWithSourcecode> ruleWithSourcecodes = ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId);
+			List<RuleWithSourcecode> ruleWithSourcecodes = ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId.getValue());
 
 			if (ruleWithSourcecodes != null) {
 				return new ResponseEntity<>(ruleWithSourcecodes, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_getting_rules", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<RuleWithSourcecode>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
 
 	/**
@@ -219,11 +195,10 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the Conditions in a List or an error.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/template_conditions/", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/template_conditions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates,
-			@RequestHeader("Accept-Language") String locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateCondition> conditions;
 		try {
 			conditions = ruleConditionsRepository.findAll();
@@ -234,7 +209,7 @@ public class RuleController {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return (ResponseEntity<Collection<TemplateCondition>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 		}
 
 		return new ResponseEntity<>(conditions, HttpStatus.OK);
@@ -249,11 +224,10 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the Actions in a List or an error.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/template_actions/", method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/template_actions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates,
-			@RequestHeader("Accept-Language") String locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		Collection<TemplateAction> actions;
 		try {
 			actions = ruleActionsRepository.findAll();
@@ -264,7 +238,7 @@ public class RuleController {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity(new CustomErrorType("Failed to load predefined contitions"), HttpStatus.FAILED_DEPENDENCY);
+			return (ResponseEntity<Collection<TemplateAction>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 		}
 
 		return new ResponseEntity<>(actions, HttpStatus.OK);
@@ -280,22 +254,20 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/rulewithsource/{ruleId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable("ruleId") String ruleId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<RuleWithSourcecode> deleteRuleWithSourcecode(@PathVariable ValidInputRule ruleId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale)) {
-			RuleWithSourcecode ruleWithSourcecode = ruleWithSourcecodeRepository.find(ruleId);
+		if (!Strings.isNullOrEmpty(ruleId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
+			RuleWithSourcecode ruleWithSourcecode = ruleWithSourcecodeRepository.find(ruleId.getValue());
 			if (ruleWithSourcecode != null) {
 				ruleWithSourcecodeRepository.delete(ruleWithSourcecode);
 				return new ResponseEntity<>(ruleWithSourcecode, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<RuleWithSourcecode>) buildResponseEntity("problem_occured_while_deleting_rule", locale);
 
 	}
 
@@ -309,22 +281,20 @@ public class RuleController {
 	 *
 	 * @return ResponseEntity object with the deleted rule or an error.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/templaterule/{ruleId}", method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/templaterule", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable("ruleId") String ruleId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<TemplateRule> deleteTemplateRule(@PathVariable ValidInputRule ruleId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(ruleId) && !Strings.isNullOrEmpty(locale)) {
-			TemplateRule templateRule = templateRuleRepository.find(ruleId);
+		if (!Strings.isNullOrEmpty(ruleId.getValue()) && !Strings.isNullOrEmpty(locale.getValue())) {
+			TemplateRule templateRule = templateRuleRepository.find(ruleId.getValue());
 			if (templateRule != null) {
 				templateRuleRepository.delete(templateRule);
 				return new ResponseEntity<>(templateRule, HttpStatus.OK);
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_rule", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<TemplateRule>) buildResponseEntity("problem_occured_while_deleting_rule", locale);
 
 	}
 

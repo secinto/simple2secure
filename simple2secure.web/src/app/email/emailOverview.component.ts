@@ -23,8 +23,8 @@
 import {HttpErrorResponse} from '@angular/common/http';
 import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
-import {ContextDTO, EmailConfiguration, EmailConfigurationDTO} from '../_models';
-import {AlertService, HttpService, DataService} from '../_services';
+import {EmailConfiguration, EmailConfigurationDTO} from '../_models/index';
+import {AlertService, HttpService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
@@ -44,7 +44,6 @@ export class EmailOverviewComponent {
 	loading = false;
 	selectedConfig: EmailConfigurationDTO;
 	deleted = false;
-	context: ContextDTO;
 	isConfigUpdated = false;
 	isConfigAdded = false;
 
@@ -64,7 +63,6 @@ export class EmailOverviewComponent {
 	{}
 
 	ngOnInit() {
-		this.context = JSON.parse(localStorage.getItem('context'));
 		this.loadAllConfigurations();
 
 	}
@@ -83,7 +81,7 @@ export class EmailOverviewComponent {
 	private loadAllConfigurations() {
 
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'email/' + this.context.context.id)
+		this.httpService.get(environment.apiEndpoint + 'email')
 			.subscribe(
 				data => {
 					this.config = data;
@@ -226,11 +224,9 @@ export class EmailOverviewComponent {
 
 	public openDialogShowRules()
 	{
-		console.log('inside openDialogShowRules: not implemented yet');
 	}
 
 	public openDialogAddRule()
 	{
-		console.log('inside openDialogAddRule: not implemented yet');
 	}
 }

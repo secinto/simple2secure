@@ -15,7 +15,7 @@
         <ng-container matColumnDef="hostname">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.testResult.hostname}}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.hostname}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="podId">
@@ -27,7 +27,7 @@
         <ng-container matColumnDef="time">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"> {{element.testResult.timestamp | date : 'short' }}</mat-cell>
+            <mat-cell *matCellDef="let element"> {{element.testRun.timestamp | date : 'short' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="type">
@@ -56,9 +56,11 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
     <mat-paginator #paginator
-                   [pageSize]="10"
+                   [pageSize]="pageSize"
                    [pageSizeOptions]="[5, 10, 20]"
-                   [showFirstLastButtons]="true">
+                   [showFirstLastButtons]="true"
+                   [length]="totalSize"
+                   (page)="pageEvent = handlePage($event)">
     </mat-paginator>
     <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 </div>

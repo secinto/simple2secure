@@ -24,9 +24,16 @@ package com.simple2secure.api.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @Table(
 		name = "License")
+@Getter
+@Setter
+@NoArgsConstructor
 public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	/**
@@ -36,20 +43,10 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	private String tokenSecret;
 
-	public CompanyLicensePrivate() {
-	};
+	private long lastTokenRefresh = 0;
 
-	public CompanyLicensePrivate(String groupId, String licenseId, String expirationDate, boolean activated) {
+	public CompanyLicensePrivate(String groupId, String licenseId, String expirationDate) {
 		super(groupId, licenseId, expirationDate);
-		this.activated = activated;
-	}
-
-	public String getTokenSecret() {
-		return tokenSecret;
-	}
-
-	public void setTokenSecret(String tokenSecret) {
-		this.tokenSecret = tokenSecret;
 	}
 
 	/**
@@ -60,15 +57,12 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 	 */
 	public CompanyLicensePublic getPublicLicense() {
 		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, deviceId);
-		publicLicense.setActivated(activated);
 		publicLicense.setAccessToken(accessToken);
-		publicLicense.setHostname(hostname);
-		publicLicense.setStatus(status);
 		return publicLicense;
 	}
 
 	public CompanyLicensePrivate copyLicense() {
-		CompanyLicensePrivate license = new CompanyLicensePrivate(groupId, licenseId, expirationDate, false);
+		CompanyLicensePrivate license = new CompanyLicensePrivate(groupId, licenseId, expirationDate);
 		return license;
 	}
 }

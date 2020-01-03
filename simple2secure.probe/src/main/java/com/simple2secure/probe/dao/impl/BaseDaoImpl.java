@@ -29,6 +29,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	protected Class<T> entityClass;
 
 	protected static String PERSISTENCE_UNIT_NAME = "s2s";
+	protected static int pageSize = 10;
 	private static EntityManagerFactory factory;
 
 	/**
@@ -84,6 +86,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 */
 	public EntityManager getEntityManager() {
 		return factory.createEntityManager();
+	}
+
+	public Session getHibernateSession() {
+		Session session = getEntityManager().unwrap(Session.class);
+		return session;
 	}
 
 	/**
@@ -164,6 +171,30 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	}
 
 	/**
+	 * Find list by field name
+	 *
+	 * @param fieldName
+	 * @param value
+	 * @return
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByFieldNamePaging(String fieldName, Object value, int lastPageNumber) {
+		Query query = getEntityManager().createQuery(getQuery(fieldName)).setParameter(fieldName, value);
+		query.setFirstResult((lastPageNumber - 1) * pageSize);
+		query.setMaxResults(pageSize);
+		return query.getResultList();
+	}
+
+	@Override
+	public int getLastPageNumberByFieldName(String fieldName, Object value) {
+		Query countQuery = getEntityManager().createQuery(getCountQuery(fieldName)).setParameter(fieldName, value);
+		Long countResults = (Long) countQuery.getSingleResult();
+		int lastPageNumber = (int) (Math.ceil(countResults / pageSize));
+		return lastPageNumber;
+	}
+
+	/**
 	 * Gets the query.
 	 *
 	 * @param fieldName
@@ -172,6 +203,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 */
 	private String getQuery(String fieldName) {
 		String query = "from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
+		return query;
+	}
+
+	private String getCountQuery(String fieldName) {
+		String query = "Select count (t.id) from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
 	}
 }

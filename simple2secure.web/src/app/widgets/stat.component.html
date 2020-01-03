@@ -1,0 +1,16 @@
+<div class="card text-white bg-{{bgClass}}">
+    <div class="card-header">
+        <div class="row">
+            <div class="col col-xs-3">
+                <i class="fa {{icon}} fa-5x"></i>
+            </div>
+            <div class="col col-xs-9 text-right">
+                <div class="d-block huge count-text-circle">{{count}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <span class="float-left"><button class="widget-delete-btn" color="info" mat-button (click)="deleteWidgetProperty(propertiesId)"><mat-icon>delete</mat-icon></button></span>
+        <span class="float-right"><b>{{label}}</b></span>
+    </div>
+</div>

@@ -22,71 +22,42 @@
 
 package com.simple2secure.portal.utils;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.TestResultDTO;
-import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.dto.TestRunDTO;
+import com.simple2secure.api.dto.TestSequenceRunDTO;
+import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
-import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.api.model.TestSequenceResult;
+import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.TestRepository;
-import com.simple2secure.portal.repository.TestResultRepository;
-import com.simple2secure.portal.repository.TestRunRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+
+@SuppressWarnings("unchecked")
 @Component
-public class TestUtils {
-
-	private static Logger log = LoggerFactory.getLogger(TestUtils.class);
-
-	@Autowired
-	TestResultRepository testResultRepository;
+@Slf4j
+public class TestUtils extends BaseServiceProvider {
 
 	@Autowired
-	TestRepository testRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	protected LoadedConfigItems loadedConfigItems;
-
-	@Autowired
-	RestTemplate restTemplate;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	TestRunRepository testRunRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	@Autowired
-	TestUtils testUtils;
+	PortalUtils portalUtils;
 
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
@@ -110,55 +81,52 @@ public class TestUtils {
 	 * @param locale
 	 * @return
 	 */
-	public List<TestResultDTO> getTestResultByContextId(String contextId, String locale) {
-		List<TestResultDTO> results = new ArrayList<>();
+	public Map<String, Object> getTestResultByContextId(String contextId, String locale, int page, int size) {
+		Map<String, Object> testResultsMap = new HashMap<>();
+
+		testResultsMap.put("tests", new ArrayList<TestRunDTO>());
+		testResultsMap.put("totalSize", 0);
+
 		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
-			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
-			if (groups != null) {
-				for (CompanyGroup group : groups) {
 
-					List<CompanyLicensePrivate> licensesByGroup = licenseRepository.findByGroupIdAndDeviceType(group.getId(), true);
+			List<TestRun> testRunList = testRunRepository.getByContextId(contextId);
+			if (testRunList != null) {
+				List<String> testRunIds = portalUtils.extractIdsFromObjects(testRunList);
+				if (testRunIds != null && testRunIds.size() > 0) {
+					List<TestResult> testResults = testResultRepository.getByTestRunIdWithPagination(testRunIds, page, size);
 
-					if (licensesByGroup != null) {
-						for (CompanyLicensePrivate license : licensesByGroup) {
-							if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					if (testResults != null && testResults.size() > 0) {
+						long count = testResultRepository.getTotalAmountOfTestResults(testRunIds);
 
-								List<TestRun> testRunList = testRunRepository.getTestRunByPodId(license.getDeviceId());
-
-								if (testRunList != null) {
-									for (TestRun testRun : testRunList) {
-										TestResult testResult = testResultRepository.getByTestRunId(testRun.getId());
-
-										if (testResult != null) {
-											TestResultDTO testResultDTO = new TestResultDTO(testResult, group);
-											results.add(testResultDTO);
-										}
-									}
-								}
-							}
+						List<TestRunDTO> testRunDto = generateTestRunDTOByTestResults(testResults);
+						if (testRunDto != null && testRunDto.size() > 0) {
+							testResultsMap.put("tests", testRunDto);
+							testResultsMap.put("totalSize", count);
 						}
 					}
 				}
 			}
 		}
-		return results;
+		return testResultsMap;
 	}
 
 	public Test synchronizeReceivedTest(Test test) {
 		Test returnTest = new Test();
-		Test currentPortalTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+		Test currentPortalTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
 
 		if (currentPortalTest != null) {
-			boolean isPortalTestOlder = testUtils.checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(),
-					test.getLastChangedTimestamp());
+			boolean isPortalTestOlder = checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(), test.getLastChangedTimestamp());
 
 			returnTest = currentPortalTest;
 
 			if (isPortalTestOlder) {
 				currentPortalTest.setHash_value(test.getHash_value());
+				currentPortalTest.setName(test.getName());
+				currentPortalTest.setPodId(test.getPodId());
 				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 				currentPortalTest.setTest_content(test.getTest_content());
 				currentPortalTest.setActive(true);
+				currentPortalTest.setSynced(true);
 				testRepository.save(currentPortalTest);
 			}
 		} else {
@@ -166,46 +134,16 @@ public class TestUtils {
 			currentPortalTest.setHash_value(test.getHash_value());
 			currentPortalTest.setName(test.getName());
 			currentPortalTest.setPodId(test.getPodId());
-			currentPortalTest.setHostname(test.getHostname());
 			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
 			currentPortalTest.setTest_content(test.getTest_content());
 			currentPortalTest.setActive(true);
+			currentPortalTest.setSynced(true);
 
 			testRepository.save(currentPortalTest);
 
-			returnTest = testRepository.getTestByNameAndPodId(test.getName(), test.getPodId());
+			returnTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
 		}
 		return returnTest;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<TestResultDTO>> getTestResultsByPodId(String podId, String locale) {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
-			List<Test> tests = testRepository.getByPodId(podId);
-			List<TestResultDTO> testResults = new ArrayList<>();
-			if (tests != null) {
-				for (Test test : tests) {
-					List<TestResult> testResultByTest = testResultRepository.getByTestId(test.getId());
-
-					if (testResultByTest != null) {
-						for (TestResult testResult : testResultByTest) {
-
-							// TODO: check if CompanyGroup is necesarry
-							TestResultDTO trDto = new TestResultDTO(testResult, new CompanyGroup("test", null));
-							testResults.add(trDto);
-						}
-					}
-				}
-			}
-
-			if (testResults != null) {
-				return new ResponseEntity<>(testResults, HttpStatus.OK);
-			}
-		}
-
-		return new ResponseEntity(
-				new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test_result", locale)),
-				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -215,9 +153,9 @@ public class TestUtils {
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<TestResult> deleteTestResult(String testResultId, String locale) {
-		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale)) {
+
+	public ResponseEntity<TestResult> deleteTestResult(String testResultId, ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale.getValue())) {
 			TestResult testResult = testResultRepository.find(testResultId);
 			if (testResult != null) {
 				testResultRepository.delete(testResult);
@@ -226,30 +164,50 @@ public class TestUtils {
 			log.error("Problem occured while deleting test result");
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_deleting_test_result", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<TestResult>) buildResponseEntity("problem_occured_while_deleting_test_result", locale));
 
 	}
 
 	/**
 	 * This function returns all tests by pod Id.
 	 *
-	 * @param podId
+	 * @param deviceId
 	 * @param locale
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<List<TestObjWeb>> getTestByPodId(String podId, String locale) {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
-
-			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(testRepository.getByPodId(podId));
+	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination,
+			ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
+			Map<String, Object> testMap = new HashMap<>();
+			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(
+					testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
 
 			if (testsWeb != null) {
-				return new ResponseEntity<>(testsWeb, HttpStatus.OK);
+				testMap.put("tests", testsWeb);
+				testMap.put("totalSize", testRepository.getCountOfTestsWithDeviceId(deviceId));
+				return new ResponseEntity<>(testMap, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
-				HttpStatus.NOT_FOUND);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
+	}
+
+	/**
+	 * This function returns all tests by pod Id.
+	 *
+	 * @param deviceId
+	 * @param locale
+	 * @return
+	 */
+	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(String deviceId, ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
+
+			List<SequenceRun> sequenceRuns = sequenceRunRepository.getSequenceRunByDeviceId(deviceId);
+
+			if (sequenceRuns != null) {
+				return new ResponseEntity<>(sequenceRuns, HttpStatus.OK);
+			}
+		}
+		return ((ResponseEntity<List<SequenceRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	/**
@@ -260,18 +218,18 @@ public class TestUtils {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<List<TestRun>> getScheduledTestsByPodId(String podId, String locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(podId) && !Strings.isNullOrEmpty(locale)) {
+	public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(String deviceId, ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
 
-			List<TestRun> testRunList = testRunRepository.getPlannedTests(podId);
+			List<TestRun> testRunList = testRunRepository.getPlannedTests(deviceId);
 
 			if (testRunList != null) {
 				return new ResponseEntity<>(testRunList, HttpStatus.OK);
 			}
 		}
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale)),
-				HttpStatus.NOT_FOUND);
+
+		return ((ResponseEntity<List<TestRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
 	}
 
 	/**
@@ -351,7 +309,6 @@ public class TestUtils {
 
 		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
 			// new test
-			test.setHostname(testObjWeb.getHostname());
 			test.setLastChangedTimestamp(System.currentTimeMillis());
 			test.setName(testObjWeb.getName());
 			test.setPodId(testObjWeb.getPodId());
@@ -359,19 +316,21 @@ public class TestUtils {
 			test.setScheduledTime(testObjWeb.getScheduledTime());
 			test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 			test.setTest_content(testContent);
-			test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+			test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
 			test.setActive(true);
+			test.setNewTest(true);
 
 		} else {
 			// test should exist in the database, update the existing one
 			test = testRepository.find(testObjWeb.getTestId());
 			if (test != null) {
 				test.setName(testObjWeb.getName());
+				test.setPodId(testObjWeb.getPodId());
 				test.setScheduled(testObjWeb.isScheduled());
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
 				test.setTest_content(testContent);
-				test.setHash_value(testUtils.getHexValueHash(testUtils.calculateMd5Hash(testContent)));
+				test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
 				test.setLastChangedTimestamp(System.currentTimeMillis());
 			} else {
 				test = null;
@@ -380,34 +339,6 @@ public class TestUtils {
 
 		return test;
 
-	}
-
-	/**
-	 * This function calculates the md5 hash of the provided string
-	 *
-	 * @param content
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 */
-	public byte[] calculateMd5Hash(String content) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		byte[] messageDigest = md.digest(content.getBytes());
-		return messageDigest;
-	}
-
-	/**
-	 * This function converts the byte array with the calculated hash to the hex value represented as string
-	 *
-	 * @param md5hash
-	 * @return
-	 */
-	public String getHexValueHash(byte[] md5hash) {
-		BigInteger no = new BigInteger(1, md5hash);
-		String hashtext = no.toString(16);
-		while (hashtext.length() < 32) {
-			hashtext = "0" + hashtext;
-		}
-		return hashtext;
 	}
 
 	/**
@@ -442,7 +373,6 @@ public class TestUtils {
 				testObjWeb.setTest_content(testContent);
 				testObjWeb.setName(test.getName());
 				testObjWeb.setActive(test.isActive());
-				testObjWeb.setHostname(test.getHostname());
 				testObjWeb.setPodId(test.getPodId());
 				testObjWeb.setTestId(test.getId());
 				testObjWeb.setScheduled(test.isScheduled());
@@ -453,6 +383,117 @@ public class TestUtils {
 		}
 
 		return testsWeb;
+	}
+
+	/**
+	 * This function generates the list of the TestRunDTO for the provided TestResults. For each test result, TestRun object is added.
+	 *
+	 * @param results
+	 * @return
+	 */
+	public List<TestRunDTO> generateTestRunDTOByTestResults(List<TestResult> results) {
+		List<TestRunDTO> testRunDto = new ArrayList<>();
+		for (TestResult testResult : results) {
+			TestRun testRun = testRunRepository.find(testResult.getTestRunId());
+			if (testRun != null) {
+				testRunDto.add(new TestRunDTO(testRun, testResult));
+			}
+		}
+		return testRunDto;
+	}
+
+	/**
+	 * This function generates the list of the TestSequenceRunDTO for the provided sequenceRuns.
+	 *
+	 * @param sequenceRuns
+	 * @return
+	 */
+	public List<TestSequenceRunDTO> generateSequenceRunDTOBySequenceRun(List<SequenceRun> sequenceRuns) {
+		List<TestSequenceRunDTO> sequenceRunDTOs = new ArrayList<>();
+		if (sequenceRuns != null) {
+			for (SequenceRun sequenceRun : sequenceRuns) {
+				if (sequenceRun != null) {
+					TestSequenceResult sequenceResult = testSequenceResultRepository.getBySequenceRunId(sequenceRun.getId());
+					sequenceRunDTOs.add(new TestSequenceRunDTO(sequenceRun, sequenceResult));
+				}
+			}
+		}
+		return sequenceRunDTOs;
+	}
+
+	/**
+	 * This function adds new portal test to the list which will be returned to the pod. Before returning the flag newTest is set to false and
+	 * updated in the database accordingly
+	 *
+	 * @param deviceId
+	 * @return
+	 */
+	public List<Test> getNewPortalTests(String deviceId) {
+		List<Test> newPortalTests = new ArrayList<>();
+		newPortalTests = testRepository.getNewPortalTestsByDeviceId(deviceId);
+
+		for (Test test : newPortalTests) {
+			test.setNewTest(false);
+			test.setSynced(true);
+			try {
+				testRepository.update(test);
+			} catch (ItemNotFoundRepositoryException e) {
+				log.error(e.getMessage());
+			}
+		}
+
+		return newPortalTests;
+	}
+
+	/**
+	 * This function iterates over all tests which are tagged to be deleted, and deletes them from the database.
+	 *
+	 * @param syncTests
+	 * @param deviceId
+	 * @return
+	 */
+	public void deleteTaggedPortalTests(String deviceId) {
+		List<Test> testsToBeDeleted = testRepository.getDeletedTestsByDeviceId(deviceId);
+		if (testsToBeDeleted != null) {
+			for (Test test : testsToBeDeleted) {
+				testRepository.delete(test);
+			}
+		}
+	}
+
+	/**
+	 * This function iterates over all tests which are not syncronized, and deletes them from the database.
+	 *
+	 * @param syncTests
+	 * @param deviceId
+	 * @return
+	 */
+	public void deleteUnsyncedTests(String deviceId) {
+		List<Test> testsToBeDeleted = testRepository.getUnsyncedTestsByDeviceId(deviceId);
+		if (testsToBeDeleted != null) {
+			for (Test test : testsToBeDeleted) {
+				testRepository.delete(test);
+			}
+		}
+	}
+
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
+	public void setAllPodTestToUnsyncronized(String deviceId) {
+		List<Test> tests = testRepository.getByDeviceId(deviceId);
+		for (Test test : tests) {
+			if (test != null) {
+				test.setSynced(false);
+				try {
+					testRepository.update(test);
+				} catch (ItemNotFoundRepositoryException e) {
+					log.debug(e.getMessage());
+				}
+			}
+		}
 	}
 
 }

@@ -103,7 +103,6 @@ export class UpdatePasswordComponent {
 						}, 3000);
 					},
 					error => {
-						console.log(error);
 						if (error.status == 0) {
 							this.alertService.error(this.translate.instant('server.notresponding'));
 						}

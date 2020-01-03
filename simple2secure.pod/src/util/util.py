@@ -20,7 +20,7 @@ def shutdown_server():
 
 
 def create_secure_hash(content):
-    sha3_hash = hashlib.sha3_512(content.encode('utf-8')).hexdigest()
+    sha3_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
     return sha3_hash
 
 
@@ -36,10 +36,11 @@ def get_date_from_string(date_string):
 def check_command_params(argv, app):
     with app.app_context():
         argumentsList = argv[1:]
-
+        log.info(argumentsList)
         try:
-            opts, args = getopt.getopt(argumentsList, "ha:", ["activate="])
+            opts, args = getopt.getopt(argumentsList, "hd", ["help", "docker"])
         except getopt.GetoptError:
+            log.error("Some error")
             print('app.py -a <True/False>')
             sys.exit(2)
 
@@ -47,8 +48,10 @@ def check_command_params(argv, app):
             if opt == '-h':
                 print('app.py -a <True/False>')
                 sys.exit()
-            elif opt in ("-a", "-activate"):
-                app.config['ACTIVATE_LICENSE'] = True
+            elif opt in ("-o", "--docker"):
+                app.config['USE_CELERY_IN_DOCKER'] = True
+            else:
+                log.info("Found unknown option {}".format(opt))
 
 
 def init_logger(app):
@@ -62,8 +65,7 @@ def init_logger(app):
         logging.getLogger().addHandler(ch)
 
 
-def generate_test_object(sync_test):
-    sync_test_json = json.loads(sync_test)
+def generate_test_object(sync_test_json):
     test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
                 sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     test.id = sync_test_json["id"]
@@ -71,11 +73,16 @@ def generate_test_object(sync_test):
 
 
 def generate_test_object_from_json(sync_test_json, existing_test):
-    existing_test.name = sync_test_json["name"]
-    existing_test.test_content = sync_test_json["test_content"]
-    existing_test.podId = sync_test_json["podId"]
-    existing_test.hash_value = sync_test_json["hash_value"]
-    existing_test.lastChangedTimestamp = sync_test_json["lastChangedTimestamp"]
+    if existing_test is not None:
+        existing_test.name = sync_test_json["name"]
+        existing_test.test_content = sync_test_json["test_content"]
+        existing_test.podId = sync_test_json["podId"]
+        existing_test.hash_value = sync_test_json["hash_value"]
+        existing_test.lastChangedTimestamp = sync_test_json["lastChangedTimestamp"]
+        existing_test.deleted = sync_test_json["deleted"]
+    else:
+        existing_test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
+                             sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
     return existing_test
 
 

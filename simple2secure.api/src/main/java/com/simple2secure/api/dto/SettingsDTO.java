@@ -27,6 +27,7 @@ import java.util.List;
 import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
+import com.simple2secure.api.model.Widget;
 
 public class SettingsDTO {
 
@@ -36,10 +37,17 @@ public class SettingsDTO {
 
 	private List<TestMacro> testMacroList;
 
-	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList) {
+	private List<Widget> widgetList;
+
+	private List<String> widgetApis;
+
+	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList, List<Widget> widgetList,
+			List<String> widgetApis) {
 		this.settings = settings;
 		this.licensePlan = licensePlan;
 		this.testMacroList = testMacroList;
+		this.widgetList = widgetList;
+		this.widgetApis = widgetApis;
 	}
 
 	public Settings getSettings() {
@@ -64,5 +72,21 @@ public class SettingsDTO {
 
 	public void setTestMacroList(List<TestMacro> testMacroList) {
 		this.testMacroList = testMacroList;
+	}
+
+	public List<Widget> getWidgetList() {
+		return widgetList;
+	}
+
+	public void setWidgetList(List<Widget> widgetList) {
+		this.widgetList = widgetList;
+	}
+
+	public List<String> getWidgetApis() {
+		return widgetApis;
+	}
+
+	public void setWidgetApis(List<String> widgetApis) {
+		this.widgetApis = widgetApis;
 	}
 }

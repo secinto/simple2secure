@@ -40,7 +40,6 @@ export class NetworkStepConfigurationEditComponent {
 	id: string;
 	type: number;
 	action: string;
-	groupId: string;
 	processors: Processor[];
 	private sub: any;
 
@@ -60,12 +59,10 @@ export class NetworkStepConfigurationEditComponent {
 		if (data.step == null) {
 			this.action = UrlParameter.NEW;
 			this.step = new Step();
-			this.groupId = data.groupId;
 		}
 		else {
 			this.action = UrlParameter.EDIT;
 			this.step = data.step;
-			this.groupId = data.groupId;
 		}
 		this.getProcessorsByGroupId();
 
@@ -73,9 +70,6 @@ export class NetworkStepConfigurationEditComponent {
 
 	saveStep() {
 
-		if (this.action == UrlParameter.NEW) {
-			this.step.groupId = this.groupId;
-		}
 		this.httpService.post(this.step, environment.apiEndpoint + 'steps').subscribe(
 			data => {
 				this.dialogRef.close(true);
@@ -86,7 +80,7 @@ export class NetworkStepConfigurationEditComponent {
 	}
 
 	getProcessorsByGroupId() {
-		this.httpService.get(environment.apiEndpoint + 'processors/group/' + this.groupId)
+		this.httpService.get(environment.apiEndpoint + 'processors')
 			.subscribe(
 				data => {
 					this.processors = data;

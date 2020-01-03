@@ -1,15 +1,5 @@
 baseProtocol: https
-baseHost:  localhost
-basePort: 8443
-basePortWeb: 9000
-usersAPI: /api/users
-loginAPI: /api/login
-reportsAPI: /api/reports
-queryAPI: /api/query
-deviceAPI: /api/device
-packetAPI: /api/packet
-stepAPI: /api/steps
-processorAPI: /api/processors
-licenseAPI: /api/license
-serviceAPI: /api/service
-groupAPI: /api/group
+baseHost:  simple2secure.info
+basePort: 51001/s2s
+basePortWeb: 51003
+trustedCertificates: 288059177155078140545935159080460680977916, 13298795840390663119752826058995181320, 91299735575339953335919266965803778155

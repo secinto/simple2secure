@@ -22,15 +22,11 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {PodDTO} from '../_models/DTO/podDTO';
-import {ContextDTO, Test, User} from '../_models/index';
-import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
-import {TestObjWeb} from '../_models/testObjWeb';
+import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog, PageEvent} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {TestDetailsComponent} from './testDetails.component';
 import { TestSequence } from '../_models/testSequence';
 import { TestSequenceDetailsComponent } from './testSequenceDetails.component';
 
@@ -44,14 +40,15 @@ export class OrbiterToolTestSequenceListComponent {
 	selectedSequence: TestSequence = new TestSequence();
 	podId: string;
 	isSequenceChanged: boolean;
-	pod: PodDTO;
 	sequences: TestSequence[];
-	testSequence: string[];
-	context: ContextDTO;
-	currentUser: any;
-	displayedColumns = ['testId', 'version', 'status', 'action'];
+	displayedColumns = ['testId', 'status', 'action'];
 	loading = false;
 	url: string;
+	id: string;
+	public pageEvent: PageEvent;
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
 	dataSource = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -67,16 +64,13 @@ export class OrbiterToolTestSequenceListComponent {
 	) {}
 
 	ngOnInit() {
-		this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
 		this.isSequenceChanged = false;
-		this.context = JSON.parse(localStorage.getItem('context'));
-		this.pod = this.dataService.getPods();
-		this.loadSequences(this.pod.pod.deviceId);
+		this.id = this.route.snapshot.paramMap.get('id');
+		this.loadSequences(this.id, 0, 10);
 	}
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
-		this.dataSource.paginator = this.paginator;
 	}
 
 	applyFilter(filterValue: string) {
@@ -90,15 +84,23 @@ export class OrbiterToolTestSequenceListComponent {
 
 	}
 
-	public loadSequences(podId: string){
+	public handlePage(e?: PageEvent) {
+		this.currentPage = e.pageIndex;
+		this.pageSize = e.pageSize;
+		this.loadSequences(this.id, e.pageIndex, e.pageSize);
+		return e;
+	}
+
+	public loadSequences(podId: string, page: number, size: number){
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'sequence/' + podId)
+		this.httpService.get(environment.apiEndpoint + 'sequence/' + podId + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.sequences = data;
+					this.sequences = data.sequences;
 					this.dataSource.data = this.sequences;
+					this.totalSize = data.totalSize;
 					if (!this.isSequenceChanged){
-						if (data.length > 0) {
+						if (data.sequences.length > 0) {
 							this.alertService.success(this.translate.instant('message.data'));
 						}
 						else {
@@ -125,7 +127,8 @@ export class OrbiterToolTestSequenceListComponent {
 		dialogConfig.width = '750px';
 		dialogConfig.data = {
 			sequence: this.selectedSequence,
-			type: type
+			type: type,
+			deviceId: this.id
 		};
 
 		const dialogRef = this.dialog.open(TestSequenceDetailsComponent, dialogConfig);
@@ -133,22 +136,21 @@ export class OrbiterToolTestSequenceListComponent {
 		dialogRef.afterClosed().subscribe(data => {
 			if (data === true) {
 				this.isSequenceChanged = true;
-				this.loadSequences(this.pod.pod.deviceId);
+				this.loadSequences(this.id, this.currentPage, this.pageSize);
 			}
 		});
 
 	}
 
-	public runTest(){
+	public runSequence(){
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'test/scheduleTest/' +
-			this.context.context.id + '/' + this.currentUser.userID;
+		this.url = environment.apiEndpoint + 'sequence/scheduleSequence';
 		this.httpService.post(this.selectedSequence, this.url).subscribe(
 			data => {
 
-				this.alertService.success(this.translate.instant('message.test.schedule'));
+				this.alertService.success(this.translate.instant('message.testsequence.schedule'));
 			},
 			error => {
 				if (error.status == 0) {
@@ -190,7 +192,7 @@ export class OrbiterToolTestSequenceListComponent {
 				this.alertService.success(this.translate.instant('message.sequence.delete'));
 				this.loading = false;
 				this.isSequenceChanged = true;
-				this.loadSequences(this.pod.pod.deviceId);
+				this.loadSequences(this.id, this.currentPage, this.pageSize);
 			},
 			error => {
 				if (error.status == 0) {

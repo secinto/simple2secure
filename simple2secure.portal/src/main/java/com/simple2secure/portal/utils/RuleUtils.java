@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -40,9 +40,11 @@ import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
 
 import groovy.lang.GroovyClassLoader;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Component
+@Slf4j
 public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils {
 
 	@Autowired
@@ -70,22 +72,22 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 	/**
 	 * Method to create a rule from a TemplateRule class which holds the information (name, description, params,...) about predefined
 	 * conditions/ actions. The Condition and Action will be registered as Beans for Spring
-	 * 
+	 *
 	 * @param ruleData
 	 *          TemplateRule object which holds the information about the future rule object.
 	 * @param packageNameConditons
 	 *          represents where the predefined Conditions are saved.
 	 * @param packageNameAction
 	 *          represents where the predefined Actions are saved.
-	 * 
+	 *
 	 * @return a Rule object which can be used for the rule engine
-	 * 
+	 *
 	 * @throws ClassNotFoundException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 * @throws IOException
-	 * 
+	 *
 	 */
 	public Rule buildRuleFromTemplateRuleWithBean(TemplateRule ruleData, String packageNameConditonsTempates,
 			String packageNameActionTemplates)
@@ -102,9 +104,9 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 
 	/**
 	 * Method to load sourcecode from string and creates a object which represents a rule.
-	 * 
+	 *
 	 * Attention: Does not support spring framework in source!
-	 * 
+	 *
 	 * @param source
 	 *          which contains the sourcecode of a rule class
 	 * @throws IOException

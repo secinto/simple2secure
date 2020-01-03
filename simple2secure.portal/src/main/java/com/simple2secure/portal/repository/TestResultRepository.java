@@ -29,13 +29,11 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestResultRepository extends MongoRepository<TestResult> {
 
-	public abstract List<TestResult> getByGroupId(String groupId);
-
-	public abstract List<TestResult> getByLicenseId(String licenseId);
-
-	public abstract List<TestResult> getByTestId(String testId);
-
 	public abstract TestResult getByTestRunId(String testRunId);
+
+	public abstract long getTotalAmountOfTestResults(List<String> testRunIds);
+
+	public abstract List<TestResult> getByTestRunIdWithPagination(List<String> testRunIds, int page, int size);
 
 	public abstract List<TestResult> getSearchQueryByTestRunId(String searchQuery, String testRunId);
 

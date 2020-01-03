@@ -23,20 +23,20 @@ package com.simple2secure.portal.scheduler;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestRunType;
 import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.DeviceInfoRepository;
 import com.simple2secure.portal.repository.GroupRepository;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.repository.TestRepository;
@@ -45,7 +45,10 @@ import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
 import com.simple2secure.portal.utils.TestUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class TestRunScheduler {
 
 	@Autowired
@@ -67,9 +70,10 @@ public class TestRunScheduler {
 	GroupRepository groupRepository;
 
 	@Autowired
-	NotificationUtils notificationUtils;
+	DeviceInfoRepository deviceInfoRepository;
 
-	private static final Logger log = LoggerFactory.getLogger(TestRunScheduler.class);
+	@Autowired
+	NotificationUtils notificationUtils;
 
 	/**
 	 * This function checks if there are some tests which need to be executed and adds those test to the TestRun table in the database
@@ -78,8 +82,7 @@ public class TestRunScheduler {
 	 *
 	 */
 
-	@Scheduled(
-			fixedRate = 50000)
+	@Scheduled(fixedRate = 50000)
 	public void checkTests() throws ItemNotFoundRepositoryException {
 
 		List<Test> tests = testRepository.getScheduledTest();
@@ -97,6 +100,7 @@ public class TestRunScheduler {
 				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
 
 					CompanyLicensePrivate license = licenseRepository.findByDeviceId(test.getPodId());
+					DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 					if (license != null) {
 
@@ -105,7 +109,7 @@ public class TestRunScheduler {
 						if (group != null) {
 							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
 									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-							testRun.setHostname(test.getHostname());
+							testRun.setHostname(deviceInfo.getName());
 
 							test.setLastExecution(currentTimestamp);
 							testRunRepository.save(testRun);

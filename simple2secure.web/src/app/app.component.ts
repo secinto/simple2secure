@@ -15,8 +15,8 @@ import 'hammerjs';
 
 export class AppComponent implements OnInit {
 
-	title = 'simple2Secure Portal';
-	translatedTitle = 'simple2Secure Portal';
+	title = 'simple2secure Portal';
+	translatedTitle = 'simple2secure Portal';
 
 	constructor(
 		private router: Router,
@@ -38,7 +38,6 @@ export class AppComponent implements OnInit {
 			.filter((route) => route.outlet === 'primary')
 			.mergeMap((route) => route.data)
 			.subscribe((event) => {
-
 				if (event['title']){
 					this.translate.get(event['title']).subscribe((translated: string) => {
 						this.titleService.setTitle(translated);
@@ -47,7 +46,6 @@ export class AppComponent implements OnInit {
 				else{
 					this.titleService.setTitle(this.translatedTitle);
 				}
-
 			});
 	}
 }

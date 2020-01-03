@@ -1,0 +1,13 @@
+<div class="card text-white bg-{{bgClass}}">
+    <div class="card-body bg-{{bgClass}}">
+        <div class="list-group bg-{{bgClass}}">
+            <a *ngFor="let item of data" href="#" class="list-group-item clearfix d-block bg-{{bgClass}}">
+                <i class="fa fa-comment fa-fw"></i> {{item.content}}
+            </a>
+        </div>
+    </div>
+    <div class="card-footer">
+        <span class="float-left"><button class="widget-delete-btn" color="info" mat-button (click)="deleteWidgetProperty(propertiesId)"><mat-icon>delete</mat-icon></button></span>
+        <span class="float-right"><b>{{label}}</b></span>
+    </div>
+</div>

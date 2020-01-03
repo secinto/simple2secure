@@ -1,0 +1,56 @@
+.navbar {
+    background-color: white;
+    color: #A7BD26;
+    border-bottom: 5px solid #A7BD26;
+    max-height: 78px;
+}
+
+.navbar .navbar-nav {
+    display: inline-block;
+}
+
+.centered-nav {
+    position: absolute;
+    left: 44%;
+    transform: translatex(-44%);
+}
+
+.navbar-nav li {
+    text-align: center;
+    display: inline-block;
+}
+
+.nav img {
+    width: 130px;
+    max-width: 50%;
+}
+
+.navbar-brand{
+    display: inline-block;
+}
+
+.navbar-right {
+    float: right;
+    display: inline-block;
+    max-width: 20%;
+    margin-right: 8%;
+}
+
+.navbar-right a {
+    color: white;
+}
+
+.navbar-header{
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+#nav-right-custom-language-switcher {
+    max-width: 50px;
+    font-weight: bold;
+}
+
+
+
+
+

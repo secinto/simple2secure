@@ -33,7 +33,7 @@ public class EmailConfigurationRepositoryImpl extends EmailConfigurationReposito
 		List<EmailConfiguration> configs = findByContextId(contextId);
 		if (configs != null) {
 			for (EmailConfiguration config : configs) {
-				mongoTemplate.remove(config);
+				this.delete(config);
 			}
 		}
 	}

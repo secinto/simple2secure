@@ -64,10 +64,10 @@ export class ConfigurationDetailsComponent {
 				},
 				error => {
 					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
+						//this.alertService.error(this.translate.instant('server.notresponding'));
 					}
 					else {
-						this.alertService.error(error.error.errorMessage);
+						//this.alertService.error(error.error.errorMessage);
 					}
 					this.loading = false;
 				});

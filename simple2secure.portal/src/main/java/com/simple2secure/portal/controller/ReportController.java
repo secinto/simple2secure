@@ -21,236 +21,214 @@
  */
 package com.simple2secure.portal.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.NetworkReportDTO;
+import com.simple2secure.api.dto.OsQueryReportDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
-import com.simple2secure.api.model.Report;
-import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ReportRepository;
-import com.simple2secure.portal.repository.UserRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
-import com.simple2secure.portal.utils.ReportUtils;
+import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputDevice;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
+import com.simple2secure.portal.validation.model.ValidInputName;
+import com.simple2secure.portal.validation.model.ValidInputPage;
+import com.simple2secure.portal.validation.model.ValidInputReport;
+import com.simple2secure.portal.validation.model.ValidInputSize;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.ServerProvidedValue;
+import simple2secure.validator.annotation.ValidRequestMapping;
+import simple2secure.validator.model.ValidRequestMethodType;
+
+@SuppressWarnings("unchecked")
 @RestController
-@RequestMapping("/api/reports")
-public class ReportController {
+@RequestMapping(StaticConfigItems.REPORT_API)
+@Slf4j
+public class ReportController extends BaseUtilsProvider {
 
-	@Autowired
-	ReportRepository reportsRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	ContextRepository contextRepository;
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ReportUtils reportUtils;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
-
-	RestTemplate restTemplate = new RestTemplate();
-
-	private static Logger log = LoggerFactory.getLogger(ReportController.class);
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
-	public ResponseEntity<Report> saveReport(@RequestBody Report report, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<OsQueryReport> saveReport(@RequestBody OsQueryReport report, @ServerProvidedValue ValidInputLocale locale) {
 		if (report != null) {
 			reportsRepository.save(report);
 			return new ResponseEntity<>(report, HttpStatus.OK);
 		}
 		log.error("Error occured while saving report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReport>) buildResponseEntity("problem_saving_report", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{contextId}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<Report>> getReportsByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
-			if (context != null) {
-				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+	public ResponseEntity<OsQueryReportDTO> getReportsByContextIdAndPagination(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
-				if (groups != null) {
-					log.debug("Loading OSQuery reports for contextId {0}", contextId);
-					List<Report> reportsList = new ArrayList<>();
-					for (CompanyGroup group : groups) {
-						reportsList.addAll(reportsRepository.getReportsByGroupId(group.getId()));
-					}
-					return new ResponseEntity<>(reportsList, HttpStatus.OK);
+			Context context = contextRepository.find(contextId.getValue());
+			if (context != null) {
+
+				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+
+				if (devices != null) {
+					log.debug("Loading OSQuery reports for contextId {}", contextId.getValue());
+
+					List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+
+					OsQueryReportDTO reportDto = new OsQueryReportDTO();
+
+					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
+
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
 			}
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/{id}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/groups", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Report> getReportByID(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
-		if (!Strings.isNullOrEmpty(id)) {
-			Report report = reportsRepository.find(id);
+	public ResponseEntity<OsQueryReportDTO> getReportsByGroupIdsAndPagination(@RequestBody List<CompanyGroup> groups,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (groups != null) {
+
+			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+
+			if (groupIds != null && !groupIds.isEmpty()) {
+				List<Device> devices = deviceUtils.getAllDevicesByGroupIds(groupIds);
+				List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+				if (deviceIds != null) {
+					OsQueryReportDTO reportDto = new OsQueryReportDTO();
+					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
+				}
+			}
+		}
+		log.error("Error occured while retrieving reports for groups");
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
+	}
+
+	@ValidRequestMapping(value = "/devices", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<OsQueryReportDTO> getReportsByDeviceIdsAndPagination(@RequestBody List<Device> devices,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
+		if (devices != null) {
+
+			List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+
+			if (deviceIds != null && !deviceIds.isEmpty()) {
+				OsQueryReportDTO reportDto = new OsQueryReportDTO();
+				reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
+				return new ResponseEntity<>(reportDto, HttpStatus.OK);
+			}
+		}
+		log.error("Error occured while retrieving reports for groups");
+		return (ResponseEntity<OsQueryReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
+	}
+
+	@ValidRequestMapping(value = "/report")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<OsQueryReport> getReportById(@PathVariable ValidInputReport reportId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(reportId.getValue())) {
+			OsQueryReport report = reportsRepository.find(reportId.getValue());
 			if (report != null) {
 				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
-		log.error("Error occured while retrieving report with id {}", id);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+		log.error("Error occured while retrieving report with id {}", reportId.getValue());
+		return (ResponseEntity<OsQueryReport>) buildResponseEntity("report_not_found", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/name",
-			method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/device")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<GraphReport>> getReportsByName(@RequestBody String name, @RequestHeader("Accept-Language") String locale) {
-		if (!Strings.isNullOrEmpty(name)) {
-			List<GraphReport> reports = reportUtils.prepareReportsForGraph(name);
+	public ResponseEntity<List<GraphReport>> getReportsByName(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputName name,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (!Strings.isNullOrEmpty(name.getValue()) && !Strings.isNullOrEmpty(deviceId.getValue())) {
+			List<GraphReport> reports = reportUtils.prepareReportsForGraph(deviceId.getValue(), name.getValue());
 			if (reports != null) {
 				return new ResponseEntity<>(reports, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<GraphReport>>) buildResponseEntity("report_not_found", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/{id}",
-			method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Report> deleteReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
-
-		if (!Strings.isNullOrEmpty(id)) {
-			Report report = reportsRepository.find(id);
-			if (report != null) {
-				reportsRepository.delete(report);
-				return new ResponseEntity<>(report, HttpStatus.OK);
-			}
-		}
-		log.error("Error occured while deleting report with id {}", id);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(
-			value = "/network",
-			method = RequestMethod.POST,
-			consumes = "application/json")
+	@ValidRequestMapping(value = "/network", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('DEVICE')")
 	public ResponseEntity<NetworkReport> saveNetworkReport(@RequestBody NetworkReport networkReport,
-			@RequestHeader("Accept-Language") String locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (networkReport != null) {
 			networkReportRepository.save(networkReport);
 			return new ResponseEntity<>(networkReport, HttpStatus.OK);
 		}
 		log.error("Error occured while saving network report");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_saving_report", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<NetworkReport>) buildResponseEntity("problem_saving_report", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/network/{contextId}",
-			method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/network")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReport>> getNetworkReportsByContextId(@PathVariable("contextId") String contextId,
-			@RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<NetworkReportDTO> getNetworkReportsByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId)) {
-			Context context = contextRepository.find(contextId);
+		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+				List<CompanyGroup> groups = groupRepository.findByContextId(contextId.getValue());
 				if (groups != null) {
-					log.debug("Loading network reports for contextId {0}", contextId);
-					List<NetworkReport> reportsList = new ArrayList<>();
-					for (CompanyGroup group : groups) {
-						reportsList.addAll(networkReportRepository.getReportsByGroupId(group.getId()));
-					}
-					return new ResponseEntity<>(reportsList, HttpStatus.OK);
+
+					log.debug("Loading network reports for contextId {0}", contextId.getValue());
+
+					List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
+
+					NetworkReportDTO reportDto = new NetworkReportDTO();
+
+					reportDto = networkReportRepository.getReportsByGroupId(groupIds, size.getValue(), page.getValue());
+
+					return new ResponseEntity<>(reportDto, HttpStatus.OK);
 				}
 			}
 		}
-
 		log.error("Error occured while retrieving network reports for context id {}", contextId);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("error_while_getting_reports", locale)),
-				HttpStatus.NOT_FOUND);
+		return (ResponseEntity<NetworkReportDTO>) buildResponseEntity("error_while_getting_reports", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/network/{id}",
-			method = RequestMethod.DELETE)
+	@ValidRequestMapping(value = "/network", method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable("id") String id, @RequestHeader("Accept-Language") String locale) {
+	public ResponseEntity<NetworkReport> deleteNetworkReport(@PathVariable ValidInputReport reportId,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(id)) {
+		if (!Strings.isNullOrEmpty(reportId.getValue())) {
 
-			NetworkReport report = networkReportRepository.find(id);
+			NetworkReport report = networkReportRepository.find(reportId.getValue());
 			if (report != null) {
 				networkReportRepository.delete(report);
 				return new ResponseEntity<>(report, HttpStatus.OK);
 			}
 		}
-		log.error("Error occured while deleting network report with id {}", id);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("no_reports_provided", locale)), HttpStatus.NOT_FOUND);
+		log.error("Error occured while deleting network report with id {}", reportId);
+		return (ResponseEntity<NetworkReport>) buildResponseEntity("no_reports_provided", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/network/name",
-			method = RequestMethod.POST)
+	@ValidRequestMapping(value = "/report/network/name", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<NetworkReport>> getNetworkReportsByName(@RequestBody String name,
-			@RequestHeader("Accept-Language") String locale) {
+			@ServerProvidedValue ValidInputLocale locale) {
 		if (!Strings.isNullOrEmpty(name)) {
 			List<NetworkReport> reports = networkReportRepository.getReportsByName(name);
 			if (reports != null) {
@@ -258,20 +236,23 @@ public class ReportController {
 			}
 		}
 		log.error("Error occured while retrieving report with name {}", name);
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+		return (ResponseEntity<List<NetworkReport>>) buildResponseEntity("report_not_found", locale);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(
-			value = "/report/network/geo",
-			method = RequestMethod.GET)
+	@ValidRequestMapping(value = "/delete/selected", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<NetworkReportDTO>> getNetworkReportsForGeoLocation(@RequestHeader("Accept-Language") String locale) {
-		List<NetworkReportDTO> reports = reportUtils.prepareNetworkReports();
-		if (reports != null) {
-			return new ResponseEntity<>(reports, HttpStatus.OK);
+	public ResponseEntity<List<OsQueryReport>> deleteSelectedReports(@RequestBody List<OsQueryReport> queryReports,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (queryReports != null) {
+			for (OsQueryReport queryReport : queryReports) {
+				OsQueryReport dbReport = reportsRepository.find(queryReport.getId());
+				if (dbReport != null) {
+					reportsRepository.delete(dbReport);
+				}
+			}
+			return new ResponseEntity<>(queryReports, HttpStatus.OK);
 		}
-		log.error("Error occured while retrieving reports for geolocation");
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("report_not_found", locale)), HttpStatus.NOT_FOUND);
+		log.error("Error occured while deleting selected network reports!");
+		return (ResponseEntity<List<OsQueryReport>>) buildResponseEntity("no_reports_provided", locale);
 	}
 }

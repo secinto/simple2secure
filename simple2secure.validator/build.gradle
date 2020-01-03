@@ -1,0 +1,13 @@
+task customFatJar(type: Jar) {
+	baseName = 'simple2secure.validator'
+	version =  '1.0.0-RC'
+	manifest {
+		attributes 'Implementation-Title': 'ProbeService',
+		'Implementation-Version': version,
+		'Class-Path': configurations.runtime.files.collect { it.name }.join(' ')
+	}
+
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}

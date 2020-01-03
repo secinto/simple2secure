@@ -22,30 +22,25 @@
 
 import {Injectable} from '@angular/core';
 import {JwtHelper} from 'angular2-jwt';
+import {DataService} from "./data.service";
 
 @Injectable()
 export class AuthenticationService {
 
 	jwtHelper: JwtHelper = new JwtHelper();
 
-	constructor() { }
+	constructor(public dataService: DataService) { }
 
 	logout() {
-		// remove user from local storage to log user out
-		localStorage.removeItem('token');
-		localStorage.removeItem('currentUser');
-		localStorage.removeItem('context');
+		// clear the sessionStorage
+		this.dataService.clearSessionStorage();
 	}
 
 	public isAuthenticated(): boolean {
-		const context = localStorage.getItem('context');
-		const token = localStorage.getItem('token');
-		if (token && context) {
+		const token = this.dataService.getAuthToken();
+		if (token) {
 			return !this.jwtHelper.isTokenExpired(token);
 		}
-		else {
-			return false;
-		}
-
+		return false;
 	}
 }

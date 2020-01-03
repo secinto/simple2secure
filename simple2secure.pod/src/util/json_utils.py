@@ -1,6 +1,9 @@
 import logging
 import platform
 
+from flask import json
+
+
 log = logging.getLogger('pod.util.json_utils')
 
 
@@ -84,3 +87,4 @@ def construct_command(tool, argument):
         return ""
     else:
         return tool + ' ' + argument
+

@@ -4,21 +4,16 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 	<persistence-unit name="s2s-test">
-		<description>Simple2Secure Probe Test</description>
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<description>simple2secure Probe Test</description>
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<class>com.simple2secure.api.model.AccountCredential</class>
-		<class>com.simple2secure.api.model.Config</class>
-		<class>com.simple2secure.api.model.DBConfig</class>
 		<class>com.simple2secure.api.model.Device</class>
 		<class>com.simple2secure.api.model.Packet</class>
 		<class>com.simple2secure.api.model.Processor</class>
-		<class>com.simple2secure.api.model.QueryConfig</class>
 		<class>com.simple2secure.api.model.QueryRun</class>
 		<class>com.simple2secure.api.model.Report</class>
 		<class>com.simple2secure.api.model.Service</class>
 		<class>com.simple2secure.api.model.Step</class>
-		<class>com.simple2secure.api.model.Task</class>
-		<class>com.simple2secure.api.model.CompanyGroup</class>
 		<class>com.simple2secure.api.model.CompanyLicensePublic</class>
 		<class>com.simple2secure.api.model.NetworkReport</class>
 		<class>com.simple2secure.api.model.ProbePacket</class>
@@ -33,7 +28,7 @@
 			<property name="hibernate.connection.driver_class"
 				value="org.h2.Driver" />
 			<property name="hibernate.connection.url"
-				value="jdbc:h2:file:./db/s2sProbeDB-test" />
+				value="jdbc:h2:file:./db/s2sProbeDB-test;MV_STORE=false" />
 			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
 			<property name="javax.persistence.jdbc.user" value="admin" />
 			<property name="javax.persistence.jdbc.password"

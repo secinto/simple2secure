@@ -1,19 +1,21 @@
 import json
 import logging
 import sys
+from urllib import parse
 
 from flask import Response, json, request, render_template
 
 import src.celery.celery_tasks as celery_tasks
 from src import create_app
 from src.db.database import TestResult, Test
-from src.db.database_schema import TestSchema
+from src.db.database_schema import TestSchema, TestSequenceSchema
 from src.scheduler.scheduler_tasks import start_scheduler_tasks
 from src.util import file_utils, json_utils
 from src.util.db_utils import clear_pod_status_auth
 from src.util.file_utils import update_services_file, read_json_testfile
 from src.util.rest_utils import schedule_test_on_the_portal
-from src.util.test_utils import update_insert_tests_to_db
+from src.util.test_sequence_utils import get_sequence_from_url
+from src.util.test_utils import update_tests
 
 app = create_app(sys.argv)
 start_scheduler_tasks(app, celery_tasks)
@@ -48,13 +50,30 @@ def index():
     return parse_tests()
 
 
+@app.route("/services/run/sequence")
+def run_sequence():
+    with app.app_context():
+        splitted_url = parse.urlsplit(request.url)
+        url_query = parse.parse_qs(splitted_url.query)
+        
+        test_sequence_schema = TestSequenceSchema()
+        
+        test_sequence = get_sequence_from_url(url_query, app)
+        
+        sequence_to_provide = test_sequence_schema.dump(test_sequence).data
+
+        testRun = celery_tasks.schedule_sequence.delay(sequence_to_provide)
+        
+        return "Task sequence has been scheduled"
+
+
 @app.route("/services/run")
 def run_service():
     with app.app_context():
 
         test_schema = TestSchema()
         response = file_utils.read_json_testfile()
-        update_insert_tests_to_db(response, app)
+        update_tests(response, app)
 
         response_text = "All available tests from services.json have been scheduled"
 
@@ -90,10 +109,10 @@ def run_service():
                     current_test["test_definition"]["postcondition"]["command"]["parameter"][
                         "value"] = postcondition_param_value
 
-            db_test.test_content = current_test
+            db_test.test_content = json.dumps(current_test)
             print(db_test.test_content)
             output = test_schema.dump(db_test)
-            resp = schedule_test_on_the_portal(output, app)
+            resp = schedule_test_on_the_portal(json.dumps(output), app)
 
             if resp.status_code == 200:
                 response_text = "Test " + test_name_response + " has been scheduled"

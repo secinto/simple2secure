@@ -22,7 +22,7 @@
 
 export * from './user';
 export * from './DTO/userDTO';
-export * from './queryrun';
+export * from './osQuery';
 export * from './step';
 export * from './processor';
 export * from './config';
@@ -51,8 +51,6 @@ export * from './DTO/userRoleDTO';
 export * from './DTO/emailConfigurationDTO';
 export * from './graphReport';
 export * from './DTO/networkReportDTO';
-export * from './marker';
-export * from './coordinates';
 export  * from './testResult';
 export  * from './testResultObj';
 export * from './DTO/testResultDTO';

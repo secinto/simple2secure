@@ -1,5 +1,7 @@
 package com.simple2secure.portal.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +10,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,20 +17,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import com.simple2secure.commons.config.LoadedConfigItems;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.security.CustomEntryPoint;
 import com.simple2secure.portal.security.auth.CustomAuthenticationFailureHandler;
 import com.simple2secure.portal.security.auth.CustomAuthenticationProvider;
 import com.simple2secure.portal.security.auth.CustomAuthenticationSuccessHandler;
 import com.simple2secure.portal.security.auth.JWTAuthenticationFilter;
 import com.simple2secure.portal.security.auth.JWTLoginFilter;
+import com.simple2secure.portal.utils.PortalUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity
 @EnableMongoRepositories("com.simple2secure.portal.dao")
-@CrossOrigin(
-		origins = "https://localhost:9000")
-@EnableGlobalMethodSecurity(
-		prePostEnabled = true)
+@CrossOrigin(origins = "https://localhost:9000")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -47,6 +52,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Autowired
+	public LoadedConfigItems loadedConfigItems;
+
+	@Autowired
+	private PortalUtils portalUtils;
+
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -55,34 +66,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return authProvider;
 	}
 
-	@Override
-	public void configure(WebSecurity web) {
-		web.ignoring().antMatchers("/config/**", "/api/register/**", "/api/user/activate/", "/api/service/**", "/api/test",
-				"/api/user/sendResetPasswordEmail", "/api/user/resetPassword/**", "/api/user/updatePassword/**", "/api/user/invite/**",
-				"/api/download/**", "/api/device/**", "/api/license/authenticate/**", "/api/pod/config/**");
-	}
-
-	// TODO - find better solution for antMatchers!
+	/**
+	 * Annotate the function with @NotSecuredApi if you want to exclude the api from the autorization
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests().antMatchers("/api/login")
-				.permitAll().and().authorizeRequests().antMatchers("/api/service").permitAll().and().authorizeRequests()
-				.antMatchers("/api/register/**").permitAll().and().authorizeRequests().antMatchers("/api/user/activate/").permitAll().and()
-				.authorizeRequests().antMatchers("/api/test").permitAll().and().authorizeRequests().antMatchers("/api/user/updatePassword/**")
-				.permitAll().and().authorizeRequests().antMatchers("/api/user/invite/**").permitAll().and().authorizeRequests()
-				.antMatchers("/api/download/**").permitAll().and().authorizeRequests().antMatchers("/api/device/**").permitAll().and()
-				.authorizeRequests().antMatchers("/api/pod/config/**").permitAll().and().authorizeRequests()
-				.antMatchers("/api/license/authenticate/**").permitAll().and().authorizeRequests()
-				// filter the login requests
-				.and().addFilterBefore(new JWTLoginFilter("/api/login", this.authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-				// And filter other requests to check the presence of JWTth in header
+		String[] unsecuredApis = portalUtils.getListOfNotSecuredApis(getApplicationContext());
+
+		log.info("Following APIs are annotated as insecured {}", Arrays.toString(unsecuredApis));
+
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers(unsecuredApis).permitAll().and().authorizeRequests().anyRequest()
+				.authenticated().and()
+				.addFilterBefore(new JWTLoginFilter(StaticConfigItems.LOGIN_API, this.authenticationManager()),
+						UsernamePasswordAuthenticationFilter.class)
 				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
 
 		http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
 		http.formLogin().successHandler(authenticationSuccessHandler);
 		http.formLogin().failureHandler(authenticationFailureHandler);
-		// http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Override

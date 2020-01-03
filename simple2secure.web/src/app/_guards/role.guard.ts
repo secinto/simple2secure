@@ -22,20 +22,21 @@
 
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router} from '@angular/router';
-import {ContextDTO} from '../_models';
+import {DataService} from "../_services";
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-	context: ContextDTO;
+	userRole: string;
 
-	constructor(public router: Router) {}
+	constructor(public router: Router,
+				public dataService: DataService) {}
 
 	canActivate(route: ActivatedRouteSnapshot): boolean {
 		const expectedRole = route.data.expectedRole;
 
-		this.context = JSON.parse(localStorage.getItem('context'));
+		this.userRole = this.dataService.getRole();
 
-		if (this.context.userRole.toString() !== expectedRole) {
+		if (this.userRole !== expectedRole) {
 			this.router.navigate(['']);
 			return false;
 		}

@@ -16,7 +16,7 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
@@ -27,18 +27,12 @@ import org.jeasy.rules.api.Facts;
 
 import com.simple2secure.api.model.Email;
 
-/**
- * 
- * @author Richard Heinz
- *
- *         Abstract action class which can be taken as template for an email rule
- */
 public abstract class AbtractEmailAction implements Action {
 
 	/**
 	 * Method to fetch the email object from the facts. There will only be one object with the name "com.simple2secure.api.model.Email" (Map
 	 * in the background)
-	 * 
+	 *
 	 * @param facts
 	 *          which hold all saved facts
 	 */
@@ -49,7 +43,7 @@ public abstract class AbtractEmailAction implements Action {
 
 	/**
 	 * Method which has to be implemented in the specific action class
-	 * 
+	 *
 	 * @param email
 	 *          which has triggered the rule
 	 * @throws Exception

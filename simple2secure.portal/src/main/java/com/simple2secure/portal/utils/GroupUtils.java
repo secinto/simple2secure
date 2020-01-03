@@ -24,9 +24,6 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -37,59 +34,20 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
-import com.simple2secure.api.model.Processor;
-import com.simple2secure.api.model.QueryRun;
-import com.simple2secure.api.model.Step;
+import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.model.CustomErrorType;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.GroupAccesRightRepository;
-import com.simple2secure.portal.repository.GroupRepository;
-import com.simple2secure.portal.repository.LicenseRepository;
-import com.simple2secure.portal.repository.NetworkReportRepository;
-import com.simple2secure.portal.repository.ProcessorRepository;
-import com.simple2secure.portal.repository.QueryRepository;
-import com.simple2secure.portal.repository.ReportRepository;
-import com.simple2secure.portal.repository.StepRepository;
-import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.providers.BaseServiceProvider;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+
+@SuppressWarnings("unchecked")
 @Component
-public class GroupUtils {
-
-	private static Logger log = LoggerFactory.getLogger(GroupUtils.class);
-
-	@Autowired
-	GroupRepository groupRepository;
-
-	@Autowired
-	StepRepository stepRepository;
-
-	@Autowired
-	ProcessorRepository processorRepository;
-
-	@Autowired
-	LicenseRepository licenseRepository;
-
-	@Autowired
-	ReportRepository reportRepository;
-
-	@Autowired
-	NetworkReportRepository networkReportRepository;
-
-	@Autowired
-	QueryRepository queryRepository;
-
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	GroupAccesRightRepository groupAccessRightRepository;
-
-	@Autowired
-	MessageByLocaleService messageByLocaleService;
+@Slf4j
+public class GroupUtils extends BaseServiceProvider {
 
 	/**
 	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
@@ -150,14 +108,9 @@ public class GroupUtils {
 	 * @param groupId
 	 */
 	public void deleteGroup(String groupId, boolean deleteAll) {
-		// Delete the group steps
-		stepRepository.deleteByGroupId(groupId);
-
-		// Delete the group processors
-		processorRepository.deleteByGroupId(groupId);
 
 		// Remove OSQuery configuration
-		queryRepository.deleteByGroupId(groupId);
+		queryGroupMappingRepository.deleteByGroupId(groupId);
 
 		// if this flag is set all group dependencies will be deleted
 		if (deleteAll) {
@@ -167,7 +120,7 @@ public class GroupUtils {
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						reportRepository.deleteByDeviceId(license.getDeviceId());
+						reportsRepository.deleteByDeviceId(license.getDeviceId());
 						networkReportRepository.deleteByDeviceId(license.getDeviceId());
 					}
 					licenseRepository.delete(license);
@@ -309,9 +262,9 @@ public class GroupUtils {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user, String locale)
-			throws ItemNotFoundRepositoryException {
+
+	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user,
+			ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (fromGroup != null) {
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(fromGroup.getContextId(),
@@ -375,8 +328,7 @@ public class GroupUtils {
 			}
 		}
 
-		return new ResponseEntity(new CustomErrorType(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale)),
-				HttpStatus.NO_CONTENT);
+		return ((ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_moving_group", locale));
 	}
 
 	/**
@@ -493,31 +445,14 @@ public class GroupUtils {
 	 * @param destGroupId
 	 */
 	public void copyGroupConfiguration(String sourceGroupId, String destGroupId) {
-		List<QueryRun> queries = queryRepository.findByGroupId(sourceGroupId, true);
-		List<Processor> processors = processorRepository.getProcessorsByGroupId(sourceGroupId);
-		List<Step> steps = stepRepository.getStepsByGroupId(sourceGroupId, true);
 
-		if (queries != null) {
-			for (QueryRun query : queries) {
-				query.setGroupId(destGroupId);
-				query.setId(null);
-				queryRepository.save(query);
-			}
-		}
+		List<OsQueryGroupMapping> queryMappings = queryGroupMappingRepository.findByGroupId(sourceGroupId);
 
-		if (processors != null) {
-			for (Processor processor : processors) {
-				processor.setGroupId(destGroupId);
-				processor.setId(null);
-				processorRepository.save(processor);
-			}
-		}
-
-		if (steps != null) {
-			for (Step step : steps) {
-				step.setGroupId(destGroupId);
-				step.setId(null);
-				stepRepository.save(step);
+		if (queryMappings != null) {
+			for (OsQueryGroupMapping mapping : queryMappings) {
+				mapping.setGroupId(destGroupId);
+				mapping.setId(null);
+				queryGroupMappingRepository.save(mapping);
 			}
 		}
 	}
@@ -549,4 +484,46 @@ public class GroupUtils {
 		return false;
 	}
 
+	/**
+	 * This function finds the parent group of the current child
+	 *
+	 * @param group
+	 * @return
+	 */
+	public CompanyGroup findTheParentGroup(CompanyGroup group) {
+
+		if (!Strings.isNullOrEmpty(group.getParentId())) {
+			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
+			if (parentGroup != null) {
+				return parentGroup;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * This function searches recursively for all dependent groups until the root group is found
+	 *
+	 * @param group
+	 * @return
+	 */
+	public List<CompanyGroup> findAllParentGroups(CompanyGroup group) {
+		List<CompanyGroup> foundGroups = new ArrayList<>();
+		foundGroups.add(group);
+		boolean rootGroupFound = false;
+		while (!rootGroupFound) {
+			CompanyGroup parentGroup = findTheParentGroup(group);
+			if (parentGroup != null) {
+				foundGroups.add(parentGroup);
+				if (parentGroup.isRootGroup()) {
+					rootGroupFound = true;
+				} else {
+					group = parentGroup;
+				}
+			} else {
+				rootGroupFound = true;
+			}
+		}
+		return foundGroups;
+	}
 }

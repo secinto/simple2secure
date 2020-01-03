@@ -1,5 +1,6 @@
 package com.simple2secure.portal.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -23,33 +24,8 @@ public class StepRepositoryImpl extends StepRepository {
 	}
 
 	@Override
-	public void deleteByGroupId(String groupId) {
-		List<Step> steps = getStepsByGroupId(groupId, true);
-		if (steps != null) {
-			for (Step step : steps) {
-				this.delete(step);
-			}
-		}
-	}
-
-	@Override
-	public List<Step> getStepsByGroupId(String groupId, boolean select_all) {
-		Query query = new Query();
-
-		if (select_all) {
-			query = new Query(Criteria.where("groupId").is(groupId));
-
-		} else {
-			query = new Query(Criteria.where("groupId").is(groupId).and("active").is(1));
-
-		}
-		List<Step> steps = mongoTemplate.find(query, Step.class);
-		return steps;
-	}
-
-	@Override
-	public Step getByNameAndGroupId(String name, String groupId) {
-		Query query = new Query(Criteria.where("groupId").is(groupId).and("name").is(name));
+	public Step getByName(String name) {
+		Query query = new Query(Criteria.where("name").is(name));
 
 		Step step = mongoTemplate.findOne(query, Step.class);
 
@@ -57,9 +33,22 @@ public class StepRepositoryImpl extends StepRepository {
 	}
 
 	@Override
-	public List<Step> getAllGreaterThanNumber(int stepNumber, String groupId) {
-		Query query = new Query(Criteria.where("number").gt(stepNumber).and("groupId").is(groupId));
+	public List<Step> getAllGreaterThanNumber(int stepNumber) {
+		Query query = new Query(Criteria.where("number").gt(stepNumber));
 		List<Step> steps = mongoTemplate.find(query, Step.class);
+		return steps;
+	}
+
+	@Override
+	public List<Step> getStepsByFlagValue(boolean select_all) {
+		List<Step> steps = new ArrayList<>();
+		if (select_all) {
+			steps = mongoTemplate.findAll(className);
+		} else {
+			Query query = new Query(Criteria.where("active").is(1));
+			steps = mongoTemplate.find(query, className);
+		}
+
 		return steps;
 	}
 }
