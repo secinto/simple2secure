@@ -115,10 +115,10 @@ public class ReportScheduler extends TimerTask {
 	private void sendReportsToServer() {
 		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("isSent", false, OsQueryReport.class);
 		int currentPageNumber = 1;
-		log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
 		while (currentPageNumber <= lastPageNumber) {
 			List<OsQueryReport> reports = DBUtil.getInstance().findByFieldNamePaging("isSent", false, OsQueryReport.class, currentPageNumber);
 			if (reports != null) {
+				log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
 				for (OsQueryReport report : reports) {
 					sendReport(report);
 				}
@@ -134,11 +134,11 @@ public class ReportScheduler extends TimerTask {
 	private void sendNetworkReportsToServer() {
 		int lastPageNumber = DBUtil.getInstance().getLastPageNumberByFieldName("sent", false, NetworkReport.class);
 		int currentPageNumber = 1;
-		log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
 		while (currentPageNumber <= lastPageNumber) {
 			List<NetworkReport> networkReports = DBUtil.getInstance().findByFieldNamePaging("sent", false, NetworkReport.class,
 					currentPageNumber);
 			if (networkReports != null) {
+				log.debug("Starting sending {} pages of network reports to server", currentPageNumber);
 				for (NetworkReport networkReport : networkReports) {
 					sendNetworkReport(networkReport);
 				}

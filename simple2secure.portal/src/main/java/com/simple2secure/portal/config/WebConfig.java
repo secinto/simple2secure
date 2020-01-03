@@ -18,11 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.simple2secure.portal.validation.ServerProvidedValueValidation;
 import com.simple2secure.portal.validation.StringToValidInputConverterFactory;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Configuration
 @Component
-@Slf4j
 public class WebConfig implements WebMvcConfigurer {
 
 	@Autowired

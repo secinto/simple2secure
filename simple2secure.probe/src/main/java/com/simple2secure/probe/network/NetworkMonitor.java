@@ -51,6 +51,11 @@ public class NetworkMonitor {
 		return instance;
 	}
 
+	public void stopMonitor() {
+		receiver.stop();
+		packetProcessor.stop();
+	}
+
 	private NetworkMonitor() {
 		initMonitor();
 	}

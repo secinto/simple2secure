@@ -123,7 +123,7 @@ public class ProbeCLI {
 	}
 
 	private void stopWorkerThreads() {
-
+		workerThread.stopWorkerThread();
 	}
 
 	private void startWorkerThreads() {
@@ -183,6 +183,7 @@ public class ProbeCLI {
 				case GET_VERSION:
 				case RESET:
 					stopWorkerThreads();
+					workerThread = new ProbeWorkerThread();
 					startWorkerThreads();
 					break;
 				case STOP:

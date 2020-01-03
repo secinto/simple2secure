@@ -98,7 +98,8 @@ public final class ProbeUtils {
 	 */
 	public static void sendDeviceInfo(DeviceInfo deviceInfo) {
 		String response = null;
-		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/update", deviceInfo);
+		response = RESTUtils.sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/update", deviceInfo,
+				ProbeConfiguration.authKey);
 		if (!Strings.isNullOrEmpty(response)) {
 			log.info("Device Information has been sent to portal!");
 		} else {
