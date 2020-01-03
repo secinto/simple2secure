@@ -76,10 +76,14 @@ public class PacketReceiver implements PacketListener, Runnable {
 		}
 	}
 
+	/**
+	 * Stops the packet receiver and the underlying handle from receiving packets. First breaks the loop, thereafter calls close.
+	 */
 	public void stop() {
 		try {
 			if (running) {
 				handle.breakLoop();
+				handle.close();
 			}
 		} catch (NotOpenException e) {
 			log.debug("PacketReceiver.close called although loop wasn't running!", e);
