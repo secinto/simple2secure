@@ -42,6 +42,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,7 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.controller.WidgetController;
+import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputParamType;
@@ -568,4 +570,17 @@ public class PortalUtils {
 		return urls;
 	}
 
+	/**
+	 * This function creates an api error object from the provided parameters
+	 *
+	 * @param message
+	 * @param status
+	 * @return
+	 */
+	public ApiError buildApiError(String message, HttpStatus status) {
+		ApiError apiError = new ApiError();
+		apiError.setErrorMessage(message);
+		apiError.setStatus(HttpStatus.UNAUTHORIZED);
+		return apiError;
+	}
 }

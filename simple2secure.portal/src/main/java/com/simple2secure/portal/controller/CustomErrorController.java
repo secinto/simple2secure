@@ -36,6 +36,7 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 
 import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @RestController
@@ -44,6 +45,7 @@ import simple2secure.validator.annotation.ValidRequestMapping;
 public class CustomErrorController extends BaseUtilsProvider implements ErrorController {
 
 	@ValidRequestMapping
+	@NotSecuredApi
 	public Map<String, Object> error(HttpServletRequest request, WebRequest webrequest, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<>();
 		Map<String, Object> errAttributes = getErrorAttributes(webrequest, false);

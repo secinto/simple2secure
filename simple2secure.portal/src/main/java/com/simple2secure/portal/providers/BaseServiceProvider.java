@@ -1,12 +1,12 @@
 package com.simple2secure.portal.providers;
 
-import org.assertj.core.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.google.common.base.Strings;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.security.PasswordValidator;
