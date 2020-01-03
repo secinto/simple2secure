@@ -91,7 +91,7 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 			String packageNameActionTemplates)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException {
 
-		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditonsTempates);
+		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditonsTempates, ruleData.getName());
 		autowireCapableBeanFactory.autowireBean(condition);
 
 		Action action = buildActionFromTemplateAction(ruleData.getTemplateAction(), packageNameActionTemplates);

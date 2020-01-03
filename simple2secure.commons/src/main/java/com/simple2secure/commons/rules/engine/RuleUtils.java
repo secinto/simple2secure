@@ -44,6 +44,7 @@ import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
+import com.simple2secure.commons.rules.annotations.RuleName;
 
 import groovy.lang.GroovyClassLoader;
 
@@ -260,7 +261,7 @@ public class RuleUtils {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String packageName)
+	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String packageName, String ruleName)
 			throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException {
 		Class<?> conditionClass = null;
 		Condition condition = null;
@@ -283,6 +284,7 @@ public class RuleUtils {
 
 		// saves param data from conditionData into the Condition object
 		for (Field f : fs) {
+			
 			f.setAccessible(true);
 			AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
 
@@ -308,7 +310,48 @@ public class RuleUtils {
 				continue;
 			}
 		}
+		
+		Class<?> conditionSuperClass = conditionClass.getSuperclass();
+		if (conditionSuperClass != null && conditionSuperClass != Object.class)
+		{
+			Field superClassFields[] = conditionSuperClass.getDeclaredFields();
 
+			for (Field f : superClassFields)
+			{
+				f.setAccessible(true);
+				RuleName ruleNameAnno = f.getAnnotation(RuleName.class);
+				
+				if(ruleNameAnno != null)
+				{
+					f.set(condition, ruleName);	
+					continue;
+				}
+				
+				AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
+				
+				if(param != null) {
+					if (param.name().equals(AnnotationRuleParam.TYPE_LIMIT))
+					{
+						f.set(condition, 1);
+						
+						List<RuleParam<?>> params = conditionData.getParams();
+						
+						if(params == null)
+							continue;
+						
+						for (RuleParam<?> paramData : conditionData.getParams()) {
+								if (paramData.getName().equals(AnnotationRuleParam.TYPE_LIMIT))
+								{
+									f.set(condition, paramData.getValue());
+									continue;
+								}
+						}
+					}
+				}
+				
+			}
+		}
+		
 		return condition;
 	}
 
@@ -403,7 +446,7 @@ public class RuleUtils {
 	public Rule buildRuleFromTemplateRule(TemplateRule ruleData, String packageNameConditons, String packageNameAction)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException {
 		return new RuleBuilder().name(ruleData.getName()).description(ruleData.getDescription())
-				.when(buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditons))
+				.when(buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditons, ruleData.getName()))
 				.then(buildActionFromTemplateAction(ruleData.getTemplateAction(), packageNameAction)).build();
 	}
 

@@ -24,15 +24,68 @@ package com.simple2secure.portal.rules.conditions;
 
 import org.jeasy.rules.api.Condition;
 import org.jeasy.rules.api.Facts;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.api.model.TriggeredRule;
+import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
+import com.simple2secure.commons.rules.annotations.RuleName;
+import com.simple2secure.portal.repository.EmailRuleTriggeredRepository;
 
+import lombok.Setter;
+
+@Setter
 public abstract class AbtractEmailCondition implements Condition {
 
+	@Autowired
+	EmailRuleTriggeredRepository emailRuleTriggeredRepository;
+	
+	@RuleName()
+	protected String ruleName;
+	
+	@AnnotationRuleParam(
+			name = AnnotationRuleParam.TYPE_LIMIT,
+			description_de = "Die Regel wird erst bei der n ten Mail des gleichen Typs ausgelöst",
+			description_en = "The rule will only be triggered after n mails of the same type",
+			type = DataType._INT)
+	private int typeLimit;
+	
 	@Override
 	public boolean evaluate(Facts facts) {
-		return condition(facts.get("com.simple2secure.api.model.Email"));
+		boolean result = condition(facts.get("com.simple2secure.api.model.Email"));
+		
+		if (!result) {
+			return false;			
+		}
+		else {
+			if (typeLimit == 1)
+				return result;
+			
+			Email email = facts.get("com.simple2secure.api.model.Email");	
+			
+			TriggeredRule triggeredRule = emailRuleTriggeredRepository.findByRuleName(ruleName);
+			
+			if(triggeredRule != null) {
+				triggeredRule.getEmails().add(email);			
+			}
+			else {
+				TemplateRule templateRule = new TemplateRule(ruleName,
+						"description is not implemented", //TODO:
+						email.getConfigId(),
+						null, null);
+				triggeredRule = new TriggeredRule(templateRule);
+				triggeredRule.addMail(email);
+			}
+			
+			if (triggeredRule.getTriggeredEmailCount() >= typeLimit)
+				return true;
+			else
+				return false;
+		}
 	}
 
 	protected abstract boolean condition(Email email);
+	
 }
