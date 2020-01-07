@@ -1,0 +1,13 @@
+<div class="card text-white bg-{{bgClass}}">
+    <div class="card-body bg-{{bgClass}}">
+        <div id="box">
+          <div class="light red" [ngClass]="{'checked': lights.isRed}"></div>
+          <div class="light yellow" [ngClass]="{'checked': lights.isYellow}"></div>
+          <div class="light green" [ngClass]="{'checked': lights.isGreen}"></div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <span class="float-left"><button class="widget-delete-btn" color="info" mat-button (click)="deleteWidgetProperty(propertiesId)"><mat-icon>delete</mat-icon></button></span>
+        <span class="float-right"><b>{{label}}</b></span>
+    </div>
+</div>

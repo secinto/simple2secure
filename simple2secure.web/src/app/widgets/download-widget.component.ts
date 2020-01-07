@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BaseWidget} from "./basewidget.component";
 
 @Component({
-    selector: 'app-download-item',
+    selector: 'app-download',
     templateUrl: './download-widget.component.html',
     styleUrls: ['./widgets.scss']
 })
