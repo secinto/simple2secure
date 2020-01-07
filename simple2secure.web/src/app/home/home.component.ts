@@ -38,7 +38,7 @@ import {environment} from '../../environments/environment';
 	templateUrl: 'home.component.html'
 })
 
-export class HomeComponent implements OnInit {
+export class HomeComponent{
 	widgets: WidgetDTO[] = [];
 	widgetDTO: WidgetDTO;
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
@@ -49,24 +49,8 @@ export class HomeComponent implements OnInit {
 				private httpService: HttpService) {
 	}
 
-	ngOnInit(): void {
-		this.loadAllWidgetsByUserId();
-	}
-
-	public getValueFromApi(widget: WidgetDTO){
-		if(!widget.isValueSet){
-			this.httpService.get(environment.apiEndpoint + widget.widget.url).shareReplay()
-				.subscribe(
-					data => {
-						widget.isValueSet = true;
-						widget.value = data;
-						return data;
-					},
-					error => {
-						return 0;
-					});
-			return 0;
-		}
+	ngAfterViewInit(){
+		this.loadAllWidgetsByUserId(); 
 	}
 
 	public loadAllWidgetsByUserId() {
