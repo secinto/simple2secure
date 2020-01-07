@@ -1,13 +1,12 @@
 package com.simple2secure.portal.providers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.google.common.base.Strings;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.security.PasswordValidator;
@@ -16,8 +15,10 @@ import com.simple2secure.portal.service.MessageByLocaleService;
 import com.simple2secure.portal.utils.DataInitialization;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BaseServiceProvider extends BaseRepositoryProvider {
-	static final Logger log = LoggerFactory.getLogger(BaseServiceProvider.class);
 
 	/*
 	 * Special services
@@ -48,9 +49,15 @@ public class BaseServiceProvider extends BaseRepositoryProvider {
 		log.error("Responding with error for message {}", message);
 
 		ApiError apiError = new ApiError();
-		apiError.setErrorMessage(messageByLocaleService.getMessage(message, locale.getValue()));
+
+		String generatedMessage = messageByLocaleService.getMessage(message, locale.getValue());
+
+		if (Strings.isNullOrEmpty(generatedMessage)) {
+			generatedMessage = message;
+		}
+
+		apiError.setErrorMessage(generatedMessage);
 		apiError.setStatus(HttpStatus.NOT_FOUND);
 		return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
-
 	}
 }

@@ -27,8 +27,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,6 +54,8 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -63,8 +63,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
+@Slf4j
 public class LicenseController extends BaseUtilsProvider {
-	private static Logger log = LoggerFactory.getLogger(LicenseController.class);
 
 	@Value("${license.filepath}")
 	private String licenseFilePath;
@@ -103,10 +103,8 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 * @throws UnsupportedEncodingException
 	 */
-	@ValidRequestMapping(
-			value = "/authenticate",
-			method = ValidRequestMethodType.POST,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@NotSecuredApi
+	@ValidRequestMapping(value = "/authenticate", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> authenticate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
@@ -196,9 +194,7 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(
-			value = "/downloadLicenseForScript",
-			method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/downloadLicenseForScript", method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {

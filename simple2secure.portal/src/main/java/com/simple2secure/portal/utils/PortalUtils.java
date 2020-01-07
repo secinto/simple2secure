@@ -39,13 +39,15 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,6 +62,7 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.controller.WidgetController;
+import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputParamType;
@@ -68,19 +71,18 @@ import com.simple2secure.portal.validation.model.ValidInputUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
 import simple2secure.validator.model.ValidatedInput;
 
 @Component
+@Slf4j
 public class PortalUtils {
-	private static Logger log = LoggerFactory.getLogger(PortalUtils.class);
 
 	@Autowired
 	JavaMailSender javaMailSender;
-
-	static final String CLAIM_POD = "podID";
-	static final String CLAIMS_SUBJECT = "data";
 
 	/**
 	 * This function generates a token(activation, invitation, paswordReset) for each user
@@ -218,8 +220,8 @@ public class PortalUtils {
 	 */
 	public String generatePodToken(String deviceId, String tokenSecret) {
 
-		Claims claims = Jwts.claims().setSubject(CLAIMS_SUBJECT);
-		claims.put(CLAIM_POD, deviceId);
+		Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+		claims.put(StaticConfigItems.CLAIM_POD, deviceId);
 
 		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
 				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
@@ -368,7 +370,7 @@ public class PortalUtils {
 	 * @param m
 	 * @return
 	 */
-	private StringBuilder createMethodUrl(Method m) {
+	private StringBuilder createMethodUrl(Method m, boolean useWildcard) {
 		StringBuilder sb = new StringBuilder();
 		Parameter[] params = m.getParameters();
 		if (params.length > 0) {
@@ -376,7 +378,12 @@ public class PortalUtils {
 				boolean isParamPathVariable = isParamPathVariable(param);
 				if (isParamPathVariable) {
 					try {
-						sb.append(getRequestMethodTag(param));
+						if (useWildcard) {
+							sb.append("/**");
+							break;
+						} else {
+							sb.append(getRequestMethodTag(param));
+						}
 					} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
 							| InvocationTargetException e) {
 						// TODO Auto-generated catch block
@@ -468,7 +475,7 @@ public class PortalUtils {
 	 * @return
 	 */
 	public RequestMappingInfo createRequestMappingInfo(String beanName, Method m, String[] clazz_url) {
-		StringBuilder method_url = createMethodUrl(m);
+		StringBuilder method_url = createMethodUrl(m, false);
 		RequestMethod rm = (RequestMethod) getValueFromAnnotation(m, ValidInputParamType.METHOD);
 		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
 		String[] consumes_value = (String[]) getValueFromAnnotation(m, ValidInputParamType.CONSUMES);
@@ -476,6 +483,13 @@ public class PortalUtils {
 		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
 		log.info("New mapping added ({}): {}", rm, complete_url);
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
+	}
+
+	public String getCompleteUrlApi(Method m, String[] clazz_url) {
+		StringBuilder method_url = createMethodUrl(m, true);
+		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
+		String complete_url = generateUrl(clazz_url, annotated_value, method_url);
+		return complete_url;
 	}
 
 	/**
@@ -502,7 +516,7 @@ public class PortalUtils {
 
 		for (final Method method : allMethods) {
 			if (method.isAnnotationPresent(WidgetFunction.class)) {
-				StringBuilder method_url = createMethodUrl(method);
+				StringBuilder method_url = createMethodUrl(method, false);
 				String annotated_value = (String) getValueFromAnnotation(method, ValidInputParamType.VALUE);
 				String[] clazz_url = { StaticConfigItems.WIDGET_API.replace("/api/", "") };
 				String complete_url = generateUrl(clazz_url, annotated_value, method_url);
@@ -513,4 +527,60 @@ public class PortalUtils {
 		return apis;
 	}
 
+	/**
+	 * This function returns the list of the annotated methods with the NotSecuredApi annotation.
+	 *
+	 * @param context
+	 * @return
+	 */
+	public String[] getListOfNotSecuredApis(ApplicationContext context) {
+		List<String> url_list = new ArrayList<>();
+		for (String beanName : context.getBeanNamesForAnnotation(RestController.class)) {
+			Object bean = context.getBean(beanName);
+			Class<?> clazz = AopUtils.getTargetClass(bean);
+			String[] clazz_url = getClassUrlFromAnnotation(clazz);
+
+			Method[] methods = clazz.getDeclaredMethods();
+
+			for (Method m : methods) {
+				if (m.isAnnotationPresent(NotSecuredApi.class)) {
+
+					String url = getCompleteUrlApi(m, clazz_url);
+					url_list.add(url);
+				}
+			}
+		}
+		url_list.add(StaticConfigItems.LOGIN_API);
+		return listToArray(url_list);
+	}
+
+	/**
+	 * This function converts List to array
+	 *
+	 * @param items
+	 * @return
+	 */
+	public String[] listToArray(List<String> items) {
+		String[] urls = new String[items.size()];
+
+		for (int index = 0; index < items.size(); index++) {
+			urls[index] = items.get(index);
+		}
+
+		return urls;
+	}
+
+	/**
+	 * This function creates an api error object from the provided parameters
+	 *
+	 * @param message
+	 * @param status
+	 * @return
+	 */
+	public ApiError buildApiError(String message, HttpStatus status) {
+		ApiError apiError = new ApiError();
+		apiError.setErrorMessage(message);
+		apiError.setStatus(HttpStatus.UNAUTHORIZED);
+		return apiError;
+	}
 }

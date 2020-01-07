@@ -38,14 +38,18 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputVersion;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SERVICE_API)
+@Slf4j
 public class ServiceController extends BaseUtilsProvider {
 
+	@NotSecuredApi
 	@ValidRequestMapping
 	public ResponseEntity<Service> getServiceVersion(@ServerProvidedValue ValidInputLocale locale) {
 		return new ResponseEntity<>(new Service("simple2secure", loadedConfigItems.getVersion()), HttpStatus.OK);

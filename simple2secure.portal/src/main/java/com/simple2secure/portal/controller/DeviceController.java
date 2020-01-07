@@ -25,8 +25,6 @@ package com.simple2secure.portal.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +55,8 @@ import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputSize;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -64,9 +64,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.DEVICE_API)
+@Slf4j
 public class DeviceController extends BaseUtilsProvider {
-
-	public static final Logger log = LoggerFactory.getLogger(DeviceController.class);
 
 	/**
 	 * This function returns all devices according to the contextId
@@ -286,6 +285,7 @@ public class DeviceController extends BaseUtilsProvider {
 		return (ResponseEntity<CompanyLicensePrivate>) buildResponseEntity("problem_occured_while_updating_device_group", locale);
 	}
 
+	@NotSecuredApi
 	@ValidRequestMapping(
 			value = "/status")
 	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
@@ -294,6 +294,7 @@ public class DeviceController extends BaseUtilsProvider {
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
 	}
 
+	@NotSecuredApi
 	@ValidRequestMapping(
 			value = "/status",
 			method = ValidRequestMethodType.POST)

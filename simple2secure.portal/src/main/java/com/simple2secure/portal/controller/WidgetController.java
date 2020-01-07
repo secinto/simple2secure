@@ -24,8 +24,6 @@ package com.simple2secure.portal.controller;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +49,7 @@ import com.simple2secure.portal.validation.model.ValidInputUser;
 import com.simple2secure.portal.validation.model.ValidInputWidget;
 import com.simple2secure.portal.validation.model.ValidInputWidgetProp;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
@@ -59,9 +58,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.WIDGET_API)
+@Slf4j
 public class WidgetController extends BaseUtilsProvider {
-
-	static final Logger log = LoggerFactory.getLogger(WidgetController.class);
 
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")

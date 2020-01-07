@@ -46,6 +46,10 @@ public class ProbeWorkerThread extends Thread {
 	private QueryScheduler queryScheduler;
 	private NetworkScheduler networkScheduler;
 
+	private boolean running = false;
+
+	private long interval = TimeUnit.MINUTES.toMillis(1);
+
 	public ProbeWorkerThread() {
 		configScheduler = new ConfigScheduler();
 		reportScheduler = new ReportScheduler();
@@ -60,11 +64,79 @@ public class ProbeWorkerThread extends Thread {
 	public void run() {
 		log.debug("ProbeWorkerThread running");
 		log.debug("Starting network monitor");
+		time.schedule(networkScheduler, 0, interval);
 		log.debug("Scheduling the different tasks");
-		time.schedule(networkScheduler, 0, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(configScheduler, 0, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(queryScheduler, 100, TimeUnit.MINUTES.toMillis(1));
-		time.schedule(reportScheduler, 500, TimeUnit.MINUTES.toMillis(1));
+		time.schedule(configScheduler, 0, interval);
+		time.schedule(queryScheduler, 100, interval);
+		time.schedule(reportScheduler, 500, interval);
+
+		running = true;
+
+		while (running) {
+			long currentTime = System.currentTimeMillis();
+			/*
+			 * Check if network scheduler is OK, if not restart it.
+			 */
+			if (networkScheduler != null) {
+				if (networkScheduler.scheduledExecutionTime() < currentTime - interval) {
+					networkScheduler.cancel();
+					time.schedule(networkScheduler, 0, interval);
+				}
+			} else {
+				if (networkMonitor == null) {
+					networkMonitor = NetworkMonitor.startMonitor();
+				}
+				networkScheduler = new NetworkScheduler(networkMonitor);
+				time.schedule(networkScheduler, 0, interval);
+			}
+
+			/*
+			 * Check if config scheduler is OK, if not restart it.
+			 */
+			if (configScheduler != null) {
+				if (configScheduler.scheduledExecutionTime() < currentTime - interval) {
+					configScheduler.cancel();
+					time.schedule(configScheduler, 0, interval);
+				}
+			} else {
+				configScheduler = new ConfigScheduler();
+				time.schedule(configScheduler, 0, interval);
+			}
+
+			/*
+			 * Check if query scheduler is OK, if not restart it.
+			 */
+			if (queryScheduler != null) {
+				if (queryScheduler.scheduledExecutionTime() < currentTime - interval) {
+					queryScheduler.cancel();
+					time.schedule(queryScheduler, 200, interval);
+				}
+			} else {
+				queryScheduler = new QueryScheduler();
+				time.schedule(queryScheduler, 200, interval);
+			}
+			/*
+			 * Check if report scheduler is OK, if not restart it.
+			 */
+			if (reportScheduler != null) {
+				if (reportScheduler.scheduledExecutionTime() < currentTime - interval) {
+					reportScheduler.cancel();
+					time.schedule(reportScheduler, 500, interval);
+				}
+			} else {
+				reportScheduler = new ReportScheduler();
+				time.schedule(reportScheduler, 500, interval);
+			}
+
+			try {
+				TimeUnit.MINUTES.sleep(1);
+			} catch (InterruptedException ie) {
+				log.error("Letting probe worker thread sleep failed. Reason {}", ie.getMessage());
+				running = false;
+			}
+
+		}
+
 	}
 
 	public ConfigScheduler getConfigScheduler() {
@@ -86,11 +158,20 @@ public class ProbeWorkerThread extends Thread {
 	public boolean isRunning() {
 		if (networkMonitor != null && networkScheduler != null && configScheduler != null && queryScheduler != null
 				&& reportScheduler != null) {
-			if (networkMonitor.isRunning()) {
+			if (networkMonitor.isRunning() && running) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public void stopWorkerThread() {
+		running = false;
+		networkMonitor.stopMonitor();
+		networkScheduler.cancel();
+		configScheduler.cancel();
+		queryScheduler.cancel();
+		reportScheduler.cancel();
 	}
 
 }

@@ -22,8 +22,6 @@
 
 package com.simple2secure.portal.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
@@ -31,10 +29,11 @@ import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
-@Component
-public class NotificationUtils extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	private static Logger log = LoggerFactory.getLogger(NotificationUtils.class);
+@Component
+@Slf4j
+public class NotificationUtils extends BaseServiceProvider {
 
 	public void addNewNotificationPortal(String data, String contextId) {
 		Notification notification = new Notification(data, false, contextId, System.currentTimeMillis());

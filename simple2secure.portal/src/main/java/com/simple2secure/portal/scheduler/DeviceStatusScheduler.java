@@ -23,8 +23,6 @@ package com.simple2secure.portal.scheduler;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -34,7 +32,10 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.utils.NotificationUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class DeviceStatusScheduler {
 
 	@Autowired
@@ -43,8 +44,6 @@ public class DeviceStatusScheduler {
 	@Autowired
 	NotificationUtils notificationUtils;
 
-	private static final Logger log = LoggerFactory.getLogger(DeviceStatusScheduler.class);
-
 	/**
 	 * This function checks if there are some tests which need to be executed and adds those test to the TestRun table in the database
 	 *
@@ -52,8 +51,7 @@ public class DeviceStatusScheduler {
 	 *
 	 */
 
-	@Scheduled(
-			fixedRate = 50000)
+	@Scheduled(fixedRate = 50000)
 	public void checkDevices() throws ItemNotFoundRepositoryException {
 
 		List<CompanyLicensePrivate> licensesOnline = licenseRepository.findByDeviceStatusOnline();

@@ -1,7 +1,5 @@
 package com.simple2secure.portal.providers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.simple2secure.portal.utils.ContextUtils;
@@ -20,9 +18,10 @@ import com.simple2secure.portal.utils.TestUtils;
 import com.simple2secure.portal.utils.UserUtils;
 import com.simple2secure.portal.utils.WidgetUtils;
 
-public class BaseUtilsProvider extends BaseServiceProvider {
+import lombok.extern.slf4j.Slf4j;
 
-	static final Logger log = LoggerFactory.getLogger(BaseUtilsProvider.class);
+@Slf4j
+public class BaseUtilsProvider extends BaseServiceProvider {
 
 	/*
 	 * Utils

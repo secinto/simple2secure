@@ -41,6 +41,9 @@ import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BaseRepositoryProvider {
 	/*
 	 * Repositories

@@ -24,8 +24,6 @@ package com.simple2secure.portal.controller;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,6 +50,7 @@ import com.simple2secure.portal.validation.model.ValidInputGroup;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 
+import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
@@ -59,9 +58,8 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.GROUP_API)
+@Slf4j
 public class GroupController extends BaseUtilsProvider {
-
-	static final Logger log = LoggerFactory.getLogger(GroupController.class);
 
 	/**
 	 * This function add new group to the group repository

@@ -44,6 +44,8 @@ import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Provides generic methods for Mongo DB repositories. Call _init() from the concrete repository after collectionName, collectionIndexName
  * and objectIdName have been assigned.
@@ -54,6 +56,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
  *          the concrete database object which is managed by the repository. Has to be derived from BasicDBObject
  */
 @Repository
+@Slf4j
 public class MongoRepository<T extends GenericDBObject> {
 
 	static final Logger log = LoggerFactory.getLogger(MongoRepository.class);

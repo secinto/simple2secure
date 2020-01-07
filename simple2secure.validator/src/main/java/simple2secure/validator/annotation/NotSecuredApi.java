@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 
-public @interface WidgetFunction {
-	String description() default "";
+public @interface NotSecuredApi {
+	
+	String value() default "";
+
 }

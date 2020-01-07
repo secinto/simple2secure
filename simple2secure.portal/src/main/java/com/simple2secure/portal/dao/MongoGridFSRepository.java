@@ -36,7 +36,10 @@ import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Repository
+@Slf4j
 public class MongoGridFSRepository {
 
 	@Autowired

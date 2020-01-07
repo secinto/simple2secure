@@ -24,8 +24,6 @@ package com.simple2secure.portal.controller;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,15 +35,16 @@ import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
 @SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.DOWNLOAD_API)
+@Slf4j
 public class DownloadController extends BaseUtilsProvider {
-
-	private static Logger log = LoggerFactory.getLogger(DownloadController.class);
 
 	/**
 	 * This function donwloads the probe from the
@@ -55,6 +54,7 @@ public class DownloadController extends BaseUtilsProvider {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
+	@NotSecuredApi
 	@ValidRequestMapping
 	public ResponseEntity<byte[]> downloadProbe(@ServerProvidedValue ValidInputLocale locale) throws IOException, URISyntaxException {
 

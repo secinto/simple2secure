@@ -31,8 +31,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -51,11 +49,12 @@ import com.simple2secure.api.model.UserInvitation;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @Component
+@Slf4j
 public class MailUtils extends BaseServiceProvider {
-
-	private static Logger log = LoggerFactory.getLogger(MailUtils.class);
 
 	@Value("${mail.username}")
 	private String mailUser;

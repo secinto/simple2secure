@@ -24,8 +24,6 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -44,11 +42,12 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SuppressWarnings("unchecked")
 @Component
+@Slf4j
 public class GroupUtils extends BaseServiceProvider {
-
-	private static Logger log = LoggerFactory.getLogger(GroupUtils.class);
 
 	/**
 	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
