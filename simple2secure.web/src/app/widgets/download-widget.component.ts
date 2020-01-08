@@ -12,7 +12,7 @@ export class DownloadWidgetComponent extends BaseWidget{
     @Input() bgClass: string;
     @Input() icon: string;
     @Input() count: number;
-    @Input() label: string;
+    @Input() name: string;
     @Input() data: any[];
     @Input() propertiesId: string;
     @Output() event: EventEmitter<any> = new EventEmitter();

@@ -14,21 +14,19 @@ public class Widget extends GenericDBObject {
 	private String tag;
 	private String bgClass;
 	private String icon;
-	private String label;
 	private String url;
 
 	public Widget() {
 
 	}
 
-	public Widget(String name, String description, String tag, String bgClass, String icon, String label, String url) {
+	public Widget(String name, String description, String tag, String bgClass, String icon, String url) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.tag = tag;
 		this.bgClass = bgClass;
 		this.icon = icon;
-		this.label = label;
 		this.url = url;
 	}
 
@@ -70,14 +68,6 @@ public class Widget extends GenericDBObject {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
 	}
 
 	public String getUrl() {

@@ -28,6 +28,5 @@ export class Widget extends Base {
 	tag: string;
 	bgClass: string;
 	icon: string;
-	label: string;
 	url: string;
 }

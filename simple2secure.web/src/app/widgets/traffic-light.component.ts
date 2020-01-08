@@ -20,7 +20,6 @@ export class TrafficLightComponent extends BaseWidget{
     @Input() tag: string;
     @Input() description: string;
     @Input() bgClass: string;
-    @Input() label: string;
     @Input() data: any[];
     @Input() propertiesId: string;
     @Output() event: EventEmitter<any> = new EventEmitter();

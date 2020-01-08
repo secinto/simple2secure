@@ -286,17 +286,6 @@
                                     </td>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.label' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].label"
-                                                   name="label{{in}}">
-                                        </mat-form-field>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
                                                         name="url{{in}}" required>
                                                 <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
