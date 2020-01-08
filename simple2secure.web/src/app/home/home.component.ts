@@ -31,6 +31,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {environment} from '../../environments/environment';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -41,12 +42,15 @@ import {environment} from '../../environments/environment';
 export class HomeComponent{
 	widgets: WidgetDTO[] = [];
 	widgetDTO: WidgetDTO;
+	location: any;
 	@ViewChild('grid') grid: NgxWidgetGridComponent;
 	constructor(private dialog: MatDialog,
 				private alertService: AlertService,
 				private translate: TranslateService,
 				private dataService: DataService,
-				private httpService: HttpService) {
+				private httpService: HttpService,
+				private route:ActivatedRoute) {
+		this.location = this.route.component["name"];
 	}
 
 	ngAfterViewInit(){
@@ -54,7 +58,7 @@ export class HomeComponent{
 	}
 
 	public loadAllWidgetsByUserId() {
-		this.httpService.get(environment.apiEndpoint + 'widget/get')
+		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.location)
 			.subscribe(
 				data => {
 					this.widgets = data;
@@ -114,6 +118,7 @@ export class HomeComponent{
 	}
 
 	addWidgetsToTheList(){
+		console.log()
 		if (this.dataService.getSelectedWidget() != null) {
 			const position = this.grid.getNextPosition();
 			if (position) {
@@ -124,6 +129,7 @@ export class HomeComponent{
 				this.widgetDTO.widgetProperties.top = position.top;
 				this.widgetDTO.widgetProperties.width = 1;
 				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
+				this.widgetDTO.widgetProperties.location = this.location;
 
 				this.widgets.push(this.widgetDTO);
 			}

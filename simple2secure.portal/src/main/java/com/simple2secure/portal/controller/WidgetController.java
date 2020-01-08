@@ -46,6 +46,7 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 import com.simple2secure.portal.validation.model.ValidInputWidget;
+import com.simple2secure.portal.validation.model.ValidInputWidgetLocation;
 import com.simple2secure.portal.validation.model.ValidInputWidgetProp;
 
 import lombok.extern.slf4j.Slf4j;
@@ -126,10 +127,11 @@ public class WidgetController extends BaseUtilsProvider {
 	@ValidRequestMapping(value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputWidgetLocation widgetLocation,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
-			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextId(userId.getValue(), contextId.getValue());
+			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextIdAndLocation(userId.getValue(), contextId.getValue(),
+					widgetLocation.getValue());
 			return new ResponseEntity<>(widgets, HttpStatus.OK);
 		}
 		log.error("Problem occured while retrieving widgets");

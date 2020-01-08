@@ -827,6 +827,20 @@ $color3: #00FF00;//green
   }
 }
 
+.light-item {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  z-index: 10;
+  margin: 5px 0;
+  &:last-child{
+    margin-bottom: 0;
+  }
+  &:first-child{
+    margin-top: 0;
+  }
+}
+
 .red {
   background-color: darken($color1,15%);
   &.checked {

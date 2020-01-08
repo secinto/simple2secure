@@ -7,6 +7,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class WidgetPropertiesRepository extends MongoRepository<WidgetProperties> {
 
-	public abstract List<WidgetProperties> getPropertiesByUserIdAndContextId(String userId, String contextId);
+	public abstract List<WidgetProperties> getPropertiesByUserIdAndContextIdAndLocation(String userId, String contextId, String location);
 
 }

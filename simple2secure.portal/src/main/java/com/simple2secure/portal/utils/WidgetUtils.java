@@ -55,9 +55,10 @@ public class WidgetUtils extends BaseServiceProvider {
 	@Autowired
 	PortalUtils portalUtils;
 
-	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
+	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, String contextId, String location) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
-		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextId(userId, contextId);
+		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextIdAndLocation(userId, contextId,
+				location);
 		if (properties != null) {
 			for (WidgetProperties property : properties) {
 				if (property != null) {

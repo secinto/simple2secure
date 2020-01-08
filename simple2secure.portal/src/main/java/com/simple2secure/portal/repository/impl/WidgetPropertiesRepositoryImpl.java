@@ -23,8 +23,8 @@ public class WidgetPropertiesRepositoryImpl extends WidgetPropertiesRepository {
 	}
 
 	@Override
-	public List<WidgetProperties> getPropertiesByUserIdAndContextId(String userId, String contextId) {
-		Query query = new Query(Criteria.where("userId").is(userId).and("contextId").is(contextId));
+	public List<WidgetProperties> getPropertiesByUserIdAndContextIdAndLocation(String userId, String contextId, String location) {
+		Query query = new Query(Criteria.where("userId").is(userId).and("contextId").is(contextId).and("location").is(location));
 
 		List<WidgetProperties> widgetProperties = mongoTemplate.find(query, className, collectionName);
 
