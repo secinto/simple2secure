@@ -30,6 +30,8 @@ import {Widget} from '../_models/widget';
 import {MatDialogRef} from '@angular/material';
 import {StatItemComponent} from './stat-item.component';
 import {NotificationCardItem} from "./notification-card-item.component";
+import {TrafficLightItemComponent} from "./traffic-light-item.component";
+import {DownloadWidgetItemComponent} from "./download-item.component";
 import {Notification} from "../_models";
 
 @Component({
@@ -111,6 +113,28 @@ export class WidgetStoreComponent {
 				(<NotificationCardItem>component.instance).bgClass = widget.bgClass;
 				(<NotificationCardItem>component.instance).label = widget.label;
 				(<NotificationCardItem>component.instance).data = notifications;
+			}
+			else if (widget.tag == 'app-traffic-light'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(TrafficLightItemComponent);
+				const component = this.container.createComponent(componentFactory);
+
+				(<TrafficLightItemComponent>component.instance).id = widget.id;
+				(<TrafficLightItemComponent>component.instance).name = widget.name;
+				(<TrafficLightItemComponent>component.instance).tag = widget.tag;
+				(<TrafficLightItemComponent>component.instance).description = widget.description;
+				(<TrafficLightItemComponent>component.instance).bgClass = widget.bgClass;
+				(<TrafficLightItemComponent>component.instance).label = widget.label;
+			}
+			else if (widget.tag == 'app-download'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(DownloadWidgetItemComponent);
+				const component = this.container.createComponent(componentFactory);
+
+				(<DownloadWidgetItemComponent>component.instance).id = widget.id;
+				(<DownloadWidgetItemComponent>component.instance).name = widget.name;
+				(<DownloadWidgetItemComponent>component.instance).tag = widget.tag;
+				(<DownloadWidgetItemComponent>component.instance).description = widget.description;
+				(<DownloadWidgetItemComponent>component.instance).bgClass = widget.bgClass;
+				(<DownloadWidgetItemComponent>component.instance).label = widget.label;
 			}
 		}
 	}

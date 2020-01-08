@@ -1,8 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {WidgetStoreComponent} from './widgetStore.component';
-import {Widget} from '../_models/widget';
-import {DataService} from '../_services';
 import {BaseWidgetItem} from "./baseWidgetItem.component";
+import {Component} from "@angular/core";
 
 @Component({
     selector: 'app-stat-item',

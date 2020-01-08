@@ -1,0 +1,22 @@
+<div class="stat-item-component">
+    <button class="add-widget-button mat-green-button" color="primary" mat-fab (click)="addWidget()" [mat-dialog-close]="true" cdkFocusInitia><mat-icon>add</mat-icon></button>
+    <div class="card text-white bg-{{bgClass}}">
+        <div class="card-header">
+            <div class="row">
+                <div class="col col-xs-6">
+                    <mat-select classs="widget-select-box" placeholder="{{ 'menu.group' | translate }}">
+                        <mat-option>
+                            Test
+                        </mat-option>
+                    </mat-select>
+                </div>
+                <div class="col col-xs-9 text-right">
+                    <span class="float-right"><button class="widget-download-btn" color="info" mat-button><mat-icon>cloud_download</mat-icon></button></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <span class="float-right"><b>{{label}}</b></span>
+        </div>
+    </div>
+</div>

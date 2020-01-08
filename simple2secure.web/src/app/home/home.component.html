@@ -6,11 +6,15 @@
                     [position]="getRectangle(widget)"
                     [movable]="true"
                     [resizable]="true">
-                    <span *ngIf="!widget.isValueSet">{{getValueFromApi(widget)}} </span>
             <app-stat *ngIf="widget.widget.tag === 'app-stat'" [bgClass]="widget.widget.bgClass"
-                      [icon]="widget.widget.icon" [count]="widget.value" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id"></app-stat>
+                      [icon]="widget.widget.icon" [count]="widget.value" [label]="widget.widget.label" [propertiesId]="widget.widgetProperties.id">
+            </app-stat>
             <app-notification *ngIf="widget.widget.tag === 'app-notification'" [bgClass]="widget.widget.bgClass"
                       [label]="widget.widget.label" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-notification>
+            <app-traffic-light *ngIf="widget.widget.tag === 'app-traffic-light'" [bgClass]="widget.widget.bgClass"
+                      [label]="widget.widget.label" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-traffic-light>
+            <app-download *ngIf="widget.widget.tag === 'app-download'" [bgClass]="widget.widget.bgClass"
+                      [label]="widget.widget.label" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-download>
         </ngx-widget>
     </ngx-widget-grid>
 </div>
