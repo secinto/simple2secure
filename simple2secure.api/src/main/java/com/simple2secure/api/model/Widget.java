@@ -14,20 +14,20 @@ public class Widget extends GenericDBObject {
 	private String tag;
 	private String bgClass;
 	private String icon;
-	private String url;
+	private String api;
 
 	public Widget() {
 
 	}
 
-	public Widget(String name, String description, String tag, String bgClass, String icon, String url) {
+	public Widget(String name, String description, String tag, String bgClass, String icon, String api) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.tag = tag;
 		this.bgClass = bgClass;
 		this.icon = icon;
-		this.url = url;
+		this.api = api;
 	}
 
 	public String getName() {
@@ -70,11 +70,11 @@ public class Widget extends GenericDBObject {
 		this.icon = icon;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getApi() {
+		return api;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setApi(String api) {
+		this.api = api;
 	}
 }

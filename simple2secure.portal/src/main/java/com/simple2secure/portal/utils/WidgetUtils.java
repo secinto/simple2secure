@@ -24,6 +24,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,7 +62,7 @@ public class WidgetUtils extends BaseServiceProvider {
 			for (WidgetProperties property : properties) {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
-					Object value = getValueFromApi(widget.getUrl(), contextId);
+					Object value = getWidgetValue(widget.getApi(), contextId);
 					widgetDTOList.add(new WidgetDTO(widget, property, value));
 					log.info("Adding new widget {} to the list", widget.getName());
 				}
@@ -73,20 +74,20 @@ public class WidgetUtils extends BaseServiceProvider {
 	/**
 	 * This is the temporary solution, because the old one has been making around 30 request pro widget from the client.
 	 *
-	 * @param url
+	 * @param api
 	 * @param contextId
 	 * @return
 	 */
-	public Object getValueFromApi(String url, String contextId) {
+	public Object getWidgetValue(String api, String contextId) {
 		Context context = contextRepository.find(contextId);
 		if (context != null) {
-			if (url.contains("devActive")) {
+			if (api.contains(StaticConfigItems.WIDGET_API_ACTIVE_DEVICES)) {
 				return deviceUtils.getAllDevicesFromCurrentContext(context, false).size();
-			} else if (url.contains("executedQueries")) {
+			} else if (api.contains(StaticConfigItems.WIDGET_API_EXEC_QUERIES)) {
 				return reportUtils.countExecutedQueries(context);
-			} else if (url.contains("lastNotifications")) {
+			} else if (api.contains(StaticConfigItems.WIDGET_API_LAST_NOTIFICATIONS)) {
 				return notificationRepository.getNotificationsWithPagination(contextId, 0, 3);
-			} else if (url.contains("getGroups")) {
+			} else if (api.contains(StaticConfigItems.WIDGET_API_GROUPS)) {
 				return groupUtils.getAllGroupsByContextId(context);
 			}
 		}
@@ -99,10 +100,12 @@ public class WidgetUtils extends BaseServiceProvider {
 	 * @return
 	 */
 	public WidgetConfig getWidgetConfig() {
-		List<String> widgetApis = portalUtils.getWidgetApis();
-		List<String> widgetTags = Arrays.asList(StaticConfigItems.WIDGET_TAGS);
+		Map<String, String> widgetApis = portalUtils.getWidgetApis();
+		Map<String, String> widgetTags = StaticConfigItems.WIDGET_TAGS_DESC;
+		List<String> widgetIcons = Arrays.asList(StaticConfigItems.WIDGET_ICONS);
+		List<String> widgetColors = Arrays.asList(StaticConfigItems.WIDGET_COLORS);
 
-		WidgetConfig widgetConfig = new WidgetConfig(widgetApis, widgetTags);
+		WidgetConfig widgetConfig = new WidgetConfig(widgetApis, widgetTags, widgetIcons, widgetColors);
 		return widgetConfig;
 	}
 

@@ -1,4 +1,6 @@
 export class WidgetConfig {
-	widgetApis: string[];
-	widgetTags: string[];
+	widgetApis: Map<string, string>;
+	widgetTags: Map<string, string>;
+	widgetIcons: string[];
+	widgetColors: string[];
 }
