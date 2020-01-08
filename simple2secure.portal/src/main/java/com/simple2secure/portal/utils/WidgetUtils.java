@@ -22,6 +22,7 @@
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,9 @@ import org.springframework.stereotype.Component;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.WidgetConfig;
 import com.simple2secure.api.model.WidgetProperties;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,9 @@ public class WidgetUtils extends BaseServiceProvider {
 
 	@Autowired
 	GroupUtils groupUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
 
 	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
@@ -85,6 +91,19 @@ public class WidgetUtils extends BaseServiceProvider {
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * This function returns a widget config which will be used in setting to create a new widget
+	 *
+	 * @return
+	 */
+	public WidgetConfig getWidgetConfig() {
+		List<String> widgetApis = portalUtils.getWidgetApis();
+		List<String> widgetTags = Arrays.asList(StaticConfigItems.WIDGET_TAGS);
+
+		WidgetConfig widgetConfig = new WidgetConfig(widgetApis, widgetTags);
+		return widgetConfig;
 	}
 
 }

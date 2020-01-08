@@ -65,6 +65,8 @@ public class StaticConfigItems {
 	public static final String[] SECINTO_EMAIL_LIST = { "s2s.test@secinto.at" };
 	public static final String STANDARD_GROUP_NAME = "Standard";
 	public static final String DEFAULT_LICENSE_PLAN = "Default";
+	
+	public static final String[] WIDGET_TAGS = {"app-traffic-light", "app-download", "app-stat", "app-notification"};
 
 	public static final String PROFILE_DEPLOYMENT = "deployment";
 	public static final String PROFILE_PRODUCTION = "prod";

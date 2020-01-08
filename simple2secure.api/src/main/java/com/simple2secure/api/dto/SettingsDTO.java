@@ -28,6 +28,7 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.WidgetConfig;
 
 public class SettingsDTO {
 
@@ -39,15 +40,15 @@ public class SettingsDTO {
 
 	private List<Widget> widgetList;
 
-	private List<String> widgetApis;
+	private WidgetConfig widgetConfig;
 
 	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList, List<Widget> widgetList,
-			List<String> widgetApis) {
+			WidgetConfig widgetConfig) {
 		this.settings = settings;
 		this.licensePlan = licensePlan;
 		this.testMacroList = testMacroList;
 		this.widgetList = widgetList;
-		this.widgetApis = widgetApis;
+		this.widgetConfig = widgetConfig;
 	}
 
 	public Settings getSettings() {
@@ -82,11 +83,11 @@ public class SettingsDTO {
 		this.widgetList = widgetList;
 	}
 
-	public List<String> getWidgetApis() {
-		return widgetApis;
+	public WidgetConfig getWidgetConfig() {
+		return widgetConfig;
 	}
 
-	public void setWidgetApis(List<String> widgetApis) {
-		this.widgetApis = widgetApis;
+	public void setWidgetConfig(WidgetConfig widgetConfig) {
+		this.widgetConfig = widgetConfig;
 	}
 }

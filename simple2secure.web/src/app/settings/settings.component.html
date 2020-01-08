@@ -256,10 +256,12 @@
                                 <tr>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.tag' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].tag"
-                                                   name="tag{{in}}">
+                                            <mat-select placeholder="{{ 'widget.tag' | translate }}" [(ngModel)]="settingsObj.widgetList[in].tag"
+                                                        name="tag{{in}}" required>
+                                                <mat-option *ngFor="let tag of settingsObj.widgetConfig.widgetTags" [value]="tag">
+                                                    {{tag}}
+                                                </mat-option> 
+                                            </mat-select>
                                         </mat-form-field>
                                     </td>
                                     <td>
@@ -288,7 +290,7 @@
                                         <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
                                                         name="url{{in}}" required>
-                                                <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
+                                                <mat-option *ngFor="let url of settingsObj.widgetConfig.widgetApis" [value]="url">
                                                     {{url}}
                                                 </mat-option>
                                             </mat-select>
