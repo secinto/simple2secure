@@ -45,6 +45,9 @@ public class WidgetUtils extends BaseServiceProvider {
 	@Autowired
 	ReportUtils reportUtils;
 
+	@Autowired
+	GroupUtils groupUtils;
+
 	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
 		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextId(userId, contextId);
@@ -63,7 +66,7 @@ public class WidgetUtils extends BaseServiceProvider {
 
 	/**
 	 * This is the temporary solution, because the old one has been making around 30 request pro widget from the client.
-	 * 
+	 *
 	 * @param url
 	 * @param contextId
 	 * @return
@@ -71,12 +74,14 @@ public class WidgetUtils extends BaseServiceProvider {
 	public Object getValueFromApi(String url, String contextId) {
 		Context context = contextRepository.find(contextId);
 		if (context != null) {
-			if (url.contains("/devActive")) {
+			if (url.contains("devActive")) {
 				return deviceUtils.getAllDevicesFromCurrentContext(context, false).size();
-			} else if (url.contains("/executedQueries")) {
+			} else if (url.contains("executedQueries")) {
 				return reportUtils.countExecutedQueries(context);
-			} else if (url.contains("/lastNotifications")) {
+			} else if (url.contains("lastNotifications")) {
 				return notificationRepository.getNotificationsWithPagination(contextId, 0, 3);
+			} else if (url.contains("getGroups")) {
+				return groupUtils.getAllGroupsByContextId(context);
 			}
 		}
 		return "";

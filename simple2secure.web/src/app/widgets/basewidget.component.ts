@@ -10,13 +10,13 @@ export class BaseWidget{
 
     loading = false;
 
-    constructor(private httpService: HttpService,
-                private alertService: AlertService,
-                private translate: TranslateService,
-                private location: Location,
-                private router: Router,
-                private route: ActivatedRoute,
-                private homeComponent: HomeComponent ) {}
+    constructor(public httpService: HttpService,
+                public alertService: AlertService,
+                public translate: TranslateService,
+                public location: Location,
+                public router: Router,
+                public route: ActivatedRoute,
+                public homeComponent: HomeComponent ) {}
 
     deleteWidgetProperty(widgetPropId: string) {
         this.loading = true;
@@ -35,9 +35,5 @@ export class BaseWidget{
                 }
                 this.loading = false;
             });
-    }
-
-    downloadLicense(){
-        console.log("download license");
     }
 }

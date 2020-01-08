@@ -201,4 +201,10 @@ public class WidgetController extends BaseUtilsProvider {
 		return ((ResponseEntity<List<Notification>>) buildResponseEntity("problem_occured_while_retrieving_widgets", locale));
 	}
 
+	@WidgetFunction
+	@ValidRequestMapping(value = "/getGroups")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
+	public void getGroups() {
+	}
+
 }

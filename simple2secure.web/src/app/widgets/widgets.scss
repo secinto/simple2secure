@@ -788,6 +788,10 @@ $font-weight-bold: 700 !default;
   margin-right: -120%;
 }
 
+.widget-select-box{
+  z-index: 22;
+}
+
 //write color in hex
 //traffic-light color
 $whole: #333;
