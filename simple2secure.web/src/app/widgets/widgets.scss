@@ -790,6 +790,7 @@ $font-weight-bold: 700 !default;
 
 .widget-select-box{
   z-index: 22;
+  text-align: center;
 }
 
 //write color in hex
@@ -799,8 +800,6 @@ $whole: #333;
 $color1: #FF0000;//red
 $color2: #FFFF00;//yellow
 $color3: #00FF00;//green
-
-
 
 #box {
   display: flex;

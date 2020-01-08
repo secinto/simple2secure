@@ -534,3 +534,11 @@ action-icon{
     cursor: pointer;
     color: #A7BD26 !important;
 }
+
+.wg-resize-diag{
+    border-style: none !important;
+}
+
+.wg-resize-axis {
+    background-color: transparent !important;
+}
