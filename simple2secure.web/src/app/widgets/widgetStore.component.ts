@@ -99,7 +99,6 @@ export class WidgetStoreComponent {
 				(<StatItemComponent>component.instance).bgClass = widget.bgClass;
 				(<StatItemComponent>component.instance).icon = widget.icon;
 				(<StatItemComponent>component.instance).count = 10;
-				(<StatItemComponent>component.instance).label = widget.label;
 			}
 			else if (widget.tag == 'app-notification'){
 				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(NotificationCardItem);
@@ -111,7 +110,6 @@ export class WidgetStoreComponent {
 				(<NotificationCardItem>component.instance).tag = widget.tag;
 				(<NotificationCardItem>component.instance).description = widget.description;
 				(<NotificationCardItem>component.instance).bgClass = widget.bgClass;
-				(<NotificationCardItem>component.instance).label = widget.label;
 				(<NotificationCardItem>component.instance).data = notifications;
 			}
 			else if (widget.tag == 'app-traffic-light'){
@@ -123,7 +121,6 @@ export class WidgetStoreComponent {
 				(<TrafficLightItemComponent>component.instance).tag = widget.tag;
 				(<TrafficLightItemComponent>component.instance).description = widget.description;
 				(<TrafficLightItemComponent>component.instance).bgClass = widget.bgClass;
-				(<TrafficLightItemComponent>component.instance).label = widget.label;
 			}
 			else if (widget.tag == 'app-download'){
 				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(DownloadWidgetItemComponent);
@@ -134,7 +131,6 @@ export class WidgetStoreComponent {
 				(<DownloadWidgetItemComponent>component.instance).tag = widget.tag;
 				(<DownloadWidgetItemComponent>component.instance).description = widget.description;
 				(<DownloadWidgetItemComponent>component.instance).bgClass = widget.bgClass;
-				(<DownloadWidgetItemComponent>component.instance).label = widget.label;
 			}
 		}
 	}

@@ -37,7 +37,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
-import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -47,6 +46,7 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 import com.simple2secure.portal.validation.model.ValidInputWidget;
+import com.simple2secure.portal.validation.model.ValidInputWidgetLocation;
 import com.simple2secure.portal.validation.model.ValidInputWidgetProp;
 
 import lombok.extern.slf4j.Slf4j;
@@ -127,10 +127,11 @@ public class WidgetController extends BaseUtilsProvider {
 	@ValidRequestMapping(value = "/get")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<List<WidgetDTO>> getWidgetDTOByUserId(@ServerProvidedValue ValidInputUser userId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
+			@ServerProvidedValue ValidInputContext contextId, @PathVariable ValidInputWidgetLocation widgetLocation,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 		if (!Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
-			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextId(userId.getValue(), contextId.getValue());
+			List<WidgetDTO> widgets = widgetUtils.getWidgetsByUserAndContextIdAndLocation(userId.getValue(), contextId.getValue(),
+					widgetLocation.getValue());
 			return new ResponseEntity<>(widgets, HttpStatus.OK);
 		}
 		log.error("Problem occured while retrieving widgets");
@@ -153,7 +154,6 @@ public class WidgetController extends BaseUtilsProvider {
 		return ((ResponseEntity<WidgetProperties>) buildResponseEntity("problem_occured_while_deleting_widget", locale));
 	}
 
-	@WidgetFunction
 	@ValidRequestMapping(value = "/devActive")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Integer> countActiveDevices(@ServerProvidedValue ValidInputContext contextId,
@@ -169,36 +169,15 @@ public class WidgetController extends BaseUtilsProvider {
 		return ((ResponseEntity<Integer>) buildResponseEntity("problem_occured_while_retrieving_widgets", locale));
 	}
 
-	@WidgetFunction
-	@ValidRequestMapping(value = "/executedQueries")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<Integer> countExecutedQueries(@ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(contextId.getValue())) {
-			Context context = contextRepository.find(contextId.getValue());
-			if (context != null) {
-				int size = reportUtils.countExecutedQueries(context);
-				return new ResponseEntity<>(size, HttpStatus.OK);
-			}
-		}
-		log.error("Problem occured while retrieving widgets");
-		return ((ResponseEntity<Integer>) buildResponseEntity("problem_occured_while_retrieving_widgets", locale));
-	}
-
-	@WidgetFunction
-	@ValidRequestMapping(value = "/lastNotifications")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<List<Notification>> getLatestNotifications(@ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(contextId.getValue())) {
-			Context context = contextRepository.find(contextId.getValue());
-			if (context != null) {
-				List<Notification> notifications = notificationRepository.getNotificationsWithPagination(contextId.getValue(), 0, 3);
-				return new ResponseEntity<>(notifications, HttpStatus.OK);
-			}
-		}
-		log.error("Problem occured while retrieving widgets");
-		return ((ResponseEntity<List<Notification>>) buildResponseEntity("problem_occured_while_retrieving_widgets", locale));
+	/**
+	 * In this function we have to define an unique name and description for each necessary widget api call. The implementation is in
+	 * WidgetUtils.getValueFromApi function
+	 */
+	@WidgetFunction(name = StaticConfigItems.WIDGET_API_GROUPS, description = "This function returns the groups for license download")
+	@WidgetFunction(name = StaticConfigItems.WIDGET_API_LAST_NOTIFICATIONS, description = "This function returns the last 3 notifications")
+	@WidgetFunction(name = StaticConfigItems.WIDGET_API_EXEC_QUERIES, description = "This function returns the count of executed queries")
+	@WidgetFunction(name = StaticConfigItems.WIDGET_API_ACTIVE_DEVICES, description = "This function returns the count of the active devices")
+	public void defineUniqueWidgetApi() {
 	}
 
 }

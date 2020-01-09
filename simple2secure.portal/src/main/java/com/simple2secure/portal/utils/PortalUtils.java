@@ -34,7 +34,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -75,6 +77,7 @@ import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.annotation.WidgetFunction;
+import simple2secure.validator.annotation.WidgetFunctions;
 import simple2secure.validator.model.ValidatedInput;
 
 @Component
@@ -510,17 +513,22 @@ public class PortalUtils {
 	 *
 	 * @return
 	 */
-	public List<String> getWidgetApis() {
-		List<String> apis = new ArrayList<>();
+	public Map<String, String> getWidgetApis() {
+		Map<String, String> apis = new HashMap<>();
 		final List<Method> allMethods = new ArrayList<>(Arrays.asList(WidgetController.class.getDeclaredMethods()));
 
 		for (final Method method : allMethods) {
-			if (method.isAnnotationPresent(WidgetFunction.class)) {
-				StringBuilder method_url = createMethodUrl(method, false);
-				String annotated_value = (String) getValueFromAnnotation(method, ValidInputParamType.VALUE);
-				String[] clazz_url = { StaticConfigItems.WIDGET_API.replace("/api/", "") };
-				String complete_url = generateUrl(clazz_url, annotated_value, method_url);
-				apis.add(complete_url);
+			if (method.isAnnotationPresent(WidgetFunctions.class)) {
+
+				WidgetFunctions[] widgetFunctions = method.getAnnotationsByType(WidgetFunctions.class);
+
+				for (WidgetFunctions func : widgetFunctions) {
+					WidgetFunction[] widgetFunctionList = func.value();
+
+					for (WidgetFunction widgetFunction : widgetFunctionList) {
+						apis.put(widgetFunction.name(), widgetFunction.description());
+					}
+				}
 			}
 		}
 

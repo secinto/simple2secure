@@ -38,6 +38,7 @@ import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.WidgetConfig;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
@@ -63,10 +64,10 @@ public class SettingsController extends BaseUtilsProvider {
 		List<LicensePlan> licensePlans = licensePlanRepository.findAll();
 		List<TestMacro> testMacros = testMacroRepository.findAll();
 		List<Widget> widgets = widgetRepository.findAll();
-		List<String> widgetApis = portalUtils.getWidgetApis();
+		WidgetConfig widgetConfig = widgetUtils.getWidgetConfig();
 		if (settings != null) {
 			if (settings.size() == 1) {
-				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros, widgets, widgetApis), HttpStatus.OK);
+				return new ResponseEntity<>(new SettingsDTO(settings.get(0), licensePlans, testMacros, widgets, widgetConfig), HttpStatus.OK);
 			}
 		}
 		log.error("Problem occured while retrieving settings");

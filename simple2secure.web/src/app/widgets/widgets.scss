@@ -788,6 +788,11 @@ $font-weight-bold: 700 !default;
   margin-right: -120%;
 }
 
+.widget-select-box{
+  z-index: 22;
+  text-align: center;
+}
+
 //write color in hex
 //traffic-light color
 $whole: #333;
@@ -795,8 +800,6 @@ $whole: #333;
 $color1: #FF0000;//red
 $color2: #FFFF00;//yellow
 $color3: #00FF00;//green
-
-
 
 #box {
   display: flex;
@@ -813,6 +816,20 @@ $color3: #00FF00;//green
 .light {
   width: 80px;
   height: 80px;
+  border-radius: 50%;
+  z-index: 10;
+  margin: 5px 0;
+  &:last-child{
+    margin-bottom: 0;
+  }
+  &:first-child{
+    margin-top: 0;
+  }
+}
+
+.light-item {
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   z-index: 10;
   margin: 5px 0;

@@ -490,7 +490,7 @@
   "widget.store": "Widget Store",
   "widget.noplace": "No space available on the dashboard!",
   "widget.deleted": "Widget deleted successfully!",
-  "widget.url": "URL",
+  "widget.api": "API",
 
   "report.groups": "Groups",
   "report.devices": "Devices"

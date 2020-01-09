@@ -37,12 +37,13 @@ public class WidgetProperties extends GenericDBObject{
 	private int left;
 	private int height;
 	private int width;
+	private String location;
 	
 	public WidgetProperties() {
 		
 	}
 	
-	public WidgetProperties(String widgetId, String userId, String contextId, int top, int left, int height, int width) {
+	public WidgetProperties(String widgetId, String userId, String contextId, int top, int left, int height, int width, String location) {
 		super();
 		this.widgetId = widgetId;
 		this.userId = userId;
@@ -51,6 +52,7 @@ public class WidgetProperties extends GenericDBObject{
 		this.left = left;
 		this.height = height;
 		this.width = width;
+		this.location = location;
 	}
 	
 	public String getWidgetId() {
@@ -100,5 +102,13 @@ public class WidgetProperties extends GenericDBObject{
 	}
 	public void setWidth(int width) {
 		this.width = width;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 }

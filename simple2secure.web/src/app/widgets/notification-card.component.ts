@@ -13,7 +13,6 @@ export class NotificationCardComponent extends BaseWidget{
     @Input() tag: string;
     @Input() description: string;
     @Input() bgClass: string;
-    @Input() label: string;
     @Input() data: Notification[];
     @Input() propertiesId: string;
     @Output() event: EventEmitter<any> = new EventEmitter();

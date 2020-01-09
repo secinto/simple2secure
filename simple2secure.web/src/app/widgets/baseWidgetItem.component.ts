@@ -12,7 +12,6 @@ export class BaseWidgetItem{
     @Input() bgClass: string;
     @Input() icon: string;
     @Input() count: number;
-    @Input() label: string;
     @Input() data: any[];
     @Output() event: EventEmitter<any> = new EventEmitter();
 
@@ -23,7 +22,6 @@ export class BaseWidgetItem{
         this.widget.id = this.id;
         this.widget.tag = this.tag;
         this.widget.description = this.description;
-        this.widget.label = this.label;
         this.widget.bgClass = this.bgClass;
         this.widget.icon = this.icon;
         this.widget.name = this.name;

@@ -22,6 +22,8 @@
 package com.simple2secure.commons.config;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.simple2secure.api.model.LocaleLanguage;
 
@@ -111,4 +113,26 @@ public class StaticConfigItems {
 	public static final String CLAIM_USERROLE = "userRole";
 	public static final String CLAIM_DEVICEID = "deviceId";
 	public static final String CLAIM_POD = "podID";
+	
+	public static final String[] WIDGET_TAGS = {"app-traffic-light", "app-download", "app-stat", "app-notification"};
+	public static final String[] WIDGET_ICONS = {"fa-server", "fa-user", "fa-satellite", "fa-bell"};
+	public static final String[] WIDGET_COLORS = {"success", "info", "warning", "danger", "light", "dark", "secinto"};
+	public static final Map<String, String> WIDGET_TAGS_DESC = new HashMap<String, String>() {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3994389748660656978L;
+
+		{
+			put("app-traffic-light", "Traffic Light widget");
+			put("app-download", "Download group license widget");
+			put("app-stat", "Statistics widget");
+			put("app-notification", "Show last 3 notifications widget");
+		}
+	};
+	
+	public static final String WIDGET_API_GROUPS = "getGroups";
+	public static final String WIDGET_API_LAST_NOTIFICATIONS = "lastNotifications";
+	public static final String WIDGET_API_EXEC_QUERIES = "executedQueries";
+	public static final String WIDGET_API_ACTIVE_DEVICES = "devActive";
 }

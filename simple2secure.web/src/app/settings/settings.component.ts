@@ -30,7 +30,6 @@ import {Settings, SettingsDTO, Timeunit} from '../_models';
 import {environment} from '../../environments/environment';
 import {LicensePlan} from '../_models/LicensePlan';
 import {Widget} from '../_models/widget';
-import {WidgetColor} from '../_models/widgetColor';
 
 @Component({
 	moduleId: module.id,
@@ -43,10 +42,7 @@ export class SettingsComponent {
 	loading = false;
 	settingsObj: SettingsDTO;
 	timeUnits = Timeunit;
-	colorEnums = WidgetColor;
-	colors: string[];
 	updated = false;
-	icons: string[];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -60,21 +56,14 @@ export class SettingsComponent {
 		this.settingsObj = new SettingsDTO();
 		this.settingsObj.licensePlan = [];
 		this.settingsObj.settings = new Settings();
-		this.icons = ['fa-server', 'fa-user', 'fa-satellite'];
 	}
 
 	ngOnInit() {
-		this.colors = this.extractColors();
 		this.loadSettings();
 	}
 
 	extractTimeUnits(): Array<string> {
 		const keys = Object.keys(this.timeUnits);
-		return keys.slice();
-	}
-
-	extractColors(): Array<string> {
-		const keys = Object.keys(this.colorEnums);
 		return keys.slice();
 	}
 

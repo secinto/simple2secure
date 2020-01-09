@@ -22,7 +22,9 @@
 package com.simple2secure.portal.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +32,9 @@ import org.springframework.stereotype.Component;
 import com.simple2secure.api.dto.WidgetDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Widget;
+import com.simple2secure.api.model.WidgetConfig;
 import com.simple2secure.api.model.WidgetProperties;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,14 +49,21 @@ public class WidgetUtils extends BaseServiceProvider {
 	@Autowired
 	ReportUtils reportUtils;
 
-	public List<WidgetDTO> getWidgetsByUserAndContextId(String userId, String contextId) {
+	@Autowired
+	GroupUtils groupUtils;
+
+	@Autowired
+	PortalUtils portalUtils;
+
+	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, String contextId, String location) {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
-		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextId(userId, contextId);
+		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextIdAndLocation(userId, contextId,
+				location);
 		if (properties != null) {
 			for (WidgetProperties property : properties) {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
-					Object value = getValueFromApi(widget.getUrl(), contextId);
+					Object value = getWidgetValue(widget.getApi(), contextId);
 					widgetDTOList.add(new WidgetDTO(widget, property, value));
 					log.info("Adding new widget {} to the list", widget.getName());
 				}
@@ -63,23 +74,40 @@ public class WidgetUtils extends BaseServiceProvider {
 
 	/**
 	 * This is the temporary solution, because the old one has been making around 30 request pro widget from the client.
-	 * 
-	 * @param url
+	 *
+	 * @param api
 	 * @param contextId
 	 * @return
 	 */
-	public Object getValueFromApi(String url, String contextId) {
+	public Object getWidgetValue(String api, String contextId) {
 		Context context = contextRepository.find(contextId);
 		if (context != null) {
-			if (url.contains("/devActive")) {
+			if (api.contains(StaticConfigItems.WIDGET_API_ACTIVE_DEVICES)) {
 				return deviceUtils.getAllDevicesFromCurrentContext(context, false).size();
-			} else if (url.contains("/executedQueries")) {
+			} else if (api.contains(StaticConfigItems.WIDGET_API_EXEC_QUERIES)) {
 				return reportUtils.countExecutedQueries(context);
-			} else if (url.contains("/lastNotifications")) {
+			} else if (api.contains(StaticConfigItems.WIDGET_API_LAST_NOTIFICATIONS)) {
 				return notificationRepository.getNotificationsWithPagination(contextId, 0, 3);
+			} else if (api.contains(StaticConfigItems.WIDGET_API_GROUPS)) {
+				return groupUtils.getAllGroupsByContextId(context);
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * This function returns a widget config which will be used in setting to create a new widget
+	 *
+	 * @return
+	 */
+	public WidgetConfig getWidgetConfig() {
+		Map<String, String> widgetApis = portalUtils.getWidgetApis();
+		Map<String, String> widgetTags = StaticConfigItems.WIDGET_TAGS_DESC;
+		List<String> widgetIcons = Arrays.asList(StaticConfigItems.WIDGET_ICONS);
+		List<String> widgetColors = Arrays.asList(StaticConfigItems.WIDGET_COLORS);
+
+		WidgetConfig widgetConfig = new WidgetConfig(widgetApis, widgetTags, widgetIcons, widgetColors);
+		return widgetConfig;
 	}
 
 }

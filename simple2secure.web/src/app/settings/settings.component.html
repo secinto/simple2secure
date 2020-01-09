@@ -256,17 +256,19 @@
                                 <tr>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.tag' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].tag"
-                                                   name="tag{{in}}">
+                                            <mat-select placeholder="{{ 'widget.tag' | translate }}" [(ngModel)]="settingsObj.widgetList[in].tag"
+                                                        name="tag{{in}}" required>
+                                                <mat-option *ngFor="let tag of settingsObj.widgetConfig.widgetTags | keyvalue" [value]="tag.key">
+                                                    <b>{{tag.key}}</b> - {{tag.value}}
+                                                </mat-option> 
+                                            </mat-select>
                                         </mat-form-field>
                                     </td>
                                     <td>
                                         <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.bgColor' | translate }}" [(ngModel)]="settingsObj.widgetList[in].bgClass"
                                                         name="bgClass{{in}}" required>
-                                                <mat-option *ngFor="let color of colors"
+                                                <mat-option *ngFor="let color of settingsObj.widgetConfig.widgetColors"
                                                             [value]="color">{{color}}
                                                 </mat-option>
                                             </mat-select>
@@ -278,7 +280,7 @@
                                         <mat-form-field class="full_width_input">
                                             <mat-select placeholder="{{ 'widget.icon' | translate }}" [(ngModel)]="settingsObj.widgetList[in].icon"
                                                         name="icon{{in}}" required>
-                                                <mat-option *ngFor="let icon of icons" [value]="icon">
+                                                <mat-option *ngFor="let icon of settingsObj.widgetConfig.widgetIcons" [value]="icon">
                                                     <span class="fa {{icon}}"> {{icon}}</span>
                                                 </mat-option>
                                             </mat-select>
@@ -286,21 +288,10 @@
                                     </td>
                                     <td>
                                         <mat-form-field class="full_width_input">
-                                            <input type="text" matInput
-                                                   placeholder="{{ 'widget.label' | translate }}"
-                                                   [(ngModel)]="settingsObj.widgetList[in].label"
-                                                   name="label{{in}}">
-                                        </mat-form-field>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <mat-form-field class="full_width_input">
-                                            <mat-select placeholder="{{ 'widget.url' | translate }}" [(ngModel)]="settingsObj.widgetList[in].url"
-                                                        name="url{{in}}" required>
-                                                <mat-option *ngFor="let url of settingsObj.widgetApis" [value]="url">
-                                                    {{url}}
+                                            <mat-select placeholder="{{ 'widget.api' | translate }}" [(ngModel)]="settingsObj.widgetList[in].api"
+                                                        name="api{{in}}" required>
+                                                <mat-option *ngFor="let api of settingsObj.widgetConfig.widgetApis | keyvalue" [value]="api.key">
+                                                    <b>{{api.key}}</b> - {{api.value}}
                                                 </mat-option>
                                             </mat-select>
                                         </mat-form-field>
