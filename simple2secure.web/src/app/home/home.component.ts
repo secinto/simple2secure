@@ -32,6 +32,7 @@ import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {environment} from '../../environments/environment';
 import {ActivatedRoute} from '@angular/router';
+import {BaseComponent} from '../components/base.component';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -39,114 +40,19 @@ import {ActivatedRoute} from '@angular/router';
 	templateUrl: 'home.component.html'
 })
 
-export class HomeComponent{
-	widgets: WidgetDTO[] = [];
-	widgetDTO: WidgetDTO;
-	location: any;
-	@ViewChild('grid') grid: NgxWidgetGridComponent;
-	constructor(private dialog: MatDialog,
-				private alertService: AlertService,
-				private translate: TranslateService,
-				private dataService: DataService,
-				private httpService: HttpService,
-				private route:ActivatedRoute) {
-		this.location = this.route.component["name"];
+export class HomeComponent extends BaseComponent{
+	location: string = this.route.component["name"];
+
+	constructor(dialog: MatDialog,
+				alertService: AlertService,
+				translate: TranslateService,
+				dataService: DataService, 
+				httpService: HttpService,
+				route: ActivatedRoute) {
+		super(dialog, alertService, translate, dataService, httpService, route);
 	}
 
-	ngAfterViewInit(){
-		this.loadAllWidgetsByUserId(); 
-	}
-
-	public loadAllWidgetsByUserId() {
-		this.httpService.get(environment.apiEndpoint + 'widget/get/' + this.location)
-			.subscribe(
-				data => {
-					this.widgets = data;
-
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
-	}
-
-	onWidgetChange(event: WidgetPositionChange) {
-		this.widgets[event.index].widgetProperties.width = event.newPosition.width;
-		this.widgets[event.index].widgetProperties.height = event.newPosition.height;
-		this.widgets[event.index].widgetProperties.left = event.newPosition.left;
-		this.widgets[event.index].widgetProperties.top = event.newPosition.top;
-
-		this.updateSaveWidgetPosition(this.widgets[event.index]);
-
-	}
-
-
-	updateSaveWidgetPosition(widget: WidgetDTO){
-		this.httpService.post(widget, environment.apiEndpoint + 'widget/updatePosition')
-			.subscribe(
-				data => {
-					widget.widgetProperties = data;
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
-	}
-
-	openDialogAddWidget(): void {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '350px';
-
-		dialogConfig.data = {
-			widgets: null
-		};
-		const dialogRef = this.dialog.open(WidgetStoreComponent, dialogConfig);
-		this.dataService.clearWidgets();
-		dialogRef.afterClosed().subscribe(result => {
-			this.addWidgetsToTheList();
-		});
-	}
-
-	addWidgetsToTheList(){
-		console.log()
-		if (this.dataService.getSelectedWidget() != null) {
-			const position = this.grid.getNextPosition();
-			if (position) {
-				this.widgetDTO = new WidgetDTO();
-				this.widgetDTO.widget = this.dataService.getSelectedWidget();
-				this.widgetDTO.widgetProperties.height = 1;
-				this.widgetDTO.widgetProperties.left = position.left;
-				this.widgetDTO.widgetProperties.top = position.top;
-				this.widgetDTO.widgetProperties.width = 1;
-				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
-				this.widgetDTO.widgetProperties.location = this.location;
-
-				this.widgets.push(this.widgetDTO);
-			}
-			else{
-				this.alertService.error(this.translate.instant('widget.noplace'));
-			}
-
-			this.dataService.clearWidgets();
-		}
-	}
-
-	getRectangle(widget: WidgetDTO){
-		const rectangle = new Rectangle();
-		rectangle.width = widget.widgetProperties.width;
-		rectangle.height = widget.widgetProperties.height;
-		rectangle.left = widget.widgetProperties.left;
-		rectangle.top = widget.widgetProperties.top;
-		return rectangle;
+	public loadWidgets(location: string){
+		this.loadAllWidgetsByUserId(location); 
 	}
 }
