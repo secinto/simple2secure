@@ -40,6 +40,8 @@ import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.commons.exceptions.InconsistentDataException;
+import com.simple2secure.commons.messages.Message;
 import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
@@ -66,6 +68,8 @@ public class RuleUtils {
 	 *          collection where the data of the RuleParam annotations should be saved
 	 * @param paramArrays
 	 *          collection where the data RuleParamArray annotations should be saved.
+	 *          
+	 * @throws UnsupportedOperationException when param has datatype which is non of the DataType Enum
 	 */
 	private void saveParamsFromClass(Class clazz, Collection<RuleParam<?>> params, Collection<RuleParamArray<?>> paramArrays) {
 		Field fs[] = clazz.getDeclaredFields();
@@ -93,7 +97,7 @@ public class RuleUtils {
 					break;
 
 				default:
-					break;
+					throw new UnsupportedOperationException("The given data type: \"" + annotationParamArray.type().toString() + "\"is not implemented");
 				}
 
 				if (paramArray != null) {
@@ -128,7 +132,7 @@ public class RuleUtils {
 					break;
 
 				default:
-					break;
+					throw new UnsupportedOperationException("The given data type: \"" + annotationParamArray.type().toString() + "\"is not implemented");
 				}
 
 				if (param != null) {
@@ -142,7 +146,35 @@ public class RuleUtils {
 				continue;
 			}
 		}
+		
+		// searching for annotation RuleParam with name "typeLimit" in the super class
+		Class<?> superClazz = clazz.getSuperclass();
+		if (superClazz != null && superClazz != Object.class) {
+			Field superClassFields[] = superClazz.getDeclaredFields();
+
+			for (Field f : superClassFields) {
+				f.setAccessible(true);
+				AnnotationRuleParam annotationParam = f.getAnnotation(AnnotationRuleParam.class);
+				
+				if(annotationParam != null) {
+					if (annotationParam.name().equals(AnnotationRuleParam.TYPE_LIMIT)) {
+						if (annotationParam.type() == DataType._INT) {
+							
+							RuleParam<?> param = new RuleParam<Integer>();
+							param.setType(DataType._INT);
+							param.setName(annotationParam.name());
+							param.setDescription_de(annotationParam.description_de());
+							param.setDescription_en(annotationParam.description_en());
+							param.setValue(null);
+							params.add(param);
+							break;
+						}
+					}
+				}
+			}	
+		}
 	}
+	
 
 	/**
 	 * Method to fetch all classes in given package which has specific annotation.
@@ -260,9 +292,10 @@ public class RuleUtils {
 	 * @throws IOException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
+	 * @throw InconsistentDataException
 	 */
 	public Condition buildConditionFromTemplateCondition(TemplateCondition conditionData, String packageName, String ruleName)
-			throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException {
+			throws ClassNotFoundException, IOException, InstantiationException, IllegalAccessException, InconsistentDataException {
 		Class<?> conditionClass = null;
 		Condition condition = null;
 
@@ -278,7 +311,11 @@ public class RuleUtils {
 			}
 		}
 
-		condition = (Condition) conditionClass.newInstance();
+		if (conditionClass == null) {
+			throw new InconsistentDataException(new Message("","Condition-classname saved in database which can´t be found in source folder."));
+		} else {
+			condition = (Condition) conditionClass.newInstance();			
+		}
 
 		Field fs[] = conditionClass.getDeclaredFields();
 
@@ -288,25 +325,44 @@ public class RuleUtils {
 			f.setAccessible(true);
 			AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
 
-			if (param != null) {
+			if (param != null) 
+			{
+				if (conditionData.getParams() == null)
+					throw new InconsistentDataException(new Message("","Needed param for conditionclass is not given."));
+					
+				boolean foundParam = false;
 				for (RuleParam<?> paramData : conditionData.getParams()) {
 					if (paramData.getName().equals(param.name())) {
+						foundParam = true;
 						f.set(condition, paramData.getValue());
 						break;
 					}
 				}
+				
+				if (!foundParam)
+				  throw new InconsistentDataException(new Message("","Needed param for conditionclass is not given."));
+				
 				continue;
 			}
 
 			AnnotationRuleParamArray paramArray = f.getAnnotation(AnnotationRuleParamArray.class);
 
 			if (paramArray != null) {
+				if(conditionData.getParamArrays() == null)
+					throw new InconsistentDataException(new Message("","Needed param array for conditionclass is not given."));
+				
+				boolean foundParam = false;
 				for (RuleParamArray<?> paramData : conditionData.getParamArrays()) {
 					if (paramData.getName().equals(paramArray.name())) {
+						foundParam = true;
 						f.set(condition, paramData.getValues());
 						break;
 					}
 				}
+				
+				if (!foundParam)
+					  throw new InconsistentDataException(new Message("","Needed param array for conditionclass is not given."));
+				
 				continue;
 			}
 		}
@@ -332,7 +388,7 @@ public class RuleUtils {
 				if(param != null) {
 					if (param.name().equals(AnnotationRuleParam.TYPE_LIMIT))
 					{
-						f.set(condition, 1);
+						f.set(condition, 1); // default value
 						
 						List<RuleParam<?>> params = conditionData.getParams();
 						
@@ -370,9 +426,10 @@ public class RuleUtils {
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
 	 * @throws IOException
+	 * @throw InconsistentDataException
 	 */
 	public Action buildActionFromTemplateAction(TemplateAction actionData, String packageName)
-			throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException {
+			throws IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, IOException, InconsistentDataException{
 		Class<?> actionClass = null;
 		Action action = null;
 
@@ -387,8 +444,13 @@ public class RuleUtils {
 				break;
 			}
 		}
+		
+		if (actionClass == null) {
+			throw new InconsistentDataException(new Message("","Action-classname saved in database which can´t be found in source folder."));
+		} else {		
+			action = (Action) actionClass.newInstance();
+		}
 
-		action = (Action) actionClass.newInstance();
 
 		Field fs[] = actionClass.getDeclaredFields();
 
@@ -398,24 +460,44 @@ public class RuleUtils {
 			AnnotationRuleParam param = f.getAnnotation(AnnotationRuleParam.class);
 
 			if (param != null) {
+				
+				if (actionData.getParams() == null) 
+					throw new InconsistentDataException(new Message("","Needed param for actionclass is not given."));
+				
+				boolean foundParam = false;
 				for (RuleParam<?> paramData : actionData.getParams()) {
 					if (paramData.getName().equals(param.name())) {
+						foundParam = true;
 						f.set(action, paramData.getValue());
 						break;
 					}
 				}
+				
+				if (!foundParam)
+					  throw new InconsistentDataException(new Message("","Needed param for actionclass is not given."));
+				
 				continue;
 			}
 
 			AnnotationRuleParamArray paramArray = f.getAnnotation(AnnotationRuleParamArray.class);
 
 			if (paramArray != null) {
+				
+				if(actionData.getParamArrays() == null)
+					throw new InconsistentDataException(new Message("","Needed param array for actionclass is not given."));
+				
+				boolean foundParams = true;
 				for (RuleParamArray<?> paramData : actionData.getParamArrays()) {
 					if (paramData.getName().equals(paramArray.name())) {
+						foundParams = true;
 						f.set(action, paramData.getValues());
 						break;
 					}
 				}
+				
+				if (!foundParams)
+					  throw new InconsistentDataException(new Message("","Needed param array for actionclass is not given."));
+				
 				continue;
 			}
 		}
