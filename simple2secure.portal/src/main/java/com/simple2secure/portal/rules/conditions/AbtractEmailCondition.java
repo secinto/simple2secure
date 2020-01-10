@@ -32,6 +32,7 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.api.model.TriggeredRule;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.RuleName;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.EmailRuleTriggeredRepository;
 
 import lombok.Setter;
@@ -68,7 +69,12 @@ public abstract class AbtractEmailCondition implements Condition {
 			TriggeredRule triggeredRule = emailRuleTriggeredRepository.findByRuleName(ruleName);
 			
 			if(triggeredRule != null) {
-				triggeredRule.getEmails().add(email);			
+				triggeredRule.getEmails().add(email);
+				try {
+					emailRuleTriggeredRepository.update(triggeredRule);
+				} catch (ItemNotFoundRepositoryException e) {
+					e.printStackTrace();
+				}
 			}
 			else {
 				TemplateRule templateRule = new TemplateRule(ruleName,
@@ -77,6 +83,7 @@ public abstract class AbtractEmailCondition implements Condition {
 						null, null);
 				triggeredRule = new TriggeredRule(templateRule);
 				triggeredRule.addMail(email);
+				emailRuleTriggeredRepository.save(triggeredRule);
 			}
 			
 			if (triggeredRule.getTriggeredEmailCount() >= typeLimit)

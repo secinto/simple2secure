@@ -1,12 +1,33 @@
-package com.simple2secure.test.portal.rules;
+/**
+*********************************************************************
+*   simple2secure is a cyber risk and information security platform.
+*   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+*********************************************************************
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as
+*   published by the Free Software Foundation, either version 3 of the
+*   License, or (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*  
+ *********************************************************************
+*/
 
+package com.simple2secure.test.portal.rules;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.jeasy.rules.api.Rule;
 import org.junit.jupiter.api.Test;
@@ -30,6 +51,7 @@ import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.Simple2SecurePortal;
 import com.simple2secure.portal.repository.EmailRuleTriggeredRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
+import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.rules.EmailRulesEngine;
 import com.simple2secure.portal.utils.RuleUtils;
 
@@ -41,10 +63,13 @@ import com.simple2secure.portal.utils.RuleUtils;
 public class TestAdvanvedRuleEngine {
 	
 	@Autowired
-	EmailRulesEngine emailRulesEngine;
+	private EmailRulesEngine emailRulesEngine;
 	
 	@Autowired
-	NotificationRepository notificationRepository;
+	private NotificationRepository notificationRepository;
+	
+	@Autowired
+	private RuleConditionsRepository ruleConditionsRepository;
 	
 	@Autowired
 	private RuleUtils ruleUtils;
@@ -72,11 +97,9 @@ public class TestAdvanvedRuleEngine {
 		// preparing condition for blocking email address
 		TemplateCondition condition = new TemplateCondition("find words in subject", "", "", null, new ArrayList<RuleParamArray<?>>() {
 			private static final long serialVersionUID = 1L;
-
 			{
 				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
 					private static final long serialVersionUID = 1L;
-
 					{
 						add("won");
 						add("lottery");
@@ -131,12 +154,8 @@ public class TestAdvanvedRuleEngine {
 			emailRuleTriggeredRepository.deleteAll();
 			TriggeredRule triggeredRule = new TriggeredRule(new TemplateRule("test", "test", "test", null, null));
 			emailRuleTriggeredRepository.save(triggeredRule);
-			
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
-			;
 		}
 	}
 	
@@ -145,10 +164,8 @@ public class TestAdvanvedRuleEngine {
 		try {
 			TriggeredRule triggeredRule = emailRuleTriggeredRepository.findByRuleName("test");
 			assertFalse(triggeredRule == null, "Failed to load triggered rule data from db by name");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			;
 		}
 	}
 	
@@ -183,7 +200,7 @@ public class TestAdvanvedRuleEngine {
 					"com.simple2secure.portal.rules.actions");
 			emailRulesEngine.addRule(rule);
 
-			for (int count = 1; count < N; count++)
+			for (int count = 1; count <= N; count++)
 			{
 				// email which should be checked  5dfa1cc5f8166c3f06ae09c5
 				Email email1 = new Email(String.valueOf(count), "5e0de912110a0a5f8b0bdd05", count, "WON MONEY", String.valueOf(count)+"alice@lottery.com", "text" + String.valueOf(count),
@@ -198,14 +215,25 @@ public class TestAdvanvedRuleEngine {
 						"Rule triggered to Early at the " + count + " time");
 				else 
 					assertFalse(notificationRepository.findAll() == null,
-						"Rule did not trigger");
+							"Rule did not trigger");
 			}
-
 		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
 	}
 	
-
+	@Test
+	public void testLoadConditionsFromPath()
+	{
+		try {
+			Collection<TemplateCondition> conditions;
+			conditions = ruleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
+			if(conditions != null && !conditions.isEmpty()) {
+				conditions.forEach(ruleConditionsRepository::save);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
