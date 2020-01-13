@@ -542,3 +542,34 @@ action-icon{
 .wg-resize-axis {
     background-color: transparent !important;
 }
+
+.widget-parent{
+    height:100%;
+    width:100%;
+    display:flex;
+}
+
+.widget-child{
+    height:100%;
+    width:100%;
+    padding:10px;
+    background-color: rgb(140, 198, 0);
+}
+
+.dashboard-container {
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 100%;
+    .dashboard-page {
+        flex: 1 1 auto;
+        position: relative;
+    }
+}
+
+ngx-widget-grid{
+    margin-top: 50px;
+}
+
+.btn-add-widget{
+    max-width: 180px;
+}

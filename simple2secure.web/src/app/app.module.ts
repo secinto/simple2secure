@@ -33,7 +33,7 @@ import {ResetComponent} from './resetPassword';
 import {ResendComponent} from './resendActivation';
 import {UpdatePasswordComponent} from './updatePassword';
 
-import {AlertComponent, FooterComponent} from './components';
+import {AlertComponent, FooterComponent, BaseComponent} from './components';
 
 import {SearchComponent, SearchResultComponent} from './search';
 import {NotificationComponent, NotificationDetailsComponent} from './notification';
@@ -87,7 +87,7 @@ import {DevicesComponent, DevicesListComponent} from './devices/index';
 import {EqualValidator} from './_directives';
 import {AuthGuard} from './_guards';
 import {TruncatePipe} from './_helpers';
-import {AlertService, AuthenticationService, DataService, HelperService, HttpService} from './_services';
+import {AlertService, AuthenticationService, DataService, HelperService, HttpService, WidgetService} from './_services';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
 import {LoginLayoutComponent} from './_layouts/loginLayout';
 import {NavbarComponent} from './navbar';
@@ -300,6 +300,7 @@ export const httpInterceptorProviders = [
 		OsQueryReportDetailsComponent,
 		QueryEditDialogComponent,
 		FooterComponent,
+		BaseComponent,
 		EqualValidator,
 		OrbiterComponent,
 		OrbiterOverviewComponent,
@@ -406,6 +407,7 @@ export const httpInterceptorProviders = [
 		HttpService,
 		DataService,
 		HelperService,
+		WidgetService,
 		httpInterceptorProviders,
 		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
 		DatePipe

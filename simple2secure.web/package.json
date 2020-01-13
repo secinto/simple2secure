@@ -81,7 +81,7 @@
     "ngx-treeview": "^6.0.2",
     "ngx-widget-grid": "^6.0.2",
     "nl2br-pipe": "^1.0.3",
-    "npm": "^6.6.0",
+    "npm": "^6.13.4",
     "popper.js": "^1.14.6",
     "rxjs": "^6.3.3",
     "rxjs-compat": "^6.0.0-rc.0",

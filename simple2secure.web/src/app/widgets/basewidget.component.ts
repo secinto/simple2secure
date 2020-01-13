@@ -3,7 +3,7 @@ import {AlertService, HttpService} from "../_services";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
-import {HomeComponent} from "../home";
+import {BaseComponent} from "../components";
 import {environment} from "../../environments/environment";
 
 export class BaseWidget{
@@ -16,7 +16,7 @@ export class BaseWidget{
                 public location: Location,
                 public router: Router,
                 public route: ActivatedRoute,
-                public homeComponent: HomeComponent ) {}
+                public baseComponent: BaseComponent) {}
 
     deleteWidgetProperty(widgetPropId: string) {
         this.loading = true;
@@ -24,7 +24,7 @@ export class BaseWidget{
             data => {
                 this.alertService.success(this.translate.instant('widget.deleted'));
                 this.loading = false;
-                this.homeComponent.loadAllWidgetsByUserId();
+                this.baseComponent.loadAllWidgetsByUserId(this.route.component["name"]);
             },
             error => {
                 if (error.status == 0) {
