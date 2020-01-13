@@ -62,7 +62,8 @@ public class StaticConfigItems {
 	public static final String PROCESSORS_JSON_LOCATION = "/configuration/processors.json";
 	public static final String STEPS_JSON_LOCATION = "/configuration/steps.json";
 	public static final String KEYS_LOCATION = "./src/main/resources/keys/";
-	public static final String[] OSQUERY_DATA_LOCALTION = { "/osquery/os_win7/osquery.conf", "/osquery/os_win7/osqueryi.exe" };
+	public static final String[] OSQUERY_DATA_LOCALTION_WINDOWS = { "/osquery/os_win7/osquery.conf", "/osquery/os_win7/osqueryi.exe" };
+	public static final String[] OSQUERY_DATA_LOCALTION_LINUX = { "/etc/osquery/osquery.conf", "/usr/bin/osqueryi" };
 
 	public static final String[] SECINTO_EMAIL_LIST = { "s2s.test@secinto.at" };
 	public static final String STANDARD_GROUP_NAME = "Standard";
