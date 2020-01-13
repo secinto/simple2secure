@@ -7,7 +7,7 @@
     <mat-table #sort="matSort" #table [dataSource]="dataSource" matSort>
 
         <ng-container matColumnDef="probeId">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.id' | translate }}
             </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.info.deviceId}}</mat-cell>
         </ng-container>
@@ -27,7 +27,7 @@
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.type' | translate }}
             </mat-header-cell>
-            <mat-cell *matCellDef="let element"><p *ngIf="element.pod">POD</p><p *ngIf="!element.pod">PROBE</p></mat-cell>
+            <mat-cell *matCellDef="let element">{{element.info.type}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">

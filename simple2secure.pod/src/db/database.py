@@ -41,16 +41,16 @@ class PodInfo(db.Model):
 class DeviceInfo(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     deviceId = db.Column(db.Text)
-    hostName = db.Column(db.Text)
+    name = db.Column(db.Text)
     ipAddress = db.Column(db.Text)
     netMask = db.Column(db.Text)
     deviceStatus = db.Column(db.Enum(DeviceStatus))
     lastOnlineTimestamp = db.Column(db.Float)
     type = db.Column(db.Enum(DeviceType))
 
-    def __init__(self, deviceId, hostName, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, type = DeviceType.POD):
+    def __init__(self, deviceId, name, ipAddress, netMask, lastOnlineTimestamp, deviceStatus = DeviceStatus.UNKNOWN, type = DeviceType.POD):
         self.deviceId = deviceId
-        self.hostName = hostName
+        self.name = name
         self.ipAddress = ipAddress
         self.netMask = netMask
         self.deviceStatus = deviceStatus

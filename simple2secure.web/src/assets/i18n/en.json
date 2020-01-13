@@ -190,6 +190,7 @@
   "table.inbox": "Inbox",
   "table.delete": "Delete", 
   "table.name": "Name",
+  "table.id" : "ID",
   "table.seqRunId" : "Sequence Run ID", 
   "table.sql": "SQL",        
   "table.state": "State", 

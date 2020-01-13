@@ -190,6 +190,7 @@
   "table.inbox": "Posteingang",
   "table.delete": "Löschen",
   "table.name": "Name",
+  "table.id" : "ID",
   "table.seqRunId" : "Sequenz Lauf ID",
   "table.sql": "Abfrage",
   "table.state": "Zustand",
