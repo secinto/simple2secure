@@ -19,9 +19,13 @@ export class PieChartComponent extends BaseWidget{
     @Input() propertiesId: string;
     @Output() event: EventEmitter<any> = new EventEmitter();
 
-    type: ChartType = 'Pie';
+    type: ChartType = 'Pie'; 
 
     options: IPieChartOptions = {
         height: 300
     };
+
+    ngAfterViewInit(){
+        console.log(this.data);
+    }
 }

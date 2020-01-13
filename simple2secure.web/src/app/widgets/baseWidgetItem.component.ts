@@ -47,14 +47,14 @@ export class BaseWidgetItem{
     };
 
     widgetData: IChartistData = {
-        labels: [
-          'Jan',
-          'Feb',
-          'Mar',
-        ],
         series: [
-          [3, 1, 2],
-          [2, 2, 3]
+          [3, 1, 2]
         ]
-  };
+    };
+
+    widgetDataPie: IChartistData = {
+        series: [
+        20, 30, 50
+        ]
+    } 
 }

@@ -6,13 +6,17 @@ public class ChartData {
 
 	private List<String> labels;
 	private List<List<Integer>> series;
+	private List<Integer> seriesPieChart;
 	
 	public ChartData() {
 		
 	}
 	
+	public ChartData(List<Integer> seriesPieChart) {
+		this.seriesPieChart = seriesPieChart;
+	}
+	
 	public ChartData(List<String> labels, List<List<Integer>> series) {
-		super();
 		this.labels = labels;
 		this.series = series;
 	}	
@@ -29,6 +33,12 @@ public class ChartData {
 	public void setSeries(List<List<Integer>> series) {
 		this.series = series;
 	}
-	
-	
+
+	public List<Integer> getSeriesPieChart() {
+		return seriesPieChart;
+	}
+
+	public void setSeriesPieChart(List<Integer> seriesPieChart) {
+		this.seriesPieChart = seriesPieChart;
+	}
 }

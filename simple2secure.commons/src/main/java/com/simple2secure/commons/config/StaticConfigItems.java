@@ -139,4 +139,5 @@ public class StaticConfigItems {
 	public static final String WIDGET_API_EXEC_QUERIES = "executedQueries";
 	public static final String WIDGET_API_ACTIVE_DEVICES = "devActive";
 	public static final String WIDGET_API_GET_CONTEXT_GROUPS_GRAPH = "getLicenseDownloadsProGroup";
+	public static final String WIDGET_API_GET_NUMBER_OF_LICENSE = "getLicenseDownloadsPieChart";
 }

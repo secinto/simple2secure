@@ -529,8 +529,11 @@ public class GroupUtils extends BaseServiceProvider {
 	}
 	
 	
-	public ChartData getLicenseDownloadsForContext(Context context) {
+	public ChartData getLicenseDownloadsForContext(Context context, String tag) {
+		
+		
 		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
+		
 		List<String> labels = new ArrayList<>();
 		List<List<Integer>> series = new ArrayList<>();
 		List<Integer> seriesOfData = new ArrayList<Integer>();
@@ -541,7 +544,13 @@ public class GroupUtils extends BaseServiceProvider {
 			}
 		}
 		series.add(seriesOfData);
+		
 		ChartData chartData = new ChartData(labels, series);
+		
+		if(tag.equals(StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE)) {
+			chartData = new ChartData(seriesOfData);
+		}
 		return chartData;
 	}
+	
 }

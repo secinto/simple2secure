@@ -178,6 +178,7 @@ public class WidgetController extends BaseUtilsProvider {
 	@WidgetFunction(name = StaticConfigItems.WIDGET_API_EXEC_QUERIES, description = "This function returns the count of executed queries")
 	@WidgetFunction(name = StaticConfigItems.WIDGET_API_ACTIVE_DEVICES, description = "This function returns the count of the active devices")
 	@WidgetFunction(name = StaticConfigItems.WIDGET_API_GET_CONTEXT_GROUPS_GRAPH, description = "This function returns count of license downloads per group")
+	@WidgetFunction(name = StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE, description = "This function returns count of license downloads per group")
 	public void defineUniqueWidgetApi() {
 	}
 

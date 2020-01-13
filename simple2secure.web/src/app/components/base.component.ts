@@ -100,7 +100,6 @@ export class BaseComponent{
 	}
 
 	public addWidgetsToTheList(){
-		console.log(this._location);
 		if (this.dataService.getSelectedWidget() != null) {
 			const position = this.grid.getNextPosition();
 			if (position) {

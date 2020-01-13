@@ -18,7 +18,8 @@ export class BaseWidget{
                 public location: Location,
                 public router: Router,
                 public route: ActivatedRoute,
-                public baseComponent: BaseComponent) {}
+                public baseComponent: BaseComponent) {
+    }
 
     deleteWidgetProperty(widgetPropId: string) {
         this.loading = true;
