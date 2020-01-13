@@ -5,6 +5,8 @@ import {Location} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {BaseComponent} from "../components";
 import {environment} from "../../environments/environment";
+import {IChartistAnimationOptions} from 'chartist';
+import {ChartEvent} from 'ng-chartist';
 
 export class BaseWidget{
 
@@ -36,4 +38,19 @@ export class BaseWidget{
                 this.loading = false;
             });
     }
+
+    events: ChartEvent = {
+        draw: (data) => {
+          if (data.type === 'bar' || data.type === 'line') {
+            data.element.animate({
+              y2: <IChartistAnimationOptions>{
+                dur: '0.5s',
+                from: data.y1,
+                to: data.y2,
+                easing: 'easeOutQuad'
+              }
+            });
+          }
+        }
+    };
 }
