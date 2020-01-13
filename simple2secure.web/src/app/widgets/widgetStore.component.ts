@@ -32,6 +32,9 @@ import {StatItemComponent} from './stat-item.component';
 import {NotificationCardItem} from "./notification-card-item.component";
 import {TrafficLightItemComponent} from "./traffic-light-item.component";
 import {DownloadWidgetItemComponent} from "./download-item.component";
+import {BarChartItemComponent} from "./bar-chart-item.component";
+import {LineChartItemComponent} from "./line-chart-item.component";
+import {PieChartItemComponent} from "./pie-chart-item.component";
 import {Notification} from "../_models";
 
 @Component({
@@ -131,6 +134,39 @@ export class WidgetStoreComponent {
 				(<DownloadWidgetItemComponent>component.instance).tag = widget.tag;
 				(<DownloadWidgetItemComponent>component.instance).description = widget.description;
 				(<DownloadWidgetItemComponent>component.instance).bgClass = widget.bgClass;
+			}
+
+			else if (widget.tag == 'app-bar-chart'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(BarChartItemComponent);
+				const component = this.container.createComponent(componentFactory);
+
+				(<BarChartItemComponent>component.instance).id = widget.id;
+				(<BarChartItemComponent>component.instance).name = widget.name;
+				(<BarChartItemComponent>component.instance).tag = widget.tag;
+				(<BarChartItemComponent>component.instance).description = widget.description;
+				(<BarChartItemComponent>component.instance).bgClass = widget.bgClass;
+			}
+
+			else if (widget.tag == 'app-line-chart'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(LineChartItemComponent);
+				const component = this.container.createComponent(componentFactory);
+
+				(<LineChartItemComponent>component.instance).id = widget.id;
+				(<LineChartItemComponent>component.instance).name = widget.name;
+				(<LineChartItemComponent>component.instance).tag = widget.tag;
+				(<LineChartItemComponent>component.instance).description = widget.description;
+				(<LineChartItemComponent>component.instance).bgClass = widget.bgClass;
+			}
+
+			else if (widget.tag == 'app-pie-chart'){
+				const componentFactory = this.componentFactoryResolver.resolveComponentFactory(PieChartItemComponent);
+				const component = this.container.createComponent(componentFactory);
+
+				(<PieChartItemComponent>component.instance).id = widget.id;
+				(<PieChartItemComponent>component.instance).name = widget.name;
+				(<PieChartItemComponent>component.instance).tag = widget.tag;
+				(<PieChartItemComponent>component.instance).description = widget.description;
+				(<PieChartItemComponent>component.instance).bgClass = widget.bgClass;
 			}
 		}
 	}

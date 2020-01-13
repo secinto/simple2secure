@@ -114,7 +114,6 @@ public class StaticConfigItems {
 	public static final String CLAIM_DEVICEID = "deviceId";
 	public static final String CLAIM_POD = "podID";
 	
-	public static final String[] WIDGET_TAGS = {"app-traffic-light", "app-download", "app-stat", "app-notification"};
 	public static final String[] WIDGET_ICONS = {"fa-server", "fa-user", "fa-satellite", "fa-bell"};
 	public static final String[] WIDGET_COLORS = {"success", "info", "warning", "danger", "light", "dark", "secinto"};
 	public static final Map<String, String> WIDGET_TAGS_DESC = new HashMap<String, String>() {
@@ -128,6 +127,9 @@ public class StaticConfigItems {
 			put("app-download", "Download group license widget");
 			put("app-stat", "Statistics widget");
 			put("app-notification", "Show last 3 notifications widget");
+			put("app-bar-chart", "Bar chart widget");
+			put("app-line-chart", "Line chart widget");
+			put("app-pie-chart", "Pie chart widget");
 		}
 	};
 	
@@ -135,4 +137,5 @@ public class StaticConfigItems {
 	public static final String WIDGET_API_LAST_NOTIFICATIONS = "lastNotifications";
 	public static final String WIDGET_API_EXEC_QUERIES = "executedQueries";
 	public static final String WIDGET_API_ACTIVE_DEVICES = "devActive";
+	public static final String WIDGET_API_GET_CONTEXT_GROUPS_GRAPH = "getLicenseDownloadsProGroup";
 }

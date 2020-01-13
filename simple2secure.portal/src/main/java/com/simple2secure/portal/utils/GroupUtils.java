@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.ChartData;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
@@ -525,5 +526,22 @@ public class GroupUtils extends BaseServiceProvider {
 			}
 		}
 		return foundGroups;
+	}
+	
+	
+	public ChartData getLicenseDownloadsForContext(Context context) {
+		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
+		List<String> labels = new ArrayList<>();
+		List<List<Integer>> series = new ArrayList<>();
+		List<Integer> seriesOfData = new ArrayList<Integer>();
+		if(contextGroups != null) {
+			for(CompanyGroup group : contextGroups) {
+				labels.add(group.getName());
+				seriesOfData.add(context.getCurrentNumberOfLicenseDownloads());	
+			}
+		}
+		series.add(seriesOfData);
+		ChartData chartData = new ChartData(labels, series);
+		return chartData;
 	}
 }

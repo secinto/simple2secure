@@ -190,6 +190,13 @@ import {DownloadWidgetComponent} from "./widgets/download-widget.component";
 import {DownloadWidgetItemComponent} from "./widgets/download-item.component";
 import {TrafficLightComponent} from "./widgets/traffic-light.component";
 import {TrafficLightItemComponent} from "./widgets/traffic-light-item.component";
+import {BarChartComponent} from "./widgets/bar-chart.component";
+import {BarChartItemComponent} from "./widgets/bar-chart-item.component";
+import {LineChartComponent} from "./widgets/line-chart.component";
+import {LineChartItemComponent} from "./widgets/line-chart-item.component";
+import {PieChartComponent} from "./widgets/pie-chart.component";
+import {PieChartItemComponent} from "./widgets/pie-chart-item.component";
+import {ChartistModule} from 'ng-chartist';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -266,7 +273,8 @@ export const httpInterceptorProviders = [
 		BoxModule,
 		BreadcrumbsModule,
 		NgxGraphModule,
-		TooltipModule
+		TooltipModule,
+		ChartistModule
 	],
 	declarations: [
 		AppComponent,
@@ -360,7 +368,13 @@ export const httpInterceptorProviders = [
 		MappedQueryEditDialog,
 		QueryCategoryAddDialog,
 		TrafficLightComponent,
-		TrafficLightItemComponent
+		TrafficLightItemComponent,
+		BarChartComponent,
+		BarChartItemComponent,
+		LineChartComponent,
+		LineChartItemComponent,
+		PieChartComponent,
+		PieChartItemComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -397,7 +411,13 @@ export const httpInterceptorProviders = [
 		DownloadWidgetComponent,
 		DownloadWidgetItemComponent,
 		TrafficLightComponent,
-		TrafficLightItemComponent
+		TrafficLightItemComponent,
+		BarChartComponent,
+		BarChartItemComponent,
+		LineChartComponent,
+		LineChartItemComponent,
+		PieChartComponent,
+		PieChartItemComponent
 	],
 	providers: [
 		AuthGuard,

@@ -33,6 +33,8 @@ import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {environment} from '../../environments/environment';
 import {ActivatedRoute} from '@angular/router';
 import {BaseComponent} from '../components/base.component';
+import {IBarChartOptions, IChartistAnimationOptions, IChartistData} from 'chartist';
+import {ChartEvent, ChartType} from 'ng-chartist';
 
 @Component({
 	styleUrls: ['home.component.scss'],

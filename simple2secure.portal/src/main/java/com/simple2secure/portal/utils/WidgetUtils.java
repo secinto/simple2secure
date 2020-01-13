@@ -90,6 +90,8 @@ public class WidgetUtils extends BaseServiceProvider {
 				return notificationRepository.getNotificationsWithPagination(contextId, 0, 3);
 			} else if (api.contains(StaticConfigItems.WIDGET_API_GROUPS)) {
 				return groupUtils.getAllGroupsByContextId(context);
+			} else if (api.contains(StaticConfigItems.WIDGET_API_GET_CONTEXT_GROUPS_GRAPH)) {
+				return groupUtils.getLicenseDownloadsForContext(context);
 			}
 		}
 		return "";
