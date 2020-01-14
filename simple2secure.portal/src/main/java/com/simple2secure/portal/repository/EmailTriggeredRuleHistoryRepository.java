@@ -28,7 +28,5 @@ import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class EmailTriggeredRuleHistoryRepository extends MongoRepository<TriggeredRuleEmail> {
 	public abstract TriggeredRuleEmail findByRuleName(String ruleName);
-	
-	public abstract void deleteByRuleId(String ruleName);
 
 }

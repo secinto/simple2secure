@@ -50,10 +50,4 @@ public class EmailTriggeredRuleHistoryRepositoryImpl extends EmailTriggeredRuleH
 		return mongoTemplate.findOne(query, TriggeredRuleEmail.class, collectionName);
 	}
 
-	@Override
-	public void deleteByRuleId(String ruleName) {
-		// TODO Auto-generated method stub
-		//TODO: implement
-		
-	}
 }
