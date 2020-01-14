@@ -29,11 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.TemplateRule;
-import com.simple2secure.api.model.TriggeredRule;
+import com.simple2secure.api.model.TriggeredRuleEmail;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.RuleName;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
-import com.simple2secure.portal.repository.EmailRuleTriggeredRepository;
+import com.simple2secure.portal.repository.EmailTriggeredRuleHistoryRepository;
 
 import lombok.Setter;
 
@@ -41,7 +41,7 @@ import lombok.Setter;
 public abstract class AbtractEmailCondition implements Condition {
 
 	@Autowired
-	EmailRuleTriggeredRepository emailRuleTriggeredRepository;
+	EmailTriggeredRuleHistoryRepository emailTriggeredRuleHistoryRepository;
 	
 	@RuleName()
 	protected String ruleName;
@@ -66,12 +66,12 @@ public abstract class AbtractEmailCondition implements Condition {
 			
 			Email email = facts.get("com.simple2secure.api.model.Email");	
 			
-			TriggeredRule triggeredRule = emailRuleTriggeredRepository.findByRuleName(ruleName);
+			TriggeredRuleEmail triggeredRule = emailTriggeredRuleHistoryRepository.findByRuleName(ruleName);
 			
 			if(triggeredRule != null) {
 				triggeredRule.getEmails().add(email);
 				try {
-					emailRuleTriggeredRepository.update(triggeredRule);
+					emailTriggeredRuleHistoryRepository.update(triggeredRule);
 				} catch (ItemNotFoundRepositoryException e) {
 					e.printStackTrace();
 				}
@@ -81,9 +81,9 @@ public abstract class AbtractEmailCondition implements Condition {
 						"description is not implemented", //TODO:
 						email.getConfigId(),
 						null, null);
-				triggeredRule = new TriggeredRule(templateRule);
+				triggeredRule = new TriggeredRuleEmail(templateRule);
 				triggeredRule.addMail(email);
-				emailRuleTriggeredRepository.save(triggeredRule);
+				emailTriggeredRuleHistoryRepository.save(triggeredRule);
 			}
 			
 			if (triggeredRule.getTriggeredEmailCount() >= typeLimit)
