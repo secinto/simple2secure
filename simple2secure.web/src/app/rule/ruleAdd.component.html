@@ -33,7 +33,6 @@
     </table>
 
 
-
     <!-- =========================================================================================================== -->
     <!-- Tabs for expert and template mode -->
     <mat-tab-group #tabGroup mat-align-tabs="center" [selectedIndex]="selectedTab">
@@ -41,6 +40,28 @@
         <!-- ------------------------------------------------------------------------------------------------------- -->
         <!-- Template tab -->
         <mat-tab #templateTab label="{{ 'menu.RuleTemplate' | translate }}" [disabled]="disableTemplateTab">
+
+            <!-- email configuration input -->
+            <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ 'rule.add.emailconfigurations' | translate }}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div *ngIf = "!emailConfigs || emailConfigs.length == 0;else configs_found">
+                    there are no email configurations found
+                </div>
+
+                <ng-template #configs_found>
+                    <!--implement checkboxes here-->
+                    <div *ngFor="let emailConfig of emailConfigs">
+                        {{emailConfig.configuration.email}}
+                    </div>
+                </ng-template>
+
+
+            </mat-expansion-panel>
 
 
             <!-- Condition input -->

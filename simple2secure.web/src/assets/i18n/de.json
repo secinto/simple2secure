@@ -408,6 +408,7 @@
 
   "rule.condition": "Regel Bedingung",
   "rule.action": "Regel Aktion",
+  "rule.add.emailconfigurations": "Emailkonfiguration hinzufügen",
 
   "osquery.runalways": "Immer ausführen?",
   "osquery.details": "Abfrage Details",

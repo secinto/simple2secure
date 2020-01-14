@@ -23,7 +23,7 @@
 import { Component, Inject, ViewChild, } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services';
 import {MatDialogRef, MAT_DIALOG_DATA, MatTabGroup, MatSnackBar, } from '@angular/material';
-import {RuleWithSourcecode} from '../_models';
+import {EmailConfiguration, EmailConfigurationDTO, RuleWithSourcecode} from '../_models';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
@@ -68,6 +68,8 @@ export class RuleAddComponent {
     selectedTab: number;
     // title which will be displayed at the head of the dialog
     dialogTitle: string;
+    loading = false;
+    emailConfigs: EmailConfigurationDTO[];
 
     @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -173,9 +175,13 @@ export class RuleAddComponent {
 
         // fetches the template actions/conditions from the database
         this.getTemplates();
+        //fetching email configurations, for mapping them to a rule
+        this.loadEmailConfigurations();
+
 	}
 
-    ngAfterViewInit() {}
+    ngAfterViewInit() {
+    }
 
     /**
      * Method to load template actions and conditions from the database
@@ -220,6 +226,32 @@ export class RuleAddComponent {
                     else {
                         this.alertService.error(error.error.errorMessage);
                     }
+                });
+    }
+
+    private loadEmailConfigurations() {
+        this.loading = true;
+        this.httpService.get(environment.apiEndpoint + 'email')
+            .subscribe(
+                data => {
+                    this.emailConfigs = data;
+
+                    if (data.length > 0) {
+                        this.alertService.success(this.translate.instant('message.emailConfig'));
+                    }
+                    else {
+                        this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
+                    }
+                    this.loading = false;
+                },
+                error => {
+                    if (error.status == 0) {
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                        this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
                 });
     }
 
