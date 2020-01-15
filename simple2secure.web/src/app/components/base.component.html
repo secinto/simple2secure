@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="example-container">
+      <button class="btn btn-sm btn-add-widget mat-green-button" (click)="openDialogAddWidget()">{{"widget.add" | translate}}</button>
+      <ngx-widget-grid [rows]="4" [columns]="5" [highlightNextPosition]="false"
+                       [showGrid]="false" (widgetPositionChange)="onWidgetChange($event)" #grid>
+          <ngx-widget *ngFor="let widget of widgets;let $index = index;"
+                      [position]="getRectangle(widget)"
+                      [movable]="true"
+                      [resizable]="true">
+              <app-stat *ngIf="widget.widget.tag === 'app-stat'" [bgClass]="widget.widget.bgClass"
+                        [icon]="widget.widget.icon" [count]="widget.value" [name]="widget.widget.name" [propertiesId]="widget.widgetProperties.id">
+              </app-stat>
+              <app-notification *ngIf="widget.widget.tag === 'app-notification'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-notification>
+              <app-traffic-light *ngIf="widget.widget.tag === 'app-traffic-light'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-traffic-light>
+              <app-download *ngIf="widget.widget.tag === 'app-download'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-download>
+              <app-bar-chart *ngIf="widget.widget.tag === 'app-bar-chart'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-bar-chart>
+              <app-line-chart *ngIf="widget.widget.tag === 'app-line-chart'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-line-chart>
+              <app-pie-chart *ngIf="widget.widget.tag === 'app-pie-chart'" [bgClass]="widget.widget.bgClass"
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-pie-chart>          
+          </ngx-widget>
+      </ngx-widget-grid>
+    </div>
+</div>

@@ -93,15 +93,16 @@ public class ProbeCLI {
 		LicenseController licenseController = new LicenseController();
 		CompanyLicensePublic license = licenseController.loadLicense();
 
-		if (ProbeUtils.isServerReachable()) {
-			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, ProbeConfiguration.ipAddress,
-					ProbeConfiguration.netmask, DeviceType.PROBE);
+		StartConditions startConditions = licenseController.checkLicenseValidity(license);
+		
+		if (startConditions.equals(StartConditions.LICENSE_VALID)) {
+			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, DeviceType.PROBE);
+			deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
+			deviceInfo.setNetMask(ProbeConfiguration.netmask);
 			deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
 
 			ProbeUtils.sendDeviceInfo(deviceInfo);
 		}
-
-		StartConditions startConditions = licenseController.checkLicenseValidity(license);
 
 		try {
 			prepareOsQuery();
@@ -150,17 +151,32 @@ public class ProbeCLI {
 		if (!FileUtil.fileOrFolderExists("tools")) {
 			FileUtil.createFolder("tools", true);
 		}
-		for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION) {
-			File newLocation = new File("./tools" + location);
-			if (!newLocation.exists()) {
-				FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+		String os_name = System.getProperty("os.name");
+		if(os_name.contains("Windows")) {
+			for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_WINDOWS) {
+				File newLocation = new File(location);
+				if (!newLocation.exists()) {
+					FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+				}
+				if (location.endsWith("osqueryi.exe")) {
+					ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+				} else {
+					ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+				}
 			}
-			if (location.endsWith("osqueryi.exe")) {
-				ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
-			} else {
-				ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+		}else if (os_name.contains("Linux")) {
+			for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_LINUX) {
+				File newLocation = new File(location);
+				if (!newLocation.exists()) {
+					FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+				}
+				if (location.endsWith("osqueryi")) {
+					ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+				} else {
+					ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+				}
 			}
-		}
+		}   
 	}
 
 	/**

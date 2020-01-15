@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 
 import requests
+import os
 from flask import json
 
 from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType
@@ -114,18 +115,27 @@ def send_license(app, licensePublic=None):
     resp_data = portal_post(app, url, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
-        devInfo = DeviceInfo.query.one()
-        if not devInfo:
-            send_device_info(app, license_json)
         accessToken = json.loads(resp_data.text)['accessToken']
         if accessToken:
             licensePublic.accessToken = accessToken
             licensePublic.activated = True
             update(licensePublic)
             update_pod_status_auth(app, accessToken)
+            devInfo = ""
+            try:
+                devInfo = DeviceInfo.query.one()
+            except:
+                log.error("Could not retreive DeviceInfo from DB!")
+            if not devInfo:
+                send_device_info(app, license_json)
             log.info('Obtained new access token from portal')
         else:
             log.error('No access token was provided as response to the authentication')
+
+
+
+
+
     elif resp_data is not None:
         message = json.loads(resp_data.text)['errorMessage']
         log.error('Error occurred while activating the pod: %s', message)
@@ -136,15 +146,16 @@ def send_license(app, licensePublic=None):
 
 
 def send_device_info(app, license):
-    url = app.config['PORTAL_URL'] + "device/update"
+    url = app.config['PORTAL_URL'] + "devices/update"
     lastOnlineTimestamp = datetime.now().timestamp() * 1000
     license_obj = json.loads(license)
     deviceId = license_obj['deviceId']
-    deviceInfo = DeviceInfo(deviceId, 'POD-' + deviceId, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
+    pod_name = os.environ['COMPUTERNAME']
+    deviceInfo = DeviceInfo(deviceId, pod_name, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
 
     device_info_schema = DeviceInfoSchema()
     device_info_json = json.dumps(device_info_schema.dump(deviceInfo))
-    resp_data = portal_post(app, url, device_info_json, True)
+    resp_data = portal_post(app, url, device_info_json, False)
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
         device_info_response = json.loads(resp_data.content)
         device_info_from_db = DeviceInfo.query.filter_by(deviceId=device_info_response['deviceId']).first()
@@ -153,7 +164,7 @@ def send_device_info(app, license):
             device_info_from_db.lastOnlineTimestamp = device_info_response['lastOnlineTimestamp']
             update(device_info_from_db)
         else:
-            device_info_for_db = DeviceInfo(device_info_response['deviceId'], device_info_response['hostName'], None, None, device_info_response['lastOnlineTimestamp'], device_info_response['deviceStatus'])
+            device_info_for_db = DeviceInfo(device_info_response['deviceId'], device_info_response['name'], None, None, device_info_response['lastOnlineTimestamp'], device_info_response['deviceStatus'])
             update(device_info_for_db)
 
 

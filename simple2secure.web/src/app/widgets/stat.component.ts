@@ -10,7 +10,7 @@ export class StatComponent extends BaseWidget{
     @Input() bgClass: string;
     @Input() icon: string;
     @Input() count: number;
-    @Input() label: string;
+    @Input() name: string;
     @Input() data: number;
     @Input() propertiesId: string;
     @Output() event: EventEmitter<any> = new EventEmitter();

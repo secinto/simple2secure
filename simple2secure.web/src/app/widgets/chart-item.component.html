@@ -1,0 +1,27 @@
+<div class="stat-item-component">
+    <button class="add-widget-button mat-green-button" color="primary" mat-fab (click)="addWidget()" [mat-dialog-close]="true" cdkFocusInitia><mat-icon>add</mat-icon></button>
+    <div class="card text-white bg-{{bgClass}}">
+        <div class="card-header">
+            <x-chartist *ngIf="type != 'Pie'"
+              [type]="type"
+              [data]="widgetData"
+              [options]="options"
+              [events]="events"
+            >
+              
+            </x-chartist>
+
+            <x-chartist *ngIf="type === 'Pie'"
+              [type]="type"
+              [data]="widgetDataPie"
+              [options]="options"
+              [events]="events"
+            >
+              
+            </x-chartist>
+        </div>
+        <div class="card-footer">
+            <span class="float-right"><b>{{name}}</b></span>
+        </div>
+    </div>
+</div>

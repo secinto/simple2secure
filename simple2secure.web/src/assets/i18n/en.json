@@ -190,6 +190,7 @@
   "table.inbox": "Inbox",
   "table.delete": "Delete", 
   "table.name": "Name",
+  "table.id" : "ID",
   "table.seqRunId" : "Sequence Run ID", 
   "table.sql": "SQL",        
   "table.state": "State", 
@@ -490,7 +491,7 @@
   "widget.store": "Widget Store",
   "widget.noplace": "No space available on the dashboard!",
   "widget.deleted": "Widget deleted successfully!",
-  "widget.url": "URL",
+  "widget.api": "API",
 
   "report.groups": "Groups",
   "report.devices": "Devices"

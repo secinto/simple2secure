@@ -42,8 +42,11 @@ import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.service.MessageByLocaleService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Configurable
+@Slf4j
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	String ROLE_PREFIX = "ROLE_";
@@ -70,18 +73,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 		User user = userRepository.findByEmailOnlyActivated(username);
 
-		if (user == null) {
-			throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
+		if (user != null) {
+			if (passwordEncoder.matches(password, user.getPassword())) {
+				userID = user.getId();
+				return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(UserRole.LOGINUSER.name()));
+			}
 		}
-
-		if (passwordEncoder.matches(password, user.getPassword())) {
-
-			userID = user.getId();
-			return new UsernamePasswordAuthenticationToken(username, password, getAuthorities(UserRole.LOGINUSER.name()));
-		} else {
-			throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
-		}
-
+		log.error(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
+		throw new BadCredentialsException(messageByLocaleService.getMessage("user_with_provided_creds_not_exists"));
 	}
 
 	public static Collection<? extends GrantedAuthority> getAuthorities(String role) {

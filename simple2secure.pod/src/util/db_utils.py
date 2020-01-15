@@ -2,6 +2,7 @@ import datetime
 import logging
 import secrets
 import socket
+import uuid
 
 from src.db.database import db, PodInfo, CompanyLicensePublic, Test
 from src.util.file_utils import get_license_file
@@ -61,7 +62,9 @@ def create_pod(app):
         PodInfo: Returns the currently created PodInfo object from the
     """
     with app.app_context():
-        podId = secrets.token_urlsafe(20)
+        #podId = secrets.token_urlsafe(20)
+        podId = uuid.uuid1().urn
+        podId = podId[10:]
         log.info('Generated new pod id: %s', podId)
 
         pod_info = PodInfo(podId)

@@ -29,12 +29,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.ChartData;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.OsQueryGroupMapping;
+import com.simple2secure.api.model.PieChartData;
 import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
@@ -526,4 +528,57 @@ public class GroupUtils extends BaseServiceProvider {
 		}
 		return foundGroups;
 	}
+	
+	/**
+	 * This is only a temp function to retrieve some data for the line and bar chart widget.
+	 * @param context
+	 * @param tag
+	 * @return
+	 */
+	public ChartData getLicenseDownloadsForContext(Context context, String tag) {
+			
+		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
+		
+		List<String> labels = new ArrayList<>();
+		List<List<Integer>> series = new ArrayList<>();
+		List<Integer> seriesOfData = new ArrayList<Integer>();
+		if(contextGroups != null) {
+			for(CompanyGroup group : contextGroups) {
+				labels.add(group.getName());
+				seriesOfData.add(context.getCurrentNumberOfLicenseDownloads());	
+			}
+		}
+		series.add(seriesOfData);
+		
+		ChartData chartData = new ChartData(labels, series);
+		
+		if(tag.equals(StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE)) {
+			chartData.setSeriesPieChart(seriesOfData);
+		}
+		return chartData;
+	}
+	
+	/**
+	 * This is only a temp function to retrieve some data for the pie chart widget.
+	 * @param context
+	 * @return
+	 */
+	public PieChartData getDataForPieChart(Context context) {
+		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
+		List<Integer> series = new ArrayList<>();
+		List<String> labels = new ArrayList<String>();
+		
+		if(contextGroups != null) {
+			for(CompanyGroup group : contextGroups) {
+				labels.add(group.getName());
+				series.add(context.getCurrentNumberOfLicenseDownloads());	
+			}
+		}
+		
+		PieChartData pieChartData = new PieChartData(series, labels);
+		return pieChartData;
+		
+		
+	}
+	
 }

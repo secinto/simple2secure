@@ -30,10 +30,14 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.security.Security;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -53,12 +57,16 @@ public class KeyUtils {
 
 	private static void initAsymmetric(String algorithm) throws NoSuchAlgorithmException {
 		log.debug("Creating asymmetric key generator for algorithm {}", algorithm);
-		keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+		Provider p = new BouncyCastleProvider();
+		Security.addProvider(p);
+		keyPairGenerator = KeyPairGenerator.getInstance(algorithm, Security.getProvider("BC"));
 	}
 
 	private static void initSymmetric(String algorithm) throws NoSuchAlgorithmException {
 		log.debug("Creating symmetric key generator for algorithm {}", algorithm);
-		keyGenerator = KeyGenerator.getInstance(algorithm);
+		Provider p = new BouncyCastleProvider();
+		Security.addProvider(p);
+		keyGenerator = KeyGenerator.getInstance(algorithm, Security.getProvider("BC")); //KeyGenerator.getInstance(algorithm);
 	}
 
 	/**

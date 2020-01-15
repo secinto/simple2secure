@@ -3,20 +3,23 @@ import {AlertService, HttpService} from "../_services";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
-import {HomeComponent} from "../home";
+import {BaseComponent} from "../components";
 import {environment} from "../../environments/environment";
+import {IChartistAnimationOptions} from 'chartist';
+import {ChartEvent} from 'ng-chartist';
 
 export class BaseWidget{
 
     loading = false;
 
-    constructor(private httpService: HttpService,
-                private alertService: AlertService,
-                private translate: TranslateService,
-                private location: Location,
-                private router: Router,
-                private route: ActivatedRoute,
-                private homeComponent: HomeComponent ) {}
+    constructor(public httpService: HttpService,
+                public alertService: AlertService,
+                public translate: TranslateService,
+                public location: Location,
+                public router: Router,
+                public route: ActivatedRoute,
+                public baseComponent: BaseComponent) {
+    }
 
     deleteWidgetProperty(widgetPropId: string) {
         this.loading = true;
@@ -24,7 +27,7 @@ export class BaseWidget{
             data => {
                 this.alertService.success(this.translate.instant('widget.deleted'));
                 this.loading = false;
-                this.homeComponent.loadAllWidgetsByUserId();
+                this.baseComponent.loadAllWidgetsByUserId(this.route.component["name"]);
             },
             error => {
                 if (error.status == 0) {
@@ -37,7 +40,18 @@ export class BaseWidget{
             });
     }
 
-    downloadLicense(){
-        console.log("download license");
-    }
+    events: ChartEvent = {
+        draw: (data) => {
+          if (data.type === 'bar' || data.type === 'line') {
+            data.element.animate({
+              y2: <IChartistAnimationOptions>{
+                dur: '0.5s',
+                from: data.y1,
+                to: data.y2,
+                easing: 'easeOutQuad'
+              }
+            });
+          }
+        }
+    };
 }

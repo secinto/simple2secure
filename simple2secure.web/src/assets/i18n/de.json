@@ -190,6 +190,7 @@
   "table.inbox": "Posteingang",
   "table.delete": "Löschen",
   "table.name": "Name",
+  "table.id" : "ID",
   "table.seqRunId" : "Sequenz Lauf ID",
   "table.sql": "Abfrage",
   "table.state": "Zustand",
@@ -489,7 +490,7 @@
   "widget.store": "Widget Store",
   "widget.noplace": "Im Dashboard ist kein Speicherplatz verfügbar!",
   "widget.deleted": "Widget erfolgreich gelöscht!",
-  "widget.url": "URL",
+  "widget.api": "API",
 
   "report.groups": "Gruppen",
   "report.devices": "Geräte"

@@ -1,0 +1,15 @@
+<div class="stat-item-component">
+    <button class="add-widget-button mat-green-button" color="primary" mat-fab (click)="addWidget()" [mat-dialog-close]="true" cdkFocusInitia><mat-icon>add</mat-icon></button>
+    <div class="card text-white bg-{{bgClass}}">
+        <div class="card-body bg-{{bgClass}}">
+            <div id="box">
+              <div class="light-item red" [ngClass]="{'checked': lights.isRed}"></div>
+              <div class="light-item yellow" [ngClass]="{'checked': lights.isYellow}"></div>
+              <div class="light-item green" [ngClass]="{'checked': lights.isGreen}"></div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <span class="float-right"><b>{{name}}</b></span>
+        </div>
+    </div>
+</div>

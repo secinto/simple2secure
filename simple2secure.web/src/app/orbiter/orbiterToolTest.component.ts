@@ -37,7 +37,7 @@ import {PageEvent} from '@angular/material/paginator';
 
 export class OrbiterToolTestComponent {
 
-	selectedPod: Device;
+	selectedPod: any;
 	pods: Device[];
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
@@ -112,7 +112,7 @@ export class OrbiterToolTestComponent {
 	}
 
 	public showPodTests() {
-		this.router.navigate([this.selectedPod.deviceId], {relativeTo: this.route});
+		this.router.navigate([this.selectedPod.info.deviceId], {relativeTo: this.route});
 	}
 
 	public showSequences() {

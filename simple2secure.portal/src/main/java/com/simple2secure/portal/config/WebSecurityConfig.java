@@ -17,14 +17,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.portal.security.CustomEntryPoint;
-import com.simple2secure.portal.security.auth.CustomAuthenticationFailureHandler;
 import com.simple2secure.portal.security.auth.CustomAuthenticationProvider;
-import com.simple2secure.portal.security.auth.CustomAuthenticationSuccessHandler;
 import com.simple2secure.portal.security.auth.JWTAuthenticationFilter;
 import com.simple2secure.portal.security.auth.JWTLoginFilter;
+import com.simple2secure.portal.security.auth.RestAuthenticationFailureHandler;
+import com.simple2secure.portal.security.auth.RestAuthenticationSuccessHandler;
+import com.simple2secure.portal.security.auth.TokenAuthenticationService;
 import com.simple2secure.portal.utils.PortalUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,22 +37,19 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	CustomAuthenticationProvider authProvider;
+	private CustomAuthenticationProvider authProvider;
 
 	@Autowired
-	private CustomEntryPoint authenticationEntryPoint;
+	private RestAuthenticationFailureHandler authenticationFailureHandler;
 
 	@Autowired
-	private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
-
-	@Autowired
-	private CustomAuthenticationFailureHandler authenticationFailureHandler;
+	private RestAuthenticationSuccessHandler authenticationSuccessHandler;
 
 	@Autowired
 	private UserDetailsService userDetailsService;
 
 	@Autowired
-	public LoadedConfigItems loadedConfigItems;
+	private TokenAuthenticationService tokenAuthenticationService;
 
 	@Autowired
 	private PortalUtils portalUtils;
@@ -76,19 +72,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		log.info("Following APIs are annotated as insecured {}", Arrays.toString(unsecuredApis));
 
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers(unsecuredApis).permitAll().and().authorizeRequests().anyRequest()
-				.authenticated().and()
-				.addFilterBefore(new JWTLoginFilter(StaticConfigItems.LOGIN_API, this.authenticationManager()),
-						UsernamePasswordAuthenticationFilter.class)
-				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).anonymous();
-
-		http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
-		http.formLogin().successHandler(authenticationSuccessHandler);
-		http.formLogin().failureHandler(authenticationFailureHandler);
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers(unsecuredApis).permitAll().anyRequest().authenticated().and()
+				.addFilterBefore(restLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(authProvider);
+	}
+
+	@Bean
+	JWTLoginFilter restLoginFilter() throws Exception {
+		final JWTLoginFilter filter = new JWTLoginFilter(StaticConfigItems.LOGIN_API, this.authenticationManager());
+		filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+		filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+		return filter;
+	}
+
+	@Bean
+	JWTAuthenticationFilter restAuthenticationFilter() {
+		final JWTAuthenticationFilter authFilter = new JWTAuthenticationFilter(tokenAuthenticationService);
+		return authFilter;
 	}
 }

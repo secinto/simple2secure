@@ -24,7 +24,8 @@
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@swimlane/ngx-dnd/release/index.css"
+              "node_modules/@swimlane/ngx-dnd/release/index.css",
+			  "node_modules/chartist/dist/chartist.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",

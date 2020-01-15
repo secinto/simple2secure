@@ -28,6 +28,7 @@ import com.simple2secure.portal.validation.model.ValidInputTestResult;
 import com.simple2secure.portal.validation.model.ValidInputTestRun;
 import com.simple2secure.portal.validation.model.ValidInputToken;
 import com.simple2secure.portal.validation.model.ValidInputWidget;
+import com.simple2secure.portal.validation.model.ValidInputWidgetLocation;
 import com.simple2secure.portal.validation.model.ValidInputWidgetProp;
 
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +99,8 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputWidget().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputWidgetProp.class) {
 				return (T) new ValidInputWidgetProp().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputWidgetLocation.class) {
+				return (T) new ValidInputWidgetLocation().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputOsinfo.class) {
 				return (T) new ValidInputOsinfo().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputName.class) {

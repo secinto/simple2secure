@@ -30,4 +30,5 @@ export class WidgetProperties extends Base {
 	left: number;
 	height: number;
 	width: number;
+	location: string;
 }

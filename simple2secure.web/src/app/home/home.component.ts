@@ -31,6 +31,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {AlertService, DataService, HttpService} from '../_services';
 import {WidgetDTO} from '../_models/DTO/widgetDTO';
 import {environment} from '../../environments/environment';
+import {ActivatedRoute} from '@angular/router';
+import {BaseComponent} from '../components/base.component';
+import {IBarChartOptions, IChartistAnimationOptions, IChartistData} from 'chartist';
+import {ChartEvent, ChartType} from 'ng-chartist';
 
 @Component({
 	styleUrls: ['home.component.scss'],
@@ -38,125 +42,19 @@ import {environment} from '../../environments/environment';
 	templateUrl: 'home.component.html'
 })
 
-export class HomeComponent implements OnInit {
-	widgets: WidgetDTO[] = [];
-	widgetDTO: WidgetDTO;
-	@ViewChild('grid') grid: NgxWidgetGridComponent;
-	constructor(private dialog: MatDialog,
-				private alertService: AlertService,
-				private translate: TranslateService,
-				private dataService: DataService,
-				private httpService: HttpService) {
+export class HomeComponent extends BaseComponent{
+	location: string = this.route.component["name"];
+
+	constructor(dialog: MatDialog,
+				alertService: AlertService,
+				translate: TranslateService,
+				dataService: DataService, 
+				httpService: HttpService,
+				route: ActivatedRoute) {
+		super(dialog, alertService, translate, dataService, httpService, route);
 	}
 
-	ngOnInit(): void {
-		this.loadAllWidgetsByUserId();
-	}
-
-	public getValueFromApi(widget: WidgetDTO){
-		if(!widget.isValueSet){
-			this.httpService.get(environment.apiEndpoint + widget.widget.url).shareReplay()
-				.subscribe(
-					data => {
-						widget.isValueSet = true;
-						widget.value = data;
-						return data;
-					},
-					error => {
-						return 0;
-					});
-			return 0;
-		}
-	}
-
-	public loadAllWidgetsByUserId() {
-		this.httpService.get(environment.apiEndpoint + 'widget/get')
-			.subscribe(
-				data => {
-					this.widgets = data;
-
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
-	}
-
-	onWidgetChange(event: WidgetPositionChange) {
-		this.widgets[event.index].widgetProperties.width = event.newPosition.width;
-		this.widgets[event.index].widgetProperties.height = event.newPosition.height;
-		this.widgets[event.index].widgetProperties.left = event.newPosition.left;
-		this.widgets[event.index].widgetProperties.top = event.newPosition.top;
-
-		this.updateSaveWidgetPosition(this.widgets[event.index]);
-
-	}
-
-
-	updateSaveWidgetPosition(widget: WidgetDTO){
-		this.httpService.post(widget, environment.apiEndpoint + 'widget/updatePosition')
-			.subscribe(
-				data => {
-					widget.widgetProperties = data;
-				},
-				error => {
-
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-				});
-	}
-
-	openDialogAddWidget(): void {
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.width = '350px';
-
-		dialogConfig.data = {
-			widgets: null
-		};
-		const dialogRef = this.dialog.open(WidgetStoreComponent, dialogConfig);
-		this.dataService.clearWidgets();
-		dialogRef.afterClosed().subscribe(result => {
-			this.addWidgetsToTheList();
-		});
-	}
-
-	addWidgetsToTheList(){
-		if (this.dataService.getSelectedWidget() != null) {
-			const position = this.grid.getNextPosition();
-			if (position) {
-				this.widgetDTO = new WidgetDTO();
-				this.widgetDTO.widget = this.dataService.getSelectedWidget();
-				this.widgetDTO.widgetProperties.height = 1;
-				this.widgetDTO.widgetProperties.left = position.left;
-				this.widgetDTO.widgetProperties.top = position.top;
-				this.widgetDTO.widgetProperties.width = 1;
-				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
-
-				this.widgets.push(this.widgetDTO);
-			}
-			else{
-				this.alertService.error(this.translate.instant('widget.noplace'));
-			}
-
-			this.dataService.clearWidgets();
-		}
-	}
-
-	getRectangle(widget: WidgetDTO){
-		const rectangle = new Rectangle();
-		rectangle.width = widget.widgetProperties.width;
-		rectangle.height = widget.widgetProperties.height;
-		rectangle.left = widget.widgetProperties.left;
-		rectangle.top = widget.widgetProperties.top;
-		return rectangle;
+	public loadWidgets(location: string){
+		this.loadAllWidgetsByUserId(location); 
 	}
 }

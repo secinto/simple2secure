@@ -1,6 +1,8 @@
 package com.simple2secure.api.model;
 
 import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
@@ -14,6 +16,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
+@Entity
+@Table(name = "DeviceInfo")
 public class DeviceInfo extends GenericDBObject {
 
 	/**
@@ -23,8 +27,8 @@ public class DeviceInfo extends GenericDBObject {
 
 	protected @NonNull String name;
 	protected @NonNull String deviceId;
-	protected @NonNull String ipAddress;
-	protected @NonNull String netMask;
+	protected String ipAddress;
+	protected String netMask;
 	protected @Embedded @NonNull DeviceType type;
 	protected DeviceStatus deviceStatus = DeviceStatus.UNKNOWN;
 	protected long lastOnlineTimestamp;

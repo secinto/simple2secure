@@ -33,7 +33,7 @@ import {ResetComponent} from './resetPassword';
 import {ResendComponent} from './resendActivation';
 import {UpdatePasswordComponent} from './updatePassword';
 
-import {AlertComponent, FooterComponent} from './components';
+import {AlertComponent, FooterComponent, BaseComponent} from './components';
 
 import {SearchComponent, SearchResultComponent} from './search';
 import {NotificationComponent, NotificationDetailsComponent} from './notification';
@@ -87,7 +87,7 @@ import {DevicesComponent, DevicesListComponent} from './devices/index';
 import {EqualValidator} from './_directives';
 import {AuthGuard} from './_guards';
 import {TruncatePipe} from './_helpers';
-import {AlertService, AuthenticationService, DataService, HelperService, HttpService} from './_services';
+import {AlertService, AuthenticationService, DataService, HelperService, HttpService, WidgetService} from './_services';
 import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
 import {LoginLayoutComponent} from './_layouts/loginLayout';
 import {NavbarComponent} from './navbar';
@@ -187,6 +187,16 @@ import {NotificationCardItem} from "./widgets/notification-card-item.component";
 import {NgxGraphModule} from "@swimlane/ngx-graph"
 import {TooltipModule} from "@swimlane/ngx-charts";
 import {DownloadWidgetComponent} from "./widgets/download-widget.component";
+import {DownloadWidgetItemComponent} from "./widgets/download-item.component";
+import {TrafficLightComponent} from "./widgets/traffic-light.component";
+import {TrafficLightItemComponent} from "./widgets/traffic-light-item.component";
+import {BarChartComponent} from "./widgets/bar-chart.component";
+import {BarChartItemComponent} from "./widgets/bar-chart-item.component";
+import {LineChartComponent} from "./widgets/line-chart.component";
+import {LineChartItemComponent} from "./widgets/line-chart-item.component";
+import {PieChartComponent} from "./widgets/pie-chart.component";
+import {PieChartItemComponent} from "./widgets/pie-chart-item.component";
+import {ChartistModule} from 'ng-chartist';
 
 export const httpInterceptorProviders = [
 	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
@@ -263,7 +273,8 @@ export const httpInterceptorProviders = [
 		BoxModule,
 		BreadcrumbsModule,
 		NgxGraphModule,
-		TooltipModule
+		TooltipModule,
+		ChartistModule
 	],
 	declarations: [
 		AppComponent,
@@ -297,6 +308,7 @@ export const httpInterceptorProviders = [
 		OsQueryReportDetailsComponent,
 		QueryEditDialogComponent,
 		FooterComponent,
+		BaseComponent,
 		EqualValidator,
 		OrbiterComponent,
 		OrbiterOverviewComponent,
@@ -344,6 +356,7 @@ export const httpInterceptorProviders = [
 		NotificationCardItem,
 		WidgetStoreComponent,
 		DownloadWidgetComponent,
+		DownloadWidgetItemComponent,
 		DevicesComponent,
 		DevicesOverviewComponent,
 		DevicesListComponent,
@@ -353,7 +366,15 @@ export const httpInterceptorProviders = [
 		QueryListComponent,
 		QueryAssignComponent,
 		MappedQueryEditDialog,
-		QueryCategoryAddDialog
+		QueryCategoryAddDialog,
+		TrafficLightComponent,
+		TrafficLightItemComponent,
+		BarChartComponent,
+		BarChartItemComponent,
+		LineChartComponent,
+		LineChartItemComponent,
+		PieChartComponent,
+		PieChartItemComponent
 	],
 	entryComponents: [
 		ConfirmationDialog,
@@ -387,7 +408,16 @@ export const httpInterceptorProviders = [
 		UserGroupEditComponent,
 		MappedQueryEditDialog,
 		QueryCategoryAddDialog,
-		DownloadWidgetComponent
+		DownloadWidgetComponent,
+		DownloadWidgetItemComponent,
+		TrafficLightComponent,
+		TrafficLightItemComponent,
+		BarChartComponent,
+		BarChartItemComponent,
+		LineChartComponent,
+		LineChartItemComponent,
+		PieChartComponent,
+		PieChartItemComponent
 	],
 	providers: [
 		AuthGuard,
@@ -397,6 +427,7 @@ export const httpInterceptorProviders = [
 		HttpService,
 		DataService,
 		HelperService,
+		WidgetService,
 		httpInterceptorProviders,
 		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
 		DatePipe
