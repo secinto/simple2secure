@@ -21,7 +21,7 @@
               <app-line-chart *ngIf="widget.widget.tag === 'app-line-chart'" [bgClass]="widget.widget.bgClass"
                         [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-line-chart>
               <app-pie-chart *ngIf="widget.widget.tag === 'app-pie-chart'" [bgClass]="widget.widget.bgClass"
-                        [name]="widget.widget.name" [data]="widget.value.seriesPieChart" [propertiesId]="widget.widgetProperties.id"></app-pie-chart>          
+                        [name]="widget.widget.name" [data]="widget.value" [propertiesId]="widget.widgetProperties.id"></app-pie-chart>          
           </ngx-widget>
       </ngx-widget-grid>
     </div>

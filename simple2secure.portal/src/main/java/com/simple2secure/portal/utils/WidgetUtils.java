@@ -93,7 +93,7 @@ public class WidgetUtils extends BaseServiceProvider {
 			} else if (api.contains(StaticConfigItems.WIDGET_API_GET_CONTEXT_GROUPS_GRAPH)) {
 				return groupUtils.getLicenseDownloadsForContext(context, StaticConfigItems.WIDGET_API_GET_CONTEXT_GROUPS_GRAPH);
 			} else if (api.contains(StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE)) {
-				return groupUtils.getLicenseDownloadsForContext(context, StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE);
+				return groupUtils.getDataForPieChart(context);
 			}
 		}
 		return "";

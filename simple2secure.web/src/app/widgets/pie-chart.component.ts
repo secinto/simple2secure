@@ -24,8 +24,4 @@ export class PieChartComponent extends BaseWidget{
     options: IPieChartOptions = {
         height: 300
     };
-
-    ngAfterViewInit(){
-        console.log(this.data);
-    }
 }
