@@ -93,7 +93,9 @@ public class ProbeCLI {
 		LicenseController licenseController = new LicenseController();
 		CompanyLicensePublic license = licenseController.loadLicense();
 
-		if (ProbeUtils.isServerReachable()) {
+		StartConditions startConditions = licenseController.checkLicenseValidity(license);
+		
+		if (startConditions.equals(StartConditions.LICENSE_VALID)) {
 			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, DeviceType.PROBE);
 			deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
 			deviceInfo.setNetMask(ProbeConfiguration.netmask);
@@ -101,8 +103,6 @@ public class ProbeCLI {
 
 			ProbeUtils.sendDeviceInfo(deviceInfo);
 		}
-
-		StartConditions startConditions = licenseController.checkLicenseValidity(license);
 
 		try {
 			prepareOsQuery();
