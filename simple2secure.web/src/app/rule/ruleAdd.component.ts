@@ -36,6 +36,8 @@ import {DataType} from '../_models/dataType';
 
 import 'brace';
 import 'ace-builds/src-noconflict/mode-groovy';
+import {RuleUserPair} from "../_models/ruleUserPair";
+import {template} from "@angular/core/src/render3";
 
 @Component({
 	moduleId: module.id,
@@ -69,10 +71,14 @@ export class RuleAddComponent {
     // title which will be displayed at the head of the dialog
     dialogTitle: string;
     loading = false;
+    // chosen email configs for mapping rule to email
     emailConfigs: EmailConfigurationDTO[];
+    emailConfigsChosen: boolean[];
+    ruleUserPairs: RuleUserPair[];
 
     @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
+
 
 	constructor(
 		private route: ActivatedRoute,
@@ -178,6 +184,8 @@ export class RuleAddComponent {
         //fetching email configurations, for mapping them to a rule
         this.loadEmailConfigurations();
 
+        this.getRuleUserPairs();
+
 	}
 
     ngAfterViewInit() {
@@ -237,6 +245,11 @@ export class RuleAddComponent {
                     this.emailConfigs = data;
 
                     if (data.length > 0) {
+                        this.emailConfigsChosen = new Array();
+
+                        for(let i = 0; i < this.emailConfigs.length; i++)
+                            this.emailConfigsChosen.push(false);
+
                         this.alertService.success(this.translate.instant('message.emailConfig'));
                     }
                     else {
@@ -250,6 +263,41 @@ export class RuleAddComponent {
                     }
                     else {
                         this.alertService.error(error.error.errorMessage);
+                    }
+                    this.loading = false;
+                });
+    }
+
+    private getRuleUserPairs() { // ruleUserPairs
+
+        this.httpService.get(environment.apiEndpoint + 'rule_user_pair/' + this.ruleTemplate.id)
+            .subscribe(
+                data => {
+                    this.ruleUserPairs = data;
+
+                    if (data.length > 0) {
+
+                        for(let i = 0; i < this.emailConfigs.length; i++)
+                        {
+                            this.ruleUserPairs.forEach(pair => {
+                                if(pair.emailConfigurationId == this.emailConfigs[i].configuration.id)
+                                    this.emailConfigsChosen[i] = true;
+                            });
+                        }
+
+                        this.alertService.success(this.translate.instant('message.emailConfig'));
+                    }
+                    else {
+                        this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
+                    }
+                    this.loading = false;
+                },
+                error => {
+                    if (error.status == 0) {
+                        this.alertService.error(this.translate.instant('server.notresponding'));
+                    }
+                    else {
+                        this.alertService.error(error.errorMessage);
                     }
                     this.loading = false;
                 });
@@ -463,6 +511,8 @@ export class RuleAddComponent {
                 // tries to save the rule
                 this.httpService.post(this.ruleTemplate, environment.apiEndpoint + 'rule/templaterule').subscribe(
                     data => {
+                        this.ruleTemplate = data;
+                        this.saveMappingRuleUser(this.ruleTemplate.id);
                         this.dialogRef.close(true);
                     },
                     error => {
@@ -483,10 +533,10 @@ export class RuleAddComponent {
                 // saves all data from gui into the rule object
                 this.ruleExpert.name = this.ruleName;
                 this.ruleExpert.description = this.ruleDescription;
-
                 // tries to save the rule
                 this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource').subscribe(
                     data => {
+                        //this.saveMappingRuleUser();
                         this.dialogRef.close(true);
                     },
                     error => {
@@ -500,4 +550,25 @@ export class RuleAddComponent {
             }
         }
 	}
+
+	private saveMappingRuleUser(ruleId: string)
+    {
+        let ruleEmailConfigurationPairs = new Array();
+
+        for(let index = 0; index < this.emailConfigs.length; index++)
+        {
+            if(this.emailConfigsChosen[index] == true)
+            {
+                let ruleUserPair = new RuleUserPair();
+                ruleUserPair.contextId = "";
+                ruleUserPair.emailConfigurationId = this.emailConfigs[index].configuration.id;
+                ruleUserPair.ruleId = ruleId;
+                ruleEmailConfigurationPairs.push(ruleUserPair);
+            }
+        }
+
+        this.httpService.post(ruleEmailConfigurationPairs, environment.apiEndpoint + 'rule/mapping').subscribe(
+            data => {},
+            error => {});
+    }
 }
