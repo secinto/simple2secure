@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.api.model.RuleUserPair;
 import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
@@ -306,5 +308,61 @@ public class RuleController extends BaseUtilsProvider {
 		return (ResponseEntity<TemplateRule>) buildResponseEntity("problem_occured_while_deleting_rule", locale);
 
 	}
+	
+	/**
+	 * Method to map rule to user 
+	 *
+	 * @param List with RuleUserPairs
+	 * @param locale
+	 *          which has been used in the web application
+	 *
+	 * @return ResponseEntity object with the ruleWithSourcecode object or with an error.
+	 *
+	 * @throws ItemNotFoundRepositoryException
+	 */
 
+	@ValidRequestMapping(value = "/mapping", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<RuleUserPair>> mapRuleWithEmailConfig(@RequestBody List<RuleUserPair> ruleUserPairs,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
+			throws ItemNotFoundRepositoryException {
+
+		if (ruleUserPairs != null && ruleUserPairs.size() != 0) {
+
+			final String ruleId = ruleUserPairs.get(0).getRuleId(); 
+			ruleUserPairsRepository.deleteByRuleId(contextId.getValue(), ruleId);
+			
+			ruleUserPairs.forEach(pair -> {
+				pair.setContextId(contextId.getValue());
+				ruleUserPairsRepository.save(pair);
+			});
+
+			return new ResponseEntity<>(ruleUserPairs, HttpStatus.OK);
+		}
+		return ((ResponseEntity<List<RuleUserPair>>) buildResponseEntity("", locale)); //TODO
+	}
+	
+	/**
+	 * Method to get users which are mapped to a rule
+	 *
+	 * @param ruleId
+	 * @param locale
+	 *          which has been used in the web application
+	 *
+	 * @return ResponseEntity object with the Actions in a List or an error.
+	 */
+	@ValidRequestMapping(value = "/rule_user_pair")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<RuleUserPair>> getRuleUserPairs(@PathVariable String ruleId,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
+		
+		
+		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(ruleId)) {
+			List<RuleUserPair> ruleUserPairs = ruleUserPairsRepository.getByContextIdAndRuleId(contextId.getValue(), ruleId);
+		
+			return new ResponseEntity<List<RuleUserPair>>(ruleUserPairs, HttpStatus.OK);
+		}
+		
+		return (ResponseEntity<List<RuleUserPair>>) buildResponseEntity("", locale);
+	}
 }
