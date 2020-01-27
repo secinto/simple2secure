@@ -59,21 +59,27 @@ def execute_test(test, test_id, test_name, test_run_id):
     """
     results = {}
 
-    tool_precondition = json_utils.get_json_test_object_new(test, "precondition", "command")
-    parameter_precondition = json_utils.get_json_test_object_new(test, "precondition", "parameter")
-    tool_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "command")
-    parameter_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "parameter")
-    tool_step = json_utils.get_json_test_object_new(test, "step", "command")
-    parameter_step = json_utils.get_json_test_object_new(test, "step", "parameter")
+    executable_precondition = json_utils.prepare_testsection_for_execution(test, 'precondition')
+    executable_step = json_utils.prepare_testsection_for_execution(test, 'step')
+    executable_postcondition = json_utils.prepare_testsection_for_execution(test, 'postcondition')
+
+    try:
+        scanner(executable_precondition, results, 'precondition')
+    except:
+        pass
+
+    try:
+        scanner(executable_step, results, 'step')
+    except:
+        pass
+
+    try:
+        scanner(executable_postcondition, results, 'postcondition')
+    except:
+        pass
+
 
     # TODO: Create folder for execution of each celery task
-
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_precondition), parameter_precondition), results, "precondition")
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_step), parameter_step), results, "step")
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_postcondition), parameter_postcondition), results, "postcondition")
 
     timestamp = get_current_timestamp()
     test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
