@@ -108,14 +108,15 @@ public class ReportController extends BaseUtilsProvider {
 		if (groups != null) {
 
 			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
-
 			if (groupIds != null && !groupIds.isEmpty()) {
 				List<Device> devices = deviceUtils.getAllDevicesByGroupIds(groupIds);
-				List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
-				if (deviceIds != null) {
-					OsQueryReportDTO reportDto = new OsQueryReportDTO();
-					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
-					return new ResponseEntity<>(reportDto, HttpStatus.OK);
+				if(devices != null) {
+					List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+					if (deviceIds != null) {
+						OsQueryReportDTO reportDto = new OsQueryReportDTO();
+						reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
+						return new ResponseEntity<>(reportDto, HttpStatus.OK);
+					}
 				}
 			}
 		}

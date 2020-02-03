@@ -23,9 +23,11 @@
 import {Generic} from './generic';
 
 export class CompanyGroup extends Generic {
+	parentId: string;
 	name: string;
 	contextId: string;
-	children: string[];
+	childrenIds: string[];
+	children: CompanyGroup[];
 	rootGroup: boolean;
 	standardGroup: boolean;
 }
