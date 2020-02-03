@@ -25,7 +25,6 @@ package com.simple2secure.portal.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +47,6 @@ import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
-import com.simple2secure.portal.pulsar.PulsarConsumer;
-import com.simple2secure.portal.pulsar.PulsarProducer;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
 import com.simple2secure.portal.validation.model.ValidInputDeviceType;
@@ -292,47 +289,6 @@ public class DeviceController extends BaseUtilsProvider {
 	@ValidRequestMapping(
 			value = "/status")
 	public ResponseEntity<Service> getStatus(@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
-		currentVersion.setId("1");
-		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
-	}
-
-	@NotSecuredApi
-	@ValidRequestMapping(
-			value = "/pulsar/consume")
-	public ResponseEntity<Service> consumePulsarMessages() throws ItemNotFoundRepositoryException {
-
-		PulsarConsumer pulsarConsumer = new PulsarConsumer("my-topic", pulsarClientConfig.getPulsarClient());
-
-		try {
-			pulsarConsumer.run();
-			pulsarConsumer.close();
-		} catch (PulsarClientException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
-		currentVersion.setId("1");
-		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
-	}
-
-	@NotSecuredApi
-	@ValidRequestMapping(
-			value = "/pulsar/produce")
-	public ResponseEntity<Service> producePulsarMessages() throws ItemNotFoundRepositoryException {
-
-		PulsarProducer pulsarProducer = new PulsarProducer("my-topic", pulsarClientConfig.getPulsarClient());
-
-		try {
-			pulsarProducer.init();
-			pulsarProducer.send("new Message");
-			pulsarProducer.close();
-		} catch (PulsarClientException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
 		Service currentVersion = new Service("simple2secure", loadedConfigItems.getVersion());
 		currentVersion.setId("1");
 		return new ResponseEntity<>(currentVersion, HttpStatus.OK);
