@@ -10,7 +10,7 @@ import {WidgetStoreComponent} from '../widgets/widgetStore.component';
 
 @Component({
 	selector: 'base-component-widget',
-	templateUrl: 'base.component.html',
+	templateUrl: 'base.component.html'
 })
 export class BaseComponent{
 

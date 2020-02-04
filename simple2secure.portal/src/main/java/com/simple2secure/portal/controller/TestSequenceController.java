@@ -97,11 +97,10 @@ public class TestSequenceController extends BaseUtilsProvider {
 
 	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<TestSequence> deleteSequence(@PathVariable String sequenceId, @ServerProvidedValue ValidInputLocale locale)
+	public ResponseEntity<TestSequence> deleteSequence(@PathVariable ValidInputSequence sequenceId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
-
-		if (!Strings.isNullOrEmpty(sequenceId)) {
-			TestSequence sequence = testSequenceRepository.find(sequenceId);
+		if (!Strings.isNullOrEmpty(sequenceId.getValue())) {
+			TestSequence sequence = testSequenceRepository.find(sequenceId.getValue());
 			if (sequence != null) {
 				testSequenceRepository.delete(sequence);
 				return new ResponseEntity<>(sequence, HttpStatus.OK);
