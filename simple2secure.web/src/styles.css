@@ -572,4 +572,5 @@ ngx-widget-grid{
 
 .btn-add-widget{
     max-width: 180px;
+	z-index: 25;
 }

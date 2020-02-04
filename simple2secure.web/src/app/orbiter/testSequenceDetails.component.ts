@@ -31,6 +31,7 @@ import { PodDTO } from '../_models/DTO/podDTO';
 import { TestSequence } from '../_models/testSequence';
 import { CarouselComponent } from 'ngx-carousel-lib';
 import {ActivatedRoute} from '@angular/router';
+import {HttpParams} from "@angular/common/http";
 
 
 @Component({
@@ -160,7 +161,9 @@ export class TestSequenceDetailsComponent {
 
     public loadTests(podId: string, page: number, size: number){
         this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size + '/' + true)
+        const params = new HttpParams()
+			.set('usePagination', String(true));
+		this.httpService.getWithParams(environment.apiEndpoint + 'test/' + podId + '/' + page + '/' + size, params)
             .subscribe(
                 data => {
                     this.tests = data.tests;

@@ -116,6 +116,6 @@ export class OrbiterToolTestComponent {
 	}
 
 	public showSequences() {
-		this.router.navigate(['sequences/' + this.selectedPod.deviceId], {relativeTo: this.route});
+		this.router.navigate(['sequences/' + this.selectedPod.info.deviceId], {relativeTo: this.route});
 	}
 }
