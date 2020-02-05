@@ -16,10 +16,10 @@ def findPid():
     result = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', str(result_1_content))
     filteredLocalHostResults = list(filter(lambda x: x != '127.0.0.1', result))
     
-    if result is None or len(result) == 0:
-        result = ""
+    if filteredLocalHostResults is None or len(filteredLocalHostResults) == 0:
+        filteredLocalHostResults = ""
     else:
-        result = result
+        result = filteredLocalHostResults[0]
 
     print(result)
     return result

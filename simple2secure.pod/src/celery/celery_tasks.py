@@ -92,6 +92,8 @@ def execute_test(test, test_id, test_name, test_run_id):
 
         rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
 
+    return results
+
 
 @celery.task(name='celery.schedule_test_for_sequence')
 def schedule_test_for_sequence(parameter, command):

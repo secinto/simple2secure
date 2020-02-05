@@ -26,7 +26,8 @@ class TestSchema(ma.ModelSchema):
 
 class TestSequenceSchema(ma.ModelSchema):
     class Meta:
-        model = TestSequence
+        fields = ("id", "podId", "name", "sequenceContent", "sequenceHash", "lastChangedTimeStamp")
+        #model = TestSequence
 
 
 class TestSequenceResultSchema(ma.ModelSchema):

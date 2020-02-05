@@ -10,5 +10,6 @@ def scanner(executable, results, type):
     # Determines the encoding of the byte array, the result
     # contains a confidence property which indicates how certain the encoding is.
     result_encoding = chardet.detect(stdout)
-    report = stdout.decode(result_encoding['encoding'])
+    #report = stdout.decode(result_encoding['encoding'])
+    report = stdout.decode('iso-8859-1')
     results[type] = report
