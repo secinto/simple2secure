@@ -19,6 +19,7 @@ import com.simple2secure.portal.utils.SearchUtils;
 import com.simple2secure.portal.utils.TestUtils;
 import com.simple2secure.portal.utils.UserUtils;
 import com.simple2secure.portal.utils.WidgetUtils;
+import com.simple2secure.portal.repository.EmailConfigurationRepository;
 
 public class BaseUtilsProvider extends BaseServiceProvider {
 
@@ -71,4 +72,7 @@ public class BaseUtilsProvider extends BaseServiceProvider {
 
 	@Autowired
 	public WidgetUtils widgetUtils;
+	
+	@Autowired
+	public EmailConfigurationRepository emailConfigurationRepository;
 }

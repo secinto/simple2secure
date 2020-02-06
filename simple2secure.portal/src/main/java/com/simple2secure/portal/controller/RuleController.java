@@ -38,6 +38,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.EmailConfigurationDTO;
+import com.simple2secure.api.dto.RuleConditionActionTemplatesDTO;
+import com.simple2secure.api.dto.RuleDTO;
+import com.simple2secure.api.dto.RuleMappingDTO;
+import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.RuleUserPair;
 import com.simple2secure.api.model.RuleWithSourcecode;
@@ -81,7 +86,6 @@ public class RuleController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-
 	@ValidRequestMapping(value = "/rulewithsource", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<RuleWithSourcecode> addOrUpdateRuleWithSourcecode(@RequestBody RuleWithSourcecode ruleWithSourcecode,
@@ -105,6 +109,7 @@ public class RuleController extends BaseUtilsProvider {
 		return ((ResponseEntity<RuleWithSourcecode>) buildResponseEntity("rule_not_found", locale));
 	}
 
+	
 	/**
 	 * Method to save/update a rule with template action and condition into/from the database
 	 *
@@ -131,43 +136,48 @@ public class RuleController extends BaseUtilsProvider {
 				if (Strings.isNullOrEmpty(templateRule.getContextID())) {
 					templateRule.setContextID(contextId.getValue());
 				}
-				templateRuleRepository.save(templateRule);
-			}
+				templateRule.id = templateRuleRepository.saveAndReturnId(templateRule).toString();
 
+			}
+			
 			return new ResponseEntity<>(templateRule, HttpStatus.OK);
 
 		}
 		return ((ResponseEntity<TemplateRule>) buildResponseEntity("rule_not_found", locale));
 
 	}
-
+	
+	
 	/**
-	 * Method to get all rules which are build with template actions and conditions from the database
+	 * Method to get data for showing the user the rules to and the possible email configurations
 	 *
 	 * @param contextId
 	 *          from the user which has send the request from the web
 	 * @param locale
 	 *          which has been used in the web application
 	 *
-	 * @return ResponseEntity object with the TemplateRule objects as a List or an error.
+	 * @return ResponseEntity object with the RuleDTO objects or an error.
 	 *
 	 */
-	@ValidRequestMapping(value = "/templaterule")
+	@ValidRequestMapping(value = "/rule")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<TemplateRule>> getTemplateRulesByContxtId(@ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<RuleDTO> getRuleDTOByContxtId(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
+			List<EmailConfiguration> emailConfigurations = emailConfigurationRepository.findByContextId(contextId.getValue());
 			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
+			List<RuleUserPair> ruleUserPairs = ruleUserPairsRepository.getByContextId(contextId.getValue());
+			
+			RuleDTO ruleDTO = new RuleDTO(emailConfigurations, templateRules, ruleUserPairs);
 
-			if (templateRules != null && templateRules.size() > 0) {
-				return new ResponseEntity<>(templateRules, HttpStatus.OK);
-			}
+			return new ResponseEntity<>(ruleDTO, HttpStatus.OK);
 		}
 
-		return (ResponseEntity<List<TemplateRule>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
+		return (ResponseEntity<RuleDTO>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
+	
 
 	/**
 	 * Method to get all free defined rules from the database
@@ -196,51 +206,34 @@ public class RuleController extends BaseUtilsProvider {
 
 		return (ResponseEntity<List<RuleWithSourcecode>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 	}
-
+	
+	
 	/**
-	 * Method to get all predefined Conditions. If they are none saved in the database they will be searched.
+	 * Method to conditon/action templates
 	 *
-	 * @param rule_templates
+	 * @param contextId
+	 *          from the user which has send the request from the web
 	 * @param locale
 	 *          which has been used in the web application
 	 *
-	 * @return ResponseEntity object with the Conditions in a List or an error.
+	 * @return ResponseEntity object with a RuleConditionActionTemplatesDTO objects or an error.
+	 *
 	 */
-	@ValidRequestMapping(value = "/template_conditions")
+	@ValidRequestMapping(value = "/template_conditions_actions")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateCondition>> getTemplateConditions(String rule_templates,
+	public ResponseEntity<RuleConditionActionTemplatesDTO> getConditionActionTemplates(@ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
+		RuleConditionActionTemplatesDTO dto = new RuleConditionActionTemplatesDTO();
 		Collection<TemplateCondition> conditions;
+		Collection<TemplateAction> actions;
+		
 		try {
 			conditions = ruleConditionsRepository.findAll();
 			if (conditions == null) {
 				conditions = ruleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
 				conditions.forEach(ruleConditionsRepository::save);
 			}
-
-		} catch (ClassNotFoundException | IOException e) {
-			log.error(e.getMessage());
-			return (ResponseEntity<Collection<TemplateCondition>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
-		}
-
-		return new ResponseEntity<>(conditions, HttpStatus.OK);
-	}
-
-	/**
-	 * Method to get all predefined Actions. If they are none saved in the database they will be searched.
-	 *
-	 * @param rule_templates
-	 * @param locale
-	 *          which has been used in the web application
-	 *
-	 * @return ResponseEntity object with the Actions in a List or an error.
-	 */
-	@ValidRequestMapping(value = "/template_actions")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Collection<TemplateAction>> getTemplateActions(String rule_templates,
-			@ServerProvidedValue ValidInputLocale locale) {
-		Collection<TemplateAction> actions;
-		try {
+			
 			actions = ruleActionsRepository.findAll();
 			if (actions == null) {
 				actions = ruleUtils.loadTemplateActions("com.simple2secure.portal.rules.actions");
@@ -249,10 +242,13 @@ public class RuleController extends BaseUtilsProvider {
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());
-			return (ResponseEntity<Collection<TemplateAction>>) buildResponseEntity("problem_occured_while_getting_rules", locale);
+			return (ResponseEntity<RuleConditionActionTemplatesDTO>) buildResponseEntity("problem_occured_while_getting_rules", locale);
 		}
 
-		return new ResponseEntity<>(actions, HttpStatus.OK);
+		dto.setActions(actions);
+		dto.setConditions(conditions);
+		
+		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 
 	/**
@@ -323,46 +319,20 @@ public class RuleController extends BaseUtilsProvider {
 
 	@ValidRequestMapping(value = "/mapping", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<RuleUserPair>> mapRuleWithEmailConfig(@RequestBody List<RuleUserPair> ruleUserPairs,
+	public ResponseEntity<RuleMappingDTO> mapRuleWithEmailConfig(@RequestBody RuleMappingDTO ruleMappingDTO,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (ruleUserPairs != null && ruleUserPairs.size() != 0) {
-
-			final String ruleId = ruleUserPairs.get(0).getRuleId(); 
-			ruleUserPairsRepository.deleteByRuleId(contextId.getValue(), ruleId);
+		if (ruleMappingDTO != null) {
 			
-			ruleUserPairs.forEach(pair -> {
-				pair.setContextId(contextId.getValue());
-				ruleUserPairsRepository.save(pair);
+			ruleUserPairsRepository.deleteByRuleId(contextId.getValue(), ruleMappingDTO.getRuleId());
+			
+			ruleMappingDTO.getEmailConfigurationsIds().forEach(emailConfigId -> {
+				ruleUserPairsRepository.save(new RuleUserPair(contextId.getValue(), emailConfigId, ruleMappingDTO.getRuleId()));
 			});
 
-			return new ResponseEntity<>(ruleUserPairs, HttpStatus.OK);
+			return new ResponseEntity<>(ruleMappingDTO, HttpStatus.OK);
 		}
-		return ((ResponseEntity<List<RuleUserPair>>) buildResponseEntity("", locale)); //TODO
-	}
-	
-	/**
-	 * Method to get users which are mapped to a rule
-	 *
-	 * @param ruleId
-	 * @param locale
-	 *          which has been used in the web application
-	 *
-	 * @return ResponseEntity object with the Actions in a List or an error.
-	 */
-	@ValidRequestMapping(value = "/rule_user_pair")
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<RuleUserPair>> getRuleUserPairs(@PathVariable String ruleId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
-		
-		
-		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(ruleId)) {
-			List<RuleUserPair> ruleUserPairs = ruleUserPairsRepository.getByContextIdAndRuleId(contextId.getValue(), ruleId);
-		
-			return new ResponseEntity<List<RuleUserPair>>(ruleUserPairs, HttpStatus.OK);
-		}
-		
-		return (ResponseEntity<List<RuleUserPair>>) buildResponseEntity("", locale);
+		return ((ResponseEntity<RuleMappingDTO>) buildResponseEntity("", locale));
 	}
 }

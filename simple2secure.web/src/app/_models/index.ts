@@ -60,4 +60,4 @@ export * from './test';
 export * from './testStep';
 export * from './DTO/ruleDTO';
 export * from './DTO/ruleMappingDTO';
-
+export * from './DTO/ruleConditionActionTemplatesDTO';

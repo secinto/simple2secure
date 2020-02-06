@@ -50,15 +50,15 @@
                 </mat-expansion-panel-header>
 
                 <!-- email configuration checkboxes -->
-                <div *ngIf = "!emailConfigs || emailConfigs.length == 0;else configs_found">
+                <div *ngIf = "!ruleDTO.emailConfigurations || ruleDTO.emailConfigurations.length == 0;else configs_found">
                     there are no email configurations found
                 </div>
 
                 <!-- email configuration checkboxes -->
                 <ng-template #configs_found>
                     <!--implement checkboxes here-->
-                    <div *ngFor="let emailConfig of emailConfigs, let chosenIndex = index">
-                        <mat-checkbox [(ngModel)]="emailConfigsChosen[chosenIndex]" name="{{emailConfig.configuration.id}}">{{emailConfig.configuration.email}}</mat-checkbox>
+                    <div *ngFor="let emailConfig of ruleDTO.emailConfigurations, let chosenIndex = index">
+                        <mat-checkbox [(ngModel)]="emailConfigsChosen[chosenIndex]" name="{{emailConfig.id}}">{{emailConfig.email}}</mat-checkbox>
                     </div>
                 </ng-template>
 
