@@ -31,6 +31,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {TemplateRule} from '../_models';
 import {RuleAddComponent} from './ruleAdd.component';
+import {RuleDTO} from "../_models/DTO/ruleDTO";
 
 @Component({
 	moduleId: module.id,
@@ -40,6 +41,7 @@ import {RuleAddComponent} from './ruleAdd.component';
 
 export class RuleOverviewComponent {
 
+	ruleDTO: RuleDTO;
 	// rules (with source) objects from the database
 	expertRules: RuleWithSourcecode[];
 	// rules which will be built from the predefined action/conditons from the database
@@ -109,10 +111,11 @@ export class RuleOverviewComponent {
 				});
 
 		// fetching the template rules
-		this.httpService.get(environment.apiEndpoint + 'rule/templaterule')
+		this.httpService.get(environment.apiEndpoint + 'rule/rule')
 			.subscribe(
 				data => {
-					this.templateRules = data;
+					this.ruleDTO = data;
+					this.templateRules = this.ruleDTO.templateRules;
 					this.dataSource.data = this.dataSource.data.concat(this.templateRules);
 					this.loading = false;
 					this.alertService.success(this.translate.instant('message.rule'));
@@ -148,7 +151,9 @@ export class RuleOverviewComponent {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '500px';
 
-		dialogConfig.data = {};
+		dialogConfig.data = {
+			ruleDTO: this.ruleDTO
+		};
 
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);
 
@@ -179,6 +184,7 @@ export class RuleOverviewComponent {
 		// gives the rule which should be edited
 		dialogConfig.data = {
 			rule: rule,
+			ruleDTO: this.ruleDTO
 		};
 
 		const dialogRef = this.dialog.open(RuleAddComponent, dialogConfig);

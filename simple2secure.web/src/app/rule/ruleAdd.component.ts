@@ -23,7 +23,7 @@
 import { Component, Inject, ViewChild, } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services';
 import {MatDialogRef, MAT_DIALOG_DATA, MatTabGroup, MatSnackBar, } from '@angular/material';
-import {EmailConfiguration, EmailConfigurationDTO, RuleWithSourcecode} from '../_models';
+import {EmailConfiguration, EmailConfigurationDTO, RuleWithSourcecode, RuleDTO, RuleMappingDTO, RuleConditionActionTemplatesDTO} from '../_models';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
@@ -36,8 +36,6 @@ import {DataType} from '../_models/dataType';
 
 import 'brace';
 import 'ace-builds/src-noconflict/mode-groovy';
-import {RuleUserPair} from "../_models/ruleUserPair";
-import {template} from "@angular/core/src/render3";
 
 @Component({
 	moduleId: module.id,
@@ -48,6 +46,7 @@ import {template} from "@angular/core/src/render3";
 
 export class RuleAddComponent {
 
+    ruleDTO: RuleDTO;
     ruleName: string;
     ruleDescription: string;
     // rule where the whole sourcecode has been given by user
@@ -72,9 +71,8 @@ export class RuleAddComponent {
     dialogTitle: string;
     loading = false;
     // chosen email configs for mapping rule to email
-    emailConfigs: EmailConfigurationDTO[];
     emailConfigsChosen: boolean[];
-    ruleUserPairs: RuleUserPair[];
+    ruleConditionActionTemplatesDTO: RuleConditionActionTemplatesDTO;
 
     @ViewChild('ace_editor') editor: AceEditorComponent;
     @ViewChild('tabGroup') tabGroup: MatTabGroup;
@@ -95,6 +93,11 @@ export class RuleAddComponent {
 		@Inject(MAT_DIALOG_DATA) data)
 	{
         this.selectedTab = 0;
+        this.ruleDTO = data.ruleDTO;
+
+
+        this.emailConfigsChosen = new Array();
+
 
         // if a rule should be edited the old data of the rule will be displayed
         if(data.rule)
@@ -129,9 +132,21 @@ export class RuleAddComponent {
                 this.selectedCondition = this.ruleTemplate.templateCondition;
                 // displays action
                 this.selectedAction = this.ruleTemplate.templateAction;
+
+                for(let i = 0; i < this.ruleDTO.emailConfigurations.length; i++)
+                {
+                    if( this.ruleDTO.ruleUserPairs.find( pair =>
+                        pair.emailConfigurationId == this.ruleDTO.emailConfigurations[i].id &&
+                        pair.ruleId == data.rule.id
+                    )) {
+                        this.emailConfigsChosen.push(true);
+                    } else {
+                        this.emailConfigsChosen.push(false);
+                    }
+                }
             }
         }
-        else // a ned rule will be added
+        else // a new rule will be added
         {
             // set the title to "editing rule"
             this.dialogTitle = this.translate.instant('button.addRule');
@@ -177,15 +192,13 @@ export class RuleAddComponent {
             // enables both tabs so the user can choose
             this.disableTemplateTab = false;
             this.disableEditorTab = false;
+
+            for(let i = 0; i < this.ruleDTO.emailConfigurations.length; i++)
+                this.emailConfigsChosen.push(false);
         }
 
         // fetches the template actions/conditions from the database
         this.getTemplates();
-        //fetching email configurations, for mapping them to a rule
-        this.loadEmailConfigurations();
-
-        this.getRuleUserPairs();
-
 	}
 
     ngAfterViewInit() {
@@ -196,12 +209,18 @@ export class RuleAddComponent {
      */
     private getTemplates()
     {
-        this.httpService.get(environment.apiEndpoint + 'rule/template_actions/')
+
+        this.httpService.get(environment.apiEndpoint + 'rule/template_conditions_actions/')
             .subscribe(
                 data => {
-                    this.allTemplateActions = data;
+                    this.ruleConditionActionTemplatesDTO = data;
+                    this.allTemplateActions = this.ruleConditionActionTemplatesDTO.actions;
+                    this.allTemplateConditions = this.ruleConditionActionTemplatesDTO.conditions;
 
                     if(this.allTemplateActions == null)
+                        return;
+
+                    if(this.allTemplateConditions == null)
                         return;
 
                     this.alertService.success(this.translate.instant('rule.loadTemplateConditionsSucces'));
@@ -215,94 +234,7 @@ export class RuleAddComponent {
                         this.alertService.error(error.error.errorMessage);
                     }
                 });
-
-        this.httpService.get(environment.apiEndpoint + 'rule/template_conditions/')
-            .subscribe(
-                data => {
-                    this.allTemplateConditions = data;
-
-                    if(this.allTemplateConditions == null)
-                        return;
-
-                    this.alertService.success(this.translate.instant('rule.loadTemplateActionsSucces'));
-                },
-                error => {
-
-                    if (error.status == 0) {
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else {
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                });
     }
-
-    private loadEmailConfigurations() {
-        this.loading = true;
-        this.httpService.get(environment.apiEndpoint + 'email')
-            .subscribe(
-                data => {
-                    this.emailConfigs = data;
-
-                    if (data.length > 0) {
-                        this.emailConfigsChosen = new Array();
-
-                        for(let i = 0; i < this.emailConfigs.length; i++)
-                            this.emailConfigsChosen.push(false);
-
-                        this.alertService.success(this.translate.instant('message.emailConfig'));
-                    }
-                    else {
-                        this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0) {
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else {
-                        this.alertService.error(error.error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
-
-    private getRuleUserPairs() { // ruleUserPairs
-
-        this.httpService.get(environment.apiEndpoint + 'rule_user_pair/' + this.ruleTemplate.id)
-            .subscribe(
-                data => {
-                    this.ruleUserPairs = data;
-
-                    if (data.length > 0) {
-
-                        for(let i = 0; i < this.emailConfigs.length; i++)
-                        {
-                            this.ruleUserPairs.forEach(pair => {
-                                if(pair.emailConfigurationId == this.emailConfigs[i].configuration.id)
-                                    this.emailConfigsChosen[i] = true;
-                            });
-                        }
-
-                        this.alertService.success(this.translate.instant('message.emailConfig'));
-                    }
-                    else {
-                        this.alertService.error(this.translate.instant('message.emailConfig.notProvided'));
-                    }
-                    this.loading = false;
-                },
-                error => {
-                    if (error.status == 0) {
-                        this.alertService.error(this.translate.instant('server.notresponding'));
-                    }
-                    else {
-                        this.alertService.error(error.errorMessage);
-                    }
-                    this.loading = false;
-                });
-    }
-
 
 
     /**
@@ -536,7 +468,6 @@ export class RuleAddComponent {
                 // tries to save the rule
                 this.httpService.post(this.ruleExpert, environment.apiEndpoint + 'rule/rulewithsource').subscribe(
                     data => {
-                        //this.saveMappingRuleUser();
                         this.dialogRef.close(true);
                     },
                     error => {
@@ -553,21 +484,17 @@ export class RuleAddComponent {
 
 	private saveMappingRuleUser(ruleId: string)
     {
-        let ruleEmailConfigurationPairs = new Array();
+        let ruleMappingDTO = new RuleMappingDTO();
+        ruleMappingDTO.contextId = "";
+        ruleMappingDTO.ruleId = ruleId;
+        ruleMappingDTO.emailConfigurationsIds =  new Array();
 
-        for(let index = 0; index < this.emailConfigs.length; index++)
-        {
+        for(let index = 0; index < this.ruleDTO.emailConfigurations.length; index++) {
             if(this.emailConfigsChosen[index] == true)
-            {
-                let ruleUserPair = new RuleUserPair();
-                ruleUserPair.contextId = "";
-                ruleUserPair.emailConfigurationId = this.emailConfigs[index].configuration.id;
-                ruleUserPair.ruleId = ruleId;
-                ruleEmailConfigurationPairs.push(ruleUserPair);
-            }
+                ruleMappingDTO.emailConfigurationsIds.push(this.ruleDTO.emailConfigurations[index].id);
         }
 
-        this.httpService.post(ruleEmailConfigurationPairs, environment.apiEndpoint + 'rule/mapping').subscribe(
+        this.httpService.post(ruleMappingDTO, environment.apiEndpoint + 'rule/mapping').subscribe(
             data => {},
             error => {});
     }

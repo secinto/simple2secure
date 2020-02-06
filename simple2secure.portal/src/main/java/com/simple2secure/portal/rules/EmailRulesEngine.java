@@ -22,6 +22,7 @@
 
 package com.simple2secure.portal.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jeasy.rules.api.Rule;
@@ -31,9 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.RuleUserPair;
 import com.simple2secure.api.model.RuleWithSourcecode;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.rules.engine.GeneralRulesEngineImpl;
+import com.simple2secure.portal.repository.RuleUserPairsRepository;
 import com.simple2secure.portal.utils.RuleUtils;
 
 /**
@@ -48,6 +51,9 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 
 	@Autowired
 	private RuleUtils ruleUtils;
+	
+	@Autowired
+	private RuleUserPairsRepository ruleUserPairRepository;
 
 	private static Logger log = LoggerFactory.getLogger(EmailRulesEngine.class);
 
@@ -57,7 +63,7 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 	 * @param contextId
 	 *          of the user
 	 */
-	private void registerRules(String contextId) {
+	private void registerRules(String contextId, Email email) {
 		List<RuleWithSourcecode> ruleWithSourcecodes = ruleUtils.getRuleWithSourcecodeRepositoryByContextId(contextId);
 
 		ruleWithSourcecodes.forEach(rule -> {
@@ -72,8 +78,13 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 
 		log.debug("Created and registered expert rules with sourcecode");
 
-		List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId);
-
+		List<RuleUserPair> ruleUserPairs = ruleUserPairRepository.getByContextIdAndEmailConfigId(contextId, email.getConfigId());
+		List<TemplateRule> templateRules = new ArrayList<TemplateRule>();
+		
+		ruleUserPairs.forEach(pair -> {
+			templateRules.add(ruleUtils.getTemplateRulesByContextIdAndRuleId(contextId, pair.getRuleId()));
+		});
+		
 		templateRules.forEach(ruleInfo -> {
 			try {
 				Rule ruleObj = ruleUtils.buildRuleFromTemplateRuleWithBean(ruleInfo, "com.simple2secure.portal.rules.conditions",
@@ -99,7 +110,7 @@ public class EmailRulesEngine extends GeneralRulesEngineImpl {
 	 */
 	public void checkMail(Email email, String contextId) {
 		addFact(email);
-		registerRules(contextId);
+		registerRules(contextId, email);
 		checkFacts();
 		removeFact(email.getClass().getName());
 		rules_.clear();
