@@ -58,4 +58,6 @@ export * from './ruleWithSourcecode';
 export * from './templateRule';
 export * from './test';
 export * from './testStep';
+export * from './DTO/ruleDTO';
+export * from './DTO/ruleMappingDTO';
 
