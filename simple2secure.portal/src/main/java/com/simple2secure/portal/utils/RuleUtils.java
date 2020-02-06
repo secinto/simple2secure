@@ -58,13 +58,30 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
+	
 	public List<RuleWithSourcecode> getRuleWithSourcecodeRepositoryByContextId(String contextId) {
-
 		return ruleWithSourcecodeRepository.findByContextId(contextId);
 	}
 
+	/**
+	 * Method to fetch TemplateRules from the DB by contextId
+	 * 
+	 * @param contextId
+	 * @return List of all found TemplateRules
+	 */
 	public List<TemplateRule> getTemplateRulesByContextId(String contextId) {
 		return templateRuleRepository.findByContextId(contextId);
+	}
+	
+	/**
+	 * Method to fetch TemplateRule from the DB by contextId and ruleId
+	 * 
+	 * @param contextId
+	 * @param ruleId
+	 * @return TemplateRule object
+	 */
+	public TemplateRule getTemplateRulesByContextIdAndRuleId(String contextId, String ruleId) {
+		return templateRuleRepository.findByContextIdAndRuleId(contextId, ruleId);
 	}
 
 	/**
