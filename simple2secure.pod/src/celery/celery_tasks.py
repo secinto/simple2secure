@@ -96,7 +96,7 @@ def execute_test(test, test_id, test_name, test_run_id):
 
 
 @celery.task(name='celery.schedule_test_for_sequence')
-def schedule_test_for_sequence(parameter, command):
+def schedule_test_for_sequence(executable):
     """
     Schedule test for a sequence
 
@@ -106,8 +106,7 @@ def schedule_test_for_sequence(parameter, command):
     """
     with app.app_context():
         results = {}
-        scanner(json_utils.construct_command(json_utils.get_tool(
-            command), parameter), results, "sequence_result")
+        scanner(executable, results, "sequence_result")
         return results["sequence_result"]
 
 
@@ -135,19 +134,20 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
             taskJson = json.loads(task)
             if firstRun:
                 test_content = json.loads(taskJson['test_content'])
-                test_command = test_content['test_definition']['step']['command']['executable']
-                test_parameter = test_content['test_definition']['step']['command']['parameter']['value']
-                scan = schedule_test_for_sequence(test_parameter, test_command)
-                nextResult = scan.strip()
+                executable = json_utils.prepare_sequence_test_section_for_execution(test_content)
+                scan = schedule_test_for_sequence(executable)
+                nextResult = scan #.strip()
                 test_sequence_result_obj[taskJson['name']] = nextResult
                 firstRun = False
             else:
                 test_content = json.loads(taskJson['test_content'])
                 test_command = test_content['test_definition']['step']['command']['executable']
-                nextResult = nextResult.replace("\r", "")
-                nextResult = nextResult.replace("\n", "")
-                nextResult = nextResult.replace(" ", "")
-                scan = schedule_test_for_sequence(nextResult, test_command)
+                executable = []
+                splitted_command = test_command.split(" ")
+                for command in splitted_command:
+                    executable.append(command)
+                executable.append(nextResult)
+                scan = schedule_test_for_sequence(executable)
                 nextResult = scan.strip()
                 test_sequence_result_obj[taskJson['name']] = nextResult
  
@@ -164,8 +164,5 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
 
         update(testSeqRes)
         update(sequence)
-        # db.session.add(testSeqRes)
-        # db.session.merge(sequence)
-        # db.session.commit()
 
         return sequence
