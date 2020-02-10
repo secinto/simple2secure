@@ -3,6 +3,7 @@ import logging
 
 import requests
 import os
+import socket
 from flask import json
 
 from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType
@@ -150,7 +151,11 @@ def send_device_info(app, license):
     lastOnlineTimestamp = datetime.now().timestamp() * 1000
     license_obj = json.loads(license)
     deviceId = license_obj['deviceId']
-    pod_name = os.environ['COMPUTERNAME']
+    #pod_name = os.environ['COMPUTERNAME']
+    try:
+        pod_name = os.environ['COMPUTERNAME']
+    except:
+        pod_name = socket.gethostname()
     deviceInfo = DeviceInfo(deviceId, pod_name, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
 
     device_info_schema = DeviceInfoSchema()

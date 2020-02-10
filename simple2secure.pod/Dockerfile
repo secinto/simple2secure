@@ -10,6 +10,8 @@ RUN apt-get update -y && \
 RUN apt-get -y install nmap
 RUN apt-get -y install traceroute
 RUN apt-get -y install sqlmap
+RUN apt-get -y install net-tools
+RUN apt-get -y install traceroute
 RUN git clone https://github.com/EnableSecurity/wafw00f.git && cd wafw00f && python setup.py install  
 RUN git clone https://github.com/commixproject/commix.git commix && cd commix && python commix.py --install
 RUN git clone https://github.com/drwetter/testssl.sh.git
