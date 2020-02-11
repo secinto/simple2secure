@@ -30,15 +30,13 @@ import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
 @AnnotationCondition(
-		name = "blocked email addresses",
-		description_de = "Regel wird ausgel%oumlst wenn die Mail von einer der angegeben Adressen kam.",
-		description_en = "Rule will be triggerd if the mail was send by one of the given addresses")
+		name_tag = "email_rules_condition_name_blocked_email_addresses",
+		description_tag = "email_rules_condition_description_blocked_email_addresses")
 public class TemplateConditionBlockedEmailAddresses extends AbtractEmailCondition {
 
 	@AnnotationRuleParamArray(
-			name = "email addresses",
-			description_de = "Mail-Addressen welche die Regel ausl&oumlsen.",
-			description_en = "Mail addresses which will trigger the rule.",
+			name_tag = "email_rules_condition_paramarray_name_email_addresses",
+			description_tag = "email_rules_condition_paramarray_description_email_addresses",
 			type = DataType._STRING)
 	private Collection<String> addresses;
 

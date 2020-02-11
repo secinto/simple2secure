@@ -47,9 +47,8 @@ public abstract class AbtractEmailCondition implements Condition {
 	protected String ruleName;
 	
 	@AnnotationRuleParam(
-			name = AnnotationRuleParam.TYPE_LIMIT,
-			description_de = "Die Regel wird erst bei der n ten Mail des gleichen Typs ausgelöst",
-			description_en = "The rule will only be triggered after n mails of the same type",
+			name_tag = "email_rules_condition_param_name_type_limit",
+			description_tag = "email_rules_condition_param_description_type_limit",
 			type = DataType._INT)
 	private int typeLimit;
 	

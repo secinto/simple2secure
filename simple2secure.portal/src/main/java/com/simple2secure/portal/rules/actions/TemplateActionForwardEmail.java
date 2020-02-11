@@ -16,9 +16,8 @@ import com.simple2secure.portal.utils.MailUtils;
  *         Action which is used as predefined Action in the rule engine. Sends the received email.
  */
 @AnnotationAction(
-		name = "forward email",
-		description_de = "Sendet den Inhalt der erhaltenen Mail weiter",
-		description_en = "Forwards the received email")
+		name_tag = "email_rules_action_name_forward_email",
+		description_tag = "email_rules_action_description_forward_email")
 public class TemplateActionForwardEmail extends AbtractEmailAction {
 
 	@Autowired
@@ -28,23 +27,20 @@ public class TemplateActionForwardEmail extends AbtractEmailAction {
 	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
 	@AnnotationRuleParam(
-			name = "text",
-			description_de = "Text der an die Email angeh&aumlngt werden soll.",
-			description_en = "Text which will be attached to the mail",
+			name_tag = "email_rules_action_param_name_attach_text",
+			description_tag = "email_rules_action_param_description_attach_text",
 			type = DataType._STRING)
 	String text;
 
 	@AnnotationRuleParam(
-			name = "subject",
-			description_de = "Betreff der Email.",
-			description_en = "Subject of the email.",
+			name_tag = "email_rules_action_param_name_subject",
+			description_tag = "email_rules_action_param_description_subject",
 			type = DataType._STRING)
 	String subject;
 
 	@AnnotationRuleParam(
-			name = "emailaddress",
-			description_de = "Adresse an welche die Email versand werden soll.",
-			description_en = "Address to which the email should be send",
+			name_tag = "email_rules_action_param_name_emailaddress",
+			description_tag = "email_rules_action_param_description_emailaddress",
 			type = DataType._STRING)
 	String emailAddress;
 

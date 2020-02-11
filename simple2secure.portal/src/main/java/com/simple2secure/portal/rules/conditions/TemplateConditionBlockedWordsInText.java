@@ -30,15 +30,13 @@ import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
 @AnnotationCondition(
-		name = "find words in text",
-		description_de = "Regel wird ausgel&oumlst wenn definierte W&oumlrter im Text gefunden werden",
-		description_en = "Rule will be triggerd if defined words has been found in the text")
+		name_tag = "email_rules_condition_name_find_words_in_text",
+		description_tag = "Regel wird ausgel&oumlst wenn definierte W&oumlrter im Text gefunden werden")
 public class TemplateConditionBlockedWordsInText extends AbtractEmailCondition {
 
 	@AnnotationRuleParamArray(
-			name = "words to find",
-			description_de = "Woerter die im Text gefunden werden m&uumlssen zum Ausl&oumlsen der Regel",
-			description_en = "Words which must be found in the text to trigger the rule",
+			name_tag = "email_rules_condition_paramarray_name_words_to_find_in_text",
+			description_tag = "email_rules_condition_paramarray_description_words_to_find_in_text",
 			type = DataType._STRING)
 	private Collection<String> words;
 
