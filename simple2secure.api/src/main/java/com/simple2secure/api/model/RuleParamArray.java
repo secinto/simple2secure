@@ -24,6 +24,9 @@ package com.simple2secure.api.model;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 
  * @author Richard Heinz
@@ -34,10 +37,11 @@ import java.util.List;
  * @param <T>
  *          generic for the type of the param values.
  */
+@Getter
+@Setter
 public class RuleParamArray<T> {
-	private String name;
-	private String description_en;
-	private String description_de;
+	private String name_tag;
+	private String description_tag;
 	private List<T> values;
 	private DataType type;
 
@@ -45,52 +49,11 @@ public class RuleParamArray<T> {
 		super();
 	}
 
-	public RuleParamArray(String name, String description_en, String description_de, List<T> values, DataType type) {
+	public RuleParamArray(String name, String description_tag, List<T> values, DataType type) {
 		super();
-		this.name = name;
-		this.description_en = description_en;
-		this.description_de = description_de;
+		this.name_tag = name;
+		this.description_tag = description_tag;
 		this.values = values;
-		this.type = type;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription_en() {
-		return description_en;
-	}
-
-	public void setDescription_en(String description_en) {
-		this.description_en = description_en;
-	}
-
-	public String getDescription_de() {
-		return description_de;
-	}
-
-	public void setDescription_de(String description_de) {
-		this.description_de = description_de;
-	}
-
-	public List<T> getValues() {
-		return values;
-	}
-
-	public void setValues(List<T> paramArray) {
-		this.values = paramArray;
-	}
-
-	public DataType getType() {
-		return type;
-	}
-
-	public void setType(DataType type) {
 		this.type = type;
 	}
 }
