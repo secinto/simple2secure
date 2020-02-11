@@ -39,9 +39,9 @@ public class RuleWithSourcecode extends GenericDBObject {
 
 	private static final long serialVersionUID = -1812440159847822313L;
 
-	private String name_tag;
+	private String name;
 
-	private String description_tag;
+	private String description;
 
 	private String contextID;
 
