@@ -45,16 +45,16 @@ public class TemplateCondition extends GenericDBObject {
 
 	private static final long serialVersionUID = -1291327703141018318L;
 
-	private String name;
-	private String description_tag;
+	private String nameTag;
+	private String descriptionTag;
 	private List<RuleParam<?>> params;
 	private List<RuleParamArray<?>> paramArrays;
 
-	public TemplateCondition(String name, String description_tag, List<RuleParam<?>> params,
+	public TemplateCondition(String nameTag, String descriptionTag, List<RuleParam<?>> params,
 			List<RuleParamArray<?>> paramArrays) {
 		super();
-		this.name = name;
-		this.description_tag = description_tag;
+		this.nameTag = nameTag;
+		this.descriptionTag = descriptionTag;
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}

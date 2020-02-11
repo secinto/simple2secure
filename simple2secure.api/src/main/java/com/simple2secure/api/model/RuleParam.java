@@ -37,8 +37,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RuleParam<T> {
-	private String name_tag;
-	private String description_tag;
+	private String nameTag;
+	private String descriptionTag;
 	private T value;
 	private DataType type;
 
@@ -46,10 +46,10 @@ public class RuleParam<T> {
 		super();
 	}
 
-	public RuleParam(String name_tag, String description_tag, T value, DataType type) {
+	public RuleParam(String nameTag, String descriptionTag, T value, DataType type) {
 		super();
-		this.name_tag = name_tag;
-		this.description_tag = description_tag;
+		this.nameTag = nameTag;
+		this.descriptionTag = descriptionTag;
 		this.value = value;
 		this.type = type;
 	}

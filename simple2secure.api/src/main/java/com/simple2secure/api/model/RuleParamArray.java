@@ -40,8 +40,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RuleParamArray<T> {
-	private String name_tag;
-	private String description_tag;
+	private String nameTag;
+	private String descriptionTag;
 	private List<T> values;
 	private DataType type;
 
@@ -49,10 +49,10 @@ public class RuleParamArray<T> {
 		super();
 	}
 
-	public RuleParamArray(String name, String description_tag, List<T> values, DataType type) {
+	public RuleParamArray(String nameTag, String descriptionTag, List<T> values, DataType type) {
 		super();
-		this.name_tag = name;
-		this.description_tag = description_tag;
+		this.nameTag = nameTag;
+		this.descriptionTag = descriptionTag;
 		this.values = values;
 		this.type = type;
 	}

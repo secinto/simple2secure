@@ -45,15 +45,15 @@ public class TemplateAction extends GenericDBObject {
 
 	private static final long serialVersionUID = 3641649125428321240L;
 
-	private String name_tag;
-	private String description_tag;
+	private String nameTag;
+	private String descriptionTag;
 	private List<RuleParam<?>> params;
 	private List<RuleParamArray<?>> paramArrays;
 
-	public TemplateAction(String name, String description_tag, List<RuleParam<?>> params, List<RuleParamArray<?>> paramArrays) {
+	public TemplateAction(String nameTag, String descriptionTag, List<RuleParam<?>> params, List<RuleParamArray<?>> paramArrays) {
 		super();
-		this.name_tag = name;
-		this.description_tag = description_tag;
+		this.nameTag = nameTag;
+		this.descriptionTag = descriptionTag;
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}

@@ -41,6 +41,8 @@ import com.simple2secure.api.model.DataType;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParam {
 	
+	static String TYPE_LIMIT = "email_rules_condition_param_name_type_limit";
+	
 	String name_tag();
 
 	String description_tag();
