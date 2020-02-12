@@ -32,6 +32,7 @@
 	</appender>
 
 	<logger name="com.simple2secure.portal" level="debug" />
+	<logger name="com.simple2secure.portal.security.auth.TokenAuthenticationService" level="info" />
 	<logger name="org.mongodb.driver" level="info" />
 	<logger name="org.springframework" level="info" />
 

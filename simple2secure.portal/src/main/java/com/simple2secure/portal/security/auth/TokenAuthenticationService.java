@@ -63,217 +63,255 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class TokenAuthenticationService {
 
-	public static final Logger log = LoggerFactory.getLogger(TokenAuthenticationService.class);
+   public static final Logger log = LoggerFactory.getLogger(TokenAuthenticationService.class);
 
-	@Autowired
-	SettingsRepository settingsRepository;
+   @Autowired
+   SettingsRepository settingsRepository;
 
-	@Autowired
-	UserRepository userRepository;
+   @Autowired
+   UserRepository userRepository;
 
-	@Autowired
-	TokenRepository tokenRepository;
+   @Autowired
+   TokenRepository tokenRepository;
 
-	@Autowired
-	LicenseRepository licenseRepository;
+   @Autowired
+   LicenseRepository licenseRepository;
 
-	@Autowired
-	CurrentContextRepository currentContextRepository;
+   @Autowired
+   CurrentContextRepository currentContextRepository;
 
-	@Autowired
-	ContextUserAuthRepository contextUserAuthRepository;
+   @Autowired
+   ContextUserAuthRepository contextUserAuthRepository;
 
-	@Autowired
-	PortalUtils portalUtils;
+   @Autowired
+   PortalUtils portalUtils;
 
-	/**
-	 * This function is used to create probe authentication token so that it is available to send data to the portal
-	 *
-	 * @param deviceId
-	 * @param group
-	 * @param license
-	 * @return
-	 */
-	public String addDeviceAuthentication(String deviceId, CompanyGroup group, CompanyLicensePrivate license) {
-		if (!Strings.isNullOrEmpty(deviceId) && group != null && license != null) {
+   /**
+    * This function is used to create probe authentication token so that it is available to send data to the portal
+    *
+    * @param deviceId
+    * @param group
+    * @param license
+    * @return
+    */
+   public String addDeviceAuthentication(String deviceId, CompanyGroup group, CompanyLicensePrivate license) {
+      if (!Strings.isNullOrEmpty(deviceId) && group != null && license != null) {
 
-			List<Settings> settings = settingsRepository.findAll();
+         List<Settings> settings = settingsRepository.findAll();
 
-			long expirationTime = 0;
+         long expirationTime = 0;
 
-			if (settings != null) {
-				if (settings.size() == 1) {
-					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
-							settings.get(0).getAccessTokenProbeValidityUnit());
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
+         if (settings != null) {
+            if (settings.size() == 1) {
+               expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenProbeValidityTime(),
+                     settings.get(0).getAccessTokenProbeValidityUnit());
+            } else {
+               return null;
+            }
+         } else {
+            return null;
+         }
 
-			Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
-			claims.put(StaticConfigItems.CLAIM_DEVICEID, deviceId);
-			claims.put(StaticConfigItems.CLAIM_USERROLE, UserRole.DEVICE);
-			String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-					.signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
+         Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+         claims.put(StaticConfigItems.CLAIM_DEVICEID, deviceId);
+         claims.put(StaticConfigItems.CLAIM_USERROLE, UserRole.DEVICE);
+         String accessToken = Jwts.builder().setClaims(claims).setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+               .signWith(SignatureAlgorithm.HS512, license.getTokenSecret()).compact();
 
-			return accessToken;
-		} else {
-			log.error("Probe id or group is null");
-			return null;
-		}
+         return accessToken;
+      } else {
+         log.error("Probe id or group is null");
+         return null;
+      }
 
-	}
+   }
 
-	public void addAuthentication(HttpServletResponse res, String username, Collection<? extends GrantedAuthority> collection) {
-		User user = userRepository.findByEmailOnlyActivated(username);
-		if (user != null) {
+   /**
+    * Adds authentication object for the provided user. The granted authorization depends on the user type and its role.
+    *
+    * @param res
+    * @param username
+    * @param collection
+    */
+   public void addAuthentication(HttpServletResponse res, String username, Collection<? extends GrantedAuthority> collection) {
+      User user = userRepository.findByEmailOnlyActivated(username);
+      if (user != null) {
 
-			Token token = tokenRepository.findByUserId(user.getId());
+         Token token = tokenRepository.findByUserId(user.getId());
 
-			Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
-			claims.put(StaticConfigItems.CLAIM_USERID, user.getId());
+         Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
+         claims.put(StaticConfigItems.CLAIM_USERID, user.getId());
 
-			List<Settings> settings = settingsRepository.findAll();
+         List<Settings> settings = settingsRepository.findAll();
 
-			long expirationTime = 0;
+         long expirationTime = 0;
 
-			if (settings != null) {
-				if (settings.size() == 1) {
-					expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
-							settings.get(0).getAccessTokenValidityUnit());
-				}
-			}
+         if (settings != null) {
+            if (settings.size() == 1) {
+               expirationTime = portalUtils.convertTimeUnitsToMilis(settings.get(0).getAccessTokenValidityTime(),
+                     settings.get(0).getAccessTokenValidityUnit());
+            }
+         }
 
-			String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
-					.setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.HS512, user.getPassword())
-					.compact();
+         String accessToken = Jwts.builder().setClaims(claims).setSubject(username)
+               .setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(SignatureAlgorithm.HS512, user.getPassword())
+               .compact();
 
-			if (token == null) {
-				token = new Token(user.getId(), "", accessToken, "", new Date(System.currentTimeMillis()));
-				tokenRepository.save(token);
-			} else {
-				token.setAccessToken(accessToken);
-				token.setLastLoginDate(new Date(System.currentTimeMillis()));
-				try {
-					tokenRepository.update(token);
-				} catch (ItemNotFoundRepositoryException e) {
-					log.error("Error occured: {}", e);
-				}
-			}
+         if (token == null) {
+            token = new Token(user.getId(), "", accessToken, "", new Date(System.currentTimeMillis()));
+            tokenRepository.save(token);
+         } else {
+            token.setAccessToken(accessToken);
+            token.setLastLoginDate(new Date(System.currentTimeMillis()));
+            try {
+               tokenRepository.update(token);
+            } catch (ItemNotFoundRepositoryException e) {
+               log.error("Error occured: {}", e);
+            }
+         }
 
-			res.addHeader(StaticConfigItems.HEADER_STRING, StaticConfigItems.TOKEN_PREFIX + " " + accessToken);
-		} else {
-			log.error("User {} cannot be found.", username);
-		}
+         res.addHeader(StaticConfigItems.HEADER_STRING, StaticConfigItems.TOKEN_PREFIX + " " + accessToken);
+      } else {
+         log.error("User {} cannot be found.", username);
+      }
 
-	}
+   }
 
-	public Authentication getAuthentication(HttpServletRequest request) {
-		log.info("Request with authentication requirement from {}", request.getRequestURL());
-		String accessToken = resolveToken(request);
+   /**
+    * Obtains an authentication object from the request if it was provided via the request. If an access token has been provided it is
+    * checked if it is still valid or not. If it is valid the request is forwarded. Otherwise the authentication is denied.
+    *
+    * @param request
+    * @return
+    */
+   public Authentication getAuthentication(HttpServletRequest request) {
+      log.debug("Request with authentication requirement from {}", request.getRequestURL());
+      String accessToken = resolveToken(request);
 
-		if (accessToken != null) {
-			Token token = tokenRepository.findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
-			UserRole userRole = UserRole.LOGINUSER;
-			if (token != null) {
-				User user = userRepository.find(token.getUserId());
+      if (accessToken != null) {
+         Token token = tokenRepository.findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
+         UserRole userRole = UserRole.LOGINUSER;
+         if (token != null) {
+            User user = userRepository.find(token.getUserId());
 
-				if (user != null) {
+            if (user != null) {
 
-					boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
-					if (isAccessTokenValid) {
+               boolean isAccessTokenValid = validateToken(accessToken, user.getPassword());
+               if (isAccessTokenValid) {
 
-						CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());
+                  CurrentContext currentContext = currentContextRepository.findByUserId(user.getId());
 
-						if (currentContext != null) {
-							ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository
-									.find(currentContext.getContextUserAuthenticationId());
+                  if (currentContext != null) {
+                     ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository
+                           .find(currentContext.getContextUserAuthenticationId());
 
-							if (contextUserAuthentication != null) {
-								userRole = contextUserAuthentication.getUserRole();
-							}
+                     if (contextUserAuthentication != null) {
+                        userRole = contextUserAuthentication.getUserRole();
+                     }
 
-						}
-						return new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()));
-					} else {
-						log.error("Provided token not valid anymore for user {}", token.getUserId());
-						return null;
-					}
-				} else {
-					log.error("User with following id: {} does not exist", token.getUserId());
-					return null;
-				}
-			}
+                  }
+                  return new UsernamePasswordAuthenticationToken(user, null, CustomAuthenticationProvider.getAuthorities(userRole.name()));
+               } else {
+                  log.error("Provided token not valid anymore for user {}", token.getUserId());
+                  return null;
+               }
+            } else {
+               log.error("User with following id: {} does not exist", token.getUserId());
+               return null;
+            }
+         } else {
+            // Handle token for devices
+            // Check if there is a token with this id in the licenseRepo
+            log.debug("Access");
 
-			else {
-				// Handle token for devices
-				// Check if there is a token with this id in the licenseRepo
-				CompanyLicensePrivate license = licenseRepository.findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
+            CompanyLicensePrivate license = licenseRepository
+                  .findByAccessToken(accessToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim());
 
-				if (license != null) {
-					boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
+            if (license != null) {
+               boolean isAccessTokenValid = validateToken(accessToken, license.getTokenSecret());
 
-					if (isAccessTokenValid) {
-						if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-							return new UsernamePasswordAuthenticationToken(license, null,
-									CustomAuthenticationProvider.getAuthorities(UserRole.DEVICE.name()));
-						}
-						/*
-						 * TODO: Verify if assigning the role PROBE is OK if no device id has been specified.
-						 */
-						return new UsernamePasswordAuthenticationToken(license, null,
-								CustomAuthenticationProvider.getAuthorities(UserRole.LOGINUSER.name()));
-					} else {
-						log.error("Provided token not valid anymore for device {}", license.getDeviceId());
+               if (isAccessTokenValid) {
+                  if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+                     return new UsernamePasswordAuthenticationToken(license, null,
+                           CustomAuthenticationProvider.getAuthorities(UserRole.DEVICE.name()));
+                  }
+                  /*
+                   * TODO: Verify if assigning the role PROBE is OK if no device id has been specified.
+                   */
+                  return new UsernamePasswordAuthenticationToken(license, null,
+                        CustomAuthenticationProvider.getAuthorities(UserRole.LOGINUSER.name()));
+               } else {
+                  log.error("Provided token not valid anymore for device {}", license.getDeviceId());
 
-						return null;
-					}
-				} else {
-					log.error("Token not found for request {}", request.getRequestURI());
-					return null;
+                  return null;
+               }
+            } else {
+               log.error("Token not found for request {}", request.getRequestURI());
+               return null;
 
-				}
-			}
-		} else {
-			log.error("Provided request does not contain accessToken in the header. Request from {}", request.getRequestURI());
-			return null;
-		}
+            }
+         }
+      } else {
+         log.error("Provided request does not contain accessToken in the header. Request from {}", request.getRequestURI());
+         return null;
+      }
 
-	}
+   }
 
-	public String resolveToken(HttpServletRequest req) {
-		String bearerToken = req.getHeader(StaticConfigItems.HEADER_STRING);
-		if (bearerToken != null && bearerToken.startsWith(StaticConfigItems.TOKEN_PREFIX)) {
-			return bearerToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim();
-		}
-		return null;
-	}
+   /**
+    * This function obtains the access token from the request, which is expected to be provided as string within the request. Only the
+    * access token string itself is returned, all prefix and postfix information is stripped. If nothing is contained <code>null</code> is
+    * returned.
+    *
+    * @param req
+    * @return
+    */
+   public String resolveToken(HttpServletRequest req) {
+      String bearerToken = req.getHeader(StaticConfigItems.HEADER_STRING);
+      if (bearerToken != null && bearerToken.startsWith(StaticConfigItems.TOKEN_PREFIX)) {
+         return bearerToken.replace(StaticConfigItems.TOKEN_PREFIX, "").trim();
+      }
+      return null;
+   }
 
-	public boolean validateToken(String token, String secretKey) {
-		try {
-			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+   /**
+    * Validates the provided token with the secret key used for creating the token. If it can't be validated false is returned, otherwise
+    * true.
+    *
+    * @param token
+    * @param secretKey
+    * @return
+    */
+   public boolean validateToken(String token, String secretKey) {
+      try {
+         Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
 
-			if (portalUtils.isAccessTokenExpired(expirationDate)) {
-				return false;
-			}
-			log.info("Token still valid! Expiration date {} ", expirationDate.toString());
-			return true;
-		} catch (JwtException | IllegalArgumentException e) {
-			log.error("Error: {}", e);
-			return false;
-		}
-	}
+         if (portalUtils.isAccessTokenExpired(expirationDate)) {
+            return false;
+         }
+         log.debug("Token still valid! Expiration date {} ", expirationDate.toString());
+         return true;
+      } catch (JwtException | IllegalArgumentException e) {
+         log.error("Error: {}", e);
+         return false;
+      }
+   }
 
-	public Date getTokenExpirationDate(String token, String secretKey) {
-		try {
-			Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
-			return expirationDate;
-		} catch (JwtException | IllegalArgumentException e) {
-			log.error("Error: {}", e);
-			return null;
-		}
-	}
+   /**
+    * Obtains the expiration date of the provided token, which is coded into the token itself.
+    *
+    * @param token
+    * @param secretKey
+    * @return
+    */
+   public Date getTokenExpirationDate(String token, String secretKey) {
+      try {
+         Date expirationDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+         return expirationDate;
+      } catch (JwtException | IllegalArgumentException e) {
+         log.error("Error: {}", e);
+         return null;
+      }
+   }
 
 }
