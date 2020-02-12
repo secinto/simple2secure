@@ -252,7 +252,8 @@ public class TokenAuthenticationService {
             }
          }
       } else {
-         log.error("Provided request does not contain accessToken in the header. Request from {}", request.getRequestURI());
+         log.error("Provided request does not contain accessToken in the header. Request to {} from host {}", request.getRequestURI(),
+               request.getRemoteHost());
          return null;
       }
 

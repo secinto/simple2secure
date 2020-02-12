@@ -55,215 +55,217 @@ import com.simple2secure.probe.utils.PcapUtil;
 import com.simple2secure.probe.utils.ProbeUtils;
 
 public class ProbeCLI {
-	private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
+   private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
 
-	private static String OPTION_FILEPATH_SHORT = "l";
-	private static String OPTION_FILEPATH = "licensePath";
+   private static String OPTION_FILEPATH_SHORT = "l";
+   private static String OPTION_FILEPATH = "licensePath";
 
-	private static String OPTION_INSTRUMENTATION_SHORT = "i";
-	private static String OPTION_INSTRUMENTATION = "instrumentation";
-	private ProbeWorkerThread workerThread;
+   private static String OPTION_INSTRUMENTATION_SHORT = "i";
+   private static String OPTION_INSTRUMENTATION = "instrumentation";
+   private ProbeWorkerThread workerThread;
 
-	/**
-	 * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
-	 * instance.
-	 *
-	 * @param importFilePath
-	 *          The absolute file path to the License ZIP File.
-	 */
-	public void init(String importFilePath) {
+   /**
+    * Initializes the ProbeCLI with importFilePath which specifies the location of the license which should be used to activate this Probe
+    * instance.
+    *
+    * @param importFilePath
+    *           The absolute file path to the License ZIP File.
+    */
+   public void init(String importFilePath) {
 
-		ProbeConfiguration.licensePath = importFilePath;
+      ProbeConfiguration.licensePath = importFilePath;
 
-		try {
-			ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
-			ProbeConfiguration.netmask = PcapUtil.getOutgoingNetmask();
-			ProbeConfiguration.ipAddress = PcapUtil.getOutgoingIPAddress();
+      try {
+         ProbeConfiguration.hostname = InetAddress.getLocalHost().getHostName();
+         ProbeConfiguration.netmask = PcapUtil.getOutgoingNetmask();
+         ProbeConfiguration.ipAddress = PcapUtil.getOutgoingIPAddress();
 
-		} catch (Exception e) {
-			log.error("Couldn't obtain network information for machine.");
-		}
+      } catch (Exception e) {
+         log.error("Couldn't obtain network information for machine.");
+      }
 
-		TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
-		/*
-		 * Needs to be performed before transmitting the device info (saveDeviceInfo) to the server. Otherwise the has not have been
-		 * initialized. If the device info is not already available at the server before authentication the device can not associated with the
-		 * correct SUT type (PROBE is a monitored system).
-		 */
-		LicenseController licenseController = new LicenseController();
-		CompanyLicensePublic license = licenseController.loadLicense();
+      TLSConfig.initializeTLSConfiguration(LoadedConfigItems.getInstance().getTrustedCertificates());
+      /*
+       * Needs to be performed before transmitting the device info (saveDeviceInfo) to the server. Otherwise the has not have been
+       * initialized. If the device info is not already available at the server before authentication the device can not associated with the
+       * correct SUT type (PROBE is a monitored system).
+       */
+      LicenseController licenseController = new LicenseController();
+      CompanyLicensePublic license = licenseController.loadLicense();
 
-		StartConditions startConditions = licenseController.checkLicenseValidity(license);
-		
-		if (startConditions.equals(StartConditions.LICENSE_VALID)) {
-			DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, DeviceType.PROBE);
-			deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
-			deviceInfo.setNetMask(ProbeConfiguration.netmask);
-			deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
+      StartConditions startConditions = licenseController.checkLicenseValidity(license);
 
-			ProbeUtils.sendDeviceInfo(deviceInfo);
-		}
+      if (startConditions.equals(StartConditions.LICENSE_VALID)) {
+         DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, DeviceType.PROBE);
+         deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
+         deviceInfo.setNetMask(ProbeConfiguration.netmask);
+         deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
 
-		try {
-			prepareOsQuery();
-		} catch (IOException e) {
-			log.error("OSQuery couldn't be prepared. Stopping execution");
-			System.exit(-1);
-		}
+         ProbeUtils.sendDeviceInfo(deviceInfo);
+      } else {
+         System.err.println("No license available, stopping execution.");
+      }
 
-		switch (startConditions) {
-		case LICENSE_NOT_AVAILABLE:
-			log.error("A problem occured while updating the license.");
-			break;
-		default:
-			log.info("A valid license is available");
-			break;
-		}
+      try {
+         prepareOsQuery();
+      } catch (IOException e) {
+         log.error("OSQuery couldn't be prepared. Stopping execution");
+         System.exit(-1);
+      }
 
-		workerThread = new ProbeWorkerThread();
-	}
+      switch (startConditions) {
+      case LICENSE_NOT_AVAILABLE:
+         log.error("A problem occured while updating the license.");
+         break;
+      default:
+         log.info("A valid license is available");
+         break;
+      }
 
-	private void stopWorkerThreads() {
-		workerThread.stopWorkerThread();
-	}
+      workerThread = new ProbeWorkerThread();
+   }
 
-	private void startWorkerThreads() {
-		/*
-		 * Starting background worker threads.
-		 */
-		workerThread.run();
+   private void stopWorkerThreads() {
+      workerThread.stopWorkerThread();
+   }
 
-	}
+   private void startWorkerThreads() {
+      /*
+       * Starting background worker threads.
+       */
+      workerThread.run();
 
-	private void checkStatus() {
-		log.debug("Checking PROBE status");
-		if (workerThread != null && workerThread.isRunning()) {
-			log.debug("PROBE_STATUS: OK");
-			System.out.println(ServiceCommands.CHECK_STATUS.getPositiveCommandResponse());
-		} else {
-			log.debug("PROBE_STATUS: NOK");
-			System.out.println(ServiceCommands.CHECK_STATUS.getNegativeCommandResponse());
-		}
+   }
 
-	}
+   private void checkStatus() {
+      log.debug("Checking PROBE status");
+      if (workerThread != null && workerThread.isRunning()) {
+         log.debug("PROBE_STATUS: OK");
+         System.out.println(ServiceCommands.CHECK_STATUS.getPositiveCommandResponse());
+      } else {
+         log.debug("PROBE_STATUS: NOK");
+         System.out.println(ServiceCommands.CHECK_STATUS.getNegativeCommandResponse());
+      }
 
-	private void prepareOsQuery() throws IOException {
-		if (!FileUtil.fileOrFolderExists("tools")) {
-			FileUtil.createFolder("tools", true);
-		}
-		String os_name = System.getProperty("os.name");
-		if(os_name.contains("Windows")) {
-			for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_WINDOWS) {
-				File newLocation = new File(location);
-				if (!newLocation.exists()) {
-					FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
-				}
-				if (location.endsWith("osqueryi.exe")) {
-					ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
-				} else {
-					ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
-				}
-			}
-		}else if (os_name.contains("Linux")) {
-			for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_LINUX) {
-				File newLocation = new File(location);
-				if (!newLocation.exists()) {
-					FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
-				}
-				if (location.endsWith("osqueryi")) {
-					ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
-				} else {
-					ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
-				}
-			}
-		}   
-	}
+   }
 
-	/**
-	 * Starts the Probe itself. Hope the best.
-	 */
-	public void startInstrumentation() {
-		boolean running = true;
-		/*
-		 * Starting instrumentation listening to obtain commands from the ProbeControllerService.
-		 */
-		Scanner commandService = new Scanner(System.in);
-		try {
-			ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
-			log.info("Received command {} via instrumentation", command.getCommand().name());
-			while (running) {
-				switch (command.getCommand()) {
-				case START:
-					startWorkerThreads();
-					break;
-				case GET_VERSION:
-				case RESET:
-					stopWorkerThreads();
-					workerThread = new ProbeWorkerThread();
-					startWorkerThreads();
-					break;
-				case STOP:
-				case TERMINATE:
-				case CHECK_STATUS:
-					checkStatus();
-					break;
-				case OTHER:
-					log.debug("Obtained not recognized command {}", command);
-					stopWorkerThreads();
-					running = false;
-					break;
-				default:
-					break;
-				}
-				command = ServiceCommand.fromString(commandService.nextLine());
-				log.debug("Command {} received and starting to process it", command);
-			}
-			log.info("Exit command {} received from probe controller service. Exiting", command);
-		} catch (Exception e) {
-			log.error("Receiving instrumentation command failed. Reason {}", e);
-		} finally {
-			commandService.close();
-		}
-	}
+   private void prepareOsQuery() throws IOException {
+      if (!FileUtil.fileOrFolderExists("tools")) {
+         FileUtil.createFolder("tools", true);
+      }
+      String os_name = System.getProperty("os.name");
+      if (os_name.contains("Windows")) {
+         for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_WINDOWS) {
+            File newLocation = new File(location);
+            if (!newLocation.exists()) {
+               FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+            }
+            if (location.endsWith("osqueryi.exe")) {
+               ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+            } else {
+               ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+            }
+         }
+      } else if (os_name.contains("Linux")) {
+         for (String location : StaticConfigItems.OSQUERY_DATA_LOCALTION_LINUX) {
+            File newLocation = new File(location);
+            if (!newLocation.exists()) {
+               FileUtils.copyInputStreamToFile(getClass().getResourceAsStream(location), newLocation);
+            }
+            if (location.endsWith("osqueryi")) {
+               ProbeConfiguration.osQueryExecutablePath = newLocation.getAbsolutePath();
+            } else {
+               ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
+            }
+         }
+      }
+   }
 
-	public static void main(String[] args) {
-		Options options = new Options();
+   /**
+    * Starts the Probe itself. Hope the best.
+    */
+   public void startInstrumentation() {
+      boolean running = true;
+      /*
+       * Starting instrumentation listening to obtain commands from the ProbeControllerService.
+       */
+      Scanner commandService = new Scanner(System.in);
+      try {
+         ServiceCommand command = ServiceCommand.fromString(commandService.nextLine());
+         log.info("Received command {} via instrumentation", command.getCommand().name());
+         while (running) {
+            switch (command.getCommand()) {
+            case START:
+               startWorkerThreads();
+               break;
+            case GET_VERSION:
+            case RESET:
+               stopWorkerThreads();
+               workerThread = new ProbeWorkerThread();
+               startWorkerThreads();
+               break;
+            case STOP:
+            case TERMINATE:
+            case CHECK_STATUS:
+               checkStatus();
+               break;
+            case OTHER:
+               log.debug("Obtained not recognized command {}", command);
+               stopWorkerThreads();
+               running = false;
+               break;
+            default:
+               break;
+            }
+            command = ServiceCommand.fromString(commandService.nextLine());
+            log.debug("Command {} received and starting to process it", command);
+         }
+         log.info("Exit command {} received from probe controller service. Exiting", command);
+      } catch (Exception e) {
+         log.error("Receiving instrumentation command failed. Reason {}", e);
+      } finally {
+         commandService.close();
+      }
+   }
 
-		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
-				.desc("The path to the license ZIP file which should be used.").build();
-		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
-				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
+   public static void main(String[] args) {
+      Options options = new Options();
 
-		options.addOption(filePath);
-		options.addOption(instrumentation);
-		try {
-			CommandLineParser parser = new DefaultParser();
-			CommandLine line = parser.parse(options, args);
-			ProbeCLI client = new ProbeCLI();
+      Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
+            .desc("The path to the license ZIP file which should be used.").build();
+      Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
+            .longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
 
-			if (line.hasOption(filePath.getOpt())) {
-				String licensePath = line.getOptionValue(filePath.getOpt());
-				log.debug("Initializing PROBE with provided license path {}", licensePath);
-				client.init(licensePath);
-			} else {
-				log.debug("Initializing PROBE with default license path");
-				client.init("./license/");
-			}
+      options.addOption(filePath);
+      options.addOption(instrumentation);
+      try {
+         CommandLineParser parser = new DefaultParser();
+         CommandLine line = parser.parse(options, args);
+         ProbeCLI client = new ProbeCLI();
 
-			if (line.hasOption(instrumentation.getOpt())) {
-				log.debug("Starting PROBE with instrumentation");
-				client.startInstrumentation();
-			} else {
-				log.debug("Starting PROBE in normal mode");
-				client.startWorkerThreads();
-			}
+         if (line.hasOption(filePath.getOpt())) {
+            String licensePath = line.getOptionValue(filePath.getOpt());
+            log.debug("Initializing PROBE with provided license path {}", licensePath);
+            client.init(licensePath);
+         } else {
+            log.debug("Initializing PROBE with default license path");
+            client.init("./license/");
+         }
 
-		} catch (ParseException e) {
-			String header = "Start monitoring your system using Probe\n\n";
-			String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("ProbeCLI", header, options, footer, true);
-		}
+         if (line.hasOption(instrumentation.getOpt())) {
+            log.debug("Starting PROBE with instrumentation");
+            client.startInstrumentation();
+         } else {
+            log.debug("Starting PROBE in normal mode");
+            client.startWorkerThreads();
+         }
 
-	}
+      } catch (ParseException e) {
+         String header = "Start monitoring your system using Probe\n\n";
+         String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
+         HelpFormatter formatter = new HelpFormatter();
+         formatter.printHelp("ProbeCLI", header, options, footer, true);
+      }
+
+   }
 }
