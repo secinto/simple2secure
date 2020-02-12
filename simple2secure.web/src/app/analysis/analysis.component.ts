@@ -71,14 +71,14 @@ export class AnalysisComponent implements OnInit{
 	loadAllProbes(defaultValue: boolean) {
 		const params = new HttpParams()
 			.set('active', String(false));
-		this.httpService.getWithParams(environment.apiEndpoint + 'device', params)
+		this.httpService.getWithParams(environment.apiEndpoint + 'devices', params)
 			.subscribe(
 				data => {
 					this.probes = data;
 					if (defaultValue){
 						if (this.probes.length > 0) {
 							this.selectedProbe = this.probes[0];
-							this.loadQueriesByProbe(this.selectedProbe.deviceId);
+							this.loadQueriesByProbe(this.selectedProbe.info.deviceId);
 						}
 					}
 
@@ -118,7 +118,7 @@ export class AnalysisComponent implements OnInit{
 	}
 
 	onProbeChange(value: any){
-		this.loadQueriesByProbe(value.deviceId);
+		this.loadQueriesByProbe(value.info.deviceId);
 	}
 
 	public openDialogShowReportDetails(event: any): void {
@@ -148,7 +148,8 @@ export class AnalysisComponent implements OnInit{
 			content: this.translate.instant('chart.additional.query'),
 			selectMessage: this.translate.instant('chart.query.select'),
 			queryList: this.queries,
-			button: this.translate.instant('button.select')
+			button: this.translate.instant('button.select'),
+			deviceId: this.selectedProbe.info.deviceId
 		};
 
 		const dialogRef = this.dialog.open(AddQueryDialog, dialogConfig);
