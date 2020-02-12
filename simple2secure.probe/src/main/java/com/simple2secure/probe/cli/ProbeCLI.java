@@ -104,6 +104,7 @@ public class ProbeCLI {
          ProbeUtils.sendDeviceInfo(deviceInfo);
       } else {
          System.err.println("No license available, stopping execution.");
+         System.exit(-1);
       }
 
       try {

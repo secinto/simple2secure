@@ -215,6 +215,7 @@ public class LicenseController {
             }
          } else {
             log.info("License activated and access token available, not performing authenticate");
+            return true;
          }
       } else {
          log.error("No license found in database, this should never happen because either it is read from file or it is stored in DB.");
