@@ -6,6 +6,7 @@ import {environment} from '../../environments/environment';
 import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
+import { DeviceStatus } from '../_models/deviceStatus';
 
 /**
  *********************************************************************
@@ -62,7 +63,6 @@ export class OrbiterSystemsUnderTestListComponent {
 	) {}
 
 	ngOnInit() {
-		// TODO: Benjamin: change this function to work with contextId
 		this.loadMonitoredSystemsList(0, 10);
 		this.loadSUTList(0, 10);
 	}
@@ -102,10 +102,13 @@ export class OrbiterSystemsUnderTestListComponent {
 		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.PROBE + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.monitoredSystems = data.devices;
-					this.dataSourceMonitored = data.devices;
+					for (let device of data.devices){
+						if(device.info.deviceStatus == DeviceStatus.ONLINE){
+							this.dataSourceMonitored.data.push(device);
+							this.dataSourceMonitored.data = this.dataSourceMonitored.data;
+						}
+					}
 					this.totalSize = data.totalSize;
-					console.log(this.monitoredSystems);
 					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
@@ -132,7 +135,6 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.systemsUnderTest = data.sutList;
 					this.dataSourceOther = data.sutList;
 					this.totalSize = data.totalSize;
-					console.log(this.systemsUnderTest);
 					if (data.sutList.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}

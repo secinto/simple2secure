@@ -560,10 +560,11 @@ action-icon{
     display: flex;
     flex-flow: column nowrap;
     flex: 1 1 100%;
-    .dashboard-page {
-        flex: 1 1 auto;
-        position: relative;
-    }
+}
+
+.dashboard-page {
+	flex: 1 1 auto;
+	position: relative;
 }
 
 ngx-widget-grid{
