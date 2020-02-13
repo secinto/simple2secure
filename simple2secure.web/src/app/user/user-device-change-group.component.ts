@@ -84,7 +84,7 @@ export class UserDeviceChangeGroupComponent {
 
 		this.loading = true;
 
-		this.url = environment.apiEndpoint + 'devices/changeGroup/' + this.device.deviceId;
+		this.url = environment.apiEndpoint + 'devices/changeGroup/' + this.device.info.deviceId;
 		this.httpService.post(this.selectedGroup, this.url).subscribe(
 			data => {
 				this.dialogRef.close(true);

@@ -20,10 +20,15 @@
  *********************************************************************
  */
 
-import {CompanyGroup} from './companygroup';
-import {DeviceInfo} from './deviceInfo';
+import {DeviceType} from './deviceType';
+import {DeviceStatus} from './deviceStatus'
 
-export class Device {
-	group: CompanyGroup;
-	info: DeviceInfo;
+export class DeviceInfo {
+	name: string;
+	deviceId: string;
+	ipAddress: string;
+	netMask: string;
+	type: DeviceType;
+	deviceStatus: DeviceStatus;
+	lastOnlineTimestamp: number;
 }

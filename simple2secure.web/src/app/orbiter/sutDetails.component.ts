@@ -75,8 +75,12 @@ export class SUTDetailsComponent {
 			  this.sut.endDeviceType = DeviceType.PROBE; 
 			  break; 
 		   } 
-		   case "WWW": { 
-			  this.sut.endDeviceType = DeviceType.WWW; 
+		   case "POD": { 
+			  this.sut.endDeviceType = DeviceType.POD; 
+			  break; 
+		   } 
+		   case "SUT": { 
+			  this.sut.endDeviceType = DeviceType.SUT; 
 			  break; 
 		   } 
 		   default: { 

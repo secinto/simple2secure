@@ -63,6 +63,33 @@ export class DevicesListComponent {
 
 	ngOnInit(){
 		this.loadDevices(0, 10);
+		/*
+		 * The filterPredicate is necessary because we want to filter over nested objects
+		*/
+		this.dataSource.filterPredicate = (device: Device, filter: string) => {
+		  let valid = false;
+
+		  const transformedFilter = filter.trim().toLowerCase();
+
+		  Object.keys(device).map(key => {
+			if (
+			  key === 'info' &&
+			  (
+				device.info.name.toLowerCase().includes(transformedFilter)
+				|| device.info.type.toLowerCase().includes(transformedFilter)
+				|| device.info.deviceStatus.toLowerCase().includes(transformedFilter)
+			  )
+			) {
+			  valid = true;
+			} else {
+			  if (('' + device[key]).toLowerCase().includes(transformedFilter)) {
+				valid = true;
+			  }
+			}
+		  });
+
+		  return valid;
+		};
 	}
 
 	ngAfterViewInit() {
