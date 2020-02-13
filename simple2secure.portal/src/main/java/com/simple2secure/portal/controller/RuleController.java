@@ -52,6 +52,7 @@ import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
+import com.simple2secure.portal.utils.RuleUtils;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputRule;
@@ -130,6 +131,8 @@ public class RuleController extends BaseUtilsProvider {
 
 		if (templateRule != null) {
 
+			ruleUtils.resetTextTags(templateRule);
+			
 			if (!Strings.isNullOrEmpty(templateRule.getId())) {
 				templateRuleRepository.update(templateRule);
 			} else {
@@ -167,8 +170,9 @@ public class RuleController extends BaseUtilsProvider {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 
 			List<EmailConfiguration> emailConfigurations = emailConfigurationRepository.findByContextId(contextId.getValue());
-			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
 			List<RuleUserPair> ruleUserPairs = ruleUserPairsRepository.getByContextId(contextId.getValue());
+			List<TemplateRule> templateRules = ruleUtils.getTemplateRulesByContextId(contextId.getValue());
+			templateRules.forEach(rule -> ruleUtils.setLocaleTexts(rule, locale));
 			
 			RuleDTO ruleDTO = new RuleDTO(emailConfigurations, templateRules, ruleUserPairs);
 
@@ -232,13 +236,18 @@ public class RuleController extends BaseUtilsProvider {
 			if (conditions == null) {
 				conditions = ruleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
 				conditions.forEach(ruleConditionsRepository::save);
+				conditions = ruleConditionsRepository.findAll(); // must be fetched from DB to get the id 
 			}
+			conditions.forEach(condition -> ruleUtils.setLocaleTexts(condition, locale));
+			
 			
 			actions = ruleActionsRepository.findAll();
 			if (actions == null) {
 				actions = ruleUtils.loadTemplateActions("com.simple2secure.portal.rules.actions");
 				actions.forEach(ruleActionsRepository::save);
+				actions = ruleActionsRepository.findAll(); // must be fetched from DB to get the id 
 			}
+			actions.forEach(action -> ruleUtils.setLocaleTexts(action, locale));
 
 		} catch (ClassNotFoundException | IOException e) {
 			log.error(e.getMessage());

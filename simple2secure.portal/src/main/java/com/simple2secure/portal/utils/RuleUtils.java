@@ -34,10 +34,18 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+import com.simple2secure.api.model.RuleParam;
+import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.RuleWithSourcecode;
+import com.simple2secure.api.model.TemplateAction;
+import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.portal.repository.RuleActionsRepository;
+import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
+import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import groovy.lang.GroovyClassLoader;
 
@@ -50,6 +58,16 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 
 	@Autowired
 	TemplateRuleRepository templateRuleRepository;
+	
+	@Autowired
+	RuleActionsRepository templateActionRepository;
+	
+	@Autowired
+	RuleConditionsRepository templateConditionRepository;
+	
+	@Autowired
+	public MessageByLocaleService messageByLocaleService;
+	
 
 	/*
 	 * AutowireCapableBeanFactory is needed to make a new instance of the class which has been imported with groovy. Otherwise the Spring
@@ -139,4 +157,98 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 			return rule;
 		}
 	}
+	
+	public void resetTextTags(TemplateRule rule)
+	{
+		TemplateAction action = templateActionRepository.find(rule.getTemplateAction().getId());
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateAction().getParams().size(); paramCount++)
+		{
+			action.getParams().set(paramCount, RuleParam.copyAndSetValue(
+					action.getParams().get(paramCount), rule.getTemplateAction().getParams().get(paramCount).getValue()));
+		}
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateAction().getParamArrays().size(); paramCount++)
+		{
+			action.getParamArrays().set(paramCount, RuleParamArray.copyAndSetValue(
+					action.getParamArrays().get(paramCount), rule.getTemplateAction().getParamArrays().get(paramCount).getValues()));
+		}
+			/*
+			 action.getParams().get(paramCount).setValue(
+			
+					(action.getParams().get(paramCount).getClass()))
+					old.getTemplateAction().getParams().get(paramCount).getValue());
+					*/
+		
+		TemplateCondition condition = templateConditionRepository.find(rule.getTemplateCondition().getId());
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateCondition().getParams().size(); paramCount++)
+		{
+			condition.getParams().set(paramCount, RuleParam.copyAndSetValue(
+					condition.getParams().get(paramCount), rule.getTemplateCondition().getParams().get(paramCount).getValue()));
+		}
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateCondition().getParamArrays().size(); paramCount++)
+		{
+			condition.getParamArrays().set(paramCount, RuleParamArray.copyAndSetValue(
+					condition.getParamArrays().get(paramCount), rule.getTemplateCondition().getParamArrays().get(paramCount).getValues()));
+		}
+		
+		rule.setTemplateAction(action);
+		rule.setTemplateCondition(condition);
+	}
+	
+	public void setLocaleTexts(TemplateAction action, ValidInputLocale locale)
+	{
+		try
+		{
+			action.setNameTag(messageByLocaleService.getMessage(action.getNameTag(), locale.getValue()));
+			action.setDescriptionTag(messageByLocaleService.getMessage(action.getDescriptionTag(), locale.getValue()));
+			
+			action.getParams().forEach(param -> {
+				param.setNameTag(messageByLocaleService.getMessage(param.getNameTag(), locale.getValue()));
+				param.setDescriptionTag(messageByLocaleService.getMessage(param.getDescriptionTag(), locale.getValue()));
+			});
+			
+			action.getParamArrays().forEach(paramArray -> {
+				paramArray.setNameTag(messageByLocaleService.getMessage(paramArray.getNameTag(), locale.getValue()));
+				paramArray.setDescriptionTag(messageByLocaleService.getMessage(paramArray.getDescriptionTag(), locale.getValue()));
+			});
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		
+	}
+	
+	public void setLocaleTexts(TemplateCondition condition, ValidInputLocale locale)
+	{
+		try
+		{
+			condition.setNameTag(messageByLocaleService.getMessage(condition.getNameTag(), locale.getValue()));
+			condition.setDescriptionTag(messageByLocaleService.getMessage(condition.getDescriptionTag(), locale.getValue()));
+			
+			condition.getParams().forEach(param -> {
+				param.setNameTag(messageByLocaleService.getMessage(param.getNameTag(), locale.getValue()));
+				param.setDescriptionTag(messageByLocaleService.getMessage(param.getDescriptionTag(), locale.getValue()));
+			});
+			
+			condition.getParamArrays().forEach(paramArray -> {
+				paramArray.setNameTag(messageByLocaleService.getMessage(paramArray.getNameTag(), locale.getValue()));
+				paramArray.setDescriptionTag(messageByLocaleService.getMessage(paramArray.getDescriptionTag(), locale.getValue()));
+			});
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	}
+	
+	public void setLocaleTexts(TemplateRule rule, ValidInputLocale locale)
+	{
+		setLocaleTexts(rule.getTemplateAction(), locale);
+		setLocaleTexts(rule.getTemplateCondition(), locale);
+	}
+	
 }
