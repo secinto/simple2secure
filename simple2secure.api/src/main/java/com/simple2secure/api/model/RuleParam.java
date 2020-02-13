@@ -53,4 +53,14 @@ public class RuleParam<T> {
 		this.value = value;
 		this.type = type;
 	}
+	
+	public static <T> RuleParam<T> copyAndSetValue(RuleParam<?> ruleParam, T value) {
+		RuleParam<T> copy = new RuleParam<T>(
+				ruleParam.getNameTag(),
+				ruleParam.getDescriptionTag(),
+				value,
+				ruleParam.getType());
+		
+		return copy;
+	}
 }

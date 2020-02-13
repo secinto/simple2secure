@@ -56,4 +56,14 @@ public class RuleParamArray<T> {
 		this.values = values;
 		this.type = type;
 	}
+	
+	public static <T> RuleParamArray<T> copyAndSetValue(RuleParamArray<?> ruleParamArray, List<T> value) {
+		RuleParamArray<T> copy = new RuleParamArray<T>(
+				ruleParamArray.getNameTag(),
+				ruleParamArray.getDescriptionTag(),
+				value,
+				ruleParamArray.getType());
+		
+		return copy;
+	}
 }
