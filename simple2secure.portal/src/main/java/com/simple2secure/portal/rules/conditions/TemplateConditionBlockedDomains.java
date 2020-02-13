@@ -30,7 +30,7 @@ import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
 @AnnotationCondition(
-		name_tag = "email_rules_condition_name",
+		name_tag = "email_rules_condition_name_blocked_domains",
 		description_tag = "email_rules_condition_description_blocked_domains")
 public class TemplateConditionBlockedDomains extends AbtractEmailCondition {
 
