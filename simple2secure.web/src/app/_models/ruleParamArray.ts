@@ -1,9 +1,8 @@
 import {DataType} from './dataType';
 
 export class RuleParamArray<T> {
-    name: string;
-    description_en: string;
-    description_de: string;
+    nameTag: string;
+    descriptionTag: string;
     values: T[];
     type: DataType;
 }
