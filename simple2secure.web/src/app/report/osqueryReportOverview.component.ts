@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogConfig} from '@angular/material';
 import {HttpService, AlertService, DataService} from '../_services/index';
 import {Router, ActivatedRoute} from '@angular/router';
@@ -60,7 +60,7 @@ export class OsQueryReportOverviewComponent {
 	@ViewChild('selectgroup') selectElRefGroups;
 	@ViewChild('selectdevices') selectElRefDevices;
 	selection = new SelectionModel<any>(true, []);
-	showDeleteButton = false;
+	isDeleteButtonDisabled = false;
 	numSelected = 0;
 
 	constructor(
@@ -71,7 +71,8 @@ export class OsQueryReportOverviewComponent {
 		private dataService: DataService,
 		public modal: Modal,
 		private dialog: MatDialog,
-		private translate: TranslateService)
+		private translate: TranslateService,
+		private cdr: ChangeDetectorRef)
 	{}
 
 	ngOnInit() {
@@ -80,6 +81,10 @@ export class OsQueryReportOverviewComponent {
 
 	ngAfterViewInit() {
 		this.dataSource.sort = this.sort;
+	}
+
+	ngAfterContentChecked() {
+		this.cdr.detectChanges();
 	}
 
 	applyFilter(filterValue: string) {
@@ -264,12 +269,7 @@ export class OsQueryReportOverviewComponent {
 		this.numSelected = this.selection.selected.length;
 		const numRows = this.dataSource.data.length;
 
-		if (this.numSelected > 0){
-			this.showDeleteButton = true;
-		}
-		else{
-			this.showDeleteButton = false;
-		}
+		this.isDeleteButtonDisabled = this.numSelected <= 0;
 
 		return this.numSelected === numRows;
 	}

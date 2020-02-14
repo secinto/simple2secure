@@ -15,7 +15,7 @@
 
 <div class="example-container mat-elevation-z8 table table-striped">
 
-    <button mat-button [disabled]="!showDeleteButton" mat-raised-button class="mat-green-button delete-button-table" color="primary"
+    <button mat-button [disabled]="isDeleteButtonDisabled" mat-raised-button class="mat-green-button delete-button-table" color="primary"
             (click)="deleteSelectedReports()">{{ 'button.deleteSelected' | translate:{'count':numSelected } }}
     </button>
 
