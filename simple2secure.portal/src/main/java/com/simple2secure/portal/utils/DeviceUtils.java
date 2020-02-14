@@ -103,17 +103,20 @@ public class DeviceUtils extends BaseServiceProvider {
 			for (CompanyLicensePrivate license : licenses) {
 				if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 					DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-					DeviceStatus status = devInfo.getDeviceStatus();
 
-					DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-					if (status != deviceStatus) {
-						devInfo.setDeviceStatus(deviceStatus);
-						licenseRepository.save(license);
+					if (devInfo != null) {
+						DeviceStatus status = devInfo.getDeviceStatus();
+
+						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+						if (status != deviceStatus) {
+							devInfo.setDeviceStatus(deviceStatus);
+							licenseRepository.save(license);
+						}
+
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+						Device device = new Device(group, devInfo);
+						devices.add(device);
 					}
-
-					CompanyGroup group = groupRepository.find(license.getGroupId());
-					Device device = new Device(group, devInfo);
-					devices.add(device);
 				}
 
 			}
