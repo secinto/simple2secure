@@ -27,7 +27,7 @@ export class BaseWidget{
             data => {
                 this.alertService.success(this.translate.instant('widget.deleted'));
                 this.loading = false;
-                this.baseComponent.loadAllWidgetsByUserId(this.route.component["name"]);
+                this.baseComponent.loadAllWidgetsByUserId(this.route.snapshot.data["dashboardName"]);
             },
             error => {
                 if (error.status == 0) {
