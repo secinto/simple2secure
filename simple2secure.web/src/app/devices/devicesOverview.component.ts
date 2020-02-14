@@ -34,7 +34,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 export class DevicesOverviewComponent extends BaseComponent{
 
-	location: string = this.route.component["name"];
+	location: string = this.route.snapshot.data["dashboardName"];
 
 	constructor(dialog: MatDialog,
 				alertService: AlertService,
@@ -43,5 +43,6 @@ export class DevicesOverviewComponent extends BaseComponent{
 				httpService: HttpService,
 				route: ActivatedRoute) {
 		super(dialog, alertService, translate, dataService, httpService, route);
+		console.log(this.location);
 	}
 }
