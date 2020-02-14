@@ -43,6 +43,5 @@ export class DevicesOverviewComponent extends BaseComponent{
 				httpService: HttpService,
 				route: ActivatedRoute) {
 		super(dialog, alertService, translate, dataService, httpService, route);
-		console.log(this.location);
 	}
 }
