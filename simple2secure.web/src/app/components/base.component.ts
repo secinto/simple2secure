@@ -105,14 +105,16 @@ export class BaseComponent{
 			if (position) {
 				this.widgetDTO = new WidgetDTO();
 				this.widgetDTO.widget = this.dataService.getSelectedWidget();
-				this.widgetDTO.widgetProperties.height = 1;
+				this.widgetDTO.widgetProperties.height = 2;
 				this.widgetDTO.widgetProperties.left = position.left;
 				this.widgetDTO.widgetProperties.top = position.top;
 				this.widgetDTO.widgetProperties.width = 1;
 				this.widgetDTO.widgetProperties.widgetId = this.dataService.getSelectedWidget().id;
 				this.widgetDTO.widgetProperties.location = this._location;
 
-				this.widgets.push(this.widgetDTO);
+				//this.widgets.push(this.widgetDTO);
+				this.updateSaveWidgetPosition(this.widgetDTO)
+				this.loadAllWidgetsByUserId(this._location);
 			}
 			else{
 				this.alertService.error(this.translate.instant('widget.noplace'));
