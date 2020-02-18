@@ -38,9 +38,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationCondition {
-	String name();
+	String name_tag();
 
-	String description_de();
-
-	String description_en();
+	String description_tag();
 }

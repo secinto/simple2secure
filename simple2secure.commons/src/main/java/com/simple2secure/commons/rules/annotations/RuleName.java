@@ -31,14 +31,10 @@ import java.lang.annotation.Target;
  * 
  * @author Richard Heinz
  * 
- *         Annotation do mark a class as a action. The data will be used to display in the web simple2secure and to save a rule in the
- *         database.
+ *         Annotation do mark a string as rule name. Will be used for template condition/action 
+ *         to know inside the an condition/action object which is the associated rule.
  *
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationAction {
-	String name_tag();
-
-	String description_tag();
-}
+public @interface RuleName {}

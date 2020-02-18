@@ -31,6 +31,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.model.EmailConfiguration;
+import com.simple2secure.api.model.RuleUserPair;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
 
@@ -55,4 +57,11 @@ public class TemplateRuleRepositoryImpl extends TemplateRuleRepository {
 		return mongoTemplate.find(query, TemplateRule.class);
 	}
 
+	@Override
+	public TemplateRule findByContextIdAndRuleId(String contextId, String ruleId) {
+		Query query = new Query(Criteria.where("contextID").is(contextId)
+				.and("_id").is(ruleId));
+		TemplateRule templateRule = mongoTemplate.findOne(query, TemplateRule.class);
+		return templateRule;
+	}
 }

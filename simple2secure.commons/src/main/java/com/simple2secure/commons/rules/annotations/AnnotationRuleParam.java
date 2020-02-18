@@ -40,12 +40,12 @@ import com.simple2secure.api.model.DataType;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParam {
+	
+	static String TYPE_LIMIT = "email_rules_condition_param_name_type_limit";
+	
+	String name_tag();
 
-	String name();
-
-	String description_de();
-
-	String description_en();
+	String description_tag();
 
 	DataType type();
 }

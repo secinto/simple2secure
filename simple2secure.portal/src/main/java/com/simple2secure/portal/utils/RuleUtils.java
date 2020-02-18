@@ -23,6 +23,7 @@
 package com.simple2secure.portal.utils;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.jeasy.rules.api.Action;
@@ -34,10 +35,18 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+import com.simple2secure.api.model.RuleParam;
+import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.RuleWithSourcecode;
+import com.simple2secure.api.model.TemplateAction;
+import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.portal.repository.RuleActionsRepository;
+import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
+import com.simple2secure.portal.service.MessageByLocaleService;
+import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import groovy.lang.GroovyClassLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +61,16 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 
 	@Autowired
 	TemplateRuleRepository templateRuleRepository;
+	
+	@Autowired
+	RuleActionsRepository templateActionRepository;
+	
+	@Autowired
+	RuleConditionsRepository templateConditionRepository;
+	
+	@Autowired
+	public MessageByLocaleService messageByLocaleService;
+	
 
 	/*
 	 * AutowireCapableBeanFactory is needed to make a new instance of the class which has been imported with groovy. Otherwise the Spring
@@ -60,13 +79,30 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
+	
 	public List<RuleWithSourcecode> getRuleWithSourcecodeRepositoryByContextId(String contextId) {
-
 		return ruleWithSourcecodeRepository.findByContextId(contextId);
 	}
 
+	/**
+	 * Method to fetch TemplateRules from the DB by contextId
+	 * 
+	 * @param contextId
+	 * @return List of all found TemplateRules
+	 */
 	public List<TemplateRule> getTemplateRulesByContextId(String contextId) {
 		return templateRuleRepository.findByContextId(contextId);
+	}
+	
+	/**
+	 * Method to fetch TemplateRule from the DB by contextId and ruleId
+	 * 
+	 * @param contextId
+	 * @param ruleId
+	 * @return TemplateRule object
+	 */
+	public TemplateRule getTemplateRulesByContextIdAndRuleId(String contextId, String ruleId) {
+		return templateRuleRepository.findByContextIdAndRuleId(contextId, ruleId);
 	}
 
 	/**
@@ -93,7 +129,7 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 			String packageNameActionTemplates)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, IOException {
 
-		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditonsTempates);
+		Condition condition = buildConditionFromTemplateCondition(ruleData.getTemplateCondition(), packageNameConditonsTempates, ruleData.getName());
 		autowireCapableBeanFactory.autowireBean(condition);
 
 		Action action = buildActionFromTemplateAction(ruleData.getTemplateAction(), packageNameActionTemplates);
@@ -123,5 +159,133 @@ public class RuleUtils extends com.simple2secure.commons.rules.engine.RuleUtils 
 			// log.debug("Created new rule {} with GroovyClassLoader", rule.getClass().getName());
 			return rule;
 		}
+	}
+	
+	/**
+	 * Method to reset the language specific texts with their tags
+	 * 
+	 * @param rule where the texts should be reseted
+	 */
+	public void resetTextTags(TemplateRule rule)
+	{
+		TemplateAction action = templateActionRepository.find(rule.getTemplateAction().getId());
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateAction().getParams().size(); paramCount++)
+		{
+			action.getParams().set(paramCount, RuleParam.copyAndSetValue(
+					action.getParams().get(paramCount), rule.getTemplateAction().getParams().get(paramCount).getValue()));
+		}
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateAction().getParamArrays().size(); paramCount++)
+		{
+			action.getParamArrays().set(paramCount, RuleParamArray.copyAndSetValue(
+					action.getParamArrays().get(paramCount), rule.getTemplateAction().getParamArrays().get(paramCount).getValues()));
+		}
+
+		
+		TemplateCondition condition = templateConditionRepository.find(rule.getTemplateCondition().getId());
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateCondition().getParams().size(); paramCount++)
+		{
+			condition.getParams().set(paramCount, RuleParam.copyAndSetValue(
+					condition.getParams().get(paramCount), rule.getTemplateCondition().getParams().get(paramCount).getValue()));
+		}
+		
+		for(int paramCount = 0; paramCount < rule.getTemplateCondition().getParamArrays().size(); paramCount++)
+		{
+			condition.getParamArrays().set(paramCount, RuleParamArray.copyAndSetValue(
+					condition.getParamArrays().get(paramCount), rule.getTemplateCondition().getParamArrays().get(paramCount).getValues()));
+		}
+		
+		rule.setTemplateAction(action);
+		rule.setTemplateCondition(condition);
+	}
+	
+	/**
+	 * Method to replace the tags with the specific language text
+	 * 
+	 * @param action
+	 * @param locale
+	 */
+	public void setLocaleTexts(TemplateAction action, ValidInputLocale locale)
+	{
+		action.setNameTag(messageByLocaleService.getMessage(action.getNameTag(), locale.getValue()));
+		action.setDescriptionTag(messageByLocaleService.getMessage(action.getDescriptionTag(), locale.getValue()));
+		
+		action.getParams().forEach(param -> {
+			param.setNameTag(messageByLocaleService.getMessage(param.getNameTag(), locale.getValue()));
+			param.setDescriptionTag(messageByLocaleService.getMessage(param.getDescriptionTag(), locale.getValue()));
+		});
+		
+		action.getParamArrays().forEach(paramArray -> {
+			paramArray.setNameTag(messageByLocaleService.getMessage(paramArray.getNameTag(), locale.getValue()));
+			paramArray.setDescriptionTag(messageByLocaleService.getMessage(paramArray.getDescriptionTag(), locale.getValue()));
+		});		
+	}
+	
+	/**
+	 * Method to replace the tags with the specific language text
+	 * 
+	 * @param condition
+	 * @param locale
+	 */
+	public void setLocaleTexts(TemplateCondition condition, ValidInputLocale locale)
+	{
+		condition.setNameTag(messageByLocaleService.getMessage(condition.getNameTag(), locale.getValue()));
+		condition.setDescriptionTag(messageByLocaleService.getMessage(condition.getDescriptionTag(), locale.getValue()));
+		
+		condition.getParams().forEach(param -> {
+			param.setNameTag(messageByLocaleService.getMessage(param.getNameTag(), locale.getValue()));
+			param.setDescriptionTag(messageByLocaleService.getMessage(param.getDescriptionTag(), locale.getValue()));
+		});
+		
+		condition.getParamArrays().forEach(paramArray -> {
+			paramArray.setNameTag(messageByLocaleService.getMessage(paramArray.getNameTag(), locale.getValue()));
+			paramArray.setDescriptionTag(messageByLocaleService.getMessage(paramArray.getDescriptionTag(), locale.getValue()));
+		});
+	}
+	
+	/**
+	 * Method to replace the tags with the specific language text
+	 * 
+	 * @param rule
+	 * @param locale
+	 */
+	public void setLocaleTexts(TemplateRule rule, ValidInputLocale locale)
+	{
+		setLocaleTexts(rule.getTemplateAction(), locale);
+		setLocaleTexts(rule.getTemplateCondition(), locale);
+	}
+	
+	/**
+	 * Method to load the template actions and save them into the DB
+	 * @return loaded actions
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public Collection<TemplateAction> loadAndSaveTemplateActions() throws ClassNotFoundException, IOException
+	{
+		templateActionRepository.deleteAll();
+		Collection<TemplateAction> actions;
+		actions = loadTemplateActions("com.simple2secure.portal.rules.actions");
+		actions.forEach(templateActionRepository::save);
+		actions = templateActionRepository.findAll(); // must be fetched from DB to get the id 
+		return actions;
+	}
+	
+	/**
+	 * Method to load the template actions and save them into the DB
+	 * @return loaded actions
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public Collection<TemplateCondition> loadAndSaveTemplateConditions() throws ClassNotFoundException, IOException
+	{
+		templateConditionRepository.deleteAll();
+		Collection<TemplateCondition> condition;
+		condition = loadTemplateConditions("com.simple2secure.portal.rules.condition");
+		condition.forEach(templateConditionRepository::save);
+		condition = templateConditionRepository.findAll(); // must be fetched from DB to get the id 
+		return condition;
 	}
 }
