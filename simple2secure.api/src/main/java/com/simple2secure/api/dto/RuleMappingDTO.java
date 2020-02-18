@@ -25,8 +25,6 @@ package com.simple2secure.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.simple2secure.api.model.EmailConfiguration;
-
 import lombok.Getter;
 import lombok.Setter;
 

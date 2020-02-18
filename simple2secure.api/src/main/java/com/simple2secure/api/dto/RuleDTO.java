@@ -25,7 +25,6 @@ package com.simple2secure.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.RuleUserPair;
 import com.simple2secure.api.model.TemplateRule;

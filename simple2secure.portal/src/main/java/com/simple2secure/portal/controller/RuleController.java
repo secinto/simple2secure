@@ -234,18 +234,14 @@ public class RuleController extends BaseUtilsProvider {
 		try {
 			conditions = ruleConditionsRepository.findAll();
 			if (conditions == null) {
-				conditions = ruleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
-				conditions.forEach(ruleConditionsRepository::save);
-				conditions = ruleConditionsRepository.findAll(); // must be fetched from DB to get the id 
+				conditions = ruleUtils.loadAndSaveTemplateConditions();
 			}
 			conditions.forEach(condition -> ruleUtils.setLocaleTexts(condition, locale));
 			
 			
 			actions = ruleActionsRepository.findAll();
 			if (actions == null) {
-				actions = ruleUtils.loadTemplateActions("com.simple2secure.portal.rules.actions");
-				actions.forEach(ruleActionsRepository::save);
-				actions = ruleActionsRepository.findAll(); // must be fetched from DB to get the id 
+				actions = ruleUtils.loadAndSaveTemplateActions();
 			}
 			actions.forEach(action -> ruleUtils.setLocaleTexts(action, locale));
 
