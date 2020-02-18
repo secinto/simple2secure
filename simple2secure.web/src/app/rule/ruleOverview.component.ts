@@ -27,7 +27,7 @@ import {RuleWithSourcecode} from '../_models';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
-import {TranslateService} from '@ngx-translate/core';
+import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {TemplateRule} from '../_models';
 import {RuleAddComponent} from './ruleAdd.component';
@@ -72,6 +72,10 @@ export class RuleOverviewComponent {
 
 	ngOnInit() {
 		this.loadRules();
+
+		this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+			this.loadRules();
+		});
 	}
 
 	ngAfterViewInit() {

@@ -23,7 +23,7 @@
 import { Component, Inject, ViewChild, } from '@angular/core';
 import {AlertService, HttpService, DataService} from '../_services';
 import {MatDialogRef, MAT_DIALOG_DATA, MatTabGroup, MatSnackBar, } from '@angular/material';
-import {EmailConfiguration, EmailConfigurationDTO, RuleWithSourcecode, RuleDTO, RuleMappingDTO, RuleConditionActionTemplatesDTO} from '../_models';
+import {RuleWithSourcecode, RuleDTO, RuleMappingDTO, RuleConditionActionTemplatesDTO} from '../_models';
 import {Router, ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
 import {LocationStrategy, Location} from '@angular/common';
@@ -223,7 +223,7 @@ export class RuleAddComponent {
                     if(this.allTemplateConditions == null)
                         return;
 
-                    this.alertService.success(this.translate.instant('rule.loadTemplateConditionsSucces'));
+                    this.alertService.success(this.translate.instant('message.rule.templates'));
                 },
                 error => {
 
@@ -247,7 +247,11 @@ export class RuleAddComponent {
         return index;
     }
 
-    //
+
+    /**
+     * Method to prepare the selected template condition
+     * @param value
+     */
 	showConditionParams(value: TemplateCondition){
 	    this.selectedCondition = value;
 	    this.selectedCondition.paramArrays.forEach(paramArray => {
@@ -257,7 +261,7 @@ export class RuleAddComponent {
 	}
 
     /**
-     * Saves the selected Template action.
+     * Method to prepare the selected template action
      *
      * @param value selected TemplateAction
      */
@@ -482,6 +486,10 @@ export class RuleAddComponent {
         }
 	}
 
+    /**
+     * sends the rule-user-mapping to the portal
+     * @param ruleId
+     */
 	private saveMappingRuleUser(ruleId: string)
     {
         let ruleMappingDTO = new RuleMappingDTO();
@@ -496,6 +504,13 @@ export class RuleAddComponent {
 
         this.httpService.post(ruleMappingDTO, environment.apiEndpoint + 'rule/mapping').subscribe(
             data => {},
-            error => {});
+            error => {
+                if (error.status == 0) {
+                    this.alertService.error(this.translate.instant('server.notresponding'));
+                }
+                else {
+                    this.alertService.error(error.error.errorMessage);
+                }
+            });
     }
 }

@@ -79,7 +79,7 @@
                 <!-- Condition select -->
                 <mat-select [(ngModel)] = "selectedCondition"
                             (selectionChange)="showConditionParams($event.value)"
-                            placeholder="{{ 'rule.chooseCondition' | translate }}">
+                            placeholder="{{ 'rule.choose.condition' | translate }}">
                     <mat-option *ngFor="let condition of allTemplateConditions" [value] = "condition" matTooltip={{condition.descriptionTag}}>{{condition.nameTag}}</mat-option>
                 </mat-select>
 
@@ -192,7 +192,7 @@
                 <!-- Action select -->
                 <mat-select [(ngModel)] = "selectedAction"
                             (selectionChange)="showActionParams($event.value)"
-                            placeholder="{{ 'rule.chooseAction' | translate }}">
+                            placeholder="{{ 'rule.choose.action' | translate }}">
                     <mat-option *ngFor="let action of allTemplateActions" [value] = "action" matTooltip={{action.descriptionTag}} >{{action.nameTag}}</mat-option>
                 </mat-select>
 

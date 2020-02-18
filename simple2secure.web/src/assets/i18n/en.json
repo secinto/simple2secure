@@ -279,6 +279,7 @@
   "message.rule.dialog": "With clicking on yes, selected rule will be deleted!",
   "message.rule.delete": "Rule deleted successfully!",
   "message.rule": "Rules loaded successfully!",
+  "message.rule.templates": "Condtions/Actions loaded successfully!",
   "message.language": "Language changed successfully to ",
   "message.passwordUpdate": "Your password has been updated successfully!",
   "message.user": "User loaded successfully!",
@@ -409,6 +410,8 @@
   "rule.condition": "Rule condition",
   "rule.action": "Rule action",
   "rule.add.emailconfigurations": "Add email configurations",
+  "rule.choose.condition": "choose a condition",
+  "rule.choose.action": "choose a action",
 
   "osquery.details": "Query Details",
   "osquery.runalways": "Run always?",
