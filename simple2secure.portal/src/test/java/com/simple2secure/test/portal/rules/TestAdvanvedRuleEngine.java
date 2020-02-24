@@ -40,16 +40,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.RuleParam;
 import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.api.model.TemplateRule;
-import com.simple2secure.api.model.TriggeredRule;
+import com.simple2secure.api.model.TriggeredRuleEmail;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.portal.Simple2SecurePortal;
-import com.simple2secure.portal.repository.EmailRuleTriggeredRepository;
+import com.simple2secure.portal.repository.EmailConfigurationRepository;
+import com.simple2secure.portal.repository.EmailTriggeredRuleHistoryRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
 import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.rules.EmailRulesEngine;
@@ -75,17 +77,32 @@ public class TestAdvanvedRuleEngine {
 	private RuleUtils ruleUtils;
 	
 	@Autowired
-	EmailRuleTriggeredRepository emailRuleTriggeredRepository;
+	EmailTriggeredRuleHistoryRepository emailTriggeredRuleHistoryRepository;
+	
+	@Autowired
+	EmailConfigurationRepository emailConfigurationRepository;
+	
+	/**
+	 * Method to create a EmailConfig otherwise the TemplateAction send Notification won´t work
+	 * @return 
+	 */
+	public String createEmailConfig()
+	{
+		EmailConfiguration emailConfig = new EmailConfiguration("1", "", "", "", "", "", "");
+		emailConfigurationRepository.deleteAll();
+		emailConfigurationRepository.save(emailConfig);
+		return emailConfigurationRepository.findByContextId("1").get(0).id;
+		 
+	}
 	
 	private TemplateAction getNotificationTemplateAction()
 	{
 		// an notification will be saved in the database if rule was triggered
-		TemplateAction action = new TemplateAction("send notification", // text
-				"", "", new ArrayList<RuleParam<?>>() {
+		TemplateAction action = new TemplateAction("email_rules_action_name_send_notification", "", new ArrayList<RuleParam<?>>() {
 					private static final long serialVersionUID = 1L;
 
 					{
-						add(new RuleParam<>("text", "", "", "email had some blocked words in the subject", DataType._STRING));
+						add(new RuleParam<>("email_rules_action_param_notification_text","", "email had some blocked words in the subject", DataType._STRING));
 					}
 				}, null);
 		
@@ -95,10 +112,10 @@ public class TestAdvanvedRuleEngine {
 	private TemplateCondition getSubjectWordsTemplateCondition()
 	{
 		// preparing condition for blocking email address
-		TemplateCondition condition = new TemplateCondition("find words in subject", "", "", null, new ArrayList<RuleParamArray<?>>() {
+		TemplateCondition condition = new TemplateCondition("email_rules_condition_name_find_words_in_subject", "", null, new ArrayList<RuleParamArray<?>>() {
 			private static final long serialVersionUID = 1L;
 			{
-				add(new RuleParamArray<>("words to find", null, null, new ArrayList<String>() {
+				add(new RuleParamArray<>("email_rules_condition_paramarray_name_words_to_find", null, new ArrayList<String>() {
 					private static final long serialVersionUID = 1L;
 					{
 						add("won");
@@ -119,7 +136,7 @@ public class TestAdvanvedRuleEngine {
 		emailRulesEngine.removeAllRules();
 
 		// email which should be checked  5dfa1cc5f8166c3f06ae09c5
-		Email email1 = new Email("1", "5e0de912110a0a5f8b0bdd05", 1, "WON MONEY", "alice@lottery.com", "text",
+		Email email1 = new Email("1", createEmailConfig(), 1, "WON MONEY", "alice@lottery.com", "text",
 				TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 		// preparing condition for blocking email address
@@ -151,9 +168,9 @@ public class TestAdvanvedRuleEngine {
 	public void testSaveIntoEmailRuleTriggeredRepo()
 	{
 		try {
-			emailRuleTriggeredRepository.deleteAll();
-			TriggeredRule triggeredRule = new TriggeredRule(new TemplateRule("test", "test", "test", null, null));
-			emailRuleTriggeredRepository.save(triggeredRule);
+			emailTriggeredRuleHistoryRepository.deleteAll();
+			TriggeredRuleEmail triggeredRule = new TriggeredRuleEmail(new TemplateRule("test", "test", "test", null, null));
+			emailTriggeredRuleHistoryRepository.save(triggeredRule);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -162,7 +179,7 @@ public class TestAdvanvedRuleEngine {
 	@Test
 	public void testReadFromEmailRuleTriggeredRepo() {
 		try {
-			TriggeredRule triggeredRule = emailRuleTriggeredRepository.findByRuleName("test");
+			TriggeredRuleEmail triggeredRule = emailTriggeredRuleHistoryRepository.findByRuleName("test");
 			assertFalse(triggeredRule == null, "Failed to load triggered rule data from db by name");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -186,7 +203,7 @@ public class TestAdvanvedRuleEngine {
 				new ArrayList<RuleParam<?>>() {
 					private static final long serialVersionUID = 1L;
 					{
-						add(new RuleParam<>(AnnotationRuleParam.TYPE_LIMIT, "", "", N, DataType._INT));
+						add(new RuleParam<>(AnnotationRuleParam.TYPE_LIMIT, "", N, DataType._INT));
 					}
 				});
 		
@@ -203,7 +220,7 @@ public class TestAdvanvedRuleEngine {
 			for (int count = 1; count <= N; count++)
 			{
 				// email which should be checked  5dfa1cc5f8166c3f06ae09c5
-				Email email1 = new Email(String.valueOf(count), "5e0de912110a0a5f8b0bdd05", count, "WON MONEY", String.valueOf(count)+"alice@lottery.com", "text" + String.valueOf(count),
+				Email email1 = new Email(String.valueOf(count), createEmailConfig(), count, "WON MONEY", String.valueOf(count)+"alice@lottery.com", "text" + String.valueOf(count),
 						TimeUtils.parseDate(TimeUtils.REPORT_DATE_FORMAT, "Mon Aug 19 10:00:00 CEST 2019"));
 
 				emailRulesEngine.addFact(email1);

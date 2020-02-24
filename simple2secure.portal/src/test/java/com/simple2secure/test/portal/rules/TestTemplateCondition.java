@@ -1,3 +1,25 @@
+/**
+*********************************************************************
+*   simple2secure is a cyber risk and information security platform.
+*   Copyright (C) 2019  by secinto GmbH <https://secinto.com>
+*********************************************************************
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU Affero General Public License as
+*   published by the Free Software Foundation, either version 3 of the
+*   License, or (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+*   GNU Affero General Public License for more details.
+*
+*   You should have received a copy of the GNU Affero General Public License
+*   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*  
+ *********************************************************************
+*/
+
 package com.simple2secure.test.portal.rules;
 
 import java.util.Collection;
@@ -20,25 +42,25 @@ import com.simple2secure.portal.rules.conditions.AbtractEmailCondition;
  * @author Richard Heinz
  *
  */
-@AnnotationCondition(name = "test condition", description_de = "action description_de", description_en = "action description_en")
+@AnnotationCondition(name_tag = "test_condition_tag", description_tag = "action_description_tag")
 public class TestTemplateCondition extends AbtractEmailCondition {
 
-	@AnnotationRuleParam(name = "varInt", description_de = "varInt description_de", description_en = "varInt description_en", type = DataType._INT)
+	@AnnotationRuleParam(name_tag = "varInt_tag", description_tag = "varInt_description_tag", type = DataType._INT)
 	int varInt;
 
-	@AnnotationRuleParam(name = "varDouble", description_de = "varDouble description_de", description_en = "varDouble description_en", type = DataType._DOUBLE)
+	@AnnotationRuleParam(name_tag = "varDouble_tag", description_tag = "varDouble_description_tag", type = DataType._DOUBLE)
 	double varDouble;
 
-	@AnnotationRuleParam(name = "varString", description_de = "varString description_de", description_en = "varString description_en", type = DataType._STRING)
+	@AnnotationRuleParam(name_tag = "varString_tag", description_tag = "varString_description_tag",  type = DataType._STRING)
 	String varString;
 
-	@AnnotationRuleParamArray(name = "arrayInt", description_de = "arrayInt description_de", description_en = "arrayInt description_en", type = DataType._INT)
+	@AnnotationRuleParamArray(name_tag = "arrayInt_tag", description_tag = "arrayInt_description_tag", type = DataType._INT)
 	Collection<Integer> arrayInt;
 
-	@AnnotationRuleParamArray(name = "arrayDouble", description_de = "arrayDouble description_de", description_en = "arrayDouble description_en", type = DataType._DOUBLE)
+	@AnnotationRuleParamArray(name_tag = "arrayDouble_tag", description_tag = "arrayDouble_description_tag", type = DataType._DOUBLE)
 	Collection<Double> arrayDouble;
 
-	@AnnotationRuleParamArray(name = "arrayString", description_de = "arrayString description_de", description_en = "arrayString description_en", type = DataType._STRING)
+	@AnnotationRuleParamArray(name_tag = "arrayString_tag", description_tag = "arrayString_description_tag", type = DataType._STRING)
 	Collection<String> arrayString;
 
 	@Override
