@@ -33,7 +33,16 @@ import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.utils.MailUtils;
 
-@AnnotationAction(name = "send email", description_de = "Sendet eine Email mit definierten Text an die angegeben Adresse.", description_en = "Sends an email with defined text to given address.")
+
+/**
+ *
+ * @author Richard Heinz
+ *
+ *         Action which is used as predefined Action in the rule engine. Sends an email with the given text.
+ */
+@AnnotationAction(
+		name_tag = "email_rules_action_name_send_email",
+		description_tag = "email_rules_action_description_send_email")
 public class TemplateActionSendEmail extends AbtractEmailAction {
 
 	@Autowired
@@ -42,13 +51,22 @@ public class TemplateActionSendEmail extends AbtractEmailAction {
 	/*
 	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
-	@AnnotationRuleParam(name = "text", description_de = "Text der an die gegebene Adresse gesendet werden soll.", description_en = "Text which will be send to given address", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name_tag = "email_rule_action_param_name_text",
+			description_tag = "email_rules_action_param_description_send_text",
+			type = DataType._STRING)
 	String text;
 
-	@AnnotationRuleParam(name = "subject", description_de = "Betreff der Email.", description_en = "Subject of the email.", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name_tag = "email_rules_action_param_name_subject",
+			description_tag = "email_rules_action_param_description_subject",
+			type = DataType._STRING)
 	String subject;
 
-	@AnnotationRuleParam(name = "emailaddress", description_de = "Adresse an welche die Email versendet werden soll.", description_en = "Address to which the email should be send", type = DataType._STRING)
+	@AnnotationRuleParam(
+			name_tag = "email_rules_action_param_name_emailaddress",
+			description_tag = "email_rules_action_param_description_emailaddress",
+			type = DataType._STRING)
 	String emailAddress;
 
 	@Override

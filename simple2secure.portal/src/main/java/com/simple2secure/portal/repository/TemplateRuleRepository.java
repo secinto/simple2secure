@@ -34,4 +34,6 @@ import com.simple2secure.portal.dao.MongoRepository;
 public abstract class TemplateRuleRepository extends MongoRepository<TemplateRule> {
 
 	public abstract List<TemplateRule> findByContextId(String contextId);
+	
+	public abstract TemplateRule findByContextIdAndRuleId(String contextId, String ruleId);
 }

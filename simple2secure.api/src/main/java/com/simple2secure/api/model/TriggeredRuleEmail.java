@@ -20,25 +20,45 @@
  *********************************************************************
 */
 
-package com.simple2secure.commons.rules.annotations;
+package com.simple2secure.api.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * 
- * @author Richard Heinz
- * 
- *         Annotation do mark a class as a action. The data will be used to display in the web simple2secure and to save a rule in the
- *         database.
- *
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationAction {
-	String name_tag();
+import com.simple2secure.api.dbo.GenericDBObject;
 
-	String description_tag();
+import lombok.Getter;
+
+@Getter
+public class TriggeredRuleEmail extends GenericDBObject {
+	
+	private static final long serialVersionUID = -5472051873781398191L;
+	private TemplateRule rule;
+	private List<Email> emails;	
+	
+	public TriggeredRuleEmail() {
+		
+	}
+	
+	public TriggeredRuleEmail(TemplateRule rule, List<Email> emails) {
+		this.rule = rule;
+		this.emails = emails;
+	}
+	
+	public TriggeredRuleEmail(TemplateRule rule)
+	{
+		this.rule = rule;
+		emails = new ArrayList<>();
+	}
+	
+	
+	public int getTriggeredEmailCount()
+	{
+		return emails.size();
+	}
+	
+	public void addMail(Email email)
+	{
+		emails.add(email);
+	}
 }

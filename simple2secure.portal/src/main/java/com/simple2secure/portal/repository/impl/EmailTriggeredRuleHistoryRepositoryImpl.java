@@ -20,25 +20,34 @@
  *********************************************************************
 */
 
-package com.simple2secure.commons.rules.annotations;
+package com.simple2secure.portal.repository.impl;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.annotation.PostConstruct;
 
-/**
- * 
- * @author Richard Heinz
- * 
- *         Annotation do mark a class as a action. The data will be used to display in the web simple2secure and to save a rule in the
- *         database.
- *
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationAction {
-	String name_tag();
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-	String description_tag();
+import com.simple2secure.api.model.TriggeredRuleEmail;
+import com.simple2secure.portal.repository.EmailTriggeredRuleHistoryRepository;
+
+@Repository
+@Transactional
+public class EmailTriggeredRuleHistoryRepositoryImpl extends EmailTriggeredRuleHistoryRepository{
+
+	@PostConstruct
+	public void init() {
+		super.collectionName = "triggeredRuleEmail";
+		super.className = TriggeredRuleEmail.class;
+	}
+	
+	@Override
+	public TriggeredRuleEmail findByRuleName(String ruleName) {
+		// TODO Auto-generated method stub
+		
+		Query query = new Query(Criteria.where("rule.name").is(ruleName));
+		return mongoTemplate.findOne(query, TriggeredRuleEmail.class, collectionName);
+	}
+
 }

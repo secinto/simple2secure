@@ -30,15 +30,13 @@ import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
 
 @AnnotationCondition(
-		name = "blocked domains",
-		description_de = "Regel wird ausgel&oumlst wenn die Mail von einer der spezifizerten Domainen gekommen ist.",
-		description_en = "Rule will be triggerd if the mail was sent by one of the given domains")
+		name_tag = "email_rules_condition_name_blocked_domains",
+		description_tag = "email_rules_condition_description_blocked_domains")
 public class TemplateConditionBlockedDomains extends AbtractEmailCondition {
 
 	@AnnotationRuleParamArray(
-			name = "domains",
-			description_de = "Domainen welche die Regel ausl&oumlsen.",
-			description_en = "Domains which will trigger the rule.",
+			name_tag = "email_rules_condition_param_name_blocked_domains",
+			description_tag = "email_rules_condition_param_description_blocked_domains",
 			type = DataType._STRING)
 	private Collection<String> domains;
 

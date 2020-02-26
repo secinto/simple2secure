@@ -40,11 +40,9 @@ import com.simple2secure.api.model.DataType;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AnnotationRuleParamArray {
-	String name();
+	String name_tag();
 
-	String description_en();
-
-	String description_de();
+	String description_tag();
 
 	DataType type();
 }

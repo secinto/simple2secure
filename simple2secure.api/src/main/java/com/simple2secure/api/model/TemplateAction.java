@@ -26,6 +26,9 @@ import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 
  * @author Richard Heinz
@@ -36,66 +39,25 @@ import com.simple2secure.api.dbo.GenericDBObject;
  *         Will be used in the rule engine for the condition/action-parameters
  *
  */
+@Getter
+@Setter
 public class TemplateAction extends GenericDBObject {
 
 	private static final long serialVersionUID = 3641649125428321240L;
 
-	private String name;
-	private String description_en;
-	private String description_de;
+	private String nameTag;
+	private String descriptionTag;
 	private List<RuleParam<?>> params;
 	private List<RuleParamArray<?>> paramArrays;
 
-	public TemplateAction(String name, String description_en, String description_de, List<RuleParam<?>> params,
-			List<RuleParamArray<?>> paramArrays) {
+	public TemplateAction(String nameTag, String descriptionTag, List<RuleParam<?>> params, List<RuleParamArray<?>> paramArrays) {
 		super();
-		this.name = name;
-		this.description_en = description_en;
-		this.description_de = description_de;
+		this.nameTag = nameTag;
+		this.descriptionTag = descriptionTag;
 		this.params = params;
 		this.paramArrays = paramArrays;
 	}
 
 	public TemplateAction() {
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription_en() {
-		return description_en;
-	}
-
-	public void setDescription_en(String description_en) {
-		this.description_en = description_en;
-	}
-
-	public String getDescription_de() {
-		return description_de;
-	}
-
-	public void setDescription_de(String description_de) {
-		this.description_de = description_de;
-	}
-
-	public List<RuleParam<?>> getParams() {
-		return params;
-	}
-
-	public void setParams(List<RuleParam<?>> params) {
-		this.params = params;
-	}
-
-	public List<RuleParamArray<?>> getParamArrays() {
-		return paramArrays;
-	}
-
-	public void setParamArray(List<RuleParamArray<?>> paramArray) {
-		this.paramArrays = paramArray;
 	}
 }

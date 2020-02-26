@@ -63,9 +63,11 @@ public class WidgetUtils extends BaseServiceProvider {
 			for (WidgetProperties property : properties) {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
-					Object value = getWidgetValue(widget.getApi(), contextId);
-					widgetDTOList.add(new WidgetDTO(widget, property, value));
-					log.info("Adding new widget {} to the list", widget.getName());
+					if(widget != null) {
+						Object value = getWidgetValue(widget.getApi(), contextId);
+						widgetDTOList.add(new WidgetDTO(widget, property, value));
+						log.info("Adding new widget {} to the list", widget.getName());
+					}
 				}
 			}
 		}

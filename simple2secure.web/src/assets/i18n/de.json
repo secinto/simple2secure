@@ -279,6 +279,7 @@
   "message.rule.dialog": "Mit dem Klick auf Ja wird der ausgewählte Regel gelöscht!",
   "message.rule.delete": "Regel erfolgreich gelöscht!",
   "message.rule": "Regeln wurden erfolgreich geladen!",
+  "message.rule.templates": "Bedingungen/Aktion wurden erfolgreich geladen!",
   "message.language": "Die Sprache wurde erfolgreich geändert auf ",
   "message.passwordUpdate": "Ihr Passwort wurde erfolgreich aktuallisiert!",
   "message.user": "Benutzer wurde erfolgreich geladen!",
@@ -409,6 +410,9 @@
 
   "rule.condition": "Regel Bedingung",
   "rule.action": "Regel Aktion",
+  "rule.add.emailconfigurations": "Emailkonfiguration hinzufügen",
+  "rule.choose.condition": "Wähle eine Bedingung",
+  "rule.choose.action": "Wähle eine Aktion",
 
   "osquery.runalways": "Immer ausführen?",
   "osquery.details": "Abfrage Details",
