@@ -36,21 +36,35 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 
 public class ZIPUtils {
-
-	private static String workingDirectory = System.getProperty("user.dir");
-
+	
+	/**
+	 * @param files
+	 * 					A list of files which are going to be zipped.
+	 * @return ByteArrayOutputStream of the zipped file/s. 
+	 * @throws IOException
+	 */
 	public static ByteArrayOutputStream createZIPStreamFromFiles(List<File> files) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
 		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
 		for (File file : files) {
-			zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
-			FileInputStream fileInputStream = new FileInputStream(file);
-			IOUtils.copy(fileInputStream, zipOutputStream);
+			if(!file.isDirectory()) {
+				zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+				FileInputStream fileInputStream = new FileInputStream(file);
+				IOUtils.copy(fileInputStream, zipOutputStream);
 
-			fileInputStream.close();
-			zipOutputStream.closeEntry();
+				fileInputStream.close();
+				zipOutputStream.closeEntry();
+			}else {
+				for(File dirFile : file.listFiles()) {
+					zipOutputStream.putNextEntry(new ZipEntry(file.getName() + File.separator + dirFile.getName()));
+					FileInputStream fileInputStream = new FileInputStream(dirFile);
+					IOUtils.copy(fileInputStream, zipOutputStream);
+					fileInputStream.close();
+					zipOutputStream.closeEntry();
+				}
+			}
 		}
 
 		if (zipOutputStream != null) {

@@ -128,7 +128,7 @@ public class ServiceUtils {
 			if (!installPath.endsWith("\\")) {
 				installPath = installPath + "\\";
 			}
-			env.put("PR_INSTALL", installPath + PROC_SRV_EXE);
+			env.put("PR_INSTALL", "'" + installPath + PROC_SRV_EXE + "'");
 		} else {
 			env.put("PR_INSTALL", getServiceInstaller());
 		}
@@ -275,7 +275,7 @@ public class ServiceUtils {
 		env.put("SERVICE_NAME", serviceName);
 
 		if (useOwnPrunSrv) {
-			env.put("PR_INSTALL", installPath + PROC_SRV_EXE);
+			env.put("PR_INSTALL", "'" + installPath + PROC_SRV_EXE + "'");
 		} else {
 			env.put("PR_INSTALL", getServiceInstaller());
 		}
@@ -315,7 +315,7 @@ public class ServiceUtils {
 		env.put("PR_CLASSPATH", installPath + library);
 
 		if (!FileUtil.fileOrFolderExists(env.get("PR_CLASSPATH"))) {
-			log.error("The specified library path is not correct! Ignoring it?");
+			log.error("The specified library path is not correct! Ignoring it? {}", env.get("PR_CLASSPATH"));
 		}
 
 		env.put("PR_STARTUP", startup);
