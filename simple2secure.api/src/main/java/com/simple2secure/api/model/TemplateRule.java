@@ -25,6 +25,7 @@ package com.simple2secure.api.model;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -38,6 +39,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class TemplateRule extends GenericDBObject {
 
 	private static final long serialVersionUID = -5156938336427387331L;
@@ -51,10 +53,6 @@ public class TemplateRule extends GenericDBObject {
 	private TemplateCondition templateCondition;
 
 	private TemplateAction templateAction;
-
-	public TemplateRule() {
-
-	}
 
 	public TemplateRule(String name, String description, String contextID, TemplateCondition templateCondition,
 			TemplateAction templateAction) {

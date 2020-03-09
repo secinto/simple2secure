@@ -27,6 +27,7 @@ import java.util.List;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -41,6 +42,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class TemplateAction extends GenericDBObject {
 
 	private static final long serialVersionUID = 3641649125428321240L;
@@ -56,8 +58,5 @@ public class TemplateAction extends GenericDBObject {
 		this.descriptionTag = descriptionTag;
 		this.params = params;
 		this.paramArrays = paramArrays;
-	}
-
-	public TemplateAction() {
 	}
 }

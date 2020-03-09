@@ -27,6 +27,7 @@ import java.util.List;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -41,6 +42,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class TemplateCondition extends GenericDBObject {
 
 	private static final long serialVersionUID = -1291327703141018318L;
@@ -59,7 +61,4 @@ public class TemplateCondition extends GenericDBObject {
 		this.paramArrays = paramArrays;
 	}
 
-	public TemplateCondition() {
-
-	}
 }

@@ -55,16 +55,31 @@ public class LicenseController {
    public LicenseController() {
    }
 
+   /**
+    * Loads the license from the database - standard case - or from the file if no license exists in the database or if the license should
+    * be re-authenticated from the one found in the file system.
+    *
+    * @return
+    */
    public CompanyLicensePublic loadLicense() {
       CompanyLicensePublic license = loadLicenseFromDB();
-      if (license == null) {
+      if (license == null || ProbeConfiguration.reauthenticate) {
+         log.debug("License will be loaded from path");
+         if (ProbeConfiguration.reauthenticate) {
+            log.debug("License will be reauthenticated");
+         }
          license = loadLicenseFromPath();
+         // ProbeConfiguration.reauthenticate = false;
       }
 
       if (license != null) {
          ProbeConfiguration.probeId = license.getDeviceId();
          ProbeConfiguration.groupId = license.getGroupId();
          ProbeConfiguration.authKey = license.getAccessToken();
+      } else {
+         log.error("No license could be obtained from database nor file system. Exiting");
+         System.err.println("No license could be obtained from database nor file system. Exiting");
+         System.exit(-2);
       }
       return license;
    }
@@ -78,10 +93,6 @@ public class LicenseController {
     * @return The {@link StartConditions} which corresponds to the current state.
     */
    public StartConditions checkLicenseValidity(CompanyLicensePublic license) {
-      if (license == null) {
-         license = loadLicense();
-      }
-
       if (license != null) {
          if (!LicenseDateUtil.isLicenseExpired(license.getExpirationDate())) {
             if (authenticateLicense()) {
@@ -192,9 +203,13 @@ public class LicenseController {
          /*
           * TODO: Hack because currently it doesn't work if the license has already been activated.
           */
-         if (!license.isActivated() && Strings.isNullOrEmpty(license.getAccessToken())) {
+         if (!license.isActivated() && Strings.isNullOrEmpty(license.getAccessToken()) || ProbeConfiguration.reauthenticate) {
             String response = RESTUtils
                   .sendPost(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.LICENSE_API + "/authenticate", license);
+            if (ProbeConfiguration.reauthenticate) {
+               log.debug("Tried reauthentication");
+               ProbeConfiguration.reauthenticate = false;
+            }
             if (response != null) {
                license = activateLicenseAndUpdateInDB(response, license);
                if (license != null) {

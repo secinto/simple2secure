@@ -26,13 +26,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Scanner;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +50,6 @@ import com.simple2secure.probe.utils.ProbeUtils;
 public class ProbeCLI {
    private static Logger log = LoggerFactory.getLogger(ProbeCLI.class);
 
-   private static String OPTION_FILEPATH_SHORT = "l";
-   private static String OPTION_FILEPATH = "licensePath";
-
-   private static String OPTION_INSTRUMENTATION_SHORT = "i";
-   private static String OPTION_INSTRUMENTATION = "instrumentation";
    private ProbeWorkerThread workerThread;
 
    /**
@@ -100,7 +88,9 @@ public class ProbeCLI {
          deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
          deviceInfo.setNetMask(ProbeConfiguration.netmask);
          deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
-
+         /*
+          * TODO: Check if this is really required here.
+          */
          ProbeUtils.sendDeviceInfo(deviceInfo);
       } else {
          System.err.println("No license available, stopping execution.");
@@ -110,7 +100,7 @@ public class ProbeCLI {
       try {
          prepareOsQuery();
       } catch (IOException e) {
-         log.error("OSQuery couldn't be prepared. Stopping execution");
+         System.err.println("OSQuery couldn't be prepared. Stopping execution");
          System.exit(-1);
       }
 
@@ -124,18 +114,6 @@ public class ProbeCLI {
       }
 
       workerThread = new ProbeWorkerThread();
-   }
-
-   private void stopWorkerThreads() {
-      workerThread.stopWorkerThread();
-   }
-
-   private void startWorkerThreads() {
-      /*
-       * Starting background worker threads.
-       */
-      workerThread.run();
-
    }
 
    private void checkStatus() {
@@ -179,13 +157,32 @@ public class ProbeCLI {
                ProbeConfiguration.osQueryConfigPath = newLocation.getAbsolutePath();
             }
          }
+      } else {
+         System.err.println("OS currently not supported");
+         System.exit(-1);
       }
+   }
+
+   public void stopAutonomous() {
+      log.debug("Stopping autonomous PROBE service execution");
+      workerThread.stopWorkerThread();
+   }
+
+   public void startAutonomous() {
+      /*
+       * Starting background worker threads.
+       */
+      log.debug("Starting autonomous PROBE service execution");
+      workerThread.run();
+
    }
 
    /**
     * Starts the Probe itself. Hope the best.
     */
    public void startInstrumentation() {
+      log.debug("Starting instrumentation PROBE service execution");
+
       boolean running = true;
       /*
        * Starting instrumentation listening to obtain commands from the ProbeControllerService.
@@ -197,13 +194,13 @@ public class ProbeCLI {
          while (running) {
             switch (command.getCommand()) {
             case START:
-               startWorkerThreads();
+               startAutonomous();
                break;
             case GET_VERSION:
             case RESET:
-               stopWorkerThreads();
+               stopAutonomous();
                workerThread = new ProbeWorkerThread();
-               startWorkerThreads();
+               startAutonomous();
                break;
             case STOP:
             case TERMINATE:
@@ -212,7 +209,7 @@ public class ProbeCLI {
                break;
             case OTHER:
                log.debug("Obtained not recognized command {}", command);
-               stopWorkerThreads();
+               stopAutonomous();
                running = false;
                break;
             default:
@@ -227,46 +224,5 @@ public class ProbeCLI {
       } finally {
          commandService.close();
       }
-   }
-
-   public static void main(String[] args) {
-      Options options = new Options();
-
-      Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
-            .desc("The path to the license ZIP file which should be used.").build();
-      Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
-            .longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
-
-      options.addOption(filePath);
-      options.addOption(instrumentation);
-      try {
-         CommandLineParser parser = new DefaultParser();
-         CommandLine line = parser.parse(options, args);
-         ProbeCLI client = new ProbeCLI();
-
-         if (line.hasOption(filePath.getOpt())) {
-            String licensePath = line.getOptionValue(filePath.getOpt());
-            log.debug("Initializing PROBE with provided license path {}", licensePath);
-            client.init(licensePath);
-         } else {
-            log.debug("Initializing PROBE with default license path");
-            client.init("./license/");
-         }
-
-         if (line.hasOption(instrumentation.getOpt())) {
-            log.debug("Starting PROBE with instrumentation");
-            client.startInstrumentation();
-         } else {
-            log.debug("Starting PROBE in normal mode");
-            client.startWorkerThreads();
-         }
-
-      } catch (ParseException e) {
-         String header = "Start monitoring your system using Probe\n\n";
-         String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
-         HelpFormatter formatter = new HelpFormatter();
-         formatter.printHelp("ProbeCLI", header, options, footer, true);
-      }
-
    }
 }
