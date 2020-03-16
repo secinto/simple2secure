@@ -40,6 +40,10 @@ export class TestResultDetailsComponent {
 		private dialogRef: MatDialogRef<TestResultDetailsComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
+		let b64EncResult = JSON.parse(data.result.result);
+		let b64DecResult = atob(b64EncResult.step);
+		b64EncResult.step = b64DecResult;
+		data.result.result = JSON.stringify(b64EncResult);
 		this.testResult = data.result;
 	}
 

@@ -22,7 +22,7 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Device} from '../_models/index';
+import {Device, DeviceType} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
@@ -38,7 +38,7 @@ import {PageEvent} from '@angular/material/paginator';
 export class OrbiterToolTestComponent {
 
 	selectedPod: any;
-	pods: Device[];
+	pods: Device[] = [];
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
@@ -86,7 +86,7 @@ export class OrbiterToolTestComponent {
 
 	loadPods(page: number, size: number) {
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'devices/pod/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.POD + '/' + page + '/' + size)
 			.subscribe(
 				data => {
 					this.pods = data.devices;

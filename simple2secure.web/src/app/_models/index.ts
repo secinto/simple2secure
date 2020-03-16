@@ -62,3 +62,4 @@ export * from './lights';
 export * from './DTO/ruleDTO';
 export * from './DTO/ruleMappingDTO';
 export * from './DTO/ruleConditionActionTemplatesDTO';
+export * from './deviceType';

@@ -110,7 +110,7 @@ public class DeviceController extends BaseUtilsProvider {
 		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(deviceType.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> devices = deviceUtils.getAllDevicesFromCurrentContextPagination(context, deviceType.getValue(), page.getValue(),
+				Map<String, Object> devices = deviceUtils.getAllDevicesByIdAndTypeFromCurrentContextPagination(context, deviceType.getValue(), page.getValue(),
 						size.getValue());
 
 				if (devices != null) {

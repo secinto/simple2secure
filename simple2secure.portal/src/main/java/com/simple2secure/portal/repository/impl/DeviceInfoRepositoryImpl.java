@@ -30,7 +30,7 @@ public class DeviceInfoRepositoryImpl extends DeviceInfoRepository {
 
 	@Override
 	public List<DeviceInfo> findByDeviceType(String type) {
-		Query query = new Query(Criteria.where("deviceType").is(type.toString()));
+		Query query = new Query(Criteria.where("type").is(type.toString()));
 		return mongoTemplate.find(query, DeviceInfo.class);
 	}
 
