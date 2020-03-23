@@ -28,6 +28,7 @@ import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {PageEvent} from '@angular/material/paginator';
+import { DeviceStatus } from '../_models/deviceStatus';
 
 @Component({
 	moduleId: module.id,
@@ -89,8 +90,12 @@ export class OrbiterToolTestComponent {
 		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.POD + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.pods = data.devices;
-					this.dataSource.data = this.pods;
+					for (let device of data.devices){
+						if(device.info.deviceStatus == DeviceStatus.ONLINE){
+							this.dataSource.data.push(device);
+							this.dataSource.data = this.dataSource.data;
+						}
+					}
 					this.totalSize = data.totalSize;
 					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));

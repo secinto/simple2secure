@@ -42,7 +42,6 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Service;
-import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -50,7 +49,6 @@ import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
 import com.simple2secure.portal.validation.model.ValidInputDeviceType;
-import com.simple2secure.portal.validation.model.ValidInputHostname;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputSize;
@@ -81,7 +79,7 @@ public class DeviceController extends BaseUtilsProvider {
 		if (!Strings.isNullOrEmpty(contextId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				Map<String, Object> devices = deviceUtils.getAllDevicesFromCurrentContextPagination(context, null, page.getValue(),
+				Map<String, Object> devices = deviceUtils.getAllDevicesFromCurrentContextPagination(context, page.getValue(),
 						size.getValue());
 
 				if (devices != null) {
@@ -93,7 +91,6 @@ public class DeviceController extends BaseUtilsProvider {
 		log.error("Problem occured while retrieving devices for contextId {}", contextId.getValue());
 
 		return (ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_devices", locale);
-
 	}
 
 	/**
@@ -176,36 +173,7 @@ public class DeviceController extends BaseUtilsProvider {
 
 		return (ResponseEntity<List<Device>>) buildResponseEntity("problem_occured_while_getting_retrieving_pods", locale);
 	}
-
-	/**
-	 * This function retrieves the tests according to the deviceId, if no tests are found then it checks if there are tests according to the
-	 * hostname.
-	 *
-	 * @param deviceId
-	 * @param hostname
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	@ValidRequestMapping(
-			value = "/config")
-	public ResponseEntity<List<Test>> checkConfiguration(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputHostname hostname)
-			throws ItemNotFoundRepositoryException {
-
-		List<Test> test = testRepository.getByDeviceId(deviceId.getValue());
-		DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(deviceId.getValue());
-		if (devInfo != null) {
-			devInfo.setLastOnlineTimestamp(System.currentTimeMillis());
-			deviceInfoRepository.update(devInfo);
-		}
-
-		if (test == null || test.isEmpty()) {
-			test = testRepository.getByHostname(hostname.getValue());
-		}
-
-		return new ResponseEntity<>(test, HttpStatus.OK);
-
-	}
-
+	
 	/**
 	 * This function retrieves the scheduled tests from the list of the scheduled tests and returns them to the pod.
 	 *
@@ -228,31 +196,6 @@ public class DeviceController extends BaseUtilsProvider {
 		}
 
 		return (ResponseEntity<List<TestRun>>) buildResponseEntity("problem_occured_while_retrieving_scheduled_tests", locale);
-	}
-
-	/**
-	 * This function deletes the specified the POD with the specified ID if it exists
-	 */
-	@ValidRequestMapping(
-			value = "/delete",
-			method = ValidRequestMethodType.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<CompanyLicensePrivate> deleteDevice(@PathVariable ValidInputDevice deviceId,
-			@ServerProvidedValue ValidInputLocale locale) {
-
-		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
-
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
-
-			if (license != null) {
-				// delete all device dependencies
-				deviceUtils.deleteDependencies(deviceId.getValue());
-				return new ResponseEntity<>(license, HttpStatus.OK);
-			}
-		}
-
-		log.error("Problem occured while deleting device with id {}", deviceId);
-		return (ResponseEntity<CompanyLicensePrivate>) buildResponseEntity("problem_occured_while_deleting_device", locale);
 	}
 
 	/**

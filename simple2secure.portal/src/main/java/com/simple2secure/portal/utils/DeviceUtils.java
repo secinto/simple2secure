@@ -135,7 +135,7 @@ public class DeviceUtils extends BaseServiceProvider {
 	 * @throws ItemNotFoundRepositoryException 
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, String type, int page, int size) throws ItemNotFoundRepositoryException {
+	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size) throws ItemNotFoundRepositoryException {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		List<Device> devices = new ArrayList<>();
 		Map<String, Object> deviceMap = new HashMap<>();
@@ -145,20 +145,18 @@ public class DeviceUtils extends BaseServiceProvider {
 		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
 
 		if (licenseMap != null) {
-
 			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
-
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-						if (devInfo != null && (Strings.isNullOrEmpty(type) || devInfo.getType().name().equals(type))) {
+						if (devInfo != null) {
 							DeviceStatus status = devInfo.getDeviceStatus();
 
 							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 							if (status != deviceStatus) {
 								devInfo.setDeviceStatus(deviceStatus);
-								licenseRepository.update(license);
+								deviceInfoRepository.update(devInfo);
 							}
 							CompanyGroup group = groupRepository.find(license.getGroupId());
 							Device device = new Device(group, devInfo);
@@ -187,47 +185,42 @@ public class DeviceUtils extends BaseServiceProvider {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		List<Device> devices = new ArrayList<>();
 		Map<String, Object> deviceMap = new HashMap<>();
-		List<DeviceInfo> podDevices = deviceInfoRepository.findByDeviceType(type);
-		for(DeviceInfo pod : podDevices) {
-			CompanyLicensePrivate license = licenseRepository.findByDeviceId(pod.getDeviceId());
-			CompanyGroup group = groupRepository.find(license.getGroupId());
-			Device device = new Device(group, pod);
-			devices.add(device);
-		}
-		/*
+		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
+		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+
+		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
+
 		if (licenseMap != null) {
-
 			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
-
+			List<DeviceInfo> devInfoList = deviceInfoRepository.findByDeviceType(type);
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						DeviceInfo devInfo = new DeviceInfo();
-						for(DeviceInfo devInfo1 : podDevices) {
-							if(devInfo1.getDeviceId().equals(license.getDeviceId())) {
-								devInfo = devInfo1;
-							}
-						}
-						if (devInfo != null && (Strings.isNullOrEmpty(type) || devInfo.getType().name().equals(type))) {
-							DeviceStatus status = devInfo.getDeviceStatus();
+						for(DeviceInfo devInfo : devInfoList) {
+							if(devInfo.getDeviceId().equals(license.getDeviceId())) {
+								if (devInfo != null) {
+									DeviceStatus status = devInfo.getDeviceStatus();
 
-							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-							if (status != deviceStatus) {
-								devInfo.setDeviceStatus(deviceStatus);
-								licenseRepository.update(license);
+									DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+									if (status != deviceStatus) {
+										devInfo.setDeviceStatus(deviceStatus);
+										deviceInfoRepository.update(devInfo);
+									}
+									CompanyGroup group = groupRepository.find(license.getGroupId());
+									Device device = new Device(group, devInfo);
+									devices.add(device);
+								}
 							}
-							CompanyGroup group = groupRepository.find(license.getGroupId());
-							Device device = new Device(group, devInfo);
-							devices.add(device);
 						}
 					}
 				}
 			}
-			*/
+
 			deviceMap.put("devices", devices);
-			deviceMap.put("totalSize", podDevices.size());
-			log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
-			return deviceMap;
+			deviceMap.put("totalSize", licenseMap.get("totalSize"));
+		}
+		log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
+		return deviceMap;
 	}
 
 	/**
