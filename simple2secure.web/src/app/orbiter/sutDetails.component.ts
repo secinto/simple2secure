@@ -27,7 +27,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { environment } from '../../environments/environment';
-import { DeviceType } from '../_models/deviceType';
+import { SUTType } from '../_models/sutType';
 
 
 @Component({
@@ -38,7 +38,7 @@ import { DeviceType } from '../_models/deviceType';
 export class SUTDetailsComponent {
 
     sut: SystemUnderTest;
-	deviceTypeSelect: any[];
+	sutTypeSelect: any[];
     type: string;
 	selectedType: any;
     isNewSUT = false;
@@ -63,33 +63,15 @@ export class SUTDetailsComponent {
 			this.isNewSUT = true;
             this.sut = new SystemUnderTest();
             this.sut.contextId = data.contextId;
-			this.deviceTypeSelect = Object.keys(DeviceType);
+			this.sutTypeSelect = Object.keys(SUTType);
 		}
     }
 
 
     public updateSaveSUT() {
 		this.loading = true;
-		switch(this.selectedType) { 
-		   case "PROBE": { 
-			  this.sut.endDeviceType = DeviceType.PROBE; 
-			  break; 
-		   } 
-		   case "POD": { 
-			  this.sut.endDeviceType = DeviceType.POD; 
-			  break; 
-		   } 
-		   case "SUT": { 
-			  this.sut.endDeviceType = DeviceType.SUT; 
-			  break; 
-		   } 
-		   default: { 
-			  this.sut.endDeviceType = DeviceType.UNKNOWN; 
-			  break; 
-		   } 
-		} 
 		this.url = environment.apiEndpoint + 'sut/add';
-		this.httpService.post(this.sut, this.url).subscribe(
+		this.httpService.get(this.url).subscribe(
 			data => {
 				if (this.type === 'new') {
 					this.alertService.success(this.translate.instant('message.sut.create'));

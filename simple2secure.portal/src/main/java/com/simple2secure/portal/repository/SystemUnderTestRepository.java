@@ -24,6 +24,7 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.MongoRepository;
 
@@ -38,5 +39,7 @@ public abstract class SystemUnderTestRepository extends MongoRepository<SystemUn
 	public abstract List<SystemUnderTest> getAllByContextIdPaged(String contextId, int page, int size);
 
 	public abstract List<SystemUnderTest> getAllByContextIdAndSystemTypePaged(String contextId, int page, int size, String type);
+	
+	public abstract List<LDCSystemUnderTest> getAllByClassType();
 
 }

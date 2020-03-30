@@ -153,7 +153,6 @@ export class OrbiterToolTestListComponent {
 		this.url = environment.apiEndpoint + 'test/scheduleTest';
 		this.httpService.post(this.selectedTest, this.url).subscribe(
 			data => {
-
 				this.alertService.success(this.translate.instant('message.test.schedule'));
 			},
 			error => {
@@ -207,5 +206,18 @@ export class OrbiterToolTestListComponent {
 				}
 				this.loading = false;
 			});
+	}
+	
+	public openSUTDialog() {
+		this.httpService.get(environment.apiEndpoint + 'sut/' + this.selectedTest.testId)
+			.subscribe(
+				data => {
+					
+				});
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
+		
+		dialogConfig.data = {};
 	}
 }

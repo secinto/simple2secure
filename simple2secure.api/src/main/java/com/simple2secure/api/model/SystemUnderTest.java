@@ -22,8 +22,6 @@
 
 package com.simple2secure.api.model;
 
-import javax.persistence.Embedded;
-
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
@@ -36,7 +34,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class SystemUnderTest extends GenericDBObject {
+public abstract class SystemUnderTest extends GenericDBObject {
 
 	/**
 	*
@@ -46,13 +44,13 @@ public class SystemUnderTest extends GenericDBObject {
 	private @NonNull String contextId;
 	private @NonNull String deviceId;
 	private @NonNull String name;
-	private String ipAdress;
-	private String netMask;
-	private String uri;
-	@Embedded
-	private @NonNull SystemType systemType;
-	private String deviceLocation;
-	private DeviceStatus deviceStatus;
-	private long lastOnlineTimestamp;
+//	private String ipAdress;
+//	private String netMask;
+//	private String uri;
+//	@Embedded
+//	private @NonNull SystemType systemType;
+//	private String deviceLocation;
+//	private DeviceStatus deviceStatus;
+//	private long lastOnlineTimestamp;
 
 }

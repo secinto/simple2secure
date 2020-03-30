@@ -7,6 +7,7 @@ import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
+import { LDCSystemUnderTest} from '../_models/LDCSystemUnderTest';
 
 /**
  *********************************************************************
@@ -43,6 +44,7 @@ export class OrbiterSystemsUnderTestListComponent {
 	contextId: string;
 	monitoredSystems: SystemUnderTest[];
 	systemsUnderTest: SystemUnderTest[];
+	newLDCSystemUnderTest = LDCSystemUnderTest;
 	selectedSUT: SystemUnderTest;
 	loading = false;
 	public pageSize = 10;
@@ -86,7 +88,6 @@ export class OrbiterSystemsUnderTestListComponent {
 
 
     openDialogShowSuT(type: string): void {
-
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '750px';
 		dialogConfig.data = {
@@ -94,7 +95,6 @@ export class OrbiterSystemsUnderTestListComponent {
 		};
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
-
 	}
 
 	public loadMonitoredSystemsList(page: number, size: number){

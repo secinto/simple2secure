@@ -36,7 +36,7 @@ public class Parameter extends GenericDBObject {
 
 	private String value;
 
-	private Parameter() {
+	public Parameter() {
 
 	}
 

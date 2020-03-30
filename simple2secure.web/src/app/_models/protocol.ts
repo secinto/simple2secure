@@ -19,20 +19,9 @@
  *
  *********************************************************************
  */
-import {Base} from './base';
-import { DeviceType } from '../_models/deviceType';
-import { DeviceStatus } from '../_models/deviceStatus';
-
-export class SystemUnderTest extends Base {
-    contextId: string;
-	deviceId: string;
-	name: string;
-/*    
-	endDeviceType: DeviceType;
-    endDeviceLocation: string;
-	ipAdress: string;
-	netMask: string;
-	deviceStatus: DeviceStatus;
-	lastOnlineTimestamp: number; 
-*/
+ 
+export enum Protocol {
+	HTTP = 'HTTP',
+	HTTPS = 'HTTPS',
+	UNKNOWN = 'UNKNOWN',
 }

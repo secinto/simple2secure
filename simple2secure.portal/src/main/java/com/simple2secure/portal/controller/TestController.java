@@ -26,7 +26,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.reflections.Reflections;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,10 @@ import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.LDCSystemUnderTest;
+import com.simple2secure.api.model.S2SDSL;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
@@ -133,29 +138,36 @@ public class TestController extends BaseUtilsProvider {
    public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputContext contextId,
          @ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
       if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
-
          User user = userRepository.find(userId.getValue());
-
          if (user != null) {
             Test currentTest = testRepository.find(test.getTestId());
-
-            if (currentTest != null) {
-
-               TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId.getValue(),
-                     TestRunType.MANUAL_PORTAL, currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
-               testRun.setHostname(test.getHostname());
-               testRunRepository.save(testRun);
-
-               notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
-                     contextId.getValue());
-
-               return new ResponseEntity<>(testRun, HttpStatus.OK);
+            TestContent tC = testUtils.getTestContent(currentTest);
+            if(tC.getTest_definition().getStep().getCommand().getParameter().getValue().equals("ldc.sut")) {
+            	Reflections reflections = new Reflections("com.simple2secure.api.model");
+          		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(S2SDSL.class);
+          		for(Class clazz : annotated) {
+          			S2SDSL annotation =  (S2SDSL) clazz.getAnnotation(S2SDSL.class);
+          			if(annotation.value().equals("ldc.sut")) {
+          				List<LDCSystemUnderTest> ldcSUTList = sutRepository.getAllByClassType();
+          				String brk = "";
+          			}
+          		}
             }
+//            if (currentTest != null) {
+//               TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId.getValue(),
+//                     TestRunType.MANUAL_PORTAL, currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+//               testRun.setHostname(test.getHostname());
+//               testRunRepository.save(testRun);
+//
+//               notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
+//                     contextId.getValue());
+//
+//               return new ResponseEntity<>(testRun, HttpStatus.OK);
+//            }
          } else {
             log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
          }
       }
-
       return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
    }
 

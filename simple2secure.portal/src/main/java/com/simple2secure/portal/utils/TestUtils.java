@@ -33,16 +33,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
+import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
+import com.simple2secure.api.model.TestDefinition;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestSequenceResult;
+import com.simple2secure.api.model.TestStep;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -495,5 +500,42 @@ public class TestUtils extends BaseServiceProvider {
 			}
 		}
 	}
+	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
+	public TestContent getTestContent(Test test) {
+		String brk = "";
+		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
+		String name = testContent.findValue("name").asText();
+		JsonNode testDefinition = testContent.findValue("test_definition");
+		JsonNode step = testDefinition.findValue("step");
+		String tdDescription = testDefinition.findValue("description").asText();
+		String tdVersion = testDefinition.findValue("version").asText();
+		String stepDescription = step.findValue("description").asText();
+		JsonNode command = step.findValue("command");
+		String commandExecutable = command.findValue("executable").asText();
+		JsonNode parameter = command.findValue("parameter");
+		String parameterDescription = parameter.findValue("description").asText();
+		String parameterPrefix = parameter.findValue("prefix").asText();
+		String parameterValue = parameter.findValue("value").asText();
+		Parameter param = new Parameter();
+		param.setDescription(parameterDescription);
+		param.setPrefix(parameterPrefix);
+		param.setValue(parameterValue);
+		Command c = new Command();
+		c.setExecutable(commandExecutable);
+		c.setParameter(param);
+		TestStep tS = new TestStep();
+		tS.setCommand(c);
+		tS.setDescription(stepDescription);
+		TestDefinition tD = new TestDefinition(tdDescription, tdVersion, tS, tS, tS);
+		TestContent tC = new TestContent(name, tD);
+		return tC;
+	}
+	
+	
 
 }

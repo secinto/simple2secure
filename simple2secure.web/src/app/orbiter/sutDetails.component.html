@@ -15,31 +15,10 @@
             <mat-form-field class="full_width_input">
               <mat-label>Device Type</mat-label>
 			  <mat-select [(ngModel)]="selectedType" name="type">
-				<mat-option *ngFor="let type of deviceTypeSelect" [value]="type">
+				<mat-option *ngFor="let type of sutTypeSelect" [value]="type">
 				  {{type}}
 				</mat-option>
 			  </mat-select>
-            </mat-form-field>
-        </div>
-
-        <div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.sut.endDeviceLocation' | translate }}"
-                        [(ngModel)]="sut.endDeviceLocation" name="endDeviceLocation">
-            </mat-form-field>
-        </div>
-		
-		<div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.ipAdress' | translate }}"
-                        [(ngModel)]="sut.ipAdress" name="ipAdress">
-            </mat-form-field>
-        </div>
-		
-		<div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.netmask' | translate }}"
-                        [(ngModel)]="sut.netMask" name="netMask">
             </mat-form-field>
         </div>
     </form>

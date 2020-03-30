@@ -20,15 +20,16 @@ public class SUTUtils extends BaseServiceProvider {
 	 */
 	public DeviceStatus getDeviceStatus(SystemUnderTest sut) {
 		// make it multilingual
-		if (sut.getLastOnlineTimestamp() == 0) {
-			return DeviceStatus.UNKNOWN;
-		} else {
-			long timeDiff = System.currentTimeMillis() - sut.getLastOnlineTimestamp();
-			if (timeDiff > 60000) {
-				return DeviceStatus.OFFLINE;
-			} else {
-				return DeviceStatus.ONLINE;
-			}
-		}
+//		if (sut.getLastOnlineTimestamp() == 0) {
+//			return DeviceStatus.UNKNOWN;
+//		} else {
+//			long timeDiff = System.currentTimeMillis() - sut.getLastOnlineTimestamp();
+//			if (timeDiff > 60000) {
+//				return DeviceStatus.OFFLINE;
+//			} else {
+//				return DeviceStatus.ONLINE;
+//			}
+//		}
+		return DeviceStatus.ONLINE;
 	}
 }

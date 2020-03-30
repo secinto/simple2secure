@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -75,5 +76,10 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 		query.skip(skip);
 		query.with(Sort.by(Sort.Direction.DESC, "lastOnlineTimestamp"));
 		return mongoTemplate.find(query, SystemUnderTest.class, collectionName);
+	}
+
+	@Override
+	public List<LDCSystemUnderTest> getAllByClassType() {
+		return mongoTemplate.findAll(LDCSystemUnderTest.class, collectionName);
 	}
 }
