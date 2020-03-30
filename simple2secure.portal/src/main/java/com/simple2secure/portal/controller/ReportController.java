@@ -42,6 +42,7 @@ import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
@@ -81,20 +82,19 @@ public class ReportController extends BaseUtilsProvider {
 
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-
-				List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
-
-				if (devices != null) {
+				
+				List<Device> devices;
+				List<String> deviceIds;
+				OsQueryReportDTO reportDto = new OsQueryReportDTO();
+				try {
+					devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
+					deviceIds = portalUtils.extractIdsFromObjects(devices);
 					log.debug("Loading OSQuery reports for contextId {}", contextId.getValue());
-
-					List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
-
-					OsQueryReportDTO reportDto = new OsQueryReportDTO();
-
 					reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
-
-					return new ResponseEntity<>(reportDto, HttpStatus.OK);
+				} catch (ItemNotFoundRepositoryException e) {
+					log.error("Error occured while retrieving devices for context {}", contextId);
 				}
+				return new ResponseEntity<>(reportDto, HttpStatus.OK);
 			}
 		}
 		log.error("Error occured while retrieving reports for context {}", contextId);
@@ -109,14 +109,19 @@ public class ReportController extends BaseUtilsProvider {
 
 			List<String> groupIds = portalUtils.extractIdsFromObjects(groups);
 			if (groupIds != null && !groupIds.isEmpty()) {
-				List<Device> devices = deviceUtils.getAllDevicesByGroupIds(groupIds);
-				if(devices != null) {
-					List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
-					if (deviceIds != null) {
-						OsQueryReportDTO reportDto = new OsQueryReportDTO();
-						reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
-						return new ResponseEntity<>(reportDto, HttpStatus.OK);
+				List<Device> devices;
+				try {
+					devices = deviceUtils.getAllDevicesByGroupIds(groupIds);
+					if(devices != null) {
+						List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+						if (deviceIds != null) {
+							OsQueryReportDTO reportDto = new OsQueryReportDTO();
+							reportDto = reportsRepository.getReportsByDeviceIdWithPagination(deviceIds, page.getValue(), size.getValue());
+							return new ResponseEntity<>(reportDto, HttpStatus.OK);
+						}
 					}
+				} catch (ItemNotFoundRepositoryException e) {
+					log.error("Error while retrieving devices for groups {}", groupIds);
 				}
 			}
 		}

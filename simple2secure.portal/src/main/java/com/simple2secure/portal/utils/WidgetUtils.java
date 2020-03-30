@@ -35,6 +35,7 @@ import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetConfig;
 import com.simple2secure.api.model.WidgetProperties;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class WidgetUtils extends BaseServiceProvider {
 	@Autowired
 	PortalUtils portalUtils;
 
-	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, String contextId, String location) {
+	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, String contextId, String location) throws ItemNotFoundRepositoryException {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
 		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextIdAndLocation(userId, contextId,
 				location);
@@ -80,8 +81,9 @@ public class WidgetUtils extends BaseServiceProvider {
 	 * @param api
 	 * @param contextId
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public Object getWidgetValue(String api, String contextId) {
+	public Object getWidgetValue(String api, String contextId) throws ItemNotFoundRepositoryException {
 		Context context = contextRepository.find(contextId);
 		if (context != null) {
 			if (api.contains(StaticConfigItems.WIDGET_API_ACTIVE_DEVICES)) {

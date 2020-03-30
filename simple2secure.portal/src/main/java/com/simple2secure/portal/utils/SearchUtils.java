@@ -36,6 +36,7 @@ import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +58,9 @@ public class SearchUtils extends BaseServiceProvider {
 	 * @param searchQuery
 	 * @param contextId
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<SearchResult> getAllSearchResults(String searchQuery, Context context) {
+	public List<SearchResult> getAllSearchResults(String searchQuery, Context context) throws ItemNotFoundRepositoryException {
 
 		List<SearchResult> searchResultList = new ArrayList<>();
 		List<TestResult> testResultList = new ArrayList<>();

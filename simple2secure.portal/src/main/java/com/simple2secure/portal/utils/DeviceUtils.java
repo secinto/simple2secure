@@ -57,8 +57,9 @@ public class DeviceUtils extends BaseServiceProvider {
 	 *
 	 * @param context
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) {
+	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) throws ItemNotFoundRepositoryException {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
 		List<Device> devices = new ArrayList<>();
@@ -75,7 +76,7 @@ public class DeviceUtils extends BaseServiceProvider {
 							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 							if (status != deviceStatus) {
 								devInfo.setDeviceStatus(deviceStatus);
-								licenseRepository.save(license);
+								deviceInfoRepository.update(devInfo);
 							}
 
 							Device device = new Device(group, devInfo);
@@ -95,8 +96,9 @@ public class DeviceUtils extends BaseServiceProvider {
 	 * @param groupIds
 	 * @param isDevicePod
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) {
+	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) throws ItemNotFoundRepositoryException {
 		List<Device> devices = new ArrayList<>();
 		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
 
@@ -111,7 +113,7 @@ public class DeviceUtils extends BaseServiceProvider {
 						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 						if (status != deviceStatus) {
 							devInfo.setDeviceStatus(deviceStatus);
-							licenseRepository.save(license);
+							deviceInfoRepository.update(devInfo);
 						}
 
 						CompanyGroup group = groupRepository.find(license.getGroupId());
