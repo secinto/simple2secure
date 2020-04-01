@@ -21,16 +21,12 @@
  */
 package com.simple2secure.portal.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -54,7 +50,6 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
-import com.google.common.io.Resources;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Device;
@@ -82,7 +77,7 @@ import simple2secure.validator.model.ValidatedInput;
 
 @Component
 @Slf4j
-public class PortalUtils {
+public class PortalUtils{
 
 	@Autowired
 	JavaMailSender javaMailSender;
@@ -160,7 +155,7 @@ public class PortalUtils {
 				if (group.getChildrenIds().size() > 0) {
 					return true;
 				}
-			}
+			} 
 		}
 		return false;
 	}
@@ -176,32 +171,6 @@ public class PortalUtils {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * This function reads the files from the resources folder according to the folder name
-	 *
-	 * @param folder
-	 * @return
-	 */
-	private static File[] getResourceFolderFiles(String folder) {
-		URL url = Resources.getResource(folder);
-		String path = url.getPath();
-		log.debug("Folder on the following path {} found", path);
-		return new File(path).listFiles();
-	}
-
-	/**
-	 * This is a function which reads the files from the resources folder and converts to the byte array in order to prepare them for download
-	 *
-	 * @return
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public byte[] downloadFile() throws IOException, URISyntaxException {
-		File[] probe = getResourceFolderFiles("probe");
-		byte[] array = Files.readAllBytes(probe[0].toPath());
-		return array;
 	}
 
 	/**

@@ -507,13 +507,10 @@ public class TestUtils extends BaseServiceProvider {
 	 * @param deviceId
 	 */
 	public TestContent getTestContent(Test test) {
-		String brk = "";
 		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
 		String name = testContent.findValue("name").asText();
 		JsonNode testDefinition = testContent.findValue("test_definition");
 		JsonNode step = testDefinition.findValue("step");
-		String tdDescription = testDefinition.findValue("description").asText();
-		String tdVersion = testDefinition.findValue("version").asText();
 		String stepDescription = step.findValue("description").asText();
 		JsonNode command = step.findValue("command");
 		String commandExecutable = command.findValue("executable").asText();
@@ -531,9 +528,8 @@ public class TestUtils extends BaseServiceProvider {
 		TestStep tS = new TestStep();
 		tS.setCommand(c);
 		tS.setDescription(stepDescription);
-		TestDefinition tD = new TestDefinition(tdDescription, tdVersion, tS, tS, tS);
-		TestContent tC = new TestContent(name, tD);
-		return tC;
+		TestDefinition tD = new TestDefinition(testDefinition.findValue("description").asText(), testDefinition.findValue("version").asText(), tS, tS, tS);
+		return new TestContent(name, tD);
 	}
 	
 	

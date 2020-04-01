@@ -149,21 +149,27 @@ export class OrbiterToolTestListComponent {
 	public runTest(){
 
 		this.loading = true;
-
-		this.url = environment.apiEndpoint + 'test/scheduleTest';
-		this.httpService.post(this.selectedTest, this.url).subscribe(
-			data => {
-				this.alertService.success(this.translate.instant('message.test.schedule'));
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-			});
-			this.loading = false;
+		let flag = this.selectedTest.test_content.test_definition.step.command.parameter.value;
+		let regexp = new RegExp('^\{.*\}');
+		let boolResult = regexp.test(flag);
+		if(flag){
+			let brk = '';
+		}else {
+			this.url = environment.apiEndpoint + 'test/scheduleTest';
+			this.httpService.post(this.selectedTest, this.url).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.test.schedule'));
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+			this.loading = false;		
+		}
 	}
 
 	public openDeleteDialog() {
@@ -206,18 +212,5 @@ export class OrbiterToolTestListComponent {
 				}
 				this.loading = false;
 			});
-	}
-	
-	public openSUTDialog() {
-		this.httpService.get(environment.apiEndpoint + 'sut/' + this.selectedTest.testId)
-			.subscribe(
-				data => {
-					
-				});
-		const dialogConfig = new MatDialogConfig();
-		dialogConfig.disableClose = true;
-		dialogConfig.autoFocus = true;
-		
-		dialogConfig.data = {};
 	}
 }
