@@ -170,6 +170,7 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
+import { SUTTypeDetailsComponent } from './orbiter/sutTypeDetails.component';
 import { SUTDetailsComponent } from './orbiter/sutDetails.component';
 import {BreadcrumbsModule} from 'ng6-breadcrumbs';
 import {StatComponent} from './widgets/stat.component';
@@ -349,6 +350,7 @@ export const httpInterceptorProviders = [
 		TestSequenceResultComponent,
 		TestSequenceResultDetailsComponent,
 		OrbiterSystemsUnderTestListComponent,
+		SUTTypeDetailsComponent,
 		SUTDetailsComponent,
 		StatComponent,
 		StatItemComponent,
@@ -404,6 +406,7 @@ export const httpInterceptorProviders = [
 		StatComponent,
 		NotificationCardComponent,
 		NotificationCardItem,
+		SUTTypeDetailsComponent,
 		SUTDetailsComponent,
 		UserGroupEditComponent,
 		MappedQueryEditDialog,

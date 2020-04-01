@@ -3,7 +3,7 @@ import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, P
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import { SUTDetailsComponent } from './sutDetails.component';
+import { SUTTypeDetailsComponent } from './sutTypeDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
@@ -94,7 +94,7 @@ export class OrbiterSystemsUnderTestListComponent {
 			type: type,
 		};
 
-		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
+		const dialogRef = this.dialog.open(SUTTypeDetailsComponent, dialogConfig);
 	}
 
 	public loadMonitoredSystemsList(page: number, size: number){
@@ -132,6 +132,7 @@ export class OrbiterSystemsUnderTestListComponent {
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
+					/*
 					this.systemsUnderTest = data.sutList;
 					this.dataSourceOther = data.sutList;
 					this.totalSize = data.totalSize;
@@ -141,6 +142,7 @@ export class OrbiterSystemsUnderTestListComponent {
 					else {
 						this.alertService.error(this.translate.instant('message.data.notProvided'));
 					}
+					*/
 					this.loading = false;
 				},
 				error => {

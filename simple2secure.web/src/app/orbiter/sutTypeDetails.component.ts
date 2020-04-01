@@ -27,7 +27,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
-import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
+import { SUTDetailsComponent} from './sutDetails.component';
 import { environment } from '../../environments/environment';
 import { SUTType } from '../_models/sutType';
 import { Protocol } from '../_models/protocol';
@@ -35,20 +35,15 @@ import { Protocol } from '../_models/protocol';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'sutDetails.component.html'
+	templateUrl: 'sutTypeDetails.component.html'
 })
 
-export class SUTDetailsComponent {
+export class SUTTypeDetailsComponent {
 	
+	sutTypeSelect: any[];
 	selectedType: SUTType;
 	sutName = '';
-	ipAddress = '';
-	port = '';
-	protocolSelect: string[];
-	selectedProtocol: Protocol;
     type: string;
-	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
-	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
     isNewSUT = false;
     url: string;
     loading = false;
@@ -58,71 +53,31 @@ export class SUTDetailsComponent {
 		private httpService: HttpService,
 		private dataService: DataService,
         private dialog: MatDialog,
-		private dialogRef: MatDialogRef<SUTDetailsComponent>,
+		private dialogRef: MatDialogRef<SUTTypeDetailsComponent>,
 		private translate: TranslateService,
 		private router: Router,
         private route: ActivatedRoute,
         @Inject(MAT_DIALOG_DATA) data)
 	{
+
 		this.type = data.type;
-		this.isNewSUT = true;
-		this.sutName = data.sutName;
-		this.selectedType = data.selectedType;
-		this.protocolSelect = Object.keys(Protocol);
+		if (
+			this.type == 'new'){
+			this.isNewSUT = true;
+			this.sutTypeSelect = Object.keys(SUTType);
+		}
     }
 
-    public save() {
-		if(this.selectedType == SUTType.LDCSUT){
-			this.ldcSUT.name = this.sutName;
-			this.ldcSUT.ipAddress = this.ipAddress;
-			this.ldcSUT.port = this.port;
-			this.ldcSUT.protocol = this.selectedProtocol;
-			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/addLDC';
-			this.httpService.post(this.ldcSUT, this.url).subscribe(
-				data => {
-					if (this.type === 'new') {
-						this.alertService.success(this.translate.instant('message.sut.create'));
-					}
-					else {
-						this.alertService.success(this.translate.instant('message.sut.update'));
-					}
-					this.close(true);
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-		}else if(this.selectedType == SUTType.SDCSUT){
-			this.sdcSUT.name = this.sutName;
-			this.sdcSUT.port = this.port;
-			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/addSDC';
-			this.httpService.post(this.sdcSUT, this.url).subscribe(
-				data => {
-					if (this.type === 'new') {
-						this.alertService.success(this.translate.instant('message.sut.create'));
-					}
-					else {
-						this.alertService.success(this.translate.instant('message.sut.update'));
-					}
-					this.close(true);
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});			
-		}
+    public next() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		dialogConfig.data = {
+			sutName: this.sutName,
+			selectedType: this.selectedType
+		};
+
+		const dialogRef2 = this.dialog.open(SUTDetailsComponent, dialogConfig);
+		this.dialogRef.close(true);
 	}
 
     public close(value: boolean){
