@@ -509,29 +509,37 @@ public class TestUtils extends BaseServiceProvider {
 	public TestContent getTestContent(Test test) {
 		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
 		String name = testContent.findValue("name").asText();
-		JsonNode testDefinition = testContent.findValue("test_definition");
-		JsonNode step = testDefinition.findValue("step");
-		String stepDescription = step.findValue("description").asText();
-		JsonNode command = step.findValue("command");
-		String commandExecutable = command.findValue("executable").asText();
-		JsonNode parameter = command.findValue("parameter");
-		String parameterDescription = parameter.findValue("description").asText();
-		String parameterPrefix = parameter.findValue("prefix").asText();
-		String parameterValue = parameter.findValue("value").asText();
-		Parameter param = new Parameter();
-		param.setDescription(parameterDescription);
-		param.setPrefix(parameterPrefix);
-		param.setValue(parameterValue);
-		Command c = new Command();
-		c.setExecutable(commandExecutable);
-		c.setParameter(param);
-		TestStep tS = new TestStep();
-		tS.setCommand(c);
-		tS.setDescription(stepDescription);
-		TestDefinition tD = new TestDefinition(testDefinition.findValue("description").asText(), testDefinition.findValue("version").asText(), tS, tS, tS);
-		return new TestContent(name, tD);
+		TestDefinition testDefinition = getTestDefinition(testContent.findValue("test_definition"));
+		return new TestContent(name, testDefinition);
+	}
+	
+	public TestDefinition getTestDefinition(JsonNode testDefinition) {
+		String description = testDefinition.findValue("description").asText();
+		String version = testDefinition.findValue("version").asText();
+		TestStep preCondition = getTestStep(testDefinition.findValue("precondition"));
+		TestStep step = getTestStep(testDefinition.findValue("step"));
+		TestStep postCondition = getTestStep(testDefinition.findValue("postcondition"));
+		return new TestDefinition(description, version, preCondition, step, postCondition);
+	}
+	
+	public TestStep getTestStep(JsonNode testStep) {
+		String description = testStep.findValue("description").asText();
+		Command command = getCommand(testStep.findValue("command"));
+		return new TestStep(description, command);
 	}
 	
 	
-
+	public Command getCommand(JsonNode command) {
+		String executable = command.findValue("executable").asText();
+		Parameter parameter = getParameter(command.findValue("parameter"));
+		return new Command(executable, parameter);
+	}
+	
+	public Parameter getParameter(JsonNode parameter) {
+		String description = parameter.findValue("description").asText();
+		String prefix = parameter.findValue("prefix").asText();
+		String value = parameter.findValue("value").asText();
+		return new Parameter(description, prefix, value);
+	}
+	
 }

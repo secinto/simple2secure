@@ -161,7 +161,15 @@ export class OrbiterToolTestListComponent {
 				data => {
 					if(flag == '{ldc.sut}'){
 						for(let ldcSut of data){
-							this.ldcSystemsUnderTest.push(new LDCSystemUnderTest(ldcSut));
+							let neuLDC = new LDCSystemUnderTest();
+							neuLDC.id = ldcSut.id;
+							neuLDC.contextId = ldcSut.contextId;
+							neuLDC.deviceId = ldcSut.deviceId;
+							neuLDC.name = ldcSut.name;
+							neuLDC.ipAddress = ldcSut.ipAddress;
+							neuLDC.port = ldcSut.port;
+							neuLDC.protocol = ldcSut.protocol;
+							this.ldcSystemsUnderTest.push(neuLDC);
 						}
 						this.openLDCSUTDialog();
 					} 
@@ -223,6 +231,8 @@ export class OrbiterToolTestListComponent {
 		};
 
 		const dialogRef2 = this.dialog.open(LDCSUTListComponent, dialogConfig);
+		this.ldcSystemsUnderTest = [];
+		
 	}
 
 	public deleteTest(selectedTest: TestObjWeb) {

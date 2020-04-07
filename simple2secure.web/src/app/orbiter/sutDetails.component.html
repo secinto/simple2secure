@@ -1,40 +1,63 @@
-<h1>Add new SUT</h1>
+<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+<h3 *ngIf="isNewSUT" mat-dialog-title>{{ 'button.add.sut.text' | translate }}</h3>
+
+
 <div mat-dialog-content>
-	<div *ngIf="selectedType == 'LDCSUT'">
-		<form id="cfgForm" #configForm="ngForm">
-			<mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.ipAddress' | translate }}"
-                        [(ngModel)]="ipAddress" name="ipAddress">
+    <form id="cfgForm" #configForm="ngForm">
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+                        [(ngModel)]="sutName" name="sutName">
             </mat-form-field>
-			<mat-form-field class="full_width_input">
-				<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-                        [(ngModel)]="port" name="port">
-			</mat-form-field>
-			<mat-form-field class="full_width_input">
-              <mat-label>Protocol</mat-label>
-			  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
-				<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
-				  {{prot}}
+        </div>
+		
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+              <mat-label>Device Type</mat-label>
+			  <mat-select [(ngModel)]="selectedType" name="selectedType">
+				<mat-option *ngFor="let type of sutTypeSelect" [value]="type">
+				  {{type}}
 				</mat-option>
 			  </mat-select>
             </mat-form-field>
-		</form>
-	</div>
-	<div *ngIf="selectedType == 'SDCSUT'">
-		<form id="cfgForm" #configForm="ngForm">
-			<mat-form-field class="full_width_input">
-				<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-                        [(ngModel)]="port" name="port">
-			</mat-form-field>
-		</form>
-	</div>
-	 
+        </div>
+    </form>
+</div>
+
+<div *ngIf="selectedType == 'LDCSUT'">
+	<form id="cfgForm" #configForm="ngForm">
+		<mat-form-field class="full_width_input">
+			<input type="text" matInput placeholder="{{ 'table.ipAddress' | translate }}"
+					[(ngModel)]="ipAddress" name="ipAddress">
+		</mat-form-field>
+		<mat-form-field class="full_width_input">
+			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
+					[(ngModel)]="port" name="port">
+		</mat-form-field>
+		<mat-form-field class="full_width_input">
+		  <mat-label>Protocol</mat-label>
+		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
+			<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
+			  {{prot}}
+			</mat-option>
+		  </mat-select>
+		</mat-form-field>
+	</form>
+</div>
+
+<div *ngIf="selectedType == 'SDCSUT'">
+	<form id="cfgForm" #configForm="ngForm">
+		<mat-form-field class="full_width_input">
+			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
+					[(ngModel)]="port" name="port">
+		</mat-form-field>
+	</form>
 </div>
 
 <div mat-dialog-actions>
     <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
-    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.next' | translate }}
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.save' | translate }}
     </button>
 </div>

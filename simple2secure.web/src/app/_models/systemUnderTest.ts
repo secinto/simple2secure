@@ -28,12 +28,4 @@ export class SystemUnderTest extends Base {
     contextId: string;
 	deviceId: string;
 	name: string;
-/*    
-	endDeviceType: DeviceType;
-    endDeviceLocation: string;
-	ipAdress: string;
-	netMask: string;
-	deviceStatus: DeviceStatus;
-	lastOnlineTimestamp: number; 
-*/
 }

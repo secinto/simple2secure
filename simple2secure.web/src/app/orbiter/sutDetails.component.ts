@@ -40,15 +40,16 @@ import { Protocol } from '../_models/protocol';
 
 export class SUTDetailsComponent {
 	
+	sutTypeSelect: any[];
 	selectedType: SUTType;
 	sutName = '';
 	ipAddress = '';
 	port = '';
 	protocolSelect: string[];
 	selectedProtocol: Protocol;
+	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
+	sdcSUT: SDCSystemUnderTest;
     type: string;
-	ldcSUT: LDCSystemUnderTest;
-	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
     isNewSUT = false;
     url: string;
     loading = false;
@@ -64,10 +65,13 @@ export class SUTDetailsComponent {
         private route: ActivatedRoute,
         @Inject(MAT_DIALOG_DATA) data)
 	{
+
 		this.type = data.type;
-		this.isNewSUT = true;
-		this.sutName = data.sutName;
-		this.selectedType = data.selectedType;
+		if (
+			this.type == 'new'){
+			this.isNewSUT = true;
+			this.sutTypeSelect = Object.keys(SUTType);
+		}
 		this.protocolSelect = Object.keys(Protocol);
     }
 

@@ -140,7 +140,6 @@ public class TestController extends BaseUtilsProvider {
          @ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
       if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
          User user = userRepository.find(userId.getValue());
-         List<SystemUnderTest> suSUTList = new ArrayList<SystemUnderTest>();
          if (user != null) {
             Test currentTest = testRepository.find(test.getTestId());
             if (currentTest != null) {
@@ -232,8 +231,7 @@ public class TestController extends BaseUtilsProvider {
 						try {
 							tcJsonString = mapper.writeValueAsString(tC);
 						} catch (JsonProcessingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							log.error("Could not parse edited test content from test to a json string {}", currentTest.getId());
 						}
             if (currentTest != null && tcJsonString != null) {
   	            TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),

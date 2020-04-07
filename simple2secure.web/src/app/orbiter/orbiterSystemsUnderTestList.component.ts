@@ -3,7 +3,7 @@ import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, P
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
 import {environment} from '../../environments/environment';
-import { SUTTypeDetailsComponent } from './sutTypeDetails.component';
+import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
@@ -86,7 +86,6 @@ export class OrbiterSystemsUnderTestListComponent {
 		return e;
 	}
 
-
     openDialogShowSuT(type: string): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '750px';
@@ -94,9 +93,8 @@ export class OrbiterSystemsUnderTestListComponent {
 			type: type,
 		};
 
-		const dialogRef = this.dialog.open(SUTTypeDetailsComponent, dialogConfig);
+		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
 	}
-
 	public loadMonitoredSystemsList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.PROBE + '/' + page + '/' + size)
@@ -133,7 +131,6 @@ export class OrbiterSystemsUnderTestListComponent {
 			.subscribe(
 				data => {
 					this.systemsUnderTest = data.sutList;
-					let brk = new LDCSystemUnderTest(<LDCSystemUnderTest> this.systemsUnderTest[1]);
 					let brk1 = this.isLDCSUT(this.systemsUnderTest[1]);
 					let brk2 = "";
 					/*

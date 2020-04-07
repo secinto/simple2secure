@@ -2,47 +2,38 @@
     {
         "name": "quickNmap-secinto",
         "test_definition": {
-            "description": "Simple tool for running some tests",
-            "version": "0.0.1",
+            "description": "",
+            "version": "",
             "precondition": {
-                "id": null,
-                "description": "Remove some file if exists",
+                "description": "",
                 "command": {
-                    "id": null,
-                    "executable": "DELETE_RESULT",
+                    "executable": "",
                     "parameter": {
-                        "id": null,
-                        "description": "File name",
+                        "description": "",
                         "prefix": "",
-                        "value": "./result/result.json"
+                        "value": ""
                     }
                 }
             },
             "step": {
-                "id": null,
                 "description": "Execute nmap",
                 "command": {
-                    "id": null,
                     "executable": "nmap",
                     "parameter": {
-                        "id": null,
                         "description": "Some simple nmap execution",
                         "prefix": "-T4 -F",
-                        "value": "www.secinto.com"
+                        "value": "{ldc.sut}"
                     }
                 }
             },
             "postcondition": {
-                "id": null,
-                "description": "Save result to the file",
+                "description": "",
                 "command": {
-                    "id": null,
-                    "executable": "SAVE_RESULT",
+                    "executable": "",
                     "parameter": {
-                        "id": null,
-                        "description": "File Name",
+                        "description": "",
                         "prefix": "",
-                        "value": "result/result.json"
+                        "value": ""
                     }
                 }
             }
@@ -71,7 +62,7 @@
                     "parameter": {
                         "description": "Some simple nmap execution",
                         "prefix": "",
-                        "value": "www.secinto.com"
+                        "value": "{sdc.sut}"
                     }
                 }
             },
@@ -147,7 +138,7 @@
             "step": {
                 "description": "Execute nmap",
                 "command": {
-                    "executable": "netstat -n",
+                    "executable": "netstat",
                     "parameter": {
                         "description": "Some simple nmap execution",
                         "prefix": "-n",
@@ -763,6 +754,46 @@
                         "description": "File Name",
                         "prefix": "",
                         "value": "./result/result.json"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "ping_qsync_server",
+        "test_definition": {
+            "description": "",
+            "version": "0.0.1",
+            "precondition": {
+                "description": "",
+                "command": {
+                    "executable": "",
+                    "parameter": {
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "step": {
+                "description": "ping qsync server",
+                "command": {
+                    "executable": "ping",
+                    "parameter": {
+                        "description": "",
+                        "prefix": "",
+                        "value": "178.112.22.254"
+                    }
+                }
+            },
+            "postcondition": {
+                "description": "",
+                "command": {
+                    "executable": "",
+                    "parameter": {
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
                     }
                 }
             }
