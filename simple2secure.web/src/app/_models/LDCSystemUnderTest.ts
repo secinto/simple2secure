@@ -28,4 +28,14 @@
 	ipAddress: string;
 	port: string;
 	protocol: Protocol;
+	constructor(sut){
+		super();
+		this.id = sut.id;
+		this.contextId = sut.contextId;
+		this.deviceId = sut.deviceId;
+		this.name = sut.name;
+		this.ipAddress = sut.ipAddress;
+		this.port = sut.port;
+		this.protocol = sut.protocol;
+	}
 }

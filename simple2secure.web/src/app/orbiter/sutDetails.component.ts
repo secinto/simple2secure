@@ -47,7 +47,7 @@ export class SUTDetailsComponent {
 	protocolSelect: string[];
 	selectedProtocol: Protocol;
     type: string;
-	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
+	ldcSUT: LDCSystemUnderTest;
 	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
     isNewSUT = false;
     url: string;

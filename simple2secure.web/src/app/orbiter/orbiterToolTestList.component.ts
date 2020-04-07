@@ -29,7 +29,9 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
+import { LDCSUTListComponent } from './ldcSUTList.component';
 import {HttpParams} from "@angular/common/http";
+import {LDCSystemUnderTest} from '../_models/LDCSystemUnderTest';
 
 @Component({
 	moduleId: module.id,
@@ -47,6 +49,7 @@ export class OrbiterToolTestListComponent {
 	loading = false;
 	url: string;
 	id: string;
+	ldcSystemsUnderTest: LDCSystemUnderTest[] = [];
 	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -151,9 +154,26 @@ export class OrbiterToolTestListComponent {
 		this.loading = true;
 		let flag = this.selectedTest.test_content.test_definition.step.command.parameter.value;
 		let regexp = new RegExp('^\{.*\}');
-		let boolResult = regexp.test(flag);
-		if(flag){
-			let brk = '';
+		let isSutTest = regexp.test(flag);
+		if(isSutTest){
+			this.url = environment.apiEndpoint + 'test/applyableSUTList';
+			this.httpService.post(this.selectedTest, this.url).subscribe(
+				data => {
+					if(flag == '{ldc.sut}'){
+						for(let ldcSut of data){
+							this.ldcSystemsUnderTest.push(new LDCSystemUnderTest(ldcSut));
+						}
+						this.openLDCSUTDialog();
+					} 
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
 		}else {
 			this.url = environment.apiEndpoint + 'test/scheduleTest';
 			this.httpService.post(this.selectedTest, this.url).subscribe(
@@ -192,6 +212,17 @@ export class OrbiterToolTestListComponent {
 				this.deleteTest(this.selectedTest);
 			}
 		});
+	}
+	
+	public openLDCSUTDialog(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		dialogConfig.data = {
+			ldcSUTs: this.ldcSystemsUnderTest,
+			selectedTest: this.selectedTest
+		};
+
+		const dialogRef2 = this.dialog.open(LDCSUTListComponent, dialogConfig);
 	}
 
 	public deleteTest(selectedTest: TestObjWeb) {

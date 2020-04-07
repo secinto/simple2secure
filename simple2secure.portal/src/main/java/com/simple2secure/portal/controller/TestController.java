@@ -37,11 +37,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.SutDTO;
 import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
@@ -140,15 +144,6 @@ public class TestController extends BaseUtilsProvider {
          if (user != null) {
             Test currentTest = testRepository.find(test.getTestId());
             if (currentTest != null) {
-              // Retrieve TestContent from test provided from Web
-              TestContent tC = testUtils.getTestContent(currentTest);
-              // Check if the Test contains as Value in the Step section a flag which indicates that it is a test which is
-              // applicable to SUT's
-              if(sutUtils.getSUTTypes().contains(tC.getTest_definition().getStep().getCommand().getParameter().getValue())) {
-              		Class clazz = sutUtils.getAnnotatedClassesMap().get(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
-              		List sutList = sutRepository.getAllLDCSystemUnderTests(clazz);
-              		suSUTList.addAll(sutList);
-              }else {
   	            TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId.getValue(),
   	                  TestRunType.MANUAL_PORTAL, currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
   	            testRun.setHostname(test.getHostname());
@@ -157,10 +152,100 @@ public class TestController extends BaseUtilsProvider {
   	            notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
   	                  contextId.getValue());
   	            return new ResponseEntity<>(testRun, HttpStatus.OK);      
+            }
+         } else {
+            log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
+         }
+      }
+      return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
+   }
+   
+   /**
+    * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
+    * added to the internal schedule which is continuously checked by the pods.
+    *
+    * @param test
+    *           The test object to add to the schedule
+    * @param contextId
+    *           The context for which this has been performed
+    * @param userId
+    *           The user which added it to the schedule
+    * @param locale
+    *           The current locale used by the user
+    * @return A test run which has been created.
+    */
+   @ValidRequestMapping(value = "/applyableSUTList", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+   @PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+   public ResponseEntity<List<SystemUnderTest>> getApplyableSUTList(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputContext contextId,
+         @ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+      if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+         User user = userRepository.find(userId.getValue());
+         List<SystemUnderTest> suSUTList = new ArrayList<SystemUnderTest>();
+         if (user != null) {
+            Test currentTest = testRepository.find(test.getTestId());
+            if (currentTest != null) {
+              // Retrieve TestContent from test provided from Web
+              TestContent tC = testUtils.getTestContent(currentTest);
+              // Check if the Test contains as Value in the Step section a flag which indicates that it is a test which is
+              // applicable to SUT's
+              if(sutUtils.getSUTTypes().contains(tC.getTest_definition().getStep().getCommand().getParameter().getValue())) {
+              		Class clazz = sutUtils.getAnnotatedClassesMap().get(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
+              		List sutList = sutRepository.getAllLDCSystemUnderTests(clazz);
+              		suSUTList.addAll(sutList);
+              		return new ResponseEntity<>(suSUTList, HttpStatus.OK);
               }
             }
          } else {
             log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
+         }
+      }
+      return (ResponseEntity<List<SystemUnderTest>>) buildResponseEntity("problem_occured_while_saving_test", locale);
+   }
+   
+   /**
+    * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
+    * added to the internal schedule which is continuously checked by the pods.
+    *
+    * @param test
+    *           The test object to add to the schedule
+    * @param contextId
+    *           The context for which this has been performed
+    * @param userId
+    *           The user which added it to the schedule
+    * @param locale
+    *           The current locale used by the user
+    * @return A test run which has been created.
+    */
+   @ValidRequestMapping(value = "/scheduleLDCSUTTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+   @PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+   public ResponseEntity<TestRun> addLDCSUTTestToSchedule(@RequestBody SutDTO sutDTO, @ServerProvidedValue ValidInputContext contextId,
+         @ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+      if (sutDTO != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+         User user = userRepository.find(userId.getValue());
+         if (user != null) {
+            Test currentTest = testRepository.find(sutDTO.getTestId());
+            LDCSystemUnderTest ldcSUT = (LDCSystemUnderTest) sutRepository.find(sutDTO.getSutId());
+            TestContent tC = testUtils.getTestContent(currentTest);            
+            tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
+            ObjectMapper mapper = new ObjectMapper();
+            String tcJsonString = null;
+						try {
+							tcJsonString = mapper.writeValueAsString(tC);
+						} catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+            if (currentTest != null && tcJsonString != null) {
+  	            TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
+  	                  TestRunType.MANUAL_PORTAL, tcJsonString, TestStatus.PLANNED, System.currentTimeMillis());
+  	            testRunRepository.save(testRun);
+  	
+  	            notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
+  	                  contextId.getValue());
+  	            return new ResponseEntity<>(testRun, HttpStatus.OK);      
+            }
+         } else {
+            log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
          }
       }
       return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);

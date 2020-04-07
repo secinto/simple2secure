@@ -132,6 +132,10 @@ export class OrbiterSystemsUnderTestListComponent {
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
+					this.systemsUnderTest = data.sutList;
+					let brk = new LDCSystemUnderTest(<LDCSystemUnderTest> this.systemsUnderTest[1]);
+					let brk1 = this.isLDCSUT(this.systemsUnderTest[1]);
+					let brk2 = "";
 					/*
 					this.systemsUnderTest = data.sutList;
 					this.dataSourceOther = data.sutList;
@@ -158,6 +162,13 @@ export class OrbiterSystemsUnderTestListComponent {
 
 	public onMenuTriggerClick(sut: SystemUnderTest) {
 		this.selectedSUT = sut;
+	}
+	
+	public isLDCSUT(sut){
+		if(sut.ipAdress != undefined && sut.protocol != undefined){
+			return true;
+		}
+		return false;
 	}
 
 }

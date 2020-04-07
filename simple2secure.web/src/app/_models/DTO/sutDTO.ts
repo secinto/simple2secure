@@ -19,30 +19,9 @@
  *
  *********************************************************************
  */
-package com.simple2secure.api.model;
 
-import com.simple2secure.api.dbo.GenericDBObject;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@RequiredArgsConstructor
-@ToString
-public class Command extends GenericDBObject {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -2977516759831166624L;
-
-	private @NonNull String executable;
-	private @NonNull Parameter parameter;
-
+export class SutDTO {
+	sutId: string;
+	testId: string;
 }
