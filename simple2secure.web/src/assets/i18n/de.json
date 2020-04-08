@@ -55,6 +55,7 @@
   "button.showRules": "Regeln anzeigen",
   "button.addSequence": "Sequenz hinzufügen",
   "button.add.sut" : "SiT hinzufügen",
+  "button.apply.sut" : "Anwenden",
   "button.default.config": "Gruppenkonfiguration übernehmen",
   "button.osquery.config": "OSQuery Gruppenkonfiguration übernehmen",
   "button.steps.processors.config": "Gruppenschritte und Prozessoren übernehmen",
@@ -237,6 +238,7 @@
   "table.endDevice" : "Endgerät",
   "table.ipAddress" : "IP Adresse",
   "table.port" : "Port",
+  "table.protocol" : "Protokoll"
   "table.netmask" : "Netzwerkmaske",
   "table.usedLicenses": "Anzahl der verwendeten Lizenzen",
   "table.executable": "Ausführbar",

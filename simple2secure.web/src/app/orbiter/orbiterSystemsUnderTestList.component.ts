@@ -7,7 +7,8 @@ import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
-import { LDCSystemUnderTest} from '../_models/LDCSystemUnderTest';
+import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
+import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
 
 /**
  *********************************************************************
@@ -40,11 +41,12 @@ import { LDCSystemUnderTest} from '../_models/LDCSystemUnderTest';
 export class OrbiterSystemsUnderTestListComponent {
 
 	displayedColumnsMonitored = ['name', 'device', 'ipAdress', 'deviceStatus'];
-	displayedColumnsTargeted = ['name', 'device', 'ipAdress', 'action'];
+	displayedColumnsTargetedLDC = ['name', 'ipAddress', 'port', 'protocol', 'action'];
+	displayedColumnsTargetedSDC = ['name', 'port', 'action'];
 	contextId: string;
 	monitoredSystems: SystemUnderTest[];
-	systemsUnderTest: SystemUnderTest[];
-	newLDCSystemUnderTest = LDCSystemUnderTest;
+	ldcSystemsUnderTest: LDCSystemUnderTest[] = [];
+	sdcSystemsUnderTest: SDCSystemUnderTest[] = [];
 	selectedSUT: SystemUnderTest;
 	loading = false;
 	public pageSize = 10;
@@ -52,7 +54,8 @@ export class OrbiterSystemsUnderTestListComponent {
 	public totalSize = 0;
 	public pageEvent: PageEvent;
 	dataSourceMonitored = new MatTableDataSource();
-	dataSourceOther = new MatTableDataSource();
+	dataSourceLDC = new MatTableDataSource();
+	dataSourceSDC = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -130,20 +133,17 @@ export class OrbiterSystemsUnderTestListComponent {
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.systemsUnderTest = data.sutList;
-					let brk1 = this.isLDCSUT(this.systemsUnderTest[1]);
-					let brk2 = "";
-					/*
-					this.systemsUnderTest = data.sutList;
-					this.dataSourceOther = data.sutList;
-					this.totalSize = data.totalSize;
-					if (data.sutList.length > 0) {
-						this.alertService.success(this.translate.instant('message.data'));
+					for(let sut of data.sutList){
+						if(this.isLDCSUT(sut) == true){
+							this.ldcSystemsUnderTest.push(this.createLDCSUT(sut));
+							this.dataSourceLDC.data.push(this.createLDCSUT(sut));
+							this.dataSourceLDC.data = this.dataSourceLDC.data;
+						}else {
+							this.sdcSystemsUnderTest.push(this.createSDCSUT(sut));
+							this.dataSourceSDC.data.push(this.createSDCSUT(sut));
+							this.dataSourceSDC.data = this.dataSourceSDC.data;
+						}
 					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
-					*/
 					this.loading = false;
 				},
 				error => {
@@ -162,10 +162,32 @@ export class OrbiterSystemsUnderTestListComponent {
 	}
 	
 	public isLDCSUT(sut){
-		if(sut.ipAdress != undefined && sut.protocol != undefined){
+		if(sut.ipAddress != undefined && sut.protocol != undefined){
 			return true;
 		}
 		return false;
+	}
+	
+	public createLDCSUT(sut){
+		let sutNew = new LDCSystemUnderTest();
+		sutNew.id = sut.id;
+		sutNew.contextId = sut.contextId;
+		sutNew.deviceId = sut.deviceId;
+		sutNew.name = sut.name;
+		sutNew.ipAddress = sut.ipAddress;
+		sutNew.port = sut.port;
+		sutNew.protocol = sut.protocol;
+		return sutNew;
+	}
+	
+	public createSDCSUT(sut){
+		let sutNew = new SDCSystemUnderTest();
+		sutNew.id = sut.id;
+		sutNew.contextId = sut.contextId;
+		sutNew.deviceId = sut.deviceId;
+		sutNew.name = sut.name;
+		sutNew.port = sut.port;
+		return sutNew;
 	}
 
 }

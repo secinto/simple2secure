@@ -172,7 +172,8 @@ export class OrbiterToolTestListComponent {
 							this.ldcSystemsUnderTest.push(neuLDC);
 						}
 						this.openLDCSUTDialog();
-					} 
+					}
+					this.loading = false;
 				},
 				error => {
 					if (error.status == 0) {

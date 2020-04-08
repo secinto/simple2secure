@@ -1,5 +1,5 @@
 <mat-tab-group xmlns:svg="">
-	<mat-tab label="List View">
+	<mat-tab label="Monitored Systems">
 		<h1> Monitored Systems </h1>
 		<div class="example-container mat-elevation-z8 table table-striped">
 			<div class="header-filter-table">
@@ -52,128 +52,125 @@
 			</mat-paginator>
 			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 		</div>
-
+	</mat-tab>
+	<mat-tab label="Targeted Systems">
 		<button mat-raised-button color="primary" id="addButton" type="button"
 				(click)="openDialogShowSuT('new')"
 				class="pull-right mat-green-button">
 			<i class="glyphicon glyphicon-plus"></i> {{ 'button.add.sut' | translate }}
 		</button>
 		<h1> Targeted Systems </h1>
-		<div class="example-container mat-elevation-z8 table table-striped">
-			<div class="header-filter-table">
-				<mat-form-field class="header-filter-field">
-					<input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-				</mat-form-field>
-			</div>
-			
-			<mat-table #table [dataSource]="dataSourceOther" matSort>
+		<mat-tab-group xmlns:svg="">
+			<mat-tab label="LDC Systems Under Test">
+				<div class="example-container mat-elevation-z8 table table-striped">
+					<div class="header-filter-table">
+						<mat-form-field class="header-filter-field">
+							<input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+						</mat-form-field>
+					</div>
+					
+					<mat-table #table [dataSource]="dataSourceLDC" matSort>
 
-				<ng-container matColumnDef="name">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
-				</ng-container>
+						<ng-container matColumnDef="name">
+							<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+							<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+						</ng-container>
 
-				<ng-container matColumnDef="device">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.device' | translate }}
-					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.info.systemType}}</mat-cell>
-				</ng-container>
+						<ng-container matColumnDef="ipAddress">
+							<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
+							</mat-header-cell>
+							<mat-cell *matCellDef="let element"> {{element.ipAddress}}</mat-cell>
+						</ng-container>
+						
+						<ng-container matColumnDef="port">
+							<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.port' | translate }}
+							</mat-header-cell>
+							<mat-cell *matCellDef="let element"> {{element.port}}</mat-cell>
+						</ng-container>
+						
+						<ng-container matColumnDef="protocol">
+							<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.protocol' | translate }}
+							</mat-header-cell>
+							<mat-cell *matCellDef="let element"> {{element.protocol}}</mat-cell>
+						</ng-container>
+
+
+						<ng-container matColumnDef="action">
+							<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }}</mat-header-cell>
+							<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+								<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+										(click)="onMenuTriggerClick(element)">
+									<i class="fas fa-bars"></i>
+								</button>
+							</mat-cell>
+						</ng-container>
+
+						<mat-header-row *matHeaderRowDef="displayedColumnsTargetedLDC"></mat-header-row>
+						<mat-row *matRowDef="let row; columns: displayedColumnsTargetedLDC;"></mat-row>
+					</mat-table>
+					
+					<mat-paginator #paginator
+								   [pageSize]="pageSize"
+								   [pageSizeOptions]="[5, 10, 20]"
+								   [showFirstLastButtons]="true"
+								   [length]="totalSize"
+								   (page)="pageEvent = handlePage($event)">
+					</mat-paginator>
+					<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+				</div>
+
+				<mat-menu #menu="matMenu">
+				</mat-menu>	
+			</mat-tab>
+			<mat-tab label="SDC Systems Under Test">
+				<div class="example-container mat-elevation-z8 table table-striped">
+					<div class="header-filter-table">
+						<mat-form-field class="header-filter-field">
+							<input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+						</mat-form-field>
+					</div>
 				
-				<ng-container matColumnDef="ipAdress">
-					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
-					</mat-header-cell>
-					<mat-cell *matCellDef="let element"> {{element.info.ipAddress}}</mat-cell>
-				</ng-container>
+					<mat-table #table [dataSource]="dataSourceSDC" matSort>
+
+							<ng-container matColumnDef="name">
+								<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+								<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+							</ng-container>
+
+							<ng-container matColumnDef="port">
+								<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.port' | translate }}
+								</mat-header-cell>
+								<mat-cell *matCellDef="let element"> {{element.port}}</mat-cell>
+							</ng-container>
 
 
-				<ng-container matColumnDef="action">
-					<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }}</mat-header-cell>
-					<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
-						<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
-								(click)="onMenuTriggerClick(element)">
-							<i class="fas fa-bars"></i>
-						</button>
-					</mat-cell>
-				</ng-container>
+							<ng-container matColumnDef="action">
+								<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }}</mat-header-cell>
+								<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+									<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+											(click)="onMenuTriggerClick(element)">
+										<i class="fas fa-bars"></i>
+									</button>
+								</mat-cell>
+							</ng-container>
 
-				<mat-header-row *matHeaderRowDef="displayedColumnsTargeted"></mat-header-row>
-				<mat-row *matRowDef="let row; columns: displayedColumnsTargeted;"></mat-row>
-			</mat-table>
-			
-			<mat-paginator #paginator
+							<mat-header-row *matHeaderRowDef="displayedColumnsTargetedSDC"></mat-header-row>
+							<mat-row *matRowDef="let row; columns: displayedColumnsTargetedSDC;"></mat-row>
+					</mat-table>
+					
+					<mat-paginator #paginator
 						   [pageSize]="pageSize"
 						   [pageSizeOptions]="[5, 10, 20]"
 						   [showFirstLastButtons]="true"
 						   [length]="totalSize"
 						   (page)="pageEvent = handlePage($event)">
-			</mat-paginator>
-			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
-		</div>
+					</mat-paginator>
+					<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 
-		<mat-menu #menu="matMenu">
-		</mat-menu>	
-	</mat-tab>
-	<!--
-	<mat-tab label="Object View">
-		<div class="example-container">
-			<ngx-graph
-					class="chart-container"
-					[view]="[768, 1024]"
-					[links]="[
-                        {
-                          id: 'a',
-                          source: 'first',
-                            target: 'second',
-                          label: 'is parent of'
-                        }, {
-                          id: 'b',
-                          source: 'first',
-                          target: 'third',
-                          label: 'custom label'
-                        }
-                      ]"
-					[nodes]="[
-                        {
-                          id: 'first',
-                          label: 'Aaaaaa'
-                        }, {
-                          id: 'second',
-                          label: 'Bsadsad'
-                        }, {
-                          id: 'third',
-                          label: 'Csadsads'
-                        }
-                      ]"
-			>
-
-				<ng-template #nodeTemplate let-node>
-					<svg:g class="node" ngx-tooltip [tooltipPlacement]="'top'" [tooltipType]="'tooltip'" [tooltipTitle]="node.label">
-						<svg:circle [attr.r]="node.dimension.width/2" [attr.cx]="node.dimension.width/2" [attr.cy]="node.dimension.width/2" [attr.fill]="node.data.color" />
-						<svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height">
-							{{node.label}}
-						</svg:text>
-					</svg:g>
-				</ng-template>
-
-				<ng-template #linkTemplate let-link>
-					<svg:g class="edge">
-						<svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
-						<svg:text class="edge-label" text-anchor="middle">
-							<textPath
-									class="text-path"
-									[attr.href]="'#' + link.id"
-									[style.dominant-baseline]="link.dominantBaseline"
-									startOffset="50%"
-							>
-								{{link.label}}
-							</textPath>
-						</svg:text>
-					</svg:g>
-				</ng-template>
-			</ngx-graph>
-		</div>
-
-	</mat-tab>-->
+					<mat-menu #menu="matMenu">
+					</mat-menu>	
+				</div>
+			</mat-tab>		
 </mat-tab-group>
 
 

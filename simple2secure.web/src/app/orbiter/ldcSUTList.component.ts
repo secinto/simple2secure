@@ -22,7 +22,7 @@
 
 import { Component, Inject } from '@angular/core';
 import { AlertService, HttpService, DataService } from '../_services';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig, MatTableDataSource } from '@angular/material';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig, MatTableDataSource, MatSort, MatPaginator, PageEvent } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
@@ -34,18 +34,23 @@ import { SutDTO } from '../_models/DTO/sutDTO';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['ldcSUTList.css'],
 	templateUrl: 'ldcSUTList.component.html'
 })
 
 export class LDCSUTListComponent {
 	
 	dataSource = new MatTableDataSource();
-	displayedColumns = ['name'];
+	displayedColumns = ['name', 'ipAddress', 'port', 'protocol', 'Apply'];
 	selectedTest: TestObjWeb = new TestObjWeb();
 	loading = false;
 	type = "new";
 	url: string;
 	sutTransferObj: SutDTO = new SutDTO();
+	public pageSize = 10;
+	public currentPage = 0;
+	public totalSize = 0;
+	public pageEvent: PageEvent;
 	
 	constructor(
 		private alertService: AlertService,
