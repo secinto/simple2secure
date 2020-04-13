@@ -40,16 +40,16 @@ import { Protocol } from '../_models/protocol';
 
 export class SUTDetailsComponent {
 	
-	sutTypeSelect: any[];
+	sutTypeSelect = Object.keys(SUTType);
 	selectedType: SUTType;
 	sutName = '';
 	ipAddress = '';
 	port = '';
-	protocolSelect: string[];
+	protocolSelect = Object.keys(Protocol);
 	selectedProtocol: Protocol;
 	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
 	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
-    type: string;
+    action: string;
     isNewSUT = false;
     url: string;
     loading = false;
@@ -66,13 +66,23 @@ export class SUTDetailsComponent {
         @Inject(MAT_DIALOG_DATA) data)
 	{
 
-		this.type = data.type;
-		if (
-			this.type == 'new'){
-			this.isNewSUT = true;
-			this.sutTypeSelect = Object.keys(SUTType);
+		this.action = data.action;
+		if (this.action ==	'edit'){
+			if(data.type == 'LDCSUT'){
+				this.selectedType = SUTType.LDCSUT;
+				this.sutName = data.sut.name;
+				this.ipAddress = data.sut.ipAddress;
+				this.port = data.sut.port;
+				this.selectedProtocol = data.sut.protocol;
+			}else if (data.type == 'SDCSUT') {
+				this.selectedType = SUTType.SDCSUT;
+				this.sutName = data.sut.name;
+				this.port = data.sut.port;
+			}else {
+				this.selectedType = SUTType.UNKNOWN;
+			}
+			
 		}
-		this.protocolSelect = Object.keys(Protocol);
     }
 
     public save() {
@@ -85,7 +95,7 @@ export class SUTDetailsComponent {
 			this.url = environment.apiEndpoint + 'sut/addLDC';
 			this.httpService.post(this.ldcSUT, this.url).subscribe(
 				data => {
-					if (this.type === 'new') {
+					if (this.action === 'new') {
 						this.alertService.success(this.translate.instant('message.sut.create'));
 					}
 					else {
@@ -109,7 +119,7 @@ export class SUTDetailsComponent {
 			this.url = environment.apiEndpoint + 'sut/addSDC';
 			this.httpService.post(this.sdcSUT, this.url).subscribe(
 				data => {
-					if (this.type === 'new') {
+					if (this.action === 'new') {
 						this.alertService.success(this.translate.instant('message.sut.create'));
 					}
 					else {

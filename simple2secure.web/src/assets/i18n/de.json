@@ -340,6 +340,7 @@
   "message.context.edit": "Kontext wurde erfolgreich aktualisiert!",
   "message.sut.create" : "System im Test erfolgreich erstellt!",
   "message.sut.update" : "System im Test erfolgreich aktualisiert!",
+  "message.sut.scheduled.on.test": "Test wurde erfolgreich auf dem System im Test angewendet.",
 
   "config.configSupplier": "Konfig. Lieferant",
   "config.taskSupplier": "Aufgabenlieferant",

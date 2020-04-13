@@ -6,22 +6,11 @@
 			{{element.name}}
 			</mat-cell>
         </ng-container>
-		<ng-container matColumnDef="ipAddress">
-			<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
-			</mat-header-cell>
-			<mat-cell *matCellDef="let element"> {{element.ipAddress}}</mat-cell>
-		</ng-container>
-						
+
 		<ng-container matColumnDef="port">
 			<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.port' | translate }}
 			</mat-header-cell>
 			<mat-cell *matCellDef="let element"> {{element.port}}</mat-cell>
-		</ng-container>
-						
-		<ng-container matColumnDef="protocol">
-			<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.protocol' | translate }}
-			</mat-header-cell>
-			<mat-cell *matCellDef="let element"> {{element.protocol}}</mat-cell>
 		</ng-container>
 		
 		<ng-container matColumnDef="Apply">

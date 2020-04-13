@@ -120,6 +120,15 @@
 				</div>
 
 				<mat-menu #menu="matMenu">
+					    <button mat-menu-item (click)="openDialogShowSuT('edit')">
+							<mat-icon>edit</mat-icon>
+							{{ 'button.edit' | translate }}
+						</button>
+
+						<button mat-menu-item (click)="openDeleteSutDialog()">
+							<mat-icon>delete</mat-icon>
+							{{ 'button.delete' | translate }}
+						</button>
 				</mat-menu>	
 			</mat-tab>
 			<mat-tab label="SDC Systems Under Test">
@@ -168,6 +177,15 @@
 					<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
 
 					<mat-menu #menu="matMenu">
+						 <button mat-menu-item (click)="openDialogShowSuT('edit')">
+							<mat-icon>edit</mat-icon>
+							{{ 'button.edit' | translate }}
+						</button>
+
+						<button mat-menu-item (click)="openDeleteSutDialog()">
+							<mat-icon>delete</mat-icon>
+							{{ 'button.delete' | translate }}
+						</button>
 					</mat-menu>	
 				</div>
 			</mat-tab>		

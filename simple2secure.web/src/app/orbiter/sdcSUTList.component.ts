@@ -25,22 +25,21 @@ import { AlertService, HttpService, DataService } from '../_services';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig, MatTableDataSource, MatSort, MatPaginator, PageEvent } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
+import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
 import { environment } from '../../environments/environment';
-import { Protocol } from '../_models/protocol';
 import { TestObjWeb } from '../_models/testObjWeb';
 import { SutDTO } from '../_models/DTO/sutDTO';
 
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'ldcSUTList.component.html'
+	templateUrl: 'sdcSUTList.component.html'
 })
 
-export class LDCSUTListComponent {
+export class SDCSUTListComponent {
 	
 	dataSource = new MatTableDataSource();
-	displayedColumns = ['name', 'ipAddress', 'port', 'protocol', 'Apply'];
+	displayedColumns = ['name', 'port', 'Apply'];
 	selectedTest: TestObjWeb = new TestObjWeb();
 	loading = false;
 	url: string;
@@ -55,13 +54,13 @@ export class LDCSUTListComponent {
 		private httpService: HttpService,
 		private dataService: DataService,
         private dialog: MatDialog,
-		private dialogRef: MatDialogRef<LDCSUTListComponent>,
+		private dialogRef: MatDialogRef<SDCSUTListComponent>,
 		private translate: TranslateService,
 		private router: Router,
         private route: ActivatedRoute,
         @Inject(MAT_DIALOG_DATA) data)
 	{
-		this.dataSource = data.ldcSUTs;
+		this.dataSource = data.sdcSUTs;
 		this.selectedTest = data.selectedTest;
     }
 	
@@ -70,7 +69,6 @@ export class LDCSUTListComponent {
 	}
 	
 	public scheduleSutTest(sut){
-		let brk = this.selectedTest;
 		this.url = environment.apiEndpoint + 'test/scheduleLDCSUTTest';
 		this.sutTransferObj.sutId = sut.id;
 		this.sutTransferObj.testId = this.selectedTest.testId;

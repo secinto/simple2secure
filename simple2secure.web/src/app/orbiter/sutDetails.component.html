@@ -13,8 +13,11 @@
 		
         <div class="form-group">
             <mat-form-field class="full_width_input">
-              <mat-label>Device Type</mat-label>
-			  <mat-select [(ngModel)]="selectedType" name="selectedType">
+              <mat-label>Type of System Under Test</mat-label>
+			  <mat-select [(ngModel)]="selectedType" name="selectedType"
+			   matTooltip="There are two types of System Under Test, the first one 
+			   is LDCSUT (Long Distance Connected System Under Test) and SDCSUT (Short Distance Connected System Under Test)"
+			   >
 				<mat-option *ngFor="let type of sutTypeSelect" [value]="type">
 				  {{type}}
 				</mat-option>

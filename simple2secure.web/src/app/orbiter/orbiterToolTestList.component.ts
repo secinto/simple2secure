@@ -30,8 +30,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
 import { LDCSUTListComponent } from './ldcSUTList.component';
+import { SDCSUTListComponent } from './sdcSUTList.component';
 import {HttpParams} from "@angular/common/http";
-import {LDCSystemUnderTest} from '../_models/LDCSystemUnderTest';
+import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
+import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
 
 @Component({
 	moduleId: module.id,
@@ -50,6 +52,7 @@ export class OrbiterToolTestListComponent {
 	url: string;
 	id: string;
 	ldcSystemsUnderTest: LDCSystemUnderTest[] = [];
+	sdcSystemsUnderTest: SDCSystemUnderTest[] = [];
 	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -172,6 +175,17 @@ export class OrbiterToolTestListComponent {
 							this.ldcSystemsUnderTest.push(neuLDC);
 						}
 						this.openLDCSUTDialog();
+					}else if(flag = '{sdc.sut}') {
+						for(let sdcSut of data){
+							let neuSDC = new SDCSystemUnderTest();
+							neuSDC.id = sdcSut.id;
+							neuSDC.contextId = sdcSut.contextId;
+							neuSDC.deviceId = sdcSut.deviceId;
+							neuSDC.name = sdcSut.name;
+							neuSDC.port = sdcSut.port;
+							this.sdcSystemsUnderTest.push(neuSDC);
+						}
+						this.openSDCSUTDialog();
 					}
 					this.loading = false;
 				},
@@ -233,6 +247,19 @@ export class OrbiterToolTestListComponent {
 
 		const dialogRef2 = this.dialog.open(LDCSUTListComponent, dialogConfig);
 		this.ldcSystemsUnderTest = [];
+		
+	}
+	
+	public openSDCSUTDialog(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		dialogConfig.data = {
+			sdcSUTs: this.sdcSystemsUnderTest,
+			selectedTest: this.selectedTest
+		};
+
+		const dialogRef2 = this.dialog.open(SDCSUTListComponent, dialogConfig);
+		this.sdcSystemsUnderTest = [];
 		
 	}
 

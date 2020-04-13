@@ -341,6 +341,7 @@
   "message.context.edit": "Context updated successfully!",
   "message.sut.create" : "System Under Test created successfully!",
   "message.sut.update" : "System Under Test updated successfully!",
+  "message.sut.scheduled.on.test": "Test succesfully applied on System Under Test",
 
   "config.configSupplier": "Config Supplier",
   "config.taskSupplier": "Task Supplier",

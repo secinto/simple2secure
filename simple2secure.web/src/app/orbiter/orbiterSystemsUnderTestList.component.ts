@@ -9,6 +9,7 @@ import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
 import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
 import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
+import { SUTType } from '../_models/sutType';
 
 /**
  *********************************************************************
@@ -48,6 +49,7 @@ export class OrbiterSystemsUnderTestListComponent {
 	ldcSystemsUnderTest: LDCSystemUnderTest[] = [];
 	sdcSystemsUnderTest: SDCSystemUnderTest[] = [];
 	selectedSUT: SystemUnderTest;
+	sutTypeSelect: SUTType;
 	loading = false;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -89,15 +91,36 @@ export class OrbiterSystemsUnderTestListComponent {
 		return e;
 	}
 
-    openDialogShowSuT(type: string): void {
+    openDialogShowSuT(action: string): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '750px';
-		dialogConfig.data = {
-			type: type,
-		};
+		if(action == 'new'){
+			dialogConfig.data = {
+				action: action,
+			};
+		}else if( action == 'edit') {
+			let type = '';
+			if(this.isLDCSUT(this.selectedSUT)){
+				type = 'LDCSUT';
+			}else {
+				type = 'SDCSUT';
+			}
+			dialogConfig.data = {
+				action: action,
+				type: type,
+				sut: this.selectedSUT
+			};
+		}
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
 	}
+	
+	
+	openDeleteSutDialog() {
+		
+	}
+	
+	
 	public loadMonitoredSystemsList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.PROBE + '/' + page + '/' + size)

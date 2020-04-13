@@ -172,6 +172,7 @@ import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
 import { SUTDetailsComponent } from './orbiter/sutDetails.component';
 import { LDCSUTListComponent } from './orbiter/ldcSUTList.component'; 
+import { SDCSUTListComponent } from './orbiter/sdcSUTList.component';
 import {BreadcrumbsModule} from 'ng6-breadcrumbs';
 import {StatComponent} from './widgets/stat.component';
 import {NotificationCardComponent} from './widgets/notification-card.component';
@@ -352,6 +353,7 @@ export const httpInterceptorProviders = [
 		OrbiterSystemsUnderTestListComponent,
 		SUTDetailsComponent,
 		LDCSUTListComponent,
+		SDCSUTListComponent,
 		StatComponent,
 		StatItemComponent,
 		NotificationCardComponent,
@@ -408,6 +410,7 @@ export const httpInterceptorProviders = [
 		NotificationCardItem,
 		SUTDetailsComponent,
 		LDCSUTListComponent,
+		SDCSUTListComponent,
 		UserGroupEditComponent,
 		MappedQueryEditDialog,
 		QueryCategoryAddDialog,
