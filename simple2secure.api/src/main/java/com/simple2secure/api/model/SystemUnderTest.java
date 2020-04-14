@@ -42,15 +42,8 @@ public abstract class SystemUnderTest extends GenericDBObject {
 	private static final long serialVersionUID = 5020907897089097628L;
 
 	private @NonNull String contextId;
-	private @NonNull String deviceId;
+	private @NonNull String uri;
 	private @NonNull String name;
-//	private String ipAdress;
-//	private String netMask;
-//	private String uri;
-//	@Embedded
-//	private @NonNull SystemType systemType;
-//	private String deviceLocation;
-//	private DeviceStatus deviceStatus;
-//	private long lastOnlineTimestamp;
-
+	private @NonNull String port;
+	private @NonNull Protocol protocol;
 }

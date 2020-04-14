@@ -23,5 +23,5 @@
  import { SystemUnderTest } from './systemUnderTest'; 
  
  export class SDCSystemUnderTest extends SystemUnderTest {
-	port: string;
+
 }

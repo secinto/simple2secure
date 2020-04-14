@@ -21,11 +21,8 @@
  */
  
  import { SystemUnderTest } from './systemUnderTest';
- import { Protocol } from './protocol';
  
  
  export class LDCSystemUnderTest extends SystemUnderTest {
 	ipAddress: string;
-	port: string;
-	protocol: Protocol;
 }

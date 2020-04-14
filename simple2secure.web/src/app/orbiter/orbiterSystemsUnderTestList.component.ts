@@ -195,11 +195,11 @@ export class OrbiterSystemsUnderTestListComponent {
 		let sutNew = new LDCSystemUnderTest();
 		sutNew.id = sut.id;
 		sutNew.contextId = sut.contextId;
-		sutNew.deviceId = sut.deviceId;
 		sutNew.name = sut.name;
 		sutNew.ipAddress = sut.ipAddress;
 		sutNew.port = sut.port;
 		sutNew.protocol = sut.protocol;
+		sutNew.uri = sut.uri;
 		return sutNew;
 	}
 	
@@ -207,9 +207,9 @@ export class OrbiterSystemsUnderTestListComponent {
 		let sutNew = new SDCSystemUnderTest();
 		sutNew.id = sut.id;
 		sutNew.contextId = sut.contextId;
-		sutNew.deviceId = sut.deviceId;
 		sutNew.name = sut.name;
 		sutNew.port = sut.port;
+		sutNew.uri = sut.uri;
 		return sutNew;
 	}
 

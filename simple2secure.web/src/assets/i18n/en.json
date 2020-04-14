@@ -22,6 +22,7 @@
   "button.send": "Send",
   "button.downloadProbe": "Download Probe",
   "button.save": "Save",
+  "button.update": "Update",
   "button.next": "Next",
   "button.cancel": "Cancel",
   "button.close": "Close",
@@ -439,6 +440,7 @@
 
   "orbiter.toolsconfig": "Edit tools configuration",
   "orbiter.edittests": "Edit test",
+  "orbiter.editsut": "Edit System Under Test",
   "orbiter.editsequence" : "Edit Sequence",
   "orbiter.sequenceLength": "Sequence length: ",
   "orbiter.sut" : "Systems Under Test",

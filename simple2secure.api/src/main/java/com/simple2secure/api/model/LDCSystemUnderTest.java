@@ -19,7 +19,5 @@ public class LDCSystemUnderTest extends SystemUnderTest {
 	private static final long serialVersionUID = -4994023419133198440L;
 	
 	private @NonNull String ipAddress;
-	private @NonNull String port;
-	private @NonNull Protocol protocol;
 
 }

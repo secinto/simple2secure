@@ -167,7 +167,7 @@ export class OrbiterToolTestListComponent {
 							let neuLDC = new LDCSystemUnderTest();
 							neuLDC.id = ldcSut.id;
 							neuLDC.contextId = ldcSut.contextId;
-							neuLDC.deviceId = ldcSut.deviceId;
+							neuLDC.uri = ldcSut.uri;
 							neuLDC.name = ldcSut.name;
 							neuLDC.ipAddress = ldcSut.ipAddress;
 							neuLDC.port = ldcSut.port;
@@ -180,7 +180,7 @@ export class OrbiterToolTestListComponent {
 							let neuSDC = new SDCSystemUnderTest();
 							neuSDC.id = sdcSut.id;
 							neuSDC.contextId = sdcSut.contextId;
-							neuSDC.deviceId = sdcSut.deviceId;
+							neuSDC.uri = sdcSut.uri;
 							neuSDC.name = sdcSut.name;
 							neuSDC.port = sdcSut.port;
 							this.sdcSystemsUnderTest.push(neuSDC);

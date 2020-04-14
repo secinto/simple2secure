@@ -42,13 +42,16 @@ export class SUTDetailsComponent {
 	
 	sutTypeSelect = Object.keys(SUTType);
 	selectedType: SUTType;
+	id: string;
+	contextId: string;
+	uri = '';
 	sutName = '';
 	ipAddress = '';
 	port = '';
 	protocolSelect = Object.keys(Protocol);
 	selectedProtocol: Protocol;
 	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
-	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
+	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest(); 
     action: string;
     isNewSUT = false;
     url: string;
@@ -68,6 +71,8 @@ export class SUTDetailsComponent {
 
 		this.action = data.action;
 		if (this.action ==	'edit'){
+			this.id = data.sut.id;
+			this.contextId = data.sut.contextId;
 			if(data.type == 'LDCSUT'){
 				this.selectedType = SUTType.LDCSUT;
 				this.sutName = data.sut.name;
@@ -81,7 +86,8 @@ export class SUTDetailsComponent {
 			}else {
 				this.selectedType = SUTType.UNKNOWN;
 			}
-			
+		}else {
+			this.isNewSUT = true;
 		}
     }
 
@@ -91,16 +97,12 @@ export class SUTDetailsComponent {
 			this.ldcSUT.ipAddress = this.ipAddress;
 			this.ldcSUT.port = this.port;
 			this.ldcSUT.protocol = this.selectedProtocol;
+			this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.port;
 			this.loading = true;
 			this.url = environment.apiEndpoint + 'sut/addLDC';
 			this.httpService.post(this.ldcSUT, this.url).subscribe(
 				data => {
-					if (this.action === 'new') {
-						this.alertService.success(this.translate.instant('message.sut.create'));
-					}
-					else {
-						this.alertService.success(this.translate.instant('message.sut.update'));
-					}
+					this.alertService.success(this.translate.instant('message.sut.create'));
 					this.close(true);
 				},
 				error => {
@@ -115,16 +117,13 @@ export class SUTDetailsComponent {
 		}else if(this.selectedType == SUTType.SDCSUT){
 			this.sdcSUT.name = this.sutName;
 			this.sdcSUT.port = this.port;
+			this.sdcSUT.protocol = this.selectedProtocol;
+			this.sdcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.port;
 			this.loading = true;
 			this.url = environment.apiEndpoint + 'sut/addSDC';
 			this.httpService.post(this.sdcSUT, this.url).subscribe(
 				data => {
-					if (this.action === 'new') {
-						this.alertService.success(this.translate.instant('message.sut.create'));
-					}
-					else {
-						this.alertService.success(this.translate.instant('message.sut.update'));
-					}
+					this.alertService.success(this.translate.instant('message.sut.create'));
 					this.close(true);
 				},
 				error => {
@@ -138,7 +137,57 @@ export class SUTDetailsComponent {
 				});			
 		}
 	}
-
+	
+	public update() {
+		if(this.selectedType == SUTType.LDCSUT){
+			this.ldcSUT.id = this.id;
+			this.ldcSUT.contextId = this.contextId;
+			this.ldcSUT.uri = this.uri;
+			this.ldcSUT.name = this.sutName;
+			this.ldcSUT.ipAddress = this.ipAddress;
+			this.ldcSUT.port = this.port;
+			this.ldcSUT.protocol = this.selectedProtocol;
+			this.loading = true;
+			this.url = environment.apiEndpoint + 'sut/updateLDC';
+			this.httpService.post(this.ldcSUT, this.url).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.sut.update'));
+					this.close(true);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});		
+		}else if(this.selectedType == SUTType.SDCSUT){
+			this.sdcSUT.id = this.id;
+			this.sdcSUT.contextId = this.contextId;
+			this.sdcSUT.uri = this.uri;
+			this.sdcSUT.name = this.sutName;
+			this.sdcSUT.port = this.port;
+			this.loading = true;
+			this.url = environment.apiEndpoint + 'sut/updateSDC';
+			this.httpService.post(this.sdcSUT, this.url).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.sut.update'));
+					this.close(true);
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+					this.loading = false;
+				});
+		}
+	}
+	
     public close(value: boolean){
 		this.dialogRef.close(value);
 	}

@@ -1,4 +1,4 @@
-<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.editsut' | translate }}</h3>
 <h3 *ngIf="isNewSUT" mat-dialog-title>{{ 'button.add.sut.text' | translate }}</h3>
 
 
@@ -54,6 +54,14 @@
 			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
 					[(ngModel)]="port" name="port">
 		</mat-form-field>
+		<mat-form-field class="full_width_input">
+		  <mat-label>Protocol</mat-label>
+		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
+			<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
+			  {{prot}}
+			</mat-option>
+		  </mat-select>
+		</mat-form-field>
 	</form>
 </div>
 
@@ -61,6 +69,13 @@
     <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
-    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.save' | translate }}
-    </button>
+	<div *ngIf='isNewSUT'>
+	    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.save' | translate }}
+		</button>
+	</div>
+	<div *ngIf='!isNewSUT'>
+		<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="update()">{{ 'button.update' | translate }}
+		</button>
+	</div>
+
 </div>

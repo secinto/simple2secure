@@ -66,7 +66,55 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
+	
+	@ValidRequestMapping(value = "/updateLDC", method = ValidRequestMethodType.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<SystemUnderTest> updateLDC(@RequestBody LDCSystemUnderTest ldcSUT, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (ldcSUT != null && contextId.getValue() != null) {
+			LDCSystemUnderTest sutToUpdate = (LDCSystemUnderTest) sutRepository.find(ldcSUT.id);
+			sutToUpdate.setContextId(ldcSUT.getContextId());
+			sutToUpdate.setUri(ldcSUT.getUri());
+			sutToUpdate.setName(ldcSUT.getName());
+			sutToUpdate.setIpAddress(ldcSUT.getIpAddress());
+			sutToUpdate.setPort(ldcSUT.getPort());
+			sutToUpdate.setProtocol(ldcSUT.getProtocol());
+			try {
+				sutRepository.update(sutToUpdate);
+				log.debug("System Under Test: {} has been updated", sutToUpdate.getName());
+			} catch (ItemNotFoundRepositoryException e) {
+				log.error("Error occured while updating the System Under Test ", e);
+			}
 
+			return new ResponseEntity<>(sutToUpdate, HttpStatus.OK);
+		}
+
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+	}
+	
+	@ValidRequestMapping(value = "/updateSDC", method = ValidRequestMethodType.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<SystemUnderTest> updateSDC(@RequestBody SDCSystemUnderTest sdcSUT, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (sdcSUT != null && contextId.getValue() != null) {
+			SDCSystemUnderTest sutToUpdate = (SDCSystemUnderTest) sutRepository.find(sdcSUT.id);
+			sutToUpdate.setContextId(sdcSUT.getContextId());
+			sutToUpdate.setUri(sdcSUT.getUri());
+			sutToUpdate.setName(sdcSUT.getName());
+			sutToUpdate.setPort(sdcSUT.getPort());
+			try {
+				sutRepository.update(sutToUpdate);
+				log.debug("System Under Test: {} has been updated", sutToUpdate.getName());
+			} catch (ItemNotFoundRepositoryException e) {
+				log.error("Error occured while updating the System Under Test ", e);
+			}
+
+			return new ResponseEntity<>(sutToUpdate, HttpStatus.OK);
+		}
+
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+	}
+	
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
