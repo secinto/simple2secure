@@ -2,7 +2,8 @@ import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, PageEvent} from '@angular/material';
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
+import { ConfirmationDialog } from '../dialog/confirmation-dialog';
 import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
@@ -54,6 +55,8 @@ export class OrbiterSystemsUnderTestListComponent {
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
+	public totalSizeLDC = 0;
+	public totalSizeSDC = 0;
 	public pageEvent: PageEvent;
 	dataSourceMonitored = new MatTableDataSource();
 	dataSourceLDC = new MatTableDataSource();
@@ -113,11 +116,33 @@ export class OrbiterSystemsUnderTestListComponent {
 		}
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
+		dialogRef.afterClosed().subscribe(data => {
+			this.loadSUTList(this.currentPage, this.pageSize);
+		});
 	}
 	
 	
 	openDeleteSutDialog() {
-		
+		const dialogConfig = new MatDialogConfig();
+
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
+
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.test.dialog')
+		};
+
+
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteSUT(this.selectedSUT);
+			}
+			this.loadSUTList(this.currentPage, this.pageSize);
+		});
 	}
 	
 	
@@ -132,7 +157,7 @@ export class OrbiterSystemsUnderTestListComponent {
 							this.dataSourceMonitored.data = this.dataSourceMonitored.data;
 						}
 					}
-					this.totalSize = data.totalSize;
+					this.totalSize = data.devices.totalSize;
 					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
@@ -156,14 +181,18 @@ export class OrbiterSystemsUnderTestListComponent {
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
+					this.dataSourceLDC.data = [];
+					this.dataSourceSDC.data = [];
 					for(let sut of data.sutList){
 						if(this.isLDCSUT(sut) == true){
 							this.ldcSystemsUnderTest.push(this.createLDCSUT(sut));
 							this.dataSourceLDC.data.push(this.createLDCSUT(sut));
+							this.totalSizeLDC = this.dataSourceLDC.data.length;
 							this.dataSourceLDC.data = this.dataSourceLDC.data;
 						}else {
 							this.sdcSystemsUnderTest.push(this.createSDCSUT(sut));
 							this.dataSourceSDC.data.push(this.createSDCSUT(sut));
+							this.totalSizeSDC = this.dataSourceSDC.data.length;
 							this.dataSourceSDC.data = this.dataSourceSDC.data;
 						}
 					}
@@ -185,7 +214,7 @@ export class OrbiterSystemsUnderTestListComponent {
 	}
 	
 	public isLDCSUT(sut){
-		if(sut.ipAddress != undefined && sut.protocol != undefined){
+		if(sut.ipAddress != undefined){
 			return true;
 		}
 		return false;
@@ -209,8 +238,26 @@ export class OrbiterSystemsUnderTestListComponent {
 		sutNew.contextId = sut.contextId;
 		sutNew.name = sut.name;
 		sutNew.port = sut.port;
+		sutNew.protocol = sut.protocol;
 		sutNew.uri = sut.uri;
 		return sutNew;
 	}
-
+	
+	public deleteSUT(sut){
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'sut/' + sut.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.sut.delete'));
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
 }

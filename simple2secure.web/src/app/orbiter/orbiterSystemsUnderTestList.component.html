@@ -113,7 +113,7 @@
 								   [pageSize]="pageSize"
 								   [pageSizeOptions]="[5, 10, 20]"
 								   [showFirstLastButtons]="true"
-								   [length]="totalSize"
+								   [length]="totalSizeLDC"
 								   (page)="pageEvent = handlePage($event)">
 					</mat-paginator>
 					<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
@@ -171,7 +171,7 @@
 						   [pageSize]="pageSize"
 						   [pageSizeOptions]="[5, 10, 20]"
 						   [showFirstLastButtons]="true"
-						   [length]="totalSize"
+						   [length]="totalSizeSDC"
 						   (page)="pageEvent = handlePage($event)">
 					</mat-paginator>
 					<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>

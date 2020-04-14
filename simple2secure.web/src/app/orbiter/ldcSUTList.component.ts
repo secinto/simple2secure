@@ -62,6 +62,7 @@ export class LDCSUTListComponent {
         @Inject(MAT_DIALOG_DATA) data)
 	{
 		this.dataSource = data.ldcSUTs;
+		this.totalSize = data.ldcSUTs.length;
 		this.selectedTest = data.selectedTest;
     }
 	

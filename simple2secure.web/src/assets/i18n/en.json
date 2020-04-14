@@ -304,6 +304,7 @@
   "message.template.dialog": "With clicking on yes, selected template will be deleted!",
   "message.test.dialog": "With clicking on yes, selected test will be deleted!",
   "message.test.delete": "Test deleted successfully!",
+  "message.sut.delete": "System Under Test deleted successfully!",
   "message.template.delete": "Template deleted successfully!",
   "message.config.delete": "Config deleted successfully!",
   "message.group.delete": "Group deleted successfully!",

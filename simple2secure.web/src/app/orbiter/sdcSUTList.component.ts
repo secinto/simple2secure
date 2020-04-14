@@ -61,6 +61,7 @@ export class SDCSUTListComponent {
         @Inject(MAT_DIALOG_DATA) data)
 	{
 		this.dataSource = data.sdcSUTs;
+		this.totalSize = data.sdcSUTs.length;
 		this.selectedTest = data.selectedTest;
     }
 	

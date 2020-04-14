@@ -24,6 +24,7 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputSize;
+import com.simple2secure.portal.validation.model.ValidInputSut;
 import com.simple2secure.portal.validation.model.ValidInputSystemType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -164,5 +165,16 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
 		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+	}
+	
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable ValidInputSut sutId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sutId != null) {
+			sutRepository.delete(sutRepository.find(sutId.getValue()));
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}
+
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 }

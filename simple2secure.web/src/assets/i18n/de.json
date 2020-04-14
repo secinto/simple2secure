@@ -303,6 +303,7 @@
   "message.template.dialog": "Mit einem Klick auf Ja wird die ausgewählte Vorlage gelöscht!",
   "message.test.dialog": "Mit einem Klick auf Ja wird die ausgewählte Test gelöscht!",
   "message.test.delete": "Test erfolgreich gelöscht!",
+  "message.sut.delete": "System im Test erfolgreich gelöscht!",
   "message.template.delete": "Vorlage erfolgreich gelöscht!",
   "message.config.delete": "Die Konfiguration wurde erfolgreich gelöscht!",
   "message.group.delete": "Gruppe erfolgreich gelöscht!",
