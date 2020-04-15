@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {TestResult} from '../_models';
+import {TestResult, TestResultObj} from '../_models';
 import {DataService} from '../_services';
 
 @Component({
@@ -31,7 +31,8 @@ import {DataService} from '../_services';
 })
 
 export class TestResultDetailsComponent {
-	testResult: TestResult;
+	testResult: TestResult = new TestResult();
+	testResultObj: TestResultObj = new TestResultObj();
 	loading = false;
 	result: string;
 
@@ -43,8 +44,13 @@ export class TestResultDetailsComponent {
 		let b64EncResult = JSON.parse(data.result.result);
 		let b64DecResult = atob(b64EncResult.step);
 		b64EncResult.step = b64DecResult;
-		data.result.result = JSON.stringify(b64EncResult);
-		this.testResult = data.result;
+		this.testResult.id = data.result.id;
+		this.testResult.name = data.result.name;
+		this.testResult.testRunId = data.result.testRunId;
+		this.testResult.hostname = data.result.hostname;
+		this.testResultObj = b64EncResult;
+		this.testResult.result = this.testResultObj;
+		this.testResult.timestamp = data.result.timestamp;
 	}
 
 }
