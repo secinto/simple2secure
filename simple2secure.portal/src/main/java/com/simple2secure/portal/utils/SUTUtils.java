@@ -23,6 +23,15 @@ public class SUTUtils extends BaseServiceProvider {
 		return Arrays.asList(sutTypeArray);
 	}
 	
+	public String getSUTBase(String sutValue) {
+		String sanitizedValue = sutValue.substring(1, sutValue.length() - 1);
+		String[] splittedValue = sanitizedValue.split("\\.");
+		if(!(splittedValue.length == 2)) {
+			return "{" +splittedValue[0] + "." + splittedValue[1] + "}";
+		}
+		return sutValue;
+	}
+	
 	public <T> Map<String, Class<T>> getAnnotatedClassesMap(){
 		Reflections reflections = new Reflections("com.simple2secure.api.model");
 		Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(S2SDSL.class);

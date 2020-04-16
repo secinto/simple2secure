@@ -35,8 +35,9 @@
 		</mat-form-field>
 		<mat-form-field class="full_width_input">
 			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-					[(ngModel)]="port" name="port">
+					[(ngModel)]="ldcport" name="ldcport">
 		</mat-form-field>
+		<div *ngIf="invalidIpOrPort">Invalid IP Address or Port</div>
 		<mat-form-field class="full_width_input">
 		  <mat-label>Protocol</mat-label>
 		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
@@ -52,7 +53,7 @@
 	<form id="cfgForm" #configForm="ngForm">
 		<mat-form-field class="full_width_input">
 			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-					[(ngModel)]="port" name="port">
+					[(ngModel)]="sdcport" name="sdcport">
 		</mat-form-field>
 		<mat-form-field class="full_width_input">
 		  <mat-label>Protocol</mat-label>

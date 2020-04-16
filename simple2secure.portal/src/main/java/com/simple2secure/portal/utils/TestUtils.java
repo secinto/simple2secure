@@ -33,11 +33,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
 import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.Test;
@@ -513,6 +516,11 @@ public class TestUtils extends BaseServiceProvider {
 		return new TestContent(name, testDefinition);
 	}
 	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
 	public TestDefinition getTestDefinition(JsonNode testDefinition) {
 		String description = testDefinition.findValue("description").asText();
 		String version = testDefinition.findValue("version").asText();
@@ -522,24 +530,79 @@ public class TestUtils extends BaseServiceProvider {
 		return new TestDefinition(description, version, preCondition, step, postCondition);
 	}
 	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
 	public TestStep getTestStep(JsonNode testStep) {
 		String description = testStep.findValue("description").asText();
 		Command command = getCommand(testStep.findValue("command"));
 		return new TestStep(description, command);
 	}
 	
-	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
 	public Command getCommand(JsonNode command) {
 		String executable = command.findValue("executable").asText();
 		Parameter parameter = getParameter(command.findValue("parameter"));
 		return new Command(executable, parameter);
 	}
 	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
 	public Parameter getParameter(JsonNode parameter) {
 		String description = parameter.findValue("description").asText();
 		String prefix = parameter.findValue("prefix").asText();
 		String value = parameter.findValue("value").asText();
 		return new Parameter(description, prefix, value);
+	}
+	
+	/**
+	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 *
+	 * @param deviceId
+	 */
+	public String mergeLDCSutAndTest(Test test, LDCSystemUnderTest ldcSUT) {
+		TestContent tC = getTestContent(test);
+		String paramValue = tC.getTest_definition().getStep().getCommand().getParameter().getValue();
+		String sanitizedParamValue = paramValue.substring(1, paramValue.length() -1);
+		String[] splittedSanParValue = sanitizedParamValue.split("\\.");
+		String result = null;
+		
+		if(splittedSanParValue.length != 2) {
+			switch(splittedSanParValue[2]) {
+			case "ip":
+				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
+				result = getJsonString(tC);
+				break;
+			case "port":
+				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getPort());
+				result = getJsonString(tC);
+				break;
+			}
+		}else if(splittedSanParValue.length == 2 ) {
+			tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getUri());
+			result = getJsonString(tC);
+		}
+		return result;
+	}
+	
+	public String getJsonString(TestContent testContent) {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = null;
+		try {
+			jsonString = mapper.writeValueAsString(testContent);
+		} catch (JsonProcessingException e) {
+			log.error("The Test Content could not be converted to Json Strin!");
+		}
+		return jsonString;
 	}
 	
 }

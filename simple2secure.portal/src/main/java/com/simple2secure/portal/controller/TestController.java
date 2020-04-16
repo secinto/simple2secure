@@ -185,10 +185,11 @@ public class TestController extends BaseUtilsProvider {
             if (currentTest != null) {
               // Retrieve TestContent from test provided from Web
               TestContent tC = testUtils.getTestContent(currentTest);
+              String sutBase = sutUtils.getSUTBase(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
               // Check if the Test contains as Value in the Step section a flag which indicates that it is a test which is
               // applicable to SUT's
-              if(sutUtils.getSUTTypes().contains(tC.getTest_definition().getStep().getCommand().getParameter().getValue())) {
-              		Class clazz = sutUtils.getAnnotatedClassesMap().get(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
+              if(sutUtils.getSUTTypes().contains(sutBase)) {
+              		Class clazz = sutUtils.getAnnotatedClassesMap().get(sutBase);
               		List sutList = sutRepository.getAllLDCSystemUnderTests(clazz);
               		suSUTList.addAll(sutList);
               		return new ResponseEntity<>(suSUTList, HttpStatus.OK);
@@ -224,18 +225,10 @@ public class TestController extends BaseUtilsProvider {
          if (user != null) {
             Test currentTest = testRepository.find(sutDTO.getTestId());
             LDCSystemUnderTest ldcSUT = (LDCSystemUnderTest) sutRepository.find(sutDTO.getSutId());
-            TestContent tC = testUtils.getTestContent(currentTest);            
-            tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
-            ObjectMapper mapper = new ObjectMapper();
-            String tcJsonString = null;
-						try {
-							tcJsonString = mapper.writeValueAsString(tC);
-						} catch (JsonProcessingException e) {
-							log.error("Could not parse edited test content from test to a json string {}", currentTest.getId());
-						}
-            if (currentTest != null && tcJsonString != null) {
+            String testContentJsonString = testUtils.mergeLDCSutAndTest(currentTest, ldcSUT);
+            if (currentTest != null && testContentJsonString != null) {
   	            TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
-  	                  TestRunType.MANUAL_PORTAL, tcJsonString, TestStatus.PLANNED, System.currentTimeMillis());
+  	                  TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
   	            testRunRepository.save(testRun);
   	
   	            notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
