@@ -162,7 +162,8 @@ export class OrbiterToolTestListComponent {
 			this.url = environment.apiEndpoint + 'test/applyableSUTList';
 			this.httpService.post(this.selectedTest, this.url).subscribe(
 				data => {
-					if(flag == '{ldc.sut}'){
+					let sutBase = this.getSUTBase(flag);
+					if(sutBase == '{ldc.sut}'){
 						for(let ldcSut of data){
 							let neuLDC = new LDCSystemUnderTest();
 							neuLDC.id = ldcSut.id;
@@ -175,7 +176,7 @@ export class OrbiterToolTestListComponent {
 							this.ldcSystemsUnderTest.push(neuLDC);
 						}
 						this.openLDCSUTDialog();
-					}else if(flag = '{sdc.sut}') {
+					}else if(sutBase = '{sdc.sut}') {
 						for(let sdcSut of data){
 							let neuSDC = new SDCSystemUnderTest();
 							neuSDC.id = sdcSut.id;
@@ -281,5 +282,15 @@ export class OrbiterToolTestListComponent {
 				}
 				this.loading = false;
 			});
+	}
+	
+	public getSUTBase(sutFlag: string) {
+		let strippedFlag = sutFlag.substring(1, sutFlag.length - 1);
+		let splittedFlag = strippedFlag.split(".");
+		if(splittedFlag.length == 2){
+			return sutFlag;
+		}else {
+			return "{" + splittedFlag[0] + "." + splittedFlag[1] + "}";
+		}
 	}
 }

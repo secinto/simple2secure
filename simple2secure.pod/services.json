@@ -3,7 +3,7 @@
         "name": "quickNmap-secinto",
         "test_definition": {
             "description": "",
-            "version": "",
+            "version": "0.0.1",
             "precondition": {
                 "description": "",
                 "command": {
@@ -22,7 +22,7 @@
                     "parameter": {
                         "description": "Some simple nmap execution",
                         "prefix": "-T4 -F",
-                        "value": "{ldc.sut}"
+                        "value": "{ldc.sut.ip}"
                     }
                 }
             },
@@ -178,7 +178,7 @@
             "step": {
                 "description": "Execute nmap",
                 "command": {
-                    "executable": "python.exe adapters/filterNetstatOutput1.py",
+                    "executable": "python.exe adapters/filter_netstat_output.py",
                     "parameter": {
                         "description": "Some simple nmap execution",
                         "prefix": "",
@@ -791,6 +791,104 @@
                 "command": {
                     "executable": "",
                     "parameter": {
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "getValidSessionID",
+        "test_definition": {
+            "description": "Get a valid session ID from a Web Application",
+            "version": "0.0.1",
+            "precondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "step": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "python.exe scripts/auth_and_get_sess_ID.py",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": "bvelic t3stP4ss https://pentest.moxis.cloud https://pentest.moxis.cloud/login"
+                    }
+                }
+            },
+            "postcondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "logoutWithValidSessionID",
+        "test_definition": {
+            "description": "Logout from Website with valid session ID",
+            "version": "0.0.1",
+            "precondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "step": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "python.exe scripts/logout_request.py",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "postcondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
                         "description": "",
                         "prefix": "",
                         "value": ""

@@ -71,13 +71,12 @@ export class LDCSUTListComponent {
 	}
 	
 	public scheduleSutTest(sut){
-		let brk = this.selectedTest;
 		this.url = environment.apiEndpoint + 'test/scheduleLDCSUTTest';
 		this.sutTransferObj.sutId = sut.id;
 		this.sutTransferObj.testId = this.selectedTest.testId;
 		this.httpService.post(this.sutTransferObj, this.url).subscribe(
 			data => {
-				this.alertService.success(this.translate.instant('message.sut.scheduled.on.test'));
+				this.alertService.success(this.selectedTest.name + " "  + this.translate.instant('message.sut.scheduled.on.test'));
 			},
 			error => {
 				if (error.status == 0) {

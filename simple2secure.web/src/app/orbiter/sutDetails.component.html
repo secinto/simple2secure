@@ -37,7 +37,6 @@
 			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
 					[(ngModel)]="ldcport" name="ldcport">
 		</mat-form-field>
-		<div *ngIf="invalidIpOrPort">Invalid IP Address or Port</div>
 		<mat-form-field class="full_width_input">
 		  <mat-label>Protocol</mat-label>
 		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
@@ -78,5 +77,6 @@
 		<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="update()">{{ 'button.update' | translate }}
 		</button>
 	</div>
-
+	<div *ngIf="invalidIpOrPort" style="color:red; padding-left: 20%;">Invalid IP Address or Port</div>
 </div>
+

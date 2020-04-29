@@ -149,29 +149,36 @@ export class SUTDetailsComponent {
 	
 	public update() {
 		if(this.selectedType == SUTType.LDCSUT){
-			this.ldcSUT.id = this.id;
-			this.ldcSUT.contextId = this.contextId;
-			this.ldcSUT.name = this.sutName;
-			this.ldcSUT.ipAddress = this.ipAddress;
-			this.ldcSUT.port = this.ldcport;
-			this.ldcSUT.protocol = this.selectedProtocol;
-			this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
-			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/updateLDC';
-			this.httpService.post(this.ldcSUT, this.url).subscribe(
-				data => {
-					this.alertService.success(this.translate.instant('message.sut.update'));
-					this.close(true);
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});		
+			if(!this.isValidIp(this.ipAddress) || !this.isValidPort(this.ldcport)){
+				this.invalidIpOrPort = true;
+			}else {
+				this.ldcSUT.id = this.id;
+				this.ldcSUT.contextId = this.contextId;
+				this.ldcSUT.name = this.sutName;
+				this.ldcSUT.ipAddress = this.ipAddress;
+				this.ldcSUT.port = this.ldcport;
+				this.ldcSUT.protocol = this.selectedProtocol;
+				this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
+				this.invalidIpOrPort = false;
+			}
+			if(!this.invalidIpOrPort){
+				this.loading = true;
+				this.url = environment.apiEndpoint + 'sut/updateLDC';
+				this.httpService.post(this.ldcSUT, this.url).subscribe(
+					data => {
+						this.alertService.success(this.translate.instant('message.sut.update'));
+						this.close(true);
+					},
+					error => {
+						if (error.status == 0) {
+							this.alertService.error(this.translate.instant('server.notresponding'));
+						}
+						else {
+							this.alertService.error(error.error.errorMessage);
+						}
+						this.loading = false;
+					});		
+			}
 		}else if(this.selectedType == SUTType.SDCSUT){
 			this.sdcSUT.id = this.id;
 			this.sdcSUT.contextId = this.contextId;
