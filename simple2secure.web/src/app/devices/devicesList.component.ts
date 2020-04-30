@@ -203,4 +203,9 @@ export class DevicesListComponent {
 					this.loading = false;
 				});
 	}
+	
+	public onMenuTriggerClick(element){
+		this.selectedItem = element;
+	}
+	
 }

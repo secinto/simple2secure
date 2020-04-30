@@ -57,8 +57,6 @@ def get_scheduled_tests(app_obj, celery_tasks):
                 current_test = json.loads(test_run["testContent"])
                 celery_tasks.execute_test.delay(current_test["test_definition"], test_run["testId"],
                                                 test_run["testName"], test_run["id"])
-                #celery_tasks.execute_test(current_test["test_definition"], test_run["testId"],
-                #                                test_run["testName"], test_run["id"])
                 send_notification("Test " + test_run["testName"] + " has been scheduled for the execution in the pod",
                                   app_obj)
                 update_test_status(app_obj, test_run["id"], test_run["testId"], "SCHEDULED")
