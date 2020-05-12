@@ -225,6 +225,7 @@ export class OrbiterSystemsUnderTestListComponent {
 		sutNew.id = sut.id;
 		sutNew.contextId = sut.contextId;
 		sutNew.name = sut.name;
+		sutNew.metadata = sut.metadata;
 		sutNew.ipAddress = sut.ipAddress;
 		sutNew.port = sut.port;
 		sutNew.protocol = sut.protocol;
@@ -237,6 +238,7 @@ export class OrbiterSystemsUnderTestListComponent {
 		sutNew.id = sut.id;
 		sutNew.contextId = sut.contextId;
 		sutNew.name = sut.name;
+		sutNew.metadata = sut.metadata;
 		sutNew.port = sut.port;
 		sutNew.protocol = sut.protocol;
 		sutNew.uri = sut.uri;

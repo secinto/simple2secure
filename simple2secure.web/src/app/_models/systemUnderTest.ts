@@ -32,4 +32,5 @@ export class SystemUnderTest extends Base {
 	name: string;
 	port: string;
 	protocol: Protocol;
+	metadata: {};
 }

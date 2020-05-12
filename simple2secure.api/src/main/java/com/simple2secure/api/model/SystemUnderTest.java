@@ -22,6 +22,8 @@
 
 package com.simple2secure.api.model;
 
+import java.util.Map;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
@@ -46,4 +48,5 @@ public abstract class SystemUnderTest extends GenericDBObject {
 	private @NonNull String name;
 	private @NonNull String port;
 	private @NonNull Protocol protocol;
+	private Map<String, String> metadata;
 }

@@ -58,6 +58,7 @@ export class SUTDetailsComponent {
     url: string;
     loading = false;
 	invalidIpOrPort = false;
+	public metadataArr: any[];
 
     constructor(
 		private alertService: AlertService,
@@ -78,13 +79,16 @@ export class SUTDetailsComponent {
 			if(data.type == 'LDCSUT'){
 				this.selectedType = SUTType.LDCSUT;
 				this.sutName = data.sut.name;
+				this.populateArrFromSutMetaData(data.sut);
 				this.ipAddress = data.sut.ipAddress;
 				this.ldcport = data.sut.port;
 				this.selectedProtocol = data.sut.protocol;
 			}else if (data.type == 'SDCSUT') {
 				this.selectedType = SUTType.SDCSUT;
+				this.populateArrFromSutMetaData(data.sut);
 				this.sutName = data.sut.name;
 				this.sdcport = data.sut.port;
+				this.selectedProtocol = data.sut.protocol;
 			}else {
 				this.selectedType = SUTType.UNKNOWN;
 			}
@@ -104,6 +108,7 @@ export class SUTDetailsComponent {
 				this.ldcSUT.protocol = this.selectedProtocol;
 				this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
 				this.invalidIpOrPort = false;
+				this.ldcSUT = this.populateSutMetaDataFromArr(this.ldcSUT)
 			}
 			if(!this.invalidIpOrPort){
 				this.loading = true;
@@ -129,6 +134,7 @@ export class SUTDetailsComponent {
 			this.sdcSUT.protocol = this.selectedProtocol;
 			this.sdcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
 			this.loading = true;
+			this.sdcSUT = this.populateSutMetaDataFromArr(this.sdcSUT)
 			this.url = environment.apiEndpoint + 'sut/addSDC';
 			this.httpService.post(this.sdcSUT, this.url).subscribe(
 				data => {
@@ -155,6 +161,7 @@ export class SUTDetailsComponent {
 				this.ldcSUT.id = this.id;
 				this.ldcSUT.contextId = this.contextId;
 				this.ldcSUT.name = this.sutName;
+				this.ldcSUT = this.populateSutMetaDataFromArr(this.ldcSUT);
 				this.ldcSUT.ipAddress = this.ipAddress;
 				this.ldcSUT.port = this.ldcport;
 				this.ldcSUT.protocol = this.selectedProtocol;
@@ -183,6 +190,7 @@ export class SUTDetailsComponent {
 			this.sdcSUT.id = this.id;
 			this.sdcSUT.contextId = this.contextId;
 			this.sdcSUT.name = this.sutName;
+			this.sdcSUT = this.populateSutMetaDataFromArr(this.sdcSUT);
 			this.sdcSUT.port = this.sdcport;
 			this.sdcSUT.protocol = this.selectedProtocol;
 			this.sdcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport; 
@@ -205,8 +213,43 @@ export class SUTDetailsComponent {
 		}
 	}
 	
+	public addMetaData(){
+		if(this.metadataArr){
+			this.metadataArr.push({key: '', value: ''});
+		}else {
+			this.metadataArr = [{key: '', value: ''}];
+		}
+	}
+	
+	public removeMetaData(index) {
+		this.metadataArr.splice(index,1)
+    }
+	
     public close(value: boolean){
 		this.dialogRef.close(value);
+	}
+	
+	public populateSutMetaDataFromArr(sut){
+		if(this.metadataArr){
+			for(let pair of this.metadataArr) {
+				if(sut.metadata){
+					sut.metadata[pair.key] = pair.value;
+				}else{
+					sut.metadata = {};
+					sut.metadata[pair.key] = pair.value;
+				}
+			}
+		}
+		return sut;
+	}
+	
+	public populateArrFromSutMetaData(sut){
+		if(!this.metadataArr){
+			this.metadataArr = [];
+			for(let mdKey in sut.metadata){
+				this.metadataArr.push({key: mdKey, value: sut.metadata[mdKey]});
+			}
+		}
 	}
 	
 	public isValidIp = value => (/^(?:(?:^|\.)(?:2(?:5[0-5]|[0-4]\d)|1?\d?\d)){4}$/.test(value) ? true : false);

@@ -40,8 +40,8 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 	@ValidRequestMapping(value = "/addLDC", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewLDCSUT(@RequestBody LDCSystemUnderTest ldcSUT, @ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<SystemUnderTest> addNewLDCSUT(@RequestBody LDCSystemUnderTest ldcSUT,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
 		if (ldcSUT != null && contextId.getValue() != null) {
 			ldcSUT.setContextId(contextId.getValue());
 			sutRepository.save(ldcSUT);
@@ -52,11 +52,11 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
-	
+
 	@ValidRequestMapping(value = "/addSDC", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSDCSUT(@RequestBody SDCSystemUnderTest sdcSUT, @ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputLocale locale) {
+	public ResponseEntity<SystemUnderTest> addNewSDCSUT(@RequestBody SDCSystemUnderTest sdcSUT,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
 		if (sdcSUT != null && contextId.getValue() != null) {
 			sdcSUT.setContextId(contextId.getValue());
 			sutRepository.save(sdcSUT);
@@ -67,7 +67,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
-	
+
 	@ValidRequestMapping(value = "/updateLDC", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> updateLDC(@RequestBody LDCSystemUnderTest ldcSUT, @ServerProvidedValue ValidInputContext contextId,
@@ -77,6 +77,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			sutToUpdate.setContextId(ldcSUT.getContextId());
 			sutToUpdate.setUri(ldcSUT.getUri());
 			sutToUpdate.setName(ldcSUT.getName());
+			sutToUpdate.setMetadata(ldcSUT.getMetadata());
 			sutToUpdate.setIpAddress(ldcSUT.getIpAddress());
 			sutToUpdate.setPort(ldcSUT.getPort());
 			sutToUpdate.setProtocol(ldcSUT.getProtocol());
@@ -92,7 +93,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
-	
+
 	@ValidRequestMapping(value = "/updateSDC", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> updateSDC(@RequestBody SDCSystemUnderTest sdcSUT, @ServerProvidedValue ValidInputContext contextId,
@@ -100,6 +101,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 		if (sdcSUT != null && contextId.getValue() != null) {
 			SDCSystemUnderTest sutToUpdate = (SDCSystemUnderTest) sutRepository.find(sdcSUT.id);
 			sutToUpdate.setContextId(sdcSUT.getContextId());
+			sutToUpdate.setMetadata(sdcSUT.getMetadata());
 			sutToUpdate.setUri(sdcSUT.getUri());
 			sutToUpdate.setName(sdcSUT.getName());
 			sutToUpdate.setPort(sdcSUT.getPort());
@@ -115,7 +117,6 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
-	
 
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
@@ -166,7 +167,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 		}
 		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
-	
+
 	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable ValidInputSut sutId, @ServerProvidedValue ValidInputLocale locale) {
