@@ -896,5 +896,103 @@
                 }
             }
         }
+    },
+    {
+        "name": "secinto_session_fixation",
+        "test_definition": {
+            "description": "Test if session fixation works on given Website",
+            "version": "0.0.1",
+            "precondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            },
+            "step": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "python.exe scripts/session_fixation.py",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": "bvelic t3stP4ss https://pentest.moxis.cloud https://pentest.moxis.cloud/login"
+                    }
+                }
+            },
+            "postcondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "getValidSessIDSUT",
+        "test_definition": {
+            "description": "Get a valid session ID with SUT",
+            "version": "0.0.1",
+            "precondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "USE_METADATA",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": "username, password, url_for_get, url_for_post"
+                    }
+                }
+            },
+            "step": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "python.exe scripts/auth_and_get_sess_ID.py",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": "{ldc.sut}"
+                    }
+                }
+            },
+            "postcondition": {
+                "id": null,
+                "description": "",
+                "command": {
+                    "id": null,
+                    "executable": "",
+                    "parameter": {
+                        "id": null,
+                        "description": "",
+                        "prefix": "",
+                        "value": ""
+                    }
+                }
+            }
+        }
     }
 ]
