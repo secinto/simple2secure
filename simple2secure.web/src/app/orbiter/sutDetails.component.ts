@@ -36,6 +36,7 @@ import { Protocol } from '../_models/protocol';
 
 @Component({
 	moduleId: module.id,
+	styleUrls: ['sut.css'],
 	templateUrl: 'sutDetails.component.html'
 })
 export class SUTDetailsComponent {

@@ -36,7 +36,7 @@ import { SUTType } from '../_models/sutType';
 
  @Component({
      moduleId: module.id,
-	 styleUrls: ['sutList.css'],
+	 styleUrls: ['sut.css'],
      templateUrl: 'orbiterSystemsUnderTestList.component.html'
  })
 

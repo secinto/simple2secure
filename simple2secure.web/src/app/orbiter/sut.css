@@ -30,3 +30,15 @@
 .fa-2x {
     font-size: 1em;
 }
+
+#addButton {
+	min-width: 5px !important;
+	min-height: 5px !important;
+	margin-left: 15px !important;
+}
+
+#removeButton {
+	min-width: 5px !important;
+	min-height: 5px !important;
+	margin-left: 15px !important;
+}
