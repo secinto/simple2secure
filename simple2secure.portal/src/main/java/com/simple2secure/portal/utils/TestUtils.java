@@ -43,6 +43,7 @@ import com.simple2secure.api.model.Command;
 import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
+import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestDefinition;
@@ -503,7 +504,7 @@ public class TestUtils extends BaseServiceProvider {
 			}
 		}
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -515,7 +516,7 @@ public class TestUtils extends BaseServiceProvider {
 		TestDefinition testDefinition = getTestDefinition(testContent.findValue("test_definition"));
 		return new TestContent(name, testDefinition);
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -529,7 +530,7 @@ public class TestUtils extends BaseServiceProvider {
 		TestStep postCondition = getTestStep(testDefinition.findValue("postcondition"));
 		return new TestDefinition(description, version, preCondition, step, postCondition);
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -540,7 +541,7 @@ public class TestUtils extends BaseServiceProvider {
 		Command command = getCommand(testStep.findValue("command"));
 		return new TestStep(description, command);
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -551,7 +552,7 @@ public class TestUtils extends BaseServiceProvider {
 		Parameter parameter = getParameter(command.findValue("parameter"));
 		return new Command(executable, parameter);
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -563,7 +564,7 @@ public class TestUtils extends BaseServiceProvider {
 		String value = parameter.findValue("value").asText();
 		return new Parameter(description, prefix, value);
 	}
-	
+
 	/**
 	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
 	 *
@@ -572,37 +573,71 @@ public class TestUtils extends BaseServiceProvider {
 	public String mergeLDCSutAndTest(Test test, LDCSystemUnderTest ldcSUT) {
 		TestContent tC = getTestContent(test);
 		String paramValue = tC.getTest_definition().getStep().getCommand().getParameter().getValue();
-		String sanitizedParamValue = paramValue.substring(1, paramValue.length() -1);
+		String sanitizedParamValue = paramValue.substring(1, paramValue.length() - 1);
 		String[] splittedSanParValue = sanitizedParamValue.split("\\.");
 		String result = null;
-		
-		if(splittedSanParValue.length != 2) {
-			switch(splittedSanParValue[2]) {
+
+		if (splittedSanParValue.length != 2) {
+			switch (splittedSanParValue[2]) {
 			case "ip":
 				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
-				result = getJsonString(tC);
+				result = getJsonStringFromTestContent(tC);
 				break;
 			case "port":
 				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getPort());
-				result = getJsonString(tC);
+				result = getJsonStringFromTestContent(tC);
 				break;
 			}
-		}else if(splittedSanParValue.length == 2 ) {
+		} else if (splittedSanParValue.length == 2) {
 			tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getUri());
-			result = getJsonString(tC);
+			result = getJsonStringFromTestContent(tC);
 		}
 		return result;
 	}
-	
-	public String getJsonString(TestContent testContent) {
+
+	public String mergeSutAndMetadata(Test test, SystemUnderTest sut) {
+		TestContent tC = getTestContent(test);
+		String newValueString = "";
+
+		Map<String, String> metadata = sut.getMetadata();
+		String[] keysFromPrecondition = getMetadaDataKeysFromPrecondition(tC).split(" ");
+
+		if (keysFromPrecondition.length != 0 && metadata.size() != 0) {
+			for (String key : keysFromPrecondition) {
+				if (newValueString.equals("")) {
+					newValueString = metadata.get(key);
+				} else {
+					newValueString += " ";
+					newValueString += metadata.get(key);
+				}
+			}
+			tC.getTest_definition().getStep().getCommand().getParameter().setValue(newValueString);
+		}
+		return getJsonStringFromTestContent(tC);
+	}
+
+	public Boolean preconditionContainsMetadata(Test test) {
+		TestContent tC = getTestContent(test);
+		if (tC.getTest_definition().getPrecondition().getCommand().getExecutable().contains("USE_METADATA")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public String getMetadaDataKeysFromPrecondition(TestContent testContent) {
+		return testContent.getTest_definition().getPrecondition().getCommand().getParameter().getValue().replace(",", "");
+	}
+
+	public String getJsonStringFromTestContent(TestContent testContent) {
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonString = null;
 		try {
 			jsonString = mapper.writeValueAsString(testContent);
 		} catch (JsonProcessingException e) {
-			log.error("The Test Content could not be converted to Json Strin!");
+			log.error("The Test Content could not be converted to Json String!");
 		}
 		return jsonString;
 	}
-	
+
 }
