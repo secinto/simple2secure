@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.LDCSystemUnderTest;
-import com.simple2secure.api.model.SDCSystemUnderTest;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -38,73 +36,27 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @Slf4j
 public class SystemUnderTestController extends BaseUtilsProvider {
 
-	@ValidRequestMapping(value = "/addLDC", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/addSut", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewLDCSUT(@RequestBody LDCSystemUnderTest ldcSUT,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
-		if (ldcSUT != null && contextId.getValue() != null) {
-			ldcSUT.setContextId(contextId.getValue());
-			sutRepository.save(ldcSUT);
-			log.debug("System Under Test: {} has been saved", ldcSUT.getName());
-
-			return new ResponseEntity<>(ldcSUT, HttpStatus.OK);
-		}
-
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
-	}
-
-	@ValidRequestMapping(value = "/addSDC", method = ValidRequestMethodType.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSDCSUT(@RequestBody SDCSystemUnderTest sdcSUT,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
-		if (sdcSUT != null && contextId.getValue() != null) {
-			sdcSUT.setContextId(contextId.getValue());
-			sutRepository.save(sdcSUT);
-			log.debug("System Under Test: {} has been saved", sdcSUT.getName());
-
-			return new ResponseEntity<>(sdcSUT, HttpStatus.OK);
-		}
-
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
-	}
-
-	@ValidRequestMapping(value = "/updateLDC", method = ValidRequestMethodType.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> updateLDC(@RequestBody LDCSystemUnderTest ldcSUT, @ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<SystemUnderTest> addNewLDCSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
-		if (ldcSUT != null && contextId.getValue() != null) {
-			LDCSystemUnderTest sutToUpdate = (LDCSystemUnderTest) sutRepository.find(ldcSUT.id);
-			sutToUpdate.setContextId(ldcSUT.getContextId());
-			sutToUpdate.setUri(ldcSUT.getUri());
-			sutToUpdate.setName(ldcSUT.getName());
-			sutToUpdate.setMetadata(ldcSUT.getMetadata());
-			sutToUpdate.setIpAddress(ldcSUT.getIpAddress());
-			sutToUpdate.setPort(ldcSUT.getPort());
-			sutToUpdate.setProtocol(ldcSUT.getProtocol());
-			try {
-				sutRepository.update(sutToUpdate);
-				log.debug("System Under Test: {} has been updated", sutToUpdate.getName());
-			} catch (ItemNotFoundRepositoryException e) {
-				log.error("Error occured while updating the System Under Test ", e);
-			}
+		if (sut != null && contextId.getValue() != null) {
+			sut.setContextId(contextId.getValue());
+			sutRepository.save(sut);
+			log.debug("System Under Test: {} has been saved", sut.getName());
 
-			return new ResponseEntity<>(sutToUpdate, HttpStatus.OK);
+			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 
-	@ValidRequestMapping(value = "/updateSDC", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(value = "/updateSut", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> updateSDC(@RequestBody SDCSystemUnderTest sdcSUT, @ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<SystemUnderTest> updateLDC(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
-		if (sdcSUT != null && contextId.getValue() != null) {
-			SDCSystemUnderTest sutToUpdate = (SDCSystemUnderTest) sutRepository.find(sdcSUT.id);
-			sutToUpdate.setContextId(sdcSUT.getContextId());
-			sutToUpdate.setMetadata(sdcSUT.getMetadata());
-			sutToUpdate.setUri(sdcSUT.getUri());
-			sutToUpdate.setName(sdcSUT.getName());
-			sutToUpdate.setPort(sdcSUT.getPort());
+		if (sut != null && contextId.getValue() != null) {
+			SystemUnderTest sutToUpdate = sutUtils.updateSut(sut);
 			try {
 				sutRepository.update(sutToUpdate);
 				log.debug("System Under Test: {} has been updated", sutToUpdate.getName());

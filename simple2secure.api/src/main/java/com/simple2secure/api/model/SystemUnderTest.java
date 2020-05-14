@@ -24,8 +24,13 @@ package com.simple2secure.api.model;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -36,6 +41,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
+@JsonTypeInfo(use = Id.CLASS,
+							include = JsonTypeInfo.As.PROPERTY,
+							property = "type")
+@JsonSubTypes({
+	@Type(value = LDCSystemUnderTest.class),
+	@Type(value = SDCSystemUnderTest.class)
+})
 public abstract class SystemUnderTest extends GenericDBObject {
 
 	/**

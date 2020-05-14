@@ -246,28 +246,6 @@ public class TestController extends BaseUtilsProvider {
 		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}
 
-	/**
-	 * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
-	 * added to the internal schedule which is continuously checked by the pods.
-	 *
-	 * @param test
-	 *          The test object to add to the schedule
-	 * @param contextId
-	 *          The context for which this has been performed
-	 * @param userId
-	 *          The user which added it to the schedule
-	 * @param locale
-	 *          The current locale used by the user
-	 * @return A test run which has been created.
-	 */
-	@ValidRequestMapping(value = "/scheduleSDCSUTTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<TestRun> addSDCSUTTestToSchedule(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
-			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
-		String brk = "";
-		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
-	}
-
 	@ValidRequestMapping(value = "/getScheduledTests")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getScheduledTestsByContextId(@ServerProvidedValue ValidInputContext contextId,

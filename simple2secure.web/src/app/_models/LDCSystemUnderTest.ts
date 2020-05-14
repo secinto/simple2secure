@@ -25,4 +25,5 @@
  
  export class LDCSystemUnderTest extends SystemUnderTest {
 	ipAddress: string;
+	type = "com.simple2secure.api.model.LDCSystemUnderTest"
 }

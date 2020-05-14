@@ -176,6 +176,8 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.loading = false;
 				});
 	}
+	
+	
 	public loadSUTList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)

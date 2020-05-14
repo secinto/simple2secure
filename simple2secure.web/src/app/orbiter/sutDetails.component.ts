@@ -53,7 +53,8 @@ export class SUTDetailsComponent {
 	protocolSelect = Object.keys(Protocol);
 	selectedProtocol: Protocol;
 	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
-	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest(); 
+	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
+	sut: any;
     action: string;
     isNewSUT = false;
     url: string;
@@ -103,41 +104,29 @@ export class SUTDetailsComponent {
 			if(!this.isValidIp(this.ipAddress) || !this.isValidPort(this.ldcport)){
 				this.invalidIpOrPort = true;
 			}else {
-				this.ldcSUT.name = this.sutName;
-				this.ldcSUT.ipAddress = this.ipAddress;
-				this.ldcSUT.port = this.ldcport;
-				this.ldcSUT.protocol = this.selectedProtocol;
-				this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
+				this.sut = new LDCSystemUnderTest();
+				this.sut.name = this.sutName;
+				this.sut.ipAddress = this.ipAddress;
+				this.sut.port = this.ldcport;
+				this.sut.protocol = this.selectedProtocol;
+				this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
 				this.invalidIpOrPort = false;
-				this.ldcSUT = this.populateSutMetaDataFromArr(this.ldcSUT)
-			}
-			if(!this.invalidIpOrPort){
-				this.loading = true;
-				this.url = environment.apiEndpoint + 'sut/addLDC';
-				this.httpService.post(this.ldcSUT, this.url).subscribe(
-					data => {
-						this.alertService.success(this.translate.instant('message.sut.create'));
-						this.close(true);
-					},
-					error => {
-						if (error.status == 0) {
-							this.alertService.error(this.translate.instant('server.notresponding'));
-						}
-						else {
-							this.alertService.error(error.error.errorMessage);
-						}
-						this.loading = false;
-					});
+				this.sut = this.populateSutMetaDataFromArr(this.sut)
 			}
 		}else if(this.selectedType == SUTType.SDCSUT){
-			this.sdcSUT.name = this.sutName;
-			this.sdcSUT.port = this.sdcport;
-			this.sdcSUT.protocol = this.selectedProtocol;
-			this.sdcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
+			this.sut = new SDCSystemUnderTest();
+			this.sut.name = this.sutName;
+			this.sut.port = this.sdcport;
+			this.sut.protocol = this.selectedProtocol;
+			this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
 			this.loading = true;
-			this.sdcSUT = this.populateSutMetaDataFromArr(this.sdcSUT)
-			this.url = environment.apiEndpoint + 'sut/addSDC';
-			this.httpService.post(this.sdcSUT, this.url).subscribe(
+			this.sut = this.populateSutMetaDataFromArr(this.sut)
+			
+		}
+		if(!this.invalidIpOrPort){
+			this.loading = true;
+			this.url = environment.apiEndpoint + 'sut/addSut';
+			this.httpService.post(this.sut, this.url).subscribe(
 				data => {
 					this.alertService.success(this.translate.instant('message.sut.create'));
 					this.close(true);
@@ -150,7 +139,7 @@ export class SUTDetailsComponent {
 						this.alertService.error(error.error.errorMessage);
 					}
 					this.loading = false;
-				});			
+				});
 		}
 	}
 	
@@ -159,47 +148,35 @@ export class SUTDetailsComponent {
 			if(!this.isValidIp(this.ipAddress) || !this.isValidPort(this.ldcport)){
 				this.invalidIpOrPort = true;
 			}else {
-				this.ldcSUT.id = this.id;
-				this.ldcSUT.contextId = this.contextId;
-				this.ldcSUT.name = this.sutName;
-				this.ldcSUT = this.populateSutMetaDataFromArr(this.ldcSUT);
-				this.ldcSUT.ipAddress = this.ipAddress;
-				this.ldcSUT.port = this.ldcport;
-				this.ldcSUT.protocol = this.selectedProtocol;
-				this.ldcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
+				this.sut = new LDCSystemUnderTest();
+				this.sut.id = this.id;
+				this.sut.contextId = this.contextId;
+				this.sut.name = this.sutName;
+				this.sut.ipAddress = this.ipAddress;
+				this.sut.port = this.ldcport;
+				this.sut.protocol = this.selectedProtocol;
+				this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
 				this.invalidIpOrPort = false;
-			}
-			if(!this.invalidIpOrPort){
-				this.loading = true;
-				this.url = environment.apiEndpoint + 'sut/updateLDC';
-				this.httpService.post(this.ldcSUT, this.url).subscribe(
-					data => {
-						this.alertService.success(this.translate.instant('message.sut.update'));
-						this.close(true);
-					},
-					error => {
-						if (error.status == 0) {
-							this.alertService.error(this.translate.instant('server.notresponding'));
-						}
-						else {
-							this.alertService.error(error.error.errorMessage);
-						}
-						this.loading = false;
-					});		
+				this.sut = this.populateSutMetaDataFromArr(this.sut)
 			}
 		}else if(this.selectedType == SUTType.SDCSUT){
-			this.sdcSUT.id = this.id;
-			this.sdcSUT.contextId = this.contextId;
-			this.sdcSUT.name = this.sutName;
-			this.sdcSUT = this.populateSutMetaDataFromArr(this.sdcSUT);
-			this.sdcSUT.port = this.sdcport;
-			this.sdcSUT.protocol = this.selectedProtocol;
-			this.sdcSUT.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport; 
+			this.sut = new SDCSystemUnderTest();
+			this.sut.id = this.id;
+			this.sut.contextId = this.contextId;
+			this.sut.name = this.sutName;
+			this.sut.port = this.sdcport;
+			this.sut.protocol = this.selectedProtocol;
+			this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
 			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/updateSDC';
-			this.httpService.post(this.sdcSUT, this.url).subscribe(
+			this.sut = this.populateSutMetaDataFromArr(this.sut)
+			
+		}
+		if(!this.invalidIpOrPort){
+			this.loading = true;
+			this.url = environment.apiEndpoint + 'sut/updateSut';
+			this.httpService.post(this.sut, this.url).subscribe(
 				data => {
-					this.alertService.success(this.translate.instant('message.sut.update'));
+					this.alertService.success(this.translate.instant('message.sut.create'));
 					this.close(true);
 				},
 				error => {
