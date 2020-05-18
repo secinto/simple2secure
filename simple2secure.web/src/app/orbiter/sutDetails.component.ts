@@ -26,10 +26,7 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angu
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SystemUnderTest } from '../_models/systemUnderTest';
-import { LDCSystemUnderTest } from '../_models/LDCSystemUnderTest';
-import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
 import { environment } from '../../environments/environment';
-import { SUTType } from '../_models/sutType';
 import { Protocol } from '../_models/protocol';
 
 
@@ -41,20 +38,9 @@ import { Protocol } from '../_models/protocol';
 })
 export class SUTDetailsComponent {
 	
-	sutTypeSelect = Object.keys(SUTType);
-	selectedType: SUTType;
-	id: string;
-	contextId: string;
-	uri = '';
-	sutName = '';
-	ipAddress = '';
-	ldcport = '';
-	sdcport = '';
 	protocolSelect = Object.keys(Protocol);
 	selectedProtocol: Protocol;
-	ldcSUT: LDCSystemUnderTest = new LDCSystemUnderTest();
-	sdcSUT: SDCSystemUnderTest = new SDCSystemUnderTest();
-	sut: any;
+	sut: SystemUnderTest = new SystemUnderTest();
     action: string;
     isNewSUT = false;
     url: string;
@@ -76,119 +62,53 @@ export class SUTDetailsComponent {
 
 		this.action = data.action;
 		if (this.action ==	'edit'){
-			this.id = data.sut.id;
-			this.contextId = data.sut.contextId;
-			if(data.type == 'LDCSUT'){
-				this.selectedType = SUTType.LDCSUT;
-				this.sutName = data.sut.name;
-				this.populateArrFromSutMetaData(data.sut);
-				this.ipAddress = data.sut.ipAddress;
-				this.ldcport = data.sut.port;
-				this.selectedProtocol = data.sut.protocol;
-			}else if (data.type == 'SDCSUT') {
-				this.selectedType = SUTType.SDCSUT;
-				this.populateArrFromSutMetaData(data.sut);
-				this.sutName = data.sut.name;
-				this.sdcport = data.sut.port;
-				this.selectedProtocol = data.sut.protocol;
-			}else {
-				this.selectedType = SUTType.UNKNOWN;
-			}
+			this.sut = data.sut;
+			this.selectedProtocol = data.sut.protocol;
+			this.populateArrFromSutMetaData(this.sut);
 		}else {
 			this.isNewSUT = true;
 		}
     }
 
     public save() {
-		if(this.selectedType == SUTType.LDCSUT){
-			if(!this.isValidIp(this.ipAddress) || !this.isValidPort(this.ldcport)){
-				this.invalidIpOrPort = true;
-			}else {
-				this.sut = new LDCSystemUnderTest();
-				this.sut.name = this.sutName;
-				this.sut.ipAddress = this.ipAddress;
-				this.sut.port = this.ldcport;
-				this.sut.protocol = this.selectedProtocol;
-				this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
-				this.invalidIpOrPort = false;
-				this.sut = this.populateSutMetaDataFromArr(this.sut)
-			}
-		}else if(this.selectedType == SUTType.SDCSUT){
-			this.sut = new SDCSystemUnderTest();
-			this.sut.name = this.sutName;
-			this.sut.port = this.sdcport;
-			this.sut.protocol = this.selectedProtocol;
-			this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
-			this.loading = true;
-			this.sut = this.populateSutMetaDataFromArr(this.sut)
-			
-		}
-		if(!this.invalidIpOrPort){
-			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/addSut';
-			this.httpService.post(this.sut, this.url).subscribe(
-				data => {
-					this.alertService.success(this.translate.instant('message.sut.create'));
-					this.close(true);
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-		}
+		this.loading = true;
+		this.sut = this.populateSutMetaDataFromArr(this.sut);
+		this.sut.protocol = this.selectedProtocol;
+		this.url = environment.apiEndpoint + 'sut/addSut';
+		this.httpService.post(this.sut, this.url).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.sut.create'));
+				this.close(true);
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
 	}
 	
 	public update() {
-		if(this.selectedType == SUTType.LDCSUT){
-			if(!this.isValidIp(this.ipAddress) || !this.isValidPort(this.ldcport)){
-				this.invalidIpOrPort = true;
-			}else {
-				this.sut = new LDCSystemUnderTest();
-				this.sut.id = this.id;
-				this.sut.contextId = this.contextId;
-				this.sut.name = this.sutName;
-				this.sut.ipAddress = this.ipAddress;
-				this.sut.port = this.ldcport;
-				this.sut.protocol = this.selectedProtocol;
-				this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.ipAddress + ':' + this.ldcport;
-				this.invalidIpOrPort = false;
-				this.sut = this.populateSutMetaDataFromArr(this.sut)
-			}
-		}else if(this.selectedType == SUTType.SDCSUT){
-			this.sut = new SDCSystemUnderTest();
-			this.sut.id = this.id;
-			this.sut.contextId = this.contextId;
-			this.sut.name = this.sutName;
-			this.sut.port = this.sdcport;
-			this.sut.protocol = this.selectedProtocol;
-			this.sut.uri = this.selectedProtocol.toLowerCase() + '://' + this.sdcport;
-			this.loading = true;
-			this.sut = this.populateSutMetaDataFromArr(this.sut)
-			
-		}
-		if(!this.invalidIpOrPort){
-			this.loading = true;
-			this.url = environment.apiEndpoint + 'sut/updateSut';
-			this.httpService.post(this.sut, this.url).subscribe(
-				data => {
-					this.alertService.success(this.translate.instant('message.sut.create'));
-					this.close(true);
-				},
-				error => {
-					if (error.status == 0) {
-						this.alertService.error(this.translate.instant('server.notresponding'));
-					}
-					else {
-						this.alertService.error(error.error.errorMessage);
-					}
-					this.loading = false;
-				});
-		}
+		this.sut = this.populateSutMetaDataFromArr(this.sut);
+		this.loading = true;
+		this.url = environment.apiEndpoint + 'sut/updateSut';
+		this.httpService.post(this.sut, this.url).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.sut.create'));
+				this.close(true);
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
 	}
 	
 	public addMetaData(){
@@ -208,15 +128,9 @@ export class SUTDetailsComponent {
 	}
 	
 	public populateSutMetaDataFromArr(sut){
-		if(this.metadataArr){
-			for(let pair of this.metadataArr) {
-				if(sut.metadata){
-					sut.metadata[pair.key] = pair.value;
-				}else{
-					sut.metadata = {};
-					sut.metadata[pair.key] = pair.value;
-				}
-			}
+		sut.metadata = {};
+		for(let pair of this.metadataArr) {
+			sut.metadata[pair.key] = pair.value;
 		}
 		return sut;
 	}

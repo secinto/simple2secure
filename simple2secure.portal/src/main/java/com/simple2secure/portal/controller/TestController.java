@@ -43,7 +43,6 @@ import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.DeviceInfo;
-import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
@@ -220,28 +219,28 @@ public class TestController extends BaseUtilsProvider {
 	public ResponseEntity<TestRun> addLDCSUTTestToSchedule(@RequestBody SutDTO sutDTO, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 		if (sutDTO != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
-			User user = userRepository.find(userId.getValue());
-			if (user != null) {
-				Test currentTest = testRepository.find(sutDTO.getTestId());
-				String testContentJsonString = null;
-				LDCSystemUnderTest ldcSUT = (LDCSystemUnderTest) sutRepository.find(sutDTO.getSutId());
-				if (testUtils.preconditionContainsMetadata(currentTest)) {
-					testContentJsonString = testUtils.mergeSutAndMetadata(currentTest, ldcSUT);
-				} else {
-					testContentJsonString = testUtils.mergeLDCSutAndTest(currentTest, ldcSUT);
-				}
-				if (currentTest != null && testContentJsonString != null) {
-					TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
-							TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
-					testRunRepository.save(testRun);
-
-					notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
-							contextId.getValue());
-					return new ResponseEntity<>(testRun, HttpStatus.OK);
-				}
-			} else {
-				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
-			}
+			// User user = userRepository.find(userId.getValue());
+			// if (user != null) {
+			// Test currentTest = testRepository.find(sutDTO.getTestId());
+			// String testContentJsonString = null;
+			// LDCSystemUnderTest ldcSUT = (LDCSystemUnderTest) sutRepository.find(sutDTO.getSutId());
+			// if (testUtils.preconditionContainsMetadata(currentTest)) {
+			// testContentJsonString = testUtils.mergeSutAndMetadata(currentTest, ldcSUT);
+			// } else {
+			// testContentJsonString = testUtils.mergeLDCSutAndTest(currentTest, ldcSUT);
+			// }
+			// if (currentTest != null && testContentJsonString != null) {
+			// TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
+			// TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
+			// testRunRepository.save(testRun);
+			//
+			// notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
+			// contextId.getValue());
+			// return new ResponseEntity<>(testRun, HttpStatus.OK);
+			// }
+			// } else {
+			// log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
+			// }
 		}
 		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}

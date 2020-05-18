@@ -25,7 +25,6 @@ import { AlertService, HttpService, DataService } from '../_services';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig, MatTableDataSource, MatSort, MatPaginator, PageEvent } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SDCSystemUnderTest } from '../_models/SDCSystemUnderTest';
 import { environment } from '../../environments/environment';
 import { TestObjWeb } from '../_models/testObjWeb';
 import { SutDTO } from '../_models/DTO/sutDTO';
@@ -88,5 +87,4 @@ export class SDCSUTListComponent {
 			});
 		this.dialogRef.close(true);
 	}
-	
 }

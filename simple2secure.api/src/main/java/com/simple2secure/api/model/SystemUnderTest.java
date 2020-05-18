@@ -42,14 +42,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
-@JsonTypeInfo(use = Id.CLASS,
-							include = JsonTypeInfo.As.PROPERTY,
-							property = "type")
-@JsonSubTypes({
-	@Type(value = LDCSystemUnderTest.class),
-	@Type(value = SDCSystemUnderTest.class)
-})
-public abstract class SystemUnderTest extends GenericDBObject {
+public class SystemUnderTest extends GenericDBObject {
 
 	/**
 	*
@@ -57,9 +50,7 @@ public abstract class SystemUnderTest extends GenericDBObject {
 	private static final long serialVersionUID = 5020907897089097628L;
 
 	private @NonNull String contextId;
-	private @NonNull String uri;
 	private @NonNull String name;
-	private @NonNull String port;
 	private @NonNull Protocol protocol;
 	private Map<String, String> metadata;
 }

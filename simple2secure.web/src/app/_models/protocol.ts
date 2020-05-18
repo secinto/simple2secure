@@ -23,6 +23,6 @@
 export enum Protocol {
 	HTTP = 'HTTP',
 	HTTPS = 'HTTPS',
-	BlueCove = 'BlueCove',
+	BLUETOOTH = 'BLUETOOTH',
 	UNKNOWN = 'UNKNOWN',
 }

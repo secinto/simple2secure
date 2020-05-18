@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Embeddable
 public enum Protocol {
-	HTTP, HTTPS, BlueCove, UNKNOWN;
+	HTTP, HTTPS, BLUETOOTH, UNKNOWN;
 
 	public static Protocol getProtocol(String protocol) {
 		switch (StringUtils.upperCase(protocol)) {
@@ -15,7 +15,7 @@ public enum Protocol {
 		case "HTTPS":
 			return Protocol.HTTPS;
 		case "BlueCove":
-			return Protocol.BlueCove;
+			return Protocol.BLUETOOTH;
 		default:
 			return Protocol.UNKNOWN;
 		}

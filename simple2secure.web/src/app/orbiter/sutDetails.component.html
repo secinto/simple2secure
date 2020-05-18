@@ -7,21 +7,7 @@
         <div class="form-group">
             <mat-form-field class="full_width_input">
                 <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
-                        [(ngModel)]="sutName" name="sutName">
-            </mat-form-field>
-        </div>
-		
-        <div class="form-group">
-            <mat-form-field class="full_width_input">
-              <mat-label>Type of System Under Test</mat-label>
-			  <mat-select [(ngModel)]="selectedType" name="selectedType"
-			   matTooltip="There are two types of System Under Test, the first one 
-			   is LDCSUT (Long Distance Connected System Under Test) and SDCSUT (Short Distance Connected System Under Test)"
-			   >
-				<mat-option *ngFor="let type of sutTypeSelect" [value]="type">
-				  {{type}}
-				</mat-option>
-			  </mat-select>
+                        [(ngModel)]="sut.name" name="sut.name">
             </mat-form-field>
         </div>
 		<div class="form-group">
@@ -51,45 +37,15 @@
 				</button><br>
 			</div>
 		</div>
+		<mat-form-field class="full_width_input">
+          <mat-label>Protocol</mat-label>
+          <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
+            <mat-option *ngFor="let prot of protocolSelect" [value]="prot">
+              {{prot}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
     </form>
-</div>
-
-<div *ngIf="selectedType == 'LDCSUT'">
-	<form id="cfgForm" #configForm="ngForm">
-		<mat-form-field class="full_width_input">
-			<input type="text" matInput placeholder="{{ 'table.ipAddress' | translate }}"
-					[(ngModel)]="ipAddress" name="ipAddress">
-		</mat-form-field>
-		<mat-form-field class="full_width_input">
-			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-					[(ngModel)]="ldcport" name="ldcport">
-		</mat-form-field>
-		<mat-form-field class="full_width_input">
-		  <mat-label>Protocol</mat-label>
-		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
-			<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
-			  {{prot}}
-			</mat-option>
-		  </mat-select>
-		</mat-form-field>
-	</form>
-</div>
-
-<div *ngIf="selectedType == 'SDCSUT'">
-	<form id="cfgForm" #configForm="ngForm">
-		<mat-form-field class="full_width_input">
-			<input type="text" matInput placeholder="{{ 'table.port' | translate }}"
-					[(ngModel)]="sdcport" name="sdcport">
-		</mat-form-field>
-		<mat-form-field class="full_width_input">
-		  <mat-label>Protocol</mat-label>
-		  <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
-			<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
-			  {{prot}}
-			</mat-option>
-		  </mat-select>
-		</mat-form-field>
-	</form>
 </div>
 
 <div mat-dialog-actions>

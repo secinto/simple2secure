@@ -40,7 +40,6 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
 import com.simple2secure.api.model.Command;
-import com.simple2secure.api.model.LDCSystemUnderTest;
 import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.SystemUnderTest;
@@ -570,30 +569,30 @@ public class TestUtils extends BaseServiceProvider {
 	 *
 	 * @param deviceId
 	 */
-	public String mergeLDCSutAndTest(Test test, LDCSystemUnderTest ldcSUT) {
-		TestContent tC = getTestContent(test);
-		String paramValue = tC.getTest_definition().getStep().getCommand().getParameter().getValue();
-		String sanitizedParamValue = paramValue.substring(1, paramValue.length() - 1);
-		String[] splittedSanParValue = sanitizedParamValue.split("\\.");
-		String result = null;
-
-		if (splittedSanParValue.length != 2) {
-			switch (splittedSanParValue[2]) {
-			case "ip":
-				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
-				result = getJsonStringFromTestContent(tC);
-				break;
-			case "port":
-				tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getPort());
-				result = getJsonStringFromTestContent(tC);
-				break;
-			}
-		} else if (splittedSanParValue.length == 2) {
-			tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getUri());
-			result = getJsonStringFromTestContent(tC);
-		}
-		return result;
-	}
+	// public String mergeLDCSutAndTest(Test test, LDCSystemUnderTest ldcSUT) {
+	// TestContent tC = getTestContent(test);
+	// String paramValue = tC.getTest_definition().getStep().getCommand().getParameter().getValue();
+	// String sanitizedParamValue = paramValue.substring(1, paramValue.length() - 1);
+	// String[] splittedSanParValue = sanitizedParamValue.split("\\.");
+	// String result = null;
+	//
+	// if (splittedSanParValue.length != 2) {
+	// switch (splittedSanParValue[2]) {
+	// case "ip":
+	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
+	// result = getJsonStringFromTestContent(tC);
+	// break;
+	// case "port":
+	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getPort());
+	// result = getJsonStringFromTestContent(tC);
+	// break;
+	// }
+	// } else if (splittedSanParValue.length == 2) {
+	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getUri());
+	// result = getJsonStringFromTestContent(tC);
+	// }
+	// return result;
+	// }
 
 	public String mergeSutAndMetadata(Test test, SystemUnderTest sut) {
 		TestContent tC = getTestContent(test);

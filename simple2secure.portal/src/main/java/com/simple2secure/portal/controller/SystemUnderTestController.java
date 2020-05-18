@@ -56,15 +56,14 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 	public ResponseEntity<SystemUnderTest> updateLDC(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 		if (sut != null && contextId.getValue() != null) {
-			SystemUnderTest sutToUpdate = sutUtils.updateSut(sut);
 			try {
-				sutRepository.update(sutToUpdate);
-				log.debug("System Under Test: {} has been updated", sutToUpdate.getName());
+				sutRepository.update(sut);
+				log.debug("System Under Test: {} has been updated", sut.getName());
 			} catch (ItemNotFoundRepositoryException e) {
 				log.error("Error occured while updating the System Under Test ", e);
 			}
 
-			return new ResponseEntity<>(sutToUpdate, HttpStatus.OK);
+			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
 
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
