@@ -32,13 +32,13 @@ import { SutDTO } from '../_models/DTO/sutDTO';
 
 @Component({
 	moduleId: module.id,
-	templateUrl: 'sdcSUTList.component.html'
+	templateUrl: 'sutList.component.html'
 })
 
-export class SDCSUTListComponent {
+export class SUTListComponent {
 	
 	dataSource = new MatTableDataSource();
-	displayedColumns = ['name', 'port', 'Apply'];
+	displayedColumns = ['name', 'protocol', 'Apply'];
 	selectedTest: TestObjWeb = new TestObjWeb();
 	loading = false;
 	url: string;
@@ -53,14 +53,14 @@ export class SDCSUTListComponent {
 		private httpService: HttpService,
 		private dataService: DataService,
         private dialog: MatDialog,
-		private dialogRef: MatDialogRef<SDCSUTListComponent>,
+		private dialogRef: MatDialogRef<SUTListComponent>,
 		private translate: TranslateService,
 		private router: Router,
         private route: ActivatedRoute,
         @Inject(MAT_DIALOG_DATA) data)
 	{
-		this.dataSource = data.sdcSUTs;
-		this.totalSize = data.sdcSUTs.length;
+		this.dataSource = data.sutList;
+		this.totalSize = data.sutList.length;
 		this.selectedTest = data.selectedTest;
     }
 	

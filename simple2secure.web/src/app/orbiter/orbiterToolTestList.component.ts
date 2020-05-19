@@ -29,7 +29,7 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
-import { SDCSUTListComponent } from './sdcSUTList.component';
+import { SUTListComponent } from './sutList.component';
 import {HttpParams} from "@angular/common/http";
 import {SystemUnderTest} from '../_models/systemUnderTest';
 @Component({
@@ -152,13 +152,17 @@ export class OrbiterToolTestListComponent {
 
 		this.loading = true;
 		let flag = this.selectedTest.test_content.test_definition.step.command.parameter.value;
-		let regexp = new RegExp('^\{.*\}');
+		//let regexp = new RegExp('^\{.*\}');
+		let regexp = new RegExp('^USE_SUT_METADATA\{.*\}');
 		let isSutTest = regexp.test(flag);
 		if(isSutTest){
 			this.url = environment.apiEndpoint + 'test/applyableSUTList';
 			this.httpService.post(this.selectedTest, this.url).subscribe(
 				data => {
 					this.loading = false;
+					this.sutList = data.sutList;
+					this.totalSize = data.totalSize;
+					this.openSutDialog();
 				},
 				error => {
 					if (error.status == 0) {
@@ -216,7 +220,7 @@ export class OrbiterToolTestListComponent {
 			selectedTest: this.selectedTest
 		};
 
-		const dialogRef2 = this.dialog.open(SDCSUTListComponent, dialogConfig);
+		const dialogRef2 = this.dialog.open(SUTListComponent, dialogConfig);
 		this.sutList = [];
 		
 	}

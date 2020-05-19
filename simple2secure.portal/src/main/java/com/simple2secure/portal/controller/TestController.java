@@ -24,6 +24,7 @@ package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -172,32 +173,31 @@ public class TestController extends BaseUtilsProvider {
 	 */
 	@ValidRequestMapping(value = "/applyableSUTList", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<List<SystemUnderTest>> getApplyableSUTList(@RequestBody TestObjWeb test,
+	public ResponseEntity<Map<String, Object>> getApplyableSUTList(@RequestBody TestObjWeb test,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputLocale locale) {
 		if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
 			User user = userRepository.find(userId.getValue());
-			List<SystemUnderTest> suSUTList = new ArrayList<>();
 			if (user != null) {
 				Test currentTest = testRepository.find(test.getTestId());
 				if (currentTest != null) {
 					// Retrieve TestContent from test provided from Web
 					TestContent tC = testUtils.getTestContent(currentTest);
-					String sutBase = sutUtils.getSUTBase(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
-					// Check if the Test contains as Value in the Step section a flag which indicates that it is a test which is
-					// applicable to SUT's
-					if (sutUtils.getSUTTypes().contains(sutBase)) {
-						Class clazz = sutUtils.getAnnotatedClassesMap().get(sutBase);
-						List sutList = sutRepository.getAllLDCSystemUnderTests(clazz);
-						suSUTList.addAll(sutList);
-						return new ResponseEntity<>(suSUTList, HttpStatus.OK);
-					}
+					List<String> sutMetadataKeys = sutUtils
+							.getSutMetadataKeys(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
+					List<String> sanitizedSutMetadataKeys = sutUtils.sanitizedSutMetadataKeyList(sutMetadataKeys);
+					List<SystemUnderTest> sutList = sutRepository.getAllValidSystemUnderTests(sanitizedSutMetadataKeys);
+					long count = sutList.size();
+					Map<String, Object> result = new HashMap<>();
+					result.put("sutList", sutList);
+					result.put("totalSize", count);
+					return new ResponseEntity<>(result, HttpStatus.OK);
 				}
 			} else {
 				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
 			}
 		}
-		return (ResponseEntity<List<SystemUnderTest>>) buildResponseEntity("problem_occured_while_saving_test", locale);
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 
 	/**

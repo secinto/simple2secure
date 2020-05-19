@@ -38,7 +38,7 @@ public abstract class SystemUnderTestRepository extends MongoRepository<SystemUn
 	public abstract List<SystemUnderTest> getAllByContextIdPaged(String contextId, int page, int size);
 
 	public abstract List<SystemUnderTest> getAllByContextIdAndSystemTypePaged(String contextId, int page, int size, String type);
-	
-	public abstract <T> List<T> getAllLDCSystemUnderTests(Class<T> clazz);
+
+	public abstract List<SystemUnderTest> getAllValidSystemUnderTests(List<String> sutMetadataKeyList);
 
 }
