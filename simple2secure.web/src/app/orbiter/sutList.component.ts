@@ -69,7 +69,7 @@ export class SUTListComponent {
 	}
 	
 	public scheduleSutTest(sut){
-		this.url = environment.apiEndpoint + 'test/scheduleSDCSUTTest';
+		this.url = environment.apiEndpoint + 'test/scheduleSutTest';
 		this.sutTransferObj.sutId = sut.id;
 		this.sutTransferObj.testId = this.selectedTest.testId;
 		this.httpService.post(this.sutTransferObj, this.url).subscribe(

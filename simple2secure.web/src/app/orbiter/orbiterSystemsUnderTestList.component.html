@@ -75,6 +75,11 @@
 								<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
 								<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
 							</ng-container>
+							
+							<ng-container matColumnDef="Protocol">
+								<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.protocol' | translate }}</mat-header-cell>
+								<mat-cell *matCellDef="let element"> {{element.protocol}}</mat-cell>
+							</ng-container>
 
 							<ng-container matColumnDef="action">
 								<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' | translate }}</mat-header-cell>

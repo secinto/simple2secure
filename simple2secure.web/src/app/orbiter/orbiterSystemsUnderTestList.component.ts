@@ -41,7 +41,7 @@ import { DeviceStatus } from '../_models/deviceStatus';
 export class OrbiterSystemsUnderTestListComponent {
 
 	displayedColumnsMonitored = ['name', 'device', 'ipAdress', 'deviceStatus'];
-	displayedColumnsTargeted = ['name', 'action'];
+	displayedColumnsTargeted = ['name', 'Protocol', 'action'];
 	contextId: string;
 	monitoredSystems: SystemUnderTest[];
 	selectedSUT: SystemUnderTest;

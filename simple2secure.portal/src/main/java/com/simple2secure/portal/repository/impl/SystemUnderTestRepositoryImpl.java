@@ -82,8 +82,7 @@ public class SystemUnderTestRepositoryImpl extends SystemUnderTestRepository {
 	}
 
 	@Override
-	public List<SystemUnderTest> getAllValidSystemUnderTests(List<String> sutMetadataKeyList) {
-		Query query = new Query();
+	public List<SystemUnderTest> getApplicableSystemUnderTests(List<String> sutMetadataKeyList) {
 		List<Criteria> criterias = new ArrayList<>();
 		Criteria[] criteriaArr = new Criteria[criterias.size()];
 		Criteria criteria = new Criteria();

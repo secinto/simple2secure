@@ -156,7 +156,7 @@ export class OrbiterToolTestListComponent {
 		let regexp = new RegExp('^USE_SUT_METADATA\{.*\}');
 		let isSutTest = regexp.test(flag);
 		if(isSutTest){
-			this.url = environment.apiEndpoint + 'test/applyableSUTList';
+			this.url = environment.apiEndpoint + 'test/applicableSutList';
 			this.httpService.post(this.selectedTest, this.url).subscribe(
 				data => {
 					this.loading = false;

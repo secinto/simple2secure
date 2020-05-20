@@ -158,20 +158,20 @@ public class TestController extends BaseUtilsProvider {
 	}
 
 	/**
-	 * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
-	 * added to the internal schedule which is continuously checked by the pods.
+	 * This function returns a list of SUTs which contain the set of keys defined in a test with the USE_SUT_METADATA flag. This can be done
+	 * by any user.
 	 *
 	 * @param test
-	 *          The test object to add to the schedule
+	 *          The test object which contains the USE_SUT_METADATA flag with the keys
 	 * @param contextId
 	 *          The context for which this has been performed
 	 * @param userId
 	 *          The user which added it to the schedule
 	 * @param locale
 	 *          The current locale used by the user
-	 * @return A test run which has been created.
+	 * @return A list of SUTs which are applicable on this test.
 	 */
-	@ValidRequestMapping(value = "/applyableSUTList", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/applicableSutList", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getApplyableSUTList(@RequestBody TestObjWeb test,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputUser userId,
@@ -186,7 +186,7 @@ public class TestController extends BaseUtilsProvider {
 					List<String> sutMetadataKeys = sutUtils
 							.getSutMetadataKeys(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
 					List<String> sanitizedSutMetadataKeys = sutUtils.sanitizedSutMetadataKeyList(sutMetadataKeys);
-					List<SystemUnderTest> sutList = sutRepository.getAllValidSystemUnderTests(sanitizedSutMetadataKeys);
+					List<SystemUnderTest> sutList = sutRepository.getApplicableSystemUnderTests(sanitizedSutMetadataKeys);
 					long count = sutList.size();
 					Map<String, Object> result = new HashMap<>();
 					result.put("sutList", sutList);
@@ -197,15 +197,15 @@ public class TestController extends BaseUtilsProvider {
 				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
 			}
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_applicable_sut_list", locale));
 	}
 
 	/**
-	 * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
-	 * added to the internal schedule which is continuously checked by the pods.
+	 * This function adds a test with values from a SUT to the schedule if it is started via the portal. This can be done by any user. The
+	 * selected test is then added to the internal schedule which is continuously checked by the pods.
 	 *
-	 * @param test
-	 *          The test object to add to the schedule
+	 * @param SutDTO
+	 *          The dto which contains the id of the SUT and the id of the test, the objects to be merged and added to the schedule
 	 * @param contextId
 	 *          The context for which this has been performed
 	 * @param userId
@@ -214,35 +214,33 @@ public class TestController extends BaseUtilsProvider {
 	 *          The current locale used by the user
 	 * @return A test run which has been created.
 	 */
-	@ValidRequestMapping(value = "/scheduleLDCSUTTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/scheduleSutTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addLDCSUTTestToSchedule(@RequestBody SutDTO sutDTO, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 		if (sutDTO != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
-			// User user = userRepository.find(userId.getValue());
-			// if (user != null) {
-			// Test currentTest = testRepository.find(sutDTO.getTestId());
-			// String testContentJsonString = null;
-			// LDCSystemUnderTest ldcSUT = (LDCSystemUnderTest) sutRepository.find(sutDTO.getSutId());
-			// if (testUtils.preconditionContainsMetadata(currentTest)) {
-			// testContentJsonString = testUtils.mergeSutAndMetadata(currentTest, ldcSUT);
-			// } else {
-			// testContentJsonString = testUtils.mergeLDCSutAndTest(currentTest, ldcSUT);
-			// }
-			// if (currentTest != null && testContentJsonString != null) {
-			// TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
-			// TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
-			// testRunRepository.save(testRun);
-			//
-			// notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
-			// contextId.getValue());
-			// return new ResponseEntity<>(testRun, HttpStatus.OK);
-			// }
-			// } else {
-			// log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
-			// }
+			User user = userRepository.find(userId.getValue());
+			if (user != null) {
+				Test currentTest = testRepository.find(sutDTO.getTestId());
+				TestContent testContent = testUtils.getTestContent(currentTest);
+				SystemUnderTest sut = sutRepository.find(sutDTO.getSutId());
+				List<String> sutMetadataKeys = sutUtils
+						.getSutMetadataKeys(testContent.getTest_definition().getStep().getCommand().getParameter().getValue());
+				String testContentJsonString = testUtils.mergeTestAndSutMetadata(testContent, sut, sutMetadataKeys);
+				if (currentTest != null && testContentJsonString != null) {
+					TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
+							TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
+					testRunRepository.save(testRun);
+
+					notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
+							contextId.getValue());
+					return new ResponseEntity<>(testRun, HttpStatus.OK);
+				}
+			} else {
+				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
+			}
 		}
-		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
+		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_scheduling_sut_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/getScheduledTests")

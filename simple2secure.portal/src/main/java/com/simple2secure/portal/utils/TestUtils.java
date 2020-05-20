@@ -505,9 +505,11 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method retrieves the @TestContent object form the given test.
 	 *
-	 * @param deviceId
+	 * @param test
+	 *          Test from which the @TestContent should be obtained.
+	 * @return The @TestContent obtained from the given test.
 	 */
 	public TestContent getTestContent(Test test) {
 		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
@@ -517,9 +519,11 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method retrieves the @TestDefinition object form the given TestDefinition JsonNode.
 	 *
-	 * @param deviceId
+	 * @param testDefinition
+	 *          JsonNode from which the @TestDefinition should be obtained.
+	 * @return The @TestDefinition obtained from the given JsonNode.
 	 */
 	public TestDefinition getTestDefinition(JsonNode testDefinition) {
 		String description = testDefinition.findValue("description").asText();
@@ -531,9 +535,11 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method retrieves the @TestStep object form the given TestStep JsonNode.
 	 *
-	 * @param deviceId
+	 * @param testStep
+	 *          JsonNode from which the @TestStep should be obtained.
+	 * @return The @TestStep obtained from the given JsonNode.
 	 */
 	public TestStep getTestStep(JsonNode testStep) {
 		String description = testStep.findValue("description").asText();
@@ -542,9 +548,11 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method retrieves the @Command object form the given Command JsonNode.
 	 *
-	 * @param deviceId
+	 * @param command
+	 *          JsonNode from which the @Command should be obtained.
+	 * @return The @Command obtained from the given JsonNode.
 	 */
 	public Command getCommand(JsonNode command) {
 		String executable = command.findValue("executable").asText();
@@ -553,9 +561,11 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method retrieves the @Parameter object form the given Parameter JsonNode.
 	 *
-	 * @param deviceId
+	 * @param parameter
+	 *          JsonNode from which the @Parameter should be obtained.
+	 * @return The @Parameter obtained from the given JsonNode.
 	 */
 	public Parameter getParameter(JsonNode parameter) {
 		String description = parameter.findValue("description").asText();
@@ -565,69 +575,43 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
+	 * This method replaces the Value in the Parameter section of the step with the in a SUT defined metadata values.
 	 *
-	 * @param deviceId
+	 * @param testContent
+	 *          The @TestContent which contains the Paramater value which will be replaced by the SUT metadata.
+	 * @param sut
+	 *          The @SystemUnderTest from which the metadata will be obtained.
+	 * @param sutMetadataKeys
+	 *          The list of strings(keys) obtained from the USE_SUT_METADATA flag.
+	 * @return A JsonString created from the @TestContent with the replaced values.
 	 */
-	// public String mergeLDCSutAndTest(Test test, LDCSystemUnderTest ldcSUT) {
-	// TestContent tC = getTestContent(test);
-	// String paramValue = tC.getTest_definition().getStep().getCommand().getParameter().getValue();
-	// String sanitizedParamValue = paramValue.substring(1, paramValue.length() - 1);
-	// String[] splittedSanParValue = sanitizedParamValue.split("\\.");
-	// String result = null;
-	//
-	// if (splittedSanParValue.length != 2) {
-	// switch (splittedSanParValue[2]) {
-	// case "ip":
-	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getIpAddress());
-	// result = getJsonStringFromTestContent(tC);
-	// break;
-	// case "port":
-	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getPort());
-	// result = getJsonStringFromTestContent(tC);
-	// break;
-	// }
-	// } else if (splittedSanParValue.length == 2) {
-	// tC.getTest_definition().getStep().getCommand().getParameter().setValue(ldcSUT.getUri());
-	// result = getJsonStringFromTestContent(tC);
-	// }
-	// return result;
-	// }
-
-	public String mergeSutAndMetadata(Test test, SystemUnderTest sut) {
-		TestContent tC = getTestContent(test);
+	public String mergeTestAndSutMetadata(TestContent testContent, SystemUnderTest sut, List<String> sutMetadataKeys) {
 		String newValueString = "";
-
 		Map<String, String> metadata = sut.getMetadata();
-		String[] keysFromPrecondition = getMetadaDataKeysFromPrecondition(tC).split(" ");
 
-		if (keysFromPrecondition.length != 0 && metadata.size() != 0) {
-			for (String key : keysFromPrecondition) {
-				if (newValueString.equals("")) {
-					newValueString = metadata.get(key);
-				} else {
-					newValueString += " ";
-					newValueString += metadata.get(key);
+		if (sutMetadataKeys.size() != 0 && metadata.size() != 0) {
+			for (String key : sutMetadataKeys) {
+				if (sut.getMetadata().containsKey(key)) {
+					if (newValueString.equals("")) {
+						newValueString = sut.getMetadata().get(key);
+					} else {
+						newValueString += " ";
+						newValueString += sut.getMetadata().get(key);
+					}
 				}
 			}
-			tC.getTest_definition().getStep().getCommand().getParameter().setValue(newValueString);
+			testContent.getTest_definition().getStep().getCommand().getParameter().setValue(newValueString);
 		}
-		return getJsonStringFromTestContent(tC);
+		return getJsonStringFromTestContent(testContent);
 	}
 
-	public Boolean preconditionContainsMetadata(Test test) {
-		TestContent tC = getTestContent(test);
-		if (tC.getTest_definition().getPrecondition().getCommand().getExecutable().contains("USE_METADATA")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public String getMetadaDataKeysFromPrecondition(TestContent testContent) {
-		return testContent.getTest_definition().getPrecondition().getCommand().getParameter().getValue().replace(",", "");
-	}
-
+	/**
+	 * This method retrieves the JsonString form the given @TestContent.
+	 *
+	 * @param testContent
+	 *          The @TestContent which should be converted into a JsonString.
+	 * @return A JsonString obtained from the converted @TestContent.
+	 */
 	public String getJsonStringFromTestContent(TestContent testContent) {
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonString = null;
