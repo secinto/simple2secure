@@ -1,79 +1,48 @@
-# Simple2Secure PenTest Service
+# simple2secure Pod
 
-## Getting Started
+For development it is easiest to use the Pod directly and not within a Docker container, since it is easier to modify things. 
+Therefore, some tools are required to be installed. The Pod uses Celery (Distributed Task Queue) for managing its different tasks
+which itself requires a third part Message Queue provider such as RabbitMQ, Redis or others. We have based your solution on Redis 
+and depending on whether you are developing on Windows or Linux it must be installed for this system. Find below the installation 
+instructions for the different OS.
 
-These instructions will get you a running simple2secure test service docker
-image on your local machine for testing purposes.
+### Installation of Redis 
 
-### Installing
+#### WINDOWS
+Download and install redis as windows service from:
+https://github.com/downloads/rgl/redis/redis-2.4.6-setup-64-bit.exe
 
-A step by step series of examples that tell you how to get an image running
-
-Load the provided image to the local repository
-
+#### LINUX
 ```
-docker load -i flask-service-s2s.tar
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install redis-server
+sudo systemctl enable redis-server.service
 ```
-
-Run the loaded image in the docker
-
+### Install all dependencies from requirements.txt
 ```
-docker run --name=s2s-test-service -d -p 5000:5000 flask-service-s2s
+pip install -r requirements.txt
 ```
-
-(Optional) Access image using bash to update services.json file or install new
-tools.
-services.json file is located in the root folder of the image.
-
+### Start python application
 ```
-docker exec -i -t s2s-test-service /bin/bash
-```
-
-## Running the tests
-
-Our local docker machine is running under http://192.168.99.100 and service runs on the port 5000.
-You can discover your docker machine ip address by calling following command:
-
-```
-docker-machine ip
+python app.py
 ```
 
-List all available tests
+## General info on the portal and the pod
 
-```
-http://192.168.99.100:5000/services
-```
+Here it is described how to activate and run the Pod using our server but it would be the same (except that you need to use localhost:9000 
+instead of simple2secure.info:51003).
 
-Run default test(It will run first test from the list of the available tests)
+Activating and running the pod from our server (currently in maintenance mode - will be announced as soon as it has been updated to current release version)
 
-```
-http://192.168.99.100:5000/services/run
-```
+1) Visit our portal at https://simple2secure.info:51003 and register if you do not have an account
 
-Run test by testId with all commands and parametes as defined in services.json
+2) Activate an account and download license from the "My Groups" tab under the following link https://simple2secure.info:51003/#/user by clicking on the Burger symbol on the Standard group.
 
-```
-http://192.168.99.100:5000/services/run?test=test1
-```
+3) Copy this license file in the /static/license/ folder (create the folder /static/license/ in simple2secure.pod folder if not available)
 
-Run test while changing the test step parameter
+4) Check in config.py file if the parameter PORTAL_URL is set to the "https://simple2secure.info:51001/s2s/api" (Is by default)
 
-```
-http://192.168.99.100:5000/services/run?test=test1&step=stp1%parameter=cmdstp1param%value=www.secinto.at
-```
+5) After that install all required libraries (see above).
 
-Run test while changing the test step command
-
-```
-http://192.168.99.100:5000/services/run?test=test1&step=stp1%command=cmdstp1%executable=nmap%20-RF
-```
-
-Run test while changing test step parameter and command
-
-```
-http://192.168.99.100:5000/services/run?test=test1&step=stp1%command=cmdstp1%executable=nmap%20-RF%parameter=cmdstp1param%value=www.secinto.at
-```
-
-## License
-
-This project is licensed under the MIT License
+6) When all libraries are installed you can start the project by running python app.py
