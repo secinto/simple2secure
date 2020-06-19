@@ -80,6 +80,25 @@ def get_tool(argument):
         return argument
 
 
+def prepare_testsection_for_execution(test, section):
+    executable = []
+    executable.append(test[section]['command']['executable'])
+    parameters = test[section]['command']['parameter']['prefix'].split(" ")
+    for param in parameters:
+        executable.append(param)
+    executable.append(test[section]['command']['parameter']['value'])
+    return executable
+
+def prepare_sequence_test_section_for_execution(test):
+    if test and test['test_definition']:
+        executable = []
+        executable.append(test['test_definition']['step']['command']['executable'])
+        parameters = test['test_definition']['step']['command']['parameter']['prefix'].split(" ")
+        for param in parameters:
+            executable.append(param)
+        executable.append(test['test_definition']['step']['command']['parameter']['value'])
+        return executable
+
 def construct_command(tool, argument):
     # Construct command from the tool name and argument
 

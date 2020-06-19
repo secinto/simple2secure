@@ -33,16 +33,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.TestRunDTO;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
+import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
+import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
+import com.simple2secure.api.model.TestDefinition;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestSequenceResult;
+import com.simple2secure.api.model.TestStep;
 import com.simple2secure.commons.crypto.CryptoUtils;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -494,6 +502,125 @@ public class TestUtils extends BaseServiceProvider {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This method retrieves the @TestContent object form the given test.
+	 *
+	 * @param test
+	 *          Test from which the @TestContent should be obtained.
+	 * @return The @TestContent obtained from the given test.
+	 */
+	public TestContent getTestContent(Test test) {
+		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
+		String name = testContent.findValue("name").asText();
+		TestDefinition testDefinition = getTestDefinition(testContent.findValue("test_definition"));
+		return new TestContent(name, testDefinition);
+	}
+
+	/**
+	 * This method retrieves the @TestDefinition object form the given TestDefinition JsonNode.
+	 *
+	 * @param testDefinition
+	 *          JsonNode from which the @TestDefinition should be obtained.
+	 * @return The @TestDefinition obtained from the given JsonNode.
+	 */
+	public TestDefinition getTestDefinition(JsonNode testDefinition) {
+		String description = testDefinition.findValue("description").asText();
+		String version = testDefinition.findValue("version").asText();
+		TestStep preCondition = getTestStep(testDefinition.findValue("precondition"));
+		TestStep step = getTestStep(testDefinition.findValue("step"));
+		TestStep postCondition = getTestStep(testDefinition.findValue("postcondition"));
+		return new TestDefinition(description, version, preCondition, step, postCondition);
+	}
+
+	/**
+	 * This method retrieves the @TestStep object form the given TestStep JsonNode.
+	 *
+	 * @param testStep
+	 *          JsonNode from which the @TestStep should be obtained.
+	 * @return The @TestStep obtained from the given JsonNode.
+	 */
+	public TestStep getTestStep(JsonNode testStep) {
+		String description = testStep.findValue("description").asText();
+		Command command = getCommand(testStep.findValue("command"));
+		return new TestStep(description, command);
+	}
+
+	/**
+	 * This method retrieves the @Command object form the given Command JsonNode.
+	 *
+	 * @param command
+	 *          JsonNode from which the @Command should be obtained.
+	 * @return The @Command obtained from the given JsonNode.
+	 */
+	public Command getCommand(JsonNode command) {
+		String executable = command.findValue("executable").asText();
+		Parameter parameter = getParameter(command.findValue("parameter"));
+		return new Command(executable, parameter);
+	}
+
+	/**
+	 * This method retrieves the @Parameter object form the given Parameter JsonNode.
+	 *
+	 * @param parameter
+	 *          JsonNode from which the @Parameter should be obtained.
+	 * @return The @Parameter obtained from the given JsonNode.
+	 */
+	public Parameter getParameter(JsonNode parameter) {
+		String description = parameter.findValue("description").asText();
+		String prefix = parameter.findValue("prefix").asText();
+		String value = parameter.findValue("value").asText();
+		return new Parameter(description, prefix, value);
+	}
+
+	/**
+	 * This method replaces the Value in the Parameter section of the step with the in a SUT defined metadata values.
+	 *
+	 * @param testContent
+	 *          The @TestContent which contains the Paramater value which will be replaced by the SUT metadata.
+	 * @param sut
+	 *          The @SystemUnderTest from which the metadata will be obtained.
+	 * @param sutMetadataKeys
+	 *          The list of strings(keys) obtained from the USE_SUT_METADATA flag.
+	 * @return A JsonString created from the @TestContent with the replaced values.
+	 */
+	public String mergeTestAndSutMetadata(TestContent testContent, SystemUnderTest sut, List<String> sutMetadataKeys) {
+		String newValueString = "";
+		Map<String, String> metadata = sut.getMetadata();
+
+		if (sutMetadataKeys.size() != 0 && metadata.size() != 0) {
+			for (String key : sutMetadataKeys) {
+				if (sut.getMetadata().containsKey(key)) {
+					if (newValueString.equals("")) {
+						newValueString = sut.getMetadata().get(key);
+					} else {
+						newValueString += " ";
+						newValueString += sut.getMetadata().get(key);
+					}
+				}
+			}
+			testContent.getTest_definition().getStep().getCommand().getParameter().setValue(newValueString);
+		}
+		return getJsonStringFromTestContent(testContent);
+	}
+
+	/**
+	 * This method retrieves the JsonString form the given @TestContent.
+	 *
+	 * @param testContent
+	 *          The @TestContent which should be converted into a JsonString.
+	 * @return A JsonString obtained from the converted @TestContent.
+	 */
+	public String getJsonStringFromTestContent(TestContent testContent) {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = null;
+		try {
+			jsonString = mapper.writeValueAsString(testContent);
+		} catch (JsonProcessingException e) {
+			log.error("The Test Content could not be converted to Json String!");
+		}
+		return jsonString;
 	}
 
 }

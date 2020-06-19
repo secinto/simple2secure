@@ -4,7 +4,7 @@
                 <mat-select placeholder="{{ 'chart.probe.select' | translate }}" [(ngModel)]="selectedProbe"
                             name="query" (selectionChange)="onProbeChange($event.value)" required>
                     <mat-option *ngFor="let probe of probes" [value]="probe">
-                        {{probe.hostname}} - {{probe.deviceId}}
+                        {{probe.info.name}} - {{probe.info.deviceId}}
                     </mat-option>
                 </mat-select>
             </mat-card>

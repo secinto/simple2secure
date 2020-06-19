@@ -41,7 +41,11 @@ export class TestSequenceResultDetailsComponent {
 		private dialogRef: MatDialogRef<TestSequenceResultDetailsComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-        this.selectedRunResult = JSON.parse(data.result.sequence_result);
+		let b64EncJsonObj = JSON.parse(data.result.sequence_result);
+		for(let key in b64EncJsonObj){
+			b64EncJsonObj[key] = atob(b64EncJsonObj[key]);
+		}
+        this.selectedRunResult = b64EncJsonObj;
 	}
 
 }

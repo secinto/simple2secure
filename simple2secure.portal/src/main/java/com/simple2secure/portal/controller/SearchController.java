@@ -34,6 +34,7 @@ import com.google.common.base.Strings;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
@@ -59,13 +60,18 @@ public class SearchController extends BaseUtilsProvider {
 			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
-				List<SearchResult> srList = searchUtils.getAllSearchResults(searchQuery.getValue(), context);
-
-				log.debug("Found {} search results for search query {}", srList.size(), searchQuery);
-
-				if (srList != null) {
-					return new ResponseEntity<>(srList, HttpStatus.OK);
+				List<SearchResult> srList;
+				try {
+					srList = searchUtils.getAllSearchResults(searchQuery.getValue(), context);
+					log.debug("Found {} search results for search query {}", srList.size(), searchQuery);
+					if (srList != null) {
+						return new ResponseEntity<>(srList, HttpStatus.OK);
+					}
+				} catch (ItemNotFoundRepositoryException e) {
+					log.error("Error occured while retrieving results for query {}", searchQuery);
 				}
+
+				
 			}
 		}
 		return ((ResponseEntity<List<SearchResult>>) buildResponseEntity("service_not_found", locale));

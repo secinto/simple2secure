@@ -31,6 +31,8 @@ public interface GeneralRulesEngine {
 	public void addRule(Object rule);
 
 	public void removeRule(String ruleName);
+	
+	public void removeAllRules();
 
 	public void addFact(Object fact);
 

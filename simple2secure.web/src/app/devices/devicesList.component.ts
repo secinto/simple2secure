@@ -22,6 +22,7 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {CompanyGroup} from '../_models/index';
 import {MatDialog, MatPaginator, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
 import {UserDeviceChangeGroupComponent} from '../user';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -42,6 +43,8 @@ export class DevicesListComponent {
 	groupAdded = false;
 	loading = false;
 	devices: Device[];
+	groupsForSelect: CompanyGroup[];
+	selectedGroup: CompanyGroup;
 	dataSource = new MatTableDataSource();
 	@ViewChild('paginator') paginator: MatPaginator;
 	@ViewChild('sort') sort: MatSort;
@@ -62,7 +65,35 @@ export class DevicesListComponent {
 	}
 
 	ngOnInit(){
+		this.loadGroups();
 		this.loadDevices(0, 10);
+		/*
+		 * The filterPredicate is necessary because we want to filter over nested objects
+		*/
+		this.dataSource.filterPredicate = (device: Device, filter: string) => {
+		  let valid = false;
+
+		  const transformedFilter = filter.trim().toLowerCase();
+
+		  Object.keys(device).map(key => {
+			if (
+			  key === 'info' &&
+			  (
+				device.info.name.toLowerCase().includes(transformedFilter)
+				|| device.info.type.toLowerCase().includes(transformedFilter)
+				|| device.info.deviceStatus.toLowerCase().includes(transformedFilter)
+			  )
+			) {
+			  valid = true;
+			} else {
+			  if (('' + device[key]).toLowerCase().includes(transformedFilter)) {
+				valid = true;
+			  }
+			}
+		  });
+
+		  return valid;
+		};
 	}
 
 	ngAfterViewInit() {
@@ -108,6 +139,31 @@ export class DevicesListComponent {
 				});
 		this.loading = false;
 	}
+	
+	loadGroups() {
+		this.loading = true;
+		this.httpService.get(environment.apiEndpoint + 'group/context')
+			.subscribe(
+				data => {
+					this.groupsForSelect = data;
+					this.selectedGroup = this.groupsForSelect[0];
+					if (data.length > 0) {
+						this.alertService.success(this.translate.instant('message.data'));
+					}
+					else {
+						this.alertService.error(this.translate.instant('message.data.notProvided'));
+					}
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+		this.loading = false;
+	}
 
 	openDialogChangeDeviceGroup(): void {
 		const dialogRef = this.dialog.open(UserDeviceChangeGroupComponent, {
@@ -136,10 +192,10 @@ export class DevicesListComponent {
 
 	public download() {
 		this.loading = true;
-		this.httpService.getFile(environment.apiEndpoint + 'download')
+		this.httpService.getFile(environment.apiEndpoint + 'download/' + this.selectedGroup.id)
 			.subscribe(
 				data => {
-					importedSaveAs(data, 's2s_setup.exe');
+					importedSaveAs(data, 's2s_setup.zip');
 					this.loading = false;
 				},
 				error => {
@@ -147,4 +203,9 @@ export class DevicesListComponent {
 					this.loading = false;
 				});
 	}
+	
+	public onMenuTriggerClick(element){
+		this.selectedItem = element;
+	}
+	
 }

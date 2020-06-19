@@ -35,16 +35,17 @@ import {HttpService} from '../_services';
 export class AddQueryDialog {
 
 	selectedQuery: any;
+	deviceId: any;
 
 	constructor(private dialogRef: MatDialogRef<AddQueryDialog>,
 	            private httpService: HttpService,
 	            @Inject(MAT_DIALOG_DATA) public data: any)
 	{
-
+		this.deviceId = data.deviceId
 	}
 
 	selectQuery() {
-		this.httpService.post(this.selectedQuery.sqlQuery, environment.apiEndpoint + 'reports/report/name')
+		this.httpService.get(environment.apiEndpoint + 'reports/device/' + this.deviceId + '/' + this.selectedQuery.name)
 			.subscribe(
 				dataAPI => {
 					this.dialogRef.close(dataAPI);

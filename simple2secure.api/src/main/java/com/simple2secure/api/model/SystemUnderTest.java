@@ -22,10 +22,15 @@
 
 package com.simple2secure.api.model;
 
-import javax.persistence.Embedded;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -36,6 +41,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class SystemUnderTest extends GenericDBObject {
 
 	/**
@@ -44,15 +50,7 @@ public class SystemUnderTest extends GenericDBObject {
 	private static final long serialVersionUID = 5020907897089097628L;
 
 	private @NonNull String contextId;
-	private @NonNull String deviceId;
 	private @NonNull String name;
-	private String ipAdress;
-	private String netMask;
-	private String uri;
-	@Embedded
-	private @NonNull SystemType systemType;
-	private String deviceLocation;
-	private DeviceStatus deviceStatus;
-	private long lastOnlineTimestamp;
-
+	private @NonNull Protocol protocol;
+	private Map<String, String> metadata;
 }

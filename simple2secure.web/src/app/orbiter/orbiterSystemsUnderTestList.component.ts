@@ -2,10 +2,13 @@ import {Component, ViewChild} from '@angular/core';
 import {MatTableDataSource, MatDialogConfig, MatDialog, MatSort, MatPaginator, PageEvent} from '@angular/material';
 import { AlertService, HttpService, DataService } from '../_services';
 import { TranslateService } from '@ngx-translate/core';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
+import { ConfirmationDialog } from '../dialog/confirmation-dialog';
 import { SUTDetailsComponent } from './sutDetails.component';
 import { SystemUnderTest } from '../_models/systemUnderTest';
 import { DeviceType } from '../_models/deviceType';
+import { DeviceStatus } from '../_models/deviceStatus';
+
 
 /**
  *********************************************************************
@@ -31,25 +34,25 @@ import { DeviceType } from '../_models/deviceType';
 
  @Component({
      moduleId: module.id,
-	 styleUrls: ['sutList.css'],
+	 styleUrls: ['sut.css'],
      templateUrl: 'orbiterSystemsUnderTestList.component.html'
  })
 
 export class OrbiterSystemsUnderTestListComponent {
 
 	displayedColumnsMonitored = ['name', 'device', 'ipAdress', 'deviceStatus'];
-	displayedColumnsTargeted = ['name', 'device', 'ipAdress', 'action'];
+	displayedColumnsTargeted = ['name', 'Protocol', 'action'];
 	contextId: string;
 	monitoredSystems: SystemUnderTest[];
-	systemsUnderTest: SystemUnderTest[];
 	selectedSUT: SystemUnderTest;
 	loading = false;
 	public pageSize = 10;
 	public currentPage = 0;
 	public totalSize = 0;
+	public totalSizeSut = 0;
 	public pageEvent: PageEvent;
 	dataSourceMonitored = new MatTableDataSource();
-	dataSourceOther = new MatTableDataSource();
+	dataSourceSut = new MatTableDataSource();
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -62,7 +65,6 @@ export class OrbiterSystemsUnderTestListComponent {
 	) {}
 
 	ngOnInit() {
-		// TODO: Benjamin: change this function to work with contextId
 		this.loadMonitoredSystemsList(0, 10);
 		this.loadSUTList(0, 10);
 	}
@@ -84,28 +86,63 @@ export class OrbiterSystemsUnderTestListComponent {
 		return e;
 	}
 
-
-    openDialogShowSuT(type: string): void {
-
+    openDialogShowSuT(action: string): void {
 		const dialogConfig = new MatDialogConfig();
 		dialogConfig.width = '750px';
-		dialogConfig.data = {
-			type: type,
-		};
+		if(action == 'new'){
+			dialogConfig.data = {
+				action: action,
+			};
+		}else if( action == 'edit') {
+			dialogConfig.data = {
+				action: action,
+				sut: this.selectedSUT
+			};
+		}
 
 		const dialogRef = this.dialog.open(SUTDetailsComponent, dialogConfig);
-
+		dialogRef.afterClosed().subscribe(data => {
+			this.loadSUTList(this.currentPage, this.pageSize);
+		});
 	}
+	
+	
+	openDeleteSutDialog() {
+		const dialogConfig = new MatDialogConfig();
 
+		dialogConfig.disableClose = true;
+		dialogConfig.autoFocus = true;
+
+		dialogConfig.data = {
+			id: 1,
+			title: this.translate.instant('message.areyousure'),
+			content: this.translate.instant('message.test.dialog')
+		};
+
+
+		const dialogRef = this.dialog.open(ConfirmationDialog, dialogConfig);
+
+		dialogRef.afterClosed().subscribe(data => {
+			if (data === true) {
+				this.deleteSUT(this.selectedSUT);
+			}
+			this.loadSUTList(this.currentPage, this.pageSize);
+		});
+	}
+	
+	
 	public loadMonitoredSystemsList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.PROBE + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.monitoredSystems = data.devices;
-					this.dataSourceMonitored = data.devices;
-					this.totalSize = data.totalSize;
-					console.log(this.monitoredSystems);
+					for (let device of data.devices){
+						if(device.info.deviceStatus == DeviceStatus.ONLINE){
+							this.dataSourceMonitored.data.push(device);
+							this.dataSourceMonitored.data = this.dataSourceMonitored.data;
+						}
+					}
+					this.totalSize = data.devices.totalSize;
 					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
 					}
@@ -124,22 +161,17 @@ export class OrbiterSystemsUnderTestListComponent {
 					this.loading = false;
 				});
 	}
+	
+	
 	public loadSUTList(page: number, size: number){
 		this.loading = true;
 		this.httpService.get(environment.apiEndpoint + 'sut/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.systemsUnderTest = data.sutList;
-					this.dataSourceOther = data.sutList;
-					this.totalSize = data.totalSize;
-					console.log(this.systemsUnderTest);
-					if (data.sutList.length > 0) {
-						this.alertService.success(this.translate.instant('message.data'));
-					}
-					else {
-						this.alertService.error(this.translate.instant('message.data.notProvided'));
-					}
+					this.dataSourceSut.data = data.sutList;
+					this.totalSizeSut = data.totalSize;
 					this.loading = false;
+					this.alertService.success(this.translate.instant('message.data'));
 				},
 				error => {
 					if (error.status == 0) {
@@ -155,5 +187,22 @@ export class OrbiterSystemsUnderTestListComponent {
 	public onMenuTriggerClick(sut: SystemUnderTest) {
 		this.selectedSUT = sut;
 	}
-
+	
+	public deleteSUT(sut){
+		this.loading = true;
+		this.httpService.delete(environment.apiEndpoint + 'sut/' + sut.id).subscribe(
+			data => {
+				this.alertService.success(this.translate.instant('message.sut.delete'));
+				this.loading = false;
+			},
+			error => {
+				if (error.status == 0) {
+					this.alertService.error(this.translate.instant('server.notresponding'));
+				}
+				else {
+					this.alertService.error(error.error.errorMessage);
+				}
+				this.loading = false;
+			});
+	}
 }

@@ -22,7 +22,7 @@ services:
         container_name: s2s-mongodb
         hostname: localhost
         volumes:
-            - $HOME/mongo/data/db:/data/db
+            - /opt/mongo/data/db:/data/db
         restart: on-failure
         
     s2s-web:  

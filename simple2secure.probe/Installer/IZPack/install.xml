@@ -1,0 +1,80 @@
+<izpack:installation version="5.0"
+                     xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+ 
+  <info>
+    <appname>Simple2secure Probe</appname>
+    <appversion>1.0</appversion>
+    <appsubpath>s2s</appsubpath>
+    <javaversion>1.8</javaversion>
+	<run-privileged condition="izpack.windowsinstall.10"/>
+	<summarylogfilepath>${INSTALL_PATH}/installinfo/Summary.htm</summarylogfilepath>
+  </info>
+ 
+  <locale>
+    <langpack iso3="eng"/>
+  </locale>
+ 
+  <guiprefs width="800" height="600" resizable="no">
+    <splash>images/peas_load.gif</splash>
+    <laf name="substance">
+      <os family="windows" />
+      <os family="unix" />
+      <param name="variant" value="mist-silver" />
+    </laf>
+    <laf name="substance">
+      <os family="mac" />
+      <param name="variant" value="mist-aqua" />
+    </laf>
+    <modifier key="useHeadingPanel" value="yes" />
+	<modifier key="showDebugWindow" value="true"/>
+  </guiprefs>
+ 
+  <panels>
+    <panel classname="TargetPanel"/>
+    <panel classname="PacksPanel"/>
+    <panel classname="InstallPanel"/>
+    <panel classname="FinishPanel"/>
+  </panels>
+ 
+  <packs>
+	<pack name="Java Libraries" required="true">
+	  <description>Needed jar files</description>
+	  <fileset dir="libs" targetdir="${INSTALL_PATH}\release\libs\" override="true" />
+	  <executable targetfile="$INSTALL_PATH\release\libs\simple2secure.service.jar" type="jar" class="com.simple2secure.service.control.ManageService" stage="postinstall" failure ="warn" keep="true" >
+		  <os family="windows" />
+		  <args>
+            <arg value="-a install"/>
+		  </args>
+	  </executable>
+	  <executable targetfile="$INSTALL_PATH\release\libs\simple2secure.service.jar" type="jar" class="com.simple2secure.service.control.ManageService" stage="postinstall" failure ="warn" keep="true" >
+		  <os family="windows" />
+		  <args>
+            <arg value="-a start"/>
+		  </args>
+	  </executable>
+	</pack>
+
+	<pack name="Apache Files" required="true">
+	  <description>Needed apache files</description>
+	  <fileset dir="apache_files" targetdir="${INSTALL_PATH}\release\" override="true" />
+	</pack>
+	<pack name="Script files" required="true">
+	  <description>Needed script files</description>
+	  <fileset dir="scripts" targetdir="${INSTALL_PATH}\release\" override="true" />
+	  <!--
+	  <executable targetfile="${INSTALL_PATH}\release\installService.bat" type="bin" stage="postinstall" failure ="warn" keep="true" >
+		  <os family="windows" />
+	  </executable>
+	  <executable targetfile="${INSTALL_PATH}\release\startService.bat" type="bin" stage="postinstall" failure ="warn" keep="true" >
+		  <os family="windows" />
+	  </executable>
+	  -->
+	</pack>
+	<pack name="License File" required="true">
+	  <description>Needed license file</description>
+	  <fileset dir="license" targetdir="${INSTALL_PATH}\release\license\" override="true" />
+	</pack>
+  </packs>
+</izpack:installation>

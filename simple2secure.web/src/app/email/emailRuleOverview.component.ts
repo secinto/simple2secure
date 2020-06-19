@@ -12,7 +12,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 export class EmailRuleOverviewComponent extends BaseComponent{
 
-	location: string = this.route.component["name"];
+	location: string = this.route.snapshot.data["dashboardName"];
 
 	constructor(dialog: MatDialog,
 				alertService: AlertService,

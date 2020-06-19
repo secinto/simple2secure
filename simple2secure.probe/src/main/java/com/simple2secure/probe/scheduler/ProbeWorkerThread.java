@@ -80,6 +80,7 @@ public class ProbeWorkerThread extends Thread {
 			if (networkScheduler != null) {
 				if (networkScheduler.scheduledExecutionTime() < currentTime - interval) {
 					networkScheduler.cancel();
+					networkScheduler = new NetworkScheduler(networkMonitor);
 					time.schedule(networkScheduler, 0, interval);
 				}
 			} else {
@@ -96,6 +97,7 @@ public class ProbeWorkerThread extends Thread {
 			if (configScheduler != null) {
 				if (configScheduler.scheduledExecutionTime() < currentTime - interval) {
 					configScheduler.cancel();
+					configScheduler = new ConfigScheduler();
 					time.schedule(configScheduler, 0, interval);
 				}
 			} else {
@@ -109,6 +111,7 @@ public class ProbeWorkerThread extends Thread {
 			if (queryScheduler != null) {
 				if (queryScheduler.scheduledExecutionTime() < currentTime - interval) {
 					queryScheduler.cancel();
+					queryScheduler = new QueryScheduler();
 					time.schedule(queryScheduler, 200, interval);
 				}
 			} else {
@@ -121,6 +124,7 @@ public class ProbeWorkerThread extends Thread {
 			if (reportScheduler != null) {
 				if (reportScheduler.scheduledExecutionTime() < currentTime - interval) {
 					reportScheduler.cancel();
+					reportScheduler = new ReportScheduler();
 					time.schedule(reportScheduler, 500, interval);
 				}
 			} else {

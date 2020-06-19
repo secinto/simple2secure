@@ -23,6 +23,19 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@RequiredArgsConstructor
+@ToString
 public class Parameter extends GenericDBObject {
 
 	/**
@@ -30,37 +43,9 @@ public class Parameter extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -3568435254329514541L;
 
-	private String description;
+	private @NonNull String description;
 
-	private String prefix;
+	private @NonNull String prefix;
 
-	private String value;
-
-	private Parameter() {
-
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
+	private @NonNull String value;
 }

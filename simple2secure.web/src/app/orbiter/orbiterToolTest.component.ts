@@ -22,12 +22,13 @@
 
 import {Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Device} from '../_models/index';
+import {Device, DeviceType} from '../_models/index';
 import {MatTableDataSource, MatSort, MatPaginator, MatDialogConfig, MatDialog} from '@angular/material';
 import {AlertService, HttpService, DataService} from '../_services';
 import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {PageEvent} from '@angular/material/paginator';
+import { DeviceStatus } from '../_models/deviceStatus';
 
 @Component({
 	moduleId: module.id,
@@ -38,7 +39,7 @@ import {PageEvent} from '@angular/material/paginator';
 export class OrbiterToolTestComponent {
 
 	selectedPod: any;
-	pods: Device[];
+	pods: Device[] = [];
 	displayedColumns: string[] = ['podId', 'hostname', 'group', 'status', 'action'];
 	loading = false;
 	dataSource = new MatTableDataSource();
@@ -85,12 +86,17 @@ export class OrbiterToolTestComponent {
 	}
 
 	loadPods(page: number, size: number) {
+		this.dataSource.data = [];
 		this.loading = true;
-		this.httpService.get(environment.apiEndpoint + 'devices/pod/' + page + '/' + size)
+		this.httpService.get(environment.apiEndpoint + 'devices/' + DeviceType.POD + '/' + page + '/' + size)
 			.subscribe(
 				data => {
-					this.pods = data.devices;
-					this.dataSource.data = this.pods;
+					for (let device of data.devices){
+						if(device.info.deviceStatus == DeviceStatus.ONLINE){
+							this.dataSource.data.push(device);
+							this.dataSource.data = this.dataSource.data;
+						}
+					}
 					this.totalSize = data.totalSize;
 					if (data.devices.length > 0) {
 						this.alertService.success(this.translate.instant('message.data'));
@@ -116,6 +122,6 @@ export class OrbiterToolTestComponent {
 	}
 
 	public showSequences() {
-		this.router.navigate(['sequences/' + this.selectedPod.deviceId], {relativeTo: this.route});
+		this.router.navigate(['sequences/' + this.selectedPod.info.deviceId], {relativeTo: this.route});
 	}
 }

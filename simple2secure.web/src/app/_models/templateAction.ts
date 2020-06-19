@@ -3,9 +3,8 @@ import {RuleParamArray} from './ruleParamArray';
 import {Base} from './base';
 
 export class TemplateAction extends Base {
-    name: string;
-    description_en: string;
-    description_de: string;
+    nameTag: string;
+    descriptionTag: string;
     // @ts-ignore
     params: RuleParam[];
     // @ts-ignore

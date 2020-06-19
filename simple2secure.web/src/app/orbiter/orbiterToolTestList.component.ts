@@ -29,8 +29,9 @@ import {environment} from '../../environments/environment';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfirmationDialog} from '../dialog/confirmation-dialog';
 import {TestDetailsComponent} from './testDetails.component';
+import { SUTListComponent } from './sutList.component';
 import {HttpParams} from "@angular/common/http";
-
+import {SystemUnderTest} from '../_models/systemUnderTest';
 @Component({
 	moduleId: module.id,
 	styleUrls: ['toolTestList.css'],
@@ -47,6 +48,7 @@ export class OrbiterToolTestListComponent {
 	loading = false;
 	url: string;
 	id: string;
+	sutList: SystemUnderTest[] = [];
 	public pageEvent: PageEvent;
 	public pageSize = 10;
 	public currentPage = 0;
@@ -149,22 +151,43 @@ export class OrbiterToolTestListComponent {
 	public runTest(){
 
 		this.loading = true;
-
-		this.url = environment.apiEndpoint + 'test/scheduleTest';
-		this.httpService.post(this.selectedTest, this.url).subscribe(
-			data => {
-
-				this.alertService.success(this.translate.instant('message.test.schedule'));
-			},
-			error => {
-				if (error.status == 0) {
-					this.alertService.error(this.translate.instant('server.notresponding'));
-				}
-				else {
-					this.alertService.error(error.error.errorMessage);
-				}
-			});
-			this.loading = false;
+		let flag = this.selectedTest.test_content.test_definition.step.command.parameter.value;
+		//let regexp = new RegExp('^\{.*\}');
+		let regexp = new RegExp('^USE_SUT_METADATA\{.*\}');
+		let isSutTest = regexp.test(flag);
+		if(isSutTest){
+			this.url = environment.apiEndpoint + 'test/applicableSutList';
+			this.httpService.post(this.selectedTest, this.url).subscribe(
+				data => {
+					this.loading = false;
+					this.sutList = data.sutList;
+					this.totalSize = data.totalSize;
+					this.openSutDialog();
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+		}else {
+			this.url = environment.apiEndpoint + 'test/scheduleTest';
+			this.httpService.post(this.selectedTest, this.url).subscribe(
+				data => {
+					this.alertService.success(this.translate.instant('message.test.schedule'));
+				},
+				error => {
+					if (error.status == 0) {
+						this.alertService.error(this.translate.instant('server.notresponding'));
+					}
+					else {
+						this.alertService.error(error.error.errorMessage);
+					}
+				});
+			this.loading = false;		
+		}
 	}
 
 	public openDeleteDialog() {
@@ -188,6 +211,19 @@ export class OrbiterToolTestListComponent {
 			}
 		});
 	}
+	
+	public openSutDialog(){
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.width = '750px';
+		dialogConfig.data = {
+			sutList: this.sutList,
+			selectedTest: this.selectedTest
+		};
+
+		const dialogRef2 = this.dialog.open(SUTListComponent, dialogConfig);
+		this.sutList = [];
+		
+	}
 
 	public deleteTest(selectedTest: TestObjWeb) {
 		this.loading = true;
@@ -207,5 +243,15 @@ export class OrbiterToolTestListComponent {
 				}
 				this.loading = false;
 			});
+	}
+	
+	public getSUTBase(sutFlag: string) {
+		let strippedFlag = sutFlag.substring(1, sutFlag.length - 1);
+		let splittedFlag = strippedFlag.split(".");
+		if(splittedFlag.length == 2){
+			return sutFlag;
+		}else {
+			return "{" + splittedFlag[0] + "." + splittedFlag[1] + "}";
+		}
 	}
 }

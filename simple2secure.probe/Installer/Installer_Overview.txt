@@ -1,0 +1,55 @@
+- Advanced Bat To Exe Converter
+	1. Im ab2econv411-Ordner ist eine aB2Econv.exe.
+	1.1 Doppelklick um die GUI zu starten.
+	1.2 batchScript_for_exe.bat im Programm öffnen
+	1.3 Auf File -> Build EXE... gehen, es wird ein weiteres Fenster aufgemacht wo man die Pfade für die eingebetteten Dateien VersionsInfo usw. eingeben kann
+	1.4 Die Pfade für die eingebetteten Dateien müssen adaptiert werden.
+	1.5 Dateien die eigebettet sind:
+		* buildRelease.bat
+		* deleteService.bat
+		* installService.bat
+		* Probe Service.exe
+		* prunmgr.exe
+		* prunsrv.exe
+		* startService.bat
+		* stopService.bat
+		* simple2secure.probe.jar
+		* simple2secure.service.jar
+	(Der Pfad fürs Icon muss auch adaptiert werden.)
+	1.6 Schlussendlich auf Build EXE-Button klicken.
+	
+	2. Um aus der Powershell die exe zu erstellen sollte man zum ersten mal mit der GUI des Programms ein Batchfile reinladen und
+	bearbeiten wie oben beschrieben, denn dann wird im Batchfile ein Header hinzugefügt für den Advanced Bat To Exe Converter.
+	(Da das BatchFile in diesem Ordner schon bearbeitet worden ist, ist der header im script schon vorhanden und man kann die Pfade
+	direkt im BatchFile adaptieren.) --> im Projekt simple2secure\simple2secure.probe\Installer zu finden.
+	
+	2.1 dann einfach in der Powershell in den ordner ab2econv411 wechseln und "aB2Econv.exe pfadZumBatchfile pfadOutputExe" in die Powershell schreiben, am besten die Pfade in Hochkomma wegen Leerzeichen in Pfaden usw.
+		- Example:    aB2Econv.exe "c:\Batch Files\input.BAT" "c:\Batch Files\output.EXE"
+		
+	Link: https://www.battoexeconverter.com/
+
+
+- IZPack Installer
+	1. Der IZPack-Installer braucht ein Konfigurationsfile im XML Format. (Im Anhang)
+
+	2. Die Ordnerstruktur muss so aussehen wie im Screenshot, wenn man die install.xml nicht editieren will. Ansonsten einfach Pfade in install.xml ändern.
+		* apache_files -> Probe Service.exe, prunmgr.exe, prunsrv.exe
+		* libs -> simple2secure.probe.jar, simple2secure.service.jar
+		* license -> valides license file von uns
+		* scripts -> deleteService.bat, installService.bat, startService.bat, stopService.bat
+		* install.xml
+		
+		der Befehl um ein install.jar zu generieren ist 
+			- compile .\install.xml -b . -o install.jar -k standard
+			
+	Problem: Der Installer kopiert alle notwendigen Dateien beim installieren in den ausgewählten Ziel Ordner jedoch kann er unseren Service nicht installieren. In der Config kann man sehen, dass
+	unsere installService.bat und startService.bat als executable markiert sind. Im Anhang ein Screenshot dass er anscheinend diese beiden Script-e ausführt. Aber es passiert nichts. Die Fehlermeldung
+	ist aufgrund des mkdir im run.bat welches absichtlich eingebaut wurde um diese Fehlermeldung heraufzuprovozieren um zu sehen was passiert. Wenn man jedoch in den vom Installer kreierten Ordner geht
+	und run.bat manuell ausführt, wird das Service ohne Probleme installiert. (Auch mit Administratorrechten versucht)
+	
+	Link: http://izpack.org/
+	
+	
+- Aktueller Stand:
+	- Zur Zeit kann man ein zip-Archiv herunterladen welches die EXE und die valide Lizenz des Users beinhaltet. Wenn man das Zip-Archiv entpackt dann doppelklick auf die exe und der Service sollte
+	automatisch installiert und gestartet werden. Die EXE innerhalb des Zip-Archivs ist mit dem Advanced Bat To Exe Converter erstellt worden.

@@ -1,9 +1,10 @@
-import {EventEmitter, Input, Output} from "@angular/core";
+import {EventEmitter, Input, Output, Injectable} from "@angular/core";
 import {DataService} from "../_services";
 import {Widget} from "../_models/widget";
 import {IChartistAnimationOptions, IChartistData} from 'chartist';
 import {ChartEvent} from 'ng-chartist';
 
+@Injectable()
 export class BaseWidgetItem{
     widget: Widget;
 

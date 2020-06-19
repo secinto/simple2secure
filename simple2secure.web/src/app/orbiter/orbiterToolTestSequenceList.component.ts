@@ -187,7 +187,8 @@ export class OrbiterToolTestSequenceListComponent {
 
 	public deleteSequence(selectedSequence: TestSequence) {
 		this.loading = true;
-		this.httpService.delete(environment.apiEndpoint + 'sequence/delete/' + selectedSequence.id).subscribe(
+		console.log(selectedSequence);
+		this.httpService.delete(environment.apiEndpoint + 'sequence/' + selectedSequence.id).subscribe(
 			data => {
 				this.alertService.success(this.translate.instant('message.sequence.delete'));
 				this.loading = false;

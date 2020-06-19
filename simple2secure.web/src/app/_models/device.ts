@@ -21,12 +21,9 @@
  */
 
 import {CompanyGroup} from './companygroup';
+import {DeviceInfo} from './deviceInfo';
 
 export class Device {
-	deviceId: string;
 	group: CompanyGroup;
-	activated: boolean;
-	hostname: string;
-	status: string;
-	pod: boolean;
+	info: DeviceInfo;
 }

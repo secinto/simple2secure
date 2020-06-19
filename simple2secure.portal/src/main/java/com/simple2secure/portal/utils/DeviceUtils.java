@@ -37,6 +37,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +57,9 @@ public class DeviceUtils extends BaseServiceProvider {
 	 *
 	 * @param context
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) {
+	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) throws ItemNotFoundRepositoryException {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		/* Set user probes from the licenses - not from the users anymore */
 		List<Device> devices = new ArrayList<>();
@@ -68,16 +70,18 @@ public class DeviceUtils extends BaseServiceProvider {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-						DeviceStatus status = devInfo.getDeviceStatus();
+						if (devInfo != null) {
+							DeviceStatus status = devInfo.getDeviceStatus();
 
-						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-						if (status != deviceStatus) {
-							devInfo.setDeviceStatus(deviceStatus);
-							licenseRepository.save(license);
+							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+							if (status != deviceStatus) {
+								devInfo.setDeviceStatus(deviceStatus);
+								deviceInfoRepository.update(devInfo);
+							}
+
+							Device device = new Device(group, devInfo);
+							devices.add(device);
 						}
-
-						Device device = new Device(group, devInfo);
-						devices.add(device);
 					}
 				}
 			}
@@ -92,8 +96,9 @@ public class DeviceUtils extends BaseServiceProvider {
 	 * @param groupIds
 	 * @param isDevicePod
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) {
+	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) throws ItemNotFoundRepositoryException {
 		List<Device> devices = new ArrayList<>();
 		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
 
@@ -101,17 +106,20 @@ public class DeviceUtils extends BaseServiceProvider {
 			for (CompanyLicensePrivate license : licenses) {
 				if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 					DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-					DeviceStatus status = devInfo.getDeviceStatus();
 
-					DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-					if (status != deviceStatus) {
-						devInfo.setDeviceStatus(deviceStatus);
-						licenseRepository.save(license);
+					if (devInfo != null) {
+						DeviceStatus status = devInfo.getDeviceStatus();
+
+						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+						if (status != deviceStatus) {
+							devInfo.setDeviceStatus(deviceStatus);
+							deviceInfoRepository.update(devInfo);
+						}
+
+						CompanyGroup group = groupRepository.find(license.getGroupId());
+						Device device = new Device(group, devInfo);
+						devices.add(device);
 					}
-
-					CompanyGroup group = groupRepository.find(license.getGroupId());
-					Device device = new Device(group, devInfo);
-					devices.add(device);
 				}
 
 			}
@@ -126,9 +134,10 @@ public class DeviceUtils extends BaseServiceProvider {
 	 *
 	 * @param context
 	 * @return
+	 * @throws ItemNotFoundRepositoryException 
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, String type, int page, int size) {
+	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size) throws ItemNotFoundRepositoryException {
 		log.debug("Retrieving devices for the context {}", context.getName());
 		List<Device> devices = new ArrayList<>();
 		Map<String, Object> deviceMap = new HashMap<>();
@@ -138,24 +147,72 @@ public class DeviceUtils extends BaseServiceProvider {
 		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
 
 		if (licenseMap != null) {
-
 			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
-
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
 					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
 						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-						if (devInfo != null && (Strings.isNullOrEmpty(type) || devInfo.getType().name().equals(type))) {
+						if (devInfo != null) {
 							DeviceStatus status = devInfo.getDeviceStatus();
 
 							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 							if (status != deviceStatus) {
 								devInfo.setDeviceStatus(deviceStatus);
-								licenseRepository.save(license);
+								deviceInfoRepository.update(devInfo);
 							}
 							CompanyGroup group = groupRepository.find(license.getGroupId());
 							Device device = new Device(group, devInfo);
 							devices.add(device);
+						}
+					}
+				}
+			}
+
+			deviceMap.put("devices", devices);
+			deviceMap.put("totalSize", licenseMap.get("totalSize"));
+		}
+		log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
+		return deviceMap;
+	}
+	
+	/**
+	 * This function returns all pods from the current context with merged Test objects.
+	 *
+	 * @param context
+	 * @return
+	 * @throws ItemNotFoundRepositoryException 
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getAllDevicesByIdAndTypeFromCurrentContextPagination(Context context, String type, int page, int size) throws ItemNotFoundRepositoryException {
+		log.debug("Retrieving devices for the context {}", context.getName());
+		List<Device> devices = new ArrayList<>();
+		Map<String, Object> deviceMap = new HashMap<>();
+		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
+		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+
+		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
+
+		if (licenseMap != null) {
+			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
+			List<DeviceInfo> devInfoList = deviceInfoRepository.findByDeviceType(type);
+			if (licenses != null) {
+				for (CompanyLicensePrivate license : licenses) {
+					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+						for(DeviceInfo devInfo : devInfoList) {
+							if(devInfo.getDeviceId().equals(license.getDeviceId())) {
+								if (devInfo != null) {
+									DeviceStatus status = devInfo.getDeviceStatus();
+
+									DeviceStatus deviceStatus = getDeviceStatus(devInfo);
+									if (status != deviceStatus) {
+										devInfo.setDeviceStatus(deviceStatus);
+										deviceInfoRepository.update(devInfo);
+									}
+									CompanyGroup group = groupRepository.find(license.getGroupId());
+									Device device = new Device(group, devInfo);
+									devices.add(device);
+								}
+							}
 						}
 					}
 				}

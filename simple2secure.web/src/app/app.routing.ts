@@ -68,17 +68,18 @@ const appRoutes: Routes = [
 			{
 				path: '',
 				component: HomeComponent,
+				data: {dashboardName: 'homeDash'}
 			},
 
 			{
 				path: 'analysis',
 				component: AnalysisComponent,
-				data: {title: 'menu.analysis', breadcrumb: 'Analysis'}
+				data: {title: 'menu.analysis', breadcrumb: 'Analysis', dashboardName: 'analysisDash'}
 			},
 			{
 				path: 'report',
 				component: ReportComponent,
-				data: {title: 'menu.reports', breadcrumb: 'Reports'},
+				data: {title: 'menu.reports', breadcrumb: 'Reports', dashboardName: 'reportsDash'},
 				children: [
 					{path: '', component: ReportOverviewComponent, data: {title: 'menu.reports', breadcrumb: 'Dashboard'}},
 					{path: 'network', component: NetworkReportOverviewComponent, data: {title: 'menu.networkanalysisReports', breadcrumb: 'Network'}},
@@ -92,7 +93,7 @@ const appRoutes: Routes = [
 			{
 				path: 'tests',
 				component: OrbiterComponent,
-				data: {title: 'menu.tests', breadcrumb: 'Tests'},
+				data: {title: 'menu.tests', breadcrumb: 'Tests', dashboardName: 'testsDash'},
 				children: [
 					{path: '', component: OrbiterOverviewComponent, data: {title: 'menu.orbiter', breadcrumb: 'Dashboard'}},
 					{path: 'test', component: OrbiterToolTestComponent, data: {title: 'menu.tests', breadcrumb: 'Test Templates'}},
@@ -106,7 +107,7 @@ const appRoutes: Routes = [
 			{
 				path: 'queries',
 				component: QueriesComponent,
-				data: {title: 'menu.queries', breadcrumb: 'Queries'},
+				data: {title: 'menu.queries', breadcrumb: 'Queries', dashboardName: 'queriesDash'},
 				children: [
 					{path: '', component: QueryOverviewComponent, data: {title: 'menu.queries', breadcrumb: 'Dashboard'}},
 					{path: 'list', component: QueryListComponent, data: {title: 'menu.queryList', breadcrumb: 'Query List'}},
@@ -116,7 +117,7 @@ const appRoutes: Routes = [
 			{
 				path: 'devices',
 				component: DevicesComponent,
-				data: {title: 'menu.mydevices', breadcrumb: 'Devices'},
+				data: {title: 'menu.mydevices', breadcrumb: 'Devices', dashboardName: 'devicesDash'},
 				children: [
 					{path: '', component: DevicesOverviewComponent, data: {title: 'menu.dashboard', breadcrumb: 'Dashboard'}},
 					{path: 'list', component: DevicesListComponent, data: {title: 'menu.deviceList', breadcrumb: 'Device List'}},
@@ -134,7 +135,7 @@ const appRoutes: Routes = [
 			{
 				path: 'email',
 				component: EmailComponent,
-				data: {title: 'menu.email', breadcrumb: 'Email'},
+				data: {title: 'menu.email', breadcrumb: 'Email', dashboardName: 'emailDash'},
 				children: [
 					{path: '', component: EmailRuleOverviewComponent, data: {title: 'menu.email', breadcrumb: 'Dashboard'}},
 					{path: 'config', component: EmailOverviewComponent, data: {title: 'menu.emailConfig', breadcrumb: 'Configuration'}},

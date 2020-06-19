@@ -38,9 +38,8 @@ import com.simple2secure.portal.utils.NotificationUtils;
  *         Action which is used as predefined Action in the rule engine. Sends an email with the given text.
  */
 @AnnotationAction(
-		name = "send notification",
-		description_de = "Sendet eine Benachrichtigung an das Portal.",
-		description_en = "Sends a notification to the portal.")
+		name_tag = "email_rules_action_name_send_notification",
+		description_tag = "email_rules_action_description_send_notification")
 public class TemplateActionSendNotification extends AbtractEmailAction {
 
 	@Autowired
@@ -53,9 +52,8 @@ public class TemplateActionSendNotification extends AbtractEmailAction {
 	 * All field values which are annotated as AnnotationRuleParam or AnnotationRuleParamArray are filled/saved during runtime directly.
 	 */
 	@AnnotationRuleParam(
-			name = "text",
-			description_de = "Text der in der Benachrichtung enthalten sein soll.",
-			description_en = "Text which is shown as notification",
+			name_tag = "email_rules_action_param_notification_text",
+			description_tag = "email_rules_action_param_description_notification_text",
 			type = DataType._STRING)
 	String notification;
 

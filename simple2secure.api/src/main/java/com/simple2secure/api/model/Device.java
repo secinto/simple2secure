@@ -23,8 +23,12 @@
 package com.simple2secure.api.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
 public class Device {
 

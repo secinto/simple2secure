@@ -24,12 +24,17 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 
  * @author Richard Heinz
  *
  *         Model to save the source code of a rule in the database. Will be used with the rule engine.
  */
+@Getter
+@Setter
 public class RuleWithSourcecode extends GenericDBObject {
 
 	private static final long serialVersionUID = -1812440159847822313L;
@@ -45,37 +50,4 @@ public class RuleWithSourcecode extends GenericDBObject {
 	public RuleWithSourcecode() {
 
 	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getContextID() {
-		return contextID;
-	}
-
-	public void setContextID(String contextID) {
-		this.contextID = contextID;
-	}
-
-	public String getSourcecode() {
-		return sourcecode;
-	}
-
-	public void setSourcecode(String groovyCode) {
-		this.sourcecode = groovyCode;
-	}
-
 }

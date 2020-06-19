@@ -1,3 +1,18 @@
+<button mat-raised-button color="primary" id="addButton" type="button"
+				(click)="download()"
+				class="pull-right mat-green-button">
+			<i class="glyphicon glyphicon-plus"></i> {{ 'button.download.probe' | translate }}
+</button>
+<div class="form-group">
+            <mat-form-field class="full_width_input">
+              <mat-label>Group</mat-label>
+			  <mat-select [(ngModel)]="selectedGroup" name="group">
+				<mat-option *ngFor="let group of groupsForSelect" [value]="selectedGroup">
+				  {{group.name}}
+				</mat-option>
+			  </mat-select>
+            </mat-form-field>
+</div>
 <div class="example-container mat-elevation-z8 table table-striped">
     <div class="header-filter-table">
         <mat-form-field class="header-filter-field">
@@ -44,7 +59,7 @@
                     *ngIf="!element.activated" style="color: #AA3939"
                     class="fas fa-times-circle fa-2x"></i></mat-cell>
         </ng-container>
-
+		
         <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
                 translate }}
@@ -56,7 +71,7 @@
                 </button>
             </mat-cell>
         </ng-container>
-
+		
         <mat-header-row *matHeaderRowDef="displayedColumnsDevices"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumnsDevices;"></mat-row>
     </mat-table>

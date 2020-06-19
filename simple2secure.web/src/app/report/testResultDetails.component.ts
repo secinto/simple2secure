@@ -22,7 +22,7 @@
 
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {TestResult} from '../_models';
+import {TestResult, TestResultObj} from '../_models';
 import {DataService} from '../_services';
 
 @Component({
@@ -31,7 +31,8 @@ import {DataService} from '../_services';
 })
 
 export class TestResultDetailsComponent {
-	testResult: TestResult;
+	testResult: TestResult = new TestResult();
+	testResultObj: TestResultObj = new TestResultObj();
 	loading = false;
 	result: string;
 
@@ -40,7 +41,29 @@ export class TestResultDetailsComponent {
 		private dialogRef: MatDialogRef<TestResultDetailsComponent>,
 		@Inject(MAT_DIALOG_DATA) data)
 	{
-		this.testResult = data.result;
+		if(data.result.result && data.result.result != "{}"){
+			let b64EncResult = JSON.parse(data.result.result);
+			let b64DecResult = atob(b64EncResult.step);
+			b64EncResult.step = b64DecResult;
+			this.testResult.id = data.result.id;
+			this.testResult.name = data.result.name;
+			this.testResult.testRunId = data.result.testRunId;
+			this.testResult.hostname = data.result.hostname;
+			this.testResultObj = b64EncResult;
+			this.testResult.result = this.testResultObj;
+			this.testResult.timestamp = data.result.timestamp;
+		}else {
+			let b64EncResult = JSON.parse(data.result.result);
+			b64EncResult.step = "The result returned empty from the Pod!";
+			this.testResult.id = data.result.id;
+			this.testResult.name = data.result.name;
+			this.testResult.testRunId = data.result.testRunId;
+			this.testResult.hostname = data.result.hostname;
+			this.testResultObj = b64EncResult;
+			this.testResult.result = this.testResultObj;
+			this.testResult.timestamp = data.result.timestamp;
+		}
+		
 	}
 
 }

@@ -22,6 +22,7 @@
 
 export enum DeviceType {
 	PROBE = 'PROBE',
-	WWW = 'WWW',
+	POD = 'POD',
+	SUT = 'SUT',
 	UNKNOWN = 'UNKNOWN',
 }

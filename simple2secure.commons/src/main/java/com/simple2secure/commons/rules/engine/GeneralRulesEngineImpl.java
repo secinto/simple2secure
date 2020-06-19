@@ -108,4 +108,10 @@ public class GeneralRulesEngineImpl implements GeneralRulesEngine {
 		log.debug("Started rule engine");
 		rules_engine_.fire(rules_, facts_);
 	}
+
+	@Override
+	public void removeAllRules() {
+		rules_.clear();
+		
+	}
 }

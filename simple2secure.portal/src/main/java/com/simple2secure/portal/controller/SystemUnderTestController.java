@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
-import com.simple2secure.api.model.DeviceStatus;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
@@ -23,7 +22,7 @@ import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputSize;
-import com.simple2secure.portal.validation.model.ValidInputSystemType;
+import com.simple2secure.portal.validation.model.ValidInputSut;
 
 import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
@@ -36,9 +35,20 @@ import simple2secure.validator.model.ValidRequestMethodType;
 @Slf4j
 public class SystemUnderTestController extends BaseUtilsProvider {
 
-	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST)
+	/**
+	 * This method stores the newly created @SystemUnderTest in the database.
+	 *
+	 * @param sut
+	 *          The @SystemUnderTest which is going to be stored in the database.
+	 * @param contextId
+	 *          The context for which this has been performed.
+	 * @param locale
+	 *          The current locale used by the user.
+	 * @return The in the database stored @SystemUnderTest.
+	 */
+	@ValidRequestMapping(value = "/addSut", method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<SystemUnderTest> addNewSUT(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
+	public ResponseEntity<SystemUnderTest> addNewSut(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 		if (sut != null && contextId.getValue() != null) {
 			sut.setContextId(contextId.getValue());
@@ -51,6 +61,46 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
 	}
 
+	/**
+	 * This methods updates the provided @SystemUnderTest in the database.
+	 *
+	 * @param sut
+	 *          The @SystemUnderTest which is going to be updated in the database.
+	 * @param contextId
+	 *          The context for which this has been performed.
+	 * @param locale
+	 *          The current locale used by the user.
+	 * @return The updated @SystemUnderTest from the database.
+	 */
+	@ValidRequestMapping(value = "/updateSut", method = ValidRequestMethodType.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<SystemUnderTest> updateSut(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (sut != null && contextId.getValue() != null) {
+			try {
+				sutRepository.update(sut);
+				log.debug("System Under Test: {} has been updated", sut.getName());
+			} catch (ItemNotFoundRepositoryException e) {
+				log.error("Error occured while updating the System Under Test ", e);
+			}
+			return new ResponseEntity<>(sut, HttpStatus.OK);
+		}
+
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_updating_sut", locale));
+	}
+
+	/**
+	 * This method retrieves all @SystemUnderTest for the provided context.
+	 *
+	 * @param contextId
+	 *          The context for which this has been performed.
+	 * @param page
+	 * @param size
+	 * @param locale
+	 *          The current locale used by the user.
+	 * @return A list of @SystemUnderTest belonging to the provided context.
+	 * @throws ItemNotFoundRepositoryException
+	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Map<String, Object>> getAllSUTsForContext(@ServerProvidedValue ValidInputContext contextId,
@@ -65,20 +115,6 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 			List<SystemUnderTest> suts = sutRepository.getAllByContextIdPaged(contextId.getValue(), page.getValue(), size.getValue());
 			if (suts != null && suts.size() > 0) {
-				for (SystemUnderTest sut : suts) {
-					/*
-					 * Updates the device status for all systems under test.
-					 *
-					 * TODO: Check if there is a better place or additional places. Because this could also be done in a scheduler or any other
-					 * recurring task.
-					 */
-					DeviceStatus status = sut.getDeviceStatus();
-					DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
-					if (status != deviceStatus) {
-						sut.setDeviceStatus(deviceStatus);
-					}
-				}
-
 				count = sutRepository.getTotalAmountOfSystemUnderTest(contextId.getValue());
 				sutMap.put("sutList", suts);
 				sutMap.put("totalSize", count);
@@ -86,46 +122,25 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_sut", locale));
 	}
 
-	@ValidRequestMapping
+	/**
+	 * This method deletes the @SystemUnderTest with the provided id.
+	 *
+	 * @param sutId
+	 *          The provided id of the @SystemUnderTest
+	 * @param locale
+	 *          The current locale used by the user.
+	 * @return A response with status code 200 and a null.
+	 */
+	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUTsForContextAndType(@ServerProvidedValue ValidInputContext contextId,
-			@PathVariable ValidInputSystemType systemType, @PathVariable ValidInputPage page, @PathVariable ValidInputSize size,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && systemType != null
-				&& !Strings.isNullOrEmpty(systemType.getValue())) {
-
-			Map<String, Object> sutMap = new HashMap<>();
-			long count = 0;
-			sutMap.put("sutList", new ArrayList<SystemUnderTest>());
-			sutMap.put("totalSize", count);
-
-			List<SystemUnderTest> suts = sutRepository.getAllByContextIdAndSystemTypePaged(contextId.getValue(), page.getValue(), size.getValue(),
-					systemType.getValue());
-			if (suts != null && suts.size() > 0) {
-				for (SystemUnderTest sut : suts) {
-					/*
-					 * Updates the device status for all systems under test.
-					 *
-					 * TODO: Check if there is a better place or additional places. Because this could also be done in a scheduler or any other
-					 * recurring task.
-					 */
-					DeviceStatus status = sut.getDeviceStatus();
-					DeviceStatus deviceStatus = sutUtils.getDeviceStatus(sut);
-					if (status != deviceStatus) {
-						sut.setDeviceStatus(deviceStatus);
-					}
-				}
-
-				count = sutRepository.getTotalAmountOfSystemUnderTestWithType(contextId.getValue(), systemType.getValue());
-				sutMap.put("sutList", suts);
-				sutMap.put("totalSize", count);
-			}
-
-			return new ResponseEntity<>(sutMap, HttpStatus.OK);
+	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable ValidInputSut sutId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sutId != null) {
+			sutRepository.delete(sutRepository.find(sutId.getValue()));
+			return new ResponseEntity<>(null, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_deleting_sut", locale));
 	}
 }

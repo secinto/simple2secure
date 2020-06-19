@@ -22,6 +22,8 @@
   "button.send": "Senden",
   "button.downloadProbe": "Probe herunterladen",
   "button.save": "Speichern",
+  "button.update": "Aktualisieren",
+  "button.next": "Nächste",
   "button.cancel": "Abbrechen",
   "button.close": "Schließen",
   "button.more": "Mehr",
@@ -54,6 +56,7 @@
   "button.showRules": "Regeln anzeigen",
   "button.addSequence": "Sequenz hinzufügen",
   "button.add.sut" : "SiT hinzufügen",
+  "button.apply.sut" : "Anwenden",
   "button.default.config": "Gruppenkonfiguration übernehmen",
   "button.osquery.config": "OSQuery Gruppenkonfiguration übernehmen",
   "button.steps.processors.config": "Gruppenschritte und Prozessoren übernehmen",
@@ -67,6 +70,7 @@
   "button.add.sut.text" : "System im Test hinzufügen",
   "button.addContext": "Kontext hinzufügen",
   "button.filter": "Filter",
+  "button.download.probe": "Probe downloaden",
 
   "login.email": "E-Mail",
   "login.email.placeholder": "Bitte geben Sie Ihre E-Mail Adresse ein",
@@ -234,6 +238,8 @@
   "table.groupId" : "Gruppe ID",
   "table.endDevice" : "Endgerät",
   "table.ipAddress" : "IP Adresse",
+  "table.port" : "Port",
+  "table.protocol" : "Protokoll"
   "table.netmask" : "Netzwerkmaske",
   "table.usedLicenses": "Anzahl der verwendeten Lizenzen",
   "table.executable": "Ausführbar",
@@ -279,6 +285,7 @@
   "message.rule.dialog": "Mit dem Klick auf Ja wird der ausgewählte Regel gelöscht!",
   "message.rule.delete": "Regel erfolgreich gelöscht!",
   "message.rule": "Regeln wurden erfolgreich geladen!",
+  "message.rule.templates": "Bedingungen/Aktion wurden erfolgreich geladen!",
   "message.language": "Die Sprache wurde erfolgreich geändert auf ",
   "message.passwordUpdate": "Ihr Passwort wurde erfolgreich aktuallisiert!",
   "message.user": "Benutzer wurde erfolgreich geladen!",
@@ -296,6 +303,7 @@
   "message.template.dialog": "Mit einem Klick auf Ja wird die ausgewählte Vorlage gelöscht!",
   "message.test.dialog": "Mit einem Klick auf Ja wird die ausgewählte Test gelöscht!",
   "message.test.delete": "Test erfolgreich gelöscht!",
+  "message.sut.delete": "System im Test erfolgreich gelöscht!",
   "message.template.delete": "Vorlage erfolgreich gelöscht!",
   "message.config.delete": "Die Konfiguration wurde erfolgreich gelöscht!",
   "message.group.delete": "Gruppe erfolgreich gelöscht!",
@@ -334,6 +342,7 @@
   "message.context.edit": "Kontext wurde erfolgreich aktualisiert!",
   "message.sut.create" : "System im Test erfolgreich erstellt!",
   "message.sut.update" : "System im Test erfolgreich aktualisiert!",
+  "message.sut.scheduled.on.test": "Test wurde erfolgreich auf dem System im Test angewendet.",
 
   "config.configSupplier": "Konfig. Lieferant",
   "config.taskSupplier": "Aufgabenlieferant",
@@ -409,6 +418,9 @@
 
   "rule.condition": "Regel Bedingung",
   "rule.action": "Regel Aktion",
+  "rule.add.emailconfigurations": "Emailkonfiguration hinzufügen",
+  "rule.choose.condition": "Wähle eine Bedingung",
+  "rule.choose.action": "Wähle eine Aktion",
 
   "osquery.runalways": "Immer ausführen?",
   "osquery.details": "Abfrage Details",
@@ -428,6 +440,7 @@
 
   "orbiter.toolsconfig": "Werkzeugkonfiguration bearbeiten",
   "orbiter.edittests": "Tests bearbeiten",
+  "orbiter.editsut": "System im Test bearbeiten",
   "orbiter.editsequence": "Sequenz bearbeiten",
   "orbiter.sequenceLength": "Sequenzlänge: ",
   "orbiter.sut" : "Systeme im Test",

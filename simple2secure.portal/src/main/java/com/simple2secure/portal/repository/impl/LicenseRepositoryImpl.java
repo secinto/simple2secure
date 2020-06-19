@@ -141,7 +141,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
 		long count = mongoTemplate.count(query, OsQueryReport.class, collectionName);
-		if (page != 0 && size != -1) {
+		if (size != -1) {
 			int limit = portalUtils.getPaginationLimit(size);
 			int skip = portalUtils.getPaginationStart(size, page, limit);
 

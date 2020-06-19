@@ -1,9 +1,9 @@
 baseProtocol: https
-baseHost:  localhost
-basePort: 8443
-basePortWeb: 9000
-# baseHost:  simple2secure.info
-# basePort: 51001/s2s
-# basePortWeb: 51003
+#baseHost:  localhost
+#basePort: 8443
+#basePortWeb: 9000
+baseHost:  simple2secure.info
+basePort: 51001/s2s
+basePortWeb: 51003
 trustedCertificates: ['1009697567', '300034014091414126167763103565643001151118', '13298795840390663119752826058995181320', '91299735575339953335919266965803778155']
 # localhost Portal, simple2secure.info, Let's encrypt root CA, DST root CA 

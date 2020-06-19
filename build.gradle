@@ -107,6 +107,7 @@ project(':simple2secure.portal') {
 		compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
 		compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 		compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+		compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
 		testCompile(
 				'org.springframework.boot:spring-boot-starter-test')

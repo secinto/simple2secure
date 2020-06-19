@@ -1,5 +1,6 @@
 import {BaseWidgetItem} from "./baseWidgetItem.component";
 import {Component} from "@angular/core";
+import {DataService} from "../_services";
 
 @Component({
     selector: 'app-stat-item',

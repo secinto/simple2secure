@@ -1,6 +1,7 @@
 import logging
 import socket
 import sys
+import base64
 
 from flask import json
 
@@ -59,21 +60,26 @@ def execute_test(test, test_id, test_name, test_run_id):
     """
     results = {}
 
-    tool_precondition = json_utils.get_json_test_object_new(test, "precondition", "command")
-    parameter_precondition = json_utils.get_json_test_object_new(test, "precondition", "parameter")
-    tool_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "command")
-    parameter_postcondition = json_utils.get_json_test_object_new(test, "postcondition", "parameter")
-    tool_step = json_utils.get_json_test_object_new(test, "step", "command")
-    parameter_step = json_utils.get_json_test_object_new(test, "step", "parameter")
+    executable_precondition = json_utils.prepare_testsection_for_execution(test, 'precondition')
+    executable_step = json_utils.prepare_testsection_for_execution(test, 'step')
+    executable_postcondition = json_utils.prepare_testsection_for_execution(test, 'postcondition')
+
+    try:
+        scanner(executable_precondition, results, 'precondition')
+    except:
+        pass
+
+    try:
+        scanner(executable_step, results, 'step')
+    except:
+        pass
+
+    try:
+        scanner(executable_postcondition, results, 'postcondition')
+    except:
+        pass
 
     # TODO: Create folder for execution of each celery task
-
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_precondition), parameter_precondition), results, "precondition")
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_step), parameter_step), results, "step")
-    scanner(json_utils.construct_command(json_utils.get_tool(
-        tool_postcondition), parameter_postcondition), results, "postcondition")
 
     timestamp = get_current_timestamp()
     test_result = TestResult("Result - " + timestamp.__str__(), json.dumps(results), test_run_id,
@@ -86,9 +92,11 @@ def execute_test(test, test_id, test_name, test_run_id):
 
         rest_utils.update_test_status(app, test_run_id, test_id, "EXECUTED")
 
+    return results
+
 
 @celery.task(name='celery.schedule_test_for_sequence')
-def schedule_test_for_sequence(parameter, command):
+def schedule_test_for_sequence(executable):
     """
     Schedule test for a sequence
 
@@ -98,8 +106,7 @@ def schedule_test_for_sequence(parameter, command):
     """
     with app.app_context():
         results = {}
-        scanner(json_utils.construct_command(json_utils.get_tool(
-            command), parameter), results, "sequence_result")
+        scanner(executable, results, "sequence_result")
         return results["sequence_result"]
 
 
@@ -116,48 +123,53 @@ def schedule_sequence(test_sequence, sequence_run_id, sequence_id):
     with app.app_context():
         sequence = update_sequence(json.loads(test_sequence))
         update_sequence_status(app, sequence_run_id, sequence_id, "RUNNING")
-        rest_utils.send_notification("Sequence " + sequence.name + " has been started by the pod " + socket.gethostname(), app)
+        rest_utils.send_notification(
+            "Sequence " + sequence.name + " has been started by the pod " + socket.gethostname(), app)
 
         current_milli_time = get_current_timestamp()
 
-        test_sequence_result_obj = {}
-        firstRun = True
-        nextResult = ""
+        first_run = True
+        previous_task = ""
+        test_seq_res = None
         for i, task in enumerate(json.loads(sequence.sequenceContent), 0):
-            taskJson = json.loads(task)
-            if firstRun:
-                test_content = json.loads(taskJson['test_content'])
-                test_command = test_content['test_definition']['step']['command']['executable']
-                test_parameter = test_content['test_definition']['step']['command']['parameter']['value']
-                scan = schedule_test_for_sequence(test_parameter, test_command)
-                nextResult = scan.strip()
-                test_sequence_result_obj[taskJson['name']] = nextResult
-                firstRun = False
+            task_json = json.loads(task)
+            if first_run:
+                test_content = json.loads(task_json['test_content'])
+                executable = json_utils.prepare_sequence_test_section_for_execution(test_content)
+                scan = schedule_test_for_sequence(executable)
+                test_sequence_result_obj = {task_json['name']: scan}
+                previous_task = task_json['name']
+                test_sequence_result_obj = json.dumps(test_sequence_result_obj)
+                test_seq_res = TestSequenceResult(sequence_run_id, sequence_id, sequence.podId, sequence.name,
+                                                  test_sequence_result_obj, current_milli_time)
+                update(test_seq_res)
+                first_run = False
             else:
-                test_content = json.loads(taskJson['test_content'])
+                test_content = json.loads(task_json['test_content'])
                 test_command = test_content['test_definition']['step']['command']['executable']
-                nextResult = nextResult.replace("\r", "")
-                nextResult = nextResult.replace("\n", "")
-                nextResult = nextResult.replace(" ", "")
-                scan = schedule_test_for_sequence(nextResult, test_command)
-                nextResult = scan.strip()
-                test_sequence_result_obj[taskJson['name']] = nextResult
- 
+                test_seq_res = TestSequenceResult.query.filter_by(sequence_run_id=sequence_run_id).one()
+                previous_result_enc = json.loads(test_seq_res.sequence_result)
+                previous_result_dec = base64.b64decode(previous_result_enc[previous_task])
+                previous_result_dec_str = previous_result_dec.decode('utf-8', 'backslashreplace')
+                executable = []
+                splitted_command = test_command.split(" ")
+                for command in splitted_command:
+                    executable.append(command)
+                executable.append(previous_result_dec_str)
+                scan = schedule_test_for_sequence(executable)
+                previous_result_enc[task_json['name']] = scan
+                previous_task = task_json['name']
+                test_seq_res.sequence_result = json.dumps(previous_result_enc)
+                update(test_seq_res)
 
-
-        test_sequence_result_obj = json.dumps(test_sequence_result_obj)
-        testSeqRes = TestSequenceResult(sequence_run_id, sequence_id, sequence.podId, sequence.name,
-                                        test_sequence_result_obj, current_milli_time)
         test_result_schema = TestSequenceResultSchema()
-        output = test_result_schema.dump(testSeqRes)
+        output = test_result_schema.dump(test_seq_res)
         portal_post(app, app.config['PORTAL_URL'] + "sequence/save/sequencerunresult", json.dumps(output))
         update_sequence_status(app, sequence_run_id, sequence_id, "EXECUTED")
-        rest_utils.send_notification("Sequence " + sequence.name + " has been executed by the pod " + socket.gethostname(), app)
+        rest_utils.send_notification(
+            "Sequence " + sequence.name + " has been executed by the pod " + socket.gethostname(), app)
 
-        update(testSeqRes)
+        update(test_seq_res)
         update(sequence)
-        # db.session.add(testSeqRes)
-        # db.session.merge(sequence)
-        # db.session.commit()
 
         return sequence

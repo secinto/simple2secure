@@ -40,13 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
-import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
-import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.LicensePlan;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.license.LicenseDateUtil;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.model.LicenseActivation;
@@ -149,41 +145,12 @@ public class LicenseController extends BaseUtilsProvider {
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
 
 		CompanyGroup group = groupRepository.find(groupId.getValue());
-		Context context = contextRepository.find(group.getContextId());
-
-		if (context != null) {
-			LicensePlan licensePlan = licensePlanRepository.find(context.getLicensePlanId());
-			if (licensePlan != null) {
-				if (context.getCurrentNumberOfLicenseDownloads() < licensePlan.getMaxNumberOfDownloads()) {
-
-					String expirationDate = LicenseDateUtil.getLicenseExpirationDate(licensePlan.getValidity(), licensePlan.getValidityUnit());
-					/*
-					 * TODO: Generates a new license for each request. Should not be the case
-					 */
-					List<CompanyLicensePrivate> companyLicenses = licenseRepository.findAllByGroupId(groupId.getValue());
-					String licenseId = LicenseUtil.generateLicenseId();
-					CompanyLicensePrivate companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate);
-
-					if (companyLicenses != null && companyLicenses.size() > 0) {
-						licenseId = companyLicenses.get(companyLicenses.size() - 1).getLicenseId();
-						companyLicense = new CompanyLicensePrivate(groupId.getValue(), licenseId, expirationDate);
-					} else {
-						licenseRepository.save(companyLicense);
-					}
-
-					String licenseFile = LicenseUtil.createLicenseFile(companyLicense.getGroupId(), companyLicense.getLicenseId(),
-							companyLicense.getExpirationDate());
-
-					ByteArrayOutputStream byteArrayOutputStream = LicenseUtil.generateLicenseZIPStreamFromFile(licenseFile,
-							licenseFilePath + "public.key");
-
-					context.setCurrentNumberOfLicenseDownloads(context.getCurrentNumberOfLicenseDownloads() + 1);
-					contextRepository.update(context);
-
-					return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
-				}
-			}
+		if(group != null) {
+			ByteArrayOutputStream byteArrayOutputStream = licenseUtils.generateLicenseForPackage(group.getContextId(), 
+					groupId.getValue());
+			return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 		}
+		
 		return (ResponseEntity<byte[]>) buildResponseEntity("max_license_number_exceeded", locale);
 	}
 

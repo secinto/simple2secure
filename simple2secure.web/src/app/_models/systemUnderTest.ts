@@ -22,15 +22,15 @@
 import {Base} from './base';
 import { DeviceType } from '../_models/deviceType';
 import { DeviceStatus } from '../_models/deviceStatus';
+import { Protocol } from './protocol';
+
 
 export class SystemUnderTest extends Base {
+	id: string;
     contextId: string;
-	endDeviceId: string;
-    endDeviceType: DeviceType;
-    endDeviceLocation: string;
-    name: string;
-	ipAdress: string;
-	netMask: string;
-	deviceStatus: DeviceStatus;
-	lastOnlineTimestamp: number;
+	uri: string;
+	name: string;
+	port: string;
+	protocol: Protocol;
+	metadata: {};
 }

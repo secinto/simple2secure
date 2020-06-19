@@ -1,0 +1,44 @@
+@-webkit-keyframes pulse {
+  0% { box-shadow:0 0 8px #30f23a, inset 0 0 8px #30f23a; }
+  50% { box-shadow:0 0 16px #30f23a, inset 0 0 14px #30f23a; }
+  100% { box-shadow:0 0 8px #30f23a, inset 0 0 8px #30f23a; }
+}
+
+.status-circle-green {
+  background-color:30f23a;
+  width:15px;
+  height:15px;
+  border-radius:50px;
+  box-shadow: 0 0 8px #30f23a, inset 0 0 8px #30f23a;
+  -webkit-animation: pulse 2s linear 1s infinite;
+}
+
+.status-circle-red {
+  background-color:eb3d40;
+  width:15px;
+  height:15px;
+  border-radius:50px;
+  box-shadow: 0 0 8px #eb3d40, inset 0 0 8px #eb3d40;
+}
+
+.sut-objects {
+	border-style: solid;
+	width: 20%;
+	height: 200px;
+}
+
+.fa-2x {
+    font-size: 1em;
+}
+
+#addButton {
+	min-width: 5px !important;
+	min-height: 5px !important;
+	margin-left: 15px !important;
+}
+
+#removeButton {
+	min-width: 5px !important;
+	min-height: 5px !important;
+	margin-left: 15px !important;
+}

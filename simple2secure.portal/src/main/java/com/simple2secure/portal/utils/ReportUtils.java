@@ -34,6 +34,7 @@ import com.simple2secure.api.model.GraphReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +129,7 @@ public class ReportUtils extends BaseServiceProvider {
 		return graphReports;
 	}
 
-	public int countExecutedQueries(Context context) {
+	public int countExecutedQueries(Context context) throws ItemNotFoundRepositoryException {
 		int size = 0;
 		if (context != null) {
 			List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);

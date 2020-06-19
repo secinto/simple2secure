@@ -1,4 +1,4 @@
-<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.editsut' | translate }}</h3>
 <h3 *ngIf="isNewSUT" mat-dialog-title>{{ 'button.add.sut.text' | translate }}</h3>
 
 
@@ -7,41 +7,44 @@
         <div class="form-group">
             <mat-form-field class="full_width_input">
                 <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
-                        [(ngModel)]="sut.name" name="name">
+                        [(ngModel)]="sut.name" name="sut.name">
             </mat-form-field>
         </div>
-		
-        <div class="form-group">
-            <mat-form-field class="full_width_input">
-              <mat-label>Device Type</mat-label>
-			  <mat-select [(ngModel)]="selectedType" name="type">
-				<mat-option *ngFor="let type of deviceTypeSelect" [value]="type">
-				  {{type}}
-				</mat-option>
-			  </mat-select>
-            </mat-form-field>
-        </div>
+		<div class="form-group">
+			<mat-label class="half_width_input">Metadata</mat-label>
+			<button mat-raised-button color="primary" id="addButton" type="button"
+				(click)="addMetaData()"
+				class="mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i>
+			</button><br>
+			<div fxLayout="row" fxLayoutGap="25px"
+				*ngFor="let pair of metadataArr; let i = index">
 
-        <div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.sut.endDeviceLocation' | translate }}"
-                        [(ngModel)]="sut.endDeviceLocation" name="endDeviceLocation">
-            </mat-form-field>
-        </div>
-		
-		<div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.ipAdress' | translate }}"
-                        [(ngModel)]="sut.ipAdress" name="ipAdress">
-            </mat-form-field>
-        </div>
-		
-		<div class="form-group">
-            <mat-form-field class="full_width_input">
-                <input type="text" matInput placeholder="{{ 'table.netmask' | translate }}"
-                        [(ngModel)]="sut.netMask" name="netMask">
-            </mat-form-field>
-        </div>
+				  <mat-form-field fxFlex="25">
+					<input matInput placeholder="Key" type="text"
+					name="key-{{i}}" value="{{pair.key}}" [(ngModel)]="metadataArr[i].key">
+				  </mat-form-field>
+
+				  <mat-form-field fxFlex>
+					<input matInput placeholder="Value" type="text"
+					name="value-{{i}}" value="{{pair.value}}" [(ngModel)]="metadataArr[i].value">
+				  </mat-form-field>
+
+				<button mat-raised-button color="primary" id="removeButton" type="button"
+					(click)="removeMetaData(i)"
+					class="mat-green-button">
+					<i class="glyphicon glyphicon-minus"></i>
+				</button><br>
+			</div>
+		</div>
+		<mat-form-field class="full_width_input">
+          <mat-label>Protocol</mat-label>
+          <mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
+            <mat-option *ngFor="let prot of protocolSelect" [value]="prot">
+              {{prot}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
     </form>
 </div>
 
@@ -49,6 +52,14 @@
     <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
             cdkFocusInitial>{{ 'button.cancel' | translate }}
     </button>
-    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveSUT()">{{ 'button.save' | translate }}
-    </button>
+	<div *ngIf='isNewSUT'>
+	    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.save' | translate }}
+		</button>
+	</div>
+	<div *ngIf='!isNewSUT'>
+		<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="update()">{{ 'button.update' | translate }}
+		</button>
+	</div>
+	<div *ngIf="invalidIpOrPort" style="color:red; padding-left: 20%;">Invalid IP Address or Port</div>
 </div>
+

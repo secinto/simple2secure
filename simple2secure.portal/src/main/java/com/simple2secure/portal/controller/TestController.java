@@ -24,6 +24,7 @@ package com.simple2secure.portal.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +39,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.dto.SutDTO;
 import com.simple2secure.api.dto.TestStatusDTO;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.DeviceInfo;
+import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
+import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
@@ -110,24 +114,33 @@ public class TestController extends BaseUtilsProvider {
 			}
 		}
 
-		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_deleting_test", locale));
+		return (ResponseEntity<Test>) buildResponseEntity("problem_occured_while_deleting_test", locale);
 
 	}
 
+	/**
+	 * This function adds a test to the schedule if it is started via the portal. This can be done by any user. The selected test is then
+	 * added to the internal schedule which is continuously checked by the pods.
+	 *
+	 * @param test
+	 *          The test object to add to the schedule
+	 * @param contextId
+	 *          The context for which this has been performed
+	 * @param userId
+	 *          The user which added it to the schedule
+	 * @param locale
+	 *          The current locale used by the user
+	 * @return A test run which has been created.
+	 */
 	@ValidRequestMapping(value = "/scheduleTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<TestRun> addTestToSchedule(@RequestBody TestObjWeb test, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
 		if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
-
 			User user = userRepository.find(userId.getValue());
-
 			if (user != null) {
-
 				Test currentTest = testRepository.find(test.getTestId());
-
 				if (currentTest != null) {
-
 					TestRun testRun = new TestRun(test.getTestId(), test.getName(), test.getPodId(), contextId.getValue(), TestRunType.MANUAL_PORTAL,
 							currentTest.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
 					testRun.setHostname(test.getHostname());
@@ -135,13 +148,99 @@ public class TestController extends BaseUtilsProvider {
 
 					notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled using the portal by " + user.getEmail(),
 							contextId.getValue());
-
 					return new ResponseEntity<>(testRun, HttpStatus.OK);
 				}
+			} else {
+				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
 			}
 		}
+		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale);
+	}
 
-		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_saving_test", locale));
+	/**
+	 * This function returns a list of SUTs which contain the set of keys defined in a test with the USE_SUT_METADATA flag. This can be done
+	 * by any user.
+	 *
+	 * @param test
+	 *          The test object which contains the USE_SUT_METADATA flag with the keys
+	 * @param contextId
+	 *          The context for which this has been performed
+	 * @param userId
+	 *          The user which added it to the schedule
+	 * @param locale
+	 *          The current locale used by the user
+	 * @return A list of SUTs which are applicable on this test.
+	 */
+	@ValidRequestMapping(value = "/applicableSutList", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<Map<String, Object>> getApplyableSUTList(@RequestBody TestObjWeb test,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (test != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+			User user = userRepository.find(userId.getValue());
+			if (user != null) {
+				Test currentTest = testRepository.find(test.getTestId());
+				if (currentTest != null) {
+					// Retrieve TestContent from test provided from Web
+					TestContent tC = testUtils.getTestContent(currentTest);
+					List<String> sutMetadataKeys = sutUtils
+							.getSutMetadataKeys(tC.getTest_definition().getStep().getCommand().getParameter().getValue());
+					List<String> sanitizedSutMetadataKeys = sutUtils.sanitizedSutMetadataKeyList(sutMetadataKeys);
+					List<SystemUnderTest> sutList = sutRepository.getApplicableSystemUnderTests(sanitizedSutMetadataKeys);
+					long count = sutList.size();
+					Map<String, Object> result = new HashMap<>();
+					result.put("sutList", sutList);
+					result.put("totalSize", count);
+					return new ResponseEntity<>(result, HttpStatus.OK);
+				}
+			} else {
+				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", test.getTestId());
+			}
+		}
+		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_applicable_sut_list", locale));
+	}
+
+	/**
+	 * This function adds a test with values from a SUT to the schedule if it is started via the portal. This can be done by any user. The
+	 * selected test is then added to the internal schedule which is continuously checked by the pods.
+	 *
+	 * @param SutDTO
+	 *          The dto which contains the id of the SUT and the id of the test, the objects to be merged and added to the schedule
+	 * @param contextId
+	 *          The context for which this has been performed
+	 * @param userId
+	 *          The user which added it to the schedule
+	 * @param locale
+	 *          The current locale used by the user
+	 * @return A test run which has been created.
+	 */
+	@ValidRequestMapping(value = "/scheduleSutTest", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<TestRun> addLDCSUTTestToSchedule(@RequestBody SutDTO sutDTO, @ServerProvidedValue ValidInputContext contextId,
+			@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sutDTO != null && !Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+			User user = userRepository.find(userId.getValue());
+			if (user != null) {
+				Test currentTest = testRepository.find(sutDTO.getTestId());
+				TestContent testContent = testUtils.getTestContent(currentTest);
+				SystemUnderTest sut = sutRepository.find(sutDTO.getSutId());
+				List<String> sutMetadataKeys = sutUtils
+						.getSutMetadataKeys(testContent.getTest_definition().getStep().getCommand().getParameter().getValue());
+				String testContentJsonString = testUtils.mergeTestAndSutMetadata(testContent, sut, sutMetadataKeys);
+				if (currentTest != null && testContentJsonString != null) {
+					TestRun testRun = new TestRun(sutDTO.getTestId(), currentTest.getName(), currentTest.getPodId(), contextId.getValue(),
+							TestRunType.MANUAL_PORTAL, testContentJsonString, TestStatus.PLANNED, System.currentTimeMillis());
+					testRunRepository.save(testRun);
+
+					notificationUtils.addNewNotificationPortal(currentTest.getName() + " has been scheduled using the portal by " + user.getEmail(),
+							contextId.getValue());
+					return new ResponseEntity<>(testRun, HttpStatus.OK);
+				}
+			} else {
+				log.debug("No user was provided for adding the test {} to the schedule, thus nothing is performed.", sutDTO.getTestId());
+			}
+		}
+		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_scheduling_sut_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/getScheduledTests")
@@ -155,7 +254,7 @@ public class TestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(tests, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
+		return (ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/testresult")
@@ -170,7 +269,7 @@ public class TestController extends BaseUtilsProvider {
 				return new ResponseEntity<>(results, HttpStatus.OK);
 			}
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_getting_retrieving_tests", locale));
+		return (ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_getting_retrieving_tests", locale);
 	}
 
 	@ValidRequestMapping(value = "/testresult", method = ValidRequestMethodType.DELETE)
@@ -193,7 +292,7 @@ public class TestController extends BaseUtilsProvider {
 			}
 		}
 
-		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_deleting_test", locale));
+		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_deleting_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/save", method = ValidRequestMethodType.POST)
@@ -209,10 +308,10 @@ public class TestController extends BaseUtilsProvider {
 				testRepository.save(convertedTest);
 				return new ResponseEntity<>(convertedTest, HttpStatus.OK);
 			} else {
-				return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test_name_exists", locale));
+				return (ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test_name_exists", locale);
 			}
 		}
-		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale));
+		return (ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}
 
 	/*
@@ -254,7 +353,7 @@ public class TestController extends BaseUtilsProvider {
 
 			}
 		}
-		return ((ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_scheduling_test", locale));
+		return (ResponseEntity<TestRun>) buildResponseEntity("problem_occured_while_scheduling_test", locale);
 
 	}
 
@@ -274,7 +373,7 @@ public class TestController extends BaseUtilsProvider {
 			Test synchronizedTest = testUtils.synchronizeReceivedTest(test);
 			return new ResponseEntity<>(synchronizedTest, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale));
+		return (ResponseEntity<Test>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/syncTests", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -307,7 +406,7 @@ public class TestController extends BaseUtilsProvider {
 
 		}
 
-		return ((ResponseEntity<List<Test>>) buildResponseEntity("problem_occured_while_saving_test", locale));
+		return (ResponseEntity<List<Test>>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}
 
 	@ValidRequestMapping(value = "/updateTestStatus", method = ValidRequestMethodType.POST)
@@ -329,7 +428,7 @@ public class TestController extends BaseUtilsProvider {
 
 		}
 
-		return ((ResponseEntity<TestStatusDTO>) buildResponseEntity("problem_occured_while_saving_test", locale));
+		return (ResponseEntity<TestStatusDTO>) buildResponseEntity("problem_occured_while_saving_test", locale);
 	}
 
 }

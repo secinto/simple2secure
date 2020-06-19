@@ -24,6 +24,10 @@ package com.simple2secure.api.model;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * 
  * @author Richard Heinz
@@ -33,6 +37,9 @@ import com.simple2secure.api.dbo.GenericDBObject;
  *         Will be used in the rule engine.
  *
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class TemplateRule extends GenericDBObject {
 
 	private static final long serialVersionUID = -5156938336427387331L;
@@ -47,10 +54,6 @@ public class TemplateRule extends GenericDBObject {
 
 	private TemplateAction templateAction;
 
-	public TemplateRule() {
-
-	}
-
 	public TemplateRule(String name, String description, String contextID, TemplateCondition templateCondition,
 			TemplateAction templateAction) {
 		super();
@@ -58,46 +61,6 @@ public class TemplateRule extends GenericDBObject {
 		this.description = description;
 		this.contextID = contextID;
 		this.templateCondition = templateCondition;
-		this.templateAction = templateAction;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getContextID() {
-		return contextID;
-	}
-
-	public void setContextID(String contextID) {
-		this.contextID = contextID;
-	}
-
-	public TemplateCondition getTemplateCondition() {
-		return templateCondition;
-	}
-
-	public void setTemplateCondition(TemplateCondition templateCondition) {
-		this.templateCondition = templateCondition;
-	}
-
-	public TemplateAction getTemplateAction() {
-		return templateAction;
-	}
-
-	public void setTemplateAction(TemplateAction templateAction) {
 		this.templateAction = templateAction;
 	}
 }

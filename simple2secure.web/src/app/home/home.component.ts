@@ -43,7 +43,7 @@ import {ChartEvent, ChartType} from 'ng-chartist';
 })
 
 export class HomeComponent extends BaseComponent{
-	location: string = this.route.component["name"];
+	location: string = this.route.snapshot.data["dashboardName"];
 
 	constructor(dialog: MatDialog,
 				alertService: AlertService,

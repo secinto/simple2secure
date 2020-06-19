@@ -24,15 +24,77 @@ package com.simple2secure.portal.rules.conditions;
 
 import org.jeasy.rules.api.Condition;
 import org.jeasy.rules.api.Facts;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.TemplateRule;
+import com.simple2secure.api.model.TriggeredRuleEmail;
+import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
+import com.simple2secure.commons.rules.annotations.RuleName;
+import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.repository.EmailTriggeredRuleHistoryRepository;
 
+import lombok.Setter;
+
+@Setter
 public abstract class AbtractEmailCondition implements Condition {
 
+	@Autowired
+	EmailTriggeredRuleHistoryRepository emailTriggeredRuleHistoryRepository;
+	
+	@RuleName()
+	protected String ruleName;
+	
+	@AnnotationRuleParam(
+			name_tag = "email_rules_condition_param_name_type_limit",
+			description_tag = "email_rules_condition_param_description_type_limit",
+			type = DataType._INT)
+	private int typeLimit;
+	
 	@Override
 	public boolean evaluate(Facts facts) {
-		return condition(facts.get("com.simple2secure.api.model.Email"));
+		boolean result = condition(facts.get("com.simple2secure.api.model.Email"));
+		
+		if (!result) {
+			return false;			
+		}
+		else {
+			if (typeLimit == 1)
+				return result;
+			
+			Email email = facts.get("com.simple2secure.api.model.Email");	
+			
+			TriggeredRuleEmail triggeredRule = emailTriggeredRuleHistoryRepository.findByRuleName(ruleName);
+			
+			if(triggeredRule != null) {
+				triggeredRule.getEmails().add(email);
+				try {
+					emailTriggeredRuleHistoryRepository.update(triggeredRule);
+				} catch (ItemNotFoundRepositoryException e) {
+					e.printStackTrace();
+				}
+			}
+			else {
+				TemplateRule templateRule = new TemplateRule(ruleName,
+						"description is not implemented",
+						email.getConfigId(),
+						null, null);
+				triggeredRule = new TriggeredRuleEmail(templateRule);
+				triggeredRule.addMail(email);
+				emailTriggeredRuleHistoryRepository.save(triggeredRule);
+			}
+			
+			if (triggeredRule.getTriggeredEmailCount() >= typeLimit)
+			{
+				emailTriggeredRuleHistoryRepository.delete(triggeredRule);
+				return true;
+			}
+			else
+				return false;
+		}
 	}
 
 	protected abstract boolean condition(Email email);
+	
 }

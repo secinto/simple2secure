@@ -21,6 +21,7 @@
  */
 package com.simple2secure.commons.config;
 
+import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -36,140 +37,143 @@ import com.google.common.io.Resources;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoadedConfigItems {
 
-	private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
-	private String baseProtocol = "https";
-	private String baseHost = "localhost";
-	private String basePort = "8443";
-	private String basePortWeb = "9000";
+   private static Logger log = LoggerFactory.getLogger(LoadedConfigItems.class);
+   private String baseProtocol = "https";
+   private String baseHost = "localhost";
+   private String basePort = "8443";
+   private String basePortWeb = "9000";
 
-	private String version = "0.2.1";
+   private String version = "0.2.1";
 
-	private String[] trustedCertificates = new String[0];
+   private String[] trustedCertificates = new String[0];
 
-	private static LoadedConfigItems instance;
+   private static LoadedConfigItems instance;
 
-	public static LoadedConfigItems getInstance() {
-		if (instance == null) {
-			instance = new LoadedConfigItems();
-			instance.init();
-		}
-		return instance;
-	}
+   public static LoadedConfigItems getInstance() {
+      if (instance == null) {
+         instance = new LoadedConfigItems();
+         instance.init();
+      }
+      return instance;
+   }
 
-	public LoadedConfigItems() {
+   public LoadedConfigItems() {
 
-	}
+   }
 
-	protected void init() {
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+   protected void init() {
+      ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-		try {
-			/*
-			 * Read configuration from resources application configuration
-			 */
-			LoadedConfigItems user = mapper.readValue(Resources.toString(Resources.getResource("config.items.yml"), Charset.forName("UTF-8")),
-					LoadedConfigItems.class);
+      try {
+         /*
+          * Read configuration from resources application configuration
+          */
+         URL configUrl = Resources.getResource("config.items.yml");
 
-			if (user != null) {
-				log.debug(ReflectionToStringBuilder.toString(user, ToStringStyle.MULTI_LINE_STYLE));
-				instance = user;
-			}
+         log.debug("Using config.items.yml from {}", configUrl.toString());
 
-		} catch (Exception e) {
-			log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(), e.getStackTrace());
-		}
-	}
+         LoadedConfigItems loadedConfigItems = mapper.readValue(Resources.toString(configUrl, Charset.forName("UTF-8")), LoadedConfigItems.class);
 
-	public String getBaseProtocol() {
-		return baseProtocol;
-	}
+         if (loadedConfigItems != null) {
+            log.debug(ReflectionToStringBuilder.toString(loadedConfigItems, ToStringStyle.MULTI_LINE_STYLE));
+            instance = loadedConfigItems;
+         }
 
-	public void setBaseProtocol(String baseProtocol) {
-		this.baseProtocol = baseProtocol;
-	}
+      } catch (Exception e) {
+         log.error("Couldn't load loadable configuration items. Cause {}, Reason {}", e.getCause(), e.getStackTrace());
+      }
+   }
 
-	public String getBaseHost() {
-		return baseHost;
-	}
+   public String getBaseProtocol() {
+      return baseProtocol;
+   }
 
-	public void setBaseHost(String baseHost) {
-		this.baseHost = baseHost;
-	}
+   public void setBaseProtocol(String baseProtocol) {
+      this.baseProtocol = baseProtocol;
+   }
 
-	public String getBasePort() {
-		return basePort;
-	}
+   public String getBaseHost() {
+      return baseHost;
+   }
 
-	public void setBasePort(String basePort) {
-		this.basePort = basePort;
-	}
+   public void setBaseHost(String baseHost) {
+      this.baseHost = baseHost;
+   }
 
-	public String getBasePortWeb() {
-		return basePortWeb;
-	}
+   public String getBasePort() {
+      return basePort;
+   }
 
-	public void setBasePortWeb(String basePortWeb) {
-		this.basePortWeb = basePortWeb;
-	}
+   public void setBasePort(String basePort) {
+      this.basePort = basePort;
+   }
 
-	public String getBaseURL() {
-		return baseProtocol + "://" + baseHost + ":" + basePort;
-	}
+   public String getBasePortWeb() {
+      return basePortWeb;
+   }
 
-	public String getBaseURLWeb() {
-		return baseProtocol + "://" + baseHost + ":" + basePortWeb;
-	}
+   public void setBasePortWeb(String basePortWeb) {
+      this.basePortWeb = basePortWeb;
+   }
 
-	public String getUsersAPI() {
-		return getBaseURL() + StaticConfigItems.USER_API;
-	}
+   public String getBaseURL() {
+      return baseProtocol + "://" + baseHost + ":" + basePort;
+   }
 
-	public String getLoginAPI() {
-		return getBaseURL() + StaticConfigItems.LOGIN_API;
-	}
+   public String getBaseURLWeb() {
+      return baseProtocol + "://" + baseHost + ":" + basePortWeb;
+   }
 
-	public String getReportsAPI() {
-		return getBaseURL() + StaticConfigItems.REPORT_API;
-	}
+   public String getUsersAPI() {
+      return getBaseURL() + StaticConfigItems.USER_API;
+   }
 
-	public String getQueryAPI() {
-		return getBaseURL() + StaticConfigItems.QUERY_API;
-	}
+   public String getLoginAPI() {
+      return getBaseURL() + StaticConfigItems.LOGIN_API;
+   }
 
-	public String getDeviceAPI() {
-		return getBaseURL() + StaticConfigItems.DEVICE_API;
-	}
+   public String getReportsAPI() {
+      return getBaseURL() + StaticConfigItems.REPORT_API;
+   }
 
-	public String getStepAPI() {
-		return getBaseURL() + StaticConfigItems.STEP_API;
-	}
+   public String getQueryAPI() {
+      return getBaseURL() + StaticConfigItems.QUERY_API;
+   }
 
-	public String getProcessorAPI() {
-		return getBaseURL() + StaticConfigItems.PROCESSOR_API;
-	}
+   public String getDeviceAPI() {
+      return getBaseURL() + StaticConfigItems.DEVICE_API;
+   }
 
-	public String getLicenseAPI() {
-		return getBaseURL() + StaticConfigItems.LICENSE_API;
-	}
+   public String getStepAPI() {
+      return getBaseURL() + StaticConfigItems.STEP_API;
+   }
 
-	public String getServiceAPI() {
-		return getBaseURL() + StaticConfigItems.SERVICE_API;
-	}
+   public String getProcessorAPI() {
+      return getBaseURL() + StaticConfigItems.PROCESSOR_API;
+   }
 
-	public String getGroupAPI() {
-		return getBaseURL() + StaticConfigItems.GROUP_API;
-	}
+   public String getLicenseAPI() {
+      return getBaseURL() + StaticConfigItems.LICENSE_API;
+   }
 
-	public String getVersion() {
-		return version;
-	}
+   public String getServiceAPI() {
+      return getBaseURL() + StaticConfigItems.SERVICE_API;
+   }
 
-	public String[] getTrustedCertificates() {
-		return trustedCertificates;
-	}
+   public String getGroupAPI() {
+      return getBaseURL() + StaticConfigItems.GROUP_API;
+   }
 
-	public void setTrustedCertificates(String[] trustedCertificates) {
-		this.trustedCertificates = trustedCertificates;
-	}
+   public String getVersion() {
+      return version;
+   }
+
+   public String[] getTrustedCertificates() {
+      return trustedCertificates;
+   }
+
+   public void setTrustedCertificates(String[] trustedCertificates) {
+      this.trustedCertificates = trustedCertificates;
+   }
 
 }

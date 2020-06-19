@@ -87,7 +87,7 @@ public class SettingsController extends BaseUtilsProvider {
 		return ((ResponseEntity<Settings>) buildResponseEntity("problem_occured_while_updating_settings", locale));
 	}
 
-	@ValidRequestMapping(value = "/licensePlan", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<LicensePlan> saveLicensePlan(@RequestBody LicensePlan licensePlan, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
@@ -137,7 +137,7 @@ public class SettingsController extends BaseUtilsProvider {
 
 	}
 
-	@ValidRequestMapping(value = "/licensePlan", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(value = "/testmacro", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public ResponseEntity<TestMacro> saveTestMacro(@RequestBody TestMacro testMacro, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {

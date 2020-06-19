@@ -21,6 +21,7 @@ import com.simple2secure.portal.repository.OsQueryRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.RuleActionsRepository;
 import com.simple2secure.portal.repository.RuleConditionsRepository;
+import com.simple2secure.portal.repository.RuleUserPairsRepository;
 import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
 import com.simple2secure.portal.repository.SequenceRunRepository;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
@@ -128,6 +129,9 @@ public class BaseRepositoryProvider {
 
 	@Autowired
 	public TemplateRuleRepository templateRuleRepository;
+	
+	@Autowired
+	public RuleUserPairsRepository ruleUserPairsRepository;
 
 	@Autowired
 	public ServiceLibraryRepository serviceLibraryRepository;
