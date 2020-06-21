@@ -1,6 +1,6 @@
 mail:
-  username: s2s.test@secinto.at
-  password: secinto4security.AT.19.test
+  username: 
+  password: 
   imap:
     host: imap.ionos.de
     auth: true
