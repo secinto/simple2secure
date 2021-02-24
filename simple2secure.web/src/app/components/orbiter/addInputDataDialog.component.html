@@ -1,0 +1,73 @@
+<h3 mat-dialog-title>{{'message.addInputData' | translate}}</h3>
+
+<div mat-dialog-content>
+    <form id="cfgForm" #configForm="ngForm">
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+                <input type="text" matInput placeholder="{{ 'table.name' | translate }}"
+                    [(ngModel)]="currentInputData.name" name="name">
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field class="full_width_input">
+
+                <textarea matInput placeholder="{{ 'table.inputData' | translate }}" [(ngModel)]="currentInputData.data"
+                    name="data"></textarea>
+
+            </mat-form-field>
+        </div>
+
+        <div class="center">
+            <ngx-file-drop dropZoneLabel="{{'button.dropFiles' | translate}}" (onFileDrop)="dropped($event)"
+                (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" multiple="false">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+                    {{'message.inputDataUpload' | translate}}
+                    <button class="mat-green-button upload-mat-button" mat-raised-button color="success" type="button"
+                        (click)="openFileSelector()">{{'button.selectFiles' | translate}}</button>
+                </ng-template>
+
+                <div class="upload-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="upload-name-style">
+                            <tr *ngFor="let item of files; let i=index">
+                                <td><strong>{{ item.relativePath }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </ngx-file-drop>
+
+            <div class="upload-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{{'table.filename' | translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="upload-name-style">
+                        <tr *ngFor="let item of files; let i=index">
+                            <td><strong>{{ item.relativePath }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="save()">{{ 'button.save' |
+        translate }}
+    </button>
+
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+        {{ 'button.close' | translate }}
+    </button>
+</div>

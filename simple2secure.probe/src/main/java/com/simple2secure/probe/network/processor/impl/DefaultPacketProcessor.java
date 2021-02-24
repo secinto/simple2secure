@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 		analysisStartTime = new Date();
 		report = new NetworkReport();
 		report.setDeviceId(ProbeConfiguration.probeId);
-		report.setGroupId(ProbeConfiguration.groupId);
+		report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 		report.setStartTime(analysisStartTime);
 		report.setHostname(ProbeConfiguration.hostname);
 
@@ -86,7 +87,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				// set new start time
 				// set reportContent stringBuilder
 				// initialize new report
-				if (!Strings.isNullOrEmpty(report.getDeviceId()) && report.getStartTime() != null) {
+				if (report.getDeviceId() != null && report.getStartTime() != null) {
 					report.setStringContent(JSONUtils.toString(reportContent));
 					report.setProcessorName(packet.getProcessor().getName());
 					report.setHostname(ProbeConfiguration.hostname);
@@ -99,7 +100,7 @@ public class DefaultPacketProcessor extends PacketProcessor {
 				analysisStartTime = new Date();
 				report = new NetworkReport();
 				report.setDeviceId(ProbeConfiguration.probeId);
-				report.setGroupId(ProbeConfiguration.groupId);
+				report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 				report.setStartTime(analysisStartTime);
 				reportContent = new HashMap<>();
 				packetCounter = 0;

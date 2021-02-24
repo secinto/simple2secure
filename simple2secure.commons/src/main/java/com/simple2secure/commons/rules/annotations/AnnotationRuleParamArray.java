@@ -31,18 +31,30 @@ import com.simple2secure.api.model.DataType;
 
 /**
  * 
- * @author Richard Heinz
- * 
- *         Annotation do mark a list as a parameter in a predefined action or condition class for the rule engine. The data will be used to
- *         display in the web simple2secure and to save a rule in the database.
+ * Annotation do mark a member variable as a parameter array in a predefined action or condition class
+ * for the rule engine. The metadata will the be saved in the database and displayed the user in
+ * the web user interface when defining a new rule.
  *
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationRuleParamArray {
+public @interface AnnotationRuleParamArray 
+{
+	/**
+	 * Tag of the locale string for displaying the name of the parameter in the
+	 * web user interface.
+	 */
 	String name_tag();
 
+	/**
+	 * Tag of the locale string for displaying the description of the parameter array in the
+	 * web user interface.
+	 */
 	String description_tag();
 
+	/**
+	 * Enum to save the data type as metadata for displaying the right input field
+	 * in the web user interface. 
+	 */
 	DataType type();
 }

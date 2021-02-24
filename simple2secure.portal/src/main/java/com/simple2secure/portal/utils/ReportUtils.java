@@ -24,6 +24,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +56,7 @@ public class ReportUtils extends BaseServiceProvider {
 	 * @param queryName
 	 * @return
 	 */
-	public List<GraphReport> prepareReportsForGraph(String deviceId, String queryName) {
+	public List<GraphReport> prepareReportsForGraph(ObjectId deviceId, String queryName) {
 		int currentPage = 0;
 		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
 		long maxPages = reportsRepository.getPagesForReportsByDeviceAndName(deviceId, queryName);
@@ -90,50 +91,17 @@ public class ReportUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function prepares the Report for the graph in the web. It parses only the necessary information so that we ignore the long queues.
+	 * This functions returns the number of the executed OSQueries
 	 *
-	 * @param queryName
+	 * @param context
 	 * @return
+	 * @throws ItemNotFoundRepositoryException
 	 */
-	public List<GraphReport> prepareReportsForGraph(String queryName) {
-		int currentPage = 0;
-		int size = StaticConfigItems.DEFAULT_VALUE_SIZE;
-		long maxPages = reportsRepository.getPagesForReportsByName(queryName);
-		List<GraphReport> graphReports = new ArrayList<>();
-		while (currentPage < maxPages) {
-			List<OsQueryReport> reports = reportsRepository.getReportsByName(queryName, currentPage, size);
-			if (reports != null) {
-				for (OsQueryReport report : reports) {
-					if (report != null) {
-						if (report.getQueryResult() != null) {
-							try {
-								JsonNode node = JSONUtils.fromString(report.getQueryResult());
-
-								int length = report.getQueryResult().length();
-								if (node != null) {
-									length = node.size();
-								}
-								graphReports.add(new GraphReport(report.getId(), report.getQuery(), length, report.getQueryTimestamp().getTime()));
-
-							} catch (Exception e) {
-								log.error("Error occured while trying to parse string to jsonArray: {}", e);
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			}
-			currentPage++;
-		}
-
-		return graphReports;
-	}
-
 	public int countExecutedQueries(Context context) throws ItemNotFoundRepositoryException {
 		int size = 0;
 		if (context != null) {
 			List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
-			List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+			List<ObjectId> deviceIds = portalUtils.extractIdsFromObjects(devices);
 			if (deviceIds != null && deviceIds.size() > 0) {
 				List<OsQueryReport> reports = reportsRepository.getReportsByDeviceId(deviceIds);
 				if (reports != null) {

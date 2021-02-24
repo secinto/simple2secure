@@ -22,47 +22,24 @@
 
 package com.simple2secure.api.dto;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.TestStatus;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TestStatusDTO {
 
-	private String testId;
+	private ObjectId testId;
 
-	private String testRunId;
+	private ObjectId testRunId;
 
 	private TestStatus testStatus;
-
-	public TestStatusDTO() {
-	}
-
-	public TestStatusDTO(String testId, String testRunId, TestStatus testStatus) {
-		this.testId = testId;
-		this.testRunId = testRunId;
-		this.testStatus = testStatus;
-	}
-
-	public String getTestId() {
-		return testId;
-	}
-
-	public void setTestId(String testId) {
-		this.testId = testId;
-	}
-
-	public String getTestRunId() {
-		return testRunId;
-	}
-
-	public void setTestRunId(String testRunId) {
-		this.testRunId = testRunId;
-	}
-
-	public TestStatus getTestStatus() {
-		return testStatus;
-	}
-
-	public void setTestStatus(TestStatus testStatus) {
-		this.testStatus = testStatus;
-	}
-
 }

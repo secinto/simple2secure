@@ -1,0 +1,88 @@
+<div mat-dialog-content>
+	<mat-horizontal-stepper #stepper>
+		<mat-step *ngIf="isSutTest">
+			<ng-template matStepLabel>{{'table.sut' | translate }}</ng-template>
+			<mat-table #table [dataSource]="dataSourceSut" matSort>
+				<!-- Name Column -->
+				<ng-container matColumnDef="name">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+					<mat-cell *matCellDef="let element" matTooltip="Metadata: {{convertSUTMetadata(element)}}"
+						matTooltipPosition="after" id="sutcell">
+						{{element.name}}
+					</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="protocol">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.protocol' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.protocol}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="select">
+					<mat-header-cell *matHeaderCellDef> {{'table.selectSut' | translate }}
+					</mat-header-cell>
+
+					<mat-cell *matCellDef="let row">
+						<mat-checkbox (click)="$event.stopPropagation()"
+							(change)="$event ? selectionSut.toggle(row) : null"
+							[checked]="selectionSut.isSelected(row)">
+						</mat-checkbox>
+					</mat-cell>
+				</ng-container>
+
+				<mat-row *matRowDef="let row; columns: displayedColumnsSut;"></mat-row>
+				<mat-header-row *matHeaderRowDef="displayedColumnsSut"></mat-header-row>
+
+			</mat-table>
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true" [length]="totalSizeSut" (page)="pageEvent = handlePage($event)">
+			</mat-paginator>
+		</mat-step>
+
+		<mat-step *ngIf="isInputData">
+			<ng-template matStepLabel>{{'table.inputData' | translate }}</ng-template>
+			<button mat-raised-button color="primary" type="button" (click)="openDialogAddInputData()"
+				class="pull-right mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i> {{'message.addInputData' | translate}}
+			</button>
+			<br><br>
+
+			<mat-table #table [dataSource]="dataSourceInputData" matSort>
+				<!-- Name Column -->
+				<ng-container matColumnDef="name">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+					<mat-cell *matCellDef="let element" matTooltip="Data: {{element.data}}" matTooltipPosition="after">
+						{{element.name}}
+					</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="select">
+					<mat-header-cell *matHeaderCellDef> {{'table.selectInputData' | translate }}
+					</mat-header-cell>
+
+					<mat-cell *matCellDef="let row">
+						<mat-checkbox (click)="$event.stopPropagation()"
+							(change)="$event ? selectionInputData.toggle(row) : null"
+							[checked]="selectionInputData.isSelected(row)">
+						</mat-checkbox>
+					</mat-cell>
+				</ng-container>
+
+				<mat-row *matRowDef="let row; columns: displayedColumnsInputData;"></mat-row>
+				<mat-header-row *matHeaderRowDef="displayedColumnsInputData"></mat-header-row>
+
+			</mat-table>
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true" [length]="totalSizeInputData" (page)="pageEvent = handlePage($event)">
+			</mat-paginator>
+		</mat-step>
+	</mat-horizontal-stepper>
+</div>
+
+<div mat-dialog-actions>
+	<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="close()">{{
+		'button.proceed' | translate }}</button>
+	<button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+		{{ 'button.cancel' | translate }}
+	</button>
+</div>

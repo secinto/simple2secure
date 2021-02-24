@@ -45,7 +45,7 @@ public class ProbeProcessInteraction {
 
 	public void sendStopCommand() {
 		try {
-			log.debug("Sending START service command to PROBE");
+			log.debug("Sending STOP service command to PROBE");
 			probeProcess.instrumentService().sendCommand(new ServiceCommand(ServiceCommands.STOP));
 		} catch (Exception e) {
 			log.error("Couldn't send service command to PROBE! Reason {}", e.getMessage());

@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Timeunit} from './timeunit';
-import {Generic} from './generic';
+import { Timeunit } from './timeunit';
+import { Generic } from './generic';
 
 export class LicensePlan extends Generic {
 	name: string;

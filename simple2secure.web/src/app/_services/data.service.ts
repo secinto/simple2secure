@@ -20,58 +20,58 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {Widget} from '../_models/widget';
+import { Injectable } from '@angular/core';
+import { Widget } from '../_models/widget';
 
 @Injectable()
 export class DataService {
 
-	get() {
-		return JSON.parse(sessionStorage.getItem('data'));
-	}
+    get() {
+        return JSON.parse(sessionStorage.getItem('data'));
+    }
 
-	set(data: any){
-		sessionStorage.setItem('data', JSON.stringify(data));
-	}
+    set(data: any) {
+        sessionStorage.setItem('data', JSON.stringify(data));
+    }
 
-	setRole(role: string){
-		sessionStorage.setItem('role', role);
-	}
+    setRole(role: string) {
+        sessionStorage.setItem('role', role);
+    }
 
-	getRole(){
-		return sessionStorage.getItem('role');
-	}
+    getRole() {
+        return sessionStorage.getItem('role');
+    }
 
-	setAuthToken(authToken: string){
-		sessionStorage.setItem('auth_token', authToken);
-	}
+    setAuthToken(authToken: string) {
+        sessionStorage.setItem('auth_token', authToken);
+    }
 
-	getAuthToken(){
-		return sessionStorage.getItem('auth_token');
-	}
+    getAuthToken() {
+        return sessionStorage.getItem('auth_token');
+    }
 
-	setGroupEditable(value: boolean) {
-		sessionStorage.setItem('isGroupEditable', JSON.stringify(value));
-	}
+    setGroupEditable(value: boolean) {
+        sessionStorage.setItem('isGroupEditable', JSON.stringify(value));
+    }
 
-	isGroupEditable() {
-		return JSON.parse(sessionStorage.getItem('isGroupEditable'));
-	}
+    isGroupEditable() {
+        return JSON.parse(sessionStorage.getItem('isGroupEditable'));
+    }
 
-	getSelectedWidget(){
-		return JSON.parse(sessionStorage.getItem('selectedWidget'));
-	}
+    getSelectedWidget() {
+        return JSON.parse(sessionStorage.getItem('selectedWidget'));
+    }
 
-	addWidgetToLS(widget: Widget) {
-		sessionStorage.setItem('selectedWidget', JSON.stringify(widget));
-	}
+    addWidgetToLS(widget: Widget) {
+        sessionStorage.setItem('selectedWidget', JSON.stringify(widget));
+    }
 
-	clearWidgets(){
-		sessionStorage.removeItem('selectedWidget');
-	}
+    clearWidgets() {
+        sessionStorage.removeItem('selectedWidget');
+    }
 
-	clearSessionStorage(){
-		sessionStorage.clear();
-	}
+    clearSessionStorage() {
+        sessionStorage.clear();
+    }
 
 }

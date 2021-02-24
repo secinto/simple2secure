@@ -75,17 +75,19 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	 * This function checks if the default data is initialized, and initializes it by each app start
 	 */
 	private void initializeData() {
+
 		if (dataInitializer != null) {
 			log.info("------------------ DATA INITIALIZATION ---------------------");
 			try {
+				dataInitializer.initializeKeycloak();
 				dataInitializer.addDefaultQueries();
 				dataInitializer.addDefaultProcessors();
 				dataInitializer.addDefaultSteps();
 				dataInitializer.addDefaultSettings();
 				dataInitializer.addDefaultLicensePlan();
-				dataInitializer.addDefaultUsers();
+				dataInitializer.initializeRuleEngine();
 				log.info("------------------ DATA INITIALIZATION SUCCESS ---------------------");
-			} catch (IOException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				log.error(e.getMessage());
 				log.info("------------------ DATA INITIALIZATION ERROR ---------------------");
 			}

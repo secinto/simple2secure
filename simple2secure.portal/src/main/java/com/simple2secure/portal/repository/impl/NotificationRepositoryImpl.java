@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -52,13 +53,13 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> findByContextId(String contextId) {
+	public List<Notification> findByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
 		return mongoTemplate.find(query, Notification.class);
 	}
 
 	@Override
-	public void deleteByContextId(String contextId) {
+	public void deleteByContextId(ObjectId contextId) {
 		List<Notification> notifications = findByContextId(contextId);
 
 		if (notifications != null) {
@@ -70,7 +71,7 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> findAllSortDescending(String contextId) {
+	public List<Notification> findAllSortDescending(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
 		query = query.with(Sort.by(Sort.Direction.DESC, "_id"));
 
@@ -78,7 +79,7 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> getNotificationByReadValue(String contextId, boolean isRead) {
+	public List<Notification> getNotificationByReadValue(ObjectId contextId, boolean isRead) {
 		Query query = new Query(Criteria.where("contextId").is(contextId).and("read").is(isRead));
 		query = query.with(Sort.by(Sort.Direction.DESC, "_id"));
 
@@ -86,7 +87,7 @@ public class NotificationRepositoryImpl extends NotificationRepository {
 	}
 
 	@Override
-	public List<Notification> getNotificationsWithPagination(String contextId, int page, int size) {
+	public List<Notification> getNotificationsWithPagination(ObjectId contextId, int page, int size) {
 
 		List<Notification> notifications = new ArrayList<>();
 		Query query = new Query(Criteria.where("contextId").is(contextId));

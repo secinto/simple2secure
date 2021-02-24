@@ -26,39 +26,58 @@ import java.util.List;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  * 
- * @author Richard Heinz
- * 
- *         Class holds the information of a predefined condition-class which has been annotated as condition. The params will be loaded from
- *         this class for each predefined condition.
- * 
- *         Will be used in the rule engine for the condition/action-parameters
+ *      Class holds the metadata and the values of each parameter of a predefined condition
+ *      for the rule engine for saving it in the the database.
+ *      The user defined values of the parameter will be loaded from this class into 
+ *      the actual condition class at runtime.
  *
  */
 @Getter
 @Setter
 @NoArgsConstructor
-public class TemplateCondition extends GenericDBObject {
+@AllArgsConstructor
+public class TemplateCondition extends GenericDBObject
+{
 
 	private static final long serialVersionUID = -1291327703141018318L;
 
+	/**
+	 * Name of the class which belongs to the metadata and parameter values of this class.
+	 */
+	private String className;
+	
+	/**
+	 * Tag of the locale string for displaying the name of the condition in the
+	 * web user interface. 
+	 */
 	private String nameTag;
+	
+	/**
+	 * Tag of the locale string for displaying the description of the condition in the
+	 * web user interface.
+	 */
 	private String descriptionTag;
+	
+	/**
+	 * Type of the fact the action has been designed.
+	 */
+	private RuleFactType factType;
+	
+	/**
+	 * List with all RuleParam objects from the actual action class
+	 */
 	private List<RuleParam<?>> params;
+	
+	/**
+	 * List of all RuleParamArray objects form the actual action class.
+	 */
 	private List<RuleParamArray<?>> paramArrays;
-
-	public TemplateCondition(String nameTag, String descriptionTag, List<RuleParam<?>> params,
-			List<RuleParamArray<?>> paramArrays) {
-		super();
-		this.nameTag = nameTag;
-		this.descriptionTag = descriptionTag;
-		this.params = params;
-		this.paramArrays = paramArrays;
-	}
 
 }

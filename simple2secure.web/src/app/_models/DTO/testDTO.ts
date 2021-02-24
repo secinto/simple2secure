@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {TestCaseResult} from '../testCaseResult';
-import {TestCase} from '../testCase';
+import { TestCaseResult } from '../testCaseResult';
+import { TestCase } from '../testCase';
 
 export class TestDTO {
 	test: TestCase;

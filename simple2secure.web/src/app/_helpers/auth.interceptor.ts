@@ -20,27 +20,29 @@
  *********************************************************************
  */
 
-import {tap} from 'rxjs/operators';
-import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {Router} from '@angular/router';
-import {DataService} from "../_services";
+import { tap } from 'rxjs/operators';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
+import { HttpService } from '../_services/http.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-	constructor(private router: Router,
-				private dataService: DataService) { }
+    constructor(private router: Router,
+        private httpService: HttpService) {
+    }
 
-	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-		return next.handle(req).pipe(tap(event => {}, err => {
-			if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403 || err.status == 0) {
-				this.dataService.clearSessionStorage();
-				this.router.navigate(['/login']);
-			}
-		}));
-	}
+        return next.handle(req).pipe(tap(event => {
+        }, err => {
+
+            if (err instanceof HttpErrorResponse && err.status == 401 || err.status == 403 || err.status == 0) {
+                this.httpService.logout();
+            }
+        }));
+    }
 
 }

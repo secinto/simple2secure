@@ -29,10 +29,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.LicensePlan;
-import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.api.model.TestResult;
+import com.simple2secure.api.model.TestRun;
+import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
@@ -49,41 +55,17 @@ public class ContextUtils extends BaseServiceProvider {
 	@Autowired
 	MailUtils mailUtils;
 
-	/**
-	 * This function returns all contexts which are created by the user or assigned to.
-	 *
-	 * @param context
-	 * @return
-	 */
-	public List<Context> getContextsByUserId(User user) {
-		log.debug("Retrieving contexts for the user {}", user.getEmail());
-		List<Context> myContexts = new ArrayList<>();
-
-		if (user != null) {
-			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(user.getId());
-			if (contextUserAuthList != null) {
-				for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
-					if (contextUserAuth != null) {
-						Context context = contextRepository.find(contextUserAuth.getContextId());
-						if (context != null) {
-							myContexts.add(context);
-						}
-					}
-				}
-			}
-		}
-
-		return myContexts;
-	}
+	@Autowired
+	UserUtils userUtils;
 
 	/**
 	 * This function maps all superadmins to the new context which has been added so that they have full control of each context.
 	 *
 	 * @param contextId
 	 */
-	public void mapSuperAdminsTotheContext(String contextId) {
-
-		List<String> superAdminIdList = contextUserAuthRepository.getUserIdsByUserRole(UserRole.SUPERADMIN);
+	public void mapSuperAdminsTotheContext(ObjectId contextId) {
+		// TODO: update it with the keycloak accordingly
+		List<String> superAdminIdList = new ArrayList<>();
 		if (superAdminIdList != null) {
 			for (String superAdminId : superAdminIdList) {
 				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId, superAdminId);
@@ -92,7 +74,6 @@ public class ContextUtils extends BaseServiceProvider {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -102,12 +83,20 @@ public class ContextUtils extends BaseServiceProvider {
 	 * @param contextId
 	 * @param userRole
 	 */
-	public ObjectId addContextUserAuthentication(String userId, String contextId, UserRole userRole, boolean defaultContext) {
+	public ObjectId addContextUserAuthentication(String userId, ObjectId contextId, UserRole userRole, boolean defaultContext) {
 
 		if (!Strings.isNullOrEmpty(userId) && userRole != null) {
 			ContextUserAuthentication contextUserAuthentication = new ContextUserAuthentication(userId, contextId, userRole, defaultContext);
 
-			return contextUserAuthRepository.saveAndReturnId(contextUserAuthentication);
+			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
+
+			ObjectId contextUserAuthenticationId = contextUserAuthRepository.saveAndReturnId(contextUserAuthentication);
+			if (contextUserAuthList.size() == 0) {
+				CurrentContext currentContext = new CurrentContext(userId, contextUserAuthenticationId);
+				currentContextRepository.save(currentContext);
+			}
+			return contextUserAuthenticationId;
+
 		}
 		return null;
 
@@ -142,12 +131,12 @@ public class ContextUtils extends BaseServiceProvider {
 	 * @param user
 	 * @return
 	 */
-	public ObjectId addNewContextForRegistration(User user, ObjectId userId) {
+	public ObjectId addNewContextForRegistration(String email, String userId) {
 		LicensePlan licensePlan = licensePlanRepository.findByName(StaticConfigItems.DEFAULT_LICENSE_PLAN);
 
 		if (licensePlan != null) {
 			Context context = new Context();
-			context.setName(generateContextName(user.getEmail()));
+			context.setName(generateContextName(email));
 			context.setLicensePlanId(licensePlan.getId());
 
 			log.debug("Added new context with name: {}", context.getName());
@@ -184,18 +173,6 @@ public class ContextUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function deletes all contextUserAuth dependencies
-	 *
-	 * @param contextUserAuth
-	 */
-	public void deleteContextAuthDependencies(ContextUserAuthentication contextUserAuth) {
-		if (contextUserAuth != null) {
-			currentContextRepository.deleteByContextUserAuthenticationId(contextUserAuth.getId());
-			contextUserAuthRepository.delete(contextUserAuth);
-		}
-	}
-
-	/**
 	 * This function takes the user email and generates a context name from it. It takes part between "@" and last "." and adds current
 	 * timestamp to it, user can change context name in the web.
 	 *
@@ -217,10 +194,9 @@ public class ContextUtils extends BaseServiceProvider {
 	 * @param context
 	 * @return
 	 */
-	public boolean checkIfUserCanDeleteContext(User user, Context context) {
-		if (user != null && context != null) {
-			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
-					user.getId());
+	public boolean checkIfUserCanDeleteContext(String userId, Context context) {
+		if (context != null) {
+			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), userId);
 			if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
 				return true;
 			}
@@ -233,6 +209,88 @@ public class ContextUtils extends BaseServiceProvider {
 		}
 
 		return false;
+	}
+
+	/**
+	 * This function returns all contexts which are created by the user or assigned to.
+	 *
+	 * @param context
+	 * @return
+	 */
+	public List<Context> getContextsByUserId(String userId) {
+		log.debug("Retrieving contexts for the user {}", userId);
+		List<Context> myContexts = new ArrayList<>();
+
+		if (!Strings.isNullOrEmpty(userId)) {
+			List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByUserId(userId);
+			if (contextUserAuthList != null) {
+				for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {
+					if (contextUserAuth != null) {
+						Context context = contextRepository.find(contextUserAuth.getContextId());
+						if (context != null) {
+							myContexts.add(context);
+						}
+					}
+				}
+			}
+		}
+
+		return myContexts;
+	}
+
+	/**
+	 * Method to get the contextId by a given devideId.
+	 *
+	 * @param deviceId
+	 * @return ObjectId
+	 */
+	public ObjectId getContextIdFromDeviceId(ObjectId deviceId) {
+		ObjectId groupId = licenseRepository.findByDeviceId(deviceId).getGroupId();
+		CompanyGroup companyGroup = groupRepository.find(groupId);
+		ObjectId contextId = companyGroup.getContextId();
+
+		return contextId;
+	}
+
+	/**
+	 * Method to get the contextId by a given OsQueryReport.
+	 *
+	 * @param report
+	 * @return ObjectId
+	 */
+	public ObjectId getContextIdFromOsQueryReport(OsQueryReport report) {
+		return getContextIdFromDeviceId(report.getDeviceId());
+	}
+
+	/**
+	 * Method to get the contextId by a given NetworkReport.
+	 *
+	 * @param report
+	 * @return ObjectId
+	 */
+	public ObjectId getContextIdFromNetworkReport(NetworkReport report) {
+		return getContextIdFromDeviceId(report.getDeviceId());
+	}
+
+	/**
+	 * Method to get the contextId by a given TestResult.
+	 *
+	 * @param result
+	 * @return ObjectId
+	 */
+	public ObjectId getContextIdFromTestResult(TestResult result) {
+		TestRun testRun = testRunRepository.find(result.getTestRunId());
+		return getContextIdFromDeviceId(testRun.getPodId());
+	}
+
+	/**
+	 * Method to get the contextId by a given TestSequenceResult.
+	 *
+	 * @param result
+	 * @return ObjectId
+	 */
+	public ObjectId getContextIdFromTestSequenceResult(TestSequenceResult result) {
+		return getContextIdFromDeviceId(result.getPodId());
 	}
 
 }

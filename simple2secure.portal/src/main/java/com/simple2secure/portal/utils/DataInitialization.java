@@ -29,7 +29,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,14 +47,9 @@ import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Settings;
 import com.simple2secure.api.model.Step;
-import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.UserRegistration;
-import com.simple2secure.api.model.UserRegistrationType;
-import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.providers.BaseServiceProvider;
-import com.simple2secure.portal.validation.model.ValidInputLocale;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +63,14 @@ public class DataInitialization extends BaseServiceProvider {
 	@Autowired
 	protected UserUtils userUtils;
 
+	@Autowired
+	public RuleUtils ruleUtils;
+
+	@Value("${keycloak.auth-server-url}")
+	private String authServerUrl;
+
+	public Keycloak keycloak;
+
 	/**
 	 *
 	 * @param userId
@@ -73,7 +80,7 @@ public class DataInitialization extends BaseServiceProvider {
 	 *          apply when another user(superadmin, admin, superuser) adds new user, because he has to choose the group before adding.
 	 * @throws IOException
 	 */
-	public void addDefaultGroup(String userId, String contextId) throws IOException {
+	public void addDefaultGroup(String userId, ObjectId contextId) throws IOException {
 
 		List<CompanyGroup> groupList = groupRepository.findByContextId(contextId);
 
@@ -89,7 +96,7 @@ public class DataInitialization extends BaseServiceProvider {
 				ObjectId groupId = groupRepository.saveAndReturnId(group);
 				log.debug("Default group added for user with id {}", userId);
 				if (!Strings.isNullOrEmpty(groupId.toString())) {
-					mapActiveQueriesToDefaultGroup(groupId.toString());
+					mapActiveQueriesToDefaultGroup(groupId);
 				}
 			}
 		}
@@ -125,7 +132,7 @@ public class DataInitialization extends BaseServiceProvider {
 					if (queries != null) {
 						List<OsQuery> queryList = Arrays.asList(queries);
 						for (OsQuery query : queryList) {
-							query.setCategoryId(categoryId.toString());
+							query.setCategoryId(categoryId);
 							queryRepository.save(query);
 						}
 					}
@@ -134,7 +141,7 @@ public class DataInitialization extends BaseServiceProvider {
 		}
 	}
 
-	public void mapActiveQueriesToDefaultGroup(String groupId) {
+	public void mapActiveQueriesToDefaultGroup(ObjectId groupId) {
 		List<OsQuery> activeQueries = queryRepository.findByActiveStatus(1);
 		if (activeQueries != null) {
 			for (OsQuery query : activeQueries) {
@@ -190,6 +197,11 @@ public class DataInitialization extends BaseServiceProvider {
 		}
 	}
 
+	/**
+	 * This function adds default license plan, if no license plan exists, on the app initialization.
+	 *
+	 * @throws IOException
+	 */
 	public void addDefaultLicensePlan() throws IOException {
 		List<LicensePlan> licensePlansDB = licensePlanRepository.findAll();
 
@@ -236,21 +248,24 @@ public class DataInitialization extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function adds default users in case that those are not already added to the database
+	 * This function initializes keycloak on the startup
 	 *
+	 * @return
+	 */
+	public void initializeKeycloak() {
+		keycloak = KeycloakBuilder.builder().serverUrl(authServerUrl).grantType("client_credentials").realm(StaticConfigItems.REALM_MASTER)
+				.clientSecret(StaticConfigItems.CLIENT_ADMIN_TOKEN).clientId(StaticConfigItems.CLIENT_ADMIN)
+				.resteasyClient(new ResteasyClientBuilder().disableTrustManager().connectionPoolSize(10).build()).build();
+	}
+
+	/**
+	 * This method fetches all predefined conditions and actions for the rule engines and saves their metadata into the database.
+	 *
+	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	public void addDefaultUsers() throws IOException {
-		UserRegistration userRegistration = new UserRegistration();
-		for (String email : StaticConfigItems.SECINTO_EMAIL_LIST) {
-			User user = userRepository.findByEmail(email);
-			if (user == null) {
-				userRegistration.setEmail(email);
-				userRegistration.setRegistrationType(UserRegistrationType.INITIALIZATION);
-				userRegistration.setUserRole(UserRole.SUPERADMIN);
-				ValidInputLocale locale = new ValidInputLocale("en");
-				userUtils.initializeSecintoUsers(userRegistration, locale);
-			}
-		}
+	public void initializeRuleEngine() throws ClassNotFoundException, IOException {
+		ruleUtils.loadAndSaveTemplateConditions();
+		ruleUtils.loadAndSaveTemplateActions();
 	}
 }

@@ -20,13 +20,10 @@
  *********************************************************************
  */
 
-import {EmailConfiguration} from '../emailconfig';
-import {TemplateRule} from "../templateRule";
-import {RuleUserPair} from "../ruleUserPair";
+import { TemplateRule } from '../templateRule';
 
 export class RuleDTO {
 
-    public emailConfigurations: EmailConfiguration[];
+    public totalSize: number;
     public templateRules: TemplateRule[];
-    public ruleUserPairs: RuleUserPair[];
 }

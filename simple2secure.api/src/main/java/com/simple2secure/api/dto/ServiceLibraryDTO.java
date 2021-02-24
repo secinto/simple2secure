@@ -23,6 +23,11 @@ package com.simple2secure.api.dto;
 
 import com.simple2secure.api.model.ServiceLibrary;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ServiceLibraryDTO extends ServiceLibrary {
 
 	private static final long serialVersionUID = -4739342507571172854L;
@@ -32,13 +37,4 @@ public class ServiceLibraryDTO extends ServiceLibrary {
 	public ServiceLibraryDTO(String name, String version, String filename) {
 		super(name, version, filename);
 	}
-
-	public byte[] getLibraryData() {
-		return libraryData;
-	}
-
-	public void setLibraryData(byte[] libraryData) {
-		this.libraryData = libraryData;
-	}
-
 }

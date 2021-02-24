@@ -19,10 +19,11 @@
  *
  *********************************************************************
  */
-
-import {TestSequence} from '../testSequence';
+import { TestSequence } from '../testSequence';
+import { TestObjWeb } from '../testObjWeb';
 
 
 export class TestSequenceDTO {
-	testSequence: TestSequence;
+	sequence: TestSequence;
+	tests: TestObjWeb[];
 }

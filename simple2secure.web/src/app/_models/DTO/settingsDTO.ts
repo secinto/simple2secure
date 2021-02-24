@@ -20,11 +20,11 @@
  *********************************************************************
  */
 
-import {Settings} from '../settings';
-import {LicensePlan} from '../LicensePlan';
-import {TestMacro} from '../TestMacro';
-import {Widget} from '../widget';
-import {WidgetConfig} from '../widgetConfig';
+import { Settings } from '../settings';
+import { LicensePlan } from '../LicensePlan';
+import { TestMacro } from '../TestMacro';
+import { Widget } from '../widget';
+import { WidgetConfig } from '../widgetConfig';
 
 export class SettingsDTO {
 	public settings: Settings;

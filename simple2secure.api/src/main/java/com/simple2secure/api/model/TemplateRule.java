@@ -16,51 +16,88 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
 package com.simple2secure.api.model;
 
+import java.util.List;
+
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 
- * @author Richard Heinz
- * 
- *         Class holds the a rule with the information af a predefined conditionand action.
- * 
- *         Will be used in the rule engine.
+ *
+ *		Class holds the a rule with the information of a predefined condition and action.
  *
  */
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
-public class TemplateRule extends GenericDBObject {
+public class TemplateRule extends GenericDBObject 
+{
 
 	private static final long serialVersionUID = -5156938336427387331L;
 
+	/**
+	 * Name of the rule.
+	 */
 	private String name;
 
+	/**
+	 * Description of the rule.
+	 */
 	private String description;
 
-	private String contextID;
+	@JsonSerialize(using = ToStringSerializer.class)
+	private ObjectId contextID;
 
-	private TemplateCondition templateCondition;
+	/**
+	 * This value will be used as threshold how often the conditions of this rule must be
+	 * evaluated true at multiple independent inputs, before the action will be performed at
+	 * last time.  
+	 */
+	private int limit;
 
-	private TemplateAction templateAction;
+	
+	/**
+	 * The logical expression how the different conditions must be evaluated so that the
+	 * actions will be perfomed.
+	 * 
+	 * e.g.: (A & B) | C means that the first two conditions must be evaluated true or the
+	 * third one, that the actions will be performed.
+	 */
+	private String conditionExpression;
 
-	public TemplateRule(String name, String description, String contextID, TemplateCondition templateCondition,
-			TemplateAction templateAction) {
+	/**
+	 * List of all chosen predefined conditions.
+	 */
+	private List<TemplateCondition> templateConditions;
+
+	/**
+	 * List of all chosen predefined actions.
+	 */
+	private List<TemplateAction> templateActions;
+
+	public TemplateRule(String name, String description, ObjectId contextID,
+			List<TemplateCondition> templateCondition,
+			List<TemplateAction> templateAction) 
+	{
 		super();
 		this.name = name;
 		this.description = description;
 		this.contextID = contextID;
-		this.templateCondition = templateCondition;
-		this.templateAction = templateAction;
+		templateConditions = templateCondition;
+		templateActions = templateAction;
 	}
 }

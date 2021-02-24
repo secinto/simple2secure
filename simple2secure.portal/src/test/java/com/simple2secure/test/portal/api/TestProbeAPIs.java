@@ -60,8 +60,8 @@ public class TestProbeAPIs extends TestAPIBase {
 	@Test
 	public void testDeleteProbeUserAuthenticated() {
 		// Create license object which should be deleted
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020");
-		license.setDeviceId("789");
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("123"), new ObjectId("456"), "01/01/2020");
+		license.setDeviceId(new ObjectId("789"));
 		licenseRepository.save(license);
 
 		// API call to delete the created license
@@ -75,15 +75,15 @@ public class TestProbeAPIs extends TestAPIBase {
 		log.debug("Response {0}", response.toString());
 
 		// License should not exist in the database. NULL must be returned
-		license = licenseRepository.findByDeviceId("789");
+		license = licenseRepository.findByDeviceId(new ObjectId("789"));
 		assertNull(license);
 	}
 
 	@Test
 	public void testDeleteProbeUserNotAuthenticated() {
 		// Create license object which should be deleted
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020");
-		license.setDeviceId("789");
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("123"), new ObjectId("456"), "01/01/2020");
+		license.setDeviceId(new ObjectId("789"));
 		licenseRepository.save(license);
 
 		// API call to delete the created license without auth token (not provided in the headers)
@@ -114,18 +114,18 @@ public class TestProbeAPIs extends TestAPIBase {
 	@Test
 	public void testChangeProbeGroupUserAuthenticated() {
 		// Create companyGroup object for the current group
-		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<String>());
+		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<ObjectId>());
 		ObjectId oldGroupId = groupRepository.saveAndReturnId(group);
 
 		// Create companyGroup object for the group which will be the new group
 		group.setName("New Group");
 		ObjectId newGroupId = groupRepository.saveAndReturnId(group);
-		group = groupRepository.find(newGroupId.toString());
+		group = groupRepository.find(newGroupId);
 
 		// Create license object
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020");
-		license.setDeviceId("789");
-		license.setGroupId(oldGroupId.toString());
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("123"), new ObjectId("456"), "01/01/2020");
+		license.setDeviceId(new ObjectId("789"));
+		license.setGroupId(oldGroupId);
 		licenseRepository.save(license);
 
 		// API call to change the probe group
@@ -138,29 +138,29 @@ public class TestProbeAPIs extends TestAPIBase {
 		assertEquals(200, response.getStatusCodeValue());
 
 		// There should be no licenses with the old groupId in the database
-		List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(oldGroupId.toString());
+		List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(oldGroupId);
 		assertTrue(licenses.isEmpty());
 
 		// There should be one license with the new groupId in the database
-		licenses = licenseRepository.findAllByGroupId(newGroupId.toString());
+		licenses = licenseRepository.findAllByGroupId(newGroupId);
 		assertFalse(licenses.isEmpty());
 	}
 
 	@Test
 	public void testChangeProbeGroupUserNotAuthenticated() {
 		// Create companyGroup object for the current group
-		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<String>());
+		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<ObjectId>());
 		ObjectId oldGroupId = groupRepository.saveAndReturnId(group);
 
 		// Create companyGroup object for the group which will be the new group
 		group.setName("New Group");
 		ObjectId newGroupId = groupRepository.saveAndReturnId(group);
-		group = groupRepository.find(newGroupId.toString());
+		group = groupRepository.find(newGroupId);
 
 		// Create license object
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020");
-		license.setDeviceId("789");
-		license.setGroupId(oldGroupId.toString());
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("123"), new ObjectId("456"), "01/01/2020");
+		license.setDeviceId(new ObjectId("789"));
+		license.setGroupId(oldGroupId);
 		licenseRepository.save(license);
 
 		// API call to change the probe group
@@ -177,12 +177,12 @@ public class TestProbeAPIs extends TestAPIBase {
 	public void testChangeProbeGroupNotExists() {
 
 		// Create companyGroup object without saving it to the database
-		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<String>());
+		CompanyGroup group = new CompanyGroup("Old Group", new ArrayList<ObjectId>());
 
 		// Create license object
-		CompanyLicensePrivate license = new CompanyLicensePrivate("123", "456", "01/01/2020");
-		license.setDeviceId("789");
-		license.setGroupId("");
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("123"), new ObjectId("456"), "01/01/2020");
+		license.setDeviceId(new ObjectId("789"));
+		license.setGroupId(new ObjectId(""));
 		licenseRepository.save(license);
 
 		// API call to change the probe group
@@ -203,7 +203,7 @@ public class TestProbeAPIs extends TestAPIBase {
 		String probeId = "102";
 
 		// Create companyGroup object and save to database
-		CompanyGroup group = new CompanyGroup("Test Group", new ArrayList<String>());
+		CompanyGroup group = new CompanyGroup("Test Group", new ArrayList<ObjectId>());
 		groupRepository.save(group);
 
 		// API call to change the probe group

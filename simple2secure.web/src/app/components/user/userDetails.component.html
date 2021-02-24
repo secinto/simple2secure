@@ -1,0 +1,38 @@
+<!--<h3 mat-dialog-title>{{ 'user.details' | translate }} {{user.email}}</h3>
+
+<div mat-dialog-content>
+    <form #userForm="ngForm">
+
+        <mat-form-field class="full_width_input">
+            <input matInput type="email" [disabled]="isEmailFieldDisabled"
+                   placeholder="{{ 'login.email.placeholder' | translate }}"
+                   [(ngModel)]="user.email" name="email" autocomplete="email" required>
+        </mat-form-field>
+
+        <mat-form-field class="full_width_input">
+            <mat-select placeholder="{{ 'user.role.placeholder' | translate }}" [(ngModel)]="user.userRole"
+                        name="userRole" (selectionChange)="onRoleChange($event.value)" required>
+                <mat-option *ngFor="let role of userRoleKeys()" [value]="role">
+                    {{role}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="showGroupSelectBox" class="full_width_input">
+            <mat-select placeholder="{{ 'table.group' | translate }}" [(ngModel)]="user.groupIds" name="groupId"
+                        multiple required>
+                <mat-option *ngFor="let group of groups" [value]="group.id">
+                    {{group.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button type="button" (click)="saveUser()" [disabled]="!userForm.dirty || !userForm.valid" mat-raised-button
+            class="mat-green-button" color="primary">{{ 'button.save' | translate }}
+    </button>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="user"
+            cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>-->

@@ -10,39 +10,20 @@ package com.simple2secure.api.dto;
 
 import java.util.List;
 
-import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.OsQuery;
+import com.simple2secure.api.model.OsQueryCategory;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OsQueryDTO {
 
 	private OsQueryCategory category;
 	private List<OsQuery> queries;
-
-	public OsQueryDTO() {
-
-	}
-
-	public OsQueryDTO(OsQueryCategory category, List<OsQuery> queries) {
-		super();
-		this.category = category;
-		this.queries = queries;
-	}
-
-	public OsQueryCategory getCategory() {
-		return category;
-	}
-
-	public void setCategory(OsQueryCategory category) {
-		this.category = category;
-	}
-
-	public List<OsQuery> getQueries() {
-		return queries;
-	}
-
-	public void setQueries(List<OsQuery> queries) {
-		this.queries = queries;
-	}
-
-	
 }

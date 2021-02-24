@@ -23,20 +23,22 @@ package com.simple2secure.portal.controller;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.dto.EmailConfigurationDTO;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputEmailConfig;
@@ -47,20 +49,20 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.EMAIL_API)
 @Slf4j
 public class EmailController extends BaseUtilsProvider {
 
-	@ValidRequestMapping(method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<EmailConfiguration> saveEmailConfiguration(@RequestBody EmailConfiguration config,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 		if (config != null) {
-			String configId = mailUtils.checkIfEmailConfigExists(config);
-			if (!Strings.isNullOrEmpty(configId)) {
+			ObjectId configId = mailUtils.checkIfEmailConfigExists(config);
+			if (configId != null) {
 				config.setId(configId);
 				emailConfigRepository.update(config);
 			} else {
@@ -69,19 +71,24 @@ public class EmailController extends BaseUtilsProvider {
 			}
 			return new ResponseEntity<>(config, HttpStatus.OK);
 		}
-
-		return (ResponseEntity<EmailConfiguration>) buildResponseEntity("configuration_not_found", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("configuration_not_found", locale.getValue()));
 	}
 
 	@ValidRequestMapping()
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<EmailConfigurationDTO>> getEmailConfigByContextId(@ServerProvidedValue ValidInputContext contextId,
+			@RequestParam(
+					required = false) String filter,
+			@RequestParam(
+					defaultValue = StaticConfigItems.DEFAULT_PAGE_PAGINATION) int page,
+			@RequestParam(
+					defaultValue = StaticConfigItems.DEFAULT_SIZE_PAGINATION) int size,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(contextId.getValue())) {
+		if (contextId.getValue() != null) {
 			Context context = contextRepository.find(contextId.getValue());
 			if (context != null) {
-				List<EmailConfigurationDTO> emailConfigurationList = mailUtils.getEmailConfigDTO(contextId.getValue());
+				List<EmailConfigurationDTO> emailConfigurationList = mailUtils.getEmailConfigDTO(contextId.getValue(), size, page);
 				if (emailConfigurationList != null) {
 					return new ResponseEntity<>(emailConfigurationList, HttpStatus.OK);
 				}
@@ -89,8 +96,7 @@ public class EmailController extends BaseUtilsProvider {
 		}
 
 		log.error("Error occured while getting email config for user with id {}", contextId.getValue());
-
-		return (ResponseEntity<List<EmailConfigurationDTO>>) buildResponseEntity("problem_occured_while_getting_email_config", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_getting_email_config", locale.getValue()));
 	}
 
 	/**
@@ -100,11 +106,12 @@ public class EmailController extends BaseUtilsProvider {
 	 * @return
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	public ResponseEntity<EmailConfiguration> deleteEmailConfig(@PathVariable ValidInputEmailConfig emailConfigId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(emailConfigId.getValue())) {
+		if (emailConfigId.getValue() != null) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(emailConfigId.getValue());
 
 			if (emailConfig != null) {
@@ -114,7 +121,6 @@ public class EmailController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting email configuration with id {}", emailConfigId);
-
-		return (ResponseEntity<EmailConfiguration>) buildResponseEntity("problem_occured_while_deleting_email_config", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_email_config", locale.getValue()));
 	}
 }

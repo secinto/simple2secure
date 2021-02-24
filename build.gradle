@@ -44,6 +44,7 @@ project(':simple2secure.api') {
 		compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 		compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
+		compile group: 'org.mongodb', name: 'bson', version: '2.5.1'
 	}
 }
 project(':simple2secure.commons') {
@@ -55,6 +56,7 @@ project(':simple2secure.commons') {
 		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 		compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.7'
 		compile group: 'org.jeasy', name: 'easy-rules-core', version: '3.3.0'
+		compile group: 'com.bpodgursky', name: 'jbool_expressions', version: '1.5'
 		compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.2'
 		compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
 	}
@@ -97,7 +99,7 @@ project(':simple2secure.portal') {
 		implementation project(':simple2secure.validator')
 
 		compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.2'
-		compile ('org.springframework.boot:spring-boot-starter-web')
+		compile 'org.springframework.boot:spring-boot-starter-web'
 		compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
 		compile 'org.springframework.boot:spring-boot-starter-security'
 		compile 'org.springframework.boot:spring-boot-devtools'
@@ -107,6 +109,9 @@ project(':simple2secure.portal') {
 		compile group: 'org.apache.commons', name: 'commons-compress', version: '1.17'
 		compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 		compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+		compile group: 'org.keycloak', name: 'keycloak-spring-boot-starter', version: '9.0.0'
+		compile group: 'org.keycloak', name: 'keycloak-tomcat7-adapter-dist', version: '9.0.0', ext: 'pom'
+		compile group: 'org.keycloak', name: 'keycloak-admin-client', version: '9.0.2'
 		compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
 		testCompile(

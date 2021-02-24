@@ -1,13 +1,13 @@
 import datetime
 import logging
-import secrets
 import socket
-import uuid
 
-from src.db.database import db, PodInfo, CompanyLicensePublic, Test
+from bson.objectid import ObjectId
+
+from src.db.database import PodInfo, CompanyLicensePublic, Test
+from src.db.session_manager import SessionManager
 from src.util.file_utils import get_license_file
 from src.util.util import get_date_from_string
-from flask import json
 
 EXPIRATION_DATE = "expirationDate"
 GROUP_ID = "groupId"
@@ -20,110 +20,106 @@ log = logging.getLogger('pod.util.db_utils')
 
 
 def update(some_object):
-    db.session.add(some_object)
-    db.session.commit()
+    with SessionManager() as session:
+        session.add(some_object)
 
 
-def delete_all_entries_from_table(some_model):
-    db.session.query(some_model).delete()
-    db.session.commit()
+def update_test(test):
+    with SessionManager() as session:
+        test_db = session.query(Test).filter_by(id=test.id).first()
+        if test_db is None:
+            update(test)
+        else:
+            test_db.name = test.name
+            test_db.testContent = test.testContent
+            test_db.lastChangedTimestamp = test.lastChangedTimestamp
+            session.flush()
+            session.commit()
 
 
-def delete_test_by_name(test_name):
-    test = Test.query.filter_by(name=test_name).one()
-    if test is not None:
-        db.session.delete(test)
-        db.session.commit()
-
-
-def get_pod(app):
+def get_pod():
     """
     Obtains the PodInfo object for this POD if available from the database or creates it and stores it in the DB.
 
     Returns:
         CompanyLicensePod: either a dummy object if no license is available or the correct object
     """
-    with app.app_context():
-        pod_info = PodInfo.query.first()
+    with SessionManager() as session:
+        pod_info = session.query(PodInfo).first()
         if pod_info is None:
-            create_pod(app)
-            pod_info = PodInfo.query.first()
+            create_pod()
+            pod_info = session.query(PodInfo).first()
 
-        log.debug('Using existing pod id from the database: {}'.format(pod_info.generated_id))
-
+        log.debug('Using existing pod id from the database: {}'.format(pod_info.id))
         return pod_info
 
 
-def create_pod(app):
+def create_pod():
     """
     Creates a new pod Id and storing it as PodInfo in the database
 
     Returns:
         PodInfo: Returns the currently created PodInfo object from the
     """
-    with app.app_context():
-        #podId = secrets.token_urlsafe(20)
-        podId = uuid.uuid1().urn
-        podId = podId[10:]
-        log.info('Generated new pod id: %s', podId)
+    pod_id = str(ObjectId())
+    log.info('Generated new pod id: %s', pod_id)
 
-        pod_info = PodInfo(podId)
-        update(pod_info)
-        log.info("Stored new PodInfo in DB")
+    pod_info = PodInfo(pod_id)
+    update(pod_info)
+    log.info("Stored new PodInfo in DB")
 
 
-def update_pod_status_license(app, groupId, licenseId):
-    with app.app_context():
-        podInfo = PodInfo.query.first()
-
-        if podInfo is None:
+def update_pod_status_license(group_id, license_id):
+    with SessionManager() as session:
+        pod_info = session.query(PodInfo).first()
+        if pod_info is None:
             log.error('PodInfo has not been created, creating a new one')
-            podInfo = create_pod(app)
+            pod_info = create_pod()
 
-        if groupId and licenseId:
-            podInfo.groupId = groupId
-            podInfo.licenseId = licenseId
+        if group_id and license_id:
+            pod_info.groupId = group_id
+            pod_info.licenseId = license_id
             log.info('Updating PodInfo with groupId and licenseId')
-            update(podInfo)
+            update(pod_info)
 
-        return podInfo
+        return pod_info
 
 
-def update_pod_status_auth(app, authToken):
-    with app.app_context():
-        podInfo = PodInfo.query.first()
-        if podInfo is None:
+def update_pod_status_auth(auth_token):
+    with SessionManager() as session:
+        pod_info = session.query(PodInfo).first()
+        if pod_info is None:
             log.error('PodInfo has not been created, creating a new one')
-            podInfo = create_pod(app)
+            pod_info = create_pod()
 
-        if authToken:
-            podInfo.authToken = authToken
+        if auth_token:
+            pod_info.authToken = auth_token
             log.info('Updating PodInfo with authToken')
-            update(podInfo)
+            update(pod_info)
 
-        return podInfo
-
-
-def clear_pod_status_auth(app):
-    with app.app_context():
-        podInfo = PodInfo.query.first()
-        if podInfo is not None:
-            podInfo.authToken = ''
-            update(podInfo)
+        return pod_info
 
 
-def update_pod_status_connection(app, connected=True):
-    with app.app_context():
-        podInfo = PodInfo.query.first()
-        if podInfo is None:
+def clear_pod_status_auth():
+    with SessionManager() as session:
+        pod_info = session.query(PodInfo).first()
+        if pod_info is not None:
+            pod_info.authToken = ''
+            update(pod_info)
+
+
+def update_pod_status_connection(connected=True):
+    with SessionManager() as session:
+        pod_info = session.query(PodInfo).first()
+        if pod_info is None:
             log.error('PodInfo has not been created, creating a new one')
-            podInfo = create_pod(app)
+            pod_info = create_pod()
 
-        podInfo.connected = connected
+        pod_info.connected = connected
         log.info('Updating connected status for PodInfo')
-        update(podInfo)
+        update(pod_info)
 
-        return podInfo
+        return pod_info
 
 
 def get_license(app, check_for_new=False):
@@ -138,9 +134,8 @@ def get_license(app, check_for_new=False):
     Returns:
         CompanyLicensePod: either a dummy object if no license is available or the correct object
     """
-    with app.app_context():
-        stored_license = CompanyLicensePublic.query.first()
-
+    with SessionManager() as session:
+        stored_license = session.query(CompanyLicensePublic).first()
         if check_for_new:
             created_license = create_license(app)
             if stored_license is not None and stored_license.licenseId == created_license.licenseId:
@@ -164,29 +159,28 @@ def create_license(app):
         CompanyLicensePod: either a dummy object if no license is available or the correct object
     """
     license_file = get_license_file(app)
-    podInfo = get_pod(app)
-    #devInfo = {'hostname': socket.gethostname(), 'ipAddress' : '', 'netMask' : ''}
+    pod_info = get_pod()
 
     if license_file is None:
-        dummy_license_obj = CompanyLicensePublic("NO_ID", "NO_ID", podInfo.generated_id, datetime.datetime.now().date())
+        dummy_license_obj = CompanyLicensePublic(str(ObjectId()), "NO_ID", "NO_ID", pod_info.id, datetime.datetime.now().date())
         return dummy_license_obj
     else:
         lines = license_file.split("\n")
         expiration_date = datetime.datetime.now().date()
 
-        groupId = None
-        licenseId = None
+        group_id = None
+        license_id = None
 
         for line in lines:
             if "#" not in line:
                 row = line.split("=")
                 if row[0] == GROUP_ID:
-                    groupId = row[1].rstrip()
+                    group_id = row[1].rstrip()
                 elif row[0] == EXPIRATION_DATE:
                     expiration_date = get_date_from_string(row[1].rstrip())
                 elif row[0] == LICENSE_ID:
-                    licenseId = row[1].rstrip()
+                    license_id = row[1].rstrip()
 
-        if groupId and licenseId:
-            license_obj = CompanyLicensePublic(groupId, licenseId, podInfo.generated_id, expiration_date)
+        if group_id and license_id:
+            license_obj = CompanyLicensePublic(str(ObjectId()), group_id, license_id, pod_info.id, expiration_date)
             return license_obj

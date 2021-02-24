@@ -34,6 +34,7 @@ simple2secure.service/release/logs/
 simple2secure.web/.idea/
 simple2secure.web/dist/
 simple2secure.web/node_modules/
+simple2secure.web/out-tsc/
 .pydevproject
 simple2secure.service/release/libs/simple2secure.service.jar
 simple2secure.service/release/libs/simple2secure.probe.jar
@@ -57,7 +58,6 @@ simple2secure.probe/license/
 .vscode/
 logs/
 temp/
-simple2secure.pod/static/license/license-5db9517a26ccd20c3a414c6f.zip
 simple2secure.pod/filterNetstatOutput1.py
 simple2secure.probe/src/main/java/com/simple2secure/probe/network/packet/CraftPacketsForTests.java
 simple2secure.testservice/server.py
@@ -65,7 +65,7 @@ simple2secure.testservice/result/result.json
 simple2secure.testservice/src/scripts/filterNetstatOutput.py
 simple2secure.testservice/src/scripts/filterNetstatOutput1.py
 simple2secure.testservice/src/scripts/test.py
-simple2secure.testservice/static/license/license-5d95d58b5223d626c45302e3.zip
+simple2secure.testservice/static/license/
 simple2secure.web/browserslist
 db/pod.db
 simple2secure.validator/gradle/wrapper/gradle-wrapper.jar
@@ -73,6 +73,8 @@ simple2secure.validator/gradle/wrapper/gradle-wrapper.properties
 simple2secure.probe/public.key
 simple2secure.probe/license.dat
 simple2secure.portal/available_apis.txt
-simple2secure.pod/static/license/license-5ddbdda4663e6a0e996cd879.zip
 simple2secure.web/simple2secure.web.iml
 simple2secure.service/tools/
+simple2secure.pod/venv/
+simple2secure.pod/static/license/
+simple2secure.pod/db.mv.db

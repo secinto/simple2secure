@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Generic} from './generic';
+import { Generic } from './generic';
 
 export class Email extends Generic {
 	contextId: string;

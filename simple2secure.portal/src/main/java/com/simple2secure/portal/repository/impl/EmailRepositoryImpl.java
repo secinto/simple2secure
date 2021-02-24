@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -23,19 +24,19 @@ public class EmailRepositoryImpl extends EmailRepository {
 	}
 
 	@Override
-	public Email findByConfigAndMessageId(String configId, String msgId) {
+	public Email findByConfigAndMessageId(ObjectId configId, String msgId) {
 		Query query = new Query(Criteria.where("configId").is(configId).and("messageId").is(msgId));
 		return mongoTemplate.findOne(query, Email.class);
 	}
 
 	@Override
-	public List<Email> findByConfigId(String configId) {
+	public List<Email> findByConfigId(ObjectId configId) {
 		Query query = new Query(Criteria.where("configId").is(configId));
 		return mongoTemplate.find(query, Email.class);
 	}
 
 	@Override
-	public void deleteByConfigId(String configId) {
+	public void deleteByConfigId(ObjectId configId) {
 		List<Email> emails = findByConfigId(configId);
 
 		if (emails != null) {

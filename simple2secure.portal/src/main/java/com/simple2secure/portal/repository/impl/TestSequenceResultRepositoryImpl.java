@@ -1,18 +1,23 @@
 package com.simple2secure.portal.repository.impl;
 
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.logging.log4j.util.Strings;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.simple2secure.api.model.TestResult;
 
 //import javax.annotation.PostConstruct;
 
@@ -33,67 +38,65 @@ public class TestSequenceResultRepositoryImpl extends TestSequenceResultReposito
 	}
 
 	@Override
-	public List<TestSequenceResult> getBySequenceId(String sequenceId) {
-		Query query = new Query(Criteria.where("sequence_id").is(sequenceId));
+	public List<TestSequenceResult> getBySequenceId(ObjectId sequenceId) {
+		Query query = new Query(Criteria.where("sequenceId").is(sequenceId));
 		List<TestSequenceResult> testSequenceResults = mongoTemplate.find(query, TestSequenceResult.class);
 		return testSequenceResults;
 	}
 
 	@Override
-	public TestSequenceResult getBySequenceRunId(String sequenceRunId) {
-		Query query = new Query(Criteria.where("sequence_run_id").is(sequenceRunId));
+	public TestSequenceResult getBySequenceRunId(ObjectId sequenceRunId) {
+		Query query = new Query(Criteria.where("sequenceRunId").is(sequenceRunId));
 		TestSequenceResult testSequenceResults = mongoTemplate.findOne(query, TestSequenceResult.class);
 		return testSequenceResults;
 	}
 
 	@Override
-	public List<TestSequenceResult> getByDeviceId(String deviceId) {
-		Query query = new Query(Criteria.where("pod_id").is(deviceId));
+	public List<TestSequenceResult> getByDeviceId(ObjectId deviceId) {
+		Query query = new Query(Criteria.where("podId").is(deviceId));
 		List<TestSequenceResult> result = mongoTemplate.find(query, TestSequenceResult.class);
 		return result;
 	}
 
 	@Override
-	public List<TestSequenceResult> getBySequenceRunIds(List<String> sequenceRunIds, int page, int size) {
-		List<TestSequenceResult> results = new ArrayList<>();
-		if(!sequenceRunIds.isEmpty()){
+	public Map<String, Object> getSequenceResultsByDeviceIdWithPagination(List<ObjectId> deviceIds, int page, int size, String filter) {
+		long count = 0;
+		Map<String, Object> testResultMap = new HashMap<>();
+		if (!deviceIds.isEmpty()) {
+
 			List<Criteria> orExpression = new ArrayList<>();
 			Criteria orCriteria = new Criteria();
 			Query query = new Query();
-			for (String sequenceRunId : sequenceRunIds) {
+
+			for (ObjectId deviceId : deviceIds) {
 				Criteria expression = new Criteria();
-				expression.and("sequence_run_id").is(sequenceRunId);
+				expression.and("podId").is(deviceId);
 				orExpression.add(expression);
 			}
+
 			query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
 
+			if (!Strings.isBlank(filter)) {
+				query.addCriteria(Criteria.where("sequenceName").regex(filter, "i"));
+			}
+
+			count = mongoTemplate.count(query, TestSequenceResult.class, collectionName);
 			int limit = portalUtils.getPaginationLimit(size);
 			int skip = portalUtils.getPaginationStart(size, page, limit);
 
 			query.limit(limit);
 			query.skip(skip);
-			query.with(Sort.by(Sort.Direction.DESC, "time_stamp"));
+			query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
 
-			results = mongoTemplate.find(query, TestSequenceResult.class, collectionName);
+			List<TestSequenceResult> reports = mongoTemplate.find(query, TestSequenceResult.class, collectionName);
+
+			testResultMap.put("report", reports);
+			testResultMap.put("totalSize", count);
+		}else {
+			testResultMap.put("report", new ArrayList<TestSequenceResult>());
+			testResultMap.put("totalSize", 0);
 		}
-		return results;
-	}
-
-	@Override
-	public long getCountOfSequencesWithSequenceRunIds(List<String> sequenceRunIds) {
-		List<Criteria> orExpression = new ArrayList<>();
-		Criteria orCriteria = new Criteria();
-		Query query = new Query();
-		for (String sequenceRunId : sequenceRunIds) {
-			Criteria expression = new Criteria();
-			expression.and("sequence_run_id").is(sequenceRunId);
-			orExpression.add(expression);
-		}
-		query.addCriteria(orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()])));
-
-		long count = mongoTemplate.count(query, TestResult.class, collectionName);
-
-		return count;
+		return testResultMap;
 	}
 
 }

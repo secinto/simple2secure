@@ -20,9 +20,9 @@
  *********************************************************************
  */
 
-import {TestDefinition} from './testDefinition';
+import { TestDefinition } from './testDefinition';
 
-export class TestContent{
+export class TestContent {
 	name = '';
 	test_definition = new TestDefinition();
 }

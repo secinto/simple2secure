@@ -1,27 +1,10 @@
 import getopt
-import hashlib
-import json
 import logging
 import sys
+
 from datetime import datetime
 
-from flask import request
-
-from src.db.database import Test
-
 log = logging.getLogger('pod.util')
-
-
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-
-
-def create_secure_hash(content):
-    sha3_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
-    return sha3_hash
 
 
 def get_current_timestamp():
@@ -34,56 +17,33 @@ def get_date_from_string(date_string):
 
 
 def check_command_params(argv, app):
-    with app.app_context():
-        argumentsList = argv[1:]
-        log.info(argumentsList)
-        try:
-            opts, args = getopt.getopt(argumentsList, "hd", ["help", "docker"])
-        except getopt.GetoptError:
-            log.error("Some error")
-            print('app.py -a <True/False>')
-            sys.exit(2)
+    arguments_list = argv[1:]
+    log.info(arguments_list)
+    try:
+        opts, args = getopt.getopt(arguments_list, "hd", ["help", "docker"])
+    except getopt.GetoptError:
+        log.error("Some error")
+        print('app.py -a <True/False>')
+        sys.exit(2)
 
-        for opt, arg in opts:
-            if opt == '-h':
-                print('app.py -a <True/False>')
-                sys.exit()
-            elif opt in ("-o", "--docker"):
-                app.config['USE_CELERY_IN_DOCKER'] = True
-            else:
-                log.info("Found unknown option {}".format(opt))
+    for opt, arg in opts:
+        if opt == '-h':
+            print('app.py -a <True/False>')
+            sys.exit()
+        elif opt in ("-o", "--docker"):
+            app.USE_CELERY_IN_DOCKER = True
+        else:
+            log.info("Found unknown option {}".format(opt))
 
 
 def init_logger(app):
-    with app.app_context():
-        logging.basicConfig(filename=app.config['LOG_FILE'],
-                            level=logging.getLevelName(app.config['LOG_LEVEL_NAME']),
-                            format=app.config['LOG_FORMAT'])
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        ch.setFormatter(logging.Formatter(app.config['LOG_FORMAT_CH']))
-        logging.getLogger().addHandler(ch)
-
-
-def generate_test_object(sync_test_json):
-    test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
-                sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
-    test.id = sync_test_json["id"]
-    return test
-
-
-def generate_test_object_from_json(sync_test_json, existing_test):
-    if existing_test is not None:
-        existing_test.name = sync_test_json["name"]
-        existing_test.test_content = sync_test_json["test_content"]
-        existing_test.podId = sync_test_json["podId"]
-        existing_test.hash_value = sync_test_json["hash_value"]
-        existing_test.lastChangedTimestamp = sync_test_json["lastChangedTimestamp"]
-        existing_test.deleted = sync_test_json["deleted"]
-    else:
-        existing_test = Test(sync_test_json["name"], sync_test_json["test_content"], sync_test_json["hash_value"],
-                             sync_test_json["lastChangedTimestamp"], sync_test_json["podId"])
-    return existing_test
+    logging.basicConfig(filename=app.LOG_FILE,
+                        level=logging.getLevelName(app.LOG_LEVEL_NAME),
+                        format=app.LOG_FORMAT)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(logging.Formatter(app.LOG_FORMAT_CH))
+    logging.getLogger().addHandler(ch)
 
 
 def print_error_message():
@@ -103,16 +63,14 @@ def print_success_message_auth(app):
               "----------------------------------------------\n" \
               "--       Extracting the pod license         --\n" \
               "----------------------------------------------\n" \
-              "-- * Pod License Id : " + app.config['LICENSE_ID'] + "\n" \
-                                                                    "-- * Pod Group Id : " + app.config[
-                  'GROUP_ID'] + "\n" \
-                                "-- * Pod Id : " + app.config['POD_ID'] + "\n" \
+              "-- * Pod License Id : " + app.LICENSE_ID + "\n" \
+                                                                    "-- * Pod Group Id : " + app.GROUP_ID + "\n" \
+                                "-- * Pod Id : " + app.POD_ID + "\n" \
                                                                           "----------------------------------------------\n" \
                                                                           "----------------------------------------------\n" \
                                                                           "--          ACTIVATING THE LICENSE          --\n" \
                                                                           "----------------------------------------------\n" \
-                                                                          "-- * Auth Token : " + app.config[
-                  'AUTH_TOKEN'] + "\n" \
+                                                                          "-- * Auth Token : " + app.AUTH_TOKEN + "\n" \
                                   "----------------------------------------------\n" \
                                   "----------------------------------------------\n" \
                                   "---------------INITIALIZATION END-------------\n" \

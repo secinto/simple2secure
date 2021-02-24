@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Generic} from './generic';
+import { Generic } from './generic';
 
 export class Base extends Generic {
 	name: string;

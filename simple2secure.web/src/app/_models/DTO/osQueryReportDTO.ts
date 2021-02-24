@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {OsQueryReport} from '../osQueryReport';
+import { OsQueryReport } from '../osQueryReport';
 
 export class OsQueryReportDTO {
 	public report: OsQueryReport[];

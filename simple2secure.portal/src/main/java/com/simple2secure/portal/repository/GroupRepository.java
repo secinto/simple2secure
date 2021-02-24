@@ -23,17 +23,19 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class GroupRepository extends MongoRepository<CompanyGroup> {
-	public abstract List<CompanyGroup> findByParentId(String parentId);
+	public abstract List<CompanyGroup> findByParentId(ObjectId parentId);
 
-	public abstract List<CompanyGroup> findByContextId(String contextId);
+	public abstract List<CompanyGroup> findByContextId(ObjectId contextId);
 
-	public abstract List<CompanyGroup> findRootGroupsByContextId(String contextId);
+	public abstract List<CompanyGroup> findRootGroupsByContextId(ObjectId contextId);
 
-	public abstract void deleteByContextId(String contextId);
+	public abstract void deleteByContextId(ObjectId contextId);
 
-	public abstract CompanyGroup findStandardGroupByContextId(String contextId);
+	public abstract CompanyGroup findStandardGroupByContextId(ObjectId contextId);
 }

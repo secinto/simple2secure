@@ -25,14 +25,16 @@ package com.simple2secure.portal.repository;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestRunRepository extends MongoRepository<TestRun> {
+	
+    public abstract List<TestRun> getPlannedTests(ObjectId deviceId);
 
-	public abstract List<TestRun> getPlannedTests(String deviceId);
+	public abstract List<TestRun> getByContextId(ObjectId contextId);
 
-	public abstract List<TestRun> getByContextId(String contextId);
-
-	public abstract Map<String, Object> getByContextIdForPagination(String contextId, int page, int size);
+	public abstract Map<String, Object> getByContextIdForPagination(ObjectId contextId, int page, int size, String filter); 
 }

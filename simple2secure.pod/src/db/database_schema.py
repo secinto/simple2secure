@@ -1,40 +1,55 @@
-from flask_marshmallow import Marshmallow
-from src.db.database import TestResult, Test, PodInfo, TestSequence, TestSequenceResult, DeviceInfo
+from marshmallow import Schema, fields
 
-ma = Marshmallow()
+from src.db.database import PodInfo
 
 
-class CompanyLicensePublicSchema(ma.ModelSchema):
+class CompanyLicensePublicSchema(Schema):
+    id = fields.Str()
+    groupId = fields.Str()
+    licenseId = fields.Str()
+    expirationDate = fields.Str()
+    deviceId = fields.Str()
+    accessToken = fields.Str()
+    refreshToken = fields.Str()
+    deviceIsPod = fields.Boolean()
+
+
+class TestResultSchema(Schema):
     class Meta:
-        fields = ("groupId", "licenseId", "expirationDate", "deviceId", "accessToken", "deviceIsPod")
+        fields = ("result", "hostname", "name", "testName", "testRunId", "deviceId", "timestamp", "isSent")
 
 
-class TestResultSchema(ma.ModelSchema):
-    class Meta:
-        fields = ("result", "hostname", "name", "testRunId", "timestamp")
-
-
-class PodInfoSchema(ma.ModelSchema):
+class PodInfoSchema(Schema):
     class Meta:
         model = PodInfo
 
 
-class TestSchema(ma.ModelSchema):
+class TestSchema(Schema):
+    id = fields.Str()
+    podId = fields.Str()
+    name = fields.Str()
+    testContent = fields.Str()
+    lastChangedTimestamp = fields.Str()
+
+
+class TestSequenceSchema(Schema):
+    id = fields.Str()
+    podId = fields.Str()
+    name = fields.Str()
+    testSequenceContent = fields.Str()
+    lastChangedTimeStamp = fields.Float()
+
+
+class TestSequenceResultSchema(Schema):
     class Meta:
-        model = Test
+        fields = ("id", "sequenceRunId", "sequenceId", "podId", "sequenceName", "sequenceResult", "timestamp")
 
 
-class TestSequenceSchema(ma.ModelSchema):
+class DeviceInfoSchema(Schema):
     class Meta:
-        fields = ("id", "podId", "name", "sequenceContent", "sequenceHash", "lastChangedTimeStamp")
-        #model = TestSequence
+        fields = ["id", "name", "ipAddress", "netMask", "deviceStatus", "lastOnlineTimestamp", "type", "publiclyAvailable"]
 
 
-class TestSequenceResultSchema(ma.ModelSchema):
+class TestSequenceStepResultSchema(Schema):
     class Meta:
-        model = TestSequenceResult
-
-
-class DeviceInfoSchema(ma.ModelSchema):
-    class Meta:
-        fields = ["deviceId", "name", "ipAddress", "netMask", "deviceStatus", "lastOnlineTimestamp", "type"]
+        fields = ("id", "sequenceRunId", "testId", "podId", "testResult", "timestamp")

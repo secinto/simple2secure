@@ -20,12 +20,14 @@
  *********************************************************************
  */
 
-import {Base} from './base';
+import { Base } from './base';
+import { TestSUTDataInput } from './DTO/testSUTDataInput';
+import { TestWebDTO } from './DTO/TestWebDTO';
 
 export class TestSequence extends Base {
 	podId = '';
 	name = '';
-	sequenceContent: string[];
-	hash_value = '';
+	tests: TestSUTDataInput[] = [];
+	testsToShow: TestWebDTO[] = [];
 	lastChangedTimestamp = '';
 }

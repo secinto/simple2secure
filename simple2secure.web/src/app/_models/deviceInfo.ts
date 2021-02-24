@@ -20,15 +20,16 @@
  *********************************************************************
  */
 
-import {DeviceType} from './deviceType';
-import {DeviceStatus} from './deviceStatus'
+import { DeviceType } from './deviceType';
+import { DeviceStatus } from './deviceStatus';
 
 export class DeviceInfo {
 	name: string;
-	deviceId: string;
+	id: string;
 	ipAddress: string;
 	netMask: string;
 	type: DeviceType;
 	deviceStatus: DeviceStatus;
 	lastOnlineTimestamp: number;
+	publiclyAvailable: boolean;
 }

@@ -23,17 +23,23 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.UserInvitation;
+import com.simple2secure.api.model.UserInvitationStatus;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class UserInvitationRepository extends MongoRepository<UserInvitation> {
-	public abstract UserInvitation getByInvitationToken(String invitationToken);
 
-	public abstract List<UserInvitation> getByContextId(String contextId);
+	public abstract List<UserInvitation> getByContextId(ObjectId contextId);
 
-	public abstract List<UserInvitation> getByUserId(String userId);
+	public abstract List<UserInvitation> getByUserIdAndStatus(String userId, UserInvitationStatus status);
 
-	public abstract void deleteByContexId(String contextId);
+	public abstract List<UserInvitation> getByUserId(ObjectId userId);
 
-	public abstract void deleteByUserId(String userId);
+	public abstract UserInvitation getByContextIdAndUserId(ObjectId contextId, String userId);
+
+	public abstract void deleteByContexId(ObjectId contextId);
+
+	public abstract void deleteByUserId(ObjectId userId);
 }

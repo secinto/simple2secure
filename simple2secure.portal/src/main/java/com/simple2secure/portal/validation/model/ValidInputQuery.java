@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputQuery extends ValidatedInput<String> {
 
-	private String queryId;
+	private ObjectId queryId;
 	private String tag = "/{queryId}";
 
 	public ValidInputQuery() {
 	}
 
 	public ValidInputQuery(String queryId) {
-		this.queryId = queryId;
+		this.queryId = new ObjectId(queryId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return queryId;
 	}
 

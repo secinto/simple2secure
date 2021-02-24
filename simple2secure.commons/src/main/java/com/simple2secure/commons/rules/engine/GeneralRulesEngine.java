@@ -22,13 +22,21 @@
 
 package com.simple2secure.commons.rules.engine;
 
+import java.util.Set;
+
+import org.jeasy.rules.api.Rule;
+
 /**
- * @author Richard Heinz
+ * 
+ * Interface for a general rule engine which uses the library
+ * easy-rules (https://github.com/j-easy/easy-rules) Version 3.3.0.
  *
  */
-
-public interface GeneralRulesEngine {
-	public void addRule(Object rule);
+public interface GeneralRulesEngine
+{
+	public void addRule(Rule rule);
+	
+	public void addRules(Set<Rule> rules);
 
 	public void removeRule(String ruleName);
 	
@@ -36,7 +44,7 @@ public interface GeneralRulesEngine {
 
 	public void addFact(Object fact);
 
-	public void removeFact(String classname);
-
+	public void removeFact(String className);
+	
 	public void checkFacts();
 }

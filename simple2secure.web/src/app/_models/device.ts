@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {CompanyGroup} from './companygroup';
-import {DeviceInfo} from './deviceInfo';
+import { CompanyGroup } from './companygroup';
+import { DeviceInfo } from './deviceInfo';
 
 export class Device {
 	group: CompanyGroup;

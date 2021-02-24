@@ -24,8 +24,21 @@ package com.simple2secure.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyGroup extends GenericDBObject {
 
 	/**
@@ -33,11 +46,17 @@ public class CompanyGroup extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = 8637103644388176110L;
 
-	private String parentId;
-	private String name;
-	private String contextId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId parentId;
 
-	List<String> childrenIds = new ArrayList<>();
+	private String name;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId contextId;
+
+	List<ObjectId> childrenIds = new ArrayList<>();
 
 	List<CompanyGroup> children = new ArrayList<>();
 
@@ -45,83 +64,23 @@ public class CompanyGroup extends GenericDBObject {
 
 	private boolean standardGroup = false;
 
-	public CompanyGroup() {
-	}
-
-	public CompanyGroup(String name, List<String> childrenIds) {
+	public CompanyGroup(String name, List<ObjectId> childrenIds) {
 		this.name = name;
 		this.childrenIds = childrenIds;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
+	public CompanyGroup(String name, ObjectId contextId, boolean rootGroup, boolean standardGroup) {
 		this.name = name;
+		this.contextId = contextId;
+		this.rootGroup = rootGroup;
+		this.standardGroup = standardGroup;
 	}
 
-	public List<String> getChildrenIds() {
-		return childrenIds;
-	}
-
-	public void addChildrenId(String companyGroupId) {
+	public void addChildrenId(ObjectId companyGroupId) {
 		childrenIds.add(companyGroupId);
 	}
 
-	public void addChildren(CompanyGroup child) {
-		children.add(child);
-	}
-
-	public void removeChildrenId(String companyGroupId) {
+	public void removeChildrenId(ObjectId companyGroupId) {
 		childrenIds.remove(companyGroupId);
-	}
-
-	public void removeChild(CompanyGroup child) {
-		children.remove(child);
-	}
-
-	public String getContextId() {
-		return contextId;
-	}
-
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
-	}
-
-	public boolean isRootGroup() {
-		return rootGroup;
-	}
-
-	public void setRootGroup(boolean rootGroup) {
-		this.rootGroup = rootGroup;
-	}
-
-	public void setChildrenIds(List<String> children) {
-		childrenIds = children;
-	}
-
-	public String getParentId() {
-		return parentId;
-	}
-
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-
-	public List<CompanyGroup> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<CompanyGroup> children) {
-		this.children = children;
-	}
-
-	public boolean isStandardGroup() {
-		return standardGroup;
-	}
-
-	public void setStandardGroup(boolean standardGroup) {
-		this.standardGroup = standardGroup;
 	}
 }

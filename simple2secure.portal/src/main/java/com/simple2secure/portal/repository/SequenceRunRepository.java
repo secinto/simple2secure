@@ -23,17 +23,17 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
+
+import org.bson.types.ObjectId;
 
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class SequenceRunRepository extends MongoRepository<SequenceRun> {
 
-	public abstract List<SequenceRun> getByContextId(String contextId);
+	public abstract List<SequenceRun> getSequenceRunByDeviceId(ObjectId deviceId);
 
-	public abstract List<SequenceRun> getSequenceRunByDeviceId(String deviceId);
+	public abstract Map<String, Object> getByContextIdWithPagination(ObjectId contextId, int page, int size, String filter);
 
-	public abstract List<SequenceRun> getByContextIdWithPagination(String contextId, int page, int size);
-
-	public abstract long countByContextId(String contextId);
 }

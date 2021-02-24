@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.pcap4j.packet.ArpPacket.ArpHeader;
 import org.pcap4j.packet.BsdLoopbackPacket.BsdLoopbackHeader;
 import org.pcap4j.packet.EthernetPacket.EthernetHeader;
@@ -95,9 +96,9 @@ public class CommonStatisticProcessor extends PacketProcessor {
 		super(name, options);
 		analysisStartTime = new Date();
 		report = new NetworkReport();
-
+		report.setId(new ObjectId());
 		report.setDeviceId(ProbeConfiguration.probeId);
-		report.setGroupId(ProbeConfiguration.groupId);
+		report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 		report.setStartTime(analysisStartTime);
 		report.setHostname(ProbeConfiguration.hostname);
 
@@ -203,8 +204,11 @@ public class CommonStatisticProcessor extends PacketProcessor {
 				// set new start time
 				// set reportContent stringBuilder
 				// initialize new report
-				if (!Strings.isNullOrEmpty(report.getDeviceId()) && report.getStartTime() != null) {
+				if (report.getDeviceId() != null && report.getStartTime() != null) {
 					writeNetworkTrafficResults();
+					if(report.getId() == null) {
+						report.setId(new ObjectId());
+					}
 					report.setProcessorName(packet.getProcessor().getName());
 					report.setStringContent(content);
 					report.setSent(false);
@@ -214,7 +218,7 @@ public class CommonStatisticProcessor extends PacketProcessor {
 
 				report = new NetworkReport();
 				report.setDeviceId(ProbeConfiguration.probeId);
-				report.setGroupId(ProbeConfiguration.groupId);
+				report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 				report.setStartTime(analysisStartTime);
 				report.setProcessorName(packet.getProcessor().getName());
 				report.setHostname(ProbeConfiguration.hostname);

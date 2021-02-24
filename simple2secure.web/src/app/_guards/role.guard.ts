@@ -20,28 +20,29 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router} from '@angular/router';
-import {DataService} from "../_services";
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { DataService } from '../_services/data.service';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-	userRole: string;
+    userRole: string;
 
-	constructor(public router: Router,
-				public dataService: DataService) {}
+    constructor(public router: Router,
+        public dataService: DataService) {
+    }
 
-	canActivate(route: ActivatedRouteSnapshot): boolean {
-		const expectedRole = route.data.expectedRole;
+    canActivate(route: ActivatedRouteSnapshot): boolean {
+        const expectedRole = route.data.expectedRole;
 
-		this.userRole = this.dataService.getRole();
+        this.userRole = this.dataService.getRole();
 
-		if (this.userRole !== expectedRole) {
-			this.router.navigate(['']);
-			return false;
-		}
+        if (this.userRole !== expectedRole) {
+            this.router.navigate(['']);
+            return false;
+        }
 
 
-		return true;
-	}
+        return true;
+    }
 }

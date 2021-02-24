@@ -20,11 +20,12 @@
  *********************************************************************
  */
 
-import {EmailConfiguration} from '../emailconfig';
+import { RuleFactType } from '../ruleFactType';
 
 export class RuleMappingDTO {
 
-    public emailConfigurationsIds: string[];
     public ruleId: string;
     public contextId: string;
+    public mappedObjectIds: string[];
+    public ruleFactType: RuleFactType;
 }

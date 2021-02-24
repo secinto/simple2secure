@@ -31,6 +31,15 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(
 		name = "Processor")
@@ -54,65 +63,11 @@ public class Processor extends GenericDBObject {
 	private long analysisInterval;
 	private TimeUnit analysisIntervalUnit;
 
-	/**
-	 * Default Constructor
-	 */
-	public Processor() {
-	}
-
 	public Processor(String name, String processor_class, String groovyProcessor) {
 		super();
 		groovy = true;
 		this.name = name;
 		this.processor_class = processor_class;
 		this.groovyProcessor = groovyProcessor;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getProcessor_class() {
-		return processor_class;
-	}
-
-	public void setProcessor_class(String processor_class) {
-		this.processor_class = processor_class;
-	}
-
-	public boolean isGroovy() {
-		return groovy;
-	}
-
-	public void setGroovy(boolean groovy) {
-		this.groovy = groovy;
-	}
-
-	public String getGroovyProcessor() {
-		return groovyProcessor;
-	}
-
-	public void setGroovyProcessor(String groovyProcessor) {
-		this.groovyProcessor = groovyProcessor;
-	}
-
-	public long getAnalysisInterval() {
-		return analysisInterval;
-	}
-
-	public void setAnalysisInterval(long analysisInterval) {
-		this.analysisInterval = analysisInterval;
-	}
-
-	public TimeUnit getAnalysisIntervalUnit() {
-		return analysisIntervalUnit;
-	}
-
-	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
-		this.analysisIntervalUnit = analysisIntervalUnit;
 	}
 }

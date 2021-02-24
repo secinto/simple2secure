@@ -21,8 +21,21 @@
  */
 package com.simple2secure.api.model;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CurrentContext extends GenericDBObject {
 
 	/**
@@ -32,30 +45,8 @@ public class CurrentContext extends GenericDBObject {
 
 	private String userId;
 
-	private String contextUserAuthenticationId;
-
-	public CurrentContext() {
-	}
-
-	public CurrentContext(String userId, String contextUserAuthenticationId) {
-		this.userId = userId;
-		this.contextUserAuthenticationId = contextUserAuthenticationId;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getContextUserAuthenticationId() {
-		return contextUserAuthenticationId;
-	}
-
-	public void setContextUserAuthenticationId(String contextUserAuthenticationId) {
-		this.contextUserAuthenticationId = contextUserAuthenticationId;
-	}
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId contextUserAuthenticationId;
 
 }

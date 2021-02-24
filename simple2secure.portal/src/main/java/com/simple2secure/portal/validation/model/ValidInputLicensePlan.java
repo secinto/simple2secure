@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputLicensePlan extends ValidatedInput<String> {
 
-	private String licensePlanId;
+	private ObjectId licensePlanId;
 	private String tag = "/{licensePlanId}";
 
 	public ValidInputLicensePlan() {
 	}
 
 	public ValidInputLicensePlan(String licensePlanId) {
-		this.licensePlanId = licensePlanId;
+		this.licensePlanId = new ObjectId(licensePlanId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return licensePlanId;
 	}
 

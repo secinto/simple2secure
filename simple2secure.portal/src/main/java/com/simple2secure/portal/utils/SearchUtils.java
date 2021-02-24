@@ -25,6 +25,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +59,7 @@ public class SearchUtils extends BaseServiceProvider {
 	 * @param searchQuery
 	 * @param contextId
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
+	 * @throws ItemNotFoundRepositoryException
 	 */
 	public List<SearchResult> getAllSearchResults(String searchQuery, Context context) throws ItemNotFoundRepositoryException {
 
@@ -67,7 +68,7 @@ public class SearchUtils extends BaseServiceProvider {
 
 		List<Device> devices = deviceUtils.getAllDevicesFromCurrentContext(context, false);
 
-		List<String> deviceIds = portalUtils.extractIdsFromObjects(devices);
+		List<ObjectId> deviceIds = portalUtils.extractIdsFromObjects(devices);
 
 		List<Notification> notifications = notificationRepository.getBySearchQuery(searchQuery, context.getId(), false);
 

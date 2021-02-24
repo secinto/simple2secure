@@ -1,14 +1,16 @@
-from datetime import datetime
+import json
 import logging
-
-import requests
 import os
 import socket
-from flask import json
+from datetime import datetime
 
-from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType
-from src.db.database_schema import CompanyLicensePublicSchema, TestSchema, DeviceInfoSchema
-from src.util.db_utils import update, update_pod_status_connection, update_pod_status_auth, get_pod, get_license, \
+import requests
+
+from src.db.database import Notification, TestStatusDTO, DeviceInfo, DeviceStatus, DeviceType, Test
+from src.db.database_schema import CompanyLicensePublicSchema, DeviceInfoSchema
+from src.db.session_manager import SessionManager
+from src.util.db_utils import update, update_test, update_pod_status_connection, update_pod_status_auth, get_pod, \
+    get_license, \
     clear_pod_status_auth
 
 log = logging.getLogger('pod.util.rest_utils')
@@ -18,7 +20,7 @@ log = logging.getLogger('pod.util.rest_utils')
 # -------------------------------------------
 
 
-def portal_get(app, url, useWithoutAuthentication=False):
+def portal_get(app, url, use_without_authentication=False):
     """
     Utility function for getting data from the PORTAL. Required are the application context, the URL from which a GET
     should be performed and a boolean indicating if authentication should be sent or not. If no authentication is sent
@@ -27,24 +29,29 @@ def portal_get(app, url, useWithoutAuthentication=False):
 
     :param app:  The application context
     :param url: The URL from which a get should be performed
-    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :param use_without_authentication: True if the authentication token should be provided in the request
     :return: The response data as obtained from the call
     """
-    headers = create_headers(app, useWithoutAuthentication)
+    headers = create_headers(app, use_without_authentication)
 
     if not headers:
         return None
 
     log.info('Sending request to portal using (portal_get)')
     try:
-        return requests.get(url, verify=False, headers=headers)
+        r = requests.get(url, verify=False, headers=headers)
+        if r.status_code == 401:
+            renew_token(app)
+            #portal_get(app, url, False)
+        else:
+            return r
     except requests.exceptions.ConnectionError as ce:
         log.error('Sending request (portal_get) to portal failed. Reason {}'.format(ce.strerror))
-        update_pod_status_connection(app, False)
+        update_pod_status_connection(False)
         return None
 
 
-def portal_post(app, url, data, useWithoutAuthentication=False):
+def portal_post(app, url, data, use_without_authentication=False):
     """
     Utility function for posting data to the PORTAL. Required are the application context, the URL from which a GET
     should be performed, the data which should be transmitted to the PORTAL and a boolean indicating if authentication
@@ -54,20 +61,25 @@ def portal_post(app, url, data, useWithoutAuthentication=False):
     :param app:  The application context
     :param url: The URL from which a get should be performed
     :param data: The data which should be sent in to PORTAL
-    :param useWithoutAuthentication: True if the authentication token should be provided in the request
+    :param use_without_authentication: True if the authentication token should be provided in the request
     :return: The response data as obtained from the call
     """
-    headers = create_headers(app, useWithoutAuthentication)
+    headers = create_headers(app, use_without_authentication)
 
     if not headers:
         return None
 
     log.info('Sending request to portal using (portal_post)')
     try:
-        return requests.post(url, data=data, verify=False, headers=headers)
+        r = requests.post(url, data=data, verify=False, headers=headers)
+        if r.status_code == 401:
+            renew_token(app)
+            #portal_post(app, url, data, False)
+        else:
+            return r
     except requests.exceptions.ConnectionError as ce:
         log.error('Sending request (portal_post) to portal failed. Reason {}'.format(ce.strerror))
-        update_pod_status_connection(app, False)
+        update_pod_status_connection(False)
         return None
 
 
@@ -86,91 +98,138 @@ def get_auth_token(app):
     Returns:
        authToken: Returns the current authToken to use for authentication
     """
-    podInfo = get_pod(app)
-    if not podInfo.authToken:
+    pod_info = get_pod()
+    if not pod_info.authToken:
         send_license(app, None)
-        podInfo = get_pod(app)
+        pod_info = get_pod()
 
-    return podInfo.authToken
+    return pod_info.authToken
 
 
-def send_license(app, licensePublic=None):
+def renew_token(app, license_public=None):
+
+    """
+    Retrieved new auth Token from the current refresh token. After retrieving the new token, device status is also updated
+    Args:
+        app:
+        license_public:
+
+    Returns:
+
+    """
+    if license_public is None:
+        license_public = get_license(app)
+
+    license_schema = CompanyLicensePublicSchema()
+
+    license_json = json.dumps(license_schema.dump(license_public))
+
+    resp_data = portal_post(app, app.API_LICENSE_RENEW_TOKEN, license_json, True)
+
+    if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
+        access_token = json.loads(resp_data.text)['accessToken']
+        refresh_token = json.loads(resp_data.text)['refreshToken']
+
+        if access_token and refresh_token:
+            update_license_dev_info(app, license_public, access_token, refresh_token, license_json)
+        else:
+            log.error('No access token was provided as response to the authentication')
+
+    elif resp_data is not None:
+        message = json.loads(resp_data.text)['errorMessage']
+        log.error('Error occurred while activating the pod: %s', message)
+        clear_pod_status_auth()
+    else:
+        log.error('No connection to PORTAL, thus not sending the license')
+        clear_pod_status_auth()
+
+
+# noinspection PyBroadException
+def update_license_dev_info(app, license_public, access_token, refresh_token, license_json):
+    """
+    This function updates the license locally and device info after retrieving the first token or renewing the tokens
+    Args:
+        app:
+        license_public:
+        access_token:
+        refresh_token:
+        license_json:
+
+    Returns:
+
+    """
+    with SessionManager() as session:
+        license_public.accessToken = access_token
+        license_public.refreshToken = refresh_token
+        license_public.activated = True
+        update(license_public)
+        update_pod_status_auth(access_token)
+        send_device_info(app, license_json)
+        log.info('Obtained new access token from portal using refresh token')
+
+
+def send_license(app, license_public=None):
     """
     Sends the license to the PORTAL for obtaining the current authentication token.
     If the license is provided it is used otherwise the currently stored license is obtained from the
     database and used.
 
     :param app: The application context object
-    :param licensePublic: A license if available.
-    :param perform_check: Specifies if the connection check should be performed
+    :param license_public: A license if available.
     """
-    url = app.config['PORTAL_URL'] + "license/authenticate"
-
-    if licensePublic is None:
-        licensePublic = get_license(app)
+    if license_public is None:
+        license_public = get_license(app)
 
     license_schema = CompanyLicensePublicSchema()
 
-    license_json = json.dumps(license_schema.dump(licensePublic))
+    license_json = json.dumps(license_schema.dump(license_public))
 
-    resp_data = portal_post(app, url, license_json, True)
+    resp_data = portal_post(app, app.API_LICENSE_ACTIVATE, license_json, True)
 
     if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
-        accessToken = json.loads(resp_data.text)['accessToken']
-        if accessToken:
-            licensePublic.accessToken = accessToken
-            licensePublic.activated = True
-            update(licensePublic)
-            update_pod_status_auth(app, accessToken)
-            devInfo = ""
-            try:
-                devInfo = DeviceInfo.query.one()
-            except:
-                log.error("Could not retreive DeviceInfo from DB!")
-            if not devInfo:
-                send_device_info(app, license_json)
-            log.info('Obtained new access token from portal')
+
+        access_token = json.loads(resp_data.text)['accessToken']
+        refresh_token = json.loads(resp_data.text)['refreshToken']
+
+        if access_token and refresh_token:
+            update_license_dev_info(app, license_public, access_token, refresh_token, license_json)
         else:
             log.error('No access token was provided as response to the authentication')
-
-
-
-
 
     elif resp_data is not None:
         message = json.loads(resp_data.text)['errorMessage']
         log.error('Error occurred while activating the pod: %s', message)
-        clear_pod_status_auth(app)
+        clear_pod_status_auth()
     else:
         log.error('No connection to PORTAL, thus not sending the license')
-        clear_pod_status_auth(app)
+        clear_pod_status_auth()
 
 
-def send_device_info(app, license):
-    url = app.config['PORTAL_URL'] + "devices/update"
-    lastOnlineTimestamp = datetime.now().timestamp() * 1000
-    license_obj = json.loads(license)
-    deviceId = license_obj['deviceId']
-    #pod_name = os.environ['COMPUTERNAME']
-    try:
-        pod_name = os.environ['COMPUTERNAME']
-    except:
-        pod_name = socket.gethostname()
-    deviceInfo = DeviceInfo(deviceId, pod_name, None, None, lastOnlineTimestamp, DeviceStatus.ONLINE, DeviceType.POD)
+# noinspection PyBroadException
+def send_device_info(app, license_obj):
+    with SessionManager() as session:
+        last_online_timestamp = datetime.now().timestamp() * 1000
+        license_obj = json.loads(license_obj)
 
-    device_info_schema = DeviceInfoSchema()
-    device_info_json = json.dumps(device_info_schema.dump(deviceInfo))
-    resp_data = portal_post(app, url, device_info_json, False)
-    if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
-        device_info_response = json.loads(resp_data.content)
-        device_info_from_db = DeviceInfo.query.filter_by(deviceId=device_info_response['deviceId']).first()
-        if device_info_from_db:
-            device_info_from_db.deviceStatus = device_info_response['deviceStatus']
-            device_info_from_db.lastOnlineTimestamp = device_info_response['lastOnlineTimestamp']
-            update(device_info_from_db)
-        else:
-            device_info_for_db = DeviceInfo(device_info_response['deviceId'], device_info_response['name'], None, None, device_info_response['lastOnlineTimestamp'], device_info_response['deviceStatus'])
-            update(device_info_for_db)
+        try:
+            pod_name = os.environ['COMPUTERNAME']
+        except:
+            pod_name = socket.gethostname()
+        device_info = DeviceInfo(license_obj['deviceId'], pod_name, None, None, last_online_timestamp, None, DeviceStatus.ONLINE, DeviceType.POD)
+
+        device_info_schema = DeviceInfoSchema()
+        device_info_json = json.dumps(device_info_schema.dump(device_info))
+        resp_data = portal_post(app, app.API_DEVICE_UPDATE_INFO, device_info_json, False)
+        if resp_data is not None and resp_data.status_code == 200 and resp_data.text:
+            device_info_response = json.loads(resp_data.content)
+            device_info_from_db = session.query(DeviceInfo).filter_by(id=device_info_response['id']).first()
+            if device_info_from_db:
+                device_info_from_db.deviceStatus = device_info_response['deviceStatus']
+                device_info_from_db.lastOnlineTimestamp = device_info_response['lastOnlineTimestamp']
+                update(device_info_from_db)
+            else:
+                device_info_for_db = DeviceInfo(device_info_response['id'], device_info_response['name'], None, None, device_info_response['lastOnlineTimestamp'], device_info_response['publiclyAvailable'], device_info_response['deviceStatus'])
+                update(device_info_for_db)
 
 
 def send_notification(content, app):
@@ -181,10 +240,10 @@ def send_notification(content, app):
     :param app: The application context
     :return:
     """
-    url = app.config['PORTAL_URL'] + "notification/" + app.config['POD_ID']
+    api_url = app.API_NOTIFICATION_SAVE.replace("{deviceId}", app.POD_ID)
 
     notification = Notification(content)
-    return portal_post(app, url, json.dumps(notification.__dict__))
+    return portal_post(app, api_url, json.dumps(notification.__dict__))
 
 
 def update_test_status(app, test_run_id, test_id, test_status):
@@ -197,9 +256,23 @@ def update_test_status(app, test_run_id, test_id, test_status):
     :param test_status: The current status of the test run
     :return:
     """
-    url = app.config['PORTAL_URL'] + "test/updateTestStatus"
     test_run_dto = TestStatusDTO(test_run_id, test_id, test_status)
-    return portal_post(app, url, json.dumps(test_run_dto.__dict__))
+    return portal_post(app, app.API_TEST_UPDATE_STATUS, json.dumps(test_run_dto.__dict__))
+
+
+def update_test_by_id(app, test_id):
+    """
+    This function updates the test in the local database after the execution
+    :param app: The application context
+    :param test_id: id of the test
+    :return:
+    """
+    api_url = app.API_TEST_BY_ID.replace("{testId}", test_id)
+    test_response = portal_get(app, api_url, True)
+    if test_response is not None and test_response.status_code == 200:
+        test_obj = Test(test_response["id"], test_response["name"], test_response["testContent"],
+                    test_response["lastChangedTimestamp"], test_response["podId"])
+        update_test(test_obj)
 
 
 def update_sequence_status(app, sequence_run_id, sequence_id, status):
@@ -212,57 +285,32 @@ def update_sequence_status(app, sequence_run_id, sequence_id, status):
     :param status: The current status of the sequence test run
     :return:
     """
-    url = app.config['PORTAL_URL'] + "sequence/update/status/" + sequence_run_id
+    api_url = app.API_SEQUENCE_UPDATE_STATUS.replace("{sequenceId}", sequence_run_id)
     info = {'sequence_run_id': sequence_run_id, 'sequence_id': sequence_id, 'status': status}
     dumped_info = json.dumps(info)
 
-    with app.app_context():
-        return portal_post(app, url, dumped_info)
-
-
-def schedule_test_on_the_portal(test, app):
-    """
-    Schedules the test on the PORTAL, actually just updating the status on the PORTAL for this test to be shown in
-    the scheduled tests view
-
-    :param test:
-    :param app:
-    :return:
-    """
-    url = app.config['PORTAL_URL'] + "test/scheduleTestPod/" + app.config['POD_ID']
-    return portal_post(app, url, test)
-
-
-def sync_test_with_portal(test, app):
-    """
-    Synchronizes the provided test with the PORTAL.
-
-    :param test: The test to be synchronized
-    :param app: The application context
-    :return:
-    """
-    test_schema = TestSchema()
-    test_json = test_schema.dump(test)
-    return portal_post(app, app.config['PORTAL_URL'] + "test/syncTest", json.dumps(test_json))
+    return portal_post(app, api_url, dumped_info)
 
 
 def sync_tests_with_portal(tests, app):
     """
-    Synchronizes the list of all tests with the PORTAL.
+    Synchronizes the list of all tests with the PORTAL after the authentication.
 
-    :param test: The test to be synchronized
+    :param tests: The test to be synchronized
     :param app: The application context
     :return:
     """
-    tests_array = []
 
-    if tests is not None:
-        for test in tests:
-            test_schema = TestSchema()
-            test_json = test_schema.dump(test)
-            tests_array.append(test_json)
+    api_url = app.API_TEST_SYNC.replace("{deviceId}", app.POD_ID)
 
-    return portal_post(app, app.config['PORTAL_URL'] + "test/syncTests/" + app.config['POD_ID'], json.dumps(tests_array))
+    tests_array = json.loads(tests)
+
+    test_list = []
+    for test in tests_array:
+        test_obj = Test(None, test["name"], json.dumps(test), None, None)
+        test_list.append(test_obj.to_json())
+
+    return portal_post(app, api_url, json.dumps(test_list))
 
 
 # ----------------------------------------
@@ -270,34 +318,34 @@ def sync_tests_with_portal(tests, app):
 # ----------------------------------------
 
 
-def create_headers(app, useWithoutAuthentication=False):
+def create_headers(app, use_without_authentication=False):
     """"
     Creates the required header information for communicating with the PORTAL. Especially the  authentication token
     is obtained and added to the header parameters.
 
     Parameters:
         app: The application context for access of the configuration
-        useWithoutAuthentication: Specifies if an auth token must not be present in the headers
+        use_without_authentication: Specifies if an auth token must not be present in the headers
     Returns:
        authToken: Returns the current authToken to use for authentication
      """
-    podInfo = get_pod(app)
+    pod_info = get_pod()
 
     headers = None
 
-    if useWithoutAuthentication:
+    if use_without_authentication:
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN'}
         log.debug('Created headers without auth token {}'.format(headers))
         return headers
 
-    if podInfo.connected:
-        if not podInfo.authToken:
-            authToken = get_auth_token(app)
+    if pod_info.connected:
+        if not pod_info.authToken:
+            auth_token = get_auth_token(app)
         else:
-            authToken = podInfo.authToken
+            auth_token = pod_info.authToken
 
         headers = {'Content-Type': 'application/json', 'Accept-Language': 'en-EN',
-                   'Authorization': "Bearer " + authToken}
+                   'Authorization': "Bearer " + auth_token}
         log.debug('Created headers {}'.format(headers))
     else:
         log.info('Not connected to PORTAL, not creating headers')
@@ -314,11 +362,11 @@ def check_portal_alive(app):
     Returns:
        authToken: Returns the current authToken to use for authentication
     """
-    response = portal_get(app, app.config['PORTAL_URL'] + "service", True)
+    response = portal_get(app, app.API_SERVICE, True)
 
     if response is not None and response.status_code == 200:
-        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is alive')
-        update_pod_status_connection(app, True)
+        log.info('PORTAL ' + app.API_SERVICE + ' is alive')
+        update_pod_status_connection(True)
     else:
-        log.info('PORTAL ' + app.config['PORTAL_URL'] + ' is dead')
-        update_pod_status_connection(app, False)
+        log.info('PORTAL ' + app.API_SERVICE + ' is dead')
+        update_pod_status_connection(False)

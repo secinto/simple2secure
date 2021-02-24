@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,23 +38,31 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.simple2secure.api.dto.TestRunDTO;
+import com.simple2secure.api.dto.TestSUTDataInput;
 import com.simple2secure.api.dto.TestSequenceRunDTO;
+import com.simple2secure.api.dto.TestWebDTO;
 import com.simple2secure.api.model.Command;
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePublic;
+import com.simple2secure.api.model.ContextUserAuthentication;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.Parameter;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.api.model.Test;
 import com.simple2secure.api.model.TestContent;
 import com.simple2secure.api.model.TestDefinition;
+import com.simple2secure.api.model.TestInputData;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestResult;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.api.model.TestSequenceResult;
+import com.simple2secure.api.model.TestStatus;
 import com.simple2secure.api.model.TestStep;
-import com.simple2secure.commons.crypto.CryptoUtils;
+import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
@@ -67,136 +76,70 @@ public class TestUtils extends BaseServiceProvider {
 	@Autowired
 	PortalUtils portalUtils;
 
+	@Autowired
+	SUTUtils sutUtils;
+
+	@Autowired
+	InputDataUtils inputDataUtils;
+
+	@Autowired
+	NotificationUtils notificationUtils;
+
 	/**
 	 * This function saves the Test Result which has been executed by the pod. Each test result has own groupId according to the group from
-	 * the license which has been used for the activation.
+	 * the license which has been used for the activation. 
 	 */
 	public TestResult saveTestResult(TestResult testResult, String locale) {
-		if (testResult != null && !Strings.isNullOrEmpty(locale)) {
-			if (!Strings.isNullOrEmpty(testResult.getTestRunId())) {
+		if (testResult != null) {
+			if (testResult.getTestRunId() != null) {
 				testResult.setId(null);
-				testResultRepository.save(testResult);
+
+				DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(testResult.getDeviceId());
+
+				if (deviceInfo != null) {
+					testResult.setHostname(deviceInfo.getName());
+				}
+				TestRun testRun = testRunRepository.find(testResult.getTestRunId());
+				testRun.setTestStatus(TestStatus.EXECUTED);
+				try {
+					testRunRepository.update(testRun);
+				} catch (ItemNotFoundRepositoryException e) {
+					log.error("A problem occured while updating the status of the test run: ", testRun.getId());
+				}
+				
+				notificationUtils.addNewNotification(
+						testRun.getTestName() + " has been executed by the pod " + testResult.getHostname(), testRun.getContextId(),
+						null, false);
+				
+				ObjectId testResultId = testResultRepository.saveAndReturnId(testResult);
+				testResult.setId(testResultId);
 			}
 		}
 		return testResult;
 	}
 
 	/**
-	 * This function returns the test results by context id. It collects all groups from the provided context and then iterates over each
-	 * group and collects test results from those groups.
-	 *
-	 * @param contextId
-	 * @param locale
-	 * @return
-	 */
-	public Map<String, Object> getTestResultByContextId(String contextId, String locale, int page, int size) {
-		Map<String, Object> testResultsMap = new HashMap<>();
-
-		testResultsMap.put("tests", new ArrayList<TestRunDTO>());
-		testResultsMap.put("totalSize", 0);
-
-		if (!Strings.isNullOrEmpty(contextId) && !Strings.isNullOrEmpty(locale)) {
-
-			List<TestRun> testRunList = testRunRepository.getByContextId(contextId);
-			if (testRunList != null) {
-				List<String> testRunIds = portalUtils.extractIdsFromObjects(testRunList);
-				if (testRunIds != null && testRunIds.size() > 0) {
-					List<TestResult> testResults = testResultRepository.getByTestRunIdWithPagination(testRunIds, page, size);
-
-					if (testResults != null && testResults.size() > 0) {
-						long count = testResultRepository.getTotalAmountOfTestResults(testRunIds);
-
-						List<TestRunDTO> testRunDto = generateTestRunDTOByTestResults(testResults);
-						if (testRunDto != null && testRunDto.size() > 0) {
-							testResultsMap.put("tests", testRunDto);
-							testResultsMap.put("totalSize", count);
-						}
-					}
-				}
-			}
-		}
-		return testResultsMap;
-	}
-
-	public Test synchronizeReceivedTest(Test test) {
-		Test returnTest = new Test();
-		Test currentPortalTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
-
-		if (currentPortalTest != null) {
-			boolean isPortalTestOlder = checkIfPortalTestIsOlder(currentPortalTest.getLastChangedTimestamp(), test.getLastChangedTimestamp());
-
-			returnTest = currentPortalTest;
-
-			if (isPortalTestOlder) {
-				currentPortalTest.setHash_value(test.getHash_value());
-				currentPortalTest.setName(test.getName());
-				currentPortalTest.setPodId(test.getPodId());
-				currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-				currentPortalTest.setTest_content(test.getTest_content());
-				currentPortalTest.setActive(true);
-				currentPortalTest.setSynced(true);
-				testRepository.save(currentPortalTest);
-			}
-		} else {
-			currentPortalTest = new Test();
-			currentPortalTest.setHash_value(test.getHash_value());
-			currentPortalTest.setName(test.getName());
-			currentPortalTest.setPodId(test.getPodId());
-			currentPortalTest.setLastChangedTimestamp(test.getLastChangedTimestamp());
-			currentPortalTest.setTest_content(test.getTest_content());
-			currentPortalTest.setActive(true);
-			currentPortalTest.setSynced(true);
-
-			testRepository.save(currentPortalTest);
-
-			returnTest = testRepository.getTestByNameAndDeviceId(test.getName(), test.getPodId());
-		}
-		return returnTest;
-	}
-
-	/**
-	 * This function checks if the test result with the provided id exists, and deletes it accordingly.
-	 *
-	 * @param testResultId
-	 * @param locale
-	 * @return
-	 */
-
-	public ResponseEntity<TestResult> deleteTestResult(String testResultId, ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(testResultId) && !Strings.isNullOrEmpty(locale.getValue())) {
-			TestResult testResult = testResultRepository.find(testResultId);
-			if (testResult != null) {
-				testResultRepository.delete(testResult);
-				return new ResponseEntity<>(testResult, HttpStatus.OK);
-			}
-			log.error("Problem occured while deleting test result");
-		}
-
-		return ((ResponseEntity<TestResult>) buildResponseEntity("problem_occured_while_deleting_test_result", locale));
-
-	}
-
-	/**
 	 * This function returns all tests by pod Id.
 	 *
 	 * @param deviceId
 	 * @param locale
 	 * @return
 	 */
-	public ResponseEntity<Map<String, Object>> getTestByDeviceId(String deviceId, int page, int size, boolean usePagination,
-			ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
+	public ResponseEntity<Map<String, Object>> getTestByDeviceId(ObjectId deviceId, int page, int size, boolean usePagination,
+			ValidInputLocale locale, String filter) {
+		if (deviceId != null) {
 			Map<String, Object> testMap = new HashMap<>();
 			List<TestObjWeb> testsWeb = convertToTestObjectForWeb(
-					testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination));
-
+					testRepository.getByDeviceIdWithPagination(deviceId, page, size, usePagination, filter));
+			List<TestWebDTO> testWebList = new ArrayList<>();
 			if (testsWeb != null) {
-				testMap.put("tests", testsWeb);
+				testWebList = createTestWebDTOsFromTestWebObjList(testsWeb);
+				testMap.put("tests", testWebList);
 				testMap.put("totalSize", testRepository.getCountOfTestsWithDeviceId(deviceId));
 				return new ResponseEntity<>(testMap, HttpStatus.OK);
 			}
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale.getValue()));
 	}
 
 	/**
@@ -206,8 +149,8 @@ public class TestUtils extends BaseServiceProvider {
 	 * @param locale
 	 * @return
 	 */
-	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(String deviceId, ValidInputLocale locale) {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
+	public ResponseEntity<List<SequenceRun>> getSequenceByDeviceId(ObjectId deviceId, ValidInputLocale locale) {
+		if (deviceId != null) {
 
 			List<SequenceRun> sequenceRuns = sequenceRunRepository.getSequenceRunByDeviceId(deviceId);
 
@@ -215,70 +158,29 @@ public class TestUtils extends BaseServiceProvider {
 				return new ResponseEntity<>(sequenceRuns, HttpStatus.OK);
 			}
 		}
-		return ((ResponseEntity<List<SequenceRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale.getValue()));
 	}
+	
+    /**
+     * This function returns all tests which are not executed and which are scheduled for the next run.
+     *
+     * @param hostname
+     * @param locale
+     * @return
+     * @throws ItemNotFoundRepositoryException
+     */
+    public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(ObjectId deviceId, ValidInputLocale locale)
+            throws ItemNotFoundRepositoryException {
+        if (deviceId != null) {
 
-	/**
-	 * This function returns all tests which are not executed and which are scheduled for the next run.
-	 *
-	 * @param hostname
-	 * @param locale
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	public ResponseEntity<List<TestRun>> getScheduledTestsByDeviceId(String deviceId, ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(deviceId) && !Strings.isNullOrEmpty(locale.getValue())) {
+            List<TestRun> testRunList = testRunRepository.getPlannedTests(deviceId);
 
-			List<TestRun> testRunList = testRunRepository.getPlannedTests(deviceId);
-
-			if (testRunList != null) {
-				return new ResponseEntity<>(testRunList, HttpStatus.OK);
-			}
-		}
-
-		return ((ResponseEntity<List<TestRun>>) buildResponseEntity("problem_occured_while_retrieving_test", locale));
-	}
-
-	/**
-	 * This function checks if the test with the provided test name already exists in the database.
-	 *
-	 * @param test
-	 * @return
-	 */
-
-	public boolean checkIfTestIsSaveable(Test test) {
-
-		Test dbTest = testRepository.getTestByName(test.getName());
-
-		if (dbTest == null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * This function checks if test exists in the database according to the test name, if it is true - this test will be updated. If not, then
-	 * this test will be saved.
-	 *
-	 * @param currentTest
-	 * @return
-	 */
-	public boolean checkIfTestIsUpdateable(Test currentTest) {
-		Test dbTest = testRepository.getTestByName(currentTest.getName());
-
-		if (dbTest == null) {
-			return true;
-		} else {
-			if (currentTest.getName().equals(dbTest.getName())) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-	}
+            if (testRunList != null) {
+                return new ResponseEntity<>(testRunList, HttpStatus.OK);
+            }
+        }
+        throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_retrieving_test", locale.getValue()));
+    }
 
 	/**
 	 * This function which test is older, test saved in the mongo db or test retrieved from the pod
@@ -315,7 +217,7 @@ public class TestUtils extends BaseServiceProvider {
 
 		String testContent = JSONUtils.toString(testObjWeb.getTest_content());
 
-		if (Strings.isNullOrEmpty(testObjWeb.getTestId())) {
+		if (testObjWeb.getTestId() == null) {
 			// new test
 			test.setLastChangedTimestamp(System.currentTimeMillis());
 			test.setName(testObjWeb.getName());
@@ -323,10 +225,8 @@ public class TestUtils extends BaseServiceProvider {
 			test.setScheduled(testObjWeb.isScheduled());
 			test.setScheduledTime(testObjWeb.getScheduledTime());
 			test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
-			test.setTest_content(testContent);
-			test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
+			test.setTestContent(testContent);
 			test.setActive(true);
-			test.setNewTest(true);
 
 		} else {
 			// test should exist in the database, update the existing one
@@ -337,8 +237,7 @@ public class TestUtils extends BaseServiceProvider {
 				test.setScheduled(testObjWeb.isScheduled());
 				test.setScheduledTime(testObjWeb.getScheduledTime());
 				test.setScheduledTimeUnit(testObjWeb.getScheduledTimeUnit());
-				test.setTest_content(testContent);
-				test.setHash_value(CryptoUtils.generateSecureHashHexString(testContent));
+				test.setTestContent(testContent);
 				test.setLastChangedTimestamp(System.currentTimeMillis());
 			} else {
 				test = null;
@@ -347,22 +246,6 @@ public class TestUtils extends BaseServiceProvider {
 
 		return test;
 
-	}
-
-	/**
-	 * This function extracts only test names from the test object list
-	 *
-	 * @param tests
-	 * @return
-	 */
-	public List<String> getTestNamesFromTestList(List<Test> tests) {
-		ArrayList<String> test_names = new ArrayList<>();
-
-		for (Test test : tests) {
-			test_names.add(test.getName());
-		}
-
-		return test_names;
 	}
 
 	/**
@@ -377,7 +260,7 @@ public class TestUtils extends BaseServiceProvider {
 
 			for (Test test : tests) {
 				TestObjWeb testObjWeb = new TestObjWeb();
-				TestContent testContent = JSONUtils.fromString(test.getTest_content(), TestContent.class);
+				TestContent testContent = JSONUtils.fromString(test.getTestContent(), TestContent.class);
 				testObjWeb.setTest_content(testContent);
 				testObjWeb.setName(test.getName());
 				testObjWeb.setActive(test.isActive());
@@ -394,20 +277,33 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function generates the list of the TestRunDTO for the provided TestResults. For each test result, TestRun object is added.
+	 * This function converts the test object which is saved in the mongo database to the correct test object which is being shown in the web.
 	 *
-	 * @param results
-	 * @return
+	 * @param tests
 	 */
-	public List<TestRunDTO> generateTestRunDTOByTestResults(List<TestResult> results) {
-		List<TestRunDTO> testRunDto = new ArrayList<>();
-		for (TestResult testResult : results) {
-			TestRun testRun = testRunRepository.find(testResult.getTestRunId());
-			if (testRun != null) {
-				testRunDto.add(new TestRunDTO(testRun, testResult));
+	public List<TestObjWeb> convertTestIdsToTestObjectForWeb(List<String> testIds) {
+		List<TestObjWeb> testsWeb = new ArrayList<>();
+
+		if (testIds != null) {
+			for (String testId : testIds) {
+				Test test = testRepository.find(new ObjectId(testId));
+				if (test != null) {
+					TestObjWeb testObjWeb = new TestObjWeb();
+					TestContent testContent = JSONUtils.fromString(test.getTestContent(), TestContent.class);
+					testObjWeb.setTest_content(testContent);
+					testObjWeb.setName(test.getName());
+					testObjWeb.setActive(test.isActive());
+					testObjWeb.setPodId(test.getPodId());
+					testObjWeb.setTestId(test.getId());
+					testObjWeb.setScheduled(test.isScheduled());
+					testObjWeb.setScheduledTime(test.getScheduledTime());
+					testObjWeb.setScheduledTimeUnit(test.getScheduledTimeUnit());
+					testsWeb.add(testObjWeb);
+				}
 			}
 		}
-		return testRunDto;
+
+		return testsWeb;
 	}
 
 	/**
@@ -430,89 +326,14 @@ public class TestUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function adds new portal test to the list which will be returned to the pod. Before returning the flag newTest is set to false and
-	 * updated in the database accordingly
-	 *
-	 * @param deviceId
-	 * @return
-	 */
-	public List<Test> getNewPortalTests(String deviceId) {
-		List<Test> newPortalTests = new ArrayList<>();
-		newPortalTests = testRepository.getNewPortalTestsByDeviceId(deviceId);
-
-		for (Test test : newPortalTests) {
-			test.setNewTest(false);
-			test.setSynced(true);
-			try {
-				testRepository.update(test);
-			} catch (ItemNotFoundRepositoryException e) {
-				log.error(e.getMessage());
-			}
-		}
-
-		return newPortalTests;
-	}
-
-	/**
-	 * This function iterates over all tests which are tagged to be deleted, and deletes them from the database.
-	 *
-	 * @param syncTests
-	 * @param deviceId
-	 * @return
-	 */
-	public void deleteTaggedPortalTests(String deviceId) {
-		List<Test> testsToBeDeleted = testRepository.getDeletedTestsByDeviceId(deviceId);
-		if (testsToBeDeleted != null) {
-			for (Test test : testsToBeDeleted) {
-				testRepository.delete(test);
-			}
-		}
-	}
-
-	/**
-	 * This function iterates over all tests which are not syncronized, and deletes them from the database.
-	 *
-	 * @param syncTests
-	 * @param deviceId
-	 * @return
-	 */
-	public void deleteUnsyncedTests(String deviceId) {
-		List<Test> testsToBeDeleted = testRepository.getUnsyncedTestsByDeviceId(deviceId);
-		if (testsToBeDeleted != null) {
-			for (Test test : testsToBeDeleted) {
-				testRepository.delete(test);
-			}
-		}
-	}
-
-	/**
-	 * This tests iterates over all pod tests and sets them to unsyncronized before the syncronization begins.
-	 *
-	 * @param deviceId
-	 */
-	public void setAllPodTestToUnsyncronized(String deviceId) {
-		List<Test> tests = testRepository.getByDeviceId(deviceId);
-		for (Test test : tests) {
-			if (test != null) {
-				test.setSynced(false);
-				try {
-					testRepository.update(test);
-				} catch (ItemNotFoundRepositoryException e) {
-					log.debug(e.getMessage());
-				}
-			}
-		}
-	}
-
-	/**
 	 * This method retrieves the @TestContent object form the given test.
 	 *
 	 * @param test
 	 *          Test from which the @TestContent should be obtained.
 	 * @return The @TestContent obtained from the given test.
 	 */
-	public TestContent getTestContent(Test test) {
-		JsonNode testContent = JSONUtils.fromString(test.getTest_content());
+	public TestContent getTestContent(String testContentString) {
+		JsonNode testContent = JSONUtils.fromString(testContentString);
 		String name = testContent.findValue("name").asText();
 		TestDefinition testDefinition = getTestDefinition(testContent.findValue("test_definition"));
 		return new TestContent(name, testDefinition);
@@ -556,7 +377,7 @@ public class TestUtils extends BaseServiceProvider {
 	 */
 	public Command getCommand(JsonNode command) {
 		String executable = command.findValue("executable").asText();
-		Parameter parameter = getParameter(command.findValue("parameter"));
+		List<Parameter> parameter = getParameter(command.findValue("parameter"));
 		return new Command(executable, parameter);
 	}
 
@@ -567,18 +388,28 @@ public class TestUtils extends BaseServiceProvider {
 	 *          JsonNode from which the @Parameter should be obtained.
 	 * @return The @Parameter obtained from the given JsonNode.
 	 */
-	public Parameter getParameter(JsonNode parameter) {
-		String description = parameter.findValue("description").asText();
-		String prefix = parameter.findValue("prefix").asText();
-		String value = parameter.findValue("value").asText();
-		return new Parameter(description, prefix, value);
+	public List<Parameter> getParameter(JsonNode parameter) {
+
+		List<Parameter> parameters = new ArrayList<>();
+
+		if (parameter.isArray()) {
+			for (JsonNode paramItem : parameter) {
+				String description = paramItem.findValue("description").asText();
+				String prefix = paramItem.findValue("prefix").asText();
+				String value = paramItem.findValue("value").asText();
+
+				parameters.add(new Parameter(description, prefix, value));
+			}
+		}
+
+		return parameters;
 	}
 
 	/**
 	 * This method replaces the Value in the Parameter section of the step with the in a SUT defined metadata values.
 	 *
 	 * @param testContent
-	 *          The @TestContent which contains the Paramater value which will be replaced by the SUT metadata.
+	 *          The @TestContent which contains the Parameter value which will be replaced by the SUT metadata.
 	 * @param sut
 	 *          The @SystemUnderTest from which the metadata will be obtained.
 	 * @param sutMetadataKeys
@@ -586,21 +417,19 @@ public class TestUtils extends BaseServiceProvider {
 	 * @return A JsonString created from the @TestContent with the replaced values.
 	 */
 	public String mergeTestAndSutMetadata(TestContent testContent, SystemUnderTest sut, List<String> sutMetadataKeys) {
-		String newValueString = "";
-		Map<String, String> metadata = sut.getMetadata();
 
-		if (sutMetadataKeys.size() != 0 && metadata.size() != 0) {
+		// TODO: This must be changed when we change USE_SUT_METADATA
+		Map<String, String> metadata = sut.getMetadata();
+		if (!sutMetadataKeys.isEmpty() && !metadata.isEmpty()) {
 			for (String key : sutMetadataKeys) {
 				if (sut.getMetadata().containsKey(key)) {
-					if (newValueString.equals("")) {
-						newValueString = sut.getMetadata().get(key);
-					} else {
-						newValueString += " ";
-						newValueString += sut.getMetadata().get(key);
+					for (Parameter param : testContent.getTest_definition().getStep().getCommand().getParameter()) {
+						if (param.getValue().equals("USE_SUT_METADATA{" + key + "}")) {
+							param.setValue(metadata.get(key));
+						}
 					}
 				}
 			}
-			testContent.getTest_definition().getStep().getCommand().getParameter().setValue(newValueString);
 		}
 		return getJsonStringFromTestContent(testContent);
 	}
@@ -621,6 +450,108 @@ public class TestUtils extends BaseServiceProvider {
 			log.error("The Test Content could not be converted to Json String!");
 		}
 		return jsonString;
+	}
+
+	/**
+	 * This method checks if the given User has the given rights to edit/delete given test.
+	 *
+	 * @param ...Test
+	 *          The @Test which should be edit/delete-ed.
+	 * @return ...true if the User has the rights to edit/delete the Test, false if not.
+	 */
+	public boolean hasUserRightsForTest(Test test, String userId) {
+		CompanyLicensePublic license = licenseRepository.findByDeviceId(test.getPodId());
+		CompanyGroup group = groupRepository.find(license.getGroupId());
+		ContextUserAuthentication contextUA = contextUserAuthRepository.getByContextIdAndUserId(group.getContextId(), userId);
+		if (contextUA != null) {
+			if (contextUA.getUserRole().equals(UserRole.SUPERADMIN) || contextUA.getUserRole().equals(UserRole.ADMIN)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This function returns the prepared test content for each test.
+	 *
+	 * @param testSutDatainput
+	 * @param currentTest
+	 * @return
+	 */
+	public String mergeSUTAndDataInput(TestSUTDataInput testSutDatainput, Test currentTest) {
+		String testContent = currentTest.getTestContent();
+
+		if (testSutDatainput.getSut() != null) {
+			testContent = sutUtils.mergeTestContentWithSut(testContent, testSutDatainput.getSut().getId());
+		}
+
+		if (testSutDatainput.getInputData() != null) {
+			// change input with the value part of the included parameter
+			testContent = inputDataUtils.mergeDataInputWithContent(testContent, testSutDatainput.getInputData());
+		}
+
+		return testContent;
+	}
+
+	/**
+	 * This function creates TestWebDTOs from the TestObjWeb List of objects
+	 *
+	 * @param testWebObjList
+	 */
+	public List<TestWebDTO> createTestWebDTOsFromTestWebObjList(List<TestObjWeb> testWebObjList) {
+
+		List<TestWebDTO> testWebList = new ArrayList<>();
+
+		for (TestObjWeb testObj : testWebObjList) {
+			List<SystemUnderTest> suts = sutUtils.getSutListForTest(testObj);
+			List<TestInputData> inputData = testInputDataRepository.getByTestId(testObj.getTestId());
+			testWebList.add(new TestWebDTO(testObj, suts, inputData));
+		}
+		return testWebList;
+	}
+
+	/**
+	 * This function deletes provided test and all input data accordingly
+	 *
+	 * @param test
+	 */
+	public void deleteTest(Test test) {
+		try {
+			testRepository.delete(test);
+			inputDataUtils.deleteInputDataByTestId(test.getId());
+		} catch (Exception e) {
+			log.error(e.getLocalizedMessage());
+		}
+	}
+
+	/**
+	 * This function clones current test and changes only test name
+	 *
+	 * @param test
+	 * @return
+	 */
+	public Test cloneTest(Test test) {
+		Test clonedTest = new Test();
+
+		String testName = test.getName() + "_" + System.currentTimeMillis();
+
+		clonedTest.setTestContent(test.getTestContent());
+		clonedTest.setName(testName);
+		clonedTest.setPodId(test.getPodId());
+		clonedTest.setLastChangedTimestamp(System.currentTimeMillis());
+		clonedTest.setActive(true);
+
+		testRepository.save(clonedTest);
+
+		Test dbTest = testRepository.getTestByName(testName);
+
+		if (dbTest != null) {
+
+			inputDataUtils.cloneInputDataByTestId(test.getId(), dbTest.getId());
+
+			return dbTest;
+		}
+		return null;
 	}
 
 }

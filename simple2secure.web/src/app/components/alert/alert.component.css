@@ -1,0 +1,11 @@
+.alert-success {
+  background-color: #a7bd26;
+}
+
+.alert-danger {
+  background-color: #aa3939;
+}
+
+.alert {
+  color: white;
+}

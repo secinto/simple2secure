@@ -1,0 +1,145 @@
+<mat-tab-group (selectedTabChange)="onTabClick($event)">
+
+	<mat-tab label="{{'table.mypods' | translate}}">
+		<div class="example-container mat-elevation-z8 table table-striped">
+
+			<div class="header-filter-table">
+				<mat-form-field class="header-filter-field">
+					<input matInput #filterValue placeholder="Filter">
+				</mat-form-field>
+			</div>
+
+			<mat-table [dataSource]="dataSource" matSort>
+
+				<!-- PodId Column -->
+				<ng-container matColumnDef="podId">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.id}}</mat-cell>
+				</ng-container>
+
+				<!-- Pod Hostname Column -->
+				<ng-container matColumnDef="hostname">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
+				</ng-container>
+
+				<!-- Status Column -->
+				<ng-container matColumnDef="status">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.deviceStatus}}</mat-cell>
+				</ng-container>
+
+				<!-- Group Column -->
+				<ng-container matColumnDef="group">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="action">
+					<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+						<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+							(click)="onMenuTriggerClick(element)">
+							<i class="fas fa-bars"></i>
+						</button>
+					</mat-cell>
+				</ng-container>
+
+				<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+				<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+			</mat-table>
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true" [length]="totalSize">
+			</mat-paginator>
+			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+		</div>
+		<mat-menu #menu="matMenu">
+			<button mat-menu-item (click)="showPodTests()">
+				<mat-icon>code</mat-icon>
+				{{ 'button.showtests' | translate }}
+			</button>
+			<button mat-menu-item (click)="showSequences()">
+				<mat-icon>code</mat-icon>
+				{{ 'button.showSequences' | translate }}
+			</button>
+			<button mat-menu-item>
+				<mat-slide-toggle [checked]="isPublic" [(ngModel)]="slide" (change)="updatePodVisibility(slide)">
+					{{'table.isPubliclyAvailable' | translate}}</mat-slide-toggle>
+			</button>
+		</mat-menu>
+	</mat-tab>
+	<mat-tab label="{{'table.publicpods' | translate}}">
+		<div class="example-container mat-elevation-z8 table table-striped">
+
+			<div class="header-filter-table">
+				<mat-form-field class="header-filter-field">
+					<input matInput #filterValue placeholder="Filter">
+				</mat-form-field>
+			</div>
+
+			<mat-table [dataSource]="dataSource" matSort>
+
+				<!-- PodId Column -->
+				<ng-container matColumnDef="podId">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.id}}</mat-cell>
+				</ng-container>
+
+				<!-- Pod Hostname Column -->
+				<ng-container matColumnDef="hostname">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
+				</ng-container>
+
+				<!-- Status Column -->
+				<ng-container matColumnDef="status">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.deviceStatus}}</mat-cell>
+				</ng-container>
+
+				<!-- Group Column -->
+				<ng-container matColumnDef="group">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.group' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.group.name}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="action">
+					<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+						<button class="mat-green-button" mat-button [matMenuTriggerFor]="menuPublic"
+							(click)="onMenuTriggerClick(element)">
+							<i class="fas fa-bars"></i>
+						</button>
+					</mat-cell>
+				</ng-container>
+
+				<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+				<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+			</mat-table>
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true">
+			</mat-paginator>
+			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+		</div>
+		<mat-menu #menuPublic="matMenu">
+			<button mat-menu-item (click)="showPodTests()">
+				<mat-icon>code</mat-icon>
+				{{ 'button.showtests' | translate }}
+			</button>
+			<button mat-menu-item (click)="showSequences()">
+				<mat-icon>code</mat-icon>
+				{{ 'button.showSequences' | translate }}
+			</button>
+		</mat-menu>
+	</mat-tab>
+</mat-tab-group>

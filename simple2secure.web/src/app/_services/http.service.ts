@@ -20,138 +20,168 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
-import {TranslateService} from '@ngx-translate/core';
-import {Observable} from 'rxjs';
-import {environment} from '../../environments/environment';
-import {Context, User, UserRegistration} from '../_models';
-import {ActivatedRoute, Router} from '@angular/router';
-import {AuthenticationService} from './authentication.service';
-import { Location } from '@angular/common';
-import {DataService} from "./data.service";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthenticationService } from './authentication.service';
+import { DataService } from './data.service';
+import { Context } from '../_models/context';
+import { UserRegistration } from '../_models/userRegistration';
+import { MatDialog } from '@angular/material/dialog';
+import { TokenObject } from '../_models/tokenObject';
 
 @Injectable()
 export class HttpService {
 
-	returnUrl: string;
+    returnUrl: string;
 
-	constructor(private route: ActivatedRoute,
-	            protected httpClient: HttpClient,
-	            private translate: TranslateService,
-	            private router: Router,
-	            private authenticationService: AuthenticationService,
-	            private location: Location,
-				private dataService: DataService)
-	{
-		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-	}
+    constructor(private route: ActivatedRoute,
+        protected httpClient: HttpClient,
+        private translate: TranslateService,
+        private router: Router,
+        private dataService: DataService,
+        private authService: AuthenticationService,
+        private dialogRef: MatDialog) {
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    }
 
-	currentLang: string;
+    currentLang: string;
+    tokenObj = new TokenObject();
 
-	public get(url: string): Observable<any> {
-		const headers = this.getHeaders(true);
+    public get(url: string): Observable<any> {
+        const headers = this.getHeaders(true);
 
-		return this.httpClient.get<any>(url, {headers});
-	}
+        return this.httpClient.get<any>(url, { headers });
+    }
 
-	public getWithParams(url: string, params: HttpParams): Observable<any> {
-		const headers = this.getHeaders(true);
+    public getWithoutAuth(url: string): Observable<any> {
+        const headers = this.getHeaders(false);
 
-		return this.httpClient.get<any>(url, {headers, params});
-	}
+        return this.httpClient.get<any>(url, { headers });
+    }
 
-	public post(item: any, url: string): Observable<any> {
-		const headers = this.getHeaders(true);
+    public getWithParams(url: string, params: HttpParams): Observable<any> {
+        const headers = this.getHeaders(true);
 
-		return this.httpClient.post<any>(url, item, {headers});
-	}
+        return this.httpClient.get<any>(url, { headers, params });
+    }
 
-	public delete(url: string): Observable<any> {
-		const headers = this.getHeaders(true);
+    public post(item: any, url: string, withAuth: boolean = true): Observable<any> {
+        const headers = this.getHeaders(withAuth);
 
-		return this.httpClient.delete<any>(url, {headers});
-	}
+        return this.httpClient.post<any>(url, item, { headers });
+    }
 
-	public getFile(url: string): Observable<Blob> {
-		const headers = this.getHeaders(true);
+    public postWithParams(item: any, url: string, params: HttpParams): Observable<any> {
+        const headers = this.getHeaders(true);
 
-		return this.httpClient.get<Blob>(url, {responseType: 'blob' as 'json', headers}).pipe();
-	}
+        return this.httpClient.post<any>(url, item, { headers, params });
+    }
 
-	public postLogin(username: string, password: string): Observable<HttpResponse<any>> {
-		const headers = this.getHeaders();
-		return this.httpClient.post<any>(environment.apiEndpoint + 'login',
-			JSON.stringify({username: username, password: password}), {observe: 'response', headers});
-	}
+    public delete(url: string): Observable<any> {
+        const headers = this.getHeaders(true);
 
-	public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
-		const headers = this.getHeaders();
-		return this.httpClient.post<any>(environment.apiEndpoint + 'user/register', user, {observe: 'response', headers});
-	}
+        return this.httpClient.delete<any>(url, { headers });
+    }
 
-	public postReset(email: String): Observable<HttpResponse<any>> {
-		return this.postEmail(environment.apiEndpoint + 'user/sendResetPasswordEmail', email);
-	}
+    public getFile(url: string): Observable<Blob> {
+        const headers = this.getHeaders(true);
 
-	public postResend(email: String): Observable<HttpResponse<any>> {
-		return this.postEmail(environment.apiEndpoint + 'user/resendActivation', email);
-	}
+        return this.httpClient.get<Blob>(url, { responseType: 'blob' as 'json', headers }).pipe();
+    }
 
-	private postEmail(url: string, email: String): Observable<HttpResponse<any>> {
-		const headers = this.getHeaders();
-		return this.httpClient.post<any>(url, email,
-			{observe: 'response', headers});
-	}
+    public postLogin(item: any, url: string): Observable<any> {
+        const headers = this.getHeaders(false);
+        return this.httpClient.post<any>(url,
+            item, { headers });
+    }
 
-	public postUpdatePassword(password: String, token: String): Observable<HttpResponse<any>> {
-		const headers = this.getHeaders();
-		return this.httpClient.post<any>(environment.apiEndpoint + 'user/updatePassword/' + token, password,
-			{observe: 'response', headers});
-	}
+    public postRegister(user: UserRegistration): Observable<HttpResponse<any>> {
+        const headers = this.getHeaders();
+        return this.httpClient.post<any>(environment.apiUserRegister, user, {
+            observe: 'response',
+            headers
+        });
+    }
 
-	public postUpdatePasswordFirstLogin(password: String, authenticationToken: String): Observable<HttpResponse<any>> {
-		const headers = this.getHeaders();
-		return this.httpClient.post<any>(environment.apiEndpoint + 'user/activate/updatePassword/' +
-			authenticationToken, password, {observe: 'response', headers});
-	}
+    public postReset(user: UserRegistration): Observable<any> {
+        const headers = this.getHeaders();
+        return this.httpClient.post<any>(environment.apiUserForgotPassword, user, { headers });
+    }
 
-	public updateContext(context: Context) {
+    public postResend(email: String): Observable<HttpResponse<any>> {
+        return this.postEmail(environment.apiUserResendActivation, email);
+    }
 
-		this.post(context, environment.apiEndpoint + 'context').subscribe(
-			() => {
-				// Navigate to the home route
-				this.router.navigate([this.returnUrl]);
-			},
-			() => {
-				this.authenticationService.logout();
-			});
-	}
+    private postEmail(url: string, email: String): Observable<HttpResponse<any>> {
+        const headers = this.getHeaders();
+        return this.httpClient.post<any>(url, email,
+            { observe: 'response', headers });
+    }
 
-	public processInvitation(url: string): Observable<any> {
-		const headers = this.getHeaders();
-		return this.httpClient.get<any>(url, {headers});
-	}
+    public updateContext(context: Context) {
 
-	private getHeaders(withAuth: boolean = false): HttpHeaders {
-		this.currentLang = this.translate.currentLang;
+        this.post(context, environment.apiContext).subscribe(
+            () => {
+                // Navigate to the home route
+                this.router.navigate([this.returnUrl]);
+            },
+            () => {
+                this.logout();
+            });
+    }
 
-		if (!this.currentLang) {
-			this.currentLang = this.translate.defaultLang;
-		}
+    public processInvitation(url: string): Observable<any> {
+        const headers = this.getHeaders();
+        return this.httpClient.get<any>(url, { headers });
+    }
 
-		if (withAuth) {
-			const token = this.dataService.getAuthToken();
-			return new HttpHeaders().set('Authorization', token)
-				.set('Accept-Language', this.currentLang)
-				.set('Access-Control-Allow-Origin', '*')
-				.set('Access-Control-Allow-Credentials', 'true');
-		}
-		else {
-			return new HttpHeaders().set('Accept-Language', this.currentLang)
-				.set('Access-Control-Allow-Origin', '*')
-				.set('Access-Control-Allow-Credentials', 'true');
-		}
-	}
+    private getHeaders(withAuth: boolean = false): HttpHeaders {
+        this.currentLang = this.translate.currentLang;
+
+        if (!this.currentLang) {
+            this.currentLang = this.translate.defaultLang;
+        }
+
+        if (withAuth) {
+            const token = this.dataService.getAuthToken();
+
+            return new HttpHeaders().append('Authorization', 'Bearer ' + token)
+                .set('Accept-Language', this.currentLang)
+                .set('Access-Control-Allow-Origin', '*')
+                .set('Access-Control-Allow-Credentials', 'true');
+        } else {
+            return new HttpHeaders().set('Accept-Language', this.currentLang)
+                .set('Access-Control-Allow-Origin', '*')
+                .set('Access-Control-Allow-Credentials', 'true');
+        }
+    }
+
+    logout() {
+
+        const token = this.dataService.getAuthToken();
+        this.tokenObj.token = token;
+
+        // logout from the portal
+
+
+        this.post(this.tokenObj, environment.apiUserLogout, false)
+            .subscribe(
+                data => {
+                },
+                error => {
+                });
+
+        // clear the sessionStorage
+        this.dataService.clearSessionStorage();
+        // close all open dialogs
+        this.dialogRef.closeAll();
+        this.router.navigate(['login']);
+        this.authService.isLoggedIn = false;
+
+    }
 
 }

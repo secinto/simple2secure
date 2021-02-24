@@ -19,15 +19,13 @@
  *
  *********************************************************************
  */
-import {Base} from './base';
-import { DeviceType } from '../_models/deviceType';
-import { DeviceStatus } from '../_models/deviceStatus';
+import { Base } from './base';
 import { Protocol } from './protocol';
 
 
 export class SystemUnderTest extends Base {
 	id: string;
-    contextId: string;
+	contextId: string;
 	uri: string;
 	name: string;
 	port: string;

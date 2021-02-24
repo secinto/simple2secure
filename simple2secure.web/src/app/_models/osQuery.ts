@@ -20,19 +20,19 @@
  *********************************************************************
  */
 
-import {Generic} from './generic';
-import {Timeunit} from './index';
+import { Generic } from './generic';
+import { Timeunit } from './timeunit';
 
 export class OsQuery extends Generic {
-	name: string;
-	categoryId: string;
-	description: string;
-	analysisInterval: number;
-	analysisIntervalUnit: Timeunit;
-	sqlQuery: string;
-	active: number;
-	systemsAvailable: number;
-	graphAble: boolean;
-	availabilityCheck: boolean;
-	fixedSize: boolean;
+    name: string;
+    categoryId: string;
+    description: string;
+    analysisInterval: number;
+    analysisIntervalUnit: Timeunit;
+    sqlQuery: string;
+    active: number;
+    systemsAvailable: number;
+    graphAble: boolean;
+    availabilityCheck: boolean;
+    fixedSize: boolean;
 }

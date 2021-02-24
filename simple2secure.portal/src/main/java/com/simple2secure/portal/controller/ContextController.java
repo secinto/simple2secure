@@ -39,9 +39,9 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.LicensePlan;
-import com.simple2secure.api.model.User;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
@@ -52,7 +52,6 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.CONTEXT_API)
 @Slf4j
@@ -63,26 +62,28 @@ public class ContextController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/add", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/add",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN')")
 
 	public ResponseEntity<Context> addContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@RequestBody Context context, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(userId.getValue()) && !Strings.isNullOrEmpty(contextId.getValue()) && context != null) {
+		if (!Strings.isNullOrEmpty(userId.getValue()) && contextId.getValue() != null && context != null) {
 
 			// Update context
-			if (!Strings.isNullOrEmpty(context.getId())) {
+			if (context.getId() != null) {
 				contextRepository.update(context);
 				return new ResponseEntity<>(context, HttpStatus.OK);
 			} else {
 				// Add new context
 				if (!contextUtils.checkIfContextAlreadyExists(context, userId.getValue())) {
 					Context currentContext = contextRepository.find(contextId.getValue());
-					User currentUser = userRepository.find(userId.getValue());
+
 					ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(contextId.getValue(),
 							userId.getValue());
-					if (currentContext != null && currentUser != null && contextUserAuth != null) {
+					if (currentContext != null && contextUserAuth != null) {
 						LicensePlan licensePlan = licensePlanRepository.findByName(StaticConfigItems.DEFAULT_LICENSE_PLAN);
 						if (licensePlan != null) {
 
@@ -90,18 +91,18 @@ public class ContextController extends BaseUtilsProvider {
 							ObjectId savedContextId = contextRepository.saveAndReturnId(context);
 
 							if (savedContextId != null) {
-								ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId.getValue(),
-										savedContextId.toString(), contextUserAuth.getUserRole(), false);
+								ContextUserAuthentication contextUserAuthenticationNew = new ContextUserAuthentication(userId.getValue(), savedContextId,
+										contextUserAuth.getUserRole(), false);
 								contextUserAuthRepository.save(contextUserAuthenticationNew);
 
 								// add standard group for current context
 								try {
-									dataInitialization.addDefaultGroup(userId.getValue(), savedContextId.toString());
-									contextUtils.mapSuperAdminsTotheContext(savedContextId.toString());
+									dataInitialization.addDefaultGroup(userId.getValue(), savedContextId);
+									contextUtils.mapSuperAdminsTotheContext(savedContextId);
 									return new ResponseEntity<>(context, HttpStatus.OK);
 								} catch (IOException e) {
 									log.error(e.getMessage());
-									return (ResponseEntity<Context>) buildResponseEntity("unknown_error_occured", locale);
+									throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 								}
 
 							}
@@ -109,12 +110,12 @@ public class ContextController extends BaseUtilsProvider {
 					}
 				} else {
 					log.error("Context {} already exist", context.getName());
-					return (ResponseEntity<Context>) buildResponseEntity("problem_occured_context_exists", locale);
+					throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_context_exists", locale.getValue()));
 				}
 			}
 		}
 		log.error("Problem occured while adding context");
-		return (ResponseEntity<Context>) buildResponseEntity("unknown_error_occured", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class ContextController extends BaseUtilsProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 	@ValidRequestMapping
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'ROLE_LOGINUSER')")
 	public ResponseEntity<List<ContextDTO>> getContextsByUserId(@ServerProvidedValue ValidInputUser userId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
@@ -143,8 +144,7 @@ public class ContextController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while retrieving contexts for user ID {}" + userId.getValue());
-		return (ResponseEntity<List<ContextDTO>>) buildResponseEntity("unknown_error_occured", locale);
-
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 	}
 
 	/**
@@ -154,31 +154,32 @@ public class ContextController extends BaseUtilsProvider {
 	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/delete", method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			value = "/delete",
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
 	public ResponseEntity<Context> deleteContext(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(contextId.getValue()) && !Strings.isNullOrEmpty(userId.getValue())) {
+		if (contextId.getValue() != null && !Strings.isNullOrEmpty(userId.getValue())) {
 			Context context = contextRepository.find(contextId.getValue());
-			User user = userRepository.find(userId.getValue());
 
-			if (context != null && user != null) {
-				if (contextUtils.checkIfUserCanDeleteContext(user, context)) {
+			if (context != null) {
+				if (contextUtils.checkIfUserCanDeleteContext(userId.getValue(), context)) {
 					// call delete context dependencies
 					contextUtils.deleteContextDependencies(context);
 					return new ResponseEntity<>(context, HttpStatus.OK);
 				} else {
 					// User not allowed to delete
-					log.error("{} not allowed to delete this default context {}", user.getEmail(), context.getName());
-					return (ResponseEntity<Context>) buildResponseEntity("not_allowed_to_delete_this_context", locale);
+					log.error("{} not allowed to delete this default context {}", userId.getValue(), context.getName());
+					throw new ApiRequestException(messageByLocaleService.getMessage("not_allowed_to_delete_this_context", locale.getValue()));
 				}
 
 			}
 
 		}
 		log.error("Problem occured while deleting context {}" + contextId);
-		return (ResponseEntity<Context>) buildResponseEntity("problem_occured_while_deleting_context", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_context", locale.getValue()));
 	}
 
 	/**
@@ -186,7 +187,8 @@ public class ContextController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'LOGINUSER')")
 
 	public ResponseEntity<CurrentContext> selectUserContext(@ServerProvidedValue ValidInputUser userId, @RequestBody Context context,
@@ -211,7 +213,6 @@ public class ContextController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while updating/creating context");
-		return (ResponseEntity<CurrentContext>) buildResponseEntity("unknown_error_occured", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 	}
-
 }

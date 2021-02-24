@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ public class OsQueryRepositoryImpl extends OsQueryRepository {
 	}
 
 	@Override
-	public List<OsQuery> findByCategoryId(String categoryId) {
+	public List<OsQuery> findByCategoryId(ObjectId categoryId) {
 		Query query = new Query(Criteria.where("categoryId").is(categoryId));
 		return mongoTemplate.find(query, OsQuery.class, collectionName);
 	}

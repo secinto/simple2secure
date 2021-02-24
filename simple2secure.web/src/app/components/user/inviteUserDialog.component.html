@@ -1,0 +1,25 @@
+<div mat-dialog-content>
+    <form #inviteForm="ngForm">
+        <mat-form-field class="full_width_input">
+            <input matInput type="text" placeholder="{{ 'login.email' | translate }}"
+                [(ngModel)]="userInvitationRequest.email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field class="full_width_input">
+            <mat-select placeholder="{{ 'user.role.placeholder' | translate }}"
+                [(ngModel)]="userInvitationRequest.userRole" name="userRole" required>
+                <mat-option *ngFor="let role of userRoleKeys()" [value]="role">
+                    {{role}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button mat-button [disabled]="!inviteForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+        (click)="inviteUser()">{{ 'button.invite' | translate }}
+    </button>
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="userInvitationRequest"
+        cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>

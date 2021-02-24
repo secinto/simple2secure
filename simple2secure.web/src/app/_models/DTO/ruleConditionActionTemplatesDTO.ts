@@ -19,8 +19,8 @@
  *
  *********************************************************************
  */
-import {TemplateCondition} from "../templateCondition";
-import {TemplateAction} from "../templateAction";
+import { TemplateCondition } from '../templateCondition';
+import { TemplateAction } from '../templateAction';
 
 export class RuleConditionActionTemplatesDTO {
 

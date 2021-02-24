@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {TestContent} from './testContent';
-import {Timeunit} from './timeunit';
+import { TestContent } from './testContent';
+import { Timeunit } from './timeunit';
 
 export class TestObjWeb {
 	podId = '';

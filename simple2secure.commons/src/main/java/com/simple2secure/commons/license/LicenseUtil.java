@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -861,14 +860,5 @@ public class LicenseUtil {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Generates a random license Id which is a alpha-numeric String of length 20.
-	 *
-	 * @return
-	 */
-	public static String generateLicenseId() {
-		return RandomStringUtils.randomAlphanumeric(20);
 	}
 }

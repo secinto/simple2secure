@@ -1,0 +1,106 @@
+<h3 *ngIf="!isNewTest" mat-dialog-title>{{ 'orbiter.editsequence' | translate }}</h3>
+<h3 *ngIf="isNewTest" mat-dialog-title>{{ 'button.addSequence' | translate }}</h3>
+<h4 mat-dialog-title>{{ 'orbiter.sequenceLength' | translate }} {{sequenceToShow.length}}</h4>
+
+<div mat-dialog-content>
+	<form id="cfgForm">
+		<div>
+			<mat-accordion>
+				<mat-form-field class="full_width_input">
+					<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="sequence.name"
+						value="" name="name">
+				</mat-form-field>
+
+				<mat-card>
+					<mat-card-content class="mat-elevation-z8 example-container">
+
+						<mat-horizontal-stepper #stepper>
+							<mat-step *ngFor="let test of sequenceToShow; let i = index">
+								<ng-template matStepLabel>{{test.test.name}}</ng-template>
+								<div>
+									<button mat-raised-button color="primary" type="button"
+										(click)="openDialogShowTestContentFromTestContentObj(test.test.test_content)"
+										class="mat-green-button">
+										<mat-icon>description</mat-icon>
+										{{ 'button.showTestContent' | translate }}
+									</button>
+									<br><br>
+
+									<mat-form-field class="full_width_input" *ngIf="checkInputData(test)">
+										<mat-select [compareWith]="compareObjects"
+											[(ngModel)]="sequence.tests[i].inputData" name="inputData{{i}}"
+											(selectionChange)="onDataInputChange($event.value, test.test.testId)"
+											placeholder="{{ 'table.selectInputData' | translate }}">
+											<mat-option *ngFor="let dataInput of test.inputData" [value]="dataInput"
+												matTooltip={{dataInput.data}}>{{dataInput.name}}</mat-option>
+										</mat-select>
+									</mat-form-field>
+									<mat-form-field class="full_width_input" *ngIf="checkSut(test)">
+										<mat-select [compareWith]="compareObjects" [ngModel]="sequence.tests[i].sut"
+											name="sut{{i}}"
+											(selectionChange)="onSutChange($event.value, test.test.testId)"
+											placeholder="{{ 'table.selectSut' | translate }}">
+											<mat-option *ngFor="let sut of test.suts" [value]="sut"
+												matTooltip={{getMetadata(sut)}}>{{sut.name}}</mat-option>
+										</mat-select>
+									</mat-form-field>
+
+									<button mat-raised-button color="primary" type="button"
+										(click)="removeTestFromSequence(i)" class="mat-red-button">
+										<i class="glyphicon glyphicon-trash"></i>
+									</button>
+								</div>
+
+							</mat-step>
+						</mat-horizontal-stepper>
+					</mat-card-content>
+				</mat-card>
+				<mat-card>
+					<mat-card-content>
+						<div class="example-container mat-elevation-z8 table table-striped">
+							<mat-table #table [dataSource]="dataSource" matSort>
+
+								<ng-container matColumnDef="test">
+									<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.test' | translate }}
+									</mat-header-cell>
+									<mat-cell *matCellDef="let element"> {{element.test.name}}</mat-cell>
+								</ng-container>
+
+								<ng-container matColumnDef="action">
+									<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{
+										'table.action' | translate}}</mat-header-cell>
+									<mat-cell *matCellDef="let element" class="mat-column-right">
+										<button mat-raised-button color="primary" id="addButton" type="button"
+											(click)="addTestToSequence(element)" class="pull-right mat-green-button">
+											<i class="glyphicon glyphicon-plus"></i>
+										</button>
+									</mat-cell>
+								</ng-container>
+
+								<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+								<mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;">
+								</mat-row>
+							</mat-table>
+							<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+								[showFirstLastButtons]="true" [length]="totalSize"
+								(page)="pageEvent = handlePage($event)">
+							</mat-paginator>
+							<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate">
+							</mat-progress-spinner>
+						</div>
+					</mat-card-content>
+				</mat-card>
+			</mat-accordion>
+
+		</div>
+	</form>
+</div>
+
+<div mat-dialog-actions>
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+		cdkFocusInitial>{{ 'button.cancel' | translate }}
+	</button>
+	<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveSequence()">{{
+		'button.save' | translate }}
+	</button>
+</div>

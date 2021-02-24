@@ -28,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public class QueryRunnable implements Runnable {
 		String queryResult = executeQuery(queryString, query.getName());
 		if (!Strings.isNullOrEmpty(queryResult)) {
 			OsQueryReport result = new OsQueryReport(ProbeConfiguration.probeId, queryString, queryResult, new Date(), false);
+			result.id = new ObjectId();
 			result.setQueryId(query.getId());
 			result.setHostname(ProbeConfiguration.hostname);
 			result.setName(query.getName());

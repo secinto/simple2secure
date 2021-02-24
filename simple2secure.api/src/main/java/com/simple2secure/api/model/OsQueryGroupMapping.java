@@ -20,70 +20,40 @@
  *********************************************************************
  */
 package com.simple2secure.api.model;
+
 import java.util.concurrent.TimeUnit;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OsQueryGroupMapping extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String groupId;
-	private String queryId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId groupId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId queryId;
+
 	private int analysisInterval;
 	private TimeUnit analysisIntervalUnit;
 	private int systemsAvailable;
-
-	public OsQueryGroupMapping() {
-	}
-
-	public OsQueryGroupMapping(String groupId, String queryId, int analysisInterval, TimeUnit analysisIntervalUnit, int systemsAvailable) {
-		this.groupId = groupId;
-		this.queryId = queryId;
-		this.analysisInterval = analysisInterval;
-		this.analysisIntervalUnit = analysisIntervalUnit;
-		this.systemsAvailable = systemsAvailable;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
-	public String getQueryId() {
-		return queryId;
-	}
-
-	public void setQueryId(String queryId) {
-		this.queryId = queryId;
-	}
-
-	public int getAnalysisInterval() {
-		return analysisInterval;
-	}
-
-	public void setAnalysisInterval(int analysisInterval) {
-		this.analysisInterval = analysisInterval;
-	}
-
-	public TimeUnit getAnalysisIntervalUnit() {
-		return analysisIntervalUnit;
-	}
-
-	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
-		this.analysisIntervalUnit = analysisIntervalUnit;
-	}
-
-	public int getSystemsAvailable() {
-		return systemsAvailable;
-	}
-
-	public void setSystemsAvailable(int systemsAvailable) {
-		this.systemsAvailable = systemsAvailable;
-	}
 }

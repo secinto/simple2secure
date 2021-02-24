@@ -20,12 +20,14 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-import {TestResultObj} from './testResultObj';
+import { Base } from './base';
+import { TestResultObj } from './testResultObj';
 
 export class TestResult extends Base {
 	name: string;
 	testRunId: string;
+	deviceId: string;
+	testName: string;
 	hostname: string;
 	result: TestResultObj;
 	timestamp: number;

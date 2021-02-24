@@ -1,0 +1,200 @@
+.mat-card:not([class*="mat-elevation-z"]) {
+  box-shadow: none;
+}
+
+.example-box {
+  padding: 20px 10px;
+  border-bottom: solid 1px #ccc;
+  border-top: solid 1px #ccc;
+  border-left: solid 1px #ccc;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: white;
+  font-size: 14px;
+}
+
+.test-list {
+  max-height: 230px;
+  overflow-y: scroll;
+}
+
+.carousel_component {
+  padding-left: 5% !important;
+}
+
+.item-carousel {
+  width: 300px !important;
+  height: 300px !important;
+  position: absolute !important;
+}
+
+.glyphicon glyphicon-plus {
+  width: 5px !important;
+  height: 5px !important;
+  top: 0px !important;
+  padding: 5px !important;
+}
+
+.glyphicon glyphicon-minus {
+  width: 5px !important;
+  height: 5px !important;
+  padding: 5px !important;
+}
+
+.pull-right {
+  min-width: 10px !important;
+  min-height: 30px !important;
+  margin-bottom: 0px !important;
+}
+
+button.pull-right.mat-green-button.minus {
+  top: -208px !important;
+  left: -1px !important;
+}
+
+.test-details-carousel {
+  padding-top: 20px !important;
+}
+
+.mat_card_content {
+  flex-direction: row !important;
+  overflow: hidden;
+}
+
+.forward-arrow-carousel {
+  position: relative;
+  width: 24px !important;
+  float: right !important;
+}
+
+.backward-arrow-carousel {
+  position: relative !important;
+  width: 24px !important;
+  float: left !important;
+}
+
+.carousel-arrows {
+  top: 50%;
+  position: absolute;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mat-dialog-content {
+  display: block;
+  margin: 0 -24px;
+  padding: 0 24px;
+  max-height: 75vh;
+}
+
+.mat-card-content {
+  margin: 0px !important;
+}
+
+.mat-card {
+  flex-direction: row !important;
+}
+
+.mat-header-cell:first-child,
+.mat-cell:first-child {
+  flex: 15%;
+}
+.mat-header-cell:nth-child(2),
+.mat-cell:nth-child(2) {
+  flex: 7%;
+}
+
+.mat-header-cell:last-child,
+.mat-cell:last-child {
+  flex: 1%;
+}
+
+.mat-row.hovered {
+  background: #eee;
+}
+
+.mat-row.highlighted {
+  background: #999;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    box-shadow: 0 0 8px #30f23a, inset 0 0 8px #30f23a;
+  }
+  50% {
+    box-shadow: 0 0 16px #30f23a, inset 0 0 14px #30f23a;
+  }
+  100% {
+    box-shadow: 0 0 8px #30f23a, inset 0 0 8px #30f23a;
+  }
+}
+
+.status-circle-green {
+  background-color: 30f23a;
+  width: 15px;
+  height: 15px;
+  border-radius: 50px;
+  box-shadow: 0 0 8px #30f23a, inset 0 0 8px #30f23a;
+  -webkit-animation: pulse 2s linear 1s infinite;
+}
+
+.status-circle-red {
+  background-color: eb3d40;
+  width: 15px;
+  height: 15px;
+  border-radius: 50px;
+  box-shadow: 0 0 8px #eb3d40, inset 0 0 8px #eb3d40;
+}
+
+.sut-objects {
+  border-style: solid;
+  width: 20%;
+  height: 200px;
+}
+
+.fa-2x {
+  font-size: 1em;
+}
+
+#addButton {
+  min-width: 5px !important;
+  min-height: 5px !important;
+  margin-left: 15px !important;
+}
+
+#removeButton {
+  min-width: 5px !important;
+  min-height: 5px !important;
+  margin-left: 15px !important;
+}
+
+#downloadButton {
+  margin-right: 11px !important;
+}
+
+#importButton {
+  margin-right: 11px !important;
+}
+
+td.mat-cell,
+th.mat-header-cell {
+  border-bottom: none;
+}
+
+.mat-radio-outer-circle {
+  box-sizing: border-box;
+  height: 20px;
+  left: 6px;
+  position: absolute;
+  top: 0;
+  transition: border-color ease 280ms;
+  width: 20px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 50%;
+}

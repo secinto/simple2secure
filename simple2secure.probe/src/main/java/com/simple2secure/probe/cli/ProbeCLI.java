@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,10 +85,9 @@ public class ProbeCLI {
       StartConditions startConditions = licenseController.checkLicenseValidity(license);
 
       if (startConditions.equals(StartConditions.LICENSE_VALID)) {
-         DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.hostname, ProbeConfiguration.probeId, DeviceType.PROBE);
+         DeviceInfo deviceInfo = new DeviceInfo(ProbeConfiguration.probeId, ProbeConfiguration.hostname, DeviceType.PROBE, DeviceStatus.ONLINE, 0, false);
          deviceInfo.setIpAddress(ProbeConfiguration.ipAddress);
          deviceInfo.setNetMask(ProbeConfiguration.netmask);
-         deviceInfo.setDeviceStatus(DeviceStatus.ONLINE);
          /*
           * TODO: Check if this is really required here.
           */

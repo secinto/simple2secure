@@ -1,0 +1,76 @@
+<mat-tab-group (selectedIndexChange)="_setDataSource($event)">
+
+    <mat-tab *ngFor="let factType of RuleFactType.values()" [label]="getTypeName(factType)">
+        <!-- Button for adding a rule -->
+        <button mat-raised-button color="primary" id="addButton" type="button" (click)="onOpenDialogAddRule(factType)"
+            class="pull-right mat-green-button">
+            <i class="glyphicon glyphicon-plus"></i> {{ 'menu.addRule' | translate }}
+        </button>
+
+        <div class="mat-elevation-z8 table table-striped">
+            <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+            <div class="header-filter-table">
+                <mat-form-field class="header-filter-field">
+                    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+                </mat-form-field>
+            </div>
+            <mat-table #table [dataSource]="dataSource" matSort>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+                </ng-container>
+
+                <!-- Description Column -->
+                <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.description' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.description}}</mat-cell>
+                </ng-container>
+
+                <!-- Action-Menu Column -->
+                <ng-container matColumnDef="action">
+                    <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
+                        translate}}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                        <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+                            [matMenuTriggerData]="{factType: factType}" (click)="onMenuTriggerClick(element)">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+            </mat-table>
+            <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+                [showFirstLastButtons]="true" [length]="totalSize" (page)="pageEvent = handlePage($event)">
+            </mat-paginator>
+        </div>
+
+    </mat-tab>
+</mat-tab-group>
+
+
+
+
+<!-- =============================================================================================================== -->
+<!-- Menu which will open when action button is pressed add a rule -->
+<mat-menu #menu="matMenu">
+    <ng-template matMenuContent let-type="factType">
+        <button mat-menu-item (click)="onEditClick(type)">
+            <mat-icon>edit</mat-icon>
+            {{ 'button.edit' | translate }}
+        </button>
+        <button mat-menu-item (click)="onMapClick(type)">
+            <mat-icon>shuffle icon</mat-icon>
+            {{ 'button.map' | translate }}
+        </button>
+        <button mat-menu-item (click)="onDeleteClick()">
+            <mat-icon>delete</mat-icon>
+            {{ 'button.delete' | translate }}
+        </button>
+    </ng-template>
+</mat-menu>

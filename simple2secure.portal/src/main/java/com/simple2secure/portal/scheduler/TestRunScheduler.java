@@ -82,7 +82,8 @@ public class TestRunScheduler {
 	 *
 	 */
 
-	@Scheduled(fixedRate = 50000)
+	@Scheduled(
+			fixedRate = 50000)
 	public void checkTests() throws ItemNotFoundRepositoryException {
 
 		List<Test> tests = testRepository.getScheduledTest();
@@ -94,10 +95,10 @@ public class TestRunScheduler {
 				// Calculate the difference between last execution time and current timestamp
 
 				long millisScheduled = TimeUtils.convertTimeUnitsToMilis(test.getScheduledTime(), test.getScheduledTimeUnit());
-				long nextExecutionTime = test.getLastExecution() + millisScheduled;
+				long nextExecutionTime = test.getLastChangedTimestamp() + millisScheduled;
 				long executionTimeDifference = nextExecutionTime - currentTimestamp;
 
-				if (test.getLastExecution() == 0 || executionTimeDifference < 0) {
+				if (test.getLastChangedTimestamp() == 0 || executionTimeDifference < 0) {
 
 					CompanyLicensePrivate license = licenseRepository.findByDeviceId(test.getPodId());
 					DeviceInfo deviceInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
@@ -108,15 +109,15 @@ public class TestRunScheduler {
 
 						if (group != null) {
 							TestRun testRun = new TestRun(test.getId(), test.getName(), test.getPodId(), group.getContextId(),
-									TestRunType.AUTOMATIC_PORTAL, test.getTest_content(), TestStatus.PLANNED, System.currentTimeMillis());
+									TestRunType.AUTOMATIC_PORTAL, test.getTestContent(), TestStatus.PLANNED, System.currentTimeMillis());
 							testRun.setHostname(deviceInfo.getName());
 
-							test.setLastExecution(currentTimestamp);
+							test.setLastScheduleTimestamp(currentTimestamp);
 							testRunRepository.save(testRun);
 							testRepository.update(test);
 
-							notificationUtils.addNewNotificationPortal(test.getName() + " has been scheduled automatically using the portal",
-									group.getContextId());
+							notificationUtils.addNewNotification(test.getName() + " has been scheduled automatically using the portal",
+									group.getContextId(), null, false);
 						}
 					}
 				}

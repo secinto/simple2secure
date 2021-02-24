@@ -20,10 +20,9 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-import {Command} from './command';
+import { Command } from './command';
 
-export class TestStep extends Base {
+export class TestStep {
 	description = '';
 	command = new Command();
 }

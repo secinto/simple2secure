@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Base} from './base';
+import { Base } from './base';
 
 export class WidgetProperties extends Base {
 	widgetId: string;

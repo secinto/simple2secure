@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.pcap4j.packet.IllegalRawDataException;
 
 import com.simple2secure.api.model.ProbePacket;
@@ -63,7 +64,7 @@ public class PacketUtil {
 	 *
 	 * @param taskMap
 	 */
-	public static List<ProbePacket> getChangedPackets(Map<String, ProbePacketQueueHandler> taskMap) {
+	public static List<ProbePacket> getChangedPackets(Map<ObjectId, ProbePacketQueueHandler> taskMap) {
 		List<ProbePacket> changedPacketList = new ArrayList<>();
 		List<ProbePacket> probePacketList = getAllProbePacketsFromDB();
 
@@ -103,11 +104,11 @@ public class PacketUtil {
 
 		try {
 			ProbePacket arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
-			arpPacket.setId("1");
+			arpPacket.setId(new ObjectId("1"));
 			ProbePacket pingPacket = ProbePacketCrafter.craftProbePacket("ping", "2", "ping-packet", false, 50, 1);
-			pingPacket.setId("2");
+			pingPacket.setId(new ObjectId("2"));
 			ProbePacket icmpCommonPacket = ProbePacketCrafter.craftProbePacket("icmpCommon", "2", "common-packet", false, 1, 1);
-			icmpCommonPacket.setId("3");
+			icmpCommonPacket.setId(new ObjectId("3"));
 
 			DBUtil.getInstance().merge(arpPacket);
 			DBUtil.getInstance().merge(pingPacket);

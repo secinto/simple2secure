@@ -33,11 +33,12 @@ import javax.mail.Store;
 import javax.mail.UIDFolder;
 import javax.mail.internet.MimeMultipart;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
 import com.simple2secure.api.model.Status;
@@ -45,8 +46,7 @@ import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 import com.simple2secure.portal.repository.EmailConfigurationRepository;
 import com.simple2secure.portal.repository.EmailRepository;
 import com.simple2secure.portal.repository.NotificationRepository;
-import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
-import com.simple2secure.portal.rules.EmailRulesEngine;
+import com.simple2secure.portal.rules.PortalRuleEngine;
 import com.simple2secure.portal.utils.MailUtils;
 import com.simple2secure.portal.utils.NotificationUtils;
 import com.simple2secure.portal.utils.PortalUtils;
@@ -54,6 +54,7 @@ import com.simple2secure.portal.utils.PortalUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Profile("!test")
 @Slf4j
 public class UpdateEmailScheduler {
 
@@ -70,9 +71,6 @@ public class UpdateEmailScheduler {
 	NotificationUtils notificationUtils;
 
 	@Autowired
-	RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
-
-	@Autowired
 	EmailRepository emailRepository;
 
 	@Autowired
@@ -82,18 +80,19 @@ public class UpdateEmailScheduler {
 	PortalUtils portalUtils;
 
 	@Autowired
-	EmailRulesEngine emailRulesEngine;
+	PortalRuleEngine portalRuleEngine;
 
 	private Properties emailProperties;
 
-	private Hashtable<String, Store> storeMapping = new Hashtable<>();
+	private Hashtable<ObjectId, Store> storeMapping = new Hashtable<>();
 
 	public UpdateEmailScheduler() {
 		emailProperties = new Properties();
 		emailProperties.setProperty("mail.imap.ssl.enable", "true");
 	}
 
-	@Scheduled(fixedRate = 50000)
+	@Scheduled(
+			fixedRate = 20000)
 	public void checkEmails() throws Exception {
 		List<EmailConfiguration> configs = emailConfigRepository.findAll();
 		log.info("Checking configured email inboxes");
@@ -122,8 +121,8 @@ public class UpdateEmailScheduler {
 	 * @return
 	 * @throws Exception
 	 */
-	public void extractEmailsFromMessages(Message[] messages, String configId) {
-		if (!Strings.isNullOrEmpty(configId)) {
+	public void extractEmailsFromMessages(Message[] messages, ObjectId configId) {
+		if (configId != null) {
 			EmailConfiguration emailConfig = emailConfigRepository.find(configId);
 			if (emailConfig != null) {
 				for (Message msg : messages) {
@@ -146,9 +145,9 @@ public class UpdateEmailScheduler {
 											mailUtils.getTextFromMimeMultipart((MimeMultipart) msg.getContent()), msg.getReceivedDate());
 								}
 
-								emailRulesEngine.checkMail(email, emailConfig.getContextId());
-
 								emailRepository.save(email);
+								portalRuleEngine.check(email, emailConfig.getContextId());
+
 							} catch (Exception e) {
 								log.error("Problem occured {}", e.getMessage());
 							}

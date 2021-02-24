@@ -24,6 +24,7 @@ package com.simple2secure.test.portal.token;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,8 @@ public class TestCompanyLicense {
 
 	@Test
 	public void testLicenseCasting() {
-		CompanyLicensePrivate license = new CompanyLicensePrivate("my group", "l1111", "20/12/2018");
-		license.setDeviceId("dadfas");
+		CompanyLicensePrivate license = new CompanyLicensePrivate(new ObjectId("my group"), new ObjectId("l1111"), "20/12/2018");
+		license.setDeviceId(new ObjectId("dadfas"));
 		license.setAccessToken("Sasdfasdf");
 		license.setTokenSecret("SECRET");
 

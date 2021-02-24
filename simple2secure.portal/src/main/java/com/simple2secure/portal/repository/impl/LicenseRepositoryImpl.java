@@ -7,16 +7,22 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.logging.log4j.util.Strings;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyLicensePrivate;
+import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.repository.LicenseRepository;
 import com.simple2secure.portal.utils.PortalUtils;
 
@@ -34,13 +40,13 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findAllByGroupId(String groupId) {
+	public List<CompanyLicensePrivate> findAllByGroupId(ObjectId groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
 		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByLicenseId(String licenseId) {
+	public List<CompanyLicensePrivate> findByLicenseId(ObjectId licenseId) {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId));
 		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 	}
@@ -52,19 +58,19 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId) {
+	public CompanyLicensePrivate findByLicenseIdAndDeviceId(ObjectId licenseId, ObjectId deviceId) {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("deviceId").is(deviceId));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByUserId(String userId) {
+	public List<CompanyLicensePrivate> findByUserId(ObjectId userId) {
 		Query query = new Query(Criteria.where("userId").is(userId));
 		return mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 	}
 
 	@Override
-	public CompanyLicensePrivate findByGroupAndUserId(String groupId, String userId) {
+	public CompanyLicensePrivate findByGroupAndUserId(ObjectId groupId, ObjectId userId) {
 		Query query = new Query(Criteria.where("userId").is(userId).and("groupId").is(groupId));
 		List<CompanyLicensePrivate> license = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 
@@ -76,13 +82,13 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicensePrivate findByDeviceId(String deviceId) {
+	public CompanyLicensePrivate findByDeviceId(ObjectId deviceId) {
 		Query query = new Query(Criteria.where("deviceId").is(deviceId));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
 
 	@Override
-	public void deleteByGroupId(String groupId) {
+	public void deleteByGroupId(ObjectId groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
 		List<CompanyLicensePrivate> licenses = mongoTemplate.find(query, CompanyLicensePrivate.class, collectionName);
 
@@ -101,8 +107,8 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public void deleteByDeviceId(String deviceId) {
-		if (!Strings.isNullOrEmpty(deviceId)) {
+	public void deleteByDeviceId(ObjectId deviceId) {
+		if (deviceId != null) {
 			CompanyLicensePrivate license = findByDeviceId(deviceId);
 			if (license != null) {
 				delete(license);
@@ -112,7 +118,7 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public CompanyLicensePrivate findByLicenseAndHostname(String licenseId, String hostname) {
+	public CompanyLicensePrivate findByLicenseAndHostname(ObjectId licenseId, String hostname) {
 		Query query = new Query(Criteria.where("licenseId").is(licenseId).and("hostname").is(hostname));
 		return mongoTemplate.findOne(query, CompanyLicensePrivate.class, collectionName);
 	}
@@ -124,12 +130,12 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public Map<String, Object> findByGroupIdsPaged(List<String> groupIds, int page, int size) {
+	public Map<String, Object> findByGroupIdsPaged(List<ObjectId> groupIds, int page, int size) {
 		List<CompanyLicensePrivate> licenses = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
 		Query query = new Query();
-		for (String groupId : groupIds) {
+		for (ObjectId groupId : groupIds) {
 			Criteria expression = new Criteria();
 			expression.and("groupId").is(groupId);
 			orExpression.add(expression);
@@ -160,13 +166,13 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 	}
 
 	@Override
-	public List<CompanyLicensePrivate> findByGroupIds(List<String> groupIds) {
+	public List<CompanyLicensePrivate> findByGroupIds(List<ObjectId> groupIds) {
 		List<CompanyLicensePrivate> licenses = new ArrayList<>();
 		if (!groupIds.isEmpty()) {
 			List<Criteria> orExpression = new ArrayList<>();
 			Criteria orCriteria = new Criteria();
 			Query query = new Query();
-			for (String groupId : groupIds) {
+			for (ObjectId groupId : groupIds) {
 				Criteria expression = new Criteria();
 				expression.and("groupId").is(groupId);
 				orExpression.add(expression);
@@ -177,6 +183,54 @@ public class LicenseRepositoryImpl extends LicenseRepository {
 		}
 
 		return licenses;
+	}
+
+	@Override
+	public Map<String, Object> getDevicesByGroupIdPagination(ObjectId groupId, int page, int size, String filter) {
+
+		AggregationOperation matchGroupId = Aggregation.match(new Criteria("groupId").is(groupId));
+		AggregationOperation lookUpDevice = Aggregation.lookup("deviceInfo", "deviceId", "_id", "info");
+		AggregationOperation lookUpGroup = Aggregation.lookup("companygroup", "groupId", "_id", "group");
+		AggregationOperation unwindInfo = Aggregation.unwind("$info");
+		AggregationOperation unwindGroup = Aggregation.unwind("$group");
+		AggregationOperation countTotal = Aggregation.count().as(StaticConfigItems.COUNT_FIELD);
+
+		String[] filterFields = { "info.name", "info.type", "info.deviceStatus" };
+
+		AggregationOperation filtering = Aggregation.match(defineFilterCriteriaWithManyFields(filterFields, filter));
+
+		Aggregation aggregation = Aggregation.newAggregation(CompanyLicensePrivate.class, matchGroupId, lookUpDevice, lookUpGroup, unwindInfo,
+				unwindGroup, countTotal);
+
+		if (!Strings.isBlank(filter)) {
+			aggregation = Aggregation.newAggregation(CompanyLicensePrivate.class, matchGroupId, lookUpDevice, lookUpGroup, unwindInfo,
+					unwindGroup, filtering, countTotal);
+		}
+
+		Object count = getCountResult(mongoTemplate.aggregate(aggregation, "license", Object.class));
+
+		int limit = portalUtils.getPaginationLimit(size);
+		long skip = portalUtils.getPaginationStart(size, page, limit);
+
+		AggregationOperation paginationLimit = Aggregation.limit(limit);
+		AggregationOperation paginationSkip = Aggregation.skip(skip);
+
+		// IMPORTANT: paginationSkip and paginationLimit must be in correct order, like shown below.
+		aggregation = Aggregation.newAggregation(CompanyLicensePrivate.class, matchGroupId, lookUpDevice, lookUpGroup, unwindInfo, unwindGroup,
+				paginationSkip, paginationLimit);
+
+		if (!Strings.isBlank(filter)) {
+			aggregation = Aggregation.newAggregation(CompanyLicensePrivate.class, matchGroupId, lookUpDevice, lookUpGroup, unwindInfo,
+					unwindGroup, filtering, paginationSkip, paginationLimit);
+		}
+
+		AggregationResults<Device> results = mongoTemplate.aggregate(aggregation, "license", Device.class);
+
+		Map<String, Object> devicesMap = new HashMap<>();
+		devicesMap.put("devices", results.getMappedResults());
+		devicesMap.put("totalSize", count);
+
+		return devicesMap;
 	}
 
 }

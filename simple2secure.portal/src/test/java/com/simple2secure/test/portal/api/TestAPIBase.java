@@ -21,47 +21,26 @@
  */
 package com.simple2secure.test.portal.api;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.bson.types.ObjectId;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.simple2secure.api.model.Context;
-import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.api.model.Settings;
-import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.LoadedConfigItems;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.Simple2SecurePortal;
-import com.simple2secure.portal.repository.ContextRepository;
-import com.simple2secure.portal.repository.ContextUserAuthRepository;
-import com.simple2secure.portal.repository.CurrentContextRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
-import com.simple2secure.portal.repository.UserRepository;
 
 @ActiveProfiles("test")
 @ExtendWith({ SpringExtension.class })
@@ -70,43 +49,17 @@ import com.simple2secure.portal.repository.UserRepository;
 		classes = { Simple2SecurePortal.class })
 public class TestAPIBase {
 
-	private static Logger log = LoggerFactory.getLogger(TestAPIBase.class);
-
 	@Autowired
 	protected LoadedConfigItems loadedConfigItems;
 
 	@Autowired
-	private TestRestTemplate restTemplate;
-
-	@Autowired
 	private SettingsRepository settingsRepository;
-
-	@Autowired
-	private ContextRepository contextRepository;
-
-	@Autowired
-	private ContextUserAuthRepository contextUserAuthRepository;
-
-	@Autowired
-	private CurrentContextRepository currentContextRepository;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	MongoTemplate mongoTemplate;
 
 	@LocalServerPort
 	protected int randomServerPort;
-
-	private User adminUser;
-
-	private User deviceUser;
-
-	private User superUser;
 
 	private String accessTokenAdmin;
 
@@ -129,14 +82,7 @@ public class TestAPIBase {
 		 * Update the port to the one randomly selected by the framework. Otherwise the URLs would be incorrect.
 		 */
 		loadedConfigItems.setBasePort(String.valueOf(randomServerPort));
-
-		adminUser = createUser(UserRole.ADMIN);
-		deviceUser = createUser(UserRole.DEVICE);
-		superUser = createUser(UserRole.SUPERUSER);
 		createSettings();
-		setAccessTokenAdmin(obtainAccessToken(adminUser));
-		setAccessTokenProbe(obtainAccessToken(deviceUser));
-		setAccessTokenSuperUser(obtainAccessToken(superUser));
 	}
 
 	/**
@@ -151,87 +97,6 @@ public class TestAPIBase {
 		settings.setAccessTokenProbeValidityTime(10);
 		settings.setAccessTokenProbeValidityUnit(TimeUnit.MINUTES);
 		settingsRepository.save(settings);
-	}
-
-	/**
-	 * Creates user object in the database with the user role parameter which has been transferred, this object will be used in login
-	 * procedure
-	 *
-	 * @return
-	 */
-	private User createUser(UserRole userRole) {
-		User user = new User();
-		String contextId = null;
-		user.setEmail("probe@test.com");
-		user.setPassword(passwordEncoder.encode("test"));
-		user.setActivated(true);
-		user.setActivationToken("54321");
-
-		if (userRole.equals(UserRole.ADMIN)) {
-			user.setEmail("testiing@test.com");
-			user.setActivationToken("12345");
-			contextId = createContext("Context 1");
-		} else if (userRole.equals(UserRole.SUPERUSER)) {
-			user.setEmail("superuser@test.com");
-			user.setActivationToken("23145");
-			contextId = createContext("Context 2");
-		}
-
-		userRepository.save(user);
-
-		// We need an userId in some tests!!
-		// TODO: Implement a function in MongoRepository which returns an object after saving
-
-		user = userRepository.findByEmail(user.getEmail());
-
-		ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(user.getId(), contextId, userRole, true);
-		ObjectId contextUserAuthId = contextUserAuthRepository.saveAndReturnId(contextUserAuth);
-
-		CurrentContext currentContext = new CurrentContext(user.getId(), contextUserAuthId.toString());
-		currentContextRepository.save(currentContext);
-
-		return user;
-	}
-
-	/**
-	 * This function adds new admin group to the database, because it is needed for some tests.
-	 *
-	 * @return
-	 */
-	private String createContext(String groupName) {
-		Context context = new Context();
-		context.setName(groupName);
-		ObjectId contextId = contextRepository.saveAndReturnId(context);
-		return contextId.toString();
-	}
-
-	/**
-	 * Obtains an access token using the login api. Sends the credentials of the user which has been previously created.
-	 *
-	 * @param user
-	 * @return
-	 */
-	private String obtainAccessToken(User user) {
-
-		JSONObject request = new JSONObject();
-		try {
-			request.put("username", user.getEmail());
-			request.put("password", "test");
-		} catch (JSONException e) {
-			log.error("Error occured {0}", e.getMessage());
-		}
-
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
-		ResponseEntity<String> loginResponse = restTemplate.exchange(loadedConfigItems.getBaseURL() + StaticConfigItems.LOGIN_API,
-				HttpMethod.POST, entity, String.class);
-
-		if (loginResponse.getStatusCode() == HttpStatus.OK) {
-			List<String> all_headers = loginResponse.getHeaders().get("Authorization");
-			return all_headers.get(0).toString();
-		}
-
-		return null;
 	}
 
 	/**
@@ -290,17 +155,5 @@ public class TestAPIBase {
 
 	public void setAccessTokenSuperUser(String accessTokenSuperUser) {
 		this.accessTokenSuperUser = accessTokenSuperUser;
-	}
-
-	public User getAdminUser() {
-		return adminUser;
-	}
-
-	public User getProbeUser() {
-		return deviceUser;
-	}
-
-	public User getSuperUser() {
-		return superUser;
 	}
 }

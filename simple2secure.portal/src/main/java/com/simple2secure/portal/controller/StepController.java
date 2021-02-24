@@ -33,44 +33,63 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputStep;
 
 import lombok.extern.slf4j.Slf4j;
+import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.STEP_API)
 @Slf4j
 public class StepController extends BaseUtilsProvider {
 
+	/**
+	 * This function returns all steps, according to the provided select_all flag
+	 *
+	 * @param select_all
+	 * @param locale
+	 * @return
+	 */
 	@ValidRequestMapping
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'ROLE_DEVICE')")
+	@NotSecuredApi
 	public ResponseEntity<List<Step>> getSteps(@RequestParam boolean select_all, @ServerProvidedValue ValidInputLocale locale) {
 
 		List<Step> steps = stepRepository.getStepsByFlagValue(select_all);
 		if (steps != null) {
 			return new ResponseEntity<>(steps, HttpStatus.OK);
 		}
-		return ((ResponseEntity<List<Step>>) buildResponseEntity("error_while_getting_steps", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_getting_steps", locale.getValue()));
 	}
 
-	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	/**
+	 * This function saves or updates step
+	 *
+	 * @param step
+	 * @param locale
+	 * @param context
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Step> saveOrUpdateStep(@RequestBody Step step, @ServerProvidedValue ValidInputLocale locale,
 			@ServerProvidedValue ValidInputContext context) throws ItemNotFoundRepositoryException {
 
 		if (step != null) {
-			if (Strings.isNullOrEmpty(step.getId())) {
+			if (step.getId() != null) {
 				List<Step> steps = stepRepository.getStepsByFlagValue(true);
 				step.setNumber(steps.size() + 1);
 				stepRepository.save(step);
@@ -81,20 +100,21 @@ public class StepController extends BaseUtilsProvider {
 			return new ResponseEntity<>(step, HttpStatus.OK);
 		}
 		log.error("Error while updating step");
-		return ((ResponseEntity<Step>) buildResponseEntity("error_while_saving_step", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_saving_step", locale.getValue()));
 	}
 
 	/**
-	 * This function returns all users from the user repository
+	 * This function deletes the step using provided stepId
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteStep(@PathVariable ValidInputStep stepId, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
-		if (!Strings.isNullOrEmpty(stepId.getValue())) {
+		if (stepId.getValue() != null) {
 			Step step = stepRepository.find(stepId.getValue());
 			List<Step> steps = stepRepository.getAllGreaterThanNumber(step.getNumber());
 			{
@@ -109,6 +129,6 @@ public class StepController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while deleting step with id {}", stepId.getValue());
-		return (buildResponseEntity("problem_occured_while_deleting_step", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_step", locale.getValue()));
 	}
 }

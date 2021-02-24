@@ -27,26 +27,20 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.EmailConfigurationDTO;
-import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.Email;
 import com.simple2secure.api.model.EmailConfiguration;
-import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.UserInvitation;
-import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -92,16 +86,15 @@ public class MailUtils extends BaseServiceProvider {
 	 * @param user
 	 * @throws IOException
 	 */
-	public boolean sendEmail(User user, String emailContent, String subject) throws IOException {
+	public boolean sendEmail(String toEmail, String emailContent, String subject) throws IOException {
 		if (!initialized) {
 			log.warn("Not sending any email since MailUtils are not initialized correctly");
 			return true;
 		}
 
-		if (user != null && !Strings.isNullOrEmpty(user.getEmail())) {
-			String to = user.getEmail();
+		if (!Strings.isNullOrEmpty(toEmail)) {
 			SimpleMailMessage message = new SimpleMailMessage();
-			message.setTo(to);
+			message.setTo(toEmail);
 			message.setFrom(mailUser);
 			message.setSubject(subject);
 			message.setText(emailContent);
@@ -109,35 +102,6 @@ public class MailUtils extends BaseServiceProvider {
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * This function sends an email message as html
-	 *
-	 * @param user
-	 * @param emailContent
-	 * @param subject
-	 * @return
-	 * @throws MessagingException
-	 */
-	public boolean sendHTMLEmail(User user, String emailContent, String subject) throws MessagingException {
-		if (!initialized) {
-			log.warn("Not sending any email since MailUtils are not initialized correctly");
-			return true;
-		}
-
-		if (user != null && !Strings.isNullOrEmpty(emailContent) && !Strings.isNullOrEmpty(subject)) {
-			MimeMessage message = javaMailSender.createMimeMessage();
-			message.setSubject(subject);
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true);
-			mimeMessageHelper.setFrom(mailUser);
-			mimeMessageHelper.setTo(user.getEmail());
-			mimeMessageHelper.setText(emailContent, true);
-			javaMailSender.send(message);
-			return true;
-		}
-		return false;
-
 	}
 
 	/**
@@ -166,27 +130,6 @@ public class MailUtils extends BaseServiceProvider {
 		return result;
 	}
 
-	public String generateEmailContent(User user, String locale) {
-		return messageByLocaleService.getMessage("registration_email_content", locale) + loadedConfigItems.getBaseURL()
-				+ StaticConfigItems.USER_API + "/activate/" + user.getActivationToken();
-	}
-
-	/**
-	 * This function generates an email body for the invitation email.
-	 *
-	 * @param userInvitation
-	 * @param context
-	 * @param addedByUser
-	 * @param locale
-	 * @return
-	 */
-	public String generateInvitationEmail(UserInvitation userInvitation, Context context, User addedByUser, String locale) {
-		String content = "You have been invited by " + addedByUser.getEmail() + " to join " + context.getName()
-				+ " context.\nTo accept the invitation please click on the following link: " + loadedConfigItems.getBaseURL()
-				+ StaticConfigItems.USER_API + "/invite/" + userInvitation.getInvitationToken();
-		return content;
-	}
-
 	/**
 	 * This function checks if the emailConfiguration already Exists according to the email and contextId
 	 *
@@ -194,7 +137,7 @@ public class MailUtils extends BaseServiceProvider {
 	 * @param contextId
 	 * @return
 	 */
-	public String checkIfEmailConfigExists(EmailConfiguration providedConfig) {
+	public ObjectId checkIfEmailConfigExists(EmailConfiguration providedConfig) {
 
 		EmailConfiguration emailConfig = emailConfigRepository.findByEmailAndContextId(providedConfig.getEmail().trim(),
 				providedConfig.getContextId());
@@ -214,6 +157,7 @@ public class MailUtils extends BaseServiceProvider {
 		if (emailConfiguration != null) {
 			emailConfigRepository.delete(emailConfiguration);
 			emailRepository.deleteByConfigId(emailConfiguration.getId());
+			ruleEmailConfigMappingRepository.deleteByEmailConfig(emailConfiguration.getContextId(), emailConfiguration.getId());
 		}
 	}
 
@@ -223,8 +167,8 @@ public class MailUtils extends BaseServiceProvider {
 	 *
 	 * @param contextId
 	 */
-	public void deleteEmailConfigurationByContextId(String contextId) {
-		if (!Strings.isNullOrEmpty(contextId)) {
+	public void deleteEmailConfigurationByContextId(ObjectId contextId) {
+		if (contextId != null) {
 			List<EmailConfiguration> emailConfigList = emailConfigRepository.findByContextId(contextId);
 			if (emailConfigList != null) {
 				for (EmailConfiguration emailConfig : emailConfigList) {
@@ -243,7 +187,7 @@ public class MailUtils extends BaseServiceProvider {
 	 * @param contextId
 	 * @return
 	 */
-	public List<EmailConfigurationDTO> getEmailConfigDTO(String contextId) {
+	public List<EmailConfigurationDTO> getEmailConfigDTO(ObjectId contextId, int size, int page) {
 		List<EmailConfigurationDTO> configurationList = new ArrayList<>();
 		List<EmailConfiguration> emailConfigList = emailConfigRepository.findByContextId(contextId);
 		if (emailConfigList != null) {

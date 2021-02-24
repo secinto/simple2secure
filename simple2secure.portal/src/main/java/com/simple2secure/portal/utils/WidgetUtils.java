@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +57,8 @@ public class WidgetUtils extends BaseServiceProvider {
 	@Autowired
 	PortalUtils portalUtils;
 
-	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, String contextId, String location) throws ItemNotFoundRepositoryException {
+	public List<WidgetDTO> getWidgetsByUserAndContextIdAndLocation(String userId, ObjectId contextId, String location)
+			throws ItemNotFoundRepositoryException {
 		List<WidgetDTO> widgetDTOList = new ArrayList<>();
 		List<WidgetProperties> properties = widgetPropertiesRepository.getPropertiesByUserIdAndContextIdAndLocation(userId, contextId,
 				location);
@@ -64,7 +66,7 @@ public class WidgetUtils extends BaseServiceProvider {
 			for (WidgetProperties property : properties) {
 				if (property != null) {
 					Widget widget = widgetRepository.find(property.getWidgetId());
-					if(widget != null) {
+					if (widget != null) {
 						Object value = getWidgetValue(widget.getApi(), contextId);
 						widgetDTOList.add(new WidgetDTO(widget, property, value));
 						log.info("Adding new widget {} to the list", widget.getName());
@@ -81,9 +83,9 @@ public class WidgetUtils extends BaseServiceProvider {
 	 * @param api
 	 * @param contextId
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
+	 * @throws ItemNotFoundRepositoryException
 	 */
-	public Object getWidgetValue(String api, String contextId) throws ItemNotFoundRepositoryException {
+	public Object getWidgetValue(String api, ObjectId contextId) throws ItemNotFoundRepositoryException {
 		Context context = contextRepository.find(contextId);
 		if (context != null) {
 			if (api.contains(StaticConfigItems.WIDGET_API_ACTIVE_DEVICES)) {

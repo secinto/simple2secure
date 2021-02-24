@@ -1,0 +1,70 @@
+<div mat-dialog-content>
+	<div class="center">
+
+		<div *ngIf="fileUploaded" class="imported-suts-table">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>{{'table.name' | translate}}</th>
+						<th>{{'table.protocol' | translate}}</th>
+					</tr>
+				</thead>
+				<tbody class="upload-name-style">
+					<tr *ngFor="let item of importedSuts; let i=index">
+						<td>{{ item.name }}</td>
+						<td>{{ item.protocol }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<ngx-file-drop dropZoneLabel="{{'button.dropFiles' | translate}}" (onFileDrop)="dropped($event)"
+			(onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" multiple="false">
+			<ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+				{{'message.sutUpload' | translate}}
+				<button class="mat-green-button upload-mat-button" mat-raised-button color="success" type="button"
+					(click)="openFileSelector()">{{'button.selectFiles' | translate}}</button>
+			</ng-template>
+
+			<div class="upload-table">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Name</th>
+						</tr>
+					</thead>
+					<tbody class="upload-name-style">
+						<tr *ngFor="let item of files; let i=index">
+							<td><strong>{{ item.relativePath }}</strong></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</ngx-file-drop>
+
+		<div *ngIf="fileUploaded" class="upload-table">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>{{'table.filename' | translate}}</th>
+					</tr>
+				</thead>
+				<tbody class="upload-name-style">
+					<tr *ngFor="let item of files; let i=index">
+						<td><strong>{{ item.relativePath }}</strong></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div mat-dialog-actions>
+	<button class="mat-green-button" type="button" mat-raised-button color="success" (click)="importSuts()">{{
+		'button.save' | translate }}
+	</button>
+
+	<button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+		{{ 'button.close' | translate }}
+	</button>
+</div>

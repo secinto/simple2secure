@@ -1,14 +1,14 @@
 package com.simple2secure.portal.rules.actions;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.simple2secure.api.model.DataType;
 import com.simple2secure.api.model.Email;
-import com.simple2secure.api.model.User;
+import com.simple2secure.api.model.RuleFactType;
 import com.simple2secure.commons.rules.annotations.AnnotationAction;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.portal.utils.MailUtils;
-
 
 /**
  *
@@ -18,9 +18,9 @@ import com.simple2secure.portal.utils.MailUtils;
  */
 @AnnotationAction(
 		name_tag = "email_rules_action_name_forward_email",
-		description_tag = "email_rules_action_description_forward_email")
-
-public class TemplateActionForwardEmail extends AbtractEmailAction {
+		description_tag = "email_rules_action_description_forward_email",
+		fact_type = RuleFactType.EMAIL)
+public class TemplateActionForwardEmail extends AbstractPortalAction<Email> {
 
 	@Autowired
 	MailUtils mailUtils;
@@ -47,15 +47,13 @@ public class TemplateActionForwardEmail extends AbtractEmailAction {
 			type = DataType._STRING)
 	String emailAddress;
 
-	@Override
-	protected void action(Email email) throws Exception {
-		User user = new User(emailAddress, "test", true, null, true, true);
 
+	@Override
+	protected void action(Email email, ObjectId contextId) throws Exception {
 		String content = text + "\n\n" + "received email why the rule has been triggered:\n\n" + "address: \"" + email.getFrom() + "\"\n"
 				+ "subject: \"" + email.getSubject() + "\"\n" + "text: \"" + email.getText() + "\"\n";
 
-		mailUtils.sendEmail(user, content, subject);
-
+		mailUtils.sendEmail(emailAddress, content, subject);
 	}
 
 }

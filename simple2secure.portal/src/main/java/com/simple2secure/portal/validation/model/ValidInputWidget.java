@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputWidget extends ValidatedInput<String> {
 
-	private String widgetId;
+	private ObjectId widgetId;
 	private String tag = "/{widgetId}";
 
 	public ValidInputWidget() {
 	}
 
 	public ValidInputWidget(String widgetId) {
-		this.widgetId = widgetId;
+		this.widgetId = new ObjectId(widgetId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return widgetId;
 	}
 

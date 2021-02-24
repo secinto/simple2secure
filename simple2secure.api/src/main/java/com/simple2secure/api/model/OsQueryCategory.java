@@ -20,8 +20,18 @@
  *********************************************************************
  */
 package com.simple2secure.api.model;
+
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OsQueryCategory extends GenericDBObject {
 
 	/**
@@ -31,37 +41,4 @@ public class OsQueryCategory extends GenericDBObject {
 	private String name;
 	private String description;
 	private int systemsAvailable;
-
-	public OsQueryCategory() {
-	}
-
-	public OsQueryCategory(String name, String description, int systemsAvailable) {
-		this.name = name;
-		this.description = description;
-		this.systemsAvailable = systemsAvailable;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getSystemsAvailable() {
-		return systemsAvailable;
-	}
-
-	public void setSystemsAvailable(int systemsAvailable) {
-		this.systemsAvailable = systemsAvailable;
-	}
 }

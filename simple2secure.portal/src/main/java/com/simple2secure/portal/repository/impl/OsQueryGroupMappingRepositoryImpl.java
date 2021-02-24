@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -24,13 +25,13 @@ public class OsQueryGroupMappingRepositoryImpl extends OsQueryGroupMappingReposi
 	}
 
 	@Override
-	public List<OsQueryGroupMapping> findByGroupId(String groupId) {
+	public List<OsQueryGroupMapping> findByGroupId(ObjectId groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
 		return mongoTemplate.find(query, OsQueryGroupMapping.class, collectionName);
 	}
 
 	@Override
-	public void deleteByGroupId(String groupId) {
+	public void deleteByGroupId(ObjectId groupId) {
 		List<OsQueryGroupMapping> mappings = findByGroupId(groupId);
 
 		if (mappings != null) {
@@ -41,13 +42,13 @@ public class OsQueryGroupMappingRepositoryImpl extends OsQueryGroupMappingReposi
 	}
 
 	@Override
-	public List<OsQueryGroupMapping> findByQueryId(String queryId) {
+	public List<OsQueryGroupMapping> findByQueryId(ObjectId queryId) {
 		Query query = new Query(Criteria.where("queryId").is(queryId));
 		return mongoTemplate.find(query, OsQueryGroupMapping.class, collectionName);
 	}
 
 	@Override
-	public void deleteByQueryId(String queryId) {
+	public void deleteByQueryId(ObjectId queryId) {
 		List<OsQueryGroupMapping> mappings = findByQueryId(queryId);
 
 		if (mappings != null) {
@@ -58,7 +59,7 @@ public class OsQueryGroupMappingRepositoryImpl extends OsQueryGroupMappingReposi
 	}
 
 	@Override
-	public List<OsQueryGroupMapping> findByGroupIdAndOSInfo(String groupId, List<Integer> possibleValues) {
+	public List<OsQueryGroupMapping> findByGroupIdAndOSInfo(ObjectId groupId, List<Integer> possibleValues) {
 		Query query = new Query();
 
 		query = new Query(Criteria.where("groupId").is(groupId).and("systemsAvailable").in(possibleValues));
@@ -67,12 +68,12 @@ public class OsQueryGroupMappingRepositoryImpl extends OsQueryGroupMappingReposi
 	}
 
 	@Override
-	public List<OsQueryGroupMapping> getAllMapingsByGroupIds(List<String> group_ids, List<Integer> possibleValues) {
+	public List<OsQueryGroupMapping> getAllMapingsByGroupIds(List<ObjectId> group_ids, List<Integer> possibleValues) {
 		List<OsQueryGroupMapping> mappings = new ArrayList<>();
 		List<Criteria> orExpression = new ArrayList<>();
 		Criteria orCriteria = new Criteria();
 		Query query = new Query();
-		for (String groupId : group_ids) {
+		for (ObjectId groupId : group_ids) {
 			Criteria expression = new Criteria();
 			expression.and("groupId").is(groupId);
 			orExpression.add(expression);

@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Generic} from './generic';
-import {Probe} from './probe';
+import { Generic } from './generic';
+import { Probe } from './probe';
 
 export class User extends Generic {
 	password: string;

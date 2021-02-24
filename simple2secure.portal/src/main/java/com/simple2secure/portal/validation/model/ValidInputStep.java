@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputStep extends ValidatedInput<String> {
 
-	private String stepId;
+	private ObjectId stepId;
 	private String tag = "/{stepId}";
 
 	public ValidInputStep() {
 	}
 
 	public ValidInputStep(String stepId) {
-		this.stepId = stepId;
+		this.stepId = new ObjectId(stepId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return stepId;
 	}
 

@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -20,6 +23,11 @@ import com.simple2secure.portal.validation.StringToValidInputConverterFactory;
 
 @Configuration
 @Component
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(
+		prePostEnabled = true)
+@CrossOrigin(
+		origins = "https://localhost:9000")
 public class WebConfig implements WebMvcConfigurer {
 
 	@Autowired

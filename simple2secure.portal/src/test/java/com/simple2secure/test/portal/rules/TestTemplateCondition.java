@@ -24,26 +24,33 @@ package com.simple2secure.test.portal.rules;
 
 import java.util.Collection;
 
+import org.jeasy.rules.api.Condition;
+import org.jeasy.rules.api.Facts;
+
 import com.simple2secure.api.model.DataType;
-import com.simple2secure.api.model.Email;
+import com.simple2secure.api.model.RuleFactType;
 import com.simple2secure.commons.rules.annotations.AnnotationCondition;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParam;
 import com.simple2secure.commons.rules.annotations.AnnotationRuleParamArray;
-import com.simple2secure.portal.rules.conditions.AbtractEmailCondition;
+
+import lombok.Getter;
 
 /**
  * 
  * @author Richard Heinz
  * 
- * Action class for testing. DO NOT change otherwise the test cases will not 
- * perform right.
+ * Action class for testing. <strong>DO NOT change otherwise the test cases will not perform right.</strong>
  */
 /**
  * @author Richard Heinz
  *
  */
-@AnnotationCondition(name_tag = "test_condition_tag", description_tag = "action_description_tag")
-public class TestTemplateCondition extends AbtractEmailCondition {
+@AnnotationCondition(
+	name_tag = "test_condition_tag", 
+	description_tag = "action_description_tag",
+	fact_type = RuleFactType.GENERAL)
+@Getter
+public class TestTemplateCondition implements Condition  {
 
 	@AnnotationRuleParam(name_tag = "varInt_tag", description_tag = "varInt_description_tag", type = DataType._INT)
 	int varInt;
@@ -64,33 +71,7 @@ public class TestTemplateCondition extends AbtractEmailCondition {
 	Collection<String> arrayString;
 
 	@Override
-	protected boolean condition(Email email) {
-		// TODO Auto-generated method stub
+	public boolean evaluate(Facts facts) {
 		return false;
 	}
-
-	public int getVarInt() {
-		return varInt;
-	}
-
-	public double getVarDouble() {
-		return varDouble;
-	}
-
-	public String getVarString() {
-		return varString;
-	}
-
-	public Collection<Integer> getArrayInt() {
-		return arrayInt;
-	}
-
-	public Collection<Double> getArrayDouble() {
-		return arrayDouble;
-	}
-
-	public Collection<String> getArrayString() {
-		return arrayString;
-	}
-
 }

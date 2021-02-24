@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Generic} from './generic';
+import { Generic } from './generic';
 
 export class NetworkReport extends Generic {
 	probeId: string;

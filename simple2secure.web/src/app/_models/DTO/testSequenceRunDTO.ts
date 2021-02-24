@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {SequenceRun} from '../sequenceRun';
-import {TestSequenceResult} from '../testSequenceResult';
+import { SequenceRun } from '../sequenceRun';
+import { TestSequenceResult } from '../testSequenceResult';
 
 
 export class TestSequenceRunDTO {

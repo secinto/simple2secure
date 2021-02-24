@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>{{ 'probe.change.group' | translate }}</h1>
+<div mat-dialog-content>
+    <form #groupForm="ngForm">
+        <mat-form-field class="full_width_input">
+            <mat-select placeholder="{{ 'table.group' | translate }}" [(ngModel)]="selectedGroup" name="selectedGroup"
+                required>
+                <mat-option *ngFor="let group of groups" [value]="group">
+                    {{group.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button mat-button [disabled]="!groupForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+        (click)="changeGroup()">{{ 'button.save' | translate }}
+    </button>
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close]="selectedGroup"
+        cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>

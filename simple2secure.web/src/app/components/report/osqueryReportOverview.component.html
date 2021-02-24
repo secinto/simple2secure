@@ -1,0 +1,82 @@
+<mat-form-field>
+    <mat-label>{{"report.groups" | translate}}</mat-label>
+    <mat-select #selectgroup name="groupSelection" [ngModel]="selectedGroups"
+        (selectionChange)="updateGroups(repType.OSQUERY, devType.PROBE)" multiple>
+        <mat-option *ngFor="let group of groups" [value]="group">{{group.name}}</mat-option>
+    </mat-select>
+</mat-form-field>
+<mat-form-field class="devices-report">
+    <mat-label>{{"report.devices" | translate}}</mat-label>
+    <mat-select #selectdevices name="deviceSelection" [ngModel]="selectedDevices"
+        (selectionChange)="updateDevices(repType.OSQUERY)" multiple>
+        <mat-option *ngFor="let device of devices" [value]="device">
+            {{device.info.name}}
+            ({{device.group.name}})
+            <i *ngIf="device.info.deviceStatus === 'ONLINE'" style="color: #A7BD26; padding-left: 20%;"
+                class="fas fa-check-circle fa-2x"></i>
+            <i *ngIf="device.info.deviceStatus === 'OFFLINE'" style="color: #AA3939; padding-left:20%;"
+                class="fas fa-times-circle fa-2x"></i>
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<div class="example-container mat-elevation-z8 table table-striped">
+
+    <button mat-button [disabled]="isDeleteButtonDisabled" mat-raised-button
+        class="mat-green-button delete-button-table" color="primary" (click)="deleteSelectedReports(repType.OSQUERY)">{{
+        'button.deleteSelected' | translate:{'count':numSelected } }}
+    </button>
+
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput #filterValue placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table #table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="query">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.query' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+        </ng-container>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="probe">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.probe' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.deviceId}}</mat-cell>
+        </ng-container>
+
+        <!-- Host Column -->
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.hostname}}</mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'table.time' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.queryTimestamp | date : 'short'}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumns;"
+            (click)="openDialogShowReportDetails(row)"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [pageSize]="paginator.pageSize" [pageSizeOptions]="[5, 10, 20]"
+        [showFirstLastButtons]="true" [length]="totalSize">
+    </mat-paginator>
+</div>

@@ -23,21 +23,18 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
+
+import org.bson.types.ObjectId;
 
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class SystemUnderTestRepository extends MongoRepository<SystemUnderTest> {
 
-	public abstract SystemUnderTest getByDeviceId(String deviceId);
+	public abstract Map<String, Object> getAllByContextIdPaged(ObjectId contextId, int page, int size, String filter);
 
-	public abstract long getTotalAmountOfSystemUnderTest(String contextId);
-
-	public abstract long getTotalAmountOfSystemUnderTestWithType(String contextId, String deviceType);
-
-	public abstract List<SystemUnderTest> getAllByContextIdPaged(String contextId, int page, int size);
-
-	public abstract List<SystemUnderTest> getAllByContextIdAndSystemTypePaged(String contextId, int page, int size, String type);
+	public abstract List<SystemUnderTest> getAllByContextId(ObjectId contextId);
 
 	public abstract List<SystemUnderTest> getApplicableSystemUnderTests(List<String> sutMetadataKeyList);
 

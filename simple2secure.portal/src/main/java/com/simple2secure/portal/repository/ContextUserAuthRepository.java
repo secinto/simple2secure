@@ -23,25 +23,28 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+import org.springframework.stereotype.Component;
+
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.UserRole;
 import com.simple2secure.portal.dao.MongoRepository;
 
+@Component
 public abstract class ContextUserAuthRepository extends MongoRepository<ContextUserAuthentication> {
 
-	public abstract List<ContextUserAuthentication> getByContextId(String contextId);
+	public abstract List<ContextUserAuthentication> getByContextId(ObjectId contextId);
 
 	public abstract List<ContextUserAuthentication> getByUserId(String userId);
 
-	public abstract ContextUserAuthentication getByContextIdAndUserId(String contextId, String userId);
+	public abstract List<ContextUserAuthentication> getAdminsByUserId(String userId);
 
-	public abstract void deleteByContextId(String contextId);
+	public abstract ContextUserAuthentication getByContextIdAndUserId(ObjectId contextId, String userId);
+
+	public abstract void deleteByContextId(ObjectId contextId);
 
 	public abstract void deleteByUserId(String userId);
 
-	public abstract void deleteByContextIdAndUserId(String contextId, String userId);
+	public abstract void deleteByContextIdAndUserId(ObjectId contextId, String userId);
 
-	public abstract void deleteById(String id);
-
-	public abstract List<String> getUserIdsByUserRole(UserRole userRole);
+	public abstract void deleteById(ObjectId id);
 }

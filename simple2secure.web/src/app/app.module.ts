@@ -23,140 +23,152 @@
 /**
  * Internal core components
  */
-
-import {HomeComponent} from './home';
-import {LoginComponent} from './login';
-import {ActivationComponent, ActivatedComponent} from './activation';
-import {UserInvitationComponent} from './invitation';
-import {RegisterComponent} from './register';
-import {ResetComponent} from './resetPassword';
-import {ResendComponent} from './resendActivation';
-import {UpdatePasswordComponent} from './updatePassword';
-
-import {AlertComponent, FooterComponent, BaseComponent} from './components';
-
-import {SearchComponent, SearchResultComponent} from './search';
-import {NotificationComponent, NotificationDetailsComponent} from './notification';
-import {ConfigurationDetailsComponent} from './configuration';
-import {
-	UserComponent, UserDetailsComponent, UserOverviewComponent, UserGroupDialogComponent,
-	UserGroupApplyConfigComponent, UserDeviceChangeGroupComponent, UserContextAddDialogComponent
-} from './user';
-import {
-	NetworkConfigurationProcessorDetailsComponent, NetworkConfigurationStepDetailsComponent,
-	NetworkStepConfigurationEditComponent, NetworkProcessorConfigurationEditComponent
-}
-	from './network';
-import {
-	ReportComponent, NetworkReportOverviewComponent, NetworkReportDetailsComponent, OsQueryReportOverviewComponent,
-	OsQueryReportDetailsComponent, ReportOverviewComponent, TestResultComponent
-} from './report';
-import {
-	EmailOverviewComponent,
-	EmailInboxComponent,
-	EmailAccountAddComponent,
-	EmailRuleOverviewComponent,
-	EmailComponent
-} from './email';
-import {RuleComponent, RuleOverviewComponent, RuleAddComponent} from './rule';
-import {SettingsComponent} from './settings';
-import {AnalysisComponent, AddQueryDialog} from './analysis';
-import {
-	OrbiterOverviewComponent,
-	OrbiterComponent,
-	OrbiterToolTestComponent,
-	OrbiterToolTestListComponent,
-	OrbiterToolTestScheduledListComponent,
-	OrbiterToolTestSequenceListComponent,
-	TestDetailsComponent,
-	TestResultDetailsComponent,
-	TestSequenceDetailsComponent
-} from './orbiter';
-
-import {ConfirmationDialog} from './dialog/confirmation-dialog';
-import { TestSequenceResultComponent } from './report/testSequenceResult.component';
-import { TestSequenceResultDetailsComponent } from './report/testSequenceResultDetails.component';
-import { OrbiterScheduledSequencesListComponent } from './orbiter/orbiterScheduledSequencesList.component';
-import { OrbiterSystemsUnderTestListComponent } from './orbiter/orbiterSystemsUnderTestList.component';
-import {DevicesComponent, DevicesListComponent} from './devices/index';
-
-
+import { environment } from '../environments/environment';
+import { NetworkReportOverviewComponent } from './components/report/networkReportOverview.component';
+import { NotificationDetailsComponent } from './components/notification/notificationDetails.component';
+import { TestSequenceResultComponent } from './components/report/testSequenceResult.component';
+import { StatComponent } from './components/widgets/stat.component';
+import { HomeComponent } from './components/home/home.component';
+import { AddQueryDialog } from './components/analysis/addQueryDialog';
+import { QueriesComponent } from './components/queries/queries.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { SelectContextDialog } from './components/dialog/select-context';
+import { OrbiterToolTestSequenceListComponent } from './components/orbiter/orbiterToolTestSequenceList.component';
+import { TestDetailsComponent } from './components/orbiter/testDetails.component';
+import { TrafficLightItemComponent } from './components/widgets/traffic-light-item.component';
+import { ConfirmationDialog } from './components/dialog/confirmation-dialog';
+import { NotificationCardItem } from './components/widgets/notification-card-item.component';
+import { UserOverviewComponent } from './components/user/userOverview.component';
+import { UserGroupDialogComponent } from './components/user/userGroupDialog.component';
+import { MappedQueryEditDialog } from './components/queries/mappedQueryEditDialog.component';
+import { PieChartItemComponent } from './components/widgets/pie-chart-item.component';
+import { NotificationCardComponent } from './components/widgets/notification-card.component';
+import { DevicesOverviewComponent } from './components/devices/devicesOverview.component';
+import { NetworkConfigurationStepDetailsComponent } from './components/network/networkConfigurationStepDetails.component';
+import { BarChartItemComponent } from './components/widgets/bar-chart-item.component';
+import { NotificationComponent } from './components/notification/notification.component';
+import { LineChartItemComponent } from './components/widgets/line-chart-item.component';
+import { UserDeviceChangeGroupComponent } from './components/user/user-device-change-group.component';
+import { SUTDetailsComponent } from './components/orbiter/sutDetails.component';
+import { LineChartComponent } from './components/widgets/line-chart.component';
+import { NetworkStepConfigurationEditComponent } from './components/network/networkStepConfigurationEdit.component';
+import { QueryListComponent } from './components/queries/queryList.component';
+import { NetworkConfigurationProcessorDetailsComponent } from './components/network/networkConfigurationProcessorDetails.component';
+import { QueryEditDialogComponent } from './components/queries/queryEditDialog.component';
+import { UserDetailsComponent } from './components/user/userDetails.component';
+import { OsQueryReportDetailsComponent } from './components/report/osqueryReportDetails.component';
+import { OrbiterComponent } from './components/orbiter/orbiter.component';
+import { DownloadWidgetComponent } from './components/widgets/download-widget.component';
+import { TestSequenceResultDetailsComponent } from './components/report/testSequenceResultDetails.component';
+import { TestResultComponent } from './components/report/testResult.component';
+import { SearchComponent } from './components/search/search.component';
+import { NotificationDialog } from './components/dialog/notification-dialog';
+import { StatItemComponent } from './components/widgets/stat-item.component';
+import { QueryOverviewComponent } from './components/queries/queryOverview.component';
+import { QueryCategoryAddDialog } from './components/queries/queryCategoryAddDialog.component';
+import { DevicesListComponent } from './components/devices/devicesList.component';
+import { OsQueryReportOverviewComponent } from './components/report/osqueryReportOverview.component';
+import { BaseComponent } from './components/widgets/base.component';
+import { ReportOverviewComponent } from './components/report/reportOverview.component';
+import { OrbiterSystemsUnderTestListComponent } from './components/orbiter/orbiterSystemsUnderTestList.component';
+import { OrbiterScheduledSequencesListComponent } from './components/orbiter/orbiterScheduledSequencesList.component';
+import { TrafficLightComponent } from './components/widgets/traffic-light.component';
+import { LoginComponent } from './components/authentication/login/login.component';
+import { EmailComponent } from './components/email/email.component';
+import { RuleOverviewComponent } from './components/rule/ruleOverview.component';
+import { ReportComponent } from './components/report/report.component';
+import { OrbiterOverviewComponent } from './components/orbiter/orbiterOverview.component';
+import { EmailRuleOverviewComponent } from './components/email/emailRuleOverview.component';
+import { DownloadWidgetItemComponent } from './components/widgets/download-item.component';
+import { UserGroupEditComponent } from './components/user/userGroupEdit.component';
+import { UserContextAddDialogComponent } from './components/user/userContextAddDialog.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { QueryAssignComponent } from './components/queries/queryAssign.component';
+import { NetworkReportDetailsComponent } from './components/report/networkReportDetails.component';
+import { EmailInboxComponent } from './components/email/emailInbox.component';
+import { OrbiterToolTestScheduledListComponent } from './components/orbiter/orbiterToolTestScheduledList.component';
+import { RuleComponent } from './components/rule/rule.component';
+import { EmailOverviewComponent } from './components/email/emailOverview.component';
+import { EmailAccountAddComponent } from './components/email/emailAccountAdd.component';
+import { OrbiterToolTestListComponent } from './components/orbiter/orbiterToolTestList.component';
+import { UserGroupApplyConfigComponent } from './components/user/userGroupApplyConfig.component';
+import { BarChartComponent } from './components/widgets/bar-chart.component';
+import { NetworkProcessorConfigurationEditComponent } from './components/network/networkProcessorConfigurationEdit.component';
+import { AnalysisComponent } from './components/analysis/analysis.component';
+import { UserComponent } from './components/user/user.component';
+import { TestSequenceDetailsComponent } from './components/orbiter/testSequenceDetails.component';
+import { WidgetStoreComponent } from './components/widgets/widgetStore.component';
+import { TestResultDetailsComponent } from './components/report/testResultDetails.component';
+import { OrbiterToolTestComponent } from './components/orbiter/orbiterToolTest.component';
+import { DevicesComponent } from './components/devices/devices.component';
+import { SidenavbarComponent } from './components/navbar/sidenavbar.component';
+import { SearchResultComponent } from './components/search/searchResult.component';
+import { PieChartComponent } from './components/widgets/pie-chart.component';
+import { RuleAddComponent } from './components/rule/ruleAdd.component';
+import { AlertComponent } from './components/alert/alert.component';
+import { RuleAddRegexComponent } from './components/rule/ruleAddRegex.component';
+import { RuleMappingComponent } from './components/rule/ruleMapping.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 /**
  * Internal common components
  */
-import {EqualValidator} from './_directives';
-import {AuthGuard} from './_guards';
-import {TruncatePipe} from './_helpers';
-import {AlertService, AuthenticationService, DataService, HelperService, HttpService, WidgetService} from './_services';
-import {DashboardLayoutComponent} from './_layouts/dashboardLayout';
-import {LoginLayoutComponent} from './_layouts/loginLayout';
-import {NavbarComponent} from './navbar';
-import {SidenavbarComponent} from './navbar';
+
 
 /**
  * Internal framework components
  */
-import {routing} from './app.routing';
-import {AppComponent} from './app.component';
-
-/**
- * Third party components
- */
-
-import {DatePipe} from '@angular/common';
-import {NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {DataTableModule} from 'angular2-datatable';
-import {Angular2FontawesomeModule} from 'angular2-fontawesome/angular2-fontawesome';
-import {TabsModule} from 'ng2-tabs';
-import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
-import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
-import {NgxJsonViewerModule} from 'ngx-json-viewer';
-import {NgMatSearchBarModule} from 'ng-mat-search-bar';
-import {FileUploadModule} from 'ng2-file-upload';
-import {ModalModule} from 'ngx-modialog';
-import {BootstrapModalModule} from 'ngx-modialog/plugins/bootstrap';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {Nl2BrPipeModule} from 'nl2br-pipe';
+import { routing } from './app.routing';
+import { AppComponent } from './app.component';
+import { DatePipe } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DataTableModule } from 'angular2-datatable';
+import { Angular2FontawesomeModule } from 'angular2-fontawesome/angular2-fontawesome';
+import { TabsModule } from 'ng2-tabs';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { NgMatSearchBarModule } from 'ng-mat-search-bar';
+import { FileUploadModule } from 'ng2-file-upload';
+import { ModalModule } from 'ngx-modialog';
+import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { Nl2BrPipeModule } from 'nl2br-pipe';
 import {
-	MatButtonModule,
-	MatCheckboxModule,
-	MatInputModule,
-	MatFormFieldModule,
-	MatOptionModule,
-	MatSelectModule,
-	MatMenuModule,
-	MatIconModule,
-	MatSidenavModule,
-	MatToolbarModule,
-	MatButtonToggleModule,
-	MatTableModule,
-	MatTabsModule,
-	MatPaginatorModule,
-	MatSortModule,
-	MatProgressSpinnerModule,
-	MatDialogModule,
-	MatNativeDateModule,
-	MatDatepickerModule,
-	MatCardModule,
-	MatExpansionModule,
-	MatBadgeModule,
-	MatListModule,
-	MatRadioModule,
-	MatTooltipModule,
-	MatSnackBarModule,
+    MatBadgeModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatExpansionModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatOptionModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSnackBarModule,
+    MatSortModule,
+    MatTableModule,
+    MatTabsModule,
+    MatTooltipModule,
 } from '@angular/material';
-import {ChartModule, HIGHCHARTS_MODULES} from 'angular-highcharts';
-import {TreeModule} from 'angular-tree-component';
-import {TreeTableModule} from 'ng-treetable';
-import {RoleGuard} from './_guards';
-import {AuthInterceptor} from './_helpers/auth.interceptor';
-import {TreeviewModule} from 'ngx-treeview';
-import {SelectContextDialog} from './dialog/select-context';
-import {NotificationDialog} from './dialog/notification-dialog';
+import { ChartModule, HIGHCHARTS_MODULES } from 'angular-highcharts';
+import { TreeModule } from 'angular-tree-component';
+import { TreeTableModule } from 'ng-treetable';
+import { AuthInterceptor } from './_helpers/auth.interceptor';
+import { TreeviewModule } from 'ngx-treeview';
 import * as highstock from 'highcharts/modules/stock.src';
 import * as exporting from 'highcharts/modules/exporting.src';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -165,284 +177,304 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { AgmCoreModule } from '@agm/core';
 import { NgxJsonViewModule } from 'ng-json-view';
 import { AgmDirectionModule } from 'agm-direction';
-import {DragDropModule} from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AceEditorModule } from 'ng2-ace-editor';
-import {CarouselModule} from 'ngx-carousel-lib';
 import { NgxWidgetGridModule } from 'ngx-widget-grid';
 import { BoxModule } from 'angular-admin-lte';
-import { SUTDetailsComponent } from './orbiter/sutDetails.component';
-import { SUTListComponent } from './orbiter/sutList.component';
-import {BreadcrumbsModule} from 'ng6-breadcrumbs';
-import {StatComponent} from './widgets/stat.component';
-import {NotificationCardComponent} from './widgets/notification-card.component';
-import {WidgetStoreComponent} from './widgets/widgetStore.component';
-import {StatItemComponent} from './widgets/stat-item.component';
-import {DevicesOverviewComponent} from './devices/devicesOverview.component';
-import {NavbarLoginComponent} from './navbar/navbarlogin.component';
-import {UserGroupEditComponent} from "./user/userGroupEdit.component";
-import {
-	QueriesComponent, QueryEditDialogComponent, QueryOverviewComponent, QueryListComponent,
-	QueryAssignComponent, MappedQueryEditDialog, QueryCategoryAddDialog
-} from "./queries";
-import {NotificationCardItem} from "./widgets/notification-card-item.component";
-import {NgxGraphModule} from "@swimlane/ngx-graph"
-import {TooltipModule} from "@swimlane/ngx-charts";
-import {DownloadWidgetComponent} from "./widgets/download-widget.component";
-import {DownloadWidgetItemComponent} from "./widgets/download-item.component";
-import {TrafficLightComponent} from "./widgets/traffic-light.component";
-import {TrafficLightItemComponent} from "./widgets/traffic-light-item.component";
-import {BarChartComponent} from "./widgets/bar-chart.component";
-import {BarChartItemComponent} from "./widgets/bar-chart-item.component";
-import {LineChartComponent} from "./widgets/line-chart.component";
-import {LineChartItemComponent} from "./widgets/line-chart-item.component";
-import {PieChartComponent} from "./widgets/pie-chart.component";
-import {PieChartItemComponent} from "./widgets/pie-chart-item.component";
-import {ChartistModule} from 'ng-chartist';
+import { BreadcrumbsModule } from 'ng6-breadcrumbs';
+import { NavbarLoginComponent } from './components/navbar/navbarlogin.component';
+import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { ChartistModule } from 'ng-chartist';
+import { FooterComponent } from './components/footer/footer.component';
+import { RoleGuard } from './_guards/role.guard';
+import { AuthGuard } from './_guards/auth.guard';
+import { TruncatePipe } from './_helpers/truncate.pipe';
+import { HttpService } from './_services/http.service';
+import { AlertService } from './_services/alert.service';
+import { HelperService } from './_services/helper.service';
+import { DashboardLayoutComponent } from './_layouts/dashboardLayout/dashboardlayout.component';
+import { LoginLayoutComponent } from './_layouts/loginLayout/loginlayout.component';
+import { AuthenticationService } from './_services/authentication.service';
+import { DataService } from './_services/data.service';
+import { InviteUserDialogComponent } from './components/user/inviteUserDialog.component';
+import { InvitationContext } from './components/dialog/invitation-context';
+import { InvitationContextAccept } from './components/dialog/invitation-context-accept';
+import { RegisterComponent } from './components/authentication/register/register.component';
+import { ForgotPasswordComponent } from './components/authentication/forgotPassword/forgotPassword.component';
+import { RuleRegexListComponent } from './components/rule/ruleRegexList.component';
+import { RuleListComponent } from './components/rule/ruleList.component';
+import { MatStepperModule } from '@angular/material/stepper';
+import { SutInputDataDialogComponent } from './components/orbiter/sutInputDataDialog.component';
+import { AddInputDataDialogComponent } from './components/orbiter/addInputDataDialog.component';
+import { TestContentDialogComponent } from './components/orbiter/testContentDialog.component';
+import { InputDataDialogComponent } from './components/orbiter/inputDataDialog.component';
+import { NgxFileDropModule } from 'ngx-file-drop';
+import { ImportSutDialogComponent } from './components/orbiter/importSutDialog.component';
+
+/**
+ * Third party components
+ */
 
 export const httpInterceptorProviders = [
-	{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
 ];
 
 @NgModule({
-	imports: [
-		BrowserModule,
-		BrowserAnimationsModule,
-		Angular2FontawesomeModule,
-		FormsModule,
-		ReactiveFormsModule,
-		DataTableModule,
-		routing,
-		FileUploadModule,
-		TabsModule,
-		ModalModule.forRoot(),
-		BootstrapModalModule,
-		NgbModule.forRoot(),
-		Nl2BrPipeModule,
-		NgxJsonViewerModule,
-		MatButtonModule,
-		MatCheckboxModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatOptionModule,
-		MatSelectModule,
-		MatMenuModule,
-		MatIconModule,
-		MatBadgeModule,
-		MatSidenavModule,
-		MatButtonToggleModule,
-		MatTableModule,
-		MatTabsModule,
-		MatPaginatorModule,
-		MatSortModule,
-		MatProgressSpinnerModule,
-		MatDialogModule,
-		MatDatepickerModule,
-		MatNativeDateModule,
-		MatCardModule,
-		MatListModule,
-		MatExpansionModule,
-		HttpClientModule,
-		ChartModule,
-		TreeTableModule,
-		NgxSpinnerModule,
-		Ng2GoogleChartsModule,
-		TreeviewModule.forRoot(),
-		TreeModule.forRoot(),
-		NgxJsonViewModule,
-		CarouselModule,
-		TranslateModule.forRoot({
-			loader: {
-				provide: TranslateLoader,
-				useFactory: HttpLoaderFactory,
-				deps: [HttpClient]
-			}
-		}),
-		AgmCoreModule.forRoot({
-			// please get your own API key here:
-			// https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
-			apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
-		}),
-		AgmDirectionModule,
-		AceEditorModule,
-		MatRadioModule,
-		MatTooltipModule,
-		MatSnackBarModule,
-		NgMatSearchBarModule,
-		Ng4LoadingSpinnerModule.forRoot(),
-		DragDropModule,
-		NgxWidgetGridModule,
-		BoxModule,
-		BreadcrumbsModule,
-		NgxGraphModule,
-		TooltipModule,
-		ChartistModule
-	],
-	declarations: [
-		AppComponent,
-		AlertComponent,
-		HomeComponent,
-		LoginComponent,
-		ResetComponent,
-		UpdatePasswordComponent,
-		UserInvitationComponent,
-		RegisterComponent,
-		DashboardLayoutComponent,
-		LoginLayoutComponent,
-		NavbarComponent,
-		NavbarLoginComponent,
-		SidenavbarComponent,
-		ConfigurationDetailsComponent,
-		NetworkReportOverviewComponent,
-		NetworkConfigurationStepDetailsComponent,
-		NetworkConfigurationProcessorDetailsComponent,
-		NetworkStepConfigurationEditComponent,
-		NetworkProcessorConfigurationEditComponent,
-		NetworkReportDetailsComponent,
-		UserComponent,
-		UserDetailsComponent,
-		UserOverviewComponent,
-		UserGroupDialogComponent,
-		UserGroupApplyConfigComponent,
-		UserDeviceChangeGroupComponent,
-		UserContextAddDialogComponent,
-		OsQueryReportOverviewComponent,
-		OsQueryReportDetailsComponent,
-		QueryEditDialogComponent,
-		FooterComponent,
-		BaseComponent,
-		EqualValidator,
-		OrbiterComponent,
-		OrbiterOverviewComponent,
-		TestResultComponent,
-		ConfirmationDialog,
-		SelectContextDialog,
-		NotificationDialog,
-		EmailOverviewComponent,
-		EmailInboxComponent,
-		EmailAccountAddComponent,
-		EmailRuleOverviewComponent,
-		EmailComponent,
-		SettingsComponent,
-		ActivationComponent,
-		ActivatedComponent,
-		NotificationComponent,
-		RuleComponent,
-		RuleOverviewComponent,
-		RuleAddComponent,
-		AnalysisComponent,
-		AddQueryDialog,
-		ReportComponent,
-		ReportOverviewComponent,
-		TestResultDetailsComponent,
-		TestDetailsComponent,
-		OrbiterToolTestComponent,
-		OrbiterToolTestListComponent,
-		OrbiterToolTestScheduledListComponent,
-		OrbiterScheduledSequencesListComponent,
-		OrbiterToolTestSequenceListComponent,
-		SearchComponent,
-		SearchResultComponent,
-		TruncatePipe,
-		NotificationDetailsComponent,
-		OrbiterToolTestSequenceListComponent,
-		TestSequenceDetailsComponent,
-		ResendComponent,
-		TestSequenceResultComponent,
-		TestSequenceResultDetailsComponent,
-		OrbiterSystemsUnderTestListComponent,
-		SUTDetailsComponent,
-		SUTListComponent,
-		StatComponent,
-		StatItemComponent,
-		NotificationCardComponent,
-		NotificationCardItem,
-		WidgetStoreComponent,
-		DownloadWidgetComponent,
-		DownloadWidgetItemComponent,
-		DevicesComponent,
-		DevicesOverviewComponent,
-		DevicesListComponent,
-		UserGroupEditComponent,
-		QueriesComponent,
-		QueryOverviewComponent,
-		QueryListComponent,
-		QueryAssignComponent,
-		MappedQueryEditDialog,
-		QueryCategoryAddDialog,
-		TrafficLightComponent,
-		TrafficLightItemComponent,
-		BarChartComponent,
-		BarChartItemComponent,
-		LineChartComponent,
-		LineChartItemComponent,
-		PieChartComponent,
-		PieChartItemComponent
-	],
-	entryComponents: [
-		ConfirmationDialog,
-		SelectContextDialog,
-		NotificationDialog,
-		UserGroupDialogComponent,
-		NetworkProcessorConfigurationEditComponent,
-		NetworkStepConfigurationEditComponent,
-		QueryEditDialogComponent,
-		UserGroupApplyConfigComponent,
-		UserDeviceChangeGroupComponent,
-		UserContextAddDialogComponent,
-		EmailAccountAddComponent,
-		EmailInboxComponent,
-		RuleAddComponent,
-		OsQueryReportDetailsComponent,
-		NetworkReportDetailsComponent,
-		UserDetailsComponent,
-		AddQueryDialog,
-		TestResultDetailsComponent,
-		TestDetailsComponent,
-		NotificationDetailsComponent,
-		TestSequenceDetailsComponent,
-		TestSequenceResultDetailsComponent,
-		WidgetStoreComponent,
-		StatItemComponent,
-		StatComponent,
-		NotificationCardComponent,
-		NotificationCardItem,
-		SUTDetailsComponent,
-		SUTListComponent,
-		UserGroupEditComponent,
-		MappedQueryEditDialog,
-		QueryCategoryAddDialog,
-		DownloadWidgetComponent,
-		DownloadWidgetItemComponent,
-		TrafficLightComponent,
-		TrafficLightItemComponent,
-		BarChartComponent,
-		BarChartItemComponent,
-		LineChartComponent,
-		LineChartItemComponent,
-		PieChartComponent,
-		PieChartItemComponent
-	],
-	providers: [
-		AuthGuard,
-		RoleGuard,
-		AlertService,
-		AuthenticationService,
-		HttpService,
-		DataService,
-		HelperService,
-		WidgetService,
-		httpInterceptorProviders,
-		{ provide: HIGHCHARTS_MODULES, useFactory: () => [ highstock, exporting ]},
-		DatePipe
-	],
-	bootstrap: [AppComponent]
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        Angular2FontawesomeModule,
+        FormsModule,
+        ReactiveFormsModule,
+        DataTableModule,
+        routing,
+        FileUploadModule,
+        TabsModule,
+        ModalModule.forRoot(),
+        BootstrapModalModule,
+        NgbModule.forRoot(),
+        Nl2BrPipeModule,
+        NgxJsonViewerModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatIconModule,
+        MatBadgeModule,
+        MatSidenavModule,
+        MatButtonToggleModule,
+        MatTableModule,
+        MatTabsModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatProgressSpinnerModule,
+        MatDialogModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatCardModule,
+        MatListModule,
+        MatExpansionModule,
+        HttpClientModule,
+        ChartModule,
+        TreeTableModule,
+        NgxSpinnerModule,
+        Ng2GoogleChartsModule,
+        TreeviewModule.forRoot(),
+        TreeModule.forRoot(),
+        NgxJsonViewModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        AgmCoreModule.forRoot({
+            // please get your own API key here:
+            // https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
+            apiKey: 'AIzaSyCo6SKY-rBYhT-6p1bLCaiH-IdYEi29oKI'
+        }),
+        AgmDirectionModule,
+        AceEditorModule,
+        MatRadioModule,
+        MatTooltipModule,
+        MatSnackBarModule,
+        NgMatSearchBarModule,
+        Ng4LoadingSpinnerModule.forRoot(),
+        DragDropModule,
+        NgxWidgetGridModule,
+        BoxModule,
+        BreadcrumbsModule,
+        NgxGraphModule,
+        ChartistModule,
+        MatStepperModule,
+        MatSlideToggleModule,
+        NgxFileDropModule
+    ],
+    declarations: [
+        AppComponent,
+        AlertComponent,
+        HomeComponent,
+        LoginComponent,
+        DashboardLayoutComponent,
+        LoginLayoutComponent,
+        NavbarComponent,
+        NavbarLoginComponent,
+        SidenavbarComponent,
+        NetworkReportOverviewComponent,
+        NetworkConfigurationStepDetailsComponent,
+        NetworkConfigurationProcessorDetailsComponent,
+        NetworkStepConfigurationEditComponent,
+        NetworkProcessorConfigurationEditComponent,
+        NetworkReportDetailsComponent,
+        UserComponent,
+        RegisterComponent,
+        ForgotPasswordComponent,
+        UserDetailsComponent,
+        UserOverviewComponent,
+        UserGroupDialogComponent,
+        UserGroupApplyConfigComponent,
+        UserDeviceChangeGroupComponent,
+        UserContextAddDialogComponent,
+        InviteUserDialogComponent,
+        OsQueryReportOverviewComponent,
+        OsQueryReportDetailsComponent,
+        QueryEditDialogComponent,
+        FooterComponent,
+        BaseComponent,
+        OrbiterComponent,
+        OrbiterOverviewComponent,
+        TestResultComponent,
+        ConfirmationDialog,
+        SelectContextDialog,
+        InvitationContext,
+        InvitationContextAccept,
+        NotificationDialog,
+        EmailOverviewComponent,
+        EmailInboxComponent,
+        EmailAccountAddComponent,
+        EmailRuleOverviewComponent,
+        EmailComponent,
+        SettingsComponent,
+        NotificationComponent,
+        RuleComponent,
+        RuleOverviewComponent,
+        RuleAddComponent,
+        RuleMappingComponent,
+        AnalysisComponent,
+        AddQueryDialog,
+        ReportComponent,
+        ReportOverviewComponent,
+        TestResultDetailsComponent,
+        TestDetailsComponent,
+        OrbiterToolTestComponent,
+        OrbiterToolTestListComponent,
+        OrbiterToolTestScheduledListComponent,
+        OrbiterScheduledSequencesListComponent,
+        OrbiterToolTestSequenceListComponent,
+        SutInputDataDialogComponent,
+        AddInputDataDialogComponent,
+        SearchComponent,
+        SearchResultComponent,
+        TruncatePipe,
+        NotificationDetailsComponent,
+        OrbiterToolTestSequenceListComponent,
+        TestSequenceDetailsComponent,
+        TestSequenceResultComponent,
+        TestSequenceResultDetailsComponent,
+        OrbiterSystemsUnderTestListComponent,
+        SUTDetailsComponent,
+        StatComponent,
+        StatItemComponent,
+        NotificationCardComponent,
+        NotificationCardItem,
+        WidgetStoreComponent,
+        DownloadWidgetComponent,
+        DownloadWidgetItemComponent,
+        DevicesComponent,
+        DevicesOverviewComponent,
+        DevicesListComponent,
+        UserGroupEditComponent,
+        QueriesComponent,
+        QueryOverviewComponent,
+        QueryListComponent,
+        QueryAssignComponent,
+        MappedQueryEditDialog,
+        QueryCategoryAddDialog,
+        TrafficLightComponent,
+        TrafficLightItemComponent,
+        BarChartComponent,
+        BarChartItemComponent,
+        LineChartComponent,
+        LineChartItemComponent,
+        PieChartComponent,
+        PieChartItemComponent,
+        RuleAddRegexComponent,
+        RuleRegexListComponent,
+        RuleListComponent,
+        TestContentDialogComponent,
+        InputDataDialogComponent,
+        ImportSutDialogComponent
+    ],
+    entryComponents: [
+        ConfirmationDialog,
+        SelectContextDialog,
+        InvitationContext,
+        InvitationContextAccept,
+        NotificationDialog,
+        UserGroupDialogComponent,
+        NetworkProcessorConfigurationEditComponent,
+        NetworkStepConfigurationEditComponent,
+        QueryEditDialogComponent,
+        UserGroupApplyConfigComponent,
+        UserDeviceChangeGroupComponent,
+        UserContextAddDialogComponent,
+        RegisterComponent,
+        ForgotPasswordComponent,
+        InviteUserDialogComponent,
+        EmailAccountAddComponent,
+        EmailInboxComponent,
+        RuleAddComponent,
+        RuleMappingComponent,
+        OsQueryReportDetailsComponent,
+        NetworkReportDetailsComponent,
+        UserDetailsComponent,
+        AddQueryDialog,
+        TestResultDetailsComponent,
+        TestDetailsComponent,
+        NotificationDetailsComponent,
+        TestSequenceDetailsComponent,
+        TestSequenceResultDetailsComponent,
+        WidgetStoreComponent,
+        StatItemComponent,
+        StatComponent,
+        NotificationCardComponent,
+        NotificationCardItem,
+        SUTDetailsComponent,
+        SutInputDataDialogComponent,
+        UserGroupEditComponent,
+        MappedQueryEditDialog,
+        QueryCategoryAddDialog,
+        DownloadWidgetComponent,
+        DownloadWidgetItemComponent,
+        TrafficLightComponent,
+        TrafficLightItemComponent,
+        BarChartComponent,
+        BarChartItemComponent,
+        LineChartComponent,
+        LineChartItemComponent,
+        PieChartComponent,
+        PieChartItemComponent,
+        AppComponent,
+        RuleAddRegexComponent,
+        AddInputDataDialogComponent,
+        TestContentDialogComponent,
+        InputDataDialogComponent,
+        ImportSutDialogComponent
+    ],
+    providers: [
+        AuthGuard,
+        RoleGuard,
+        AlertService,
+        AuthenticationService,
+        HttpService,
+        DataService,
+        HelperService,
+        httpInterceptorProviders,
+        { provide: HIGHCHARTS_MODULES, useFactory: () => [highstock, exporting] },
+        DatePipe,
+    ],
+
+    bootstrap: [AppComponent]
 })
 
 export class AppModule {
-
 }
 
 // required for AOT compilation
 export function HttpLoaderFactory(http: HttpClient) {
-	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }

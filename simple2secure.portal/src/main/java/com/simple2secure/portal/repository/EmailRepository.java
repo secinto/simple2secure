@@ -23,14 +23,16 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.Email;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class EmailRepository extends MongoRepository<Email> {
-	public abstract Email findByConfigAndMessageId(String configId, String msgId);
+	public abstract Email findByConfigAndMessageId(ObjectId configId, String msgId);
 
-	public abstract List<Email> findByConfigId(String configId);
+	public abstract List<Email> findByConfigId(ObjectId configId);
 
-	public abstract void deleteByConfigId(String configId);
+	public abstract void deleteByConfigId(ObjectId configId);
 
 }

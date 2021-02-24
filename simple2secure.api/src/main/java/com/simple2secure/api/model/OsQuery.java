@@ -27,18 +27,32 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
-@Table(name = "OsQuery")
+@Table(
+		name = "OsQuery")
 public class OsQuery extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4400048729580737036L;
-	private String categoryId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId categoryId;
+
 	private String name;
 	private String description;
 
@@ -78,93 +92,5 @@ public class OsQuery extends GenericDBObject {
 		this.analysisIntervalUnit = analysisIntervalUnit;
 		this.sqlQuery = sqlQuery;
 		this.active = active;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCategoryId() {
-		return categoryId;
-	}
-
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getAnalysisInterval() {
-		return analysisInterval;
-	}
-
-	public void setAnalysisInterval(int analysisInterval) {
-		this.analysisInterval = analysisInterval;
-	}
-
-	public TimeUnit getAnalysisIntervalUnit() {
-		return analysisIntervalUnit;
-	}
-
-	public void setAnalysisIntervalUnit(TimeUnit analysisIntervalUnit) {
-		this.analysisIntervalUnit = analysisIntervalUnit;
-	}
-
-	public String getSqlQuery() {
-		return sqlQuery;
-	}
-
-	public void setSqlQuery(String sqlQuery) {
-		this.sqlQuery = sqlQuery;
-	}
-
-	public int getActive() {
-		return active;
-	}
-
-	public void setActive(int active) {
-		this.active = active;
-	}
-
-	public int getSystemsAvailable() {
-		return systemsAvailable;
-	}
-
-	public void setSystemsAvailable(int systemsAvailable) {
-		this.systemsAvailable = systemsAvailable;
-	}
-
-	public boolean isGraphAble() {
-		return graphAble;
-	}
-
-	public void setGraphAble(boolean graphAble) {
-		this.graphAble = graphAble;
-	}
-
-	public boolean isAvailabilityCheck() {
-		return availabilityCheck;
-	}
-
-	public void setAvailabilityCheck(boolean availabilityCheck) {
-		this.availabilityCheck = availabilityCheck;
-	}
-
-	public boolean isFixedSize() {
-		return fixedSize;
-	}
-
-	public void setFixedSize(boolean fixedSize) {
-		this.fixedSize = fixedSize;
 	}
 }

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.OSInfo;
@@ -45,7 +46,7 @@ public class QueryUtils extends BaseServiceProvider {
 	 * @param groupId
 	 * @return
 	 */
-	public List<OsQuery> getUnmappedQueriesByGroup(String groupId) {
+	public List<OsQuery> getUnmappedQueriesByGroup(ObjectId groupId) {
 		List<OsQuery> unmappedQueries = new ArrayList<>();
 
 		List<OsQuery> allQueries = queryRepository.findAll();
@@ -75,7 +76,7 @@ public class QueryUtils extends BaseServiceProvider {
 	 * @param groupId
 	 * @return
 	 */
-	public List<OsQuery> getMappedQueriesByGroup(String groupId) {
+	public List<OsQuery> getMappedQueriesByGroup(ObjectId groupId) {
 		List<OsQuery> queries = new ArrayList<>();
 		List<OsQueryGroupMapping> mappedQueries = queryGroupMappingRepository.findByGroupId(groupId);
 
@@ -106,7 +107,7 @@ public class QueryUtils extends BaseServiceProvider {
 	 * @param queries
 	 * @param groupId
 	 */
-	public void updateQueryGroupMapping(List<OsQuery> queries, String groupId) {
+	public void updateQueryGroupMapping(List<OsQuery> queries, ObjectId groupId) {
 		if (queries != null) {
 			queryGroupMappingRepository.deleteByGroupId(groupId);
 			for (OsQuery query : queries) {
@@ -126,7 +127,7 @@ public class QueryUtils extends BaseServiceProvider {
 	 * @param selectAll
 	 * @return
 	 */
-	public List<OsQuery> findByGroupIdsAndOsInfo(List<String> groupIds, OSInfo osInfo) {
+	public List<OsQuery> findByGroupIdsAndOsInfo(List<ObjectId> groupIds, OSInfo osInfo) {
 		List<Integer> possibleValues = getPossibleValues(osInfo);
 		List<OsQuery> queries = new ArrayList<>();
 		List<OsQueryGroupMapping> mappings = queryGroupMappingRepository.getAllMapingsByGroupIds(groupIds, possibleValues);
@@ -153,7 +154,7 @@ public class QueryUtils extends BaseServiceProvider {
 	 * @param selectAll
 	 * @return
 	 */
-	public List<OsQuery> findByGroupIdAndOsInfo(String groupId, OSInfo osInfo) {
+	public List<OsQuery> findByGroupIdAndOsInfo(ObjectId groupId, OSInfo osInfo) {
 		List<Integer> possibleValues = getPossibleValues(osInfo);
 		List<OsQuery> queries = new ArrayList<>();
 		List<OsQueryGroupMapping> mappings = queryGroupMappingRepository.findByGroupIdAndOSInfo(groupId, possibleValues);

@@ -21,6 +21,11 @@
  */
 package com.simple2secure.api.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ServiceLibrary extends Service {
 
 	private static final long serialVersionUID = 4975292575224536067L;
@@ -31,13 +36,4 @@ public class ServiceLibrary extends Service {
 		super(name, version);
 		this.filename = filename;
 	}
-
-	public String getFilename() {
-		return filename;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
 }

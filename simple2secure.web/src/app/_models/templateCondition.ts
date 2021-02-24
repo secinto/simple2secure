@@ -1,10 +1,13 @@
-import {RuleParam} from './ruleParam';
-import {RuleParamArray} from './ruleParamArray';
-import {Base} from './base';
+import { RuleParam } from './ruleParam';
+import { RuleParamArray } from './ruleParamArray';
+import { Base } from './base';
+import { RuleFactType } from './ruleFactType';
 
-export class TemplateCondition extends Base{
+export class TemplateCondition extends Base {
+    className: string;
     nameTag: string;
     descriptionTag: string;
+    ruleFactType: RuleFactType;
     // @ts-ignore
     params: RuleParam[];
     // @ts-ignore

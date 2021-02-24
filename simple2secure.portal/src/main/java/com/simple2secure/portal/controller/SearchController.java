@@ -35,6 +35,7 @@ import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.SearchResult;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
@@ -44,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SEARCH_API)
 @Slf4j
@@ -54,8 +54,7 @@ public class SearchController extends BaseUtilsProvider {
 	public ResponseEntity<List<SearchResult>> getSearchResult(@PathVariable ValidInputSearchQuery searchQuery,
 			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(searchQuery.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())
-				&& !Strings.isNullOrEmpty(locale.getValue())) {
+		if (!Strings.isNullOrEmpty(searchQuery.getValue()) && contextId.getValue() != null) {
 
 			Context context = contextRepository.find(contextId.getValue());
 
@@ -71,10 +70,9 @@ public class SearchController extends BaseUtilsProvider {
 					log.error("Error occured while retrieving results for query {}", searchQuery);
 				}
 
-				
 			}
 		}
-		return ((ResponseEntity<List<SearchResult>>) buildResponseEntity("service_not_found", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("service_not_found", locale.getValue()));
 	}
 
 }

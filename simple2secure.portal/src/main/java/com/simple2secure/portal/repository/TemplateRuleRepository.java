@@ -24,6 +24,10 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
+import com.simple2secure.api.dto.TemplateRulesDTO;
+import com.simple2secure.api.model.RuleFactType;
 import com.simple2secure.api.model.TemplateRule;
 import com.simple2secure.portal.dao.MongoRepository;
 
@@ -33,7 +37,15 @@ import com.simple2secure.portal.dao.MongoRepository;
  */
 public abstract class TemplateRuleRepository extends MongoRepository<TemplateRule> {
 
-	public abstract List<TemplateRule> findByContextId(String contextId);
+	public abstract List<TemplateRule> findByContextId(ObjectId contextId);
 	
-	public abstract TemplateRule findByContextIdAndRuleId(String contextId, String ruleId);
+	public abstract TemplateRule findByContextIdAndRuleId(ObjectId contextId, ObjectId ruleId);
+	
+	public abstract TemplateRule findByContextIdAndRuleName(ObjectId contextId, String name);
+	
+	public abstract List<TemplateRule> findByContextIdAndFactType(ObjectId contextId, RuleFactType type);
+	
+	public abstract TemplateRulesDTO findByContextIdAndFactTypeAndPagination(ObjectId contextId, RuleFactType type, int page, int size, String filter);
+	
+	public abstract void deleteTemplateRuleWithMapping(ObjectId contextId, ObjectId ruleId, RuleFactType type);
 }

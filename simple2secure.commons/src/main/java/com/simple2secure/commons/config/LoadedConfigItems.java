@@ -163,6 +163,10 @@ public class LoadedConfigItems {
    public String getGroupAPI() {
       return getBaseURL() + StaticConfigItems.GROUP_API;
    }
+   
+   public String getLogoutApi() {
+  	 return getBaseURL() + StaticConfigItems.LOGOUT_API;
+   }
 
    public String getVersion() {
       return version;

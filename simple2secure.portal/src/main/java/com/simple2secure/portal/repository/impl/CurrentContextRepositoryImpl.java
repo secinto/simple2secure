@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -36,7 +37,7 @@ public class CurrentContextRepositoryImpl extends CurrentContextRepository {
 	}
 
 	@Override
-	public void deleteByContextUserAuthenticationId(String contextUserAuthenticationId) {
+	public void deleteByContextUserAuthenticationId(ObjectId contextUserAuthenticationId) {
 		Query query = new Query(Criteria.where("contextUserAuthenticationId").is(contextUserAuthenticationId));
 		List<CurrentContext> currentContextList = mongoTemplate.find(query, CurrentContext.class);
 		if (currentContextList != null) {
@@ -49,7 +50,7 @@ public class CurrentContextRepositoryImpl extends CurrentContextRepository {
 	}
 
 	@Override
-	public void deleteByContextId(String contextId) {
+	public void deleteByContextId(ObjectId contextId) {
 		List<ContextUserAuthentication> contextUserAuthList = contextUserAuthRepository.getByContextId(contextId);
 		if (contextUserAuthList != null) {
 			for (ContextUserAuthentication contextUserAuth : contextUserAuthList) {

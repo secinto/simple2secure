@@ -1,0 +1,25 @@
+<nav class="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a routerLink="/home"><img class="navbar-brand" src="assets/logo_new.png" alt="Logo"></a>
+        </div>
+        <ul class="nav navbar-nav centered-nav">
+
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+
+            <li>
+                <mat-form-field id="nav-right-custom-language-switcher">
+                    <mat-select id="nav-right-custom-language-switcher-select" [ngModel]="currentLang" (selectionChange)="setLocale($event.value)">
+
+                        <mat-option id="nav-right-custom-language-switcher-option" *ngFor="let language of languages"
+                        [value]="language.value">
+                            {{language.value}}
+                        </mat-option>
+
+                    </mat-select>
+                </mat-form-field>
+            </li>
+        </ul>
+    </div>
+</nav>

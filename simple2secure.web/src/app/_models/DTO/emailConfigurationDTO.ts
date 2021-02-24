@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Email} from '../email';
-import {EmailConfiguration} from '../emailconfig';
+import { Email } from '../email';
+import { EmailConfiguration } from '../emailconfig';
 
 export class EmailConfigurationDTO {
 	public configuration: EmailConfiguration;

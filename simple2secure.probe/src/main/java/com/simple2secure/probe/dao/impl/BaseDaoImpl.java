@@ -29,6 +29,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import org.bson.types.ObjectId;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +108,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 * Returns object by id
 	 */
 	@Override
-	public T getByID(String id) {
+	public T getByID(ObjectId id) {
 		return getEntityManager().find(this.entityClass, id);
 	}
 
@@ -207,7 +208,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	}
 
 	private String getCountQuery(String fieldName) {
-		String query = "Select count (t.id) from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
+		String query = "Select count (t) from " + this.entityClass.getName() + " t " + "where t." + fieldName + " = :" + fieldName;
 		return query;
 	}
 }

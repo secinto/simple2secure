@@ -21,94 +21,41 @@
  */
 package com.simple2secure.api.model;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
-public class WidgetProperties extends GenericDBObject{
-	
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class WidgetProperties extends GenericDBObject {
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6253109541875693926L;
-	
-	private String widgetId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId widgetId;
+
 	private String userId;
-	private String contextId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId contextId;
+
 	private int top;
 	private int left;
 	private int height;
 	private int width;
 	private String location;
-	
-	public WidgetProperties() {
-		
-	}
-	
-	public WidgetProperties(String widgetId, String userId, String contextId, int top, int left, int height, int width, String location) {
-		super();
-		this.widgetId = widgetId;
-		this.userId = userId;
-		this.contextId = contextId;
-		this.top = top;
-		this.left = left;
-		this.height = height;
-		this.width = width;
-		this.location = location;
-	}
-	
-	public String getWidgetId() {
-		return widgetId;
-	}
-
-	public void setWidgetId(String widgetId) {
-		this.widgetId = widgetId;
-	}
-	
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getContextId() {
-		return contextId;
-	}
-
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
-	}
-
-	public int getTop() {
-		return top;
-	}
-	public void setTop(int top) {
-		this.top = top;
-	}
-	public int getLeft() {
-		return left;
-	}
-	public void setLeft(int left) {
-		this.left = left;
-	}
-	public int getHeight() {
-		return height;
-	}
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	public int getWidth() {
-		return width;
-	}
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
 }

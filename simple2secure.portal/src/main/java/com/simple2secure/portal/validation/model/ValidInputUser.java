@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.simple2secure.api.model.User;
-
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputUser extends ValidatedInput<String> {
@@ -36,13 +34,10 @@ public class ValidInputUser extends ValidatedInput<String> {
 	@Override
 	public Object validate(HttpServletRequest request, Map<String, Object> params) {
 		if (((Boolean) params.get(IS_AUTHENTICATED_TAG))) {
-			User currentUser = (User) params.get(USER_OBJECT_TAG);
-			if (currentUser != null) {
-				return new ValidInputUser(currentUser.getId());
-			}
+			return new ValidInputUser((String) params.get(USER_OBJECT_TAG));
+		} else {
+			return null;
 		}
-		// TODO: Throw an exception that user is not authenticated
-		return null;
 	}
 
 	@Override

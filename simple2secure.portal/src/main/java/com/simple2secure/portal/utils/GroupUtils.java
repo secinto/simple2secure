@@ -24,6 +24,7 @@ package com.simple2secure.portal.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -37,10 +38,10 @@ import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.GroupAccessRight;
 import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.api.model.PieChartData;
-import com.simple2secure.api.model.User;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 
@@ -50,6 +51,17 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class GroupUtils extends BaseServiceProvider {
+
+	/**
+	 * This function adds new group for each new registered user
+	 */
+	public CompanyGroup createNewGroupRegistration(ObjectId contextId) {
+		CompanyGroup group = new CompanyGroup(StaticConfigItems.STANDARD_GROUP_NAME, contextId, true, true);
+		groupRepository.save(group);
+		group = groupRepository.findStandardGroupByContextId(contextId);
+		dataInitialization.mapActiveQueriesToDefaultGroup(group.getId());
+		return group;
+	}
 
 	/**
 	 * This function moves the group to the destination group. If source group was root group in this function it will be unset. Children to
@@ -109,7 +121,7 @@ public class GroupUtils extends BaseServiceProvider {
 	 *
 	 * @param groupId
 	 */
-	public void deleteGroup(String groupId, boolean deleteAll) {
+	public void deleteGroup(ObjectId groupId, boolean deleteAll) {
 
 		// Remove OSQuery configuration
 		queryGroupMappingRepository.deleteByGroupId(groupId);
@@ -121,7 +133,7 @@ public class GroupUtils extends BaseServiceProvider {
 
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					if (license.getDeviceId() != null) {
 						reportsRepository.deleteByDeviceId(license.getDeviceId());
 						networkReportRepository.deleteByDeviceId(license.getDeviceId());
 					}
@@ -142,8 +154,8 @@ public class GroupUtils extends BaseServiceProvider {
 	 *
 	 * @param contextId
 	 */
-	public void deleteGroupsByContextId(String contextId) {
-		if (!Strings.isNullOrEmpty(contextId)) {
+	public void deleteGroupsByContextId(ObjectId contextId) {
+		if (contextId != null) {
 			List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
 			if (groups != null) {
 				for (CompanyGroup group : groups) {
@@ -158,7 +170,7 @@ public class GroupUtils extends BaseServiceProvider {
 	 *
 	 * @param groupId
 	 */
-	private void deleteGroupFromChildren(String groupId) {
+	private void deleteGroupFromChildren(ObjectId groupId) {
 		CompanyGroup group = groupRepository.find(groupId);
 
 		if (group != null) {
@@ -174,11 +186,11 @@ public class GroupUtils extends BaseServiceProvider {
 					}
 				}
 
-				if (PortalUtils.groupHasChildren(group)) {
+				if (groupHasChildren(group)) {
 					deleteGroupChildren(group);
 				}
 			} else {
-				if (PortalUtils.groupHasChildren(group)) {
+				if (groupHasChildren(group)) {
 					deleteGroupChildren(group);
 				}
 			}
@@ -200,7 +212,7 @@ public class GroupUtils extends BaseServiceProvider {
 		List<CompanyGroup> children = getGroupChildren(parentGroup);
 
 		for (CompanyGroup group : children) {
-			if (PortalUtils.groupHasChildren(group)) {
+			if (groupHasChildren(group)) {
 				deleteGroupChildren(group);
 				deleteGroup(group.getId(), true);
 			} else {
@@ -216,7 +228,7 @@ public class GroupUtils extends BaseServiceProvider {
 	 * @return
 	 */
 	private List<CompanyGroup> getGroupChildren(CompanyGroup group) {
-		if (PortalUtils.groupHasChildren(group)) {
+		if (groupHasChildren(group)) {
 			return groupRepository.findByParentId(group.getId());
 		} else {
 			return null;
@@ -235,7 +247,7 @@ public class GroupUtils extends BaseServiceProvider {
 		List<CompanyGroup> allChildren = groupRepository.findByParentId(root.id);
 		if (allChildren != null && allChildren.size() > 0) {
 			for (CompanyGroup child : allChildren) {
-				if (PortalUtils.groupHasChildren(child)) {
+				if (groupHasChildren(child)) {
 					List<CompanyGroup> children = getGroupChildren(child);
 					child.setChildren(children);
 					myChildren.add(child);
@@ -265,12 +277,12 @@ public class GroupUtils extends BaseServiceProvider {
 	 * @throws ItemNotFoundRepositoryException
 	 */
 
-	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, User user,
+	public ResponseEntity<CompanyGroup> checkIfGroupCanBeMoved(CompanyGroup fromGroup, CompanyGroup toGroup, String userId,
 			ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (fromGroup != null) {
 			ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(fromGroup.getContextId(),
-					user.getId());
+					userId);
 
 			if (contextUserAuthentication != null) {
 				// SUPERADMIN
@@ -284,7 +296,7 @@ public class GroupUtils extends BaseServiceProvider {
 				else if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERUSER)) {
 					// Move only if superuser belongs to the both groups(both groups are assigned to him)
 
-					GroupAccessRight groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(fromGroup.getId(), user.getId());
+					GroupAccessRight groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(fromGroup.getId(), new ObjectId(userId));
 					if (groupAccessRight != null) {
 						// in this case the moved group will be root group
 						if (toGroup == null) {
@@ -293,7 +305,7 @@ public class GroupUtils extends BaseServiceProvider {
 							}
 						} else {
 							// check if toGroup is assigned to this user
-							groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(toGroup.getId(), user.getId());
+							groupAccessRight = groupAccessRightRepository.findByGroupIdAndUserId(toGroup.getId(), new ObjectId(userId));
 							if (groupAccessRight != null) {
 								if (moveGroup(fromGroup, toGroup)) {
 									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
@@ -305,7 +317,7 @@ public class GroupUtils extends BaseServiceProvider {
 				// ADMIN
 				else if (contextUserAuthentication.getUserRole().equals(UserRole.ADMIN)) {
 
-					if (!Strings.isNullOrEmpty(fromGroup.getContextId())) {
+					if (fromGroup.getContextId() != null) {
 						// check if contextId of the from Group is same as contextId assigned to the user
 
 						if (contextUserAuthentication != null) {
@@ -315,7 +327,7 @@ public class GroupUtils extends BaseServiceProvider {
 									return new ResponseEntity<>(fromGroup, HttpStatus.OK);
 								}
 							} else {
-								if (!Strings.isNullOrEmpty(toGroup.getContextId())) {
+								if (toGroup.getContextId() != null) {
 									// Check if fromGroup contextId is same as toGroup contextId. If both are same move the group
 									if (fromGroup.getContextId().equals(toGroup.getContextId())) {
 										if (moveGroup(fromGroup, toGroup)) {
@@ -329,90 +341,7 @@ public class GroupUtils extends BaseServiceProvider {
 				}
 			}
 		}
-
-		return ((ResponseEntity<CompanyGroup>) buildResponseEntity("problem_occured_while_moving_group", locale));
-	}
-
-	/**
-	 * This function is used to generate the correct structure which will be shown in web
-	 *
-	 * @param context
-	 * @return
-	 */
-	public List<CompanyGroup> getAllGroupsByContextId(Context context) {
-		List<CompanyGroup> myGroupsWithChildren = new ArrayList<>();
-		List<CompanyGroup> myGroups = groupRepository.findRootGroupsByContextId(context.getId());
-		if (myGroups == null) {
-			myGroups = new ArrayList<>();
-		} else {
-			for (CompanyGroup group : myGroups) {
-				if (!PortalUtils.groupHasChildren(group)) {
-					myGroupsWithChildren.add(group);
-				} else {
-					myGroupsWithChildren.add(groupTraverse(group));
-				}
-			}
-		}
-		return myGroupsWithChildren;
-	}
-
-	/**
-	 * This function updates the List of the currenty assigned super user to the group
-	 *
-	 * @param groupIds
-	 * @param user
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	public void updateGroupAccessRightsforTheSuperuser(List<String> groupIds, User user, Context context)
-			throws ItemNotFoundRepositoryException {
-		if (groupIds != null && user != null && context != null) {
-			for (String groupId : groupIds) {
-				if (checkIfGroupExists(groupId)) {
-					GroupAccessRight groupAccessRight = new GroupAccessRight(user.getId(), groupId, context.getId());
-					groupAccessRightRepository.save(groupAccessRight);
-					log.debug("Superuser {} added to the following group {}", user.getEmail(), groupId);
-				}
-			}
-		}
-	}
-
-	/**
-	 * This function iterates over all groups in the context and removes the superuserid from those groups.
-	 *
-	 * @param user
-	 * @param context
-	 * @throws ItemNotFoundRepositoryException
-	 */
-	public void removeSuperuserFromtheGroupAccessRights(User user, Context context) throws ItemNotFoundRepositoryException {
-		if (user != null && context != null) {
-
-			List<GroupAccessRight> groupAccessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
-
-			if (groupAccessRightList != null) {
-				for (GroupAccessRight groupAccessRight : groupAccessRightList) {
-					if (groupAccessRight != null) {
-						groupAccessRightRepository.delete(groupAccessRight);
-					}
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * This function checks if the groups exists in the database according to the provided groupId
-	 *
-	 * @param groupId
-	 * @return
-	 */
-	public boolean checkIfGroupExists(String groupId) {
-		if (!Strings.isNullOrEmpty(groupId)) {
-			CompanyGroup group = groupRepository.find(groupId);
-			if (group != null) {
-				return true;
-			}
-		}
-		return false;
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_moving_group", locale.getValue()));
 	}
 
 	/**
@@ -422,10 +351,10 @@ public class GroupUtils extends BaseServiceProvider {
 	 * @param user
 	 * @return
 	 */
-	public List<String> getAllAssignedGroupIdsForSuperUser(Context context, User user) {
-		List<String> groupIds = new ArrayList<>();
+	public List<ObjectId> getAllAssignedGroupIdsForSuperUser(Context context, String userId) {
+		List<ObjectId> groupIds = new ArrayList<>();
 
-		List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), user.getId());
+		List<GroupAccessRight> accessRightList = groupAccessRightRepository.findByContextIdAndUserId(context.getId(), new ObjectId(userId));
 
 		if (accessRightList != null) {
 			for (GroupAccessRight accessRight : accessRightList) {
@@ -441,12 +370,51 @@ public class GroupUtils extends BaseServiceProvider {
 	}
 
 	/**
+	 * This function is used to generate the correct structure which will be shown in web
+	 *
+	 * @param context
+	 * @return
+	 */
+	public List<CompanyGroup> getAllGroupsByContextId(Context context) {
+		List<CompanyGroup> myGroupsWithChildren = new ArrayList<>();
+		List<CompanyGroup> myGroups = groupRepository.findRootGroupsByContextId(context.getId());
+		if (myGroups == null) {
+			myGroups = new ArrayList<>();
+		} else {
+			for (CompanyGroup group : myGroups) {
+				if (!groupHasChildren(group)) {
+					myGroupsWithChildren.add(group);
+				} else {
+					myGroupsWithChildren.add(groupTraverse(group));
+				}
+			}
+		}
+		return myGroupsWithChildren;
+	}
+
+	/**
+	 * This function checks if the groups exists in the database according to the provided groupId
+	 *
+	 * @param groupId
+	 * @return
+	 */
+	public boolean checkIfGroupExists(ObjectId groupId) {
+		if (groupId != null) {
+			CompanyGroup group = groupRepository.find(groupId);
+			if (group != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * This function copies the configuration from the source group to the destination group
 	 *
 	 * @param sourceGroupId
 	 * @param destGroupId
 	 */
-	public void copyGroupConfiguration(String sourceGroupId, String destGroupId) {
+	public void copyGroupConfiguration(ObjectId sourceGroupId, ObjectId destGroupId) {
 
 		List<OsQueryGroupMapping> queryMappings = queryGroupMappingRepository.findByGroupId(sourceGroupId);
 
@@ -465,7 +433,7 @@ public class GroupUtils extends BaseServiceProvider {
 	 * @param groupName
 	 * @return
 	 */
-	public boolean checkIfGroupNameIsAllowed(String groupName, String contextId) {
+	public boolean checkIfGroupNameIsAllowed(String groupName, ObjectId contextId) {
 
 		if (!Strings.isNullOrEmpty(groupName)) {
 			if (!groupName.toLowerCase().trim().equals(StaticConfigItems.STANDARD_GROUP_NAME.toLowerCase().trim())) {
@@ -494,7 +462,7 @@ public class GroupUtils extends BaseServiceProvider {
 	 */
 	public CompanyGroup findTheParentGroup(CompanyGroup group) {
 
-		if (!Strings.isNullOrEmpty(group.getParentId())) {
+		if (group.getParentId() != null) {
 			CompanyGroup parentGroup = groupRepository.find(group.getParentId());
 			if (parentGroup != null) {
 				return parentGroup;
@@ -528,57 +496,74 @@ public class GroupUtils extends BaseServiceProvider {
 		}
 		return foundGroups;
 	}
-	
+
+	/**
+	 * This function checks if this group has children groups
+	 *
+	 * @param group
+	 * @return
+	 */
+	private boolean groupHasChildren(CompanyGroup group) {
+		if (group != null) {
+			if (group.getChildrenIds() != null) {
+				if (group.getChildrenIds().size() > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * This is only a temp function to retrieve some data for the line and bar chart widget.
+	 *
 	 * @param context
 	 * @param tag
 	 * @return
 	 */
 	public ChartData getLicenseDownloadsForContext(Context context, String tag) {
-			
+
 		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
-		
+
 		List<String> labels = new ArrayList<>();
 		List<List<Integer>> series = new ArrayList<>();
-		List<Integer> seriesOfData = new ArrayList<Integer>();
-		if(contextGroups != null) {
-			for(CompanyGroup group : contextGroups) {
+		List<Integer> seriesOfData = new ArrayList<>();
+		if (contextGroups != null) {
+			for (CompanyGroup group : contextGroups) {
 				labels.add(group.getName());
-				seriesOfData.add(context.getCurrentNumberOfLicenseDownloads());	
+				seriesOfData.add(context.getCurrentNumberOfLicenseDownloads());
 			}
 		}
 		series.add(seriesOfData);
-		
+
 		ChartData chartData = new ChartData(labels, series);
-		
-		if(tag.equals(StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE)) {
+
+		if (tag.equals(StaticConfigItems.WIDGET_API_GET_NUMBER_OF_LICENSE)) {
 			chartData.setSeriesPieChart(seriesOfData);
 		}
 		return chartData;
 	}
-	
+
 	/**
 	 * This is only a temp function to retrieve some data for the pie chart widget.
+	 *
 	 * @param context
 	 * @return
 	 */
 	public PieChartData getDataForPieChart(Context context) {
 		List<CompanyGroup> contextGroups = getAllGroupsByContextId(context);
 		List<Integer> series = new ArrayList<>();
-		List<String> labels = new ArrayList<String>();
-		
-		if(contextGroups != null) {
-			for(CompanyGroup group : contextGroups) {
+		List<String> labels = new ArrayList<>();
+
+		if (contextGroups != null) {
+			for (CompanyGroup group : contextGroups) {
 				labels.add(group.getName());
-				series.add(context.getCurrentNumberOfLicenseDownloads());	
+				series.add(context.getCurrentNumberOfLicenseDownloads());
 			}
 		}
-		
+
 		PieChartData pieChartData = new PieChartData(series, labels);
 		return pieChartData;
-		
-		
+
 	}
-	
 }

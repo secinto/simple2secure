@@ -27,18 +27,36 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "OsQueryReport")
+@Table(
+		name = "OsQueryReport")
+@Getter
+@Setter
+@NoArgsConstructor
 public class OsQueryReport extends GenericDBObject {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -7217360147886001090L;
-	private String queryId;
-	private String deviceId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId queryId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId deviceId;
 	@Lob
 	private String query;
 	private String name;
@@ -50,17 +68,13 @@ public class OsQueryReport extends GenericDBObject {
 	private Date queryTimestamp;
 	private boolean isSent;
 
-	public OsQueryReport() {
-
-	}
-
 	/**
 	 *
 	 * @param name
 	 * @param report_class
 	 * @param interval
 	 */
-	public OsQueryReport(String deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
+	public OsQueryReport(ObjectId deviceId, String query, String queryResult, Date queryTimestamp, boolean isSent) {
 		super();
 		this.deviceId = deviceId;
 		this.query = query;
@@ -68,69 +82,4 @@ public class OsQueryReport extends GenericDBObject {
 		this.queryTimestamp = queryTimestamp;
 		this.isSent = isSent;
 	}
-
-	public String getQueryId() {
-		return queryId;
-	}
-
-	public void setQueryId(String queryId) {
-		this.queryId = queryId;
-	}
-
-	public boolean isSent() {
-		return isSent;
-	}
-
-	public void setSent(boolean isSent) {
-		this.isSent = isSent;
-	}
-
-	public String getQuery() {
-		return query;
-	}
-
-	public void setQuery(String query) {
-		this.query = query;
-	}
-
-	public String getQueryResult() {
-		return queryResult;
-	}
-
-	public void setQueryResult(String queryResult) {
-		this.queryResult = queryResult;
-	}
-
-	public Date getQueryTimestamp() {
-		return queryTimestamp;
-	}
-
-	public void setQueryTimestamp(Date queryTimestamp) {
-		this.queryTimestamp = queryTimestamp;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 }

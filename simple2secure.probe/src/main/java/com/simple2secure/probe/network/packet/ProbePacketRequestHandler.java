@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import org.bson.types.ObjectId;
 import org.pcap4j.packet.Packet;
 
 import com.simple2secure.api.model.ProbePacket;
@@ -43,7 +44,7 @@ public class ProbePacketRequestHandler implements Runnable {
 	private boolean running = false;
 	private List<ProbePacket> probePacketList;
 	private ProcessingQueue<Packet> processingQueue = new ProcessingQueue<>();
-	private Map<String, ProbePacketQueueHandler> taskMap = new HashMap<>();
+	private Map<ObjectId, ProbePacketQueueHandler> taskMap = new HashMap<>();
 
 	public ProbePacketRequestHandler() {
 
@@ -62,27 +63,27 @@ public class ProbePacketRequestHandler implements Runnable {
 
 	private void stopTasks() {
 		Timer timer = new Timer(true);
-		for (Map.Entry<String, ProbePacketQueueHandler> entry : taskMap.entrySet()) {
+		for (Map.Entry<ObjectId, ProbePacketQueueHandler> entry : taskMap.entrySet()) {
 			entry.getValue().cancel();
 			timer.purge();
 		}
 	}
 
-	private void startTasks(Map<String, ProbePacketQueueHandler> taskMap) {
+	private void startTasks(Map<ObjectId, ProbePacketQueueHandler> taskMap) {
 		Timer timer = new Timer(true);
-		for (Map.Entry<String, ProbePacketQueueHandler> entry : taskMap.entrySet()) {
+		for (Map.Entry<ObjectId, ProbePacketQueueHandler> entry : taskMap.entrySet()) {
 			if (entry.getValue().scheduledExecutionTime() == 0) {
 				timer.schedule(entry.getValue(), entry.getValue().getProbePacket().getAnalysisInterval());
 			}
 		}
 	}
 
-	private void changeTaskMap(ProbePacketQueueHandler taskToChange, String probePacketId) {
+	private void changeTaskMap(ProbePacketQueueHandler taskToChange, ObjectId probePacketId) {
 		taskMap.remove(probePacketId);
 		taskMap.put(probePacketId, taskToChange);
 	}
 
-	private ProbePacket findNewProbePacketForMap(Map<String, ProbePacketQueueHandler> taskMap) {
+	private ProbePacket findNewProbePacketForMap(Map<ObjectId, ProbePacketQueueHandler> taskMap) {
 		ProbePacket packetToReturn = null;
 		List<ProbePacket> packetsFromDB = DBUtil.getInstance().findAll(ProbePacket.class);
 		for (ProbePacket probePacketFromDB : packetsFromDB) {

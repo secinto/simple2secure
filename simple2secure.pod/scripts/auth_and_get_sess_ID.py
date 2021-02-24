@@ -1,5 +1,6 @@
-import requests
 import sys
+
+import requests
 
 
 def auth_and_get_session_id(username, password, uri_for_get, uri_for_post):

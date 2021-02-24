@@ -1,26 +1,19 @@
-import subprocess
-import base64
 import os
+import subprocess
 
 curr_dir = os.getcwd()
 
 
-def scanner(executable, results, type):
+def scanner(executable, results, results_type):
     executable = list(filter(None, executable))
     if "scripts/" in executable[0]:
         executable = get_scripts_executables(executable)
     elif "adapter/" in executable[0]:
         executable = get_adapter_executables(executable)
-    process = subprocess.Popen(executable, stdout=subprocess.PIPE)
+    process = subprocess.Popen(executable, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     stdout = process.communicate()[0]
-    result = bytearray(stdout)
-    sanitized_result = bytearray()
-    for ind, elem in enumerate(result, start=0):
-        if elem != 13 and elem != 10:
-            sanitized_result.append(elem)
-    report = base64.b64encode(sanitized_result)
-#    report = stdout.decode("utf-8", "backslashreplace")
-    results[type] = report
+    results[results_type] = stdout.strip()
+    return results
 
 
 def get_scripts_executables(executable):

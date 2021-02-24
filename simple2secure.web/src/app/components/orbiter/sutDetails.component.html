@@ -1,0 +1,62 @@
+<h3 *ngIf="!isNewSUT" mat-dialog-title>{{ 'orbiter.editsut' | translate }}</h3>
+<h3 *ngIf="isNewSUT" mat-dialog-title>{{ 'button.add.sut.text' | translate }}</h3>
+
+
+<div mat-dialog-content>
+	<form id="cfgForm" #configForm="ngForm">
+		<div class="form-group">
+			<mat-form-field class="full_width_input">
+				<input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="sut.name"
+					name="sut.name">
+			</mat-form-field>
+		</div>
+		<div class="form-group">
+			<mat-label class="half_width_input">Metadata</mat-label>
+			<button mat-raised-button color="primary" id="addButton" type="button" (click)="addMetaData()"
+				class="mat-green-button">
+				<i class="glyphicon glyphicon-plus"></i>
+			</button><br>
+			<div fxLayout="row" fxLayoutGap="25px" *ngFor="let pair of metadataArr; let i = index">
+
+				<mat-form-field fxFlex="25">
+					<input matInput placeholder="Key" type="text" name="key-{{i}}" value="{{pair.key}}"
+						[(ngModel)]="metadataArr[i].key">
+				</mat-form-field>
+
+				<mat-form-field fxFlex>
+					<input matInput placeholder="Value" type="text" name="value-{{i}}" value="{{pair.value}}"
+						[(ngModel)]="metadataArr[i].value">
+				</mat-form-field>
+
+				<button mat-raised-button color="primary" id="removeButton" type="button" (click)="removeMetaData(i)"
+					class="mat-green-button">
+					<i class="glyphicon glyphicon-minus"></i>
+				</button><br>
+			</div>
+		</div>
+		<mat-form-field class="full_width_input">
+			<mat-label>Protocol</mat-label>
+			<mat-select [(ngModel)]="selectedProtocol" name="selectedProtocol">
+				<mat-option *ngFor="let prot of protocolSelect" [value]="prot">
+					{{prot}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field>
+	</form>
+</div>
+
+<div mat-dialog-actions>
+
+	<button *ngIf='isNewSUT' class="mat-green-button" type="button" mat-raised-button color="success"
+		(click)="save()">{{ 'button.save' | translate }}
+	</button>
+
+	<button *ngIf='!isNewSUT' class="mat-green-button" type="button" mat-raised-button color="success"
+		(click)="update()">{{ 'button.update' | translate }}
+	</button>
+
+	<button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+		cdkFocusInitial>{{ 'button.close' | translate }}
+	</button>
+
+</div>

@@ -26,8 +26,18 @@ import javax.persistence.Table;
 
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "Step")
+@Table(
+		name = "Step")
 public class Step extends GenericDBObject {
 	/**
 	 *
@@ -36,68 +46,4 @@ public class Step extends GenericDBObject {
 	private int number;
 	private String name;
 	private int active;
-
-	public Step() {
-
-	}
-
-	/**
-	 *
-	 * @param number
-	 * @param name
-	 */
-	public Step(int number, String name, int active) {
-		super();
-		this.number = number;
-		this.name = name;
-		this.active = active;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public int getNumber() {
-		return number;
-	}
-
-	/**
-	 *
-	 * @param number
-	 */
-	public void setNumber(int number) {
-		this.number = number;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 *
-	 * @param name
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public int getActive() {
-		return active;
-	}
-
-	/**
-	 *
-	 * @param active
-	 */
-	public void setActive(int active) {
-		this.active = active;
-	}
 }

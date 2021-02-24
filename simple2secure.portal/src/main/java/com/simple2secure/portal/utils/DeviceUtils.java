@@ -27,17 +27,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.CompanyGroup;
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.Context;
+import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.api.model.Device;
 import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.DeviceStatus;
+import com.simple2secure.api.model.DeviceType;
+import com.simple2secure.api.model.NetworkReport;
+import com.simple2secure.api.model.OsQueryReport;
+import com.simple2secure.api.model.ReportType;
+import com.simple2secure.api.model.TestResult;
+import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseServiceProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +60,15 @@ public class DeviceUtils extends BaseServiceProvider {
 	@Autowired
 	PortalUtils portalUtils;
 
+	@Autowired
+	UserUtils userUtils;
+
 	/**
-	 * This function returns all probes from the current context
+	 * This function returns all devices from the current context
 	 *
 	 * @param context
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
+	 * @throws ItemNotFoundRepositoryException
 	 */
 	public List<Device> getAllDevicesFromCurrentContext(Context context, boolean active) throws ItemNotFoundRepositoryException {
 		log.debug("Retrieving devices for the context {}", context.getName());
@@ -68,7 +79,7 @@ public class DeviceUtils extends BaseServiceProvider {
 			List<CompanyLicensePrivate> licenses = licenseRepository.findAllByGroupId(group.getId());
 			if (licenses != null) {
 				for (CompanyLicensePrivate license : licenses) {
-					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					if (license.getDeviceId() != null) {
 						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 						if (devInfo != null) {
 							DeviceStatus status = devInfo.getDeviceStatus();
@@ -91,20 +102,45 @@ public class DeviceUtils extends BaseServiceProvider {
 	}
 
 	/**
-	 * This function creates the devices objects from the CompanyLicensePrivate objects and returns it according to the provided groupIds
+	 * This functions returns all devices (probes) according to provided groupIds only if they already have some reports in the database.
 	 *
 	 * @param groupIds
-	 * @param isDevicePod
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
 	 */
-	public List<Device> getAllDevicesByGroupIds(List<String> groupIds) throws ItemNotFoundRepositoryException {
-		List<Device> devices = new ArrayList<>();
-		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
+	public List<Device> getAllDevicesWithReportsByGroupId(List<ObjectId> groupIds, DeviceType deviceType, ReportType reportType) {
 
-		if (licenses != null) {
+		List<CompanyLicensePrivate> licenses = licenseRepository.findByGroupIds(groupIds);
+		List<Device> devices = new ArrayList<>();
+
+		boolean hasReports = false;
+
+		if (licenses != null && !licenses.isEmpty()) {
+
 			for (CompanyLicensePrivate license : licenses) {
-				if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+
+				if (reportType == ReportType.OSQUERY) {
+					List<OsQueryReport> reports = reportsRepository.getReportsByDeviceId(license.getDeviceId());
+					if (reports != null && !reports.isEmpty()) {
+						hasReports = true;
+					}
+				} else if (reportType == ReportType.NETWORK) {
+					List<NetworkReport> reports = networkReportRepository.getReportsByDeviceId(license.getDeviceId());
+					if (reports != null && !reports.isEmpty()) {
+						hasReports = true;
+					}
+				} else if (reportType == ReportType.TEST) {
+					List<TestResult> reports = testResultRepository.getByDeviceId(license.getDeviceId());
+					if (reports != null && !reports.isEmpty()) {
+						hasReports = true;
+					}
+				} else if (reportType == ReportType.TESTSEQUENCE) {
+					List<TestSequenceResult> reports = testSequenceResultRepository.getByDeviceId(license.getDeviceId());
+					if (reports != null && !reports.isEmpty()) {
+						hasReports = true;
+					}
+				}
+
+				if (hasReports) {
 					DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
 
 					if (devInfo != null) {
@@ -113,20 +149,101 @@ public class DeviceUtils extends BaseServiceProvider {
 						DeviceStatus deviceStatus = getDeviceStatus(devInfo);
 						if (status != deviceStatus) {
 							devInfo.setDeviceStatus(deviceStatus);
-							deviceInfoRepository.update(devInfo);
+							try {
+								deviceInfoRepository.update(devInfo);
+							} catch (ItemNotFoundRepositoryException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 
 						CompanyGroup group = groupRepository.find(license.getGroupId());
 						Device device = new Device(group, devInfo);
 						devices.add(device);
 					}
+
 				}
 
+				hasReports = false;
 			}
 		}
-
 		return devices;
+	}
 
+	/**
+	 * This function returns all devices from the current context with merged Test objects.
+	 *
+	 * @param context
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size)
+			throws ItemNotFoundRepositoryException {
+		log.debug("Retrieving devices for the context {}", context.getName());
+		Map<String, Object> deviceMap = new HashMap<>();
+		List<Device> deviceList = deviceInfoRepository.findByContextId(context.getId());
+		for (Device device : deviceList) {
+			updateDeviceStatus(device);
+		}
+		deviceMap.put("devices", deviceList);
+		deviceMap.put("totalSize", deviceList.size());
+		return deviceMap;
+	}
+
+	/**
+	 * This function returns all devices with merged test objects
+	 *
+	 * @param context
+	 * @param type
+	 * @param userId
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	public Map<String, Object> getAllDevicesByIdAndTypeWithMergedTestObjects(Context context, String type, String userId, int page,
+			int size, String filter) {
+		log.debug("Retrieving devices for the context {}", context.getName());
+		Map<String, Object> deviceMap = new HashMap<>();
+		List<Device> deviceList = deviceInfoRepository.findByContextIdAndType(context.getId(), type, page, size, filter);
+		List<Device> resultDeviceList = new ArrayList<>();
+		for (Device device : deviceList) {
+			ContextUserAuthentication cUA = contextUserAuthRepository.getByContextIdAndUserId(device.getGroup().getContextId(), userId);
+			if (userUtils.checkIsUserAdminInContext(cUA)) {
+				resultDeviceList.add(device);
+			}
+			try {
+				updateDeviceStatus(device);
+			} catch (ItemNotFoundRepositoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		deviceMap.put("devices", resultDeviceList);
+		deviceMap.put("totalSize", resultDeviceList.size());
+		return deviceMap;
+	}
+
+	/**
+	 * This method updates the publicly available flag for the given Pod.
+	 *
+	 * @param Device
+	 *          ...the device where the flag is going to be updated
+	 * @return
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	public DeviceInfo updatePodVisibility(Device device) throws ItemNotFoundRepositoryException {
+		log.debug("Updating device {}!", device.getInfo().getName());
+		deviceInfoRepository.update(device.getInfo());
+		updateDeviceStatus(device);
+
+		return device.getInfo();
+	}
+
+	public Map<String, Object> getAllDevicesByGroupId(ObjectId groupId, int page, int size, String filter) {
+
+		Map<String, Object> deviceMap = licenseRepository.getDevicesByGroupIdPagination(groupId, page, size, filter);
+
+		return deviceMap;
 	}
 
 	/**
@@ -134,109 +251,81 @@ public class DeviceUtils extends BaseServiceProvider {
 	 *
 	 * @param context
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
+	 * @throws ItemNotFoundRepositoryException
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getAllDevicesFromCurrentContextPagination(Context context, int page, int size) throws ItemNotFoundRepositoryException {
-		log.debug("Retrieving devices for the context {}", context.getName());
-		List<Device> devices = new ArrayList<>();
-		Map<String, Object> deviceMap = new HashMap<>();
-		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
-		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+	public Map<String, Object> getAllPublicPodDevicesPagination(int page, int size, String filter) throws ItemNotFoundRepositoryException {
+		log.debug("Retrieving all public pod devices.");
 
-		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
-
-		if (licenseMap != null) {
-			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
-			if (licenses != null) {
-				for (CompanyLicensePrivate license : licenses) {
-					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
-						if (devInfo != null) {
-							DeviceStatus status = devInfo.getDeviceStatus();
-
-							DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-							if (status != deviceStatus) {
-								devInfo.setDeviceStatus(deviceStatus);
-								deviceInfoRepository.update(devInfo);
-							}
-							CompanyGroup group = groupRepository.find(license.getGroupId());
-							Device device = new Device(group, devInfo);
-							devices.add(device);
-						}
-					}
-				}
-			}
-
-			deviceMap.put("devices", devices);
-			deviceMap.put("totalSize", licenseMap.get("totalSize"));
+		Map<String, Object> deviceMap = deviceInfoRepository.findAllPublicPodDevices(page, size, filter);
+		List<Device> deviceList = (List<Device>) deviceMap.get("devices");
+		for (Device device : deviceList) {
+			updateDeviceStatus(device);
 		}
-		log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
+
+		
 		return deviceMap;
 	}
-	
+
 	/**
-	 * This function returns all pods from the current context with merged Test objects.
+	 * This function retrieves all devices from the current context according to the deviceType and active state.
 	 *
-	 * @param context
+	 * @param contextId
+	 * @param active
+	 * @param deviceType
+	 * @param size
+	 * @param page
 	 * @return
-	 * @throws ItemNotFoundRepositoryException 
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getAllDevicesByIdAndTypeFromCurrentContextPagination(Context context, String type, int page, int size) throws ItemNotFoundRepositoryException {
-		log.debug("Retrieving devices for the context {}", context.getName());
-		List<Device> devices = new ArrayList<>();
+	public Map<String, Object> getAllDevicesFromContextWithPaginationByType(ObjectId contextId, boolean active, String deviceType, int size,
+			int page, String locale, String filter) {
+
+		// TODO: we have to distinguish what is active device!!!
+		Context context = contextRepository.find(contextId);
 		Map<String, Object> deviceMap = new HashMap<>();
-		List<CompanyGroup> assignedGroups = groupRepository.findByContextId(context.getId());
-		List<String> groupIds = portalUtils.extractIdsFromObjects(assignedGroups);
+		if (context != null) {
+			if (deviceType.equals(DeviceType.UNKNOWN.toString())) {
+				try {
+					return getAllDevicesFromCurrentContextPagination(context, page, size);
+				} catch (ItemNotFoundRepositoryException e) {
+					log.error(e.getLocalizedMessage());
+					throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_getting_user_devices", locale));
+				}
+			} else if (deviceType.equals(DeviceType.POD.toString())) {
+				// TODO: must work with pagination
+				List<Device> devices = deviceInfoRepository.findByContextIdAndType(contextId, deviceType, page, size, filter);
+				deviceMap.put("devices", devices);
+				deviceMap.put("totalSize", devices.size());
+				if (deviceMap != null && !deviceMap.isEmpty()) {
+					return deviceMap;
+				}
 
-		Map<String, Object> licenseMap = licenseRepository.findByGroupIdsPaged(groupIds, page, size);
+			} else if (deviceType.equals(DeviceType.PROBE.toString())) {
 
-		if (licenseMap != null) {
-			List<CompanyLicensePrivate> licenses = (List<CompanyLicensePrivate>) licenseMap.get("licenses");
-			List<DeviceInfo> devInfoList = deviceInfoRepository.findByDeviceType(type);
-			if (licenses != null) {
-				for (CompanyLicensePrivate license : licenses) {
-					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
-						for(DeviceInfo devInfo : devInfoList) {
-							if(devInfo.getDeviceId().equals(license.getDeviceId())) {
-								if (devInfo != null) {
-									DeviceStatus status = devInfo.getDeviceStatus();
+				if (active) {
+					List<CompanyGroup> groups = groupRepository.findByContextId(contextId);
+					if (groups != null) {
+						List<ObjectId> groupIds = portalUtils.extractIdsFromObjects(groups);
+						List<Device> devices = getAllDevicesWithReportsByGroupId(groupIds, DeviceType.PROBE, ReportType.OSQUERY);
 
-									DeviceStatus deviceStatus = getDeviceStatus(devInfo);
-									if (status != deviceStatus) {
-										devInfo.setDeviceStatus(deviceStatus);
-										deviceInfoRepository.update(devInfo);
-									}
-									CompanyGroup group = groupRepository.find(license.getGroupId());
-									Device device = new Device(group, devInfo);
-									devices.add(device);
-								}
-							}
+						deviceMap.put("devices", devices);
+						deviceMap.put("totalSize", devices.size());
+						if (deviceMap != null && !deviceMap.isEmpty()) {
+							return deviceMap;
 						}
 					}
+
+				} else {
+					List<Device> devices = deviceInfoRepository.findByContextIdAndType(contextId, deviceType, page, size, filter);
+					deviceMap.put("devices", devices);
+					deviceMap.put("totalSize", devices.size());
+					if (deviceMap != null && !deviceMap.isEmpty()) {
+						return deviceMap;
+					}
 				}
+
 			}
-
-			deviceMap.put("devices", devices);
-			deviceMap.put("totalSize", licenseMap.get("totalSize"));
 		}
-		log.debug("Retrieved {} devices for context {}", devices.size(), context.getName());
-		return deviceMap;
-	}
-
-	/**
-	 * This function deletes the device dependencies for the specified device id
-	 *
-	 * @param deviceId
-	 */
-	public void deleteDependencies(String deviceId) {
-		if (!Strings.isNullOrEmpty(deviceId)) {
-			// TODO - check before deleting if we need to decrement the number of downloaded licenses in context
-			licenseRepository.deleteByDeviceId(deviceId);
-			log.debug("Deleted dependencies for probe id {}", deviceId);
-		}
-
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_getting_user_devices", locale));
 	}
 
 	/**
@@ -244,9 +333,10 @@ public class DeviceUtils extends BaseServiceProvider {
 	 *
 	 * @param deviceInfo
 	 * @return
+	 *
+	 *         TODO: make it multilingual
 	 */
-	private DeviceStatus getDeviceStatus(DeviceInfo devInfo) {
-		// make it multilingual
+	public DeviceStatus getDeviceStatus(DeviceInfo devInfo) {
 		if (devInfo.getLastOnlineTimestamp() == 0) {
 			return DeviceStatus.UNKNOWN;
 		} else {
@@ -259,4 +349,39 @@ public class DeviceUtils extends BaseServiceProvider {
 		}
 	}
 
+	/**
+	 * This function creates a list of devices from the provided licenses
+	 *
+	 * @param licenses
+	 * @return
+	 */
+	public List<Device> createDeviceObjectsFromLicenses(List<CompanyLicensePrivate> licenses) {
+		List<Device> devices = new ArrayList<>();
+		if (licenses != null) {
+			for (CompanyLicensePrivate license : licenses) {
+				CompanyGroup group = groupRepository.find(license.getGroupId());
+				DeviceInfo devInfo = deviceInfoRepository.findByDeviceId(license.getDeviceId());
+
+				if (group != null && devInfo != null) {
+					devices.add(new Device(group, devInfo));
+				}
+			}
+		}
+		return devices;
+	}
+
+	/**
+	 * This function updates the device status to the ONLINE, OFFLINE or UNKNOWN
+	 *
+	 * @param device
+	 * @throws ItemNotFoundRepositoryException
+	 */
+	private void updateDeviceStatus(Device device) throws ItemNotFoundRepositoryException {
+		DeviceStatus status = device.getInfo().getDeviceStatus();
+		DeviceStatus currentStatus = getDeviceStatus(device.getInfo());
+		if (status != currentStatus) {
+			device.getInfo().setDeviceStatus(currentStatus);
+			deviceInfoRepository.update(device.getInfo());
+		}
+	}
 }

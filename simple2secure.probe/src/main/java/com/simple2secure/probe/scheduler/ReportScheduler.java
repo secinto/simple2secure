@@ -24,6 +24,7 @@ package com.simple2secure.probe.scheduler;
 import java.util.List;
 import java.util.TimerTask;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +33,10 @@ import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.commons.time.TimeUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 import com.simple2secure.probe.utils.DBUtil;
+import com.simple2secure.probe.utils.RESTUtils;
 
 public class ReportScheduler extends TimerTask {
 
@@ -66,7 +67,7 @@ public class ReportScheduler extends TimerTask {
 	private void sendReport(OsQueryReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+			if (report.getDeviceId() != null) {
 				report.setDeviceId(ProbeConfiguration.probeId);
 			}
 			if (Strings.isNullOrEmpty(report.getHostname())) {
@@ -89,11 +90,11 @@ public class ReportScheduler extends TimerTask {
 	private void sendNetworkReport(NetworkReport report) {
 		// Do not send during license checking because the access token can be changed!
 		if (!ProbeConfiguration.isCheckingLicense) {
-			if (Strings.isNullOrEmpty(report.getDeviceId())) {
+			if (report.getDeviceId() != null) {
 				report.setDeviceId(ProbeConfiguration.probeId);
 			}
-			if (Strings.isNullOrEmpty(report.getGroupId())) {
-				report.setGroupId(ProbeConfiguration.groupId);
+			if (Strings.isNullOrEmpty(report.getGroupId().toString())) {
+				report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 			}
 			if (Strings.isNullOrEmpty(report.getHostname())) {
 				report.setHostname(ProbeConfiguration.hostname);

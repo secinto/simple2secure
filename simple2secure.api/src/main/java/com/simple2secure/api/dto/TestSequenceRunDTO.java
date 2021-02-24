@@ -25,35 +25,18 @@ package com.simple2secure.api.dto;
 import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestSequenceResult;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TestSequenceRunDTO {
 
 	private SequenceRun sequenceRun;
 
 	private TestSequenceResult sequenceResult;
-
-	public TestSequenceRunDTO() {
-
-	}
-
-	public TestSequenceRunDTO(SequenceRun sequenceRun, TestSequenceResult sequenceResult) {
-		super();
-		this.sequenceRun = sequenceRun;
-		this.sequenceResult = sequenceResult;
-	}
-
-	public SequenceRun getSequenceRun() {
-		return sequenceRun;
-	}
-
-	public void setSequenceRun(SequenceRun sequenceRun) {
-		this.sequenceRun = sequenceRun;
-	}
-
-	public TestSequenceResult getSequenceResult() {
-		return sequenceResult;
-	}
-
-	public void setSequenceResult(TestSequenceResult sequenceResult) {
-		this.sequenceResult = sequenceResult;
-	}
 }

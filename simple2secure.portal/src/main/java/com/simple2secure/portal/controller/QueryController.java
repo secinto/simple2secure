@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +46,7 @@ import com.simple2secure.api.model.OsQueryCategory;
 import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputDevice;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
@@ -57,7 +59,6 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.QUERY_API)
 @Slf4j
@@ -76,18 +77,19 @@ public class QueryController extends BaseUtilsProvider {
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQuery> getQueryByID(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(queryId.getValue())) {
+		if (queryId.getValue() != null) {
 			OsQuery queryConfig = queryRepository.find(queryId.getValue());
 			if (queryConfig != null) {
 				return new ResponseEntity<>(queryConfig, HttpStatus.OK);
 			}
 		}
 		log.error("Query configuration not found for the query ID {}", queryId.getValue());
-		return (ResponseEntity<OsQuery>) buildResponseEntity("queryrun_not_found", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue()));
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/allDto")
+	@ValidRequestMapping(
+			value = "/allDto")
 	public ResponseEntity<List<OsQueryDTO>> getQueryDTOs(@ServerProvidedValue ValidInputLocale locale) {
 
 		List<OsQueryDTO> queryDtoList = new ArrayList<>();
@@ -101,24 +103,23 @@ public class QueryController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(queryDtoList, HttpStatus.OK);
 		}
-
-		return (ResponseEntity<List<OsQueryDTO>>) buildResponseEntity("error_while_getting_queryrun", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue()));
 	}
 
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/unmapped")
+	@ValidRequestMapping(
+			value = "/unmapped")
 	public ResponseEntity<List<OsQuery>> getUnmappedQueriesByGroupId(@PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+		if (groupId.getValue() != null) {
 			List<OsQuery> queryList = queryUtils.getUnmappedQueriesByGroup(groupId.getValue());
 
 			if (queryList != null) {
 				return new ResponseEntity<>(queryList, HttpStatus.OK);
 			}
 		}
-
-		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_getting_queryrun", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue()));
 	}
 
 	/**
@@ -126,13 +127,14 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQuery> updateQuery(@RequestBody OsQuery query, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (query != null) {
-			if (!Strings.isNullOrEmpty(query.getId())) {
+			if (query.getId() != null) {
 
 				queryRepository.update(query);
 				return new ResponseEntity<>(query, HttpStatus.OK);
@@ -144,7 +146,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return (ResponseEntity<OsQuery>) buildResponseEntity("error_while_update_queryrun", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue()));
 
 	}
 
@@ -153,13 +155,15 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/category", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/category",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<OsQueryCategory> updateSaveCategory(@RequestBody OsQueryCategory category,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
 		if (category != null) {
-			if (!Strings.isNullOrEmpty(category.getId())) {
+			if (category.getId() != null) {
 
 				queryCategoryRepository.update(category);
 				return new ResponseEntity<>(category, HttpStatus.OK);
@@ -173,7 +177,7 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return (ResponseEntity<OsQueryCategory>) buildResponseEntity("error_while_update_queryrun", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue()));
 	}
 
 	/**
@@ -181,12 +185,14 @@ public class QueryController extends BaseUtilsProvider {
 	 *
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(value = "/mapping", method = ValidRequestMethodType.POST)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(
+			value = "/mapping",
+			method = ValidRequestMethodType.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'LOGINUSER')")
 	public ResponseEntity<List<OsQuery>> updateQueryMappings(@RequestBody List<OsQuery> queryList, @PathVariable ValidInputGroup groupId,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-		if (queryList != null && !Strings.isNullOrEmpty(groupId.getValue())) {
+		if (queryList != null && groupId.getValue() != null) {
 			CompanyGroup group = groupRepository.find(groupId.getValue());
 			if (group != null) {
 				queryUtils.updateQueryGroupMapping(queryList, groupId.getValue());
@@ -194,18 +200,18 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while inserting/updating queryRun");
-		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_update_queryrun", locale);
-
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_update_queryrun", locale.getValue()));
 	}
 
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteQuery(@PathVariable ValidInputQuery queryId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(queryId.getValue())) {
+		if (queryId.getValue() != null) {
 			OsQuery queryRun = queryRepository.find(queryId.getValue());
 			if (queryRun != null) {
 				queryGroupMappingRepository.deleteByQueryId(queryId.getValue());
@@ -214,13 +220,13 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Problem occured while deleting query run with id {}", queryId.getValue());
-		return buildResponseEntity("problem_occured_while_deleting_queryrun", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_queryrun", locale.getValue()));
 	}
 
 	/**
 	 * This function returns the query config for the specified user
 	 */
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'ROLE_DEVICE')")
 	@ValidRequestMapping
 	public ResponseEntity<List<OsQuery>> getQueriesByDeviceId(@PathVariable ValidInputDevice deviceId, @PathVariable ValidInputOsinfo osinfo,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -229,7 +235,7 @@ public class QueryController extends BaseUtilsProvider {
 			osinfo.setValue(OSInfo.UNKNOWN.name());
 		}
 
-		if (!Strings.isNullOrEmpty(deviceId.getValue())) {
+		if (deviceId.getValue() != null) {
 			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId.getValue());
 			if (license != null) {
 				CompanyGroup group = groupRepository.find(license.getGroupId());
@@ -245,7 +251,7 @@ public class QueryController extends BaseUtilsProvider {
 						// go until the root group is not found and get all configurations from all groups which are parents of this group
 						List<CompanyGroup> foundGroups = groupUtils.findAllParentGroups(group);
 						if (foundGroups != null) {
-							List<String> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
+							List<ObjectId> groupIds = portalUtils.extractIdsFromObjects(foundGroups);
 							if (groupIds != null) {
 								queryConfig = queryUtils.findByGroupIdsAndOsInfo(groupIds, OSInfo.valueOf(osinfo.getValue()));
 							}
@@ -259,20 +265,19 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error while getting query run for the probe id {}", deviceId);
-
-		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("error_while_getting_queryrun", locale);
-
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_getting_queryrun", locale.getValue()));
 	}
 
 	/**
 	 * This function returns query config by the id
 	 */
-	@ValidRequestMapping(value = "/group")
+	@ValidRequestMapping(
+			value = "/group")
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<List<OsQuery>> getQueriesByGroupId(@PathVariable ValidInputGroup groupId, @RequestParam boolean select_all,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(groupId.getValue())) {
+		if (groupId.getValue() != null) {
 			List<OsQuery> queries = new ArrayList<>();
 			List<OsQueryGroupMapping> groupMappings = queryGroupMappingRepository.findByGroupId(groupId.getValue());
 
@@ -299,6 +304,6 @@ public class QueryController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Query configuration not found for the group ID {}", groupId);
-		return (ResponseEntity<List<OsQuery>>) buildResponseEntity("queryrun_not_found", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("queryrun_not_found", locale.getValue()));
 	}
 }

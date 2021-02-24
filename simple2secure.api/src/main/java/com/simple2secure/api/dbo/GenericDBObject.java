@@ -23,10 +23,16 @@ package com.simple2secure.api.dbo;
 
 import java.io.Serializable;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @MappedSuperclass
 public abstract class GenericDBObject implements Serializable {
@@ -38,15 +44,18 @@ public abstract class GenericDBObject implements Serializable {
 
 	public static String ID = "_id";
 
+	@EmbeddedId
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public String id;
+	@JsonSerialize(using=ToStringSerializer.class)
+	public ObjectId id;
 
-	public void setId(String id) {
+	public void setId(ObjectId id) {
 		this.id = id;
 	}
-
-	public String getId() {
+	
+	@JsonSerialize(using=ToStringSerializer.class)
+	public ObjectId getId() {
 		return id;
 	}
 

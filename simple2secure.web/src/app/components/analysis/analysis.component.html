@@ -1,0 +1,28 @@
+<div class="container">
+    <mat-card>
+        <mat-select placeholder="{{ 'chart.probe.select' | translate }}" [(ngModel)]="selectedProbe" name="query"
+            (selectionChange)="onProbeChange($event.value)" required>
+            <mat-option *ngFor="let probe of probes" [value]="probe">
+                {{probe.info.name}} - {{probe.info.id}}
+            </mat-option>
+        </mat-select>
+    </mat-card>
+    <mat-card>
+        <mat-select placeholder="{{ 'chart.query.select' | translate }}" [(ngModel)]="selectedQuery" name="query"
+            (selectionChange)="onQueryChange($event.value)" required>
+            <mat-option *ngFor="let query of queries" [value]="query">
+                {{query.name}}
+            </mat-option>
+        </mat-select>
+    </mat-card>
+    <mat-card>
+
+        <button mat-raised-button color="primary" id="addButton" type="button" (click)="openDialogAddQuery()"
+            class="mat-green-button">
+            <i class="glyphicon glyphicon-plus"></i> {{ 'button.addQuery' | translate }}
+        </button>
+
+        <div [chart]="chart"></div>
+    </mat-card>
+
+</div>

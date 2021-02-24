@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputGroup extends ValidatedInput<String> {
 
-	private String groupId;
+	private ObjectId groupId;
 	private String tag = "/{groupId}";
 
 	public ValidInputGroup() {
 	}
 
 	public ValidInputGroup(String groupId) {
-		this.groupId = groupId;
+		this.groupId = new ObjectId(groupId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return groupId;
 	}
 

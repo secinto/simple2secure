@@ -21,39 +21,23 @@
  */
 package com.simple2secure.api.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.simple2secure.api.model.NetworkReport;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class NetworkReportDTO {
 
-	private List<NetworkReport> report;
+	private List<NetworkReport> report = new ArrayList<NetworkReport>();
 
 	private long totalSize;
-
-	public NetworkReportDTO() {
-
-	}
-
-	public NetworkReportDTO(List<NetworkReport> report, long totalSize) {
-		super();
-		this.report = report;
-		this.totalSize = totalSize;
-	}
-
-	public List<NetworkReport> getReport() {
-		return report;
-	}
-
-	public void setReports(List<NetworkReport> report) {
-		this.report = report;
-	}
-
-	public long getTotalSize() {
-		return totalSize;
-	}
-
-	public void setTotalSize(long totalSize) {
-		this.totalSize = totalSize;
-	}
 }

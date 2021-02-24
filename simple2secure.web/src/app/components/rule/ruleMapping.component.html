@@ -1,0 +1,38 @@
+<!-- title for the dialog -->
+<h3 mat-dialog-title>{{ 'title.select.mapping' | translate }}</h3>
+
+
+<!-- =============================================================================================================== -->
+<!-- body with the content of the dialog -->
+<mat-dialog-content>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+    <div *ngIf="ruleFactType == ruleFactTypeEnum.EMAIL">
+        <div *ngFor="let emailConfig of emailConfigurations, let chosenIndex = index">
+
+            <mat-checkbox [(ngModel)]="chosenItems[chosenIndex]" name="{{emailConfig.id}}">{{emailConfig.email}}
+            </mat-checkbox>
+        </div>
+    </div>
+
+    <div *ngIf="ruleFactType == ruleFactTypeEnum.TESTRESULT ||
+                ruleFactType == ruleFactTypeEnum.TESTSEQUENCERESULT ||
+                ruleFactType == ruleFactTypeEnum.OSQUERYREPORT ||
+                ruleFactType == ruleFactTypeEnum.NETWORKREPORT">
+        <div *ngFor="let device of devices, let chosenIndex = index">
+            <mat-checkbox [(ngModel)]="chosenItems[chosenIndex]" name="{{device.info.id}}">{{device.info.name}}
+            </mat-checkbox>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<!-- =============================================================================================================== -->
+<!-- save/cancel buttons, fixed at the end of the dialog -->
+<div mat-dialog-actions>
+    <button mat-button mat-raised-button class="mat-green-button" color="primary" (click)="saveMapping()">
+        {{ 'button.save' | translate }}
+    </button>
+
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+        {{ 'button.cancel' | translate }}
+    </button>
+</div>

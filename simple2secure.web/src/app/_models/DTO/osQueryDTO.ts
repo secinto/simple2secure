@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {OsQueryCategory} from "../osQueryCategory";
-import {OsQuery} from "../osQuery";
+import { OsQueryCategory } from '../osQueryCategory';
+import { OsQuery } from '../osQuery';
 
 export class OsQueryDTO {
 	category: OsQueryCategory;

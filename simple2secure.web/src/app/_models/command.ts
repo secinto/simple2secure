@@ -20,10 +20,9 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-import {Parameter} from './parameter';
+import { Parameter } from './parameter';
 
-export class Command extends Base {
-	parameter = new Parameter();
+export class Command {
+	parameter: Parameter[] = [];
 	executable = '';
 }

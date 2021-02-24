@@ -21,14 +21,18 @@
  */
 package com.simple2secure.portal.repository;
 
+import org.bson.types.ObjectId;
+import org.springframework.stereotype.Component;
+
 import com.simple2secure.api.model.CurrentContext;
 import com.simple2secure.portal.dao.MongoRepository;
 
+@Component
 public abstract class CurrentContextRepository extends MongoRepository<CurrentContext> {
 	public abstract CurrentContext findByUserId(String userId);
 
-	public abstract void deleteByContextUserAuthenticationId(String contextUserAuthenticationId);
+	public abstract void deleteByContextUserAuthenticationId(ObjectId contextUserAuthenticationId);
 
-	public abstract void deleteByContextId(String contextId);
+	public abstract void deleteByContextId(ObjectId contextId);
 
 }

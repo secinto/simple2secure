@@ -1,0 +1,141 @@
+<div *ngIf="loading" class="container">
+    <ng4-loading-spinner> </ng4-loading-spinner>
+</div>
+
+<div *ngIf="!loading" class="container">
+
+    <mat-expansion-panel [disabled]="isPanelDisabled(searchResult[0])" (opened)="_setDataSource(0)">
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.notifications' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[0])}} {{ 'title.hits' | translate }}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div *ngIf="!isPanelDisabled(searchResult[0])" class="example-container mat-elevation-z8 table table-striped">
+            <div class="header-filter-table">
+                <mat-form-field class="header-filter-field">
+                    <input matInput (keyup)="applyFilter($event.target.value, 0)" placeholder="Filter">
+                </mat-form-field>
+            </div>
+            <mat-table #table [dataSource]="dataSourceNotifications" matSort>
+                <ng-container matColumnDef="content">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.content' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.content | truncate }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="timestamp">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.timestamp | date:'dd.MM.yy HH:mm:ss'}}</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumnsNotifications"></mat-header-row>
+                <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumnsNotifications;"
+                    (click)="openDialogShowDetails(row, 'notification')"></mat-row>
+            </mat-table>
+            <mat-paginator #paginatorNotification [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
+                [showFirstLastButtons]="true">
+            </mat-paginator>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [disabled]="isPanelDisabled(searchResult[1])">
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.queryReport' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[1])}} {{ 'title.hits' | translate }}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div *ngIf="!isPanelDisabled(searchResult[1])" class="example-container mat-elevation-z8 table table-striped">
+            <div class="header-filter-table">
+                <mat-form-field class="header-filter-field">
+                    <input matInput (keyup)="applyFilter($event.target.value, 1)" placeholder="Filter">
+                </mat-form-field>
+            </div>
+            <mat-table #tableOSQuery [dataSource]="dataSourceOSQuery" matSort>
+                <ng-container matColumnDef="result">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.queryresults' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.queryResult | truncate }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="timestamp">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.queryTimestamp}}</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumnsOSQuery"></mat-header-row>
+                <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumnsOSQuery;"
+                    (click)="openDialogShowDetails(row, 'osqueryReport')"></mat-row>
+            </mat-table>
+            <mat-paginator #paginatorOSQuery [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
+                [showFirstLastButtons]="true">
+            </mat-paginator>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [disabled]="isPanelDisabled(searchResult[2])">
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.networkreports' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[2])}} {{ 'title.hits' | translate }}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div *ngIf="!isPanelDisabled(searchResult[2])" class="example-container mat-elevation-z8 table table-striped">
+            <div class="header-filter-table">
+                <mat-form-field class="header-filter-field">
+                    <input matInput (keyup)="applyFilter($event.target.value, 2)" placeholder="Filter">
+                </mat-form-field>
+            </div>
+            <mat-table #tableNetworkReport [dataSource]="dataSourceNetworkReport" matSort>
+                <ng-container matColumnDef="result">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.testresult' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.stringContent | truncate }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="timestamp">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.startTime}}</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumnsNetworkReport"></mat-header-row>
+                <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumnsNetworkReport;"
+                    (click)="openDialogShowDetails(row, 'networkReport')"></mat-row>
+            </mat-table>
+            <mat-paginator #paginatorNetworkReport [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
+                [showFirstLastButtons]="true">
+            </mat-paginator>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [disabled]="isPanelDisabled(searchResult[3])">
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'menu.testResults' | translate }}</mat-panel-title>
+            <mat-panel-description>{{getSearchResultObjectLenght(searchResult[3])}} {{ 'title.hits' | translate }}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div *ngIf="!isPanelDisabled(searchResult[3])" class="example-container mat-elevation-z8 table table-striped">
+            <div class="header-filter-table">
+                <mat-form-field class="header-filter-field">
+                    <input matInput (keyup)="applyFilter($event.target.value, 3)" placeholder="Filter">
+                </mat-form-field>
+            </div>
+            <mat-table #tableTR [dataSource]="dataSourceTR" matSort>
+                <ng-container matColumnDef="result">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.testresult' | translate }}
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.result | truncate }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="timestamp">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.timestamp | date:'dd.MM.yy HH:mm:ss'}} </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumnsTR"></mat-header-row>
+                <mat-row class="clickable-table-row" *matRowDef="let row; columns: displayedColumnsTR;"
+                    (click)="openDialogShowDetails(row, 'testresult')"></mat-row>
+            </mat-table>
+            <mat-paginator #paginatorTR [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true">
+            </mat-paginator>
+        </div>
+    </mat-expansion-panel>
+</div>

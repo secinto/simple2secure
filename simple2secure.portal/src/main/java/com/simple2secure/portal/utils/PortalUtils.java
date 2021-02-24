@@ -21,26 +21,21 @@
  */
 package com.simple2secure.portal.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.codec.binary.Base64;
+import org.bson.types.ObjectId;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,15 +54,11 @@ import com.simple2secure.api.model.SequenceRun;
 import com.simple2secure.api.model.TestRun;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.controller.WidgetController;
-import com.simple2secure.portal.model.ApiError;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputParamType;
 import com.simple2secure.portal.validation.model.ValidInputUser;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import simple2secure.validator.annotation.NotSecuredApi;
 import simple2secure.validator.annotation.ValidRequestMapping;
@@ -77,20 +68,10 @@ import simple2secure.validator.model.ValidatedInput;
 
 @Component
 @Slf4j
-public class PortalUtils{
+public class PortalUtils {
 
 	@Autowired
 	JavaMailSender javaMailSender;
-
-	/**
-	 * This function generates a token(activation, invitation, paswordReset) for each user
-	 *
-	 * @return
-	 */
-	public synchronized String generateToken() {
-		UUID uuid = UUID.randomUUID();
-		return uuid.toString();
-	}
 
 	/**
 	 * This function checks if processor with the provided name or class already exist in the database. New processor will be only added if it
@@ -107,98 +88,6 @@ public class PortalUtils{
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Check before each request if access token has expired
-	 *
-	 * @param expirationDate
-	 * @return
-	 */
-	public boolean isAccessTokenExpired(Date expirationDate) {
-		Date currentDate = new Date(System.currentTimeMillis());
-
-		if (expirationDate.before(currentDate)) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-	/**
-	 * Converts the given TimeUnits time to milliseconds.
-	 *
-	 * @param time
-	 *          The value of the time unit.
-	 * @param timeUnit
-	 *          The unit in which the time is measured.
-	 * @return The specified amount of time in milliseconds.
-	 */
-	public long convertTimeUnitsToMilis(long time, TimeUnit timeUnit) {
-		if (timeUnit != null) {
-			return timeUnit.toMillis(time);
-		} else {
-			return 0;
-		}
-	}
-
-	/**
-	 * This function checks if this group has children groups
-	 *
-	 * @param group
-	 * @return
-	 */
-	public static boolean groupHasChildren(CompanyGroup group) {
-		if (group != null) {
-			if (group.getChildrenIds() != null) {
-				if (group.getChildrenIds().size() > 0) {
-					return true;
-				}
-			} 
-		}
-		return false;
-	}
-
-	/**
-	 * This function checks if the invitation token is still valid
-	 *
-	 * @param expirationTime
-	 * @return
-	 */
-	public boolean checkIfTokenIsStillValid(long expirationTime) {
-		if (System.currentTimeMillis() <= expirationTime) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * This function converts an input stream object to string
-	 *
-	 * @param inputStream
-	 * @return
-	 * @throws IOException
-	 */
-	public String convertInputStreamToString(InputStream inputStream) throws IOException {
-		return IOUtils.toString(inputStream, "UTF-8");
-	}
-
-	/**
-	 * This function generates pod token which is used for communication between pod and portal. With this token we will be able to send
-	 * request to the pod service from the portal.
-	 *
-	 * @return
-	 */
-	public String generatePodToken(String deviceId, String tokenSecret) {
-
-		Claims claims = Jwts.claims().setSubject(StaticConfigItems.CLAIM_SUBJECT);
-		claims.put(StaticConfigItems.CLAIM_POD, deviceId);
-
-		String podToken = Jwts.builder().setExpiration(new Date(System.currentTimeMillis() + 3600000))
-				.signWith(SignatureAlgorithm.HS512, tokenSecret).compact();
-
-		return podToken;
 	}
 
 	/**
@@ -236,43 +125,43 @@ public class PortalUtils{
 	 * @param groups
 	 * @return
 	 */
-	public List<String> extractIdsFromObjects(List<?> objects) {
-		List<String> ids = new ArrayList<>();
+	public List<ObjectId> extractIdsFromObjects(List<?> objects) {
+		List<ObjectId> ids = new ArrayList<>();
 
 		if (objects != null) {
 			for (Object object : objects) {
 				if (object.getClass().equals(CompanyGroup.class)) {
 					CompanyGroup group = (CompanyGroup) object;
-					if (!Strings.isNullOrEmpty(group.getId())) {
+					if (group.getId() != null) {
 						ids.add(group.getId());
 					}
 				}
 
 				else if (object.getClass().equals(TestRun.class)) {
 					TestRun testRun = (TestRun) object;
-					if (!Strings.isNullOrEmpty(testRun.getId())) {
+					if (testRun.getId() != null) {
 						ids.add(testRun.getId());
 					}
 				}
 
 				else if (object.getClass().equals(CompanyLicensePrivate.class)) {
 					CompanyLicensePrivate license = (CompanyLicensePrivate) object;
-					if (!Strings.isNullOrEmpty(license.getDeviceId())) {
+					if (license.getDeviceId() != null) {
 						ids.add(license.getDeviceId());
 					}
 				}
 
 				else if (object.getClass().equals(SequenceRun.class)) {
 					SequenceRun sequenceRun = (SequenceRun) object;
-					if (!Strings.isNullOrEmpty(sequenceRun.getId())) {
+					if (sequenceRun.getId() != null) {
 						ids.add(sequenceRun.getId());
 					}
 				}
 
 				else if (object.getClass().equals(Device.class)) {
 					Device device = (Device) object;
-					if (!Strings.isNullOrEmpty(device.getInfo().getDeviceId())) {
-						ids.add(device.getInfo().getDeviceId());
+					if (device.getInfo().getId() != null) {
+						ids.add(device.getInfo().getId());
 					}
 				}
 			}
@@ -303,7 +192,7 @@ public class PortalUtils{
 	}
 
 	/**
-	 * This method generates the method url string from the provided parameter type
+	 * This method parses the declaredMethod tag from the provided parameter object
 	 *
 	 * @param param
 	 * @return
@@ -457,6 +346,13 @@ public class PortalUtils{
 		return RequestMappingInfo.paths(complete_url).methods(rm).consumes(consumes_value).produces(produces_value).build();
 	}
 
+	/**
+	 * This method generates and returns the complete url for the provided method
+	 *
+	 * @param m
+	 * @param clazz_url
+	 * @return
+	 */
 	public String getCompleteUrlApi(Method m, String[] clazz_url) {
 		StringBuilder method_url = createMethodUrl(m, true);
 		String annotated_value = (String) getValueFromAnnotation(m, ValidInputParamType.VALUE);
@@ -528,36 +424,25 @@ public class PortalUtils{
 			}
 		}
 		url_list.add(StaticConfigItems.LOGIN_API);
-		return listToArray(url_list);
+
+		Object[] objectArray = url_list.toArray();
+
+		return Arrays.copyOf(objectArray, objectArray.length, String[].class);
 	}
 
-	/**
-	 * This function converts List to array
-	 *
-	 * @param items
-	 * @return
+	/*
+	 * This library decodes jwt token without verification and returns body part of it
 	 */
-	public String[] listToArray(List<String> items) {
-		String[] urls = new String[items.size()];
+	public String decodeJWTAndReturnBody(String token) {
+		if (!Strings.isNullOrEmpty(token)) {
+			String[] split_string = token.split("\\.");
+			String base64EncodedBody = split_string[1];
 
-		for (int index = 0; index < items.size(); index++) {
-			urls[index] = items.get(index);
+			Base64 base64Url = new Base64(true);
+
+			String body = new String(base64Url.decode(base64EncodedBody));
+			return body;
 		}
-
-		return urls;
-	}
-
-	/**
-	 * This function creates an api error object from the provided parameters
-	 *
-	 * @param message
-	 * @param status
-	 * @return
-	 */
-	public ApiError buildApiError(String message, HttpStatus status) {
-		ApiError apiError = new ApiError();
-		apiError.setErrorMessage(message);
-		apiError.setStatus(HttpStatus.UNAUTHORIZED);
-		return apiError;
+		return null;
 	}
 }

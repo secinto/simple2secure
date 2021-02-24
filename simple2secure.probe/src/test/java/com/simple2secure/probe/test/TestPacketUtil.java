@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public class TestPacketUtil {
 	public void isPacketInDB_PacketStoredInDB_True() throws UnsupportedEncodingException {
 		ProbePacket arpPacket;
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
-		arpPacket.setId("5");
+		arpPacket.setId(new ObjectId("5"));
 		DBUtil.getInstance().merge(arpPacket);
 
 		Assertions.assertTrue(PacketUtil.isPacketInDB(arpPacket));
@@ -58,11 +59,11 @@ public class TestPacketUtil {
 	public void updateProbePacketInDB_ModifiedProbePacket_ModifiedProbePacket() throws UnsupportedEncodingException {
 		ProbePacket arpPacket;
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 10, 1);
-		arpPacket.setId("1");
+		arpPacket.setId(new ObjectId("1"));
 		DBUtil.getInstance().merge(arpPacket);
 
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet1", false, 15, 5);
-		arpPacket.setId("1");
+		arpPacket.setId(new ObjectId("1"));
 
 		PacketUtil.updateProbePacketInDB(arpPacket);
 
@@ -90,10 +91,10 @@ public class TestPacketUtil {
 
 		arpPacket = ProbePacketCrafter.craftProbePacket("arp", "1", "arp-packet", false, 15, 5);
 		// arpPacket.setId("2");
-		Map<String, ProbePacketQueueHandler> taskMap = new HashMap<>();
-		taskMap.put(arpPacket.getName(), new ProbePacketQueueHandler(arpPacket, new ProcessingQueue<>()));
-		taskMap.put(pingPacket.getName(), new ProbePacketQueueHandler(pingPacket, new ProcessingQueue<>()));
-		taskMap.put(icmpCommonPacket.getName(), new ProbePacketQueueHandler(icmpCommonPacket, new ProcessingQueue<>()));
+		Map<ObjectId, ProbePacketQueueHandler> taskMap = new HashMap<>();
+		taskMap.put(new ObjectId(arpPacket.getName()), new ProbePacketQueueHandler(arpPacket, new ProcessingQueue<>()));
+		taskMap.put(new ObjectId(pingPacket.getName()), new ProbePacketQueueHandler(pingPacket, new ProcessingQueue<>()));
+		taskMap.put(new ObjectId(icmpCommonPacket.getName()), new ProbePacketQueueHandler(icmpCommonPacket, new ProcessingQueue<>()));
 
 		List<ProbePacket> changedPackets = PacketUtil.getChangedPackets(taskMap);
 

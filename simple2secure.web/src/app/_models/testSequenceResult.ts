@@ -20,13 +20,13 @@
  *********************************************************************
  */
 
-import {Base} from './base';
+import { Base } from './base';
 
 export class TestSequenceResult extends Base {
-	sequence_run_id: string
-	sequence_id: string;
-    pod_id: string;
-    sequence_name: string;
-    sequence_result: {};
-    time_stamp: string;
+    sequenceRunId: string;
+    sequenceId: string;
+    podId: string;
+    sequenceName: string;
+    sequenceResult: string;
+    timestamp: string;
 }

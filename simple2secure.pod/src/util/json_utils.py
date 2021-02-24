@@ -1,109 +1,23 @@
+import json
 import logging
-import platform
-
-from flask import json
-
 
 log = logging.getLogger('pod.util.json_utils')
 
 
-def get_json_test_object(data, test_id, key, attribute):
-    # Iterate over data object
-    for test in data:
-        # Check if provided test id is equal to the test_id of the current object
-        if test["id"] == test_id:
-            # Check what is the provided attribute name and get value of that attribute
-            if attribute == "command":
-                return test[key][attribute]["executable"]
-            elif attribute == "parameter":
-                return test[key]["command"][attribute]["value"]
-
-
-def get_test_item_value(data, query_string, test_id, test_type, attribute):
-    # if query_string is empty get the object from the file
-    if is_blank(query_string):
-        value = get_json_test_object(data, test_id, test_type, attribute)
-    else:
-        # If query string of the searched attribute is empty get it from the file
-        if is_blank(parse_query_test(query_string, attribute)):
-            value = get_json_test_object(data, test_id, test_type, attribute)
-        # Read the value from the query_string
-        else:
-            value = parse_query_test(query_string, attribute)
-
-    return value
-
-
-def get_json_test_object_new(data, key, attribute):
-    # Check what is the provided attribute name and get value of that attribute
-    if attribute == "command":
-        return data[key][attribute]["executable"]
-    # Check what is the provided attribute name and get value of that attribute
-    if attribute == "parameter":
-        return data[key]["command"][attribute]["value"]
-
-
-def parse_query_test(query_string, item_type):
-    # Split query params by "%"
-    mylist = query_string.split("%")
-    # print(enumerate(mylist))
-    for index, item in enumerate(mylist):
-        # Split sub params by "="
-        mysublist = item.split("=")
-        # Check if current attribute equals the provided item_type
-        if mysublist[0] == item_type:
-            correct_item = mylist[index + 1].split("=")
-            return correct_item[1]
-
-
-def is_blank(mystring):
-    # Check if provided string is null or empty
-    if mystring and mystring.strip():
-        return False
-    return True
-
-
-def get_tool(argument):
-    # Check the provided argument and return the real
-    # command according to the current OS
-    if argument == 'SAVE_RESULT':
-        if platform.system().lower() == 'windows':
-            return 'type nul >'
-        else:
-            return 'mkdir'
-    elif argument == 'DELETE_RESULT':
-        if platform.system().lower() == 'windows':
-            return 'del'
-        else:
-            return 'rm -rf'
-    else:
-        return argument
-
-
-def prepare_testsection_for_execution(test, section):
-    executable = []
-    executable.append(test[section]['command']['executable'])
-    parameters = test[section]['command']['parameter']['prefix'].split(" ")
+def prepare_test_section_for_execution(test, section):
+    executable = [test[section]['command']['executable']]
+    parameters = test[section]['command']['parameter']
     for param in parameters:
-        executable.append(param)
-    executable.append(test[section]['command']['parameter']['value'])
+        executable.append(param["prefix"])
+        executable.append(param["value"])
     return executable
+
 
 def prepare_sequence_test_section_for_execution(test):
     if test and test['test_definition']:
-        executable = []
-        executable.append(test['test_definition']['step']['command']['executable'])
-        parameters = test['test_definition']['step']['command']['parameter']['prefix'].split(" ")
+        executable = [test['test_definition']['step']['command']['executable']]
+        parameters = test['test_definition']['step']['command']['parameter']
         for param in parameters:
-            executable.append(param)
-        executable.append(test['test_definition']['step']['command']['parameter']['value'])
+            executable.append(param["prefix"])
+            executable.append(param["value"])
         return executable
-
-def construct_command(tool, argument):
-    # Construct command from the tool name and argument
-
-    if argument is None and tool is None:
-        return ""
-    else:
-        return tool + ' ' + argument
-

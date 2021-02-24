@@ -4,12 +4,14 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.simple2secure.api.model.UserInvitation;
+import com.simple2secure.api.model.UserInvitationStatus;
 import com.simple2secure.portal.repository.UserInvitationRepository;
 
 @Repository
@@ -23,28 +25,28 @@ public class UserInvitationRepositoryImpl extends UserInvitationRepository {
 	}
 
 	@Override
-	public UserInvitation getByInvitationToken(String invitationToken) {
-		Query query = new Query(Criteria.where("invitationToken").is(invitationToken));
-		UserInvitation userInvitation = mongoTemplate.findOne(query, UserInvitation.class);
-		return userInvitation;
-	}
-
-	@Override
-	public List<UserInvitation> getByContextId(String contextId) {
+	public List<UserInvitation> getByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
 		List<UserInvitation> userInvitationList = mongoTemplate.find(query, UserInvitation.class);
 		return userInvitationList;
 	}
 
 	@Override
-	public List<UserInvitation> getByUserId(String userId) {
+	public List<UserInvitation> getByUserIdAndStatus(String userId, UserInvitationStatus status) {
+		Query query = new Query(Criteria.where("userId").is(userId).and("invitationStatus").is(status));
+		List<UserInvitation> userInvitationList = mongoTemplate.find(query, UserInvitation.class);
+		return userInvitationList;
+	}
+
+	@Override
+	public List<UserInvitation> getByUserId(ObjectId userId) {
 		Query query = new Query(Criteria.where("userId").is(userId));
 		List<UserInvitation> userInvitationList = mongoTemplate.find(query, UserInvitation.class);
 		return userInvitationList;
 	}
 
 	@Override
-	public void deleteByContexId(String contextId) {
+	public void deleteByContexId(ObjectId contextId) {
 		List<UserInvitation> userInvitationList = getByContextId(contextId);
 		if (userInvitationList != null) {
 			for (UserInvitation userInvitation : userInvitationList) {
@@ -56,7 +58,7 @@ public class UserInvitationRepositoryImpl extends UserInvitationRepository {
 	}
 
 	@Override
-	public void deleteByUserId(String userId) {
+	public void deleteByUserId(ObjectId userId) {
 		List<UserInvitation> userInvitationList = getByUserId(userId);
 		if (userInvitationList != null) {
 			for (UserInvitation userInvitation : userInvitationList) {
@@ -67,4 +69,10 @@ public class UserInvitationRepositoryImpl extends UserInvitationRepository {
 		}
 	}
 
+	@Override
+	public UserInvitation getByContextIdAndUserId(ObjectId contextId, String userId) {
+		Query query = new Query(Criteria.where("userId").is(userId).and("contextId").is(contextId));
+		UserInvitation userInvitation = mongoTemplate.findOne(query, UserInvitation.class);
+		return userInvitation;
+	}
 }

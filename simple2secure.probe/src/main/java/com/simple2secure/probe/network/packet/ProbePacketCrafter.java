@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
+import org.bson.types.ObjectId;
 import org.pcap4j.packet.ArpPacket;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IcmpV4CommonPacket;
@@ -68,7 +69,7 @@ public class ProbePacketCrafter {
 			packetAsHexStream = PcapUtil.convertPackRawDataToHexStreamString(result.getRawData());
 		}
 
-		return new ProbePacket(groupId, name, always, requestCount, analysisInterval, analysisIntervalUnit, packetAsHexStream);
+		return new ProbePacket(new ObjectId(groupId), name, always, requestCount, analysisInterval, analysisIntervalUnit, packetAsHexStream);
 	}
 
 	private static Packet craftArpPacket(String srcIpAddress, String dstIpAddress, MacAddress srcMacAddress) {

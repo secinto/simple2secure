@@ -22,12 +22,15 @@
 
 package com.simple2secure.portal.dao;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -42,6 +45,7 @@ import com.simple2secure.api.model.NetworkReport;
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.api.model.TestResult;
+import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -103,8 +107,7 @@ public class MongoRepository<T extends GenericDBObject> {
 	 * @param item
 	 */
 	public void delete(T item) {
-		String objId = item.getId();
-		this.mongoTemplate.remove(Query.query(Criteria.where(GenericDBObject.ID).is(objId)), this.collectionName);
+		this.mongoTemplate.remove(Query.query(Criteria.where(GenericDBObject.ID).is(item.getId())), this.collectionName);
 	}
 
 	/**
@@ -131,9 +134,8 @@ public class MongoRepository<T extends GenericDBObject> {
 	 *           if there is no such item
 	 */
 	public void update(T item) throws ItemNotFoundRepositoryException {
-		String objId = item.getId();
 
-		List<? extends GenericDBObject> items = this.mongoTemplate.find(Query.query(Criteria.where(GenericDBObject.ID).is(objId)),
+		List<? extends GenericDBObject> items = this.mongoTemplate.find(Query.query(Criteria.where(GenericDBObject.ID).is(item.getId())),
 				item.getClass(), this.collectionName);
 
 		if (items == null) {
@@ -157,8 +159,8 @@ public class MongoRepository<T extends GenericDBObject> {
 	 * @throws ItemNotFoundRepositoryException
 	 *           if there is no such item
 	 */
-	public T find(String itemId) {
-		String objId = itemId;
+	public T find(ObjectId itemId) {
+		ObjectId objId = itemId;
 
 		List<T> items = this.mongoTemplate.find(Query.query(Criteria.where(GenericDBObject.ID).is(objId)), this.className, this.collectionName);
 
@@ -193,7 +195,7 @@ public class MongoRepository<T extends GenericDBObject> {
 	 * @param searchQuery
 	 * @return
 	 */
-	public List<T> getBySearchQuery(String searchQuery, String contextId, boolean satisfyAllQueries) {
+	public List<T> getBySearchQuery(String searchQuery, ObjectId contextId, boolean satisfyAllQueries) {
 
 		TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingAny(searchQuery);
 
@@ -226,6 +228,45 @@ public class MongoRepository<T extends GenericDBObject> {
 		textIndex = new TextIndexDefinitionBuilder().onField("result").onField("hostname").onField("name").build();
 		mongoTemplate.indexOps(TestResult.class).ensureIndex(textIndex);
 
+	}
+
+	/**
+	 * This function iterates over all provided fields and creates a or match query with regex, which is used by filter function
+	 *
+	 * @param fields
+	 * @param filter
+	 * @return
+	 */
+	public Criteria defineFilterCriteriaWithManyFields(String[] fields, String filter) {
+		Criteria orCriteria = new Criteria();
+		List<Criteria> orExpression = new ArrayList<>();
+
+		for (String field : fields) {
+			Criteria expression = new Criteria();
+			// "i" means case insensitive
+			expression.and(field).regex(filter, "i");
+			orExpression.add(expression);
+		}
+
+		return orCriteria.orOperator(orExpression.toArray(new Criteria[orExpression.size()]));
+	}
+
+	/**
+	 * This function extracts the count object from the aggregation results. This is used for the total number of items, which are part of the
+	 * table pagination.
+	 *
+	 * @param countResult
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getCountResult(AggregationResults<Object> countResult) {
+		Map<String, String> countMap = (Map<String, String>) countResult.getUniqueMappedResult();
+		Object count = 0;
+		if (countMap != null) {
+			count = countMap.get(StaticConfigItems.COUNT_FIELD);
+		}
+
+		return count;
 	}
 
 }

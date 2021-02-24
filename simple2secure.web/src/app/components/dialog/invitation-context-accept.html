@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>{{data.title}}</h2>
+<div mat-dialog-content>
+    <mat-dialog-content class="error">{{data.content}}</mat-dialog-content>
+    <form #contextForm="ngForm">
+        <mat-table #table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="context">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.context' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.context}}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'user.role.placeholder' | translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.invitation.userRole}}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.action' |
+                    translate }}
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                    <button mat-button (click)="onButtonClick(element, true)">
+                        <i class="fas fa-check"></i>
+                    </button>
+
+                    <button mat-button (click)="onButtonClick(element, false)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumnsContext"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumnsContext;"></mat-row>
+        </mat-table>
+    </form>
+</div>
+
+<mat-dialog-actions>
+    <button mat-raised-button class="mat-red-button" (click)="onCloseClick()">Close
+    </button>
+</mat-dialog-actions>

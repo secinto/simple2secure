@@ -20,10 +20,10 @@
  *********************************************************************
  */
 
-import {Base} from './base';
+import { Base } from './base';
 
 export class TestResultObj extends Base {
-	precondition: string
+	precondition: string;
 	step: string;
 	postcondition: string;
 }

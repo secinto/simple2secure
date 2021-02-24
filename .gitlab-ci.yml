@@ -1,0 +1,48 @@
+--- 
+Test-Backend: 
+  before_script: 
+    - "export GRADLE_USER_HOME=`pwd`/.gradle"
+    - "cd simple2secure.portal"
+  cache: 
+    paths: 
+      - .gradle/wrapper
+      - .gradle/caches
+  image: "gradle:jdk11"
+  script: 
+    - "chmod +x ./gradlew"
+    - "./gradlew test"
+  stage: test
+Build-Backend: 
+  before_script: 
+    - "export GRADLE_USER_HOME=`pwd`/.gradle"
+    - "cd simple2secure.portal"
+  cache: 
+    paths: 
+      - .gradle/wrapper
+      - .gradle/caches
+  image: "gradle:jdk11"
+  script: 
+    - "chmod +x ./gradlew"
+    - "./gradlew build -x test"
+  stage: build
+Build-Probe: 
+  before_script: 
+    - "export GRADLE_USER_HOME=`pwd`/.gradle"
+    - "cd simple2secure.probe"
+  cache: 
+    paths: 
+      - .gradle/wrapper
+      - .gradle/caches
+  image: "gradle:jdk11"
+  script: 
+    - "chmod +x ./gradlew"
+    - "./gradlew build -x test"
+  stage: build
+Build-Frontend: 
+  before_script: 
+    - "cd simple2secure.web"
+  image: "node:8"
+  script: 
+    - "npm install"
+    - "npm run build"
+  stage: build

@@ -1,6 +1,7 @@
-import requests
 import json
 import time
+
+import requests
 
 
 def create_headers(auth_token):

@@ -72,6 +72,8 @@ public class ConfigurableTrustManager implements X509TrustManager {
 							trustedIssuers.add(cert);
 						}
 					} else {
+						log.error("Client certificate {} with serial number {} not found in list of trusted certificates!",
+								cert.getSubjectX500Principal().toString(), cert.getSerialNumber().toString());
 						throw new CertificateException(
 								"Not trusted certificate found. Currently only trusting certificate with serial " + acceptedSerialNumbers);
 					}
@@ -79,15 +81,13 @@ public class ConfigurableTrustManager implements X509TrustManager {
 			}
 		} catch (CertificateException excep) {
 			for (X509Certificate cert : chain) {
-				log.debug("Client Certificate Chain {}", cert.getSubjectX500Principal().toString());
-				log.debug("Client Certificate Serial Number {}", cert.getSerialNumber().toString());
-				log.debug("Client Certificate Issuer DN {}", cert.getIssuerX500Principal());
-				log.debug("Client Certificate Subject DN {}", cert.getSubjectX500Principal());
 				if (stringContainsItemFromList(cert.getSerialNumber().toString(), acceptedSerialNumbers)) {
 					if (!trustedIssuers.contains(cert)) {
 						trustedIssuers.add(cert);
 					}
 				} else {
+					log.error("Client certificate {} with serial number {} not found in list of trusted certificates!",
+							cert.getSubjectX500Principal().toString(), cert.getSerialNumber().toString());
 					throw new CertificateException(
 							"Not trusted certificate found. Currently only trusting certificate with serial " + acceptedSerialNumbers);
 				}

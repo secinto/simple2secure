@@ -1,0 +1,68 @@
+<h3 mat-dialog-title>{{ 'menu.emailConfig' | translate }}</h3>
+<div mat-dialog-content>
+    <form #emailConfigForm="ngForm" (ngSubmit)="saveConfig()">
+
+        <table class="full_width_input" cellspacing="0">
+            <tr>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="text" placeholder="{{ 'login.email' | translate }}"
+                            [(ngModel)]="config.email" name="email" autocomplete='given-name' required>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="password" placeholder="{{ 'login.password' | translate }}"
+                            [(ngModel)]="config.password" name="password" autocomplete='family-name' required>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+
+        <table class="full_width_input" cellspacing="0">
+            <tr>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="text" placeholder="{{ 'email.incomingserver' | translate }}"
+                            [(ngModel)]="config.incomingServer" name="incomingServer" autocomplete='given-name'
+                            required>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="number" placeholder="{{ 'email.incomingport' | translate }}"
+                            [(ngModel)]="config.incomingPort" name="incomingPort" autocomplete='family-name' required>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+
+        <table class="full_width_input" cellspacing="0">
+            <tr>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="text" placeholder="{{ 'email.outgoingserver' | translate }}"
+                            [(ngModel)]="config.outgoingServer" name="outgoingServer" autocomplete='given-name'
+                            required>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field class="full_width_input">
+                        <input matInput type="number" placeholder="{{ 'email.outgoingport' | translate }}"
+                            [(ngModel)]="config.outgoingPort" name="outgoingPort" autocomplete='family-name' required>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+
+    </form>
+</div>
+
+<div mat-dialog-actions>
+    <button mat-button [disabled]="!emailConfigForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+        (click)="saveConfig()">{{ 'button.save' | translate }}
+    </button>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="config"
+        cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>

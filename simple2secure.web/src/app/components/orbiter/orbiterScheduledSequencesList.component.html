@@ -1,0 +1,81 @@
+<div class="example-container mat-elevation-z8 table table-striped">
+
+    <div class="header-filter-table">
+        <mat-form-field class="header-filter-field">
+            <input matInput #filterValue placeholder="Filter">
+        </mat-form-field>
+    </div>
+    <mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="podId">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.podId' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.deviceId}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.sequenceName}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="hostname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.hostname' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.hostname}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="time">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.time' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.sequenceRun.timestamp | date : 'short' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'test.executionType' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getEnumValue(element.sequenceRun.sequenceRunType)}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{utils.getSequenceStatusBySequenceResult(element.sequenceRun)}}
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+            <mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+                <button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+                    (click)="onMenuTriggerClick(element)">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true"
+        [length]="totalSize">
+    </mat-paginator>
+    <mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<mat-menu #menu="matMenu">
+
+    <button *ngIf="showSequenceResult" mat-menu-item (click)="openDialogShowSequenceResult()">
+        <mat-icon>description</mat-icon>
+        {{ 'button.showsequenceresult' | translate }}
+    </button>
+
+    <button *ngIf="!showSequenceResult" disabled mat-menu-item (click)="openDialogShowSequenceResult()">
+        <mat-icon>description</mat-icon>
+        {{ 'button.showsequenceresult' | translate }}
+    </button>
+
+    <button mat-menu-item (click)="showSequenceContent(selectedSequenceRun.sequenceRun.testSequenceContent)">
+        <mat-icon>description</mat-icon>
+        {{ 'button.showTestContent' | translate }}
+    </button>
+</mat-menu>

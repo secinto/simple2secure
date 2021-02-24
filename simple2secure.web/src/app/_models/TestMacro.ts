@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {Base} from './base';
+import { Base } from './base';
 
 export class TestMacro extends Base {
 	public executable: string;

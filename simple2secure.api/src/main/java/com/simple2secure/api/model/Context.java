@@ -21,8 +21,19 @@
  */
 package com.simple2secure.api.model;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class Context extends GenericDBObject {
 
 	/**
@@ -32,36 +43,9 @@ public class Context extends GenericDBObject {
 
 	private String name;
 
-	private String licensePlanId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId licensePlanId;
 
 	private int currentNumberOfLicenseDownloads;
-
-	public Context() {
-
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getLicensePlanId() {
-		return licensePlanId;
-	}
-
-	public void setLicensePlanId(String licensePlanId) {
-		this.licensePlanId = licensePlanId;
-	}
-
-	public int getCurrentNumberOfLicenseDownloads() {
-		return currentNumberOfLicenseDownloads;
-	}
-
-	public void setCurrentNumberOfLicenseDownloads(int currentNumberOfLicenseDownloads) {
-		this.currentNumberOfLicenseDownloads = currentNumberOfLicenseDownloads;
-	}
-
 }

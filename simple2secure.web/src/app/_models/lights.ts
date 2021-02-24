@@ -1,5 +1,5 @@
 export interface Lights {
-    isRed: boolean,
-    isYellow: boolean,
-    isGreen: boolean
+    isRed: boolean;
+    isYellow: boolean;
+    isGreen: boolean;
 }

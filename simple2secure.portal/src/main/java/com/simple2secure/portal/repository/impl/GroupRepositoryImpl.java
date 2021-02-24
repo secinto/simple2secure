@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,25 +25,25 @@ public class GroupRepositoryImpl extends GroupRepository {
 	}
 
 	@Override
-	public List<CompanyGroup> findByContextId(String contextId) {
+	public List<CompanyGroup> findByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 
 	@Override
-	public List<CompanyGroup> findRootGroupsByContextId(String contextId) {
+	public List<CompanyGroup> findRootGroupsByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId).and("rootGroup").is(true)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 
 	@Override
-	public List<CompanyGroup> findByParentId(String parentId) {
+	public List<CompanyGroup> findByParentId(ObjectId parentId) {
 		Query query = new Query(Criteria.where("parentId").is(parentId)).with(Sort.by(Sort.Direction.ASC, "name"));
 		return mongoTemplate.find(query, CompanyGroup.class, collectionName);
 	}
 
 	@Override
-	public void deleteByContextId(String contextId) {
+	public void deleteByContextId(ObjectId contextId) {
 		List<CompanyGroup> groups = findByContextId(contextId);
 		if (groups != null) {
 			for (CompanyGroup group : groups) {
@@ -55,7 +56,7 @@ public class GroupRepositoryImpl extends GroupRepository {
 	}
 
 	@Override
-	public CompanyGroup findStandardGroupByContextId(String contextId) {
+	public CompanyGroup findStandardGroupByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId).and("standardGroup").is(true));
 		return mongoTemplate.findOne(query, CompanyGroup.class, collectionName);
 	}

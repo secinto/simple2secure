@@ -27,29 +27,50 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+
 /**
  * 
- * @author Richard Heinz
- * 
- *         Model which holds the information for one rule parameter array. Will be used in the rule engine for the
- *         condition/action-parameters
+ * This class is used for every condition/action which has user defined parameter.
+ * It holds the metadata and an array of values for one parameter array. inside the condition/action class. 
  *
- * @param <T>
- *          generic for the type of the param values.
+ * @param <T> generic type for parameter value.
  */
+
 @Getter
 @Setter
-public class RuleParamArray<T> {
+public class RuleParamArray<T> 
+{
+	
+	/**
+	 * Tag of the locale string for displaying the name of the parameter in the
+	 * web user interface.
+	 */
 	private String nameTag;
+	
+	/**
+	 * Tag of the locale string for displaying the description of the parameter in the
+	 * web user interface.
+	 */
 	private String descriptionTag;
+	
+	/** 
+	 * Actual list of values of the parameter array.
+	 */
 	private List<T> values;
+	
+	/**
+	 * Enum to save the data type as metadata for displaying the right input field
+	 * in the web user interface. 
+	 */
 	private DataType type;
 
-	public RuleParamArray() {
+	public RuleParamArray()
+	{
 		super();
 	}
 
-	public RuleParamArray(String nameTag, String descriptionTag, List<T> values, DataType type) {
+	public RuleParamArray(String nameTag, String descriptionTag, List<T> values, DataType type)
+	{
 		super();
 		this.nameTag = nameTag;
 		this.descriptionTag = descriptionTag;
@@ -57,7 +78,16 @@ public class RuleParamArray<T> {
 		this.type = type;
 	}
 	
-	public static <T> RuleParamArray<T> copyAndSetValue(RuleParamArray<?> ruleParamArray, List<T> value) {
+	/**
+	 * Method to make a copy of an existing RuleParamArray object and setting a new value list.
+	 * 
+	 * @param <T> datatype of the value.
+	 * @param ruleParam which should be copied.
+	 * @param value which should be set in the copy.
+	 * @return the new created object.
+	 */
+	public static <T> RuleParamArray<T> copyAndSetValue(RuleParamArray<?> ruleParamArray, List<T> value) 
+	{
 		RuleParamArray<T> copy = new RuleParamArray<T>(
 				ruleParamArray.getNameTag(),
 				ruleParamArray.getDescriptionTag(),

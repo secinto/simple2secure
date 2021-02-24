@@ -23,8 +23,21 @@ package com.simple2secure.api.model;
 
 import java.util.Date;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Email extends GenericDBObject {
 
 	/**
@@ -33,80 +46,12 @@ public class Email extends GenericDBObject {
 	private static final long serialVersionUID = -6339585681852758358L;
 
 	private String messageId;
-	private String configId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId configId;
 	private int number;
 	private String subject;
 	private String from;
 	private String text;
 	private Date receivedDate;
-
-	public Email() {
-	}
-
-	public Email(String messageId, String configId, int number, String subject, String from, String text, Date receivedDate) {
-		this.configId = configId;
-		this.number = number;
-		this.subject = subject;
-		this.from = from;
-		this.text = text;
-		this.receivedDate = receivedDate;
-		this.messageId = messageId;
-	}
-
-	public String getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
-	}
-
-	public void setConfigId(String configId) {
-		this.configId = configId;
-	}
-
-	public String getConfigId() {
-		return configId;
-	}
-
-	public int getNumber() {
-		return number;
-	}
-
-	public void setNumber(int number) {
-		this.number = number;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Date getReceivedDate() {
-		return receivedDate;
-	}
-
-	public void setReceivedDate(Date receivedDate) {
-		this.receivedDate = receivedDate;
-	}
-
 }

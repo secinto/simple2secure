@@ -1,0 +1,31 @@
+<h1 mat-dialog-title align="center">{{ 'register.header' | translate }}</h1>
+<div mat-dialog-content>
+    <form #registerForm="ngForm" novalidate>
+        <div class="form-group input" [ngClass]="{ 'has-error': registerForm.submitted && !email.valid }">
+            <label for="email">{{ 'login.email' | translate }}</label>
+            <input placeholder="{{ 'login.email.placeholder' | translate }}" type="email" class="form-control"
+                name="email" [(ngModel)]="user.email" #email="ngModel" required email />
+            <div *ngIf="registerForm.submitted && !email.valid" class="help-block">{{ 'login.email.error'
+                | translate }}</div>
+        </div>
+
+        <div class="form-group input" [ngClass]="{ 'has-error': registerForm.submitted && !password.valid }">
+            <label for="password">{{ 'login.password' | translate }}</label>
+            <input placeholder="{{ 'login.password.placeholder' | translate }}" type="password" class="form-control"
+                name="password" [(ngModel)]="user.password" #password="ngModel" required />
+            <div *ngIf="registerForm.submitted && !password.valid" class="help-block">{{ 'login.password.error' |
+                translate }}
+            </div>
+        </div>
+    </form>
+</div>
+<div mat-dialog-actions>
+
+    <button [disabled]="!registerForm.dirty" mat-raised-button class="mat-green-button" color="primary"
+        (click)="register()">
+        {{ 'button.register' | translate }}
+    </button>
+    <button mat-raised-button color="info" class="mat-red-button" [mat-dialog-close]="user" cdkFocusInitial>{{
+        'button.cancel' | translate }}
+    </button>
+</div>

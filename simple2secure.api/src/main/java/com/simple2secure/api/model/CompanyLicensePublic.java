@@ -25,8 +25,12 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.Getter;
@@ -48,37 +52,52 @@ public class CompanyLicensePublic extends GenericDBObject {
 	 */
 	private static final long serialVersionUID = -7011645066859754490L;
 
-	protected String groupId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	protected ObjectId groupId;
 
-	protected String deviceId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	protected ObjectId deviceId;
 
-	protected String licenseId;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	protected ObjectId licenseId;
 
 	@Lob
 	protected String accessToken;
+
+	@Lob
+	protected String refreshToken;
 
 	protected String expirationDate;
 
 	@JsonProperty
 	protected boolean activated;
 
-	public CompanyLicensePublic(String groupId, String licenseId) {
+	public CompanyLicensePublic(ObjectId groupId, ObjectId licenseId) {
 		setGroupId(groupId);
 		setLicenseId(licenseId);
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate) {
+	public CompanyLicensePublic(ObjectId groupId, ObjectId licenseId, String expirationDate) {
 		this(groupId, licenseId);
 		setExpirationDate(expirationDate);
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId) {
+	public CompanyLicensePublic(ObjectId groupId, ObjectId licenseId, String expirationDate, ObjectId deviceId) {
 		this(groupId, licenseId, expirationDate);
 		setDeviceId(deviceId);
 	}
 
-	public CompanyLicensePublic(String groupId, String licenseId, String expirationDate, String deviceId, String accessToken) {
+	public CompanyLicensePublic(ObjectId groupId, ObjectId licenseId, String expirationDate, ObjectId deviceId, String accessToken) {
 		this(groupId, licenseId, expirationDate, deviceId);
 		setAccessToken(accessToken);
+	}
+
+	public CompanyLicensePublic(ObjectId groupId, ObjectId licenseId, String expirationDate, ObjectId deviceId, String accessToken,
+			String refreshToken) {
+		this(groupId, licenseId, expirationDate, deviceId, accessToken);
+		setRefreshToken(refreshToken);
 	}
 }

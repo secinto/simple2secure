@@ -1,0 +1,34 @@
+<div class="notifications animated">
+    <div class="dropdown-header">
+        <span class="heading">Notifications</span>
+    </div>
+    <div class="dropdown-body">
+
+        <div *ngIf="notifications">
+            <div *ngIf="notifications.length <= 0">
+                <div class="notification new">
+                    <div class="notification-text">
+                        <span>{{ 'notifications.empty' | translate }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="notifications.length > 0">
+                <div class="notification new" *ngFor="let notification of notifications">
+                    <div class="notification-text">
+                        <span (click)="isRead(notification)" *ngIf="!notification.read"
+                            class="highlight">{{notification.content}}</span>
+                        <span *ngIf="notification.read">{{notification.content}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!notifications">
+            <div class="notification new">
+                <div class="notification-text">
+                    <span>{{ 'notifications.empty' | translate }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

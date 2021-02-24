@@ -24,36 +24,40 @@ package com.simple2secure.portal.repository;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class LicenseRepository extends MongoRepository<CompanyLicensePrivate> {
-	public abstract List<CompanyLicensePrivate> findAllByGroupId(String groupId);
+	public abstract List<CompanyLicensePrivate> findAllByGroupId(ObjectId groupId);
 
-	public abstract List<CompanyLicensePrivate> findByUserId(String userId);
+	public abstract List<CompanyLicensePrivate> findByUserId(ObjectId userId);
 
-	public abstract CompanyLicensePrivate findByDeviceId(String deviceId);
+	public abstract CompanyLicensePrivate findByDeviceId(ObjectId deviceId);
 
 	public abstract List<CompanyLicensePrivate> findByDeviceStatusOnline();
 
-	public abstract List<CompanyLicensePrivate> findByLicenseId(String licenseId);
+	public abstract List<CompanyLicensePrivate> findByLicenseId(ObjectId licenseId);
 
-	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(String licenseId, String deviceId);
+	public abstract CompanyLicensePrivate findByLicenseIdAndDeviceId(ObjectId licenseId, ObjectId deviceId);
 
-	public abstract CompanyLicensePrivate findByLicenseAndHostname(String licenseId, String hostname);
+	public abstract CompanyLicensePrivate findByLicenseAndHostname(ObjectId licenseId, String hostname);
 
 	public abstract CompanyLicensePrivate findByAccessToken(String accessToken);
 
-	public abstract CompanyLicensePrivate findByGroupAndUserId(String groupId, String userId);
+	public abstract CompanyLicensePrivate findByGroupAndUserId(ObjectId groupId, ObjectId userId);
 
 	public abstract CompanyLicensePrivate findByHostname(String hostname);
 
-	public abstract void deleteByGroupId(String groupId);
+	public abstract void deleteByGroupId(ObjectId groupId);
 
-	public abstract void deleteByDeviceId(String deviceId);
+	public abstract void deleteByDeviceId(ObjectId deviceId);
 
-	public abstract Map<String, Object> findByGroupIdsPaged(List<String> groupIds, int page, int size);
+	public abstract Map<String, Object> findByGroupIdsPaged(List<ObjectId> groupIds, int page, int size);
 
-	public abstract List<CompanyLicensePrivate> findByGroupIds(List<String> groupIds);
+	public abstract List<CompanyLicensePrivate> findByGroupIds(List<ObjectId> groupIds);
+
+	public abstract Map<String, Object> getDevicesByGroupIdPagination(ObjectId groupId, int page, int size, String filter);
 
 }

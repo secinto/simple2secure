@@ -39,12 +39,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Strings;
+import com.simple2secure.api.model.AuthToken;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePrivate;
 import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.ContextUserAuthentication;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.commons.license.LicenseUtil;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.model.LicenseActivation;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputGroup;
@@ -56,7 +59,6 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.LICENSE_API)
 @Slf4j
@@ -100,14 +102,17 @@ public class LicenseController extends BaseUtilsProvider {
 	 * @throws UnsupportedEncodingException
 	 */
 	@NotSecuredApi
-	@ValidRequestMapping(value = "/authenticate", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			value = "/authenticate",
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CompanyLicensePublic> authenticate(@RequestBody CompanyLicensePublic licensePublic,
 			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
 		if (licensePublic != null) {
 
-			if (Strings.isNullOrEmpty(licensePublic.getDeviceId())) {
+			if (licensePublic.getDeviceId() == null) {
 				log.warn("License with or without pod and probe Id provided for checking token. This should usually not happen");
-				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
+				throw new ApiRequestException(messageByLocaleService.getMessage("problem_during_activation", locale.getValue()));
 			}
 
 			LicenseActivation activation = null;
@@ -116,13 +121,43 @@ public class LicenseController extends BaseUtilsProvider {
 
 			if (activation.isSuccess()) {
 				licensePublic.setAccessToken(activation.getAccessToken());
+				licensePublic.setRefreshToken(activation.getRefreshToken());
 				licensePublic.setActivated(true);
 				return new ResponseEntity<>(licensePublic, HttpStatus.OK);
 			} else {
-				return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity(activation.getMessage(), locale);
+				throw new ApiRequestException(messageByLocaleService.getMessage(activation.getMessage(), locale.getValue()));
 			}
 		}
-		return (ResponseEntity<CompanyLicensePublic>) buildResponseEntity("problem_during_activation", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_during_activation", locale.getValue()));
+	}
+
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/renewAuthentication",
+			method = ValidRequestMethodType.POST)
+	public ResponseEntity<CompanyLicensePublic> renewAuthentication(@RequestBody CompanyLicensePublic license,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, UnsupportedEncodingException {
+		if (license != null) {
+
+			CompanyLicensePrivate privateLicense = licenseRepository.findByDeviceId(license.getDeviceId());
+
+			if (privateLicense != null) {
+				AuthToken accessToken = keycloakAuthenticationService.getNewTokenFromRefresh(license.getRefreshToken());
+
+				if (accessToken != null) {
+					privateLicense.setAccessToken(accessToken.getAuthToken());
+					privateLicense.setRefreshToken(accessToken.getRefreshToken());
+
+					licenseRepository.update(privateLicense);
+
+					license.setAccessToken(accessToken.getAuthToken());
+					license.setRefreshToken(accessToken.getRefreshToken());
+
+					return new ResponseEntity<>(license, HttpStatus.OK);
+				}
+			}
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_during_token_renewal", locale.getValue()));
 	}
 
 	/**
@@ -145,23 +180,25 @@ public class LicenseController extends BaseUtilsProvider {
 		httpHeaders.setContentDispositionFormData("attachment", "license.zip");
 
 		CompanyGroup group = groupRepository.find(groupId.getValue());
-		if(group != null) {
-			ByteArrayOutputStream byteArrayOutputStream = licenseUtils.generateLicenseForPackage(group.getContextId(), 
-					groupId.getValue());
+		if (group != null) {
+			ByteArrayOutputStream byteArrayOutputStream = licenseUtils.generateLicenseForPackage(group.getContextId(), groupId.getValue());
 			return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), HttpStatus.OK);
 		}
-		
-		return (ResponseEntity<byte[]>) buildResponseEntity("max_license_number_exceeded", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("max_license_number_exceeded", locale.getValue()));
 	}
 
 	/**
-	 * This function deletes the user from the current context
+	 * This function automatically downloads the license for the script
+	 *
+	 * TODO: Check if this works with keycloak
 	 *
 	 * @param userId
 	 * @return
 	 * @throws Exception
 	 */
-	@ValidRequestMapping(value = "/downloadLicenseForScript", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/downloadLicenseForScript",
+			method = ValidRequestMethodType.POST)
 	public ResponseEntity<byte[]> logindAndDownload(@RequestBody String authToken, @ServerProvidedValue ValidInputLocale locale)
 			throws Exception {
 		if (!Strings.isNullOrEmpty(authToken)) {
@@ -176,7 +213,7 @@ public class LicenseController extends BaseUtilsProvider {
 						if (context.isOwnContext()) {
 							CompanyGroup group = groupRepository.findStandardGroupByContextId(context.getContextId());
 							if (group != null) {
-								return getLicense(new ValidInputGroup(group.getId()), locale);
+								return getLicense(new ValidInputGroup(group.getId().toHexString()), locale);
 							}
 						}
 					}

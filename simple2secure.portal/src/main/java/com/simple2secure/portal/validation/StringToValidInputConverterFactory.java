@@ -12,17 +12,19 @@ import com.simple2secure.portal.validation.model.ValidInputHostname;
 import com.simple2secure.portal.validation.model.ValidInputLicensePlan;
 import com.simple2secure.portal.validation.model.ValidInputName;
 import com.simple2secure.portal.validation.model.ValidInputOsinfo;
-import com.simple2secure.portal.validation.model.ValidInputPage;
 import com.simple2secure.portal.validation.model.ValidInputProcessor;
 import com.simple2secure.portal.validation.model.ValidInputQuery;
 import com.simple2secure.portal.validation.model.ValidInputReport;
-import com.simple2secure.portal.validation.model.ValidInputRule;
+import com.simple2secure.portal.validation.model.ValidInputRuleFactType;
+import com.simple2secure.portal.validation.model.ValidInputRuleId;
+import com.simple2secure.portal.validation.model.ValidInputRuleMappingDTO;
+import com.simple2secure.portal.validation.model.ValidInputRuleRegex;
 import com.simple2secure.portal.validation.model.ValidInputSearchQuery;
 import com.simple2secure.portal.validation.model.ValidInputSequence;
-import com.simple2secure.portal.validation.model.ValidInputSize;
 import com.simple2secure.portal.validation.model.ValidInputStep;
 import com.simple2secure.portal.validation.model.ValidInputSut;
 import com.simple2secure.portal.validation.model.ValidInputTest;
+import com.simple2secure.portal.validation.model.ValidInputTestDataInput;
 import com.simple2secure.portal.validation.model.ValidInputTestMacro;
 import com.simple2secure.portal.validation.model.ValidInputTestResult;
 import com.simple2secure.portal.validation.model.ValidInputTestRun;
@@ -53,11 +55,7 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 		@SuppressWarnings("unchecked")
 		@Override
 		public T convert(String source) {
-			if (this.targetClass == ValidInputSize.class) {
-				return (T) new ValidInputSize().validatePathVariable(Integer.parseInt(source));
-			} else if (this.targetClass == ValidInputPage.class) {
-				return (T) new ValidInputPage().validatePathVariable(Integer.parseInt(source));
-			} else if (this.targetClass == ValidInputDevice.class) {
+			if (this.targetClass == ValidInputDevice.class) {
 				return (T) new ValidInputDevice().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputHostname.class) {
 				return (T) new ValidInputHostname().validatePathVariable(source);
@@ -73,8 +71,14 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputQuery().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputReport.class) {
 				return (T) new ValidInputReport().validatePathVariable(source);
-			} else if (this.targetClass == ValidInputRule.class) {
-				return (T) new ValidInputRule().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputRuleId.class) {
+				return (T) new ValidInputRuleId().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputRuleRegex.class) {
+				return (T) new ValidInputRuleRegex().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputRuleFactType.class) {
+				return (T) new ValidInputRuleFactType().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputRuleMappingDTO.class) {
+				return (T) new ValidInputRuleMappingDTO().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputSearchQuery.class) {
 				return (T) new ValidInputSearchQuery().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputLicensePlan.class) {
@@ -107,6 +111,8 @@ public class StringToValidInputConverterFactory implements ConverterFactory<Stri
 				return (T) new ValidInputName().validatePathVariable(source);
 			} else if (this.targetClass == ValidInputDeviceType.class) {
 				return (T) new ValidInputDeviceType().validatePathVariable(source);
+			} else if (this.targetClass == ValidInputTestDataInput.class) {
+				return (T) new ValidInputTestDataInput().validatePathVariable(source);
 			} else {
 				return null;
 			}

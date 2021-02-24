@@ -20,27 +20,13 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {JwtHelper} from 'angular2-jwt';
-import {DataService} from "./data.service";
+import { Injectable } from '@angular/core';
+import { DataService } from './data.service';
 
 @Injectable()
 export class AuthenticationService {
 
-	jwtHelper: JwtHelper = new JwtHelper();
+    public isLoggedIn = false;
 
-	constructor(public dataService: DataService) { }
-
-	logout() {
-		// clear the sessionStorage
-		this.dataService.clearSessionStorage();
-	}
-
-	public isAuthenticated(): boolean {
-		const token = this.dataService.getAuthToken();
-		if (token) {
-			return !this.jwtHelper.isTokenExpired(token);
-		}
-		return false;
-	}
+    constructor(public dataService: DataService) { }
 }

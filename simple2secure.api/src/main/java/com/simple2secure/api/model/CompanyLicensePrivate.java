@@ -24,6 +24,8 @@ package com.simple2secure.api.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.bson.types.ObjectId;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,7 +47,7 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 
 	private long lastTokenRefresh = 0;
 
-	public CompanyLicensePrivate(String groupId, String licenseId, String expirationDate) {
+	public CompanyLicensePrivate(ObjectId groupId, ObjectId licenseId, String expirationDate) {
 		super(groupId, licenseId, expirationDate);
 	}
 
@@ -58,6 +60,7 @@ public class CompanyLicensePrivate extends CompanyLicensePublic {
 	public CompanyLicensePublic getPublicLicense() {
 		CompanyLicensePublic publicLicense = new CompanyLicensePublic(groupId, licenseId, expirationDate, deviceId);
 		publicLicense.setAccessToken(accessToken);
+		publicLicense.setRefreshToken(refreshToken);
 		return publicLicense;
 	}
 

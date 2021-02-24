@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputProcessor extends ValidatedInput<String> {
 
-	private String processorId;
+	private ObjectId processorId;
 	private String tag = "/{processorId}";
 
 	public ValidInputProcessor() {
 	}
 
 	public ValidInputProcessor(String processorId) {
-		this.processorId = processorId;
+		this.processorId = new ObjectId(processorId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return processorId;
 	}
 

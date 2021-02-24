@@ -30,6 +30,15 @@ import com.simple2secure.api.model.TestMacro;
 import com.simple2secure.api.model.Widget;
 import com.simple2secure.api.model.WidgetConfig;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SettingsDTO {
 
 	private Settings settings;
@@ -41,53 +50,4 @@ public class SettingsDTO {
 	private List<Widget> widgetList;
 
 	private WidgetConfig widgetConfig;
-
-	public SettingsDTO(Settings settings, List<LicensePlan> licensePlan, List<TestMacro> testMacroList, List<Widget> widgetList,
-			WidgetConfig widgetConfig) {
-		this.settings = settings;
-		this.licensePlan = licensePlan;
-		this.testMacroList = testMacroList;
-		this.widgetList = widgetList;
-		this.widgetConfig = widgetConfig;
-	}
-
-	public Settings getSettings() {
-		return settings;
-	}
-
-	public void setSettings(Settings settings) {
-		this.settings = settings;
-	}
-
-	public List<LicensePlan> getLicensePlan() {
-		return licensePlan;
-	}
-
-	public void setLicensePlan(List<LicensePlan> licensePlan) {
-		this.licensePlan = licensePlan;
-	}
-
-	public List<TestMacro> getTestMacroList() {
-		return testMacroList;
-	}
-
-	public void setTestMacroList(List<TestMacro> testMacroList) {
-		this.testMacroList = testMacroList;
-	}
-
-	public List<Widget> getWidgetList() {
-		return widgetList;
-	}
-
-	public void setWidgetList(List<Widget> widgetList) {
-		this.widgetList = widgetList;
-	}
-
-	public WidgetConfig getWidgetConfig() {
-		return widgetConfig;
-	}
-
-	public void setWidgetConfig(WidgetConfig widgetConfig) {
-		this.widgetConfig = widgetConfig;
-	}
 }

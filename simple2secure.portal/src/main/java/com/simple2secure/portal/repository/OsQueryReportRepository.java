@@ -24,28 +24,30 @@ package com.simple2secure.portal.repository;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.dto.OsQueryReportDTO;
 import com.simple2secure.api.model.OsQueryReport;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class OsQueryReportRepository extends MongoRepository<OsQueryReport> {
-	public abstract List<OsQueryReport> getReportsByDeviceId(String deviceId);
+	public abstract List<OsQueryReport> getReportsByDeviceId(ObjectId deviceId);
 
 	public abstract List<OsQueryReport> getReportsByName(String name, int page, int size);
 
-	public abstract List<OsQueryReport> getReportsByDeviceAndName(String deviceId, String name, int page, int size);
+	public abstract List<OsQueryReport> getReportsByDeviceAndName(ObjectId deviceId, String name, int page, int size);
 
 	public abstract List<OsQueryReport> getLastReportsFromTimeStampAndName(Date timestamp, String name);
 
 	public abstract long getPagesForReportsByName(String name);
 
-	public abstract long getPagesForReportsByDeviceAndName(String deviceId, String name);
+	public abstract long getPagesForReportsByDeviceAndName(ObjectId deviceId, String name);
 
-	public abstract OsQueryReportDTO getReportsByDeviceIdWithPagination(List<String> deviceIds, int page, int size);
+	public abstract OsQueryReportDTO getReportsByDeviceIdWithPagination(List<ObjectId> deviceIds, int page, int size, String filter);
 
-	public abstract void deleteByDeviceId(String deviceId);
+	public abstract void deleteByDeviceId(ObjectId deviceId);
 
-	public abstract List<OsQueryReport> getSearchQueryByDeviceIds(String searchQuery, List<String> deviceIds);
+	public abstract List<OsQueryReport> getSearchQueryByDeviceIds(String searchQuery, List<ObjectId> deviceIds);
 
-	public abstract List<OsQueryReport> getReportsByDeviceId(List<String> deviceIds);
+	public abstract List<OsQueryReport> getReportsByDeviceId(List<ObjectId> deviceIds);
 }

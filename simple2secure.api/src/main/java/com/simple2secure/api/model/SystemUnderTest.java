@@ -24,10 +24,10 @@ package com.simple2secure.api.model;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
 import lombok.AllArgsConstructor;
@@ -49,7 +49,9 @@ public class SystemUnderTest extends GenericDBObject {
 	*/
 	private static final long serialVersionUID = 5020907897089097628L;
 
-	private @NonNull String contextId;
+	@JsonSerialize(using=ToStringSerializer.class)
+	private @NonNull ObjectId contextId;
+	
 	private @NonNull String name;
 	private @NonNull Protocol protocol;
 	private Map<String, String> metadata;

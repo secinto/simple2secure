@@ -22,8 +22,6 @@
 
 package com.simple2secure.api.model;
 
-import com.simple2secure.api.dbo.GenericDBObject;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -36,12 +34,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
-public class TestStep extends GenericDBObject {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1998429205709387726L;
+public class TestStep {
 
 	private @NonNull String description;
 	private @NonNull Command command;

@@ -29,9 +29,22 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(
 		name = "NetworkReport")
@@ -41,8 +54,14 @@ public class NetworkReport extends GenericDBObject {
 	 *
 	 */
 	private static final long serialVersionUID = -5984944130903360444L;
-	private String groupId;
-	private String deviceId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId groupId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId deviceId;
 	private String hostname;
 
 	@Lob
@@ -55,71 +74,4 @@ public class NetworkReport extends GenericDBObject {
 
 	@JsonProperty
 	private boolean sent;
-
-	public NetworkReport() {
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getStringContent() {
-		return stringContent;
-	}
-
-	public void setStringContent(String stringContent) {
-		this.stringContent = stringContent;
-	}
-
-	public Date getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	public boolean isSent() {
-		return sent;
-	}
-
-	public void setSent(boolean sent) {
-		this.sent = sent;
-	}
-
-	public String getProcessorName() {
-		return processorName;
-	}
-
-	public void setProcessorName(String processorName) {
-		this.processorName = processorName;
-	}
-
-	public List<PacketInfo> getIpPairs() {
-		return ipPairs;
-	}
-
-	public void setIpPairs(List<PacketInfo> ipPairs) {
-		this.ipPairs = ipPairs;
-	}
 }

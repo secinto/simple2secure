@@ -35,7 +35,6 @@ import com.simple2secure.api.model.OSInfo;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.commons.config.LoadedConfigItems;
 import com.simple2secure.commons.config.StaticConfigItems;
-import com.simple2secure.commons.rest.RESTUtils;
 import com.simple2secure.probe.config.ProbeConfiguration;
 
 public final class ProbeUtils {
@@ -72,10 +71,10 @@ public final class ProbeUtils {
 	 */
 	public static boolean isServerReachable() {
 		String response = null;
-		if (!Strings.isNullOrEmpty(ProbeConfiguration.probeId)) {
+		if (ProbeConfiguration.probeId != null) {
 			response = RESTUtils.sendPost(
 					LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status/" + ProbeConfiguration.probeId, null,
-					null);
+					ProbeConfiguration.authKey);
 		} else {
 			response = RESTUtils.sendGet(LoadedConfigItems.getInstance().getBaseURL() + StaticConfigItems.DEVICE_API + "/status");
 		}

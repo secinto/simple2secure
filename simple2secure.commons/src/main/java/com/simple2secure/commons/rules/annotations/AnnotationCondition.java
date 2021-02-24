@@ -27,18 +27,32 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.simple2secure.api.model.RuleFactType;
+
 /**
  * 
- * @author Richard Heinz
+ *		Annotation do mark a class as a condition for the rule engine. The metadata will the be saved
+ *      in the database and displayed the user in the web user interface when defining a new rule.
  *
- *         Annotation do mark a class as a condition. The data will be used to display in the web simple2secure and to save a rule in the
- *         database.
- * 
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AnnotationCondition {
+public @interface AnnotationCondition 
+{
+	/**
+	 * Tag of the locale string for displaying the name of the action in the
+	 * web user interface.
+	 */
 	String name_tag();
 
+	/**
+	 * Tag of the locale string for displaying the description of the action in the
+	 * web user interface.
+	 */
 	String description_tag();
+	
+	/**
+	 * Type of the fact the action has been designed.
+	 */
+	RuleFactType fact_type();
 }

@@ -22,101 +22,45 @@
 
 package com.simple2secure.api.model;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.simple2secure.api.dbo.GenericDBObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SequenceRun extends GenericDBObject {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 8963088362714211548L;
-	private String sequenceId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId sequenceId;
+
 	private String sequenceName;
-	private String deviceId;
-	private String contextId;
-	private TestRunType testRunType;
-	private List<String> sequenceContent;
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId deviceId;
+
+	@JsonSerialize(
+			using = ToStringSerializer.class)
+	private ObjectId contextId;
+
+	private TestRunType sequenceRunType;
+	private LinkedHashMap<String, String> testSequenceContent;
 	private TestStatus sequenceStatus;
 	private long timestamp;
-
-	public SequenceRun() {
-
-	}
-
-	public SequenceRun(String sequenceId, String sequenceName, String deviceId, String contextId, TestRunType testRunType, List<String> sequenceContent,
-			TestStatus sequenceStatus, long timestamp) {
-		this.sequenceId = sequenceId;
-		this.sequenceName = sequenceName;
-		this.deviceId = deviceId;
-		this.contextId = contextId;
-		this.testRunType = testRunType;
-		this.sequenceContent = sequenceContent;
-		this.sequenceStatus = sequenceStatus;
-		this.timestamp = timestamp;
-	}
-
-	public String getSequenceId() {
-		return sequenceId;
-	}
-
-	public void setSequenceId(String sequenceId) {
-		this.sequenceId = sequenceId;
-	}
-
-	public String getSequenceName() {
-		return sequenceName;
-	}
-
-	public void setSequenceName(String sequenceName) {
-		this.sequenceName = sequenceName;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getContextId() {
-		return contextId;
-	}
-
-	public void setContextId(String contextId) {
-		this.contextId = contextId;
-	}
-
-	public TestRunType getTestRunType() {
-		return testRunType;
-	}
-
-	public void setTestRunType(TestRunType testRunType) {
-		this.testRunType = testRunType;
-	}
-
-	public List<String> getSequenceContent() {
-		return sequenceContent;
-	}
-
-	public void setSequenceContent(List<String> sequenceContent) {
-		this.sequenceContent = sequenceContent;
-	}
-
-	public TestStatus getSequenceStatus() {
-		return sequenceStatus;
-	}
-
-	public void setSequenceStatus(TestStatus sequenceStatus) {
-		this.sequenceStatus = sequenceStatus;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
+	private String hostname;
 }

@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-import {CompanyGroup} from '../companygroup';
+import { CompanyGroup } from '../companygroup';
 
 export class CompanyGroupDTO {
 	group: CompanyGroup;

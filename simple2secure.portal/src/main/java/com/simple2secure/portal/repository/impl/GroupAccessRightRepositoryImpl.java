@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -23,42 +24,42 @@ public class GroupAccessRightRepositoryImpl extends GroupAccesRightRepository {
 	}
 
 	@Override
-	public List<GroupAccessRight> findByUserId(String userId) {
+	public List<GroupAccessRight> findByUserId(ObjectId userId) {
 		Query query = new Query(Criteria.where("userId").is(userId));
 		List<GroupAccessRight> accessRights = mongoTemplate.find(query, GroupAccessRight.class);
 		return accessRights;
 	}
 
 	@Override
-	public List<GroupAccessRight> findByGroupId(String groupId) {
+	public List<GroupAccessRight> findByGroupId(ObjectId groupId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId));
 		List<GroupAccessRight> accessRights = mongoTemplate.find(query, GroupAccessRight.class);
 		return accessRights;
 	}
 
 	@Override
-	public List<GroupAccessRight> findByContextId(String contextId) {
+	public List<GroupAccessRight> findByContextId(ObjectId contextId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId));
 		List<GroupAccessRight> accessRights = mongoTemplate.find(query, GroupAccessRight.class);
 		return accessRights;
 	}
 
 	@Override
-	public List<GroupAccessRight> findByContextIdAndUserId(String contextId, String userId) {
+	public List<GroupAccessRight> findByContextIdAndUserId(ObjectId contextId, ObjectId userId) {
 		Query query = new Query(Criteria.where("contextId").is(contextId).and("userId").is(userId));
 		List<GroupAccessRight> accessRights = mongoTemplate.find(query, GroupAccessRight.class);
 		return accessRights;
 	}
 
 	@Override
-	public GroupAccessRight findByGroupIdAndUserId(String groupId, String userId) {
+	public GroupAccessRight findByGroupIdAndUserId(ObjectId groupId, ObjectId userId) {
 		Query query = new Query(Criteria.where("groupId").is(groupId).and("userId").is(userId));
 		GroupAccessRight accessRight = mongoTemplate.findOne(query, GroupAccessRight.class);
 		return accessRight;
 	}
 
 	@Override
-	public void deleteByUserId(String userId) {
+	public void deleteByUserId(ObjectId userId) {
 		List<GroupAccessRight> accessRights = findByUserId(userId);
 		if (accessRights != null) {
 			for (GroupAccessRight accessRight : accessRights) {
@@ -68,7 +69,7 @@ public class GroupAccessRightRepositoryImpl extends GroupAccesRightRepository {
 	}
 
 	@Override
-	public void deleteByGroupId(String groupId) {
+	public void deleteByGroupId(ObjectId groupId) {
 		List<GroupAccessRight> accessRights = findByGroupId(groupId);
 		if (accessRights != null) {
 			for (GroupAccessRight accessRight : accessRights) {
@@ -78,7 +79,7 @@ public class GroupAccessRightRepositoryImpl extends GroupAccesRightRepository {
 	}
 
 	@Override
-	public void deleteByContextId(String contextId) {
+	public void deleteByContextId(ObjectId contextId) {
 		List<GroupAccessRight> accessRights = findByContextId(contextId);
 		if (accessRights != null) {
 			for (GroupAccessRight accessRight : accessRights) {
@@ -88,7 +89,7 @@ public class GroupAccessRightRepositoryImpl extends GroupAccesRightRepository {
 	}
 
 	@Override
-	public void deleteByContextIdAndUserId(String contextId, String userId) {
+	public void deleteByContextIdAndUserId(ObjectId contextId, ObjectId userId) {
 		List<GroupAccessRight> accessRights = findByContextIdAndUserId(contextId, userId);
 		if (accessRights != null) {
 			for (GroupAccessRight accessRight : accessRights) {

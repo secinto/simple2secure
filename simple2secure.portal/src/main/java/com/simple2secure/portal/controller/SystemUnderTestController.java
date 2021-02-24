@@ -11,17 +11,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.SystemUnderTest;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
-import com.simple2secure.portal.validation.model.ValidInputPage;
-import com.simple2secure.portal.validation.model.ValidInputSize;
 import com.simple2secure.portal.validation.model.ValidInputSut;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.SUT_API)
 @Slf4j
@@ -46,7 +44,9 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 	 *          The current locale used by the user.
 	 * @return The in the database stored @SystemUnderTest.
 	 */
-	@ValidRequestMapping(value = "/addSut", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/addSut",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> addNewSut(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -57,8 +57,7 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
-
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_saving_sut", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue()));
 	}
 
 	/**
@@ -72,7 +71,9 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 	 *          The current locale used by the user.
 	 * @return The updated @SystemUnderTest from the database.
 	 */
-	@ValidRequestMapping(value = "/updateSut", method = ValidRequestMethodType.POST)
+	@ValidRequestMapping(
+			value = "/updateSut",
+			method = ValidRequestMethodType.POST)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> updateSut(@RequestBody SystemUnderTest sut, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
@@ -85,8 +86,28 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 			}
 			return new ResponseEntity<>(sut, HttpStatus.OK);
 		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_updating_sut", locale.getValue()));
+	}
 
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_updating_sut", locale));
+	/**
+	 * This method imports the provided list of the suts
+	 * 
+	 * @param sutList
+	 * @param contextId
+	 * @param locale
+	 * @return
+	 */
+	@ValidRequestMapping(
+			value = "/importSut",
+			method = ValidRequestMethodType.POST)
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	public ResponseEntity<List<SystemUnderTest>> addNewSut(@RequestBody List<SystemUnderTest> sutList,
+			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale) {
+		if (sutList != null && contextId.getValue() != null) {
+			sutList = sutUtils.importSuts(sutList, contextId.getValue());
+			return new ResponseEntity<>(sutList, HttpStatus.OK);
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_saving_sut", locale.getValue()));
 	}
 
 	/**
@@ -103,26 +124,20 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 	 */
 	@ValidRequestMapping
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	public ResponseEntity<Map<String, Object>> getAllSUTsForContext(@ServerProvidedValue ValidInputContext contextId,
-			@PathVariable ValidInputPage page, @PathVariable ValidInputSize size, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(locale.getValue()) && !Strings.isNullOrEmpty(contextId.getValue())) {
+	public ResponseEntity<Map<String, Object>> getAllSUTsForContext(@ServerProvidedValue ValidInputContext contextId, @RequestParam(
+			required = false) String filter,
+			@RequestParam(
+					defaultValue = StaticConfigItems.DEFAULT_PAGE_PAGINATION) int page,
+			@RequestParam(
+					defaultValue = StaticConfigItems.DEFAULT_SIZE_PAGINATION) int size,
+			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
+		if (contextId.getValue() != null) {
 
-			Map<String, Object> sutMap = new HashMap<>();
-			long count = 0;
-			sutMap.put("sutList", new ArrayList<SystemUnderTest>());
-			sutMap.put("totalSize", count);
-
-			List<SystemUnderTest> suts = sutRepository.getAllByContextIdPaged(contextId.getValue(), page.getValue(), size.getValue());
-			if (suts != null && suts.size() > 0) {
-				count = sutRepository.getTotalAmountOfSystemUnderTest(contextId.getValue());
-				sutMap.put("sutList", suts);
-				sutMap.put("totalSize", count);
-			}
-
+			Map<String, Object> sutMap = sutRepository.getAllByContextIdPaged(contextId.getValue(), page, size, filter);
+			
 			return new ResponseEntity<>(sutMap, HttpStatus.OK);
 		}
-		return ((ResponseEntity<Map<String, Object>>) buildResponseEntity("problem_occured_while_loading_sut", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_loading_sut", locale.getValue()));
 	}
 
 	/**
@@ -134,13 +149,14 @@ public class SystemUnderTestController extends BaseUtilsProvider {
 	 *          The current locale used by the user.
 	 * @return A response with status code 200 and a null.
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<SystemUnderTest> deleteSUT(@PathVariable ValidInputSut sutId, @ServerProvidedValue ValidInputLocale locale) {
 		if (sutId != null) {
 			sutRepository.delete(sutRepository.find(sutId.getValue()));
 			return new ResponseEntity<>(null, HttpStatus.OK);
 		}
-		return ((ResponseEntity<SystemUnderTest>) buildResponseEntity("problem_occured_while_deleting_sut", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_sut", locale.getValue()));
 	}
 }

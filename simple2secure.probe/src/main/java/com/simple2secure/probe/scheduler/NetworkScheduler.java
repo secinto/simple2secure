@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
+import org.bson.types.ObjectId;
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
 import org.pcap4j.core.PcapStat;
 import org.slf4j.Logger;
@@ -68,10 +69,11 @@ public class NetworkScheduler extends TimerTask {
 			log.debug("Obtaining current network statistics from Pcap driver");
 			PcapStat statistics = monitor.getReceiverHandle().getStats();
 			NetworkReport report = new NetworkReport();
+			report.id = new ObjectId();
 			report.setStartTime(new Date());
 			report.setProcessorName("PCAP Network Statistics");
 			report.setDeviceId(ProbeConfiguration.probeId);
-			report.setGroupId(ProbeConfiguration.groupId);
+			report.setGroupId(new ObjectId(ProbeConfiguration.groupId));
 			report.setHostname(ProbeConfiguration.hostname);
 			Map<String, String> content = new TreeMap<>();
 			content.put("PacketsCaptured", String.valueOf(statistics.getNumPacketsCaptured()));

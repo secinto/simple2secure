@@ -23,21 +23,23 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.OsQueryGroupMapping;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class OsQueryGroupMappingRepository extends MongoRepository<OsQueryGroupMapping> {
 
-	public abstract List<OsQueryGroupMapping> findByGroupId(String groupId);
+	public abstract List<OsQueryGroupMapping> findByGroupId(ObjectId groupId);
 
-	public abstract List<OsQueryGroupMapping> findByQueryId(String queryId);
+	public abstract List<OsQueryGroupMapping> findByQueryId(ObjectId queryId);
 
-	public abstract void deleteByGroupId(String groupId);
+	public abstract void deleteByGroupId(ObjectId groupId);
 
-	public abstract void deleteByQueryId(String queryId);
+	public abstract void deleteByQueryId(ObjectId queryId);
 
-	public abstract List<OsQueryGroupMapping> findByGroupIdAndOSInfo(String groupId, List<Integer> possibleValues);
+	public abstract List<OsQueryGroupMapping> findByGroupIdAndOSInfo(ObjectId groupId, List<Integer> possibleValues);
 
-	public abstract List<OsQueryGroupMapping> getAllMapingsByGroupIds(List<String> group_ids, List<Integer> possibleValues);
+	public abstract List<OsQueryGroupMapping> getAllMapingsByGroupIds(List<ObjectId> group_ids, List<Integer> possibleValues);
 
 }

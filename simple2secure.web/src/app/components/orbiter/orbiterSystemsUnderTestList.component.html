@@ -1,0 +1,121 @@
+<mat-tab-group (selectedTabChange)="onTabClick($event)">
+	<mat-tab label="{{'menu.targetedSystems' | translate}}">
+		<button mat-raised-button color="primary" id="addButtonList" type="button" (click)="openDialogShowSuT('new')"
+			class="pull-right mat-green-button">
+			<mat-icon>add</mat-icon> {{ 'button.add.sut' | translate }}
+		</button>
+		<button mat-raised-button color="primary" id="downloadButton" type="button" (click)="downloadSuts()"
+			class="pull-right mat-green-button">
+			<mat-icon>get_app</mat-icon> {{ 'button.download' | translate }}
+		</button>
+		<button mat-raised-button color="primary" id="importButton" type="button" (click)="openDialogImportSuts()"
+			class="pull-right mat-green-button">
+			<mat-icon>publish</mat-icon> {{ 'button.importSUT' | translate }}
+		</button>
+		<br><br><br>
+
+		<div class="example-container mat-elevation-z8 table table-striped">
+
+			<div class="header-filter-table">
+				<mat-form-field class="header-filter-field">
+					<input matInput #filterValue placeholder="Filter">
+				</mat-form-field>
+			</div>
+
+			<mat-table #table [dataSource]="dataSourceSut" matSort>
+
+				<ng-container matColumnDef="name">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="Protocol">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.protocol' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.protocol}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="action">
+					<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> {{ 'table.action' |
+						translate }}</mat-header-cell>
+					<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+						<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+							(click)="onMenuTriggerClick(element)">
+							<i class="fas fa-bars"></i>
+						</button>
+					</mat-cell>
+				</ng-container>
+
+				<mat-header-row *matHeaderRowDef="displayedColumnsTargeted"></mat-header-row>
+				<mat-row *matRowDef="let row; columns: displayedColumnsTargeted;"></mat-row>
+			</mat-table>
+
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true" [length]="totalSizeSut">
+			</mat-paginator>
+			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+
+			<mat-menu #menu="matMenu">
+				<button mat-menu-item (click)="openDialogShowSuT('edit')">
+					<mat-icon>edit</mat-icon>
+					{{ 'button.edit' | translate }}
+				</button>
+
+				<button mat-menu-item (click)="openDeleteSutDialog()">
+					<mat-icon>delete</mat-icon>
+					{{ 'button.delete' | translate }}
+				</button>
+			</mat-menu>
+		</div>
+	</mat-tab>
+	<mat-tab label="{{'menu.monitoredSystems' | translate}}">
+		<div class="example-container mat-elevation-z8 table table-striped">
+
+			<div class="header-filter-table">
+				<mat-form-field class="header-filter-field">
+					<input matInput #filterValue placeholder="Filter">
+				</mat-form-field>
+			</div>
+
+			<mat-table #table [dataSource]="dataSourceMonitored" matSort>
+
+				<ng-container matColumnDef="name">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.name}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="groupId">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.groupId' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.group.groupId}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="device">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.device' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.type}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="ipAdress">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.ipAddress' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.ipAddress}}</mat-cell>
+				</ng-container>
+
+				<ng-container matColumnDef="deviceStatus">
+					<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.status' | translate }}
+					</mat-header-cell>
+					<mat-cell *matCellDef="let element"> {{element.info.deviceStatus}}</mat-cell>
+				</ng-container>
+
+				<mat-header-row *matHeaderRowDef="displayedColumnsMonitored"></mat-header-row>
+				<mat-row *matRowDef="let row; columns: displayedColumnsMonitored;"></mat-row>
+			</mat-table>
+
+			<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+				[showFirstLastButtons]="true" [length]="totalSize">
+			</mat-paginator>
+			<mat-progress-spinner *ngIf="loading" style="margin:0 auto;" mode="indeterminate"></mat-progress-spinner>
+		</div>
+	</mat-tab>
+</mat-tab-group>

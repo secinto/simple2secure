@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-import {Timeunit} from './timeunit';
+import { Base } from './base';
+import { Timeunit } from './timeunit';
 
 export class Settings extends Base {
 	accessTokenValidityTime: number;

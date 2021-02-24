@@ -1,0 +1,110 @@
+.navbar {
+  background-color: white;
+  color: #a7bd26;
+  border-bottom: 1px solid #a7bd26;
+  max-height: 64px;
+  left: 8%;
+}
+
+.navbar .navbar-nav {
+  display: inline-block;
+}
+
+.centered-nav {
+  position: absolute;
+  left: 44%;
+  transform: translatex(-44%);
+}
+
+.navbar-nav li {
+  text-align: center;
+  display: inline-block;
+}
+
+.nav img {
+  width: 130px;
+  max-width: 50%;
+}
+
+.navbar-right {
+  float: right;
+  display: inline-block;
+  max-width: 20%;
+  margin-right: 8%;
+}
+
+.navbar-right a {
+  color: white;
+}
+
+#current-context-id {
+  margin-left: -10px;
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+  font-size: 11px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* ############### onHover effects ###############
+		 Navigation item on hover effect */
+
+#search-bar {
+  padding-top: 18px;
+  padding-right: 10px;
+}
+
+.dropdown-language a {
+  color: #a7bd26 !important;
+  background: rgba(0, 0, 0, 0);
+}
+
+.dropdown-language a:hover {
+  background: rgba(0, 0, 0, 0);
+}
+
+.dropdown-user a {
+  color: #a7bd26 !important;
+  background: rgba(0, 0, 0, 0);
+  text-align: center;
+}
+
+.dropdown-user a:hover {
+  background: rgba(0, 0, 0, 0);
+}
+
+.dropdown-user p {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.dropdown-user ul {
+  padding-inline-start: 10px !important;
+}
+
+.notification-icon {
+  margin-top: 5px;
+}
+
+.navbar-header {
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+.breadcrumb-item {
+  color: #a7bd26 !important;
+}
+
+a {
+  color: #a7bd26 !important;
+}
+
+#nav-right-custom-language-switcher {
+  max-width: 50px;
+  font-weight: bold;
+}
+
+.search-bar-input {
+  width: 500px !important;
+}

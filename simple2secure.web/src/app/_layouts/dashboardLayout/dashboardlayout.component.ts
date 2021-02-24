@@ -20,37 +20,30 @@
  *********************************************************************
  */
 
-import {Component} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-
-
-
-import {Title} from '@angular/platform-browser';
+import { Component, DoCheck } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
-	moduleId: module.id,
-	templateUrl: 'dashboardlayout.component.html',
-	selector: 'dashboard'
+    moduleId: module.id,
+    templateUrl: 'dashboardlayout.component.html',
+    selector: 'dashboard'
 })
 
-export class DashboardLayoutComponent {
+export class DashboardLayoutComponent implements DoCheck {
 
-	pageTitle: string;
+    pageTitle: string;
 
-	constructor(
-		private router: Router,
-		private route: ActivatedRoute,
-		private titleService: Title
-	)
-	{
-	}
+    constructor(
+        private titleService: Title
+    ) {
+    }
 
-	ngOnInit() {
+    ngOnInit() {
 
-	}
+    }
 
-	ngDoCheck() {
-		this.pageTitle = this.titleService.getTitle();
-	}
+    ngDoCheck() {
+        this.pageTitle = this.titleService.getTitle();
+    }
 
 }

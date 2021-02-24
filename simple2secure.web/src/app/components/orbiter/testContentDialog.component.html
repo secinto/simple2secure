@@ -1,0 +1,11 @@
+<h3 mat-dialog-title>{{ 'menu.testContent' | translate }}</h3>
+
+<div mat-dialog-content>
+    <ngx-json-viewer [json]="getTestContent()"></ngx-json-viewer>
+</div>
+
+<div mat-dialog-actions>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" [mat-dialog-close]="testRun"
+        cdkFocusInitial>{{ 'button.close' | translate }}
+    </button>
+</div>

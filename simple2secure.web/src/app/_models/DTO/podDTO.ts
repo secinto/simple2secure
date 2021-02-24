@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Device} from '../device';
-import {TestObjWeb} from '../testObjWeb';
+import { Device } from '../device';
+import { TestObjWeb } from '../testObjWeb';
 
 export class PodDTO {
 	public pod: Device;

@@ -1,0 +1,53 @@
+<div mat-dialog-content>
+	<ng-template matStepLabel>{{'table.inputData' | translate }}</ng-template>
+	<button mat-raised-button color="primary" type="button" (click)="openDialogAddEditInputData('new')"
+		class="pull-right mat-green-button">
+		<i class="glyphicon glyphicon-plus"></i> {{'message.addInputData' | translate}}
+	</button>
+	<br><br>
+
+	<mat-table #table [dataSource]="dataSource" matSort>
+		<!-- Name Column -->
+		<ng-container matColumnDef="name">
+			<mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'table.name' | translate }}</mat-header-cell>
+			<mat-cell *matCellDef="let element" matTooltip="Data: {{element.data}}" matTooltipPosition="after">
+				{{element.name}}
+			</mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="action">
+			<mat-header-cell *matHeaderCellDef class="mat-column-right" mat-sort-header> Action</mat-header-cell>
+			<mat-cell *matCellDef="let element" class="mat-column-right" (click)="$event.stopPropagation()">
+				<button class="mat-green-button" mat-button [matMenuTriggerFor]="menu"
+					(click)="onMenuTriggerClick(element)">
+					<i class="fas fa-bars"></i>
+				</button>
+			</mat-cell>
+		</ng-container>
+
+		<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+		<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+	</mat-table>
+	<mat-paginator #paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true"
+		[length]="totalSize" (page)="pageEvent = handlePage($event)">
+	</mat-paginator>
+</div>
+
+<div mat-dialog-actions>
+	<button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+		{{ 'button.close' | translate }}
+	</button>
+</div>
+
+<mat-menu #menu="matMenu">
+	<button mat-menu-item (click)="openDialogAddEditInputData('edit')">
+		<mat-icon>edit</mat-icon>
+		{{ 'button.edit' | translate }}
+	</button>
+
+	<button mat-menu-item (click)="openDeleteDialog()">
+		<mat-icon>delete</mat-icon>
+		{{ 'button.delete' | translate }}
+	</button>
+</mat-menu>

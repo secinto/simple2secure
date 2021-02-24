@@ -20,42 +20,41 @@
  *********************************************************************
  */
 
-import {Injectable} from '@angular/core';
-import {TestRunDTO} from '../_models/DTO/testRunDTO';
+import { Injectable } from '@angular/core';
+import { TestRunDTO } from '../_models/DTO/testRunDTO';
 import { SequenceRun } from '../_models/sequenceRun';
 
 @Injectable()
 export class HelperService {
 
-	getEnumValue(value: any){
-		if (value == 'MANUAL_POD'){
-			return 'MANUAL POD';
-		}
-		else if (value == 'MANUAL_PORTAL'){
-			return 'MANUAL PORTAL';
-		}
-		else{
-			return 'AUTOMATIC PORTAL';
-		}
-	}
+    getEnumValue(value: any) {
+        if (value == 'MANUAL_POD') {
+            return 'MANUAL POD';
+        } else if (value == 'AUTOMATIC PORTAL') {
+            return 'AUTOMATIC PORTAL';
+        } else {
+            return 'MANUAL PORTAL';
+        }
+    }
 
-	getTestStatusByTestResult(testRunDTO: TestRunDTO){
-		if(testRunDTO.testResult == null){
-			if(testRunDTO.testRun !== null) {
-				return testRunDTO.testRun.testStatus;
-			}
-			else {
-				return 'UNKNOWN';
-			}
-		}
-		else{
-			return testRunDTO.testRun.testStatus;
-		}
-	}
+    getTestStatusByTestResult(testRunDTO: TestRunDTO) {
+        if (testRunDTO.testResult == null) {
+            if (testRunDTO.testRun !== null) {
+                return testRunDTO.testRun.testStatus;
+            } else {
+                return 'UNKNOWN';
+            }
+        } else {
+            return testRunDTO.testRun.testStatus;
+        }
+    }
 
-	getSequenceStatusBySequenceResult(sequenceRun: SequenceRun){
-        if(sequenceRun !== null){
+    getSequenceStatusBySequenceResult(sequenceRun: SequenceRun) {
+        if (sequenceRun !== null) {
             return sequenceRun.sequenceStatus;
+        }
+        else {
+            return 'UNKNOWN';
         }
     }
 }

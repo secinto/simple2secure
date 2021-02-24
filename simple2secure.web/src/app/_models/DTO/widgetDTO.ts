@@ -20,8 +20,8 @@
  *********************************************************************
  */
 
-import {Widget} from '../widget';
-import {WidgetProperties} from '../widgetProperties';
+import { Widget } from '../widget';
+import { WidgetProperties } from '../widgetProperties';
 
 export class WidgetDTO {
 

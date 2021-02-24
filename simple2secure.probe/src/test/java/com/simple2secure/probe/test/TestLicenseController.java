@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ public class TestLicenseController {
 	@Test
 	public void testIsLicenseExpiredFail() throws Exception {
 
-		CompanyLicensePublic companyLicense = new CompanyLicensePublic("test", "1", "10/10/2018", "1");
+		CompanyLicensePublic companyLicense = new CompanyLicensePublic(new ObjectId("test"), new ObjectId("1"), "10/10/2018", new ObjectId("1"));
 
 		boolean result = LicenseDateUtil.isLicenseExpired(companyLicense.getExpirationDate());
 
@@ -63,7 +64,7 @@ public class TestLicenseController {
 
 	@Test
 	public void testLoadLicenseFromDB() {
-		CompanyLicensePublic compLicense = new CompanyLicensePublic("1", "2", "3", "12/12/2018");
+		CompanyLicensePublic compLicense = new CompanyLicensePublic(new ObjectId("1"), new ObjectId("2"), "3", new ObjectId("12/12/2018"));
 		licenseController.updateLicenseInDB(compLicense);
 
 		CompanyLicensePublic licenseFrDB;

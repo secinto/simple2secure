@@ -24,47 +24,32 @@ package com.simple2secure.api.dto;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
+import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Device;
+import com.simple2secure.api.model.DeviceInfo;
 import com.simple2secure.api.model.TestObjWeb;
 import com.simple2secure.api.model.TestSequence;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class DeviceDTO {
 
-	private Device device;
-
-	private List<TestObjWeb> test;
-
-	private List<TestSequence> test_sequence;
-	public DeviceDTO() {
-	}
-
-	public DeviceDTO(Device device, List<TestObjWeb> test, List<TestSequence> test_sequence) {
-		this.device = device;
-		this.test = test;
-		this.test_sequence = test_sequence;
-	}
-
-	public Device getPod() {
-		return device;
-	}
-
-	public void setPod(Device pod) {
-		this.device = pod;
-	}
-
-	public List<TestObjWeb> getTest() {
-		return test;
-	}
-
-	public void setTest(List<TestObjWeb> test) {
-		this.test = test;
-	}
-
-	public List<TestSequence> getTest_sequence() {
-		return test_sequence;
-	}
-
-	public void setTest_sequence(List<TestSequence> test_sequence) {
-		this.test_sequence = test_sequence;
-	}
+	private ObjectId _id;
+	private String name;
+	private ObjectId licensePlanId;
+	private int currentNumberOfLicenseDownloads;
+	private String _class;
+	private CompanyGroup groups;
+	private CompanyLicensePublic licenses;
+	private DeviceInfo deviceInfos;
+	
 }

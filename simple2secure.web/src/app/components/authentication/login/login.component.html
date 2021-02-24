@@ -1,0 +1,46 @@
+<div class="loginPageForm">
+    <form name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+        <div class="login-same-level">
+            <div class="login-fields">
+                <div class="form-group input" [ngClass]="{ 'has-error': f.submitted && !email.valid }">
+                    <label class="loginLabel" for="email">{{ 'login.email' | translate }}</label>
+                    <input placeholder="{{ 'login.email.placeholder' | translate }}" type="email"
+                        class="email form-control" name="email" [(ngModel)]="userLogin.username" #email="ngModel"
+                        required email />
+                    <div *ngIf="f.submitted && !email.valid" class="help-block">{{ 'login.email.error' | translate }}
+                    </div>
+                </div>
+                <div class="form-group has-feedback input password-field-login"
+                    [ngClass]="{ 'has-error': f.submitted && !password.valid }">
+                    <label class="loginLabel" for="password">{{ 'login.password' | translate }}</label>
+                    <input placeholder="{{ 'login.password.placeholder' | translate }}"
+                        [type]="hide ? 'password' : 'text'" class="form-control" name="password"
+                        [(ngModel)]="userLogin.password" #password="ngModel" required />
+                    <i *ngIf="hide" class="fas fa-eye form-control-feedback" (click)=showPassword()></i>
+                    <i *ngIf="!hide" class="fas fa-eye-slash form-control-feedback" (click)=showPassword()></i>
+                    <div *ngIf="f.submitted && !password.valid" class="help-block">{{ 'login.password.error' | translate
+                        }}
+                    </div>
+                </div>
+            </div>
+            <div class="login-button">
+                <button mat-raised-button class="button button5 mat-green-button"><i
+                        class="fas fa-sign-in-alt fa-3x"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <div class="buttons-group">
+        <div class="form-group" id="registerButton">
+            <button (click)="openDialogRegister()" mat-raised-button class="mat-green-button-with-hover"
+                formnovalidate>{{
+                'register.standard' | translate }}
+            </button>
+        </div>
+        <div class="form-group" id="forgotPasswordButton">
+            <button (click)="openDialogForgotPwd()" mat-raised-button class="mat-red-button" formnovalidate>{{
+                'login.password.forgot' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -40,61 +40,61 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProbeStarter {
-   private static String OPTION_FILEPATH_SHORT = "l";
-   private static String OPTION_FILEPATH = "licensePath";
+	private static String OPTION_FILEPATH_SHORT = "l";
+	private static String OPTION_FILEPATH = "licensePath";
 
-   private static String OPTION_INSTRUMENTATION_SHORT = "i";
-   private static String OPTION_INSTRUMENTATION = "instrumentation";
+	private static String OPTION_INSTRUMENTATION_SHORT = "i";
+	private static String OPTION_INSTRUMENTATION = "instrumentation";
 
-   private static String OPTION_REAUTH_LICENSE_SHORT = "r";
-   private static String OPTION_REAUTH_LICENSE = "reauth";
+	private static String OPTION_REAUTH_LICENSE_SHORT = "r";
+	private static String OPTION_REAUTH_LICENSE = "reauth";
 
-   public static void main(String[] args) {
-      Options options = new Options();
+	public static void main(String[] args) {
+		Options options = new Options();
 
-      Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
-            .desc("The path to the license ZIP file which should be used.").build();
-      Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
-            .longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
-      Option reauth = Option.builder(OPTION_REAUTH_LICENSE_SHORT).required(false).longOpt(OPTION_REAUTH_LICENSE)
-            .desc("The license should be reauthenticated from the provided license path").build();
+		Option filePath = Option.builder(OPTION_FILEPATH_SHORT).required(false).hasArg().argName("FILE").longOpt(OPTION_FILEPATH)
+				.desc("The path to the license ZIP file which should be used.").build();
+		Option instrumentation = Option.builder(OPTION_INSTRUMENTATION_SHORT).required(false).argName("INSTRUMENTATION")
+				.longOpt(OPTION_INSTRUMENTATION).desc("Specifies if the PROBE should be started using instrumenation").build();
+		Option reauth = Option.builder(OPTION_REAUTH_LICENSE_SHORT).required(false).longOpt(OPTION_REAUTH_LICENSE)
+				.desc("The license should be reauthenticated from the provided license path").build();
 
-      options.addOption(filePath);
-      options.addOption(instrumentation);
-      options.addOption(reauth);
-      try {
-         CommandLineParser parser = new DefaultParser();
-         CommandLine line = parser.parse(options, args);
-         ProbeCLI client = new ProbeCLI();
+		options.addOption(filePath);
+		options.addOption(instrumentation);
+		options.addOption(reauth);
+		try {
+			CommandLineParser parser = new DefaultParser();
+			CommandLine line = parser.parse(options, args);
+			ProbeCLI client = new ProbeCLI();
 
-         if (line.hasOption(reauth.getOpt())) {
-            log.debug("Initializing PROBE with and reauthenticate with provided license path");
-            ProbeConfiguration.reauthenticate = true;
-         }
+			if (line.hasOption(reauth.getOpt())) {
+				log.debug("Initializing PROBE and reauthenticate with provided license path");
+				ProbeConfiguration.reauthenticate = true;
+			}
 
-         if (line.hasOption(filePath.getOpt())) {
-            String licensePath = line.getOptionValue(filePath.getOpt());
-            log.debug("Initializing PROBE with provided license path {}", licensePath);
-            client.init(licensePath);
-         } else {
-            log.debug("Initializing PROBE with default license path");
-            client.init("./license/");
-         }
+			if (line.hasOption(filePath.getOpt())) {
+				String licensePath = line.getOptionValue(filePath.getOpt());
+				log.debug("Initializing PROBE with provided license path {}", licensePath);
+				client.init(licensePath);
+			} else {
+				log.debug("Initializing PROBE with default license path");
+				client.init("./license/");
+			}
 
-         if (line.hasOption(instrumentation.getOpt())) {
-            log.debug("Starting PROBE with instrumentation");
-            client.startInstrumentation();
-         } else {
-            log.debug("Starting PROBE in normal mode");
-            client.startAutonomous();
-         }
+			if (line.hasOption(instrumentation.getOpt())) {
+				log.debug("Starting PROBE with instrumentation");
+				client.startInstrumentation();
+			} else {
+				log.debug("Starting PROBE in normal mode");
+				client.startAutonomous();
+			}
 
-      } catch (ParseException e) {
-         String header = "Start monitoring your system using Probe\n\n";
-         String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
-         HelpFormatter formatter = new HelpFormatter();
-         formatter.printHelp("ProbeCLI", header, options, footer, true);
-      }
+		} catch (ParseException e) {
+			String header = "Start monitoring your system using Probe\n\n";
+			String footer = "\nPlease report issues at https://github.com/secinto/simple2secure/issues";
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("ProbeCLI", header, options, footer, true);
+		}
 
-   }
+	}
 }

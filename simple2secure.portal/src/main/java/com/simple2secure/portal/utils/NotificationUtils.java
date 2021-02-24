@@ -22,6 +22,7 @@
 
 package com.simple2secure.portal.utils;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import com.simple2secure.api.model.CompanyGroup;
@@ -35,28 +36,45 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotificationUtils extends BaseServiceProvider {
 
-	public void addNewNotificationPortal(String data, String contextId) {
-		Notification notification = new Notification(data, false, contextId, System.currentTimeMillis());
-		notificationRepository.save(notification);
-		log.info("New notification has been added");
-	}
+	/**
+	 * This function adds new notification to the portal notifier.
+	 *
+	 * @param data
+	 * @param contextId
+	 * @param deviceId
+	 * @param isPod
+	 * @return
+	 */
+	public boolean addNewNotification(String data, ObjectId contextId, ObjectId deviceId, boolean isPod) {
 
-	public boolean addNewNotificationPod(String data, String deviceId) {
+		boolean result = false;
 
-		CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+		if (isPod) {
+			CompanyLicensePrivate license = licenseRepository.findByDeviceId(deviceId);
+			if (license != null) {
 
-		if (license != null) {
+				CompanyGroup group = groupRepository.find(license.getGroupId());
 
-			CompanyGroup group = groupRepository.find(license.getGroupId());
-
-			if (group != null) {
-				Notification notification = new Notification(data, false, group.getContextId(), System.currentTimeMillis());
-				notificationRepository.save(notification);
-				log.info("New pod notification has been added");
+				if (group != null) {
+					Notification notification = new Notification(data, false, group.getContextId(), System.currentTimeMillis());
+					notificationRepository.save(notification);
+					log.info("New pod notification has been added");
+					result = true;
+				} else {
+					log.error("Problem occurred by adding new notification from the pod");
+				}
+			} else {
+				log.error("Problem occurred by adding new notification from the pod");
 			}
 		}
-		log.error("Problem occurred by adding new notification from the pod");
-		return false;
-	}
 
+		else {
+			Notification notification = new Notification(data, false, contextId, System.currentTimeMillis());
+			notificationRepository.save(notification);
+			result = true;
+			log.info("New notification has been added");
+		}
+
+		return result;
+	}
 }

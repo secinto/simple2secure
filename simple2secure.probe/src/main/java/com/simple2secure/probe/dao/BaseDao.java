@@ -23,6 +23,8 @@ package com.simple2secure.probe.dao;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 public interface BaseDao<T> {
 
 	/**
@@ -36,7 +38,7 @@ public interface BaseDao<T> {
 	 * Get Object by ID from table
 	 */
 
-	public T getByID(String id);
+	public T getByID(ObjectId id);
 
 	/**
 	 * Save object to table

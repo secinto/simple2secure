@@ -32,11 +32,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.base.Strings;
 import com.simple2secure.api.model.Processor;
 import com.simple2secure.api.model.Step;
 import com.simple2secure.commons.config.StaticConfigItems;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputProcessor;
@@ -46,33 +46,34 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.PROCESSOR_API)
 @Slf4j
 public class ProcessorController extends BaseUtilsProvider {
 
 	@ValidRequestMapping
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'DEVICE')")
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER', 'ROLE_DEVICE')")
 	public ResponseEntity<List<Processor>> getProcessors(@ServerProvidedValue ValidInputLocale locale) {
 		List<Processor> processors = processorRepository.findAll();
 		if (processors != null) {
 			return new ResponseEntity<>(processors, HttpStatus.OK);
 		}
-		return (ResponseEntity<List<Processor>>) buildResponseEntity("error_while_getting_processors", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("error_while_getting_processors", locale.getValue()));
 	}
 
-	@ValidRequestMapping(method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.POST,
+			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<Processor> saveOrUpdateProcessor(@RequestBody Processor processor, @ServerProvidedValue ValidInputLocale locale)
 			throws ItemNotFoundRepositoryException {
 
 		if (processor != null) {
-			if (Strings.isNullOrEmpty(processor.getId())) {
+			if (processor.getId() != null) {
 				List<Processor> processors = processorRepository.findAll();
 
 				if (portalUtils.checkIfListAlreadyContainsProcessor(processors, processor)) {
-					return (ResponseEntity<Processor>) buildResponseEntity("processor_already_exist", locale);
+					throw new ApiRequestException(messageByLocaleService.getMessage("processor_already_exist", locale.getValue()));
 				}
 				processorRepository.save(processor);
 			} else {
@@ -81,17 +82,18 @@ public class ProcessorController extends BaseUtilsProvider {
 			return new ResponseEntity<>(processor, HttpStatus.OK);
 		}
 		log.error("Error occured while saving/updating processor");
-		return (ResponseEntity<Processor>) buildResponseEntity("problem_saving_processor", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_saving_processor", locale.getValue()));
 	}
 
 	/**
 	 * This function returns all users from the user repository
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.DELETE)
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
 	public ResponseEntity<?> deleteProcessor(@PathVariable ValidInputProcessor processorId, @ServerProvidedValue ValidInputLocale locale) {
 
-		if (!Strings.isNullOrEmpty(processorId.getValue())) {
+		if (processorId.getValue() != null) {
 			Processor processor = processorRepository.find(processorId.getValue());
 			if (processor != null) {
 				// Check according to the processor name if the same step exists
@@ -108,6 +110,6 @@ public class ProcessorController extends BaseUtilsProvider {
 			}
 		}
 		log.error("Error occured while deleting processor with id {}", processorId.getValue());
-		return buildResponseEntity("problem_occured_while_deleting_processor", locale);
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_while_deleting_processor", locale.getValue()));
 	}
 }

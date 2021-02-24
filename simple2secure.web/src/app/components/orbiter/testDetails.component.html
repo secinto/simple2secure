@@ -1,0 +1,271 @@
+<div *ngIf="type !== 'readonly'">
+    <h3 *ngIf="!isNewTest" mat-dialog-title>{{ 'orbiter.edittests' | translate }}</h3>
+    <h3 *ngIf="isNewTest" mat-dialog-title>{{ 'button.addTest' | translate }}</h3>
+</div>
+
+<div mat-dialog-content readonly="true">
+    <form id="cfgForm" #configForm="ngForm">
+        <mat-horizontal-stepper #stepper>
+            <mat-step>
+                <ng-template matStepLabel>{{'menu.general' | translate }}</ng-template>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.name' | translate }}" [(ngModel)]="test.name"
+                            name="name" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.description" [readonly]="isReadOnly"
+                            name="description">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.version' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.version" name="version"
+                            [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <label for="scheduled">{{ 'osquery.runalways' | translate }}</label><br>
+                    <mat-button-toggle-group id="scheduled" name="scheduled" [(ngModel)]="test.scheduled">
+                        <mat-button-toggle [value]="true">{{ 'button.true' | translate }}</mat-button-toggle>
+                        <mat-button-toggle [value]="false">{{ 'button.false' | translate }}</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
+
+                <table *ngIf="test.scheduled" cellspacing="0" !readonly>
+                    <tr>
+                        <td>
+                            <mat-form-field class="full_width_input">
+                                <input type="number" matInput placeholder="{{ 'table.unitValue' | translate }}"
+                                    [(ngModel)]="test.scheduledTime" name="scheduledTime">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="full_width_input">
+                                <mat-select [(ngModel)]="test.scheduledTimeUnit"
+                                    placeholder="{{ 'table.unit' | translate }}" name="scheduledTimeUnit">
+                                    <mat-option *ngFor="let ttimeUnit of extractTimeUnits()" [value]="ttimeUnit">
+                                        {{ttimeUnit}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                </table>
+
+            </mat-step>
+
+            <mat-step>
+                <ng-template matStepLabel>{{'test.precondition' | translate }}</ng-template>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.precondition.description"
+                            name="precondition.description" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.precondition.command.executable"
+                            name="precondition.executable" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="primary" id="addButton" type="button"
+                    (click)="addParameter('precondition')" class="mat-green-button pull-right">
+                    <i class="glyphicon glyphicon-plus"></i> {{'button.addParameter' | translate}}
+                </button><br>
+                <mat-accordion>
+                    <mat-expansion-panel
+                        *ngFor="let param_pre_con of test.test_content.test_definition.precondition.command.parameter, let paramIndex = index">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate:{'val':param_pre_con.value } }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                    [(ngModel)]="param_pre_con.description"
+                                    name="precondition.parameter.description-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                    [(ngModel)]="param_pre_con.prefix" name="precondition.prefix-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                    [(ngModel)]="param_pre_con.value"
+                                    name="precondition.parameter.value-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <button mat-raised-button color="primary" type="button"
+                            (click)="removeParameter('precondition', paramIndex)" class="mat-red-button">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+
+                    </mat-expansion-panel>
+                </mat-accordion>
+
+            </mat-step>
+
+            <mat-step>
+                <ng-template matStepLabel>{{'test.step' | translate }}</ng-template>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.step.description" name="step.description"
+                            [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.step.command.executable"
+                            name="step.executable" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="primary" type="button" (click)="addParameter('step')"
+                    class="pull-right mat-green-button">
+                    <i class="glyphicon glyphicon-plus"></i>{{'button.addParameter' | translate}}
+                </button><br>
+
+                <mat-accordion>
+                    <mat-expansion-panel
+                        *ngFor="let param_step of test.test_content.test_definition.step.command.parameter, let paramIndex = index">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate:{'val':param_step.value } }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                    [(ngModel)]="param_step.description"
+                                    name="step.parameter.description-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                    [(ngModel)]="param_step.prefix" name="step.prefix-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                    [(ngModel)]="param_step.value" name="step.parameter.value-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <button mat-raised-button color="primary" type="button"
+                            (click)="removeParameter('step', paramIndex)" class="mat-red-button">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-step>
+
+            <mat-step>
+                <ng-template matStepLabel>{{'test.postcondition' | translate }}</ng-template>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.postcondition.description"
+                            name="postcondition.description" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <div class="form-group">
+                    <mat-form-field class="full_width_input">
+                        <input type="text" matInput placeholder="{{ 'table.executable' | translate }}"
+                            [(ngModel)]="test.test_content.test_definition.postcondition.command.executable"
+                            name="postcondition.executable" [readonly]="isReadOnly">
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="primary" type="button" (click)="addParameter('postcondition')"
+                    class="pull-right mat-green-button">
+                    <i class="glyphicon glyphicon-plus"></i>{{'button.addParameter' | translate}}
+                </button><br>
+
+                <mat-accordion>
+                    <mat-expansion-panel
+                        *ngFor="let param_post_con of test.test_content.test_definition.postcondition.command.parameter, let paramIndex = index">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ 'test.parameter' | translate:{'val':param_post_con.value } }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.description' | translate }}"
+                                    [(ngModel)]="param_post_con.description"
+                                    name="postcondition.parameter.description-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.prefix' | translate }}"
+                                    [(ngModel)]="param_post_con.prefix" name="postcondition.prefix-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group">
+                            <mat-form-field class="full_width_input">
+                                <input type="text" matInput placeholder="{{ 'table.value' | translate }}"
+                                    [(ngModel)]="param_post_con.value"
+                                    name="postcondition.parameter.value-{{paramIndex}}">
+                            </mat-form-field>
+                        </div>
+
+                        <button mat-raised-button color="primary" type="button"
+                            (click)="removeParameter('postcondition', paramIndex)" class="mat-red-button">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </button>
+
+                    </mat-expansion-panel>
+                </mat-accordion>
+
+            </mat-step>
+        </mat-horizontal-stepper>
+    </form>
+</div>
+
+<div mat-dialog-actions *ngIf="type !== 'readonly'">
+    <button class="mat-green-button" type="button" mat-raised-button color="success" (click)="updateSaveTest()">{{
+        'button.save' | translate }}
+    </button>
+    <button class="mat-red-button" type="button" mat-raised-button color="warn" (click)="close(false)"
+        cdkFocusInitial>{{ 'button.cancel' | translate }}
+    </button>
+</div>

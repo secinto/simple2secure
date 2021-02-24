@@ -21,24 +21,25 @@ import com.simple2secure.portal.repository.OsQueryRepository;
 import com.simple2secure.portal.repository.ProcessorRepository;
 import com.simple2secure.portal.repository.RuleActionsRepository;
 import com.simple2secure.portal.repository.RuleConditionsRepository;
-import com.simple2secure.portal.repository.RuleUserPairsRepository;
-import com.simple2secure.portal.repository.RuleWithSourcecodeRepository;
+import com.simple2secure.portal.repository.RuleDeviceMappingRepository;
+import com.simple2secure.portal.repository.RuleEmailConfigMappingRepository;
 import com.simple2secure.portal.repository.SequenceRunRepository;
 import com.simple2secure.portal.repository.ServiceLibraryRepository;
 import com.simple2secure.portal.repository.SettingsRepository;
 import com.simple2secure.portal.repository.StepRepository;
 import com.simple2secure.portal.repository.SystemUnderTestRepository;
+import com.simple2secure.portal.repository.TemplateActionFactTypeMappingRepository;
+import com.simple2secure.portal.repository.TemplateConditionFactTypeMappingRepository;
 import com.simple2secure.portal.repository.TemplateRuleRepository;
+import com.simple2secure.portal.repository.TestInputDataRepository;
 import com.simple2secure.portal.repository.TestMacroRepository;
 import com.simple2secure.portal.repository.TestRepository;
 import com.simple2secure.portal.repository.TestResultRepository;
 import com.simple2secure.portal.repository.TestRunRepository;
 import com.simple2secure.portal.repository.TestSequenceRepository;
 import com.simple2secure.portal.repository.TestSequenceResultRepository;
-import com.simple2secure.portal.repository.TokenRepository;
-import com.simple2secure.portal.repository.UserInfoRepository;
+import com.simple2secure.portal.repository.TestSequenceStepResultRepository;
 import com.simple2secure.portal.repository.UserInvitationRepository;
-import com.simple2secure.portal.repository.UserRepository;
 import com.simple2secure.portal.repository.WidgetPropertiesRepository;
 import com.simple2secure.portal.repository.WidgetRepository;
 
@@ -49,9 +50,6 @@ public class BaseRepositoryProvider {
 	/*
 	 * Repositories
 	 */
-	@Autowired
-	public UserRepository userRepository;
-
 	@Autowired
 	public GroupRepository groupRepository;
 
@@ -86,9 +84,6 @@ public class BaseRepositoryProvider {
 	public GroupAccesRightRepository groupAccessRightRepository;
 
 	@Autowired
-	public TokenRepository tokenRepository;
-
-	@Autowired
 	public StepRepository stepRepository;
 
 	@Autowired
@@ -119,9 +114,6 @@ public class BaseRepositoryProvider {
 	public NetworkReportRepository networkReportRepository;
 
 	@Autowired
-	public RuleWithSourcecodeRepository ruleWithSourcecodeRepository;
-
-	@Autowired
 	public RuleConditionsRepository ruleConditionsRepository;
 
 	@Autowired
@@ -129,9 +121,18 @@ public class BaseRepositoryProvider {
 
 	@Autowired
 	public TemplateRuleRepository templateRuleRepository;
-	
+
 	@Autowired
-	public RuleUserPairsRepository ruleUserPairsRepository;
+	public TemplateActionFactTypeMappingRepository templateActionFactTypeMappingRepository;
+
+	@Autowired
+	public TemplateConditionFactTypeMappingRepository templateConditionFactTypeMappingRepository;
+
+	@Autowired
+	public RuleEmailConfigMappingRepository ruleEmailConfigMappingRepository;
+
+	@Autowired
+	public RuleDeviceMappingRepository ruleDeviceMappingRepository;
 
 	@Autowired
 	public ServiceLibraryRepository serviceLibraryRepository;
@@ -161,15 +162,18 @@ public class BaseRepositoryProvider {
 	public TestSequenceResultRepository testSequenceResultRepository;
 
 	@Autowired
-	public UserInvitationRepository userInvitationRepository;
+	public TestSequenceStepResultRepository testSequenceStepResultRepository;
 
 	@Autowired
-	public UserInfoRepository userInfoRepository;
+	public UserInvitationRepository userInvitationRepository;
 
 	@Autowired
 	public WidgetPropertiesRepository widgetPropertiesRepository;
 
 	@Autowired
 	public SequenceRunRepository sequenceRunRepository;
+
+	@Autowired
+	public TestInputDataRepository testInputDataRepository;
 
 }

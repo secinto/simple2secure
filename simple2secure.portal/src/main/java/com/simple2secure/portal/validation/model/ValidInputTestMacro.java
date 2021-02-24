@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputTestMacro extends ValidatedInput<String> {
 
-	private String testMacroId;
+	private ObjectId testMacroId;
 	private String tag = "/{testMacroId}";
 
 	public ValidInputTestMacro() {
 	}
 
 	public ValidInputTestMacro(String testMacroId) {
-		this.testMacroId = testMacroId;
+		this.testMacroId = new ObjectId(testMacroId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return testMacroId;
 	}
 

@@ -16,17 +16,16 @@
 *
 *   You should have received a copy of the GNU Affero General Public License
 *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*  
+*
  *********************************************************************
 */
 
 package com.simple2secure.api.model;
 
 /**
- * 
- * @author Richard Heinz
- * 
- *         Emun for the email rule engine, to define which input type will be needed for condition-/action-parameter.
+ *
+ * Enum for the rule engine, to define which data type a condition-/action-parameter has. This information is needed as metadata for the web
+ * user interface so that the input field on the web allows only the correct type as input.
  *
  */
 public enum DataType {

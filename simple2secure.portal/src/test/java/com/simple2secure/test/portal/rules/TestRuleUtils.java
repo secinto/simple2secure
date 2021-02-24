@@ -39,11 +39,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.simple2secure.api.model.DataType;
+import com.simple2secure.api.model.RuleFactType;
 import com.simple2secure.api.model.RuleParam;
 import com.simple2secure.api.model.RuleParamArray;
 import com.simple2secure.api.model.TemplateAction;
 import com.simple2secure.api.model.TemplateCondition;
 import com.simple2secure.portal.Simple2SecurePortal;
+import com.simple2secure.portal.repository.RuleConditionsRepository;
 import com.simple2secure.portal.utils.RuleUtils;
 
 @ExtendWith({ SpringExtension.class })
@@ -55,6 +57,9 @@ public class TestRuleUtils {
 
 	@Autowired
 	private RuleUtils ruleUtils;
+	
+	@Autowired
+	private RuleConditionsRepository ruleConditionsRepository;
 
 	private boolean compareRuleParam(RuleParam<?> p1, RuleParam<?> p2) {
 		if (p1.getType() != p2.getType()) {
@@ -179,7 +184,7 @@ public class TestRuleUtils {
 				assertEquals("action_description_tag", condition.getDescriptionTag(),
 						"Field description_de from the Annotation \"AnnotationAction\"n is wrong");
 
-				final int conditonParamCount = 4; // 3 normal params and the and 1 from AbtractEmailCondition which has been derived
+				final int conditonParamCount = 3; // 3 normal params
 				// Checking field Annotation (RuleParam)
 				assertEquals(conditonParamCount, condition.getParams().size(), "Number of RuleParams has not been read proply");
 
@@ -297,7 +302,12 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayString);
 
-		TemplateAction templateAction = new TemplateAction("test_action_tag", "action_description_tag", ruleParams, ruleParamArrays);
+		TemplateAction templateAction = new TemplateAction(TestTemplateAction.class.getName(),
+				"test_action_tag",
+				"action_description_tag",
+				RuleFactType.GENERAL,
+				ruleParams,
+				ruleParamArrays);
 
 		try {
 
@@ -416,7 +426,13 @@ public class TestRuleUtils {
 
 		ruleParamArrays.add(arrayString);
 
-		TemplateCondition templateCondition = new TemplateCondition("test_condition_tag", "action_description_tag", ruleParams, ruleParamArrays);
+		TemplateCondition templateCondition = new TemplateCondition(
+				TestTemplateCondition.class.getName(),
+				"test_condition_tag",
+				"action_description_tag",
+				RuleFactType.GENERAL,
+				ruleParams,
+				ruleParamArrays);
 
 		try {
 			// creating a specific condition object from the prepared data
@@ -456,6 +472,20 @@ public class TestRuleUtils {
 			}, condition.arrayString, "arrayString has not been injected right");
 
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testLoadConditionsFromPath()
+	{
+		try {
+			Collection<TemplateCondition> conditions;
+			conditions = ruleUtils.loadTemplateConditions("com.simple2secure.portal.rules.conditions");
+			if(conditions != null && !conditions.isEmpty()) {
+				conditions.forEach(ruleConditionsRepository::save);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

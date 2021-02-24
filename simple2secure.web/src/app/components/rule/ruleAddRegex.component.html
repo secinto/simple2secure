@@ -1,0 +1,67 @@
+<!-- title for the dialog -->
+<h3 mat-dialog-title>{{dialogTitle}}</h3>
+
+
+<!-- =============================================================================================================== -->
+<!-- body with the content of the dialog -->
+<mat-dialog-content>
+
+    <!-- Input for the name  -->
+    <mat-form-field class="full_width_input">
+        <input matInput type="text" placeholder="{{ 'rule.regex.name' | translate }}" [(ngModel)]="name" minlength="4"
+            name="name" autocomplete='given-name' required (focusout)="this.lostFocusRegexName($event.target)">
+    </mat-form-field>
+
+    <!-- Input for the description  -->
+    <mat-form-field class="full_width_input">
+        <input matInput type="text" placeholder="{{ 'rule.regex.description' | translate }}" [(ngModel)]="description"
+            name="description" autocomplete='family-name' required>
+    </mat-form-field>
+
+    <!-- Input for the regex  -->
+    <mat-form-field class="full_width_input">
+        <input matInput type="text" placeholder="{{ 'rule.regex.regex' | translate }}" [(ngModel)]="regex"
+            name="description" autocomplete='family-name' required>
+    </mat-form-field>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{ 'rule.regex.test.description' | translate }}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+
+        <mat-form-field class="full_width_input">
+            <input matInput type="text" placeholder="{{ 'rule.regex.test.text' | translate }}" [(ngModel)]="testText"
+                name="textInput" autocomplete='family-name'>
+        </mat-form-field>
+
+        <mat-form-field>
+            <textarea #test_result matInput type="text" placeholder="{{ 'rule.regex.test.result' | translate }}"
+                cdkTextareaAutosize name="textInput"></textarea>
+        </mat-form-field>
+
+        <button mat-button mat-raised-button class="mat-green-button" color="primary" style="float: right;"
+            (click)="testRegex()">
+            {{ 'rule.regex.test.button' | translate }}
+        </button>
+
+    </mat-expansion-panel>
+
+
+</mat-dialog-content>
+
+<!-- =============================================================================================================== -->
+<!-- save/cancel buttons, fixed at the end of the dialog -->
+<div mat-dialog-actions>
+
+    <button mat-button mat-raised-button class="mat-green-button" color="primary" (click)="saveRegex()">
+        {{ 'button.save' | translate }}
+    </button>
+
+    <button mat-button mat-raised-button class="mat-red-button" color="warn" [mat-dialog-close] cdkFocusInitial>
+        {{ 'button.cancel' | translate }}
+    </button>
+
+</div>

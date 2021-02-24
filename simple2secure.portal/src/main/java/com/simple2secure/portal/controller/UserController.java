@@ -21,40 +21,47 @@
  */
 package com.simple2secure.portal.controller;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.io.InputStreamResource;
+import org.bson.types.ObjectId;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Strings;
 import com.simple2secure.api.dto.UserDTO;
-import com.simple2secure.api.dto.UserRoleDTO;
+import com.simple2secure.api.dto.UserInvitationDTO;
 import com.simple2secure.api.model.CompanyGroup;
+import com.simple2secure.api.model.CompanyLicensePublic;
 import com.simple2secure.api.model.Context;
 import com.simple2secure.api.model.ContextUserAuthentication;
-import com.simple2secure.api.model.User;
-import com.simple2secure.api.model.UserInfo;
+import com.simple2secure.api.model.TokenObject;
 import com.simple2secure.api.model.UserInvitation;
+import com.simple2secure.api.model.UserInvitationRequest;
+import com.simple2secure.api.model.UserInvitationStatus;
+import com.simple2secure.api.model.UserLogin;
 import com.simple2secure.api.model.UserRegistration;
-import com.simple2secure.api.model.UserRegistrationType;
+import com.simple2secure.api.model.UserRegistrationResponse;
 import com.simple2secure.api.model.UserRole;
 import com.simple2secure.commons.config.StaticConfigItems;
+import com.simple2secure.commons.json.JSONUtils;
 import com.simple2secure.portal.dao.exceptions.ItemNotFoundRepositoryException;
+import com.simple2secure.portal.exceptions.ApiRequestException;
 import com.simple2secure.portal.providers.BaseUtilsProvider;
 import com.simple2secure.portal.validation.model.ValidInputContext;
+import com.simple2secure.portal.validation.model.ValidInputDevice;
 import com.simple2secure.portal.validation.model.ValidInputLocale;
 import com.simple2secure.portal.validation.model.ValidInputToken;
 import com.simple2secure.portal.validation.model.ValidInputUser;
@@ -65,215 +72,183 @@ import simple2secure.validator.annotation.ServerProvidedValue;
 import simple2secure.validator.annotation.ValidRequestMapping;
 import simple2secure.validator.model.ValidRequestMethodType;
 
-@SuppressWarnings("unchecked")
 @RestController
 @RequestMapping(StaticConfigItems.USER_API)
 @Slf4j
 public class UserController extends BaseUtilsProvider {
 
+	@Value("${keycloak.realm}")
+	private String realm;
+
 	/**
 	 * This function finds and returns user according to the user id
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(method = ValidRequestMethodType.GET)
+	@ValidRequestMapping(
+			method = ValidRequestMethodType.GET)
 	public ResponseEntity<UserDTO> getUserByID(@ServerProvidedValue ValidInputUser userId, @ServerProvidedValue ValidInputContext contextId,
 			@ServerProvidedValue ValidInputLocale locale) {
 
-		User user = userRepository.find(userId.getValue());
-
-		if (user != null && !Strings.isNullOrEmpty(contextId.getValue())) {
+		if (contextId.getValue() != null) {
 			// Retrieving the context according to the current active context
 			Context context = contextRepository.find(contextId.getValue());
 
 			if (context != null) {
 
 				// Retrieving the current UserContextAuth
-				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), user.getId());
+				ContextUserAuthentication contextUserAuth = contextUserAuthRepository.getByContextIdAndUserId(context.getId(), userId.getValue());
 
-				List<String> assignedGroups = new ArrayList<>();
+				List<ObjectId> assignedGroups = new ArrayList<>();
 				List<CompanyGroup> groups = groupUtils.getAllGroupsByContextId(context);
-				List<UserRoleDTO> myUsers = userUtils.getAllUsersFromCurrentContext(context, user.getId());
-				List<Context> myContexts = contextUtils.getContextsByUserId(user);
-				UserInfo userInfo = userInfoRepository.getByUserId(user.getId());
-				log.debug("Found {} groups, {} users, and {} contexts", groups.size(), myUsers.size(), myContexts.size());
+				List<Context> myContexts = contextUtils.getContextsByUserId(userId.getValue());
+				log.debug("Found {} groups", groups.size());
 				if (contextUserAuth != null) {
 					if (contextUserAuth.getUserRole().equals(UserRole.SUPERUSER)) {
-						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, user);
+						assignedGroups = groupUtils.getAllAssignedGroupIdsForSuperUser(context, userId.getValue());
 					}
 				}
 
-				UserDTO userDTO = new UserDTO(userInfo, myUsers, groups, myContexts, assignedGroups);
+				UserDTO userDTO = new UserDTO(groups, myContexts, assignedGroups);
 				return new ResponseEntity<>(userDTO, HttpStatus.OK);
 			}
 		}
-
-		return ((ResponseEntity<UserDTO>) buildResponseEntity("problem_occured_user_not_found", locale));
-
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue()));
 	}
 
 	/**
-	 * This function is used to add new user. For each user added it sets the configuration, queries, processors and steps from the default
-	 * configuration files which are placed on the server. This function is called from a super user or admin from within the portal. If the
-	 * user is added by the normal registration process this is performed via {@link #registerUser(UserRegistration, String)}.
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	@ValidRequestMapping(method = ValidRequestMethodType.POST)
-	public ResponseEntity<User> insertUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputUser userId,
-			@ServerProvidedValue ValidInputContext contextId, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
-
-		if (user != null) {
-			if (user.getRegistrationType().equals(UserRegistrationType.ADDED_BY_USER)) {
-				user.setCurrentContextId(contextId.getValue());
-				user.setAddedByUserId(userId.getValue());
-
-				return userUtils.addNewUser(user, locale);
-			} else {
-				return userUtils.updateUser(user, locale);
-			}
-
-		} else {
-			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
-		}
-	}
-
-	/**
-	 * This function is used for adding users via the standard registration process provided on the login page.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	@ValidRequestMapping(value = "/resendActivation", method = ValidRequestMethodType.POST)
-	public ResponseEntity<User> resendActivation(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
-		if (!Strings.isNullOrEmpty(email)) {
-			User user = userRepository.findByEmail(email);
-			if (user != null) {
-				if (!user.isActivated()) {
-					return userUtils.resendActivation(user, locale);
-				} else {
-					return ((ResponseEntity<User>) buildResponseEntity("user_already_activated", locale));
-				}
-			}
-		}
-		return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
-	}
-
-	/**
-	 * This user updates user info
-	 *
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 * @throws URISyntaxException
+	 * This function invites the user into the context. If the user is not registered, an email invitation should be sent. For each
+	 * invitation, object with the invitation details will be saved in the invitation repository. This object will be used by the invited user
+	 * in order to accept the invitation or reject it.
 	 */
 	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
-	@ValidRequestMapping(value = "/update", method = ValidRequestMethodType.POST)
-	public ResponseEntity<UserInfo> updateUserInfo(@RequestBody UserInfo userInfo, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
+	@ValidRequestMapping(
+			value = "/inviteContext",
+			method = ValidRequestMethodType.POST)
 
-		if (userInfo != null) {
-			User user = userRepository.find(userInfo.getUserId());
+	public ResponseEntity<UserInvitation> inviteUserToContext(@ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputContext contextId, @RequestBody UserInvitationRequest userInvitationRequest,
+			@ServerProvidedValue ValidInputLocale locale) {
 
-			if (user != null) {
-				userInfoRepository.update(userInfo);
-				return new ResponseEntity<>(userInfo, HttpStatus.OK);
+		if (contextId.getValue() != null && userInvitationRequest != null) {
+
+			// Retrieving the context according to the current active context
+			Context context = contextRepository.find(contextId.getValue());
+
+			if (context != null) {
+
+				UsersResource usersResource = dataInitialization.keycloak.realm(realm).users();
+				List<UserRepresentation> users = usersResource.search(userInvitationRequest.getEmail());
+
+				// Check if user is registered (there can be only one user with the provided
+				if (users != null && users.size() > 0) {
+
+					// Invite/add user to this context
+					String invitation_userId = users.get(0).getId();
+					if (!Strings.isNullOrEmpty(invitation_userId)) {
+						UserInvitation userInvitation = new UserInvitation(invitation_userId, contextId.getValue(), userInvitationRequest.getUserRole(),
+								userId.getValue(), UserInvitationStatus.PENDING);
+						if (userUtils.addUserInvitation(userInvitation)) {
+							return new ResponseEntity<>(userInvitation, HttpStatus.OK);
+						} else {
+							throw new ApiRequestException(messageByLocaleService.getMessage("user_invitation_already_in_context", locale.getValue()));
+						}
+
+					}
+				} else {
+					// TODO: if user is not registered, send him an invitation using email and
+					// notify user, currently notifying user that provided
+					// user is not registered
+					throw new ApiRequestException(messageByLocaleService.getMessage("user_invitation_not_registered", locale.getValue()));
+				}
+
 			}
 		}
-		return ((ResponseEntity<UserInfo>) buildResponseEntity("problem_occured_user_not_found", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue()));
 	}
 
 	/**
-	 * This function deletes the user from the current context
+	 * This function returns the user context invitations according to the userId, if some are available
 	 *
-	 * @param userId
-	 * @return
 	 * @throws ItemNotFoundRepositoryException
 	 */
-	@ValidRequestMapping(method = ValidRequestMethodType.DELETE)
-	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER')")
-	public ResponseEntity<ContextUserAuthentication> deleteUser(@PathVariable String userId, @PathVariable String contextId,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		// TODO: Define it so that user with ADMIN or SUPERADMIN must have at least one context???
-		if (!Strings.isNullOrEmpty(userId) && !Strings.isNullOrEmpty(contextId)) {
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(
+			value = "/acceptInvitation",
+			method = ValidRequestMethodType.POST)
 
-			User user = userRepository.find(userId);
-			Context context = contextRepository.find(contextId);
+	public ResponseEntity<UserInvitation> acceptOrDeclineInvitation(@ServerProvidedValue ValidInputUser userId,
+			@RequestBody UserInvitationDTO userInvitation, @ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
 
-			if (user != null && context != null) {
-				ContextUserAuthentication contextUserAuthentication = contextUserAuthRepository.getByContextIdAndUserId(context.getId(),
-						user.getId());
-				if (contextUserAuthentication != null) {
-					if (contextUserAuthentication.getUserRole().equals(UserRole.SUPERADMIN)) {
-						return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_superadmin", locale));
-					} else {
-						contextUtils.deleteContextAuthDependencies(contextUserAuthentication);
-						return new ResponseEntity<>(contextUserAuthentication, HttpStatus.OK);
-					}
+		if (!Strings.isNullOrEmpty(userId.getValue()) && userInvitation != null) {
+			// Retrieving the context according to the current active context
+			if (userInvitation.isAccepted()) {
+				ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(userId.getValue(),
+						userInvitation.getInvitation().getContextId(), userInvitation.getInvitation().getUserRole(), false);
+				contextUserAuthRepository.save(contextUserAuth);
+				userInvitation.getInvitation().setInvitationStatus(UserInvitationStatus.ACCEPTED);
+				userInvitationRepository.update(userInvitation.getInvitation());
+			} else {
+				userInvitationRepository.update(userInvitation.getInvitation());
+			}
+			return new ResponseEntity<>(userInvitation.getInvitation(), HttpStatus.OK);
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue()));
+	}
+
+	/**
+	 * This function returns the user context invitations according to the userId, if some are available
+	 */
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(
+			value = "/invitations",
+			method = ValidRequestMethodType.GET)
+	public ResponseEntity<List<UserInvitationDTO>> getUserInvitationsByUserId(@ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputLocale locale) {
+
+		if (!Strings.isNullOrEmpty(userId.getValue())) {
+			// Retrieving the context according to the current active context
+			List<UserInvitation> invitations = userInvitationRepository.getByUserIdAndStatus(userId.getValue(), UserInvitationStatus.PENDING);
+
+			if (invitations != null) {
+				List<UserInvitationDTO> invitationsDTO = new ArrayList<>();
+
+				for (UserInvitation invitation : invitations) {
+					Context context = contextRepository.find(invitation.getContextId());
+					UserInvitationDTO invitationDTO = new UserInvitationDTO(invitation, context.getName(), invitation.getInvitedByUserId(), false);
+					invitationsDTO.add(invitationDTO);
 				}
+
+				return new ResponseEntity<>(invitationsDTO, HttpStatus.OK);
 			}
 		}
-		return ((ResponseEntity<ContextUserAuthentication>) buildResponseEntity("problem_occured_while_deleting_user", locale));
+		throw new ApiRequestException(messageByLocaleService.getMessage("problem_occured_user_not_found", locale.getValue()));
+	}
+
+	@PreAuthorize("hasAnyAuthority('SUPERADMIN', 'ADMIN', 'SUPERUSER', 'USER')")
+	@ValidRequestMapping(
+			value = "/isAdminForDevice",
+			method = ValidRequestMethodType.GET)
+	public ResponseEntity<Boolean> isAdminForDevice(@PathVariable ValidInputDevice deviceId, @ServerProvidedValue ValidInputUser userId,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (userId != null) {
+			CompanyLicensePublic license = licenseRepository.findByDeviceId(deviceId.getValue());
+			CompanyGroup group = groupRepository.find(license.getGroupId());
+			ContextUserAuthentication contextUA = contextUserAuthRepository.getByContextIdAndUserId(group.getContextId(), userId.getValue());
+			if (contextUA != null) {
+				if (contextUA.getUserRole().equals(UserRole.ADMIN) || contextUA.getUserRole().equals(UserRole.SUPERADMIN)) {
+					return new ResponseEntity<>(true, HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(false, HttpStatus.OK);
+				}
+			} else {
+				return new ResponseEntity<>(false, HttpStatus.OK);
+			}
+		}
+		// TODO: Check this again what the response is
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 	}
 
 	// Unsecured APIs
-
-	/**
-	 * This function updates the user password with the token sent in the password reset email.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws URISyntaxException
-	 * @throws IOException
-	 */
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/updatePassword", method = ValidRequestMethodType.POST)
-	public ResponseEntity<User> updateUserPassword(@PathVariable ValidInputToken token, @RequestBody String password,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
-
-		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
-			User user = userRepository.findByPasswordResetToken(token.getValue());
-
-			if (user != null) {
-				if (portalUtils.checkIfTokenIsStillValid(user.getPasswordResetExpirationTime())) {
-
-					user.setPassword(password);
-
-					String error = userUtils.validateUserPassword(user);
-
-					if (!Strings.isNullOrEmpty(error)) {
-						return ((ResponseEntity<User>) buildResponseEntity(error, locale));
-					}
-
-					user.setPassword(passwordEncoder.encode(password));
-					user.setPasswordResetToken(token.getValue());
-					userRepository.update(user);
-
-					String emailContent = messageByLocaleService.getMessage("password_changed_email_content", locale.getValue());
-					mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subjct_pcs);
-
-					URI url = new URI(loadedConfigItems.getBaseURLWeb());
-					HttpHeaders httpHeaders = new HttpHeaders();
-					httpHeaders.setLocation(url);
-					return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
-				} else {
-					return ((ResponseEntity<User>) buildResponseEntity("password_reset_token_expired", locale));
-				}
-			} else {
-				return ((ResponseEntity<User>) buildResponseEntity("problem_token_already_used", locale));
-			}
-
-		} else {
-			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
-		}
-	}
 
 	/**
 	 * This function only redirects the user to the correct page in the web for accepting the user invitation.
@@ -283,8 +258,9 @@ public class UserController extends BaseUtilsProvider {
 	 * @throws URISyntaxException
 	 */
 	@NotSecuredApi
-	@ValidRequestMapping(value = "/invite")
-	public ResponseEntity<User> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
+	@ValidRequestMapping(
+			value = "/invite")
+	public ResponseEntity<String> showAcceptInvitationPage(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
 			throws URISyntaxException {
 
 		// TODO - check if token exists
@@ -294,221 +270,58 @@ public class UserController extends BaseUtilsProvider {
 		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
 	}
 
-	/**
-	 * @throws ItemNotFoundRepositoryException
-	 *
-	 */
 	@NotSecuredApi
-	@ValidRequestMapping(value = "/invite/process")
-	public ResponseEntity<UserInvitation> processInvitation(@PathVariable String token, @RequestParam boolean isAccepted,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException {
-		if (!Strings.isNullOrEmpty(token)) {
-			UserInvitation userInvitation = userInvitationRepository.getByInvitationToken(token);
-			if (userInvitation != null) {
-				User user = userRepository.find(userInvitation.getUserId());
-				if (isAccepted && user != null) {
-					if (portalUtils.checkIfTokenIsStillValid(userInvitation.getInvitationTokenExpirationTime())) {
-						Context context = contextRepository.find(userInvitation.getContextId());
-						if (context != null) {
-							ContextUserAuthentication contextUserAuth = new ContextUserAuthentication(userInvitation.getUserId(),
-									userInvitation.getContextId(), userInvitation.getUserRole(), false);
-							// If user role is superuser add groups
-							if (userInvitation.getUserRole().equals(UserRole.SUPERUSER)) {
-								if (userInvitation.getGroupIds() != null) {
-									groupUtils.updateGroupAccessRightsforTheSuperuser(userInvitation.getGroupIds(), user, context);
-								}
-							}
-							contextUserAuthRepository.save(contextUserAuth);
-							userInvitationRepository.delete(userInvitation);
-							return new ResponseEntity<>(userInvitation, HttpStatus.OK);
+	@ValidRequestMapping(
+			value = "/login",
+			method = ValidRequestMethodType.POST)
+	public ResponseEntity<TokenObject> login(@RequestBody UserLogin userLogin, @ServerProvidedValue ValidInputLocale locale) {
+		if (userLogin != null) {
+			return userUtils.processLogin(userLogin, locale);
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
+	}
 
-						} else {
-							userInvitationRepository.delete(userInvitation);
-							log.error("Context not found for following {}", token);
-						}
-					} else {
-						log.error("Invitation token expired {}", token);
-						userInvitationRepository.delete(userInvitation);
-						return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_token_expired", locale));
-					}
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/register",
+			method = ValidRequestMethodType.POST)
+	public ResponseEntity<UserRegistrationResponse> register(@RequestBody UserRegistration userRegistration,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (userRegistration != null) {
+			return userUtils.processRegistration(userRegistration, locale);
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
+	}
 
-				} else {
-					userInvitationRepository.delete(userInvitation);
-					return ((ResponseEntity<UserInvitation>) buildResponseEntity("invitation_rejected", locale));
-				}
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/forgotPassword",
+			method = ValidRequestMethodType.POST)
+	public ResponseEntity<UserRegistrationResponse> forgotPassword(@RequestBody UserRegistration userRegistration,
+			@ServerProvidedValue ValidInputLocale locale) {
+		if (userRegistration != null) {
+			return userUtils.processForgotPassword(userRegistration, locale);
+		}
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
+	}
+
+	@NotSecuredApi
+	@ValidRequestMapping(
+			value = "/logout",
+			method = ValidRequestMethodType.POST)
+	public ResponseEntity<String> logout(@RequestBody TokenObject tokenObj, @ServerProvidedValue ValidInputLocale locale) {
+		if (tokenObj != null) {
+
+			String body = portalUtils.decodeJWTAndReturnBody(tokenObj.getToken());
+
+			if (!Strings.isNullOrEmpty(body)) {
+
+				JsonNode json = JSONUtils.fromString(body);
+				return userUtils.processLogout(json.get("sub").asText(), locale);
 
 			}
+
 		}
-		log.error("Error occured during invitation for invitation token {}", token);
-		return ((ResponseEntity<UserInvitation>) buildResponseEntity("unknown_error_occured", locale));
-	}
-
-	/**
-	 * This function is used for adding users via the standard registration process provided on the login page.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/register", method = ValidRequestMethodType.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> registerUser(@RequestBody UserRegistration user, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException, URISyntaxException {
-		if (user != null) {
-			return userUtils.addNewUser(user, locale);
-		} else {
-			return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
-		}
-	}
-
-	/**
-	 * This function is used to update the password after clicking on the activation link. This is used only for the users which are added by
-	 * another user.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws URISyntaxException
-	 * @throws IOException
-	 */
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/activate/updatePassword", method = ValidRequestMethodType.POST)
-	public ResponseEntity<User> updateUserPasswordFirstLogin(@PathVariable ValidInputToken token, @RequestBody String password,
-			@ServerProvidedValue ValidInputLocale locale) throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
-
-		if (!Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(token.getValue())) {
-			User user = userRepository.findByActivationToken(token.getValue());
-
-			if (user != null) {
-				user.setActivated(true);
-				user.setPassword(password);
-
-				String error = userUtils.validateUserPassword(user);
-
-				if (!Strings.isNullOrEmpty(error)) {
-					return ((ResponseEntity<User>) buildResponseEntity(error, locale));
-				}
-
-				user.setPassword(passwordEncoder.encode(user.getPassword()));
-				user.setPasswordUpdated(true);
-
-				userRepository.update(user);
-
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + user.getActivationToken());
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
-
-			} else {
-				return ((ResponseEntity<User>) buildResponseEntity("problem_occured_user_not_found", locale));
-			}
-
-		} else {
-			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
-		}
-
-	}
-
-	/**
-	 * This function activates the user, after the user has clicked on the link in the activation email which has been sent after successful
-	 * registration
-	 *
-	 * @param token
-	 * @param locale
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws URISyntaxException
-	 * @throws IOException
-	 */
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/activate", method = ValidRequestMethodType.GET)
-	public ResponseEntity<InputStreamResource> activateUser(@PathVariable ValidInputToken token, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, URISyntaxException, IOException {
-		User user = userRepository.findByActivationToken(token.getValue());
-
-		if (user != null) {
-
-			if (!user.isActivated()) {
-				if (user.isPasswordUpdated()) {
-					user.setActivated(true);
-					userRepository.update(user);
-				}
-
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activate/" + token.getValue());
-
-				if (!user.isPasswordUpdated()) {
-					url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/updatePassword/" + token.getValue());
-				}
-
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-			} else {
-				URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/account/activated/");
-				HttpHeaders httpHeaders = new HttpHeaders();
-				httpHeaders.setLocation(url);
-				return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-			}
-
-		} else {
-			return ((ResponseEntity<InputStreamResource>) buildResponseEntity("activation_token_not_valid", locale));
-		}
-	}
-
-	/**
-	 * This function sends password reset email with the generated link to the user.
-	 *
-	 * @param user
-	 * @return
-	 * @throws ItemNotFoundRepositoryException
-	 * @throws IOException
-	 */
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/sendResetPasswordEmail", method = ValidRequestMethodType.POST)
-	public ResponseEntity<User> sendResetPasswordEmail(@RequestBody String email, @ServerProvidedValue ValidInputLocale locale)
-			throws ItemNotFoundRepositoryException, IOException {
-
-		if (!Strings.isNullOrEmpty(email)) {
-			User user = userRepository.findByEmailOnlyActivated(email);
-			if (user != null) {
-				user.setPasswordResetToken(portalUtils.generateToken());
-				user.setPasswordResetExpirationTime(System.currentTimeMillis() + StaticConfigItems.expiration_time_password_reset);
-
-				userRepository.update(user);
-
-				// Add template for the email content and retrieve it from the database!
-				String emailContent = "In order to change your password please click on the link below. \n\n Password reset link: "
-						+ loadedConfigItems.getBaseURL() + "/api/user/resetPassword/" + user.getPasswordResetToken();
-
-				if (mailUtils.sendEmail(user, emailContent, StaticConfigItems.email_subject_pr)) {
-					return new ResponseEntity<>(user, HttpStatus.OK);
-				} else {
-					return ((ResponseEntity<User>) buildResponseEntity("error_while_sending_email", locale));
-				}
-			} else {
-				return ((ResponseEntity<User>) buildResponseEntity("user_with_provided_email_not_exists", locale));
-			}
-		} else {
-			return ((ResponseEntity<User>) buildResponseEntity("unknown_error_occured", locale));
-		}
-	}
-
-	/**
-	 * This function only redirects the user to the correct page in the web, after the user clicks on the link in the password reset email.
-	 *
-	 * @param user
-	 * @return
-	 * @throws URISyntaxException
-	 */
-
-	@NotSecuredApi
-	@ValidRequestMapping(value = "/resetPassword")
-	public ResponseEntity<User> redirectToChangePasswordPage(@PathVariable ValidInputToken token) throws URISyntaxException {
-		URI url = new URI(loadedConfigItems.getBaseURLWeb() + "/#/resetPassword/" + token.getValue());
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.setLocation(url);
-		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+		throw new ApiRequestException(messageByLocaleService.getMessage("unknown_error_occured", locale.getValue()));
 	}
 }

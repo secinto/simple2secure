@@ -20,17 +20,18 @@
  *********************************************************************
  */
 
-import {Base} from './base';
-import {TestRunType} from './testRunType';
-import {TestStatus} from './testStatus';
+import { Base } from './base';
+import { TestRunType } from './testRunType';
+import { TestStatus } from './testStatus';
 
 export class SequenceRun extends Base {
 	sequenceId: string;
 	sequenceName: string;
 	deviceId: string;
 	contextId: string;
+	hostname: string;
 	sequenceRunType: TestRunType;
-	sequenceContent: string[];
+	testSequenceContent = new Map<string, any>();
 	sequenceStatus: TestStatus;
 	timestamp: number;
 }

@@ -23,20 +23,22 @@
 package com.simple2secure.portal.repository;
 
 import java.util.List;
+import java.util.Map;
+
+import org.bson.types.ObjectId;
 
 import com.simple2secure.api.model.TestSequenceResult;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class TestSequenceResultRepository extends MongoRepository<TestSequenceResult> {
 
-	public abstract List<TestSequenceResult> getBySequenceId(String sequenceId);
+	public abstract List<TestSequenceResult> getBySequenceId(ObjectId sequenceId);
 
-	public abstract List<TestSequenceResult> getByDeviceId(String deviceId);
+	public abstract List<TestSequenceResult> getByDeviceId(ObjectId deviceId);
 
-	public abstract TestSequenceResult getBySequenceRunId(String sequenceRunId);
+	public abstract TestSequenceResult getBySequenceRunId(ObjectId sequenceRunId);
 
-	public abstract List<TestSequenceResult> getBySequenceRunIds(List<String> sequenceRunIds, int page, int size);
-
-	public abstract long getCountOfSequencesWithSequenceRunIds(List<String> sequenceRunIds);
+	public abstract Map<String, Object> getSequenceResultsByDeviceIdWithPagination(List<ObjectId> deviceIds, int page, int size,
+			String filter);
 
 }

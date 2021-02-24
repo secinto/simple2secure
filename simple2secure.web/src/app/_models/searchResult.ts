@@ -20,7 +20,7 @@
  *********************************************************************
  */
 
-export class SearchResult{
+export class SearchResult {
 	object: any[] = [];
 	clazz: string;
 }

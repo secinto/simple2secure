@@ -4,22 +4,24 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bson.types.ObjectId;
+
 import simple2secure.validator.model.ValidatedInput;
 
 public class ValidInputReport extends ValidatedInput<String> {
 
-	private String reportId;
+	private ObjectId reportId;
 	private String tag = "/{reportId}";
 
 	public ValidInputReport() {
 	}
 
 	public ValidInputReport(String reportId) {
-		this.reportId = reportId;
+		this.reportId = new ObjectId(reportId);
 	}
 
 	@Override
-	public String getValue() {
+	public ObjectId getValue() {
 		return reportId;
 	}
 

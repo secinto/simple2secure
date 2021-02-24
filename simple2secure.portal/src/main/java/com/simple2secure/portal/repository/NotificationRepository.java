@@ -24,18 +24,20 @@ package com.simple2secure.portal.repository;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.simple2secure.api.model.Notification;
 import com.simple2secure.portal.dao.MongoRepository;
 
 public abstract class NotificationRepository extends MongoRepository<Notification> {
-	public abstract List<Notification> findByContextId(String contextId);
+	public abstract List<Notification> findByContextId(ObjectId contextId);
 
-	public abstract void deleteByContextId(String contextId);
+	public abstract void deleteByContextId(ObjectId contextId);
 
-	public abstract List<Notification> findAllSortDescending(String contextId);
+	public abstract List<Notification> findAllSortDescending(ObjectId contextId);
 
-	public abstract List<Notification> getNotificationByReadValue(String contextId, boolean isRead);
+	public abstract List<Notification> getNotificationByReadValue(ObjectId contextId, boolean isRead);
 
-	public abstract List<Notification> getNotificationsWithPagination(String contextId, int page, int size);
+	public abstract List<Notification> getNotificationsWithPagination(ObjectId contextId, int page, int size);
 
 }

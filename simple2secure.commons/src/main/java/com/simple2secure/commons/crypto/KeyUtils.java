@@ -32,17 +32,16 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.security.Security;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ public class KeyUtils {
 		log.debug("Creating symmetric key generator for algorithm {}", algorithm);
 		Provider p = new BouncyCastleProvider();
 		Security.addProvider(p);
-		keyGenerator = KeyGenerator.getInstance(algorithm, Security.getProvider("BC")); //KeyGenerator.getInstance(algorithm);
+		keyGenerator = KeyGenerator.getInstance(algorithm, Security.getProvider("BC")); // KeyGenerator.getInstance(algorithm);
 	}
 
 	/**
