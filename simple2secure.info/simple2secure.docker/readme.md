@@ -1,4 +1,4 @@
-# Simple2Secure Docker
+# simple2secure Docker
 
 ## Prerequisites
 Following programs must be installed on your system:
